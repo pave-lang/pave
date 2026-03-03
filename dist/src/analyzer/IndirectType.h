@@ -5,9 +5,10 @@
 
 #line 5 "src/analyzer/Type.pv"
 enum IndirectType {
+    INDIRECT_TYPE__REFERENCE,
+    INDIRECT_TYPE__DYNAMIC_DISPATCH,
     INDIRECT_TYPE__POINTER,
     INDIRECT_TYPE__CONST_POINTER,
-    INDIRECT_TYPE__REFERENCE,
 };
 
 #endif

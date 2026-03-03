@@ -9,19 +9,22 @@ struct Type;
 
 #include <stdio.h>
 
-#line 11 "src/analyzer/Type.pv"
+#line 12 "src/analyzer/Type.pv"
 struct Indirect {
     enum IndirectType type;
     struct Type to;
 };
 
-#line 17 "src/analyzer/Type.pv"
+#line 18 "src/analyzer/Type.pv"
 struct Indirect* Indirect__new_reference(struct Allocator allocator, struct Type to);
 
-#line 23 "src/analyzer/Type.pv"
+#line 24 "src/analyzer/Type.pv"
+struct Indirect* Indirect__new_dynamic_dispatch(struct Allocator allocator, struct Type to);
+
+#line 30 "src/analyzer/Type.pv"
 struct Indirect* Indirect__new_pointer(struct Allocator allocator, struct Type to);
 
-#line 29 "src/analyzer/Type.pv"
+#line 36 "src/analyzer/Type.pv"
 struct Indirect* Indirect__new_const_pointer(struct Allocator allocator, struct Type to);
 
 #endif

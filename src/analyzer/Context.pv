@@ -368,12 +368,19 @@ impl Context {
             *type = Type::Indirect(indirect_2);
             return true;
         } else if self.check_next(TokenType::Symbol, "&") {
+            let dynamic_dispatch = self.check_next(TokenType::Keyword, "dyn");
             let target_type: Type;
-            if self.parse_type(&target_type, generics) == 0 { return false; }
 
-            let indirect = Indirect::new_reference(self.allocator, target_type);
+            if dynamic_dispatch {
+                if !self.parse_type_trait(&target_type, generics) { return false; }
+                let indirect = Indirect::new_dynamic_dispatch(self.allocator, target_type);
+                *type = Type::Indirect(indirect);
+            } else {
+                if !self.parse_type(&target_type, generics) { return false; }
+                let indirect = Indirect::new_reference(self.allocator, target_type);
+                *type = Type::Indirect(indirect);
+            }
 
-            *type = Type::Indirect(indirect);
             return true;
         } else if self.check_next(TokenType::Symbol, "*") {
             let indirect_type = IndirectType::Pointer;
@@ -509,6 +516,40 @@ impl Context {
         *type = Type::Unknown(name.value, generics_);
     
         return false;
+    }
+
+    fn parse_type_trait(&self, type: &Type, generics: &Generics) -> bool {
+        let name = self.expect(TokenType::Identifier);
+        if name == 0 { return false; }
+
+        let trait_info = self.module.find_trait(name.value);
+        if trait_info == 0 {
+            self.error_token(name, "Unable to find trait with this name");
+            return false;
+        }
+
+        let generics_ = Array<Type>::new(self.allocator);
+        
+        if self.check_next(TokenType::Symbol, "<") {
+            while self.check_next(TokenType::Symbol, ">") == 0 {
+                let child_type: Type = Type::Primitive(0);
+
+                if self.parse_type(&child_type, generics) == 0 {
+                    return false;
+                }
+
+                generics_.append(child_type);
+
+                if self.check_next(TokenType::Symbol, ",") == 0 && self.check_value(TokenType::Symbol, ">") == 0 {
+                    self.error("Expected , or >");
+                    return false;
+                }
+            }
+        }
+
+        *type = *self.module.make_type_usage(&Type::Trait(trait_info, 0), &generics_);
+
+        return true;
     }
 
     fn parse_type2(&self, generics: &Generics) -> &Type {

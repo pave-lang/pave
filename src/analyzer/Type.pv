@@ -3,9 +3,10 @@
 use std
 
 enum IndirectType {
+    Reference,
+    DynamicDispatch,
     Pointer,
     ConstPointer,
-    Reference,
 }
 
 struct Indirect {
@@ -17,6 +18,12 @@ impl Indirect {
     fn new_reference(allocator: &Allocator, to: Type) -> &Self {
         let result: &Self = allocator.alloc(sizeof(Self));
         *result = Self { type: IndirectType::Reference, to };
+        return result;
+    }
+
+    fn new_dynamic_dispatch(allocator: &Allocator, to: Type) -> &Self {
+        let result: &Self = allocator.alloc(sizeof(Self));
+        *result = Self { type: IndirectType::DynamicDispatch, to };
         return result;
     }
 
