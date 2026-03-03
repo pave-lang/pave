@@ -16,6 +16,7 @@
 #include <analyzer/Token.h>
 #include <std/Array_Type.h>
 #include <analyzer/Type.h>
+#include <analyzer/Primitive.h>
 #include <analyzer/Expression.h>
 
 #include <analyzer/Enum.h>

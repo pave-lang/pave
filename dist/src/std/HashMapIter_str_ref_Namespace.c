@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_ref_Namespace.h>
 #include <std/str.h>
 #include <analyzer/Namespace.h>
-#include <stdint.h>
 #include <tuple_str_ref_Namespace.h>
 
 #include <std/HashMapIter_str_ref_Namespace.h>

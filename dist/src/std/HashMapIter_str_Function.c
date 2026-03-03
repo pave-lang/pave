@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_Function.h>
 #include <std/str.h>
 #include <analyzer/Function.h>
-#include <stdint.h>
 #include <tuple_str_Function.h>
 
 #include <std/HashMapIter_str_Function.h>

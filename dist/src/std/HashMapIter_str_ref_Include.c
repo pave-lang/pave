@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_ref_Include.h>
 #include <std/str.h>
 #include <analyzer/Include.h>
-#include <stdint.h>
 #include <tuple_str_ref_Include.h>
 
 #include <std/HashMapIter_str_ref_Include.h>

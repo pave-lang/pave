@@ -53,20 +53,6 @@ impl Block {
                 context.inlay_hint(name, type_name.c_str(), InlayHintKind::Type, false, false);
             } else {
                 expression.validate_type(context, type);
-                // if type.needs_implicit_cast(&expression.return_type) {
-                //     expression = Expression::make(context.allocator, name, ExpressionData::ImplicitCast(expression), type);
-                // } else if type.eq(&expression.return_type) == 0 {
-                //     let message = String::new(context.allocator);
-                //     message.append("Type ");
-                //     let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
-                //     message.append(type_name.as_str());
-                //     message.append(" does not match expression return type of ");
-                //     let return_type_name = context.root.naming_decl.get_type_decl(&expression.return_type, context.type_self, 0);
-                //     message.append(return_type_name.as_str());
-                //     context.error_token(name, message.c_str());
-                // } else {
-                //     expression.return_type = *type;
-                // }
             }
         }
 
@@ -101,20 +87,7 @@ impl Block {
         if expression == 0 { return false; }
         if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
 
-        let type = &context.function.return_type;
-
-        if type.needs_implicit_cast(&expression.return_type) {
-            expression = Expression::make(context.allocator, first_token, ExpressionData::ImplicitCast(expression), type);
-        } else if type.eq(&expression.return_type) == 0 {
-            let message = String::new(context.allocator);
-            message.append("Function return type ");
-            let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
-            message.append(type_name.as_str());
-            message.append(" does not match expression return type of ");
-            let return_type_name = context.root.naming_decl.get_type_decl(&expression.return_type, context.type_self, 0);
-            message.append(return_type_name.as_str());
-            context.error_token(first_token, message.c_str());
-        }
+        expression.validate_type(context, &context.function.return_type);
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::ReturnStatement(expression, defer_statements)));
 
@@ -135,20 +108,7 @@ impl Block {
         if expression == 0 { return false; }
         if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
 
-        let type = &context.function.return_type;
-
-        if type.needs_implicit_cast(&expression.return_type) {
-            expression = Expression::make(context.allocator, first_token, ExpressionData::ImplicitCast(expression), type);
-        } else if type.eq(&expression.return_type) == 0 {
-            let message = String::new(context.allocator);
-            message.append("Function return type ");
-            let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
-            message.append(type_name.as_str());
-            message.append(" does not match expression return type of ");
-            let return_type_name = context.root.naming_decl.get_type_decl(&expression.return_type, context.type_self, 0);
-            message.append(return_type_name.as_str());
-            context.error_token(first_token, message.c_str());
-        }
+        expression.validate_type(context, &context.function.return_type);
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::YieldStatement(expression)));
 
@@ -167,20 +127,7 @@ impl Block {
             let value = Expression::parse(context, generics);
             if value == 0 { return false; }
 
-            let type = &expression.return_type;
-
-            if type.needs_implicit_cast(&value.return_type) {
-                value = Expression::make(context.allocator, first_token, ExpressionData::ImplicitCast(value), type);
-            } else if type.eq(&value.return_type) == 0 {
-                let message = String::new(context.allocator);
-                message.append("Type ");
-                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
-                message.append(type_name.as_str());
-                message.append(" does not match expression type of ");
-                let return_type_name = context.root.naming_decl.get_type_decl(&value.return_type, context.type_self, 0);
-                message.append(return_type_name.as_str());
-                context.error_token(first_token, message.c_str());
-            }
+            value.validate_type(context, &expression.return_type);
 
             self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(expression, operator, value)));
         } else {

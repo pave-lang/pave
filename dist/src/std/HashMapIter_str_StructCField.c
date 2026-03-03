@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_StructCField.h>
 #include <std/str.h>
 #include <analyzer/StructCField.h>
-#include <stdint.h>
 #include <tuple_str_StructCField.h>
 
 #include <std/HashMapIter_str_StructCField.h>

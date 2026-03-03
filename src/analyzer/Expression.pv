@@ -322,19 +322,7 @@ impl Expression {
                         return false;
                     }
 
-                    if param_type.needs_implicit_cast(&arg.value.return_type) {
-                        arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
-                    } else if param_type.eq(&arg.value.return_type) == 0 {
-                        let message = String::new(context.allocator);
-                        message.append("Field type ");
-                        let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
-                        message.append(return_type_name.as_str());
-                        message.append(" does not match expression type of ");
-                        let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
-                        message.append(param_type_name.as_str());
-                        context.error_token(arg.value.token, message.c_str());
-                        return false;
-                    } 
+                    arg.value.validate_type(context, param_type);
                 }
 
                 return true;
@@ -388,19 +376,7 @@ impl Expression {
                         return false;
                     }
 
-                    if param_type.needs_implicit_cast(&arg.value.return_type) {
-                        arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
-                    } else if param_type.eq(&arg.value.return_type) == 0 {
-                        let message = String::new(context.allocator);
-                        message.append("Argument ");
-                        let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
-                        message.append(return_type_name.as_str());
-                        message.append(" does not match function parameter type of ");
-                        let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
-                        message.append(param_type_name.as_str());
-                        context.error_token(arg.value.token, message.c_str());
-                        return false;
-                    } 
+                    arg.value.validate_type(context, param_type);
                 }
 
                 return true;
@@ -441,19 +417,7 @@ impl Expression {
                 return false;
             }
 
-            if param_type.needs_implicit_cast(&arg.value.return_type) {
-                arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
-            } else if param_type.eq(&arg.value.return_type) == 0 {
-                let message = String::new(context.allocator);
-                message.append("Argument ");
-                let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
-                message.append(return_type_name.as_str());
-                message.append(" does not match enum parameter type of ");
-                let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
-                message.append(param_type_name.as_str());
-                context.error_token(arg.value.token, message.c_str());
-                return false;
-            } 
+            arg.value.validate_type(context, param_type);
         }
 
         return true;

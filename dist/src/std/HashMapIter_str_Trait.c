@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_Trait.h>
 #include <std/str.h>
 #include <analyzer/Trait.h>
-#include <stdint.h>
 #include <tuple_str_Trait.h>
 
 #include <std/HashMapIter_str_Trait.h>

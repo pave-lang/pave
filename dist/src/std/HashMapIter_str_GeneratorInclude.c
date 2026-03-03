@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_GeneratorInclude.h>
 #include <std/str.h>
 #include <compiler/GeneratorInclude.h>
-#include <stdint.h>
 #include <tuple_str_GeneratorInclude.h>
 
 #include <std/HashMapIter_str_GeneratorInclude.h>
