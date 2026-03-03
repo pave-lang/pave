@@ -1,0 +1,347 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+
+use std
+
+struct Tokenizer {
+    data: str,
+    pos: usize,
+    line: usize,
+    column: usize,
+    keywords: Array<*const char>,
+    symbols: Array<*const char>,
+}
+
+impl Tokenizer {
+    fn increase_pos(&self) {
+        if self.data.ptr[self.pos] == '\r' && self.data.ptr[self.pos+1] == '\n' {
+            self.pos += 2;
+            self.line += 1;
+            self.column = 0;
+            return;
+        }
+        
+        if self.data.ptr[self.pos] == '\r' || self.data.ptr[self.pos] == '\n' {
+            self.pos += 1;
+            self.line += 1;
+            self.column = 0;
+            return;
+        }
+
+        self.pos += 1;
+        self.column += 1;
+    }
+
+    fn is_letter(&self) -> bool {
+        let c: char = self.data.ptr[self.pos];
+
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
+    }
+
+    fn is_digit(&self, offset: usize) -> bool {
+        let c: char = self.data.ptr[self.pos + offset];
+
+        return c >= '0' && c <= '9';
+    }
+
+    fn is_symbol(&self) -> bool {
+        let c: char = self.data.ptr[self.pos];
+
+        return c == '{' || c == '}' || c == '(' || c == ')' || c == '[' || c == ']' || c == '<' || c == '>' || c == '.' || c == ',' || c == ';' || c == ':' || c == '=' || c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '&' || c == '!' || c == '|' || c == '^' || c == '~';
+    }
+
+    fn is_quote(&self) -> bool {
+        let c: char = self.data.ptr[self.pos];
+
+        return c == '\"' || c == '\'';
+    }
+
+    fn is_comment_line(&self) -> bool {
+        let c1: char = self.data.ptr[self.pos];
+        let c2: char = self.data.ptr[self.pos + 1];
+
+        return c1 == '/' && c2 == '/';
+    }
+
+    fn skip_comment_line(&self) {
+        self.increase_pos();
+        self.increase_pos();
+
+        while self.pos < self.data.length && self.data.ptr[self.pos] != '\r' && self.data.ptr[self.pos] != '\n' {
+            self.increase_pos();
+        }
+    }
+
+    fn skip_comment_block(&self) {
+        self.increase_pos();
+        self.increase_pos();
+
+        while self.pos < self.data.length && (self.data.ptr[self.pos] == '*' && self.data.ptr[self.pos + 1] == '/') == 0 {
+            self.increase_pos();
+        }
+
+        if self.data.ptr[self.pos] == '*' && self.data.ptr[self.pos + 1] == '/' {
+            self.increase_pos();
+            self.increase_pos();
+        }
+    }
+
+    fn is_comment_block(&self) -> bool {
+        let c1: char = self.data.ptr[self.pos];
+        let c2: char = self.data.ptr[self.pos + 1];
+
+        return c1 == '/' && c2 == '*';
+    }
+
+    fn skip_whitespace(&self) {
+        while self.pos < self.data.length && (self.data.ptr[self.pos] == ' ' || self.data.ptr[self.pos] == '\t' ||  self.data.ptr[self.pos] == '\r' || self.data.ptr[self.pos] == '\n') {
+            self.increase_pos();
+        } 
+    }
+
+    fn skip_alphanumeric(&self) {
+        while self.is_letter() || self.is_digit(0) {
+            self.increase_pos();
+        } 
+    }
+
+    fn skip_digits(&self) {
+        while self.is_digit(0) {
+            self.increase_pos();
+        } 
+    }
+
+    fn skip_string(&self) {
+        let delimiter: char = self.data.ptr[self.pos];
+        self.increase_pos();
+
+        while self.pos < self.data.length && self.data.ptr[self.pos] != delimiter {
+            if self.data.ptr[self.pos] == '\\' {
+                self.increase_pos();
+            }
+
+            self.increase_pos();
+        }
+
+        if self.data.ptr[self.pos] == delimiter {
+            self.increase_pos();
+        }
+    }
+
+    fn is_in_array(array: &Array<*const char>, s: *const char, len: usize) -> bool {
+        let i: usize = 0;
+    
+        while i < array.length {
+            if strlen(array.data[i]) == len && strncmp(array.data[i], s, len) == 0 {
+                return 1;
+            }
+    
+            i += 1;
+        }
+    
+        return 0;
+    }
+
+    fn make_keywords(allocator: &ArenaAllocator) -> Array<*const char> {
+        let keywords = Array<*const char>::new(allocator);
+
+        keywords.append("struct");
+        keywords.append("trait");
+        keywords.append("enum");
+        keywords.append("impl");
+        keywords.append("fn");
+        keywords.append("co");
+        keywords.append("let");
+        keywords.append("return");
+        keywords.append("yield");
+        keywords.append("for");
+        keywords.append("in");
+        keywords.append("while");
+        keywords.append("continue");
+        keywords.append("break");
+        keywords.append("if");
+        keywords.append("else");
+        keywords.append("match");
+        keywords.append("defer");
+        keywords.append("const");
+        keywords.append("true");
+        keywords.append("false");
+        keywords.append("ns");
+        keywords.append("mod");
+        keywords.append("use");
+        keywords.append("static");
+
+        // unused for now
+        keywords.append("export");
+        keywords.append("pub");
+        keywords.append("mut");
+
+        return keywords;
+    }
+
+    fn make_symbols(allocator: &ArenaAllocator) -> Array<*const char> {
+        let symbols = Array<*const char>::new(allocator);
+
+        symbols.append("::");
+        symbols.append("->");
+        symbols.append("=>");
+        symbols.append("||");
+        symbols.append("&&");
+        symbols.append("<<");
+        symbols.append("==");
+        symbols.append(">=");
+        symbols.append("<=");
+        symbols.append("!=");
+        symbols.append("+=");
+        symbols.append("-=");
+        symbols.append("*=");
+        symbols.append("/=");
+        symbols.append("|=");
+        symbols.append("..");
+
+        return symbols;
+    }
+
+    fn read_file_into_string(allocator: &ArenaAllocator, filename: *const char) -> str {
+        let file: &FILE = fopen(filename, "rb");
+
+        if file == 0 {
+            fprintf(stderr, "Unable to open file: %s\n", filename);
+            perror("fopen");
+            return str {};
+        }
+
+        fseek(file, 0, SEEK_END);
+        let length: i32 = ftell(file);
+        rewind(file);
+
+        let buffer: *char = allocator.alloc(length + 1);
+
+        if buffer == 0 {
+            perror("Memory allocation failed");
+            fclose(file);
+            return str {};
+        }
+
+        let read_length: usize = fread(buffer, 1, length, file);
+
+        if read_length != length {
+            perror("Error reading file");
+            allocator.free(buffer);
+            fclose(file);
+            return str {};
+        }
+
+        buffer[length] = '\0';
+
+        fclose(file);
+
+        return str { ptr: buffer, length };
+    }
+
+    fn tokenize(allocator: &ArenaAllocator, path: *const char) -> Array<Token> {
+        let data = Tokenizer::read_file_into_string(allocator, path);
+
+        if data.length == 0 {
+            return Array<Token> {};
+        }
+
+        let tokenizer: Tokenizer = Tokenizer {
+            data,
+            keywords: Tokenizer::make_keywords(allocator),
+            symbols: Tokenizer::make_symbols(allocator),
+        };
+        
+        let tokens: Array<Token> = Array<Token>::new(allocator);
+
+        tokenizer.skip_whitespace();
+    
+        while tokenizer.pos < tokenizer.data.length {
+            let is_raw_identifier = tokenizer.data.ptr[tokenizer.pos] == 'r' && tokenizer.data.ptr[tokenizer.pos + 1] == '#';
+            if is_raw_identifier {
+                tokenizer.increase_pos();
+                tokenizer.increase_pos();
+            }
+
+            let start_pos: usize = tokenizer.pos;
+
+            let token: Token = Token {
+                value: str {
+                    ptr: tokenizer.data.ptr + start_pos,
+                },
+                start_line: tokenizer.line,
+                start_column: tokenizer.column,
+            };
+    
+            if is_raw_identifier || tokenizer.is_letter() || tokenizer.data.ptr[tokenizer.pos] == '#' {
+                let is_hash_keyword = !is_raw_identifier && tokenizer.data.ptr[tokenizer.pos] == '#';
+                if is_hash_keyword { tokenizer.increase_pos(); }
+    
+                tokenizer.skip_alphanumeric();
+    
+                if !is_raw_identifier && (is_hash_keyword || Tokenizer::is_in_array(&tokenizer.keywords, token.value.ptr, tokenizer.pos - start_pos)) {
+                    token.type = TokenType::Keyword;
+                } else {
+                    token.type = TokenType::Identifier;
+                }
+            } else if tokenizer.is_digit(0) {
+                tokenizer.increase_pos();
+                
+                if tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'x' || tokenizer.data.ptr[tokenizer.pos] == 'X') {
+                    tokenizer.increase_pos();
+                    while tokenizer.is_digit(0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') {
+                        tokenizer.increase_pos();
+                    }
+                } else {
+                    tokenizer.skip_digits();
+
+                    if tokenizer.data.ptr[tokenizer.pos] == '.' && tokenizer.is_digit(1) {
+                        tokenizer.increase_pos();
+                        tokenizer.increase_pos();
+                        tokenizer.skip_digits();
+                    }
+
+                    if tokenizer.data.ptr[tokenizer.pos] == 'f' || tokenizer.data.ptr[tokenizer.pos] == 'F' {
+                        tokenizer.increase_pos();
+                    }
+                }
+    
+                token.type = TokenType::Number;
+            } else if tokenizer.is_quote() {
+                tokenizer.skip_string();
+
+                token.type = TokenType::String;
+            } else if tokenizer.is_comment_line() {
+                tokenizer.skip_comment_line();
+
+                token.type = TokenType::Comment;
+            } else if tokenizer.is_comment_block() {
+                tokenizer.skip_comment_block();
+
+                token.type = TokenType::Comment;
+            } else if tokenizer.is_symbol() {
+                if Tokenizer::is_in_array(&tokenizer.symbols, token.value.ptr, 2) {
+                    tokenizer.increase_pos();
+                } 
+                
+                tokenizer.increase_pos();
+    
+                token.type = TokenType::Symbol;
+            } else {
+                fprintf(stderr, "Tokenizer: Unknown token type: %.*s\n", 10, tokenizer.data.ptr + tokenizer.pos);
+                tokenizer.increase_pos();
+            }
+    
+            token.value.length = tokenizer.pos - start_pos;
+            token.end_line = tokenizer.line;
+            token.end_column = tokenizer.column;
+    
+            tokens.append(token);
+    
+            tokenizer.skip_whitespace();
+        }
+    
+        return tokens;
+    }
+}

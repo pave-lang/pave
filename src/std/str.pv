@@ -1,0 +1,104 @@
+#include "string.h"
+
+struct str {
+    ptr: *const char,
+    length: usize,
+}
+
+impl str {
+    fn new(ptr: *const char) -> str {
+        return str { ptr, length: strlen(ptr) };
+    }
+
+    fn slice(self, start: usize, end: usize) -> str {
+        return str {
+            ptr: self.ptr + start,
+            length: end - start,
+        };
+    }
+
+    fn eq(self, s: str) -> bool {
+        if self.length != s.length {
+            return 0;
+        }
+
+        return strncmp(self.ptr, s.ptr, self.length) == 0;
+    }
+
+    fn eq_len(self, s: *const char, len: usize) -> bool {
+        if len > self.length { return false; }
+        return strncmp(self.ptr, s, len) == 0;
+    }
+
+    fn contains(self, substring: *const char) -> bool {
+        let sub_len: usize = strlen(substring);
+        if sub_len > self.length { return false; }
+        
+        let i: usize = 0;
+        while i <= self.length - sub_len {
+            if strncmp(self.ptr + i, substring, sub_len) == 0 {
+                return true;
+            }
+            i = i + 1;
+        }
+        return false;
+    }
+
+    fn starts_with(self, prefix: *const char) -> bool {
+        let prefix_len = strlen(prefix);
+        if self.length < prefix_len { return false; }
+        
+        return strncmp(self.ptr, prefix, prefix_len) == 0;
+    }
+
+    fn ends_with(self, suffix: *const char) -> bool {
+        let suffix_len = strlen(suffix);
+        if self.length < suffix_len { return false; }
+        
+        return strncmp(self.ptr + self.length - suffix_len, suffix, suffix_len) == 0;
+    }
+
+    fn iter(self) -> ArrayIter<*const char> {
+        return ArrayIter<*const char>::new(self.ptr, self.ptr + self.length);
+    }
+
+    fn index_of(self, ch: char) -> isize {
+        return self.index_of_start(ch, 0);
+    }
+
+    fn index_of_start(self, ch: char, start: usize) -> isize {
+        let s = self.ptr + start;
+        let e = self.ptr + self.length;
+
+        for ptr in s..e {
+            if *ptr == ch {
+                return ptr - self.ptr;
+            }
+        }
+
+        return -1;
+    }
+
+    fn is_whitespace(ch: char) -> bool {
+        return ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t';
+    }
+
+    fn trim(self) -> str {
+        let start: usize = 0;
+        let end: usize = self.length;
+
+        while start < end && str::is_whitespace(*(self.ptr + start)) {
+            start = start + 1;
+        }
+
+        while end > start && str::is_whitespace(*(self.ptr + end - 1)) {
+            end = end - 1;
+        }
+
+        return self.slice(start, end);
+    }
+}
+
+impl Hash for str {
+    fn hash(&self) -> Hashed { return Fnv1a::hash(self.ptr, self.length); }
+}

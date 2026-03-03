@@ -1,0 +1,185 @@
+use std
+
+struct StructField {
+    name: &Token,
+    type: Type,
+}
+
+enum StructType {
+    Incomplete,
+    Field,
+    Tuple,
+}
+
+struct Struct {
+    name: &Token,
+    module: &Module,
+    token_start: usize,
+    token_end: usize,
+    generics: Generics,
+    type: StructType,
+    fields: HashMap<str, StructField>,
+    traits: HashMap<str, &Trait>,
+    impls: Array<&Impl>,
+}
+
+impl Struct {
+    fn new(module: &Module) -> Self {
+        let context = module.context;
+
+        return Self {
+            module,
+            generics: Generics::new(context.allocator),
+            fields: HashMap<str, StructField>::new(context.allocator),
+            traits: HashMap<str, &Trait>::new(context.allocator),
+            impls: Array<&Impl>::new(context.allocator),
+        };
+    }
+
+    fn parse(module: &Module) -> Struct {
+        let context = &module.context;
+        let node: Struct = Struct::new(module);
+
+        if !context.expect_value(TokenType::Keyword, "struct") { return node; }
+
+        let name = context.expect(TokenType::Identifier);
+        if name == 0 { return node; }
+
+        node.token_start = context.pos;
+
+        if context.check_value(TokenType::Symbol, "<") && !context.skip_brackets("<", ">") { return node; }
+
+        if context.check_next(TokenType::Symbol, ";") {
+            node.type = StructType::Incomplete;
+        } else if context.check_value(TokenType::Symbol, "(") {
+            node.type = StructType::Tuple;
+            if !context.skip_brackets("(", ")") || !context.expect_value(TokenType::Symbol, ";") { return node; }
+        } else {
+            node.type = StructType::Field;
+            if !context.skip_brackets("{", "}") { return node; }
+        }
+
+        node.token_end = context.pos;
+
+        node.name = name;
+        return node;
+    }
+
+    fn prefill_types(&self) -> bool {
+        let context = &self.module.context;
+        context.pos = self.token_start;
+
+        if context.check_value(TokenType::Symbol, "<") && !self.generics.parse(context) { return false; }
+
+        match self.type {
+            StructType::Field => { return context.expect_value(TokenType::Symbol, "{"); },
+            StructType::Tuple => { return context.expect_value(TokenType::Symbol, "("); },
+            StructType::Incomplete => { return true; },
+        }
+    }
+
+    fn fill_types(&self) -> bool {
+        let context = &self.module.context;
+        context.pos = self.token_start;
+
+        if context.check_value(TokenType::Symbol, "<") && !context.skip_brackets("<", ">") { return false; }
+
+        match self.type {
+            StructType::Field => { return self.fill_types_field(); },
+            StructType::Tuple => { return self.fill_types_tuple(); },
+            StructType::Incomplete => { return true; },
+        }
+    }
+
+    fn fill_types_field(&self) -> bool {
+        let context = &self.module.context;
+
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
+
+        while context.pos < self.token_end && context.check_value(TokenType::Symbol, "}") == 0 {
+            let name = context.expect(TokenType::Identifier);
+            if name == 0 { return false; }
+
+            if !context.expect_value(TokenType::Symbol, ":") { return false; }
+
+            let type: Type = self.module.root.type_void;
+            if !context.parse_type(&type, &self.generics) { return false; }
+
+            let field: StructField = StructField {
+                name,
+                type,
+            };
+
+            match type {
+                Type::Function(func_info, _) => {
+                    func_info.name = name;
+                    func_info.type = FunctionType::Builtin;
+                    func_info.parent = FunctionParent::Struct(self, 0, 0);
+                },
+                _ => {},
+            }
+
+            if !self.fields.insert(name.value, field) { return false; }
+
+            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                context.expect_value(TokenType::Symbol, "}");
+                return false;
+            }
+        }
+
+        if !context.expect_value(TokenType::Symbol, "}") { return false; }
+
+        if context.pos != self.token_end {
+            context.error("Not at closing bracket for struct definition");
+        }
+
+        return true;
+    }
+
+    fn fill_types_tuple(&self) -> bool {
+        let context = &self.module.context;
+
+        if !context.expect_value(TokenType::Symbol, "(") { return false; }
+
+        let field_index: usize = 0;
+        while context.pos < self.token_end && context.check_value(TokenType::Symbol, ")") == 0 {
+            let name = String::new(context.allocator);
+            name.append("_");
+            name.append_usize(field_index);
+            let name_str = name.as_str();
+
+            let name_token = *context.current();
+            name_token.value = name_str;
+
+            let type: Type = self.module.root.type_void;
+            if !context.parse_type(&type, &self.generics) { return false; }
+
+            let field: StructField = StructField {
+                name: context.allocator.store(name_token),
+                type,
+            };
+
+            if !self.fields.insert(name_str, field) { return false; }
+
+            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                context.expect_value(TokenType::Symbol, ")");
+                return false;
+            }
+
+            field_index += 1;
+        }
+
+        if !context.expect_value(TokenType::Symbol, ")") { return false; }
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
+
+        if context.pos != self.token_end {
+            context.error("Not at end of struct definition");
+        }
+
+        return true;
+    }
+
+    fn is_newtype(&self) -> bool {
+        return self.type == StructType::Tuple && self.fields.length == 1;
+    }
+}

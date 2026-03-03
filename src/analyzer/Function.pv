@@ -1,0 +1,213 @@
+#include "stdio.h"
+
+use std
+
+struct Parameter {
+    name: &Token,
+    type: Type,
+}
+
+enum FunctionParent {
+    None,
+    Primitive(&Primitive, usize, &Trait),
+    Enum(&Enum, usize, &Trait),
+    Struct(&Struct, usize, &Trait),
+    Trait(&Trait),
+    Type(&Type, usize, &Trait),
+}
+
+enum FunctionType {
+    Standard,
+    Coroutine,
+    Builtin,
+    MethodCpp,
+}
+
+struct Function {
+    name: &Token,
+    context: &Context,
+    declaration_start: usize,
+    declaration_end: usize,
+    token_start: usize,
+    token_end: usize,
+    parent: FunctionParent,
+    type: FunctionType,
+    generics: Generics,
+    parameters: Array<Parameter>,
+    return_type: Type,
+    body: &Block,
+}
+
+impl Function {
+    fn new(context: &Context) -> Self {
+        return Self {
+            context,
+            generics: Generics::new(context.allocator),
+            parameters: Array<Parameter>::new(context.allocator),
+        };
+    }
+
+    fn new_allocator(allocator: &Allocator) -> Self {
+        return Self {
+            generics: Generics::new(allocator),
+            parameters: Array<Parameter>::new(allocator),
+        };
+    }
+
+    fn parse(context: &Context) -> Function {
+        return Function::parse_inner(context, false);
+    }
+
+    fn parse_optional_body(context: &Context) -> Function {
+        return Function::parse_inner(context, true);
+    }
+
+    fn parse_inner(context: &Context, body_optional: bool) -> Function {
+        let node: Function = Function::new(context);
+
+        if context.check_next(TokenType::Keyword, "co") {
+            node.type = FunctionType::Coroutine;
+        } else if !context.check_next(TokenType::Keyword, "fn") {
+            context.error("Expected fn or co keywords");
+            return node;
+        }
+
+        let name = context.expect(TokenType::Identifier);
+        if name == 0 { return node; }
+
+        node.declaration_start = context.pos;
+
+        while context.pos < context.length && !context.check_value(TokenType::Symbol, "{") && !context.check_value(TokenType::Symbol, ";") {
+            context.next_token();
+        }
+
+        if body_optional && context.check_next(TokenType::Symbol, ";") {
+            node.declaration_end = context.pos - 1;
+            node.token_start = context.pos;
+            node.token_end = context.pos;
+            node.name = name;
+            return node;
+        }
+
+        if !context.check_value(TokenType::Symbol, "{") && !context.expect_value(TokenType::Symbol, "{") { return node; }
+
+        node.token_start = context.pos;
+        if context.skip_brackets("{", "}") == 0 { return node; }
+        node.token_end = context.pos;
+        node.name = name;
+        return node;
+    }
+
+    fn parse_parameters(&self, generics: &Generics) -> bool {
+        let context = self.context;
+        if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+        while context.pos < context.length && context.check_value(TokenType::Symbol, ")") == 0 {
+            if context.check_next(TokenType::Symbol, "&") {
+                let name = &context.tokens[context.pos];
+
+                if !context.expect_value(TokenType::Identifier, "self") {
+                    return false;
+                }
+
+                let parameter: Parameter = Parameter {
+                    type: Type::Indirect(Indirect::new_reference(context.allocator, context.root.type_self)),
+                    name,
+                };
+
+                if parameter.name == 0 {
+                    return false;
+                }
+
+                self.parameters.append(parameter);
+            } else {
+                let parameter: Parameter = Parameter {
+                    name: context.expect(TokenType::Identifier),
+                };
+    
+                if parameter.name == 0 {
+                    return 0;
+                }
+
+                let has_type = false;
+
+                if context.check_next(TokenType::Symbol, ":") {
+                    if !context.parse_type(&parameter.type, generics) { return false; }
+                    has_type = true;
+                }
+
+                if !has_type && parameter.name.value.eq("self") {
+                    parameter.type = Type::Self;
+                    has_type = true;
+                }
+
+                if !has_type {
+                    context.expect_value(TokenType::Symbol, ":");
+                    return false;
+                }
+    
+                self.parameters.append(parameter);
+            }
+
+            if !context.check_next(TokenType::Symbol, ",") {
+                return context.expect_value(TokenType::Symbol, ")");
+            }
+        }
+
+        if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+        return true;
+    }
+
+    fn parse_return_type(&self, generics: &Generics) -> bool {
+        let context = self.context;
+
+        if !context.check_next(TokenType::Symbol, "->") { return true; }
+
+        return context.parse_type(&self.return_type, &self.generics);
+    }
+
+    fn fill_types(&self, generics: &Generics) -> bool {
+        self.generics.parent = generics;
+
+        let context = self.context;
+        context.pos = self.declaration_start;
+
+        if context.check_value(TokenType::Symbol, "<") && !self.generics.parse(context) { return false; }
+        
+        if !self.parse_parameters(&self.generics) { return false; }
+        if !self.parse_return_type(&self.generics) { return false; }
+
+        if context.pos != self.declaration_end {
+            return false;
+        }
+
+        return true;
+    }
+    
+    fn parse_function(&self, generics: &Generics) -> bool {
+        self.generics.parent = generics;
+
+        let context = self.context;
+        context.pos = self.token_start;
+        let block = Block::new_ptr(context);
+        context.push_scope(0);
+        context.function = self;
+
+        for param_info in self.parameters {
+            if context.set_value(param_info.name, &param_info.type) == 0 { context.pop_scope(); return true; }
+        }
+
+        let block_result = block.parse(context, &self.generics, 1);
+
+        if block_result == 0 { context.pop_scope(); return true; }
+
+        self.body = block;
+
+        if context.pos != self.token_end { context.pop_scope(); return true; }
+
+        context.function = 0;
+        context.pop_scope();
+        return false;
+    }
+}

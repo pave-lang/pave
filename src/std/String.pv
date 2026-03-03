@@ -1,0 +1,167 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+
+struct String {
+    array: Array<char>,
+}
+
+impl String {
+    fn new(allocator: &Allocator) -> Self {
+        return Self { array: Array<char>::new(allocator) };
+    }
+
+    fn ensure_can_hold(&self, length: usize) {
+        let array: &Array<char> = &self.array;
+
+        if (array.length + length >= array.capacity) {
+            let reserve: usize = array.length + length + 1;
+
+            if reserve < array.capacity {
+                reserve = array.capacity;
+            }
+
+            array.reserve(array.capacity + reserve);
+        }
+    }
+
+    fn append_sized(&self, ptr: *const char, length: usize) {
+        let array: &Array<char> = &self.array;
+        
+        self.ensure_can_hold(length);
+
+        memcpy(array.data + array.length, ptr, length);
+        array.length += length;
+
+        array.data[array.length] = 0;
+    }
+
+    fn append_sized_lowercase(&self, ptr: *const char, length: usize) {
+        let array: &Array<char> = &self.array;
+        
+        self.ensure_can_hold(length);
+
+        let i: usize = 0;
+
+        while i < length {
+            let c: char = ptr[i];
+
+            if c >= 'A' && c <= 'Z' {
+                array.data[array.length] = c + 32;
+            } else {
+                array.data[array.length] = c;
+            }
+
+            i += 1;
+            array.length += 1;
+        }
+
+        array.data[array.length] = 0;
+    }
+
+    fn append_f64(&self, value: f64) {
+        let array: &Array<char> = &self.array;
+
+        if value == 0 {
+            self.ensure_can_hold(1);
+            array.data[array.length] = '0';
+            array.length += 1;
+            return;
+        }
+        
+        self.ensure_can_hold(20);
+
+        array.length += snprintf(array.data + array.length, 20, "%g", value);
+    }
+
+    fn append_u64(&self, value: u64) {
+        let array: &Array<char> = &self.array;
+
+        if value == 0 {
+            self.ensure_can_hold(1);
+            array.data[array.length] = '0';
+            array.length += 1;
+            return;
+        }
+        
+        self.ensure_can_hold(20);
+
+        array.length += snprintf(array.data + array.length, 20, "%zu", value);
+    }
+
+    fn append_usize(&self, value: usize) {
+        let array: &Array<char> = &self.array;
+
+        if value == 0 {
+            self.ensure_can_hold(1);
+            array.data[array.length] = '0';
+            array.length += 1;
+            return;
+        }
+        
+        self.ensure_can_hold(20);
+
+        array.length += snprintf(array.data + array.length, 20, "%zu", value);
+    }
+
+    fn append(&self, value: str) {
+        self.append_sized(value.ptr, value.length);
+    }
+
+    fn append_string(&self, value: &String) {
+        self.append(value.as_str());
+    }
+
+    fn append_str_lowercase(&self, value: str) {
+        self.append_sized_lowercase(value.ptr, value.length);
+    }
+
+    fn prepend_sized(&self, ptr: *const char, length: usize) {
+        let array: &Array<char> = &self.array;
+        
+        self.ensure_can_hold(length);
+
+        memmove(array.data + length, array.data, array.length + 1);
+        memcpy(array.data, ptr, length);
+        array.length += length;
+    }
+
+    fn prepend(&self, s: str) {
+        self.prepend_sized(s.ptr, s.length);
+    }
+
+    fn clear(&self) {
+        self.array.clear();
+    }
+
+    fn release(&self) {
+        self.array.release();
+    }
+
+    fn as_str(&self) -> str {
+        let array: &Array<char> = &self.array;
+        return str { ptr: array.data, length: array.length };
+    }
+
+    fn c_str(&self) -> *const char {
+        return self.array.data;
+    }
+
+    fn eq(&self, s: *const char) -> bool {
+        let length: usize = strlen(s);
+
+        if self.array.length != length {
+            return 0;
+        }
+
+        return strncmp(self.array.data, s, length) == 0;
+    }
+
+    fn length(&self) -> usize {
+        return self.array.length;
+    }
+
+    fn len_i32(&self) -> i32 {
+        return self.array.length;
+    }
+}

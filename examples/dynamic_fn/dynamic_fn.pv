@@ -1,0 +1,44 @@
+use std
+
+struct Object { position: Position }
+struct Position { x: f32, y: f32 }
+struct Time { delta: f32 }
+
+struct Physics {
+    gravity: f32,
+}
+
+impl Physics {
+    fn apply_physics(&self, data: &Position, time: Time) {
+        data.y += time.delta * self.gravity;
+    }
+}
+
+fn run(func: &DynFn, objects: &[Object], time: Time, physics: Physics) {
+    let params = func.get_params();
+
+    for obj in objects {
+        for (i, param) in params.iter().enumerate() {
+            if param == typeid(Physics) {
+                func.set_arg(i, &physics);
+            } else if param == typeid(Time) {
+                func.set_arg(i, &time);
+            } else if param == typeid(&Position) {
+                func.set_arg(i, &obj.position);
+            }
+        }
+
+        func.execute();
+    }
+}
+
+fn main(argc: i32, argv: **const char) -> i32 {
+  let objects = Array<Object>::new(GeneralPurposeAllocator::default());
+  objects.append(Object { position: Position { x: 0.0f, y: 3.0f } });
+  objects.append(Object { position: Position { x: 2.0f, y: 1.0f } });
+  objects.append(Object { position: Position { x: 3.0f, y: 7.0f } });
+
+  run(&Physics::apply_physics, objects.as_slice(), Time { delta: 0.16f }, Physics { gravity: -9.81f });
+
+  return 0;
+}

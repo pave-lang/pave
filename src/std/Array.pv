@@ -1,0 +1,198 @@
+#include "stdlib.h"
+#include "string.h"
+
+struct ArrayIter<T> {
+    step: isize,
+    iter: T,
+    start: T,
+    end: T,
+}
+
+impl<T> ArrayIter<T> {
+    fn new(start: T, end: T) -> Self {
+        return Self {
+            step: 1,
+            iter: start - 1,
+            start,
+            end,
+        };
+    }
+
+    fn reverse(self) -> Self {
+        self.step = -self.step;
+        
+        if self.step < 0 {
+            self.iter = self.end;
+        } else {
+            self.iter = self.start - self.step;
+        }
+
+        return self;
+    }
+
+    fn skip(self, steps: isize) -> Self {
+        self.iter = self.iter + steps * self.step;
+        return self;
+    }
+
+    fn next(&self) -> bool {
+        self.iter = self.iter + self.step; 
+        return self.start <= self.iter && self.iter < self.end;
+    }
+
+    fn value(&self) -> T {
+        return self.iter;
+    }
+
+    fn enumerate(self) -> IterEnumerate<T> {
+        return IterEnumerate<T> { iter: self };
+    }
+}
+
+struct IterEnumerate<T> {
+    index: usize,
+    iter: ArrayIter<T>,
+}
+
+impl<T> IterEnumerate<T> {
+    fn next(&self) -> bool {
+        if !self.iter.next() { return false; }
+        self.index += 1;
+        return true;
+    }
+
+    fn value(&self) -> (usize, T) {
+        return (self.index - 1, self.iter.value());
+    }
+}
+
+struct Array<T> {
+    allocator: &Allocator,
+    data: &T,
+    length: usize,
+    capacity: usize,
+}
+
+impl<T> Array<T> {
+    fn new(allocator: &Allocator) -> Self {
+        return Self { allocator };
+    }
+    
+    fn new_with_length(allocator: &Allocator, length: usize) -> Self {
+        let self = Self { allocator };
+        self.reserve(length);
+        self.length = length;
+        return self;
+    }
+    
+    fn new_with_capacity(allocator: &Allocator, length: usize) -> Self {
+        let self = Self { allocator };
+        self.reserve(length);
+        return self;
+    }
+
+    fn reserve(&self, capacity: usize) {
+        if self.capacity > capacity {
+            return;
+        }
+
+        self.data = self.allocator.realloc(self.data, capacity * sizeof(T));
+        self.capacity = capacity;
+    }
+
+    fn get(&self, index: usize) -> &T {
+        if index >= self.length { return 0; }
+        return self.data + index;
+    }
+
+    fn append(&self, value: T) -> usize {
+        if self.capacity <= self.length + 1 {
+            let additional_capacity: usize = self.capacity;
+
+            if additional_capacity < 5 {
+                additional_capacity = 5;
+            }
+            
+            self.reserve(self.capacity + additional_capacity);
+        }
+
+        self.data[self.length] = value;
+        self.length += 1;
+
+        return self.length - 1;
+    }
+
+    fn prepend(&self, value: T) -> usize {
+        if self.capacity <= self.length + 1 {
+            let additional_capacity: usize = self.capacity;
+
+            if additional_capacity < 5 {
+                additional_capacity = 5;
+            }
+            
+            self.reserve(self.capacity + additional_capacity);
+        }
+
+        memmove(self.data + 1, self.data, self.length * sizeof(T));
+        self.data[0] = value;
+        self.length += 1;
+
+        return 0;
+    }
+
+    fn remove_back(&self) -> bool {
+        if self.length == 0 {
+            return false;
+        }
+
+        self.length -= 1;
+        memset(self.data + self.length, 0, sizeof(T));
+
+        return true;
+    }
+
+    fn back(&self) -> *T {
+        if self.length == 0 { return 0; }
+
+        return &self.data[self.length - 1];
+    }
+
+    fn clear(&self) {
+        memset(self.data, 0, self.length * sizeof(T));
+        self.length = 0;
+    }
+
+    fn release(&self) {
+        self.allocator.free(self.data);
+        self.data = 0;
+        self.length = 0;
+        self.capacity = 0;
+    }
+
+    fn clone(&self, allocator: &Allocator) -> Self {
+        let data: *T = allocator.alloc(self.capacity * sizeof(T));
+        memcpy(data, self.data, self.length * sizeof(T));
+
+        return Self {
+            allocator,
+            data,
+            length: self.length,
+            capacity: self.capacity,
+        };
+    }
+
+    fn iter(&self) -> ArrayIter<&T> {
+        // Cast hack due to double resolving &T which turns into &&T
+        return ArrayIter<&T>::new(cast<*void>(self.data), cast<*void>(self.data + self.length));
+    }
+
+    fn as_slice(&self) -> &[T] {
+        return &self.data[0..self.length];
+    }
+}
+
+// impl<T> Deref<[T]> for Array<T> {
+//     fn deref(&self) -> &[T] {
+//         return self.data[..self.length];
+//     }
+// }

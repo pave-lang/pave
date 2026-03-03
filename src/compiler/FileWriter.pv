@@ -1,0 +1,98 @@
+#include "stdio.h"
+
+use std
+use analyzer
+
+struct FileWriter {
+    file: &FILE,
+    indent: usize,
+}
+
+impl FileWriter {
+    fn new(file: &FILE) -> Self {
+        return Self { file };
+    }
+
+    fn add_indent(&self) {
+        self.indent += 1;
+    }
+
+    fn remove_indent(&self) -> bool {
+        if self.indent == 0 {
+            return 0;
+        }
+
+        self.indent -= 1;
+
+        return 1;
+    }
+
+    fn write_indent(&self) {
+        let i: i32 = 0;
+
+        while i < self.indent {
+            fprintf(self.file, "    ");
+            i += 1;
+        }
+    }
+
+    fn write(&self, s: *const char) -> bool {
+        fprintf(self.file, "%s", s);
+        return 1;
+    }
+
+    fn write_str(&self, s: str) -> bool {
+        let length: i32 = s.length;
+        fprintf(self.file, "%.*s", length, s.ptr);
+        return 1;
+    }
+
+    fn write_str_title(&self, s: str) -> bool {
+        let i: usize = 0;
+        let length = s.length;
+        let was_lowercase = false;
+        
+        while i < length {
+            let c: char = s.ptr[i];
+            
+            if c >= 'a' && c <= 'z' {
+                fprintf(self.file, "%c", c - 32);
+                was_lowercase = 1;
+            } else {
+                if was_lowercase && c >= 'A' && c <= 'Z' {
+                    fprintf(self.file, "_");
+                }
+
+                fprintf(self.file, "%c", c);
+                was_lowercase = 0;
+            }
+
+            i += 1;
+        }
+
+        return 1;
+    }
+
+    fn write_str_lowercase(&self, s: str) -> bool {
+        let i: usize = 0;
+        let length = s.length;
+
+        while i < length {
+            let c: char = s.ptr[i];
+
+            if c >= 'A' && c <= 'Z' {
+                fprintf(self.file, "%c", c + 32);
+            } else {
+                fprintf(self.file, "%c", c);
+            }
+
+            i += 1;
+        }
+
+        return 1;
+    }
+
+    fn write_token(&self, token: &Token) -> bool {
+        return self.write_str(token.value);
+    }
+}

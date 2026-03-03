@@ -1,0 +1,35 @@
+#include "stdio.h"
+
+use std
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    for i in 0..10 {
+        printf("index: %d\n", i);
+    }
+
+    let array = Array<i32>::new(GeneralPurposeAllocator::default());
+    array.append(3);
+    array.append(4);
+    array.append(1);
+    for *a in array {
+        printf("array: %d\n", a);
+    }
+
+    let array_tuple = Array<(*const char, i32, f32)>::new(GeneralPurposeAllocator::default());
+    array.append(("hello", 3, 1.5f));
+    array.append(("world", 4, 2.0f));
+    array.append(("!", 1, 1.0f));
+    for (a, b, c) in array_tuple {
+        printf("tuple: %s %d %.2f\n", a, b, c);
+    }
+
+    let hashmap = HashMap<str, i32>::new(GeneralPurposeAllocator::default());
+    hashmap.insert("hello", 3);
+    hashmap.insert("world", 4);
+    hashmap.insert("!", 1);
+    for (key, value) in hashmap {
+        printf("hashmap key: %.*s, value: %d\n", cast<i32>(key.length), key.ptr, value);
+    }
+
+    return 0;
+}

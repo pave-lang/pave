@@ -1,0 +1,5 @@
+impl<T> &[T] {
+    fn iter(self) -> ArrayIter<&T> {
+        return ArrayIter<&T>::new(self.data, self.data + self.length);
+    }
+}

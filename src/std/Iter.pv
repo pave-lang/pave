@@ -1,0 +1,4 @@
+trait Iter<T> {
+    fn next(&self) -> bool;
+    fn value(&self) -> T;
+}

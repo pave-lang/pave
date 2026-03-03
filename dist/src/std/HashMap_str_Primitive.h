@@ -1,0 +1,55 @@
+#ifndef PAVE_HASH_MAP_STR_PRIMITIVE
+#define PAVE_HASH_MAP_STR_PRIMITIVE
+
+#include <std/Allocator.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+struct HashMapBucket_str_Primitive;
+struct str;
+struct Primitive;
+struct HashMapIter_str_Primitive;
+
+#include <stdio.h>
+#include <string.h>
+
+#line 26 "src/std/HashMap.pv"
+struct HashMap_str_Primitive {
+    struct Allocator allocator;
+    struct HashMapBucket_str_Primitive** buckets;
+    struct HashMapBucket_str_Primitive* data;
+    uintptr_t capacity;
+    uintptr_t length;
+};
+
+#line 35 "src/std/HashMap.pv"
+struct HashMap_str_Primitive HashMap_str_Primitive__new(struct Allocator allocator);
+
+#line 46 "src/std/HashMap.pv"
+void HashMap_str_Primitive__resize(struct HashMap_str_Primitive* self, uintptr_t new_capacity);
+
+#line 53 "src/std/HashMap.pv"
+struct Primitive* HashMap_str_Primitive__find(struct HashMap_str_Primitive* self, struct str* key);
+
+#line 70 "src/std/HashMap.pv"
+struct Primitive* HashMap_str_Primitive__insert(struct HashMap_str_Primitive* self, struct str key, struct Primitive value);
+
+#line 102 "src/std/HashMap.pv"
+bool HashMap_str_Primitive__remove(struct HashMap_str_Primitive* self, struct str* key);
+
+#line 126 "src/std/HashMap.pv"
+void HashMap_str_Primitive__release(struct HashMap_str_Primitive* self);
+
+#line 135 "src/std/HashMap.pv"
+void HashMap_str_Primitive__fill_buckets(struct HashMap_str_Primitive* self);
+
+#line 153 "src/std/HashMap.pv"
+struct HashMap_str_Primitive HashMap_str_Primitive__clone(struct HashMap_str_Primitive* self, struct Allocator allocator);
+
+#line 167 "src/std/HashMap.pv"
+struct HashMapIter_str_Primitive HashMap_str_Primitive__iter(struct HashMap_str_Primitive* self);
+
+#line 174 "src/std/HashMap.pv"
+void HashMap_str_Primitive__clear(struct HashMap_str_Primitive* self);
+
+#endif

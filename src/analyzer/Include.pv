@@ -1,0 +1,833 @@
+#include "clang-c/Index.h"
+#include "stdio.h"
+#include "string.h"
+
+use std
+
+struct Include {
+    root: &Root,
+    mode_cpp: bool,
+    path: str,
+    cxtype_to_type: HashMap<u32, Type>,
+    typedef_to_type: HashMap<str, Type>,
+    types: HashMap<str, Type>,
+    values: HashMap<str, Type>,
+}
+
+impl Include {
+    fn new(root: &Root, path: str, mode_cpp: bool) -> &Self {
+        let self = root.allocator.store(Self {
+            root,
+            mode_cpp,
+            path,
+            cxtype_to_type: HashMap<u32, Type>::new(root.allocator),
+            typedef_to_type: HashMap<str, Type>::new(root.allocator),
+            types: HashMap<str, Type>::new(root.allocator),
+            values: HashMap<str, Type>::new(root.allocator),
+        });
+
+        self.add_cxtype_primitive(CXType_Bool, "bool");
+
+        self.add_cxtype_primitive(CXType_Char_S, "char");
+        self.add_cxtype_primitive(CXType_Char_U, "char");
+
+        self.add_cxtype_primitive(CXType_SChar, "i8");
+        self.add_cxtype_primitive(CXType_Short, "i16");
+        self.add_cxtype_primitive(CXType_Int, "i32");
+        self.add_cxtype_primitive(CXType_Long, "i32");
+        self.add_cxtype_primitive(CXType_LongLong, "i64");
+
+        self.add_cxtype_primitive(CXType_UChar, "u8");
+        self.add_cxtype_primitive(CXType_UShort, "u16");
+        self.add_cxtype_primitive(CXType_UInt, "u32");
+        self.add_cxtype_primitive(CXType_ULong, "u32");
+        self.add_cxtype_primitive(CXType_ULongLong, "u64");
+
+        self.add_cxtype_primitive(CXType_Float, "f32");
+        self.add_cxtype_primitive(CXType_Double, "f64");
+
+        self.add_typedef_primitive("bool", "bool");
+
+        self.add_typedef_primitive("int8_t", "i8");
+        self.add_typedef_primitive("int16_t", "i16");
+        self.add_typedef_primitive("int32_t", "i32");
+        self.add_typedef_primitive("int64_t", "i64");
+
+        self.add_typedef_primitive("uint8_t", "u8");
+        self.add_typedef_primitive("uint16_t", "u16");
+        self.add_typedef_primitive("uint32_t", "u32");
+        self.add_typedef_primitive("uint64_t", "u64");
+
+        self.add_typedef_primitive("size_t", "usize");
+
+        self.add_typedef_primitive("Sint8", "i8");
+        self.add_typedef_primitive("Sint16", "i16");
+        self.add_typedef_primitive("Sint32", "i32");
+        self.add_typedef_primitive("Sint64", "i64");
+
+        self.add_typedef_primitive("Uint8", "u8");
+        self.add_typedef_primitive("Uint16", "u16");
+        self.add_typedef_primitive("Uint32", "u32");
+        self.add_typedef_primitive("Uint64", "u64");
+
+        return self;
+    }
+
+    fn add_cxtype_primitive(&self, kind: CXTypeKind, name: *const char) {
+        let primitives = self.root.primitives;
+
+        self.cxtype_to_type.insert(cast<u32>(kind), Type::Primitive(primitives.find(name)));
+    }
+
+    fn add_typedef_primitive(&self, type: *const char, name: *const char) {
+        let primitives = &self.root.primitives;
+        self.typedef_to_type.insert(type, Type::Primitive(primitives.find(name)));
+    }
+
+    fn process(&self) -> bool {
+        let root = self.root;
+        let clang_args = root.clang_args;
+        let release_clang_args = false;
+
+        let path = String::new(root.allocator);
+        path.append(self.path.slice(1, self.path.length - 1));
+
+        let file_content = String::new(root.allocator);
+        file_content.append("#include ");
+        file_content.append(self.path);
+
+        let filename: *const char = "__temp.c";
+        if self.mode_cpp {
+            filename = "__temp.cpp";
+            clang_args = clang_args.clone(root.allocator);
+            clang_args.append("-std=c++17");
+            release_clang_args = true;
+        }
+
+        let unsaved = CXUnsavedFile {
+            Filename: filename,
+            Contents: file_content.c_str(),
+            Length: file_content.length(),
+        };
+
+        let index: CXIndex = clang_createIndex(0, 1);
+        if index == 0 {
+            self.root.error(self.path, 0, 0, 0, 0, "clang_createIndex failed\n");
+            return 0;
+        }
+
+        let unit: *CXTranslationUnitImpl = 0;
+        
+        let result: CXErrorCode = clang_parseTranslationUnit2(
+            index,
+            filename,
+            clang_args.data, clang_args.length,
+            &unsaved, 1,
+            CXTranslationUnit_None | CXTranslationUnit_DetailedPreprocessingRecord | CXTranslationUnit_Incomplete | CXTranslationUnit_SkipFunctionBodies,
+            &unit,
+        );
+
+        if release_clang_args {
+            clang_args.release();
+        }
+
+        /* if unit == 0 {
+            self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed\n");
+            return 0;
+        } */
+
+        match result {
+            CXError_Failure => {
+                let num_errors: usize = clang_getNumDiagnostics(unit);
+                let display_options: usize = clang_defaultDiagnosticDisplayOptions();
+
+                if num_errors == 0 {
+                    self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure no errors");
+                } else {
+                    self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure has errors");
+                }
+
+                let i: usize = 0;
+                while i < num_errors {
+                    let diag: CXDiagnostic = clang_getDiagnostic(unit, i);
+                    let str: CXString = clang_formatDiagnostic(diag, display_options);
+
+                    self.root.error(self.path, 0, 0, 0, 0, clang_getCString(str));
+
+                    clang_disposeString(str);
+                    clang_disposeDiagnostic(diag);
+                    i += 1;
+                }
+            },
+            CXError_Crashed => { self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Crashed"); },
+            CXError_InvalidArguments => { self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_InvalidArguments"); },
+            CXError_ASTReadError => { self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_ASTReadError"); },
+            CXError_Success => {},
+        }
+
+        let cursor = clang_getTranslationUnitCursor(unit);
+        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent: 0, types: &self.types, values: &self.values });
+
+        clang_disposeTranslationUnit(unit);
+        clang_disposeIndex(index);
+
+        return 1;
+    }
+
+    fn parse_type(&self, type: CXType) -> &Type {
+        let type_u32 = cast<u32>(type.kind);
+        let lookup = self.cxtype_to_type.find(&type_u32);
+
+        if lookup != 0 {
+            return lookup;
+        }
+        
+        if type.kind == CXType_Pointer {
+            let pointee_type = clang_getPointeeType(type);
+            let is_pointee_const = clang_isConstQualifiedType(pointee_type) != 0;
+            let resolved_pointee_type = self.parse_type(pointee_type);
+
+            let indirect: &Indirect;
+            if is_pointee_const {
+                indirect = Indirect::new_const_pointer(self.root.allocator, *resolved_pointee_type);
+            } else {
+                indirect = Indirect::new_pointer(self.root.allocator, *resolved_pointee_type);
+            }
+
+            return self.root.allocator.store(Type::Indirect(indirect)); 
+        }
+        
+        if type.kind == CXType_Elaborated {
+            let decl = clang_getTypeDeclaration(type);
+            let name_spelling = clang_getCursorSpelling(decl);
+            let name = clang_getCString(name_spelling);
+
+            let resolve = self.typedef_to_type.find(name);
+            if resolve != 0 {
+                clang_disposeString(name_spelling);
+                return resolve;
+            }
+
+            let lookup = self.types.find(name);
+            if lookup == 0 { /*fprintf(stderr, "Could not find elaborated type %s\n", name_str.ptr);*/ }
+
+            clang_disposeString(name_spelling);
+
+            if lookup == 0 { return &self.root.type_void; }
+
+            return lookup;
+        }
+
+        return &self.root.type_void;
+    }
+
+    fn find_enum(&self, name: *const char) -> &EnumC {
+        let type_info = self.types.find(name);
+
+        match type_info {
+            Type::EnumC(enum_info) => { return enum_info; },
+            _ => {},
+        }
+
+        return 0;
+    }
+
+    fn make_string(&self, s: CXString) -> *char {
+        let length: usize = strlen(clang_getCString(s));
+        let result: *char = self.root.allocator.alloc(length + 1);
+        memcpy(result, clang_getCString(s), length + 1);
+        return result;
+    }
+
+    fn is_function_like_macro(&self, cursor: CXCursor) -> bool {
+        let range: CXSourceRange = clang_getCursorExtent(cursor);
+        let tu: CXTranslationUnit = clang_Cursor_getTranslationUnit(cursor);
+
+        let tokens: *CXToken = 0;
+        let num_tokens: u32 = 0;
+        clang_tokenize(tu, range, &tokens, &num_tokens);
+
+        if num_tokens < 2 {
+            clang_disposeTokens(tu, tokens, num_tokens);
+            return 0;
+        }
+
+        let spelling: CXString = clang_getTokenSpelling(tu, tokens[1]);
+        let txt: *const char = clang_getCString(spelling);
+
+        let result: bool = 0;
+
+        if strcmp(txt, "(") == 0 {
+            let loc_name_end: CXSourceLocation = clang_getRangeEnd(clang_getTokenExtent(tu, tokens[0]));
+            let loc_paren: CXSourceLocation = clang_getTokenLocation(tu, tokens[1]);
+
+            let line1: u32 = 0;
+            let col1: u32 = 0;
+            let line2: u32 = 0;
+            let col2: u32 = 0;
+
+            clang_getSpellingLocation(loc_name_end, 0, &line1, &col1, 0);
+            clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
+
+            if line1 == line2 && col1 == col2 {
+                result = 1;
+            }
+        }
+
+        clang_disposeString(spelling);
+        clang_disposeTokens(tu, tokens, num_tokens);
+
+        return result;
+    }
+}
+
+struct IncludeContext {
+    include: &Include,
+    parent: &IncludeContext,
+    types: &HashMap<str, Type>,
+    values: &HashMap<str, Type>,
+}
+
+struct IncludeObjectContext {
+    context: &IncludeContext,
+    object: &void,
+}
+
+impl IncludeContext {
+    fn insert_type(&self, name: *const char, type: Type) {
+        self.types.insert(name, type);
+    }
+
+    fn insert_value(&self, name: *const char, type: Type) {
+        self.values.insert(name, type);
+    }
+
+    fn insert_function(&self, name: *const char, return_type: &Type) -> bool {
+        let func_info = FunctionC::new(self.include, name);
+        func_info.return_type = *return_type;
+
+        let func_type = Type::FunctionC(func_info);
+        return self.values.insert(name, func_type);
+    }
+
+    fn add_function(&self, name: *const char, cursor: CXCursor) {
+        let include = self.include;
+
+        let cursor_return_type = clang_getCursorResultType(cursor);
+        let return_type = include.parse_type(cursor_return_type);
+        if return_type == 0 { return_type = &include.root.type_void; }
+
+        self.insert_function(name, return_type);
+    }
+
+    fn add_basic_function(&self, name: *const char) {
+        self.insert_function(name, &self.include.root.type_void);
+    }
+
+    fn add_struct(&self, name: *const char) -> &StructC {
+        let struct_info = StructC::new(self.include, name);
+        self.insert_type(name, Type::StructC(struct_info));
+        return struct_info;
+    }
+
+    fn add_union(&self, name: *const char) -> &StructC {
+        let struct_info = StructC::new(self.include, name);
+        self.insert_type(name, Type::UnionC(struct_info));
+        return struct_info;
+    }
+
+    fn add_class(&self, name: *const char, is_struct: bool) -> &ClassCpp {
+        let class_info = ClassCpp::new(self.include, name, is_struct);
+        self.insert_type(name, Type::ClassCpp(class_info));
+        return class_info;
+    }
+
+    fn add_enum(&self, name: *const char) -> &EnumC {
+        let enum_info: &EnumC = EnumC::new(self.include, name);
+        self.insert_type(name, Type::EnumC(enum_info));
+        return enum_info;
+    }
+
+    fn add_enum_value(&self, enum_info: &EnumC, value_name: *const char) {
+        enum_info.values.insert(value_name, EnumCValue { name: value_name });
+        self.insert_value(value_name, Type::EnumC(enum_info));
+    }
+
+    fn add_namespace(&self, name: *const char) -> &IncludeContext {
+        let include = self.include;
+        let allocator = include.root.allocator;
+
+        // Reuse existing namespace if already registered (namespace can appear in multiple translation units)
+        let existing = self.types.find(name);
+        if existing != 0 {
+            match existing {
+                Type::NamespaceCpp(ns_info) => {
+                    return allocator.store(IncludeContext {
+                        include,
+                        parent: self,
+                        types: &ns_info.types,
+                        values: &ns_info.values,
+                    });
+                },
+                _ => {},
+            }
+        }
+
+        let ns_info = NamespaceCpp::new(include, name);
+        self.insert_type(name, Type::NamespaceCpp(ns_info));
+
+        return allocator.store(IncludeContext {
+            include,
+            parent: self,
+            types: &ns_info.types,
+            values: &ns_info.values,
+        });
+    }
+
+    fn add_typedef(&self, name: *const char, cursor: CXCursor) {
+        let include = self.include;
+
+        if self.types.find(name) != 0 { return; }
+
+        let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
+        let type = include.parse_type(underlying_type);
+
+        if type == 0 {
+            let underlying_decl = clang_getTypeDeclaration(underlying_type);
+            let underlying_name = clang_getCursorSpelling(underlying_decl);
+            let underlying_name_cstring = clang_getCString(underlying_name);
+
+            fprintf(stderr, "Missing typedef processing: %d %s %s\n", underlying_type.kind, name, underlying_name_cstring);
+
+            clang_disposeString(underlying_name);
+
+            return;
+        }
+
+        self.insert_type(name, Type::TypedefC(TypedefC::new(include, name, type)));
+    }
+
+    fn add_typedef_struct(&self, name: *const char) -> &StructC {
+        let include = self.include;
+        let struct_info = StructC::new(include, "");
+        let struct_type = Type::StructC(struct_info);
+
+        if self.types.find(name) == 0 {
+            let typedef_ = TypedefC::new(include, name, struct_type.to_ptr(include.root.allocator));
+            self.insert_type(name, Type::TypedefC(typedef_));
+        }
+
+        return struct_info;
+    }
+
+    fn add_typedef_union(&self, name: *const char) -> &StructC {
+        let include = self.include;
+        let struct_info = StructC::new(include, "");
+        let struct_type = Type::UnionC(struct_info);
+
+        if self.types.find(name) == 0 {
+            let typedef_ = TypedefC::new(include, name, struct_type.to_ptr(include.root.allocator));
+            self.insert_type(name, Type::TypedefC(typedef_));
+        }
+
+        return struct_info;
+    }
+
+    fn add_typedef_struct_pointer(&self, name: *const char) -> &StructC {
+        let include = self.include;
+        let struct_info: &StructC = StructC::new(include, "");
+        let indirect = Indirect::new_pointer(include.root.allocator, Type::StructC(struct_info));
+
+        if self.types.find(name) == 0 {
+            let indirect_type: Type = Type::Indirect(indirect);
+            let typedef_ = TypedefC::new(include, name, indirect_type.to_ptr(include.root.allocator));
+            self.insert_type(name, Type::TypedefC(typedef_));
+        }
+
+        return struct_info;
+    }
+
+    fn add_typedef_function_pointer(&self, name: *const char) -> &FunctionC {
+        let include = self.include;
+        let func_info = FunctionC::new(include, name);
+        let indirect = Indirect::new_pointer(include.root.allocator, Type::FunctionC(func_info));
+        let indirect_type: Type = Type::Indirect(indirect);
+
+        if self.types.find(name) == 0 {
+            let typedef_ = TypedefC::new(include, name, indirect_type.to_ptr(include.root.allocator));
+            self.insert_type(name, Type::TypedefC(typedef_));
+        }
+
+        return func_info;
+    }
+
+    fn add_typedef_pointer(&self, name: *const char) {
+        let include = self.include;
+
+        if self.types.find(name) != 0 { return; }
+
+        let indirect: &Indirect = include.root.allocator.alloc(sizeof(Indirect));
+        let indirect_type = Type::Indirect(indirect);
+        let typedef_ = TypedefC::new(include, name, indirect_type.to_ptr(include.root.allocator));
+
+        self.insert_type(name, Type::TypedefC(typedef_));
+    }
+
+    fn visitor(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeContext = client_data;
+        let include = self.include;
+
+        let kind = clang_getCursorKind(cursor);
+        let language: CXLanguageKind = clang_getCursorLanguage(cursor);
+        
+        let cursor_spelling: CXString = clang_getCursorSpelling(cursor);
+        let name = include.make_string(cursor_spelling);
+        clang_disposeString(cursor_spelling);
+
+        if kind == CXCursor_Namespace {
+            let ns_context = self.add_namespace(name);
+            clang_visitChildren(cursor, IncludeContext::visitor, ns_context);
+            return CXChildVisit_Continue;
+        } else if kind == CXCursor_FunctionDecl {
+            self.add_function(name, cursor);
+            return CXChildVisit_Continue;
+        } else if kind == CXCursor_EnumDecl {
+            let enum_info = self.add_enum(name);
+            clang_visitChildren(cursor, IncludeObjectContext::visitor_enum, &IncludeObjectContext { context: self, object: enum_info });
+            return CXChildVisit_Continue;
+        } else if kind == CXCursor_StructDecl || kind == CXCursor_ClassDecl {
+            let type = clang_getCursorType(cursor);
+            let type_spelling = clang_getTypeSpelling(type);
+            let type_name = include.make_string(type_spelling);
+            clang_disposeString(type_spelling);
+            defer include.root.allocator.free(type_name);
+
+            if language == CXLanguage_CPlusPlus {
+                let class_info = self.add_class(name, kind == CXCursor_StructDecl);
+
+                clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
+                    context: self,
+                    object: class_info,
+                });
+
+                return CXChildVisit_Continue;
+            } else {
+                if strncmp(type_name, "struct ", 7) == 0 {
+                    let struct_info = self.add_struct(name);
+
+                    clang_visitChildren(cursor, IncludeObjectContext::visitor_struct, &IncludeObjectContext {
+                        context: self,
+                        object: struct_info,
+                    });
+
+                    return CXChildVisit_Continue;
+                }
+
+                if strncmp(type_name, "union ", 7) == 0 {
+                    let union_info = self.add_union(name);
+
+                    clang_visitChildren(cursor, IncludeObjectContext::visitor_struct, &IncludeObjectContext {
+                        context: self,
+                        object: union_info,
+                    });
+
+                    return CXChildVisit_Continue;
+                }
+            }
+        } else if kind == CXCursor_TypedefDecl {
+            let typedef_type = clang_getCursorType(cursor);
+            let canonical_type = clang_getCanonicalType(typedef_type);
+            let canonical_decl = clang_getTypeDeclaration(canonical_type);
+            let canonical_kind = clang_getCursorKind(canonical_decl);
+
+            if canonical_kind == CXCursor_StructDecl || canonical_kind == CXCursor_ClassDecl {
+                let struct_info = self.add_typedef_struct(name);
+
+                clang_visitChildren(canonical_decl, IncludeObjectContext::visitor_struct, &IncludeObjectContext {
+                    context: self,
+                    object: struct_info,
+                });
+                return CXChildVisit_Continue;
+            } else if canonical_kind == CXCursor_UnionDecl {
+                let union_info = self.add_typedef_union(name);
+
+                clang_visitChildren(canonical_decl, IncludeObjectContext::visitor_struct, &IncludeObjectContext {
+                    context: self,
+                    object: union_info,
+                });
+                return CXChildVisit_Continue;
+            } else if canonical_type.kind == CXType_Pointer {
+                let pointee_type = clang_getPointeeType(canonical_type);
+                let pointee_decl = clang_getTypeDeclaration(pointee_type);
+                let pointee_kind = clang_getCursorKind(pointee_decl);
+
+                if pointee_type.kind == CXType_Void {
+                    self.add_typedef_pointer(name);
+                } else if pointee_kind == CXCursor_StructDecl {
+                    let struct_info: &StructC = self.add_typedef_struct_pointer(name);
+
+                    clang_visitChildren(canonical_decl, IncludeObjectContext::visitor_struct, &IncludeObjectContext {
+                        context: self,
+                        object: struct_info,
+                    });
+                } else if pointee_type.kind == CXType_FunctionProto {
+                    self.add_typedef_function_pointer(name);
+                    // let field_spelling: CXString = clang_getCursorSpelling(canonical_decl);
+                    // let field_name: *const char = include.make_string(field_spelling);
+                    // clang_disposeString(field_spelling);
+
+                    // fprintf(stderr, "Info: %d %s %s\n", pointee_type.kind, name, field_name);
+                }
+                return CXChildVisit_Continue;
+            // } else if canonical_type.kind == CXCursor_TypedefDecl {
+            //     let canonical_name: CXString = clang_getCursorSpelling(canonical_decl);
+            //     let canonical_name_char = include.make_string(canonical_name);
+            //     clang_disposeString(canonical_name);
+
+            //     fprintf(stderr, "typedef to typedef %s %s\n", name, canonical_name_char);
+            //     return CXChildVisit_Continue;
+            } else {
+                self.add_typedef(name, cursor);
+            }
+        } else if kind == CXCursor_VarDecl {
+            let type = clang_getCursorType(cursor);
+            let resolved_type = include.parse_type(type);
+            self.insert_value(name, *resolved_type);
+
+            return CXChildVisit_Continue;
+        } else if kind == CXCursor_MacroDefinition {
+            if include.root.primitives.find(name) != 0 { return CXChildVisit_Continue; }
+
+            if include.is_function_like_macro(cursor) {
+                self.add_basic_function(name);
+            } else {
+                self.insert_value(name, Type::Primitive(include.root.primitive_void));
+            }
+
+            return CXChildVisit_Continue;
+        }
+
+        include.root.allocator.free(name);
+
+        return CXChildVisit_Continue;
+    }
+}
+
+impl IncludeObjectContext {
+    fn visitor_struct(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let include = self.context.include;
+        let struct_info: &StructC = self.object;
+        let kind = clang_getCursorKind(cursor);
+
+        if kind == CXCursor_FieldDecl {
+            let field_spelling: CXString = clang_getCursorSpelling(cursor);
+            let field_name: *const char = include.make_string(field_spelling);
+            clang_disposeString(field_spelling);
+
+            let field_cx_type = clang_getCursorType(cursor);
+            let field_type = *include.parse_type(field_cx_type);
+
+            struct_info.fields.insert(field_name, StructCField { name: field_name, type: field_type });
+        }
+
+        return CXChildVisit_Continue;
+    }
+
+    fn visitor_class(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let include = self.context.include;
+        let class_info: &ClassCpp = self.object;
+        let kind = clang_getCursorKind(cursor);
+        let allocator = include.root.allocator;
+
+        match kind {
+            CXCursor_FieldDecl => {
+                let field_spelling: CXString = clang_getCursorSpelling(cursor);
+                let field_name: *const char = include.make_string(field_spelling);
+                clang_disposeString(field_spelling);
+
+                let field_cx_type = clang_getCursorType(cursor);
+                let field_type = *include.parse_type(field_cx_type);
+
+                class_info.fields.insert(field_name, field_type);
+            },
+            CXCursor_VarDecl => {
+                let storage = clang_Cursor_getStorageClass(cursor);
+                if storage == CX_SC_Static {
+                    let spelling = clang_getCursorSpelling(cursor);
+                    let name = include.make_string(spelling);
+                    clang_disposeString(spelling);
+
+                    let cx_type = clang_getCursorType(cursor);
+                    let ty = *include.parse_type(cx_type);
+
+                    class_info.values.insert(name, ty);
+                }
+            },
+            CXCursor_CXXMethod => {
+                let method_spelling: CXString = clang_getCursorSpelling(cursor);
+                let method_name: *const char = include.make_string(method_spelling);
+                clang_disposeString(method_spelling);
+
+                let return_type = clang_getCursorResultType(cursor);
+                let return_type_resolved = include.parse_type(return_type);
+
+                let func_info = Function::new_allocator(include.root.allocator);
+                func_info.name = allocator.store(Token { value: method_name });
+                func_info.return_type = *return_type_resolved;
+                func_info.type = FunctionType::MethodCpp;
+
+                let func_type = Type::Function(allocator.store(func_info), 0);
+                class_info.fields.insert(method_name, func_type);
+
+                // fprintf(stderr, "Method: %s\n", method_name);
+
+                // include.root.allocator.free(method_name);
+            },
+            _ => {},
+        }
+
+        return CXChildVisit_Continue;
+    }
+
+    fn visitor_enum(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let enum_info: &EnumC = self.object;
+        let kind = clang_getCursorKind(cursor);
+
+        if kind == CXCursor_EnumConstantDecl {
+            let value_spelling: CXString = clang_getCursorSpelling(cursor);
+            let value_name: *const char = self.context.include.make_string(value_spelling);
+            clang_disposeString(value_spelling);
+
+            self.context.add_enum_value(enum_info, value_name);
+        }
+
+        return CXChildVisit_Continue;
+    }
+}
+
+struct TypedefC {
+    include: &Include,
+    name: str,
+    type: &Type,
+}
+
+impl TypedefC {
+    fn new(include: &Include, name: *const char, type: &Type) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            type,
+        });
+    }
+}
+
+struct EnumC {
+    include: &Include,
+    name: str,
+    values: HashMap<str, EnumCValue>,
+}
+
+impl EnumC {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            values: HashMap<str, EnumCValue>::new(allocator),
+        });
+    }
+}
+
+struct EnumCValue {
+    name: str,
+}
+
+struct StructC {
+    include: &Include,
+    name: str,
+    fields: HashMap<str, StructCField>,
+}
+
+impl StructC {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            fields: HashMap<str, StructCField>::new(allocator),
+        });
+    }
+}
+
+struct StructCField {
+    name: str,
+    type: Type,
+}
+
+struct ClassCpp {
+    include: &Include,
+    is_struct: bool,
+    name: str,
+    fields: HashMap<str, Type>,
+    values: HashMap<str, Type>,
+}
+
+impl ClassCpp {
+    fn new(include: &Include, name: *const char, is_struct: bool) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            is_struct,
+            name: name,
+            fields: HashMap<str, Type>::new(allocator),
+            values: HashMap<str, Type>::new(allocator),
+        });
+    }
+}
+
+struct FunctionC {
+    include: &Include,
+    name: str,
+    arguments: Array<&Expression>,
+    return_type: Type,
+}
+
+impl FunctionC {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            arguments: Array<&Expression>::new(allocator),
+        });
+    }
+}
+
+struct NamespaceCpp {
+    include: &Include,
+    name: str,
+    types: HashMap<str, Type>,
+    values: HashMap<str, Type>,
+}
+
+impl NamespaceCpp {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            types: HashMap<str, Type>::new(allocator),
+            values: HashMap<str, Type>::new(allocator),
+        });
+    }
+}

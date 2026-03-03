@@ -1,0 +1,15 @@
+trait Add<T> {
+    fn add(&self, other: T) -> void;
+}
+
+trait Sub<T> {
+    fn sub(&self, other: T) -> void;
+}
+
+trait Mul<T> {
+    fn sub(&self, other: T) -> void;
+}
+
+trait Div<T> {
+    fn sub(&self, other: T) -> void;
+}

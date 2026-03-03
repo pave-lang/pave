@@ -1,0 +1,15 @@
+.vscode
+build
+dist/src
+src
+node_modules
+
+**/.*
+
+biome.jsonc
+bun.lock
+tsconfig.json
+
+**/*.pv
+**/*.c
+**/*.h

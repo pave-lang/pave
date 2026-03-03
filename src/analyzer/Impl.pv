@@ -1,0 +1,122 @@
+use std
+
+enum ImplNode {
+    Function(str),
+}
+
+struct Impl {
+    name: &Token,
+    type: &Type,
+    context: &Context,
+    declaration_start: usize,
+    declaration_end: usize,
+    token_start: usize,
+    token_end: usize,
+    trait_name: &Token,
+    trait_type: &Type,
+    impl_generics: Generics,
+    trait_generics: Generics,
+    struct_generics: Generics,
+    trait_: &Trait,
+    nodes: Array<ImplNode>,
+    functions: HashMap<str, Function>,
+    type_self: Type,
+}
+
+impl Impl {
+    fn parse(context: &Context) -> Impl {
+        let node: Impl = Impl {
+            context,
+            impl_generics: Generics::new(context.allocator),
+            struct_generics: Generics::new(context.allocator),
+            nodes: Array<ImplNode>::new(context.allocator),
+            functions: HashMap<str, Function>::new(context.allocator),
+        };
+
+        if context.expect_value(TokenType::Keyword, "impl") == 0 { return node; }
+
+        node.token_start = context.pos;
+        context.skip_to_symbol("{");
+        context.skip_brackets("{", "}");
+        node.token_end = context.pos;
+    
+        return node;
+    }
+
+    fn prefill_types(&self) -> bool {
+        let context = self.context;
+        context.pos = self.token_start;
+
+        if context.check_value(TokenType::Symbol, "<") && !self.impl_generics.parse(context) { return false; }
+
+        if context.check(TokenType::Identifier) {
+            self.name = context.expect(TokenType::Identifier);
+            if self.name == 0 { return false; }
+            if context.check_value(TokenType::Symbol, "<") && !self.struct_generics.parse(context) { return false; }
+        } else {
+            self.type = context.allocator.alloc(sizeof(Type));
+            if !context.parse_type(self.type, &self.impl_generics) { return false; }
+        }
+
+        if context.check_value(TokenType::Symbol, "<") && !self.struct_generics.parse(context) { return false; }
+
+        if context.check_next(TokenType::Keyword, "for") {
+            self.trait_name = self.name;
+            self.trait_type = self.type;
+            self.trait_generics = self.struct_generics;
+            self.struct_generics = Generics::new(context.allocator);
+
+            if context.check(TokenType::Identifier) {
+                self.name = context.expect(TokenType::Identifier);
+                if self.name == 0 { return false; }
+                if context.check_value(TokenType::Symbol, "<") && !self.struct_generics.parse(context) { return false; }
+            } else {
+                self.type = context.allocator.alloc(sizeof(Type));
+                if !context.parse_type(self.type, &self.impl_generics) { return false; }
+            }
+        }
+
+        self.token_start = context.pos;
+
+        return true;
+    }
+
+    fn fill_types(&self, parent: FunctionParent) -> bool {
+        let context = self.context;
+        context.pos = self.token_start;
+        let nodes: &Array<ImplNode> = &self.nodes;
+
+        if context.expect_value(TokenType::Symbol, "{") == 0 { return 0; }
+
+        context.skip_comments();
+
+        while context.pos < self.token_end - 1 {
+            let func_info: Function = Function::parse(context);
+            func_info.parent = parent;
+            if func_info.name == 0 { return 0; }
+
+            self.functions.insert(func_info.name.value, func_info);
+
+            let impl_node: ImplNode = ImplNode::Function(func_info.name.value);
+            nodes.append(impl_node);
+
+            context.skip_comments();
+        }
+
+        if context.expect_value(TokenType::Symbol, "}") == 0 { return 0; }
+
+        return 1;
+    }
+
+    fn parse_functions(&self) -> bool {
+        self.context.type_self = &self.type_self;
+
+        for (_, &function) in self.functions {
+            function.parse_function(&self.impl_generics);
+        }
+
+        self.context.type_self = &self.context.root.type_self;
+
+        return 1;
+    }
+}

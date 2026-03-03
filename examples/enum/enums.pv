@@ -1,0 +1,31 @@
+#include "stdio.h"
+
+enum Standard {
+    One,
+    Two
+}
+
+impl Standard {
+    fn print(&self) {
+        match self {
+            Standard::One => { printf("one\n"); },
+            Standard::Two => { printf("two\n"); },
+        }
+    }
+}
+
+enum Discriminated {
+    None,
+    Single(i32),
+    Dual(i32, i32),
+}
+
+impl Discriminated {
+    fn print(&self) {
+        match self {
+            Discriminated::None => { printf("none\n"); },
+            Discriminated::Single(value) => { printf("single: %d\n", value); },
+            Discriminated::Dual(left, right) => { printf("dual: %d %d\n", left, right); },
+        }
+    }
+}

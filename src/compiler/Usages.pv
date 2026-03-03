@@ -1,0 +1,657 @@
+#include "stdio.h"
+
+use std
+use analyzer
+
+struct TypeFunctionUsage {
+    type: &Function,
+    generic_maps: Array<&GenericMap>,
+    function_context: FunctionContext,
+    impl_dynamic_function: bool,
+    usage_context: UsageContext,
+}
+
+impl TypeFunctionUsage {
+    fn new(allocator: &ArenaAllocator, type: &Function) -> Self {
+        return Self {
+            type,
+            generic_maps: Array<&GenericMap>::new(allocator),
+            function_context: FunctionContext::new(allocator, type, false),
+            impl_dynamic_function: false,
+        };
+    }
+}
+
+enum UsageMode {
+    Layout,
+    Signature,
+    Body,
+}
+
+struct UsageContext {
+    cpp_usages: HashMap<str, &Type>,
+}
+
+impl UsageContext {
+    fn new(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            cpp_usages: HashMap<str, &Type>::new(allocator),
+        };
+    }
+}
+
+struct TypeUsage<T> {
+    type: &T,
+    generic_maps: Array<&GenericMap>,
+    impl_functions: Array<HashMap<usize, TypeFunctionUsage>>,
+    impl_dynamic_usage: bool,
+    usage_context: UsageContext,
+}
+
+impl<T> TypeUsage<T> {
+    fn new(allocator: &ArenaAllocator, type: &T, impl_count: usize) -> Self {
+        let self = Self {
+            type,
+            generic_maps: Array<&GenericMap>::new(allocator),
+            usage_context: UsageContext::new(allocator),
+        };
+
+        if impl_count > 0 {
+            self.impl_functions = Array<HashMap<usize, TypeFunctionUsage>>::new(allocator);
+            self.impl_functions.reserve(impl_count);
+            self.impl_functions.length = impl_count;
+
+            for i in 0..impl_count {
+                self.impl_functions.data[i] = HashMap<usize, TypeFunctionUsage>::new(allocator);
+            }
+        }
+
+        return self;
+    }
+}
+
+struct Usages {
+    allocator: &ArenaAllocator,
+    generator: &Generator,
+    root: &Root,
+
+    usages: Array<Type>,
+    usage_types: HashSet<str>,
+    usage_traits: HashSet<str>,
+
+    primitives: HashMap<usize, TypeUsage<Primitive>>,
+    functions: HashMap<usize, TypeFunctionUsage>,
+    structs: HashMap<usize, TypeUsage<Struct>>,
+    enums: HashMap<usize, TypeUsage<Enum>>,
+    traits: HashMap<usize, TypeUsage<Trait>>,
+    sequences: Array<Type>,
+    tuples: Array<&Tuple>,
+
+    usage_mode: UsageMode,
+    usage_context: &UsageContext,
+    function_context: &FunctionContext,
+}
+
+impl Usages {
+    fn new(generator: &Generator) -> Self {
+        let allocator = generator.allocator;
+
+        let self = Self {
+            allocator,
+            generator,
+            root: generator.root,
+
+            usages: Array<Type>::new(allocator),
+            usage_types: HashSet<str>::new(allocator),
+            usage_traits: HashSet<str>::new(allocator),
+
+            primitives: HashMap<usize, TypeUsage<Primitive>>::new(allocator),
+            functions: HashMap<usize, TypeFunctionUsage>::new(allocator),
+            structs: HashMap<usize, TypeUsage<Struct>>::new(allocator),
+            enums: HashMap<usize, TypeUsage<Enum>>::new(allocator),
+            traits: HashMap<usize, TypeUsage<Trait>>::new(allocator),
+            sequences: Array<Type>::new(allocator),
+            tuples: Array<&Tuple>::new(allocator),
+        };
+
+        for (_, &info) in self.root.primitives {
+            if info.impls.length > 0 {
+                let primitive_ptr = cast<usize>(info);
+                self.primitives.insert(primitive_ptr, TypeUsage<Primitive>::new(self.allocator, info, info.impls.length));
+                self.usages.append(Type::Primitive(info));
+            }
+        }
+
+        self.add_namespace(&self.root.children);
+
+        let usage_i: usize = 0;
+        while usage_i < self.usages.length {
+            let usage = self.usages.data[usage_i];
+            self.usage_mode = UsageMode::Layout;
+
+            match usage {
+                Type::Primitive(primitive_info) => { self.process_primitive(primitive_info); },
+                Type::Struct(struct_info, generic_map) => { self.process_struct(struct_info, generic_map); },
+                Type::Enum(enum_info, generic_map) => { self.process_enum(enum_info, generic_map); },
+                Type::Trait(trait_info, generic_map) => { self.process_trait(trait_info, generic_map); },
+                Type::Function(func_info, generic_map) => { self.process_function(func_info, generic_map); },
+                Type::Sequence(sequence) => { self.process_sequence(sequence); },
+                Type::Tuple(tuple) => { self.process_tuple(tuple); },
+                _ => {},
+            }
+
+            usage_i += 1;
+        }
+
+
+
+        self.normalize();
+
+        return self;
+    }
+
+    fn add_namespace(&self, children: &HashMap<str, &Namespace>) {
+        for (_, namespace) in children {
+            for (_, module) in namespace.modules {
+                self.add_module(module);
+            }
+
+            self.add_namespace(&namespace.children);
+        }
+    }
+
+    fn add_module(&self, module: &Module) {
+        for (_, &func_info) in module.functions {
+            self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+            
+            if func_info.generics.array.length == 0 && self.usage_types.insert(func_info.name.value) {
+                let generic_map = self.allocator.store(GenericMap {});
+                let self_type = self.allocator.store(Type::Function(func_info, generic_map));
+                generic_map.self_type = self_type;
+                self.usages.append(Type::Function(func_info, generic_map));
+            }
+        }
+
+        for (_, &enum_info) in module.enums {
+            let usage = self.enums.insert(cast<usize>(enum_info), TypeUsage<Enum>::new(self.allocator, enum_info, enum_info.impls.length));
+
+            let i: usize = 0;
+            for *impl_info in enum_info.impls {
+                for (_, &func_info) in impl_info.functions {
+                    usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                }
+                i += 1;
+            }
+
+            if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
+                let generic_map = self.allocator.store(GenericMap {});
+                let self_type = self.allocator.store(Type::Enum(enum_info, generic_map));
+                generic_map.self_type = self_type;
+                self.usages.append(Type::Enum(enum_info, generic_map));
+            }
+        }
+
+        for (_, &struct_info) in module.structs {
+            let usage = self.structs.insert(cast<usize>(struct_info), TypeUsage<Struct>::new(self.allocator, struct_info, struct_info.impls.length));
+
+            let i: usize = 0;
+            for *impl_info in struct_info.impls {
+                for (_, &func_info) in impl_info.functions {
+                    usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                }
+                i += 1;
+            }
+
+            if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
+                let generic_map = self.allocator.store(GenericMap {});
+                let self_type = self.allocator.store(Type::Struct(struct_info, generic_map));
+                generic_map.self_type = self_type;
+                self.usages.append(Type::Struct(struct_info, generic_map));
+            }
+        }
+
+        for (_, &trait_info) in module.traits {
+            let usage = self.traits.insert(cast<usize>(trait_info), TypeUsage<Trait>::new(self.allocator, trait_info, 1));
+
+            for (_, &func_info) in trait_info.functions {
+                usage.impl_functions.data[0].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+            }
+
+            if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
+                let generic_map = self.allocator.store(GenericMap {});
+                let self_type = self.allocator.store(Type::Trait(trait_info, generic_map));
+                generic_map.self_type = self_type;
+                self.usages.append(Type::Trait(trait_info, generic_map));
+            }
+        }
+    }
+
+    fn add_type(&self, type: &Type, generic_map: &GenericMap) {
+        let resolved_type = Context::resolve_type(self.allocator, type, generic_map, 0);
+        let type_deref = resolved_type.deref();
+        let is_type = false;
+        let is_trait = false;
+        let usage_context = self.usage_context;
+
+        match type_deref {
+            Type::Struct(_, _) => { is_type = true; },
+            Type::Enum(_, _) => { is_type = true; },
+            Type::Function(func_info, _) => { is_type = func_info.generics.array.length > 0; },
+            Type::Trait(_, _) => { is_trait = true; },
+            Type::Sequence(sequence) => { is_type = sequence.is_slice(); },
+            Type::Tuple(_) => { is_type = true; },
+            Type::ClassCpp(class_info) => {
+                if self.usage_mode != UsageMode::Body && usage_context {
+                    usage_context.cpp_usages.insert(class_info.name, type);
+                }
+            },
+            _ => {},
+        }
+
+        if !is_type && !is_trait { return; }
+
+        let type_name = self.root.naming_decl.get_type_name(type_deref, generic_map.self_type, generic_map);
+        let type_name_str = type_name.as_str();
+
+        if (is_type && !self.usage_types.insert(type_name_str)) || (is_trait && !self.usage_traits.insert(type_name_str)) {
+            type_name.release();
+            return;
+        }
+
+        self.usages.append(*type_deref);
+    }
+
+    fn process_primitive(&self, primitive_info: &Primitive) {
+        let self_type = self.allocator.store(Type::Primitive(primitive_info));
+        let generic_map = self.allocator.store(GenericMap { self_type });
+
+        for *impl_info in primitive_info.impls {
+            for (_, &func_info) in impl_info.functions {
+                self.process_function(func_info, generic_map);
+            }
+        }
+    }
+
+    fn process_sequence(&self, sequence: &Sequence) {
+        // let self_type = self.allocator.store(Type::Sequence(sequence));
+        let generic_map = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        generic_map.insert("T", sequence.element);
+        let sequence_type = Type::Sequence(sequence);
+        let indirect = self.allocator.store(Indirect { type: IndirectType::Reference, to: sequence_type });
+        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));        
+
+        let impl_info = self.root.hack_type_impl.impl_info;
+
+        for (_, &func_info) in impl_info.functions {
+            self.process_function(func_info, &generic_map);
+        }
+    }
+
+    fn process_tuple(&self, tuple: &Tuple) {
+        let generic_map = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        let tuple_type = Type::Tuple(tuple);
+        let indirect = self.allocator.store(Indirect { type: IndirectType::Reference, to: tuple_type });
+        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));        
+
+        let impl_info = self.root.hack_type_impl.impl_info;
+
+        for (_, &func_info) in impl_info.functions {
+            self.process_function(func_info, &generic_map);
+        }
+    }
+
+    // fn process_ctype(&self, info: &TypedefC) {
+    //     let self_type = self.allocator.store(Type::TypedefC(info));
+    //     let generic_map = self.allocator.store(GenericMap { self_type });
+
+    //     for *impl_info in info.impls {
+    //         for (_, &func_info) in impl_info.functions {
+    //             self.process_function(func_info, generic_map);
+    //         }
+    //     }
+    // }
+
+    fn process_struct(&self, struct_info: &Struct, generic_map: &GenericMap) {
+        let parent_ptr = cast<usize>(struct_info);
+        let parent_usage = self.structs.find(&parent_ptr);
+        self.usage_context = &parent_usage.usage_context;
+
+        for (_, &field) in struct_info.fields {
+            self.add_type(&field.type, generic_map);
+        }
+
+        for *impl_info in struct_info.impls {
+            for (_, &func_info) in impl_info.functions {
+                if func_info.generics.array.length == 0 {
+                    self.process_function(func_info, generic_map);
+                }
+            }
+        }
+    }
+
+    fn process_enum(&self, enum_info: &Enum, generic_map: &GenericMap) {
+        for (_, &variant) in enum_info.variants {
+            for type in variant.types {
+                self.add_type(type, generic_map);
+            }
+        }
+
+        for *impl_info in enum_info.impls {
+            for (_, &func_info) in impl_info.functions {
+                self.process_function(func_info, generic_map);
+            }
+        }
+    }
+
+    fn process_trait(&self, trait_info: &Trait, generic_map: &GenericMap) {
+        for (_, &func_info) in trait_info.functions {
+            self.process_function(func_info, generic_map);
+        }
+    }
+
+    fn process_function(&self, func_info: &Function, generic_map: &GenericMap) {
+        let func_ptr = cast<usize>(func_info);
+
+        match func_info.parent {
+            FunctionParent::None => {
+                let func_usage = self.functions.find(&func_ptr);
+                self.function_context = &func_usage.function_context;
+            },
+            FunctionParent::Primitive(primitive_info, impl_index, _) => {
+                let parent_ptr = cast<usize>(primitive_info);
+                let parent_usage = self.primitives.find(&parent_ptr);
+                self.usage_context = &parent_usage.usage_context;
+
+                let func_usage = parent_usage.impl_functions.get(impl_index).find(&func_ptr);
+                self.function_context = &func_usage.function_context;
+            },
+            FunctionParent::Struct(struct_info, impl_index, _) => {
+                let parent_ptr = cast<usize>(struct_info);
+                let parent_usage = self.structs.find(&parent_ptr);
+                self.usage_context = &parent_usage.usage_context;
+
+                let impl_functions = parent_usage.impl_functions.get(impl_index);
+                let func_usage = impl_functions.find(&func_ptr);
+                self.function_context = &func_usage.function_context;
+            },
+            FunctionParent::Enum(enum_info, impl_index, _) => {
+                let parent_ptr = cast<usize>(enum_info);
+                let parent_usage = self.enums.find(&parent_ptr);
+                self.usage_context = &parent_usage.usage_context;
+
+                let impl_functions = parent_usage.impl_functions.get(impl_index);
+                let func_usage = impl_functions.find(&func_ptr);
+                self.function_context = &func_usage.function_context;
+            },
+            FunctionParent::Trait(trait_info) => {
+                let parent_ptr = cast<usize>(trait_info);
+                let parent_usage = self.traits.find(&parent_ptr);
+                self.usage_context = &parent_usage.usage_context;
+
+                let func_usage = parent_usage.impl_functions.get(0).find(&func_ptr);
+                self.function_context = &func_usage.function_context;
+            },
+            FunctionParent::Type(_, _, _) => {
+                // let func_usage = self.functions.find(&func_ptr);
+                // self.function_context = &func_usage.function_context;
+                return;
+            },
+        }
+
+        self.usage_mode = UsageMode::Signature;
+
+        for param in func_info.parameters {
+            self.add_type(&param.type, generic_map);
+        }
+
+        self.usage_mode = UsageMode::Body;
+
+        self.process_block(func_info.body, generic_map);
+
+        self.usage_context = 0;
+        self.function_context = 0;
+    }
+
+    fn process_block(&self, block: &Block, generic_map: &GenericMap) {
+        if block == 0 { return; }
+
+        for statement_iter in block.statements {
+            match statement_iter.data {
+                StatementData::BlockStatement(child_block) => {
+                    self.process_block(child_block, generic_map);
+                },
+                StatementData::LetStatement(let_statement) => {
+                    if !let_statement.is_static {
+                        self.function_context.add_variable(let_statement.name.value, let_statement.type);
+                    }
+
+                    self.add_type(let_statement.type, generic_map);
+
+                    if let_statement.value != 0 {
+                        self.process_expression(let_statement.value, generic_map);
+                    }
+                },
+                StatementData::ReturnStatement(expression, _) => {
+                    if expression != 0 {
+                        self.process_expression(expression, generic_map);
+                    }
+                },
+                StatementData::YieldStatement(expression) => {
+                    self.function_context.coroutine.yield_count += 1;
+                    self.process_expression(expression, generic_map);
+                },
+                StatementData::IfStatement(condition, if_block, &else_statements) => {
+                    self.process_expression(condition, generic_map);
+                    self.process_block(if_block, generic_map);
+
+                    for else_statement in else_statements {
+                        self.process_block(else_statement.block, generic_map);
+                    }
+                },
+                StatementData::MatchStatement(condition, &cases) => {
+                    self.process_expression(condition, generic_map);
+
+                    for case_info in cases {
+                        self.process_block(case_info.body, generic_map);
+                    }
+                },
+                StatementData::WhileStatement(condition, while_block) => {
+                    self.process_expression(condition, generic_map);
+                    self.process_block(while_block, generic_map);
+                },
+                StatementData::ForStatement(for_statement) => {
+                    match for_statement.type {
+                        ForStatementType::Range(start, end) => {
+                            self.process_expression(start, generic_map);
+                            self.process_expression(end, generic_map);
+                        },
+                        ForStatementType::Iter(iter_expression) => {
+                            self.process_expression(iter_expression, generic_map);
+                        }
+                    }
+
+                    self.process_block(for_statement.block, generic_map);
+                },
+                StatementData::AssignmentStatement(left, _, right) => {
+                    self.process_expression(left, generic_map);
+                    self.process_expression(right, generic_map);
+                },
+                StatementData::ExpressionStatement(expression) => {
+                    self.process_expression(expression, generic_map);
+                },
+                StatementData::ContinueStatement(_) => {},
+                StatementData::BreakStatement(_) => {},
+            }
+        }
+    }
+
+    fn process_expression(&self, expression: &Expression, generic_map: &GenericMap) {
+        self.add_type(&expression.return_type, generic_map);
+
+        match expression.data {
+            ExpressionData::EnumVariant(_) => {},
+            ExpressionData::Invoke(target, arguments) => {
+                self.process_expression(target, generic_map);
+                for *arg in arguments {
+                    self.process_expression(arg.value, generic_map);
+                }
+            },
+            ExpressionData::Type(type) => { self.add_type(type, generic_map); },
+            ExpressionData::Literal(_) => {},
+            ExpressionData::Variable(_) => {},
+            ExpressionData::UnaryExpression(_, inner) => {
+                self.process_expression(inner, generic_map);
+            },
+            ExpressionData::BinaryExpression(left, _, right) => {
+                self.process_expression(left, generic_map);
+                self.process_expression(right, generic_map);
+            },
+            ExpressionData::MemberStaticExpression(inner, _) => {
+                self.add_type(inner.return_type.deref(), generic_map);
+                self.process_expression(inner, generic_map);
+            },
+            ExpressionData::MemberInstanceExpression(inner, _) => {
+                self.add_type(inner.return_type.deref(), generic_map);
+                self.process_expression(inner, generic_map);
+            },
+            ExpressionData::IndexExpression(inner, index) => {
+                self.process_expression(inner, generic_map);
+                self.process_expression(index, generic_map);
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                self.process_expression(inner, generic_map);
+            },
+            ExpressionData::CppExpression(cpp_expression) => {
+                match cpp_expression {
+                    CppExpression::New(placement, new_expression) => {
+                        if placement != 0 { self.process_expression(placement, generic_map); }
+                        self.process_expression(new_expression, generic_map);
+                    },
+                    CppExpression::Delete(delete_expression) => {
+                        self.process_expression(delete_expression, generic_map);
+                    }
+                }
+            },
+            ExpressionData::ImplicitCast(inner) => {
+                self.process_expression(inner, generic_map);
+
+                match inner.return_type.deref() {
+                    Type::Function(func_info, _) => {
+                        // let name = func_info.name.value;
+                        let func_ptr = cast<usize>(func_info);
+
+                        match func_info.parent {
+                            FunctionParent::None => {
+                                let usage = self.functions.find(&func_ptr);
+                                usage.impl_dynamic_function = true;
+                            },
+                            FunctionParent::Primitive(primitive_info, impl_index, _) => {
+                                let parent_ptr = cast<usize>(primitive_info);
+                                let parent_usage = self.primitives.find(&parent_ptr);
+                                let impl_functions = parent_usage.impl_functions.get(impl_index);
+                                let impl_function = impl_functions.find(&func_ptr);
+                                impl_function.impl_dynamic_function = true;
+                            },
+                            FunctionParent::Struct(struct_info, impl_index, _) => {
+                                let parent_ptr = cast<usize>(struct_info);
+                                let parent_usage = self.structs.find(&parent_ptr);
+                                let impl_functions = parent_usage.impl_functions.get(impl_index);
+                                let impl_function = impl_functions.find(&func_ptr);
+                                impl_function.impl_dynamic_function = true;
+                            },
+                            FunctionParent::Enum(enum_info, impl_index, _) => {
+                                let parent_ptr = cast<usize>(enum_info);
+                                let parent_usage = self.enums.find(&parent_ptr);
+                                let impl_functions = parent_usage.impl_functions.get(impl_index);
+                                let impl_function = impl_functions.find(&func_ptr);
+                                impl_function.impl_dynamic_function = true;
+                            },
+                            _ => {},
+                        }
+                    },
+                    Type::Struct(struct_info, _) => {
+                        match expression.return_type {
+                            Type::Indirect(indirect) => {
+                                match indirect.to {
+                                    Type::Trait(trait_info, _) => {
+                                        if trait_info.name.value.eq("DynStruct") {
+                                            let ptr = cast<usize>(struct_info);
+                                            let usage = self.structs.find(&ptr);
+                                            usage.impl_dynamic_usage = true;
+                                        }
+                                    },
+                                    _ => {},
+                                }
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
+            },
+        }
+    }
+
+    fn normalize(&self) {
+        for usage in self.usages {
+            match usage {
+                Type::Struct(struct_info, generic_map) => {
+                    let parent_ptr = cast<usize>(struct_info);
+                    let usage = self.structs.find(&parent_ptr);
+                    usage.generic_maps.append(generic_map);
+                },
+                Type::Enum(enum_info, generic_map) => {
+                    let parent_ptr = cast<usize>(enum_info);
+                    let usage = self.enums.find(&parent_ptr);
+
+                    usage.generic_maps.append(generic_map);
+                },
+                Type::Trait(trait_info, generic_map) => {
+                    let parent_ptr = cast<usize>(trait_info);
+                    let usage = self.traits.find(&parent_ptr);
+                    usage.generic_maps.append(generic_map);
+                },
+                Type::Function(func_info, generic_map) => {
+                    if func_info.type == FunctionType::Builtin { continue; }
+
+                    let func_ptr = cast<usize>(func_info);
+
+                    match func_info.parent {
+                        FunctionParent::None => {
+                            let usage = self.functions.find(&func_ptr);
+                            usage.generic_maps.append(generic_map);
+                        },
+                        FunctionParent::Struct(struct_info, impl_index, _) => {
+                            let parent_ptr = cast<usize>(struct_info);
+                            let parent_usage = self.structs.find(&parent_ptr);
+                            if parent_usage == 0 { fprintf(stderr, "Could not find parent usage\n"); }
+
+                            let impl_functions = parent_usage.impl_functions.get(impl_index);
+                            let impl_function = impl_functions.find(&func_ptr);
+
+                            impl_function.generic_maps.append(generic_map);
+                        },
+                        FunctionParent::Enum(enum_info, impl_index, _) => {
+                            let parent_ptr = cast<usize>(enum_info);
+                            let parent_usage = self.enums.find(&parent_ptr);
+                            if parent_usage == 0 { fprintf(stderr, "Could not find parent usage\n"); }
+
+                            let impl_functions = parent_usage.impl_functions.get(impl_index);
+                            let impl_function = impl_functions.find(&func_ptr);
+
+                            impl_function.generic_maps.append(generic_map);
+                        },
+                        _ => {},
+                    }
+                },
+                Type::Sequence(sequence) => {
+                    self.sequences.append(sequence.element);
+                },
+                Type::Tuple(tuple) => {
+                    self.tuples.append(tuple);
+                },
+                _ => {},
+            }
+        }
+    }
+}

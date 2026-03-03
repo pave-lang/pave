@@ -1,0 +1,241 @@
+#include "stdio.h"
+#include "string.h"
+
+use std
+
+struct Root {
+    allocator: &ArenaAllocator,
+    children: HashMap<str, &Namespace>,
+    types: HashMap<str, Type>,
+    primitives: HashMap<str, Primitive>,
+    ctypes: HashMap<str, TypedefC>,
+    traits: HashMap<str, &Trait>,
+    functions: HashMap<str, Type>,
+    clang_args: Array<*const char>,
+    analysis: &Analysis,
+    primitive_bool: &Primitive,
+    primitive_usize: &Primitive,
+    primitive_void: &Primitive,
+    type_void: Type,
+    type_self: Type,
+    type_ref_self: Type,
+    type_usize: Type,
+    func_next: Function,
+    func_value: Function,
+    naming_decl: Naming,
+    hack_type_impl: &TypeImpl,
+    includes_c: HashMap<str, &Include>,
+    includes_cpp: HashMap<str, &Include>,
+
+}
+
+impl Root {
+    fn new(allocator: &ArenaAllocator, args: &Array<*const char>, clang_args: &Array<*const char>, analysis: &Analysis) -> &Self {
+        let self: &Self = allocator.alloc(sizeof(Self));
+
+        *self = Self {
+            allocator,
+            children: HashMap<str, &Namespace>::new(allocator),
+            types: HashMap<str, Type>::new(allocator),
+            primitives: HashMap<str, Primitive>::new(allocator),
+            ctypes: HashMap<str, TypedefC>::new(allocator),
+            traits: HashMap<str, &Trait>::new(allocator),
+            functions: HashMap<str, Type>::new(allocator),
+            clang_args: Array<*const char>::new(allocator),
+            analysis,
+            naming_decl: Naming::new_decl(allocator),
+            includes_c: HashMap<str, &Include>::new(allocator),
+            includes_cpp: HashMap<str, &Include>::new(allocator),
+        };
+
+        self.primitive_bool = self.add_primitive("bool");
+        self.add_primitive("i8");
+        self.add_primitive("i16");
+        self.add_primitive("i32");
+        self.add_primitive("i64");
+        self.add_primitive("isize");
+        self.add_primitive("u8");
+        self.add_primitive("u16");
+        self.add_primitive("u32");
+        self.add_primitive("u64");
+        self.primitive_usize = self.add_primitive("usize");
+        self.add_primitive("f32");
+        self.add_primitive("f64");
+        self.add_primitive("char");
+        self.primitive_void = self.add_primitive("void");
+        self.type_void = Type::Primitive(self.primitive_void);
+        self.type_self = Type::Self;
+        self.type_ref_self = Type::Indirect(Indirect::new_reference(self.allocator, self.type_self));
+        self.type_usize = Type::Primitive(self.primitive_usize);
+        self.func_next = Function {
+            type: FunctionType::Standard,
+            name: allocator.store(Token { value: "next" }),
+            parameters: Array<Parameter>::new(allocator),
+            return_type: Type::Primitive(self.primitive_bool),
+        };
+        self.func_next.parameters.append(Parameter { name: allocator.store(Token { value: "self" }), type: self.type_ref_self });
+
+        self.func_value = Function {
+            type: FunctionType::Standard,
+            name: allocator.store(Token { value: "value" }),
+            parameters: Array<Parameter>::new(allocator),
+            return_type: Type::Generic(allocator.store(Generic { name: allocator.store(Token { value: "T" }) })),
+        };
+        self.func_value.parameters.append(Parameter { name: allocator.store(Token { value: "self" }), type: self.type_ref_self });
+
+        for (key, &value) in self.primitives {
+            self.types.insert(key, Type::Primitive(value));
+        }
+
+        for *arg in args {
+            let pos: *const char = strchr(arg, '=');
+
+            if pos == 0 {
+                fprintf(stderr, "Unknown arg \"%s\"\n", arg);
+            } else {
+                let arg_str: str = arg;
+                let name = arg_str.slice(0, pos - arg);
+                let path = pos + 1;
+
+                self.add_namespace(name, path);
+            }
+        }
+
+        for *arg in clang_args {
+            self.clang_args.append(arg);
+        }
+
+        for (_, child) in self.children {
+            child.parse();
+        }
+
+        return self;
+    }
+
+    fn add_primitive(&self, name: *const char) -> &Primitive {
+        return self.primitives.insert(name, Primitive::new(self.allocator, name));
+    }
+
+    fn add_ctype(&self, name: *const char) -> &Primitive {
+        let existing = self.primitives.find(name);
+        if existing != 0 { return existing; }
+
+        return self.primitives.insert(name, Primitive::new(self.allocator, name));
+    }
+
+    fn add_namespace(&self, name: str, path: str) -> bool {
+        let child = Namespace::new(self, 0, name, path);
+    
+        if self.children.find(&name) != 0 {
+            let name_length: u32 = name.length;
+            fprintf(stderr, "Duplicate namespace %.*s\n", name_length, name.ptr);
+
+            return 0;
+        }
+
+        self.children.insert(name, child);
+        return 1;
+    }
+
+    fn find_namespace(&self, name: str) -> *Namespace {
+        let result = self.children.find(&name);
+        if result == 0 { return 0; }
+
+        return *result;
+    }
+
+    fn add_use_namespaces(&self) -> bool {
+        for (_, child) in self.children {
+            child.add_use_namespaces();
+        }
+
+        return 1;
+    }
+
+    fn fill_namespace(&self) -> bool {
+        for (_, child) in self.children {
+            child.fill_namespace();
+        }
+
+        return 1;
+    }
+
+    fn prefill_types(&self) -> bool {
+        for (_, child) in self.children {
+            child.prefill_types();
+        }
+
+        return 1;
+    }
+
+    fn parse_declarations(&self) -> bool {
+        for (_, child) in self.children {
+            child.parse_declarations();
+        }
+
+        for (_, &primitive_info) in self.primitives {
+            for (impl_index, *impl_info) in primitive_info.impls.iter().enumerate() {
+                let parent = FunctionParent::Primitive(primitive_info, impl_index, impl_info.trait_);
+                impl_info.fill_types(parent);
+
+                for (_, &func_info) in impl_info.functions {
+                    func_info.fill_types(&impl_info.impl_generics);
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    fn parse_functions(&self) -> bool {
+        for (_, child) in self.children {
+            child.parse_functions();
+        }
+
+        for (_, &primitive_info) in self.primitives {
+            for *impl_info in primitive_info.impls {
+                impl_info.parse_functions();
+            }
+        }
+
+        return 1;
+    }
+
+    fn find_type(&self, name: str) -> &Type {
+        return self.types.find(&name);
+    }
+
+    fn find_trait(&self, name: str) -> &Trait {
+        let trait_info = self.traits.find(&name);
+        if trait_info == 0 { return 0; }
+        return *trait_info;
+    }
+
+    fn find_function(&self, name: str) -> &Type {
+        return self.functions.find(&name);
+    }
+
+    fn find_primitive(&self, name: *const char) -> *Primitive {
+        return self.primitives.find(name);
+    }
+
+    fn error(&self, path: str, start_line: usize, start_column: usize, end_line: usize, end_column: usize, message: *const char) {
+        let diagnostics = &self.analysis.diagnostics;
+        let file_diagnostics: &Array<Diagnostic> = diagnostics.find(&path);
+        if file_diagnostics == 0 { file_diagnostics = diagnostics.insert(path, Array<Diagnostic>::new(self.allocator)); }
+
+        file_diagnostics.append(Diagnostic {
+            message: message,
+            range: Range {
+                start: Position {
+                    line: start_line,
+                    character: start_column,
+                },
+                end: Position {
+                    line: end_line,
+                    character: end_column,
+                },
+            }
+        });
+    }
+}

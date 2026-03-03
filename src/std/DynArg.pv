@@ -1,0 +1,12 @@
+struct DynArg(TypeId, *void);
+
+impl DynArg {
+    fn temp() -> &[DynArg] {
+        let static a: [DynArg; 0];
+        let b: &[DynArg] = &a;
+        for c in b {
+            c._0 = cast<TypeId>(0);
+        }
+        return b;
+    }
+}

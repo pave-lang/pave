@@ -1,0 +1,179 @@
+#include "stdio.h"
+#include "string.h"
+
+struct HashMapBucket<K, V> {
+    key: K,
+    value: V,
+    next: &HashMapBucket<K, V>,
+}
+
+struct HashMapIter<K, V> {
+    iter: &HashMapBucket<K, V>,
+    end: &HashMapBucket<K, V>,
+}
+
+impl<K, V> HashMapIter<K, V> {
+    fn next(&self) -> bool {
+        self.iter += 1; 
+        return self.iter < self.end;
+    }
+
+    fn value(&self) -> &(K, V) {
+        return cast<&(K, V)>(self.iter);
+    }
+}
+
+struct HashMap<K: Hash, V> {
+    allocator: &Allocator,
+    buckets: &&HashMapBucket<K, V>,
+    data: &HashMapBucket<K, V>,
+    capacity: usize,
+    length: usize,
+}
+
+impl<K: Hash, V> HashMap<K: Hash, V> {
+    fn new(allocator: &Allocator) -> Self {
+        let initial_capacity = 16;
+        let self = Self {
+            allocator,
+        };
+
+        self.resize(initial_capacity);
+
+        return self;
+    }
+    
+    fn resize(&self, new_capacity: usize) {
+        self.buckets = self.allocator.realloc(self.buckets, new_capacity * sizeof(&HashMapBucket<K, V>));
+        self.data = self.allocator.realloc(self.data, new_capacity * sizeof(HashMapBucket<K, V>));
+        self.capacity = new_capacity;
+        self.fill_buckets();
+    }
+
+    fn find(&self, key: &K) -> &V {
+        if self.capacity == 0 { return 0; }
+
+        let hash = (*key).hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets[bucket_index];
+
+        while current_bucket_node != 0 {
+            if current_bucket_node.key.hash()._0 == hash._0 {
+                return &current_bucket_node.value;
+            }
+            current_bucket_node = current_bucket_node.next;
+        }
+
+        return 0;
+    }
+
+    fn insert(&self, key: K, value: V) -> &V {
+        let existing_value = self.find(&key);
+        if existing_value != 0 {
+            *existing_value = value;
+            return existing_value;
+        }
+
+        if self.capacity == 0 || (self.length * 100 / self.capacity) > 75 {
+            self.resize(self.capacity * 2);
+        }
+
+        let hash = key.hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets + bucket_index;
+
+        // if *current_bucket_node != 0 {
+        //     fprintf(stderr, "hashmap collision\n");
+        // }
+
+        while *current_bucket_node != 0 {
+            current_bucket_node = &(*current_bucket_node).next;
+        }
+
+        self.data[self.length] = HashMapBucket<K, V> { key, value };
+        let data = self.data + self.length;
+        self.length += 1;
+
+        *current_bucket_node = data;
+
+        return &data.value;
+    }
+
+    fn remove(&self, key: &K) -> bool {
+        if self.capacity == 0 { return 0; }
+
+        let hash = (*key).hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets[bucket_index];
+
+        while current_bucket_node != 0 {
+            if current_bucket_node.key.hash()._0 == hash._0 {
+                let last = self.data + self.length - 1;
+                if current_bucket_node != last { *current_bucket_node = *last; }
+                
+                self.length -= 1;
+                self.fill_buckets();
+
+                return true;
+            }
+
+            current_bucket_node = current_bucket_node.next;
+        }
+
+        return false;
+    }
+
+    fn release(&self) {
+        self.allocator.free(self.buckets);
+        self.allocator.free(self.data);
+        self.buckets = 0;
+        self.data = 0;
+        self.capacity = 0;
+        self.length = 0;
+    }
+
+    fn fill_buckets(&self) {
+        memset(self.buckets, 0, self.capacity * sizeof(&HashMapBucket<K, V>));
+
+        for i in 0..self.length {
+            let node = self.data + i;
+            node.next = 0;
+            let hash = (*node).key.hash();
+            let bucket_index: usize = hash._0 % self.capacity;
+            let current_bucket_node = self.buckets + bucket_index;
+
+            while *current_bucket_node != 0 {
+                current_bucket_node = &(*current_bucket_node).next;
+            }
+
+            *current_bucket_node = node;
+        }
+    }
+
+    fn clone(&self, allocator: &Allocator) -> Self {
+        let other = Self {
+            allocator,
+            buckets: allocator.alloc(self.capacity * sizeof(self.data)),
+            data: allocator.alloc(self.capacity * sizeof(HashMapBucket<K, V>)),
+            length: self.length,
+            capacity: self.capacity,
+        };
+        memcpy(other.data, self.data, self.capacity * sizeof(HashMapBucket<K, V>));
+        other.fill_buckets();
+
+        return other;
+    }
+
+    fn iter(&self) -> HashMapIter<K, V> {
+        return HashMapIter<K, V> {
+            iter: self.data - 1,
+            end: self.data + self.length,
+        };
+    }
+
+    fn clear(&self) {
+        memset(self.data, 0, self.capacity * sizeof(HashMapBucket<K, V>));
+        memset(self.buckets, 0, self.capacity * sizeof(&HashMapBucket<K, V>));
+        self.length = 0;
+    }
+}

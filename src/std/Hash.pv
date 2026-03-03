@@ -1,0 +1,63 @@
+struct Hashed(u64);
+
+struct Fnv1a {}
+impl Fnv1a {
+    fn hash(value: *const void, size: usize) -> Hashed {
+        let fnv_prime: u64 = 1099511628211;
+        let fnv_offset_basis: u64 = 14695981039346656037;
+        
+        let result = fnv_offset_basis;
+
+        let bytes: *const u8 = value;
+
+        let i: usize = 0;
+        while i < size {
+            result = result ^ bytes[i];
+            result = result * fnv_prime;
+            i += 1;
+        }
+
+        return Hashed(result);
+    }
+
+    fn continue_with(hash: Hashed, value: *const void, size: usize) -> Hashed {
+        let fnv_prime: u64 = 1099511628211;
+        
+        let result = hash._0; 
+
+        let bytes: *const u8 = value;
+
+        let i: usize = 0;
+        while i < size {
+            result = result ^ bytes[i];
+            result = result * fnv_prime;
+            i += 1;
+        }
+
+        return Hashed(result);
+    }
+}
+
+impl Hashed {
+    fn continue_with(self, value: *const void, size: usize) -> Hashed {
+        return Fnv1a::continue_with(self, value, size);
+    }
+}
+
+trait Hash {
+    fn hash(&self) -> Hashed { return Fnv1a::hash(self, sizeof(Self)); }
+}
+
+impl Hash for char {}
+
+impl Hash for i8 {}
+impl Hash for i16 {}
+impl Hash for i32 {}
+impl Hash for i64 {}
+impl Hash for isize {}
+
+impl Hash for u8 {}
+impl Hash for u16 {}
+impl Hash for u32 {}
+impl Hash for u64 {}
+impl Hash for usize {}

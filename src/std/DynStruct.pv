@@ -1,0 +1,10 @@
+struct DynStructField {
+    name: str,
+    typeid: TypeId,
+}
+
+trait DynStruct {
+    fn get_fields(&self) -> &[DynStructField];
+    fn get_field(&self, index: usize) -> &void;
+    fn set_field(&self, index: usize, value: *void) -> bool;
+}

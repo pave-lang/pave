@@ -1,0 +1,566 @@
+#include "stdio.h"
+
+use std
+
+struct Module {
+    root: &Root,
+    namespace: &Namespace,
+    path: str,
+    use_namespaces: Array<NamespacePath>,
+    used_namespaces: Array<&Namespace>,
+    types: HashMap<str, Type>,
+    enums: HashMap<str, Enum>,
+    structs: HashMap<str, Struct>,
+    traits: HashMap<str, Trait>,
+    impls: Array<Impl>,
+    functions: HashMap<str, Function>,
+    type_impls: Array<TypeImpl>,
+    context: Context,
+    tokens: Array<Token>,
+    mode_cpp: bool,
+    includes: HashMap<str, &Include>,
+}
+
+impl Module {
+    fn new(namespace: &Namespace, path: str)-> &Self {
+        let allocator = namespace.root.allocator;
+        let analysis = namespace.root.analysis;
+        let self: &Self = allocator.alloc(sizeof(Self));
+
+        *self = Self {
+            root: namespace.root,
+            namespace,
+            path,
+            use_namespaces: Array<NamespacePath>::new(allocator),
+            used_namespaces: Array<&Namespace>::new(allocator),
+            types: HashMap<str, Type>::new(allocator),
+            enums: HashMap<str, Enum>::new(allocator),
+            structs: HashMap<str, Struct>::new(allocator),
+            traits: HashMap<str, Trait>::new(allocator),
+            impls: Array<Impl>::new(allocator),
+            functions: HashMap<str, Function>::new(allocator),
+            type_impls: Array<TypeImpl>::new(allocator),
+            includes: HashMap<str, &Include>::new(allocator),
+        };
+
+        self.context = Context::new(allocator, "", path, 0, analysis, self);
+
+        return self;
+    }
+
+    fn parse(&self) -> bool {
+        let allocator = self.namespace.root.allocator;
+        let use_namespaces = &self.use_namespaces;
+        let enums = &self.enums;
+        let structs = &self.structs;
+        let traits = &self.traits;
+        let impls = &self.impls;
+        let functions = &self.functions;
+        let context = &self.context;
+
+        self.tokens = Tokenizer::tokenize(allocator, self.path.ptr);
+        self.context.tokens = self.tokens.data;
+        self.context.length = self.tokens.length;
+
+        let result = true;
+
+        while context.pos < context.length && result {
+            let token = &context.tokens[context.pos];
+
+            if token.eq(TokenType::Keyword, "ns") {
+                if context.expect_value(TokenType::Keyword, "ns") == 0 { return false; }
+                if context.check(TokenType::String) {
+                    let name = context.expect(TokenType::String);
+
+                    if name == 0 {
+                        result = 0;
+                    } else {
+                        let namespace: &Namespace = self.namespace;
+                        result = namespace.add_namespace_subfolder(name.value.slice(1, name.value.length - 1));
+                    }
+                } else {
+                    let name = context.expect(TokenType::Identifier);
+
+                    if name == 0 {
+                        result = 0;
+                    } else {
+                        let namespace: &Namespace = self.namespace;
+                        result = namespace.add_namespace_subfolder(name.value);
+                    }
+                }
+            } else if token.eq(TokenType::Keyword, "mod") {
+                if context.expect_value(TokenType::Keyword, "mod") == 0 { return false; }
+                if context.check(TokenType::String) {
+                    let name = context.expect(TokenType::String);
+
+                    if name == 0 {
+                        result = 0;
+                    } else {
+                        let namespace: &Namespace = self.namespace;
+                        result = namespace.add_module(name.value.slice(1, name.value.length - 1));
+                    }
+                } else {
+                    let name = context.expect(TokenType::Identifier);
+
+                    if name == 0 {
+                        result = 0;
+                    } else {
+                        let namespace: &Namespace = self.namespace;
+                        result = namespace.add_module(name.value);
+                    }
+                }
+            } else if token.eq(TokenType::Keyword, "use") {
+                if !context.expect_value(TokenType::Keyword, "use") { return false; }
+
+                let path = NamespacePath::new(allocator);
+                if !path.parse(context) { return false; }
+                
+                use_namespaces.append(path);
+            } else if token.eq(TokenType::Keyword, "#cpp") {
+                if context.expect_value(TokenType::Keyword, "#cpp") == 0 { return false; }
+                self.mode_cpp = true;
+            } else if token.eq(TokenType::Keyword, "#include") {
+                if context.expect_value(TokenType::Keyword, "#include") == 0 { return false; }
+
+                let path = context.expect(TokenType::String);
+                if path == 0 { return false; }
+
+                let includes = &self.root.includes_c;
+                if self.mode_cpp { includes = &self.root.includes_cpp; } 
+
+                let include_ptr = includes.find(&path.value);
+                let include: &Include = 0;
+                if include_ptr != 0 { include = *include_ptr;}
+
+                if include == 0 {
+                    include = Include::new(self.root, path.value, self.mode_cpp);
+                    include.process();
+                    includes.insert(path.value, include);
+                }
+
+                if self.includes.find(&path.value) == 0 {
+                    self.includes.insert(path.value, include);
+                }
+            } else if token.eq(TokenType::Keyword, "enum") {
+                let node: Enum = Enum::parse(context);
+
+                if node.name == 0 {
+                    result = 0;
+                } else {
+                    enums.insert(node.name.value, node);
+                }
+            } else if token.eq(TokenType::Keyword, "struct") {
+                let node: Struct = Struct::parse(self);
+
+                if node.name == 0 {
+                    result = 0;
+                } else {
+                    structs.insert(node.name.value, node);
+                }
+            } else if token.eq(TokenType::Keyword, "impl") {
+                let node: Impl = Impl::parse(context);
+
+                if node.token_start == node.token_end {
+                    result = 0;
+                } else {
+                    impls.append(node);
+                }
+            } else if token.eq(TokenType::Keyword, "trait") {
+                let node: Trait = Trait::parse(self);
+
+                if node.name == 0 {
+                    result = 0;
+                } else {
+                    traits.insert(node.name.value, node);
+                }
+            } else if token.eq(TokenType::Keyword, "fn") || token.eq(TokenType::Keyword, "co") {
+                let node: Function = Function::parse(context);
+
+                if node.name == 0 {
+                    result = 0;
+                } else {
+                    functions.insert(node.name.value, node);
+                }
+            } else if token.type == TokenType::Comment {
+                context.next_token();
+            } else {
+                context.error_token(token, "Unexpected token, expected include, fn, co, impl, struct or trait");
+                result = 0;
+            }
+        }
+
+        return result;
+    }
+
+    fn add_use_namespaces(&self) -> bool {
+        let success = true;
+
+        for path in self.use_namespaces {
+            success = self.add_use_namespace(path) && success;
+        }
+
+        return success;
+    }
+
+    fn add_use_namespace(&self, path: &NamespacePath) -> bool {
+        let parts_iter = path.parts.iter();
+        parts_iter.next();
+        let first_part = *parts_iter.value();
+        let namespace: *Namespace = 0;
+
+        if path.root {
+            namespace = self.root.find_namespace(first_part.value);
+        } else {
+            namespace = self.namespace.find_namespace(first_part.value);
+        }
+
+        if namespace == 0 {
+            self.context.error_token(first_part, "Unable to find namespace");
+            return false;
+        }
+
+        for *part in parts_iter {
+            let child = namespace.children.find(&part.value);
+            if child == 0 {
+                self.context.error_token(part, "Unable to find namespace");
+                return false;
+            }
+
+            namespace = *child;
+        }
+
+        self.used_namespaces.append(namespace);
+
+        return true;
+    }
+
+    fn fill_namespace(&self) -> bool {
+        let namespace = self.namespace;
+        let allocator = namespace.root.allocator;
+        let blank_generics = allocator.store(GenericMap {});
+        blank_generics.self_type = Type::Self.to_ptr(allocator);
+
+        for (_, &func_info) in self.functions {
+            namespace.functions.insert(func_info.name.value, Type::Function(func_info, blank_generics));
+        }
+
+        for (_, &enum_info) in self.enums {
+            namespace.types.insert(enum_info.name.value, Type::Enum(enum_info, blank_generics));
+        }
+
+        for (_, &struct_info) in self.structs {
+            let generics = allocator.store(GenericMap::from_generics(allocator, &struct_info.generics));
+            generics.self_type = blank_generics.self_type;
+
+            namespace.types.insert(struct_info.name.value, Type::Struct(struct_info, generics));
+        }
+
+        for (_, &trait_info) in self.traits {
+            namespace.types.insert(trait_info.name.value, Type::Trait(trait_info, blank_generics));
+            namespace.traits.insert(trait_info.name.value, trait_info);
+        }
+
+        return 1;
+    }
+
+    fn prefill_types(&self) -> bool {
+        let success = true;
+
+        for *namespace in self.used_namespaces {
+            if namespace.name.eq("std") {
+                let t = Generic::new(self.context.allocator);
+                t.name = self.context.allocator.store(Token { type: TokenType::String, value: "T" });
+
+                let param_name = self.context.allocator.store(Token { type: TokenType::String, value: "type" });
+
+                let generics = Array<Generic>::new(self.context.allocator);
+                generics.append(t);
+                let generic_t = generics.get(0);
+
+                let params = Array<Parameter>::new(self.context.allocator);
+                params.append(Parameter { name: param_name, type: Type::Generic(generic_t) });
+
+                let type_id_type = namespace.find_type("TypeId");
+                if type_id_type != 0 {
+                    self.context.insert_builtin_function("typeid", &generics, &params, *type_id_type);
+                }
+                else {
+                    fprintf(stderr, "TypeId type not found in namespace std\n");
+                }
+
+                params.release();
+                generics.release();
+            }
+        }
+
+        for impl_info in self.impls {
+            success = impl_info.prefill_types() && success;
+        }
+
+        for (_, &enum_info) in self.enums {
+            success = enum_info.prefill_types() && success;
+        }
+
+        for (_, &struct_info) in self.structs {
+            success = struct_info.prefill_types() && success;
+        }
+
+        return success;
+    }
+
+    fn parse_declarations(&self) -> bool {
+        let allocator = self.namespace.root.allocator;
+
+        for (_, &func_info) in self.functions {
+            func_info.fill_types(0);
+        }
+
+        for impl_info in self.impls {
+            if impl_info.trait_name != 0 {
+                impl_info.trait_ = self.find_trait(impl_info.trait_name.value);
+                if impl_info.trait_ == 0 {
+                    self.context.error_token(impl_info.trait_name, "Could not find trait");
+                    return false;
+                }
+            }
+
+            if impl_info.type == 0 { impl_info.type = self.find_type(impl_info.name.value); }
+            if impl_info.type == 0 {
+                self.context.error_token(impl_info.name, "Could not find type");
+                return false;
+            }
+
+            match impl_info.type {
+                Type::Enum(enum_parent, _) => {
+                    impl_info.type_self = Type::Enum(enum_parent, allocator.store(GenericMap::from_generics(allocator, &impl_info.struct_generics)));
+
+                    if impl_info.trait_ != 0 { enum_parent.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    enum_parent.impls.append(impl_info);
+                },
+                Type::Struct(struct_parent, _) => {
+                    impl_info.type_self = Type::Struct(struct_parent, allocator.store(GenericMap::from_generics(allocator, &impl_info.struct_generics)));
+
+                    if impl_info.trait_ != 0 { struct_parent.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    struct_parent.impls.append(impl_info);
+                },
+                Type::Primitive(primitive_info) => {
+                    impl_info.type_self = *impl_info.type;
+
+                    if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    primitive_info.impls.append(impl_info);
+                },
+                Type::TypedefC(info) => {
+                    let ctype = self.root.add_ctype(info.name.ptr);
+                    impl_info.type_self = *impl_info.type;
+
+                    if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    ctype.impls.append(impl_info);
+                },
+                Type::Indirect(_) => {
+                    impl_info.type_self = *impl_info.type;
+                    self.type_impls.append(TypeImpl::new(allocator, *impl_info.type, impl_info));
+                    self.root.hack_type_impl = self.type_impls.back();
+                },
+                _ => { self.context.error_token(impl_info.name, "TODO: Currently unimplemented"); },
+            }
+        }
+
+        for (_, &enum_info) in self.enums {
+            let generics = allocator.store(GenericMap {});
+            let self_type: &Type = allocator.alloc(sizeof(Type));
+            generics.self_type = self_type;
+            *self_type = Type::Enum(enum_info, generics);
+            enum_info.context.type_self = self_type;
+
+            enum_info.fill_variants();
+
+            for (impl_index, *impl_info) in enum_info.impls.iter().enumerate() {
+                let parent = FunctionParent::Enum(enum_info, impl_index, impl_info.trait_);
+                impl_info.fill_types(parent);
+
+                for (_, &func_info) in impl_info.functions {
+                    func_info.fill_types(&impl_info.impl_generics);
+                }
+            }
+        }
+
+        for (_, &struct_info) in self.structs {
+            struct_info.fill_types();
+
+            for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
+                let parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
+                impl_info.fill_types(parent);
+
+                for (_, &func_info) in impl_info.functions {
+                    func_info.fill_types(&impl_info.impl_generics);
+                }
+            }
+        }
+
+        for (_, &trait_info) in self.traits {
+            let parent = FunctionParent::Trait(trait_info);
+            trait_info.fill_types(parent);
+
+            for (_, &func_info) in trait_info.functions {
+                func_info.fill_types(&trait_info.generics);
+            }
+        }
+
+        for type_impl in self.type_impls {
+            let parent = FunctionParent::Type(&type_impl.type, 0, 0);
+            type_impl.impl_info.fill_types(parent);
+
+            for (_, &func_info) in type_impl.impl_info.functions {
+                func_info.fill_types(&type_impl.impl_info.impl_generics);
+            }
+        }
+
+        return 1;
+    }
+
+    fn parse_functions(&self) -> bool {
+        let allocator = self.namespace.root.allocator;
+
+        for (_, &func_info) in self.functions {
+            let generics: Generics = Generics::new(allocator);
+            func_info.parse_function(&generics);
+        }
+
+        for (_, &enum_info) in self.enums {
+            let generics = allocator.store(GenericMap {});
+            let self_type: &Type = allocator.alloc(sizeof(Type));
+            generics.self_type = self_type;
+            *self_type = Type::Enum(enum_info, generics);
+            enum_info.context.type_self = self_type;
+
+            for *impl_info in enum_info.impls {
+                impl_info.parse_functions();
+            }
+        }
+
+        for (_, &struct_info) in self.structs {
+            for *impl_info in struct_info.impls {
+                impl_info.parse_functions();
+            }
+        }
+
+        for (_, &trait_info) in self.traits {
+            trait_info.parse_functions();
+        }
+
+        for type_impl in self.type_impls {
+            type_impl.impl_info.parse_functions();
+        }
+
+        return 1;
+    }
+
+    fn find_type(&self, name: str) -> *Type {
+        let type: *Type = self.types.find(&name);
+        if type != 0 { return type; }
+
+        type = self.namespace.find_type(name);
+        if type != 0 { return type; }
+
+        for *namespace in self.used_namespaces {
+            type = namespace.find_type(name);
+            if type != 0 { return type; }
+        }
+
+        type = self.namespace.root.find_type(name);
+        if type != 0 { return type; }
+
+        for (_, include) in self.includes {
+            type = include.types.find(&name);
+            if type != 0 { return type; }
+        }
+
+        return 0;
+    }
+
+    fn find_trait(&self, name: str) -> &Trait {
+        let type = self.namespace.root.find_trait(name);
+        if type != 0 { return type; }
+
+        type = self.namespace.find_trait(name);
+        if type != 0 { return type; }
+
+        for *namespace in self.used_namespaces {
+            type = namespace.find_trait(name);
+            if type != 0 { return type; }
+        }
+
+        return 0;
+    }
+
+    fn find_function(&self, name: str) -> &Type {
+        let type = self.namespace.root.find_function(name);
+        if type != 0 { return type; }
+
+        type = self.namespace.find_function(name);
+        if type != 0 { return type; }
+
+        for *namespace in self.used_namespaces {
+            type = namespace.find_function(name);
+            if type != 0 { return type; }
+        }
+
+        return 0;
+    }
+
+    fn find_value(&self, name: str) -> &Type {
+        for (_, include) in self.includes {
+            let type = include.values.find(&name);
+            if type != 0 { return type; }
+        }
+
+        return 0;
+    }
+
+    fn find_make_type(&self, name: str, usage_types: &Array<Type>) -> &Type {
+        let type = self.find_type(name);
+        return self.make_type_usage(type, usage_types);
+    }
+
+    fn make_type_usage(&self, type: &Type, usage_types: &Array<Type>) -> &Type {
+        if type == 0 { return 0; }
+        let allocator = self.namespace.root.allocator;
+
+        match type {
+            Type::Enum(enum_info, _) => {
+                let generics = GenericMap::new(allocator, &enum_info.generics, usage_types);
+                let self_type: &Type = allocator.alloc(sizeof(Type));
+                generics.self_type = self_type;
+                *self_type = Type::Enum(enum_info, allocator.store(generics));
+                return self_type;
+            },
+            Type::Struct(struct_info, _) => {
+                let generics = GenericMap::new(allocator, &struct_info.generics, usage_types);
+                let self_type: &Type = allocator.alloc(sizeof(Type));
+                generics.self_type = self_type;
+                *self_type = Type::Struct(struct_info, allocator.store(generics));
+                return self_type;
+            },
+            Type::Trait(trait_info, _) => {
+                let generics = GenericMap::new(allocator, &trait_info.generics, usage_types);
+                let self_type: &Type = allocator.alloc(sizeof(Type));
+                generics.self_type = self_type;
+                *self_type = Type::Trait(trait_info, allocator.store(generics));
+                return self_type;
+            },
+            Type::Function(function_info, _) => {
+                let generics = GenericMap::new(allocator, &function_info.generics, usage_types);
+                let self_type: &Type = allocator.alloc(sizeof(Type));
+                generics.self_type = self_type;
+                *self_type = Type::Function(function_info, allocator.store(generics));
+                return self_type;
+            },
+            _ => { return type; }
+        }
+    }
+
+    fn find_primitive(&self, name: *const char) -> *Primitive {
+        let primitives = &self.namespace.root.primitives;
+        return primitives.find(name);
+    }
+}

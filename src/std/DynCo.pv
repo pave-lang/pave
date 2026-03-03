@@ -1,0 +1,5 @@
+trait DynCo<T> {
+    fn get_params(&self) -> &Array<TypeId>;
+    fn set_arg(&self, index: usize, value: *void) -> bool;
+    fn init(&self, allocator: &Allocator) -> &Iter<T>;
+}

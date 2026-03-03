@@ -1,0 +1,11 @@
+use std
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+    let args = Array<*const char> { data: argv, length: argc };
+
+    let ls = LanguageServer::new(&allocator, &args);
+    defer ls.destroy();
+
+    return ls.run();
+}

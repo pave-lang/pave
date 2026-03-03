@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <string.h>
+
+#include <stdbool.h>
+#include <std/HashMapBucket_str_Enum.h>
+#include <std/str.h>
+#include <analyzer/Enum.h>
+#include <stdint.h>
+#include <tuple_str_Enum.h>
+
+#include <std/HashMapIter_str_Enum.h>
+
+#line 16 "src/std/HashMap.pv"
+bool HashMapIter_str_Enum__next(struct HashMapIter_str_Enum* self) {
+    #line 17 "src/std/HashMap.pv"
+    self->iter += 1;
+    #line 18 "src/std/HashMap.pv"
+    return self->iter < self->end;
+}
+
+#line 21 "src/std/HashMap.pv"
+struct tuple_str_Enum* HashMapIter_str_Enum__value(struct HashMapIter_str_Enum* self) {
+    #line 22 "src/std/HashMap.pv"
+    return (struct tuple_str_Enum*)(self->iter);
+}

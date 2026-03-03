@@ -1,0 +1,5 @@
+build*
+
+examples/*.c
+examples/*.h
+examples/std

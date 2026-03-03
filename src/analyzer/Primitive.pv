@@ -1,0 +1,17 @@
+use std
+
+struct Primitive {
+    name: str,
+    traits: HashMap<str, &Trait>,
+    impls: Array<&Impl>,
+}
+
+impl Primitive {
+    fn new(allocator: &ArenaAllocator, name: *const char) -> Self {
+        return Self {
+            name: name,
+            traits: HashMap<str, &Trait>::new(allocator),
+            impls: Array<&Impl>::new(allocator),
+        };
+    }
+}

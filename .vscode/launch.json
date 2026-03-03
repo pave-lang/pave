@@ -1,0 +1,120 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Build",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "make"
+		},
+		{
+			"name": "Dist Debug",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "./dist/pavec.exe",
+			"cwd": "${workspaceRoot}",
+			"args": [
+				"std=src/std",
+				"analyzer=src/analyzer",
+				"compiler=src/compiler",
+				"-IC:/Program Files/LLVM/include/",
+				"-I./src/compiler",
+				"-o",
+				"./pave/build/2/src"
+			],
+			"stopAtEntry": false,
+			"environment": [
+				{
+					"name": "PATH",
+					"value": "${env:PATH};C:\\Program Files\\LLVM\\lib\\clang\\20\\lib\\windows"
+				}
+			],
+			"console": "integratedTerminal"
+		},
+		{
+			"name": "Build 1 Debug",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "./build/1/pavec.exe",
+			"cwd": "${workspaceRoot}",
+			"args": [
+				"std=src/std",
+				"analyzer=src/analyzer",
+				"compiler=src/compiler",
+				"-IC:/Program Files/LLVM/include/",
+				"-I./src/compiler",
+				"-o",
+				"build/2/src"
+			],
+			"stopAtEntry": false,
+			"environment": [
+				{
+					"name": "PATH",
+					"value": "${env:PATH};C:\\Program Files\\LLVM\\lib\\clang\\20\\lib\\windows"
+				}
+			],
+			"console": "integratedTerminal"
+		},
+		{
+			"name": "Build 1 Debug linux",
+			"type": "lldb",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/1/pavec",
+			"args": [
+				"std=src/std",
+				"analyzer=src/analyzer",
+				"compiler=src/compiler",
+				"-I/lib/llvm-20/include",
+				"-I./src/compiler",
+				"-o",
+				"build/2/src"
+			],
+			"console": "integratedTerminal"
+		},
+		{
+			"name": "pavels",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "./out/pavels.exe",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}-vscode",
+			"console": "integratedTerminal",
+			"preLaunchTask": "pavels build"
+		},
+		{
+			"name": "pavejson",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "./build/json/pavejson.exe",
+			"cwd": "${workspaceRoot}",
+			"args": [],
+			"stopAtEntry": false,
+			"console": "integratedTerminal"
+		},
+		{
+			"name": "dist built pavels",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "./dist/pavec.exe",
+			"cwd": "${workspaceRoot}",
+			"args": [
+				"std=src/std",
+				"analyzer=src/analyzer",
+				"language_server=src/language_server",
+				"-IC:/Program Files/LLVM/include/",
+				"-I./src/language_server",
+				"-o",
+				"./build/ls/src"
+			],
+			"stopAtEntry": false,
+			"environment": [
+				{
+					"name": "PATH",
+					"value": "${env:PATH};C:\\Program Files\\LLVM\\lib\\clang\\20\\lib\\windows"
+				}
+			],
+			"console": "integratedTerminal"
+		}
+	]
+}

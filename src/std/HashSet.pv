@@ -1,0 +1,120 @@
+#include "stdio.h"
+#include "string.h"
+
+struct HashSetBucket<T> {
+    value: T,
+    next: &HashSetBucket<T>,
+}
+
+struct HashSet<T: Hash> {
+    allocator: &ArenaAllocator,
+    buckets: &&HashSetBucket<T>,
+    data: &HashSetBucket<T>,
+    capacity: usize,
+    length: usize,
+}
+
+impl<T: Hash> HashSet<T: Hash> {
+    fn new(allocator: &ArenaAllocator) -> Self {
+        let initial_capacity = 16;
+        let self = Self {
+            allocator,
+        };
+
+        self.resize(initial_capacity);
+
+        return self;
+    }
+    
+    fn resize(&self, new_capacity: usize) {
+        self.buckets = self.allocator.realloc(self.buckets, new_capacity * sizeof(self.data));
+        self.data = self.allocator.realloc(self.data, new_capacity * sizeof(HashSetBucket<T>));
+        self.capacity = new_capacity;
+        memset(self.buckets, 0, self.capacity * sizeof(self.data));
+
+        self.fill_buckets();
+    }
+
+    fn has(&self, value: &T) -> bool {
+        let hash = (*value).hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets[bucket_index];
+
+        while current_bucket_node != 0 {
+            if current_bucket_node.value.hash()._0 == hash._0 {
+                return true;
+            }
+            current_bucket_node = current_bucket_node.next;
+        }
+
+        return false;
+    }
+
+    fn insert(&self, value: T) -> bool {
+        if self.has(&value) { return false; }
+
+        if (self.length * 100 / self.capacity) > 75 {
+            self.resize(self.capacity * 2);
+        }
+
+        let hash = value.hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets + bucket_index;
+
+        while *current_bucket_node != 0 {
+            current_bucket_node = &(*current_bucket_node).next;
+        }
+
+        self.data[self.length] = HashSetBucket<T> { value };
+        let data = self.data + self.length;
+        self.length += 1;
+
+        *current_bucket_node = data;
+
+        return true;
+    }
+
+    fn release(&self) {
+        self.allocator.free(self.buckets);
+        self.allocator.free(self.data);
+        self.buckets = 0;
+        self.data = 0;
+        self.capacity = 0;
+        self.length = 0;
+    }
+
+    fn fill_buckets(&self) {
+        let i: usize = 0;
+        while i < self.length {
+            let node = self.data + i;
+            node.next = 0;
+            let hash = (*node).value.hash();
+            let bucket_index: usize = hash._0 % self.capacity;
+            let current_bucket_node = self.buckets + bucket_index;
+
+            while *current_bucket_node != 0 {
+                current_bucket_node = &(*current_bucket_node).next;
+            }
+
+            *current_bucket_node = node;
+
+            i += 1;
+        }
+    }
+
+    fn clone(&self, allocator: &ArenaAllocator) -> Self {
+        let other = Self {
+            allocator,
+            buckets: allocator.alloc(self.capacity * sizeof(self.data)),
+            data: allocator.alloc(self.capacity * sizeof(HashSetBucket<T>)),
+            length: self.length,
+            capacity: self.capacity,
+        };
+
+        memcpy(other.data, self.data, self.capacity * sizeof(HashSetBucket<T>));
+
+        other.fill_buckets();
+
+        return other;
+    }
+}

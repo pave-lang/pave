@@ -1,0 +1,11 @@
+#ifndef PAVE_SLICE_PTRC_CHAR
+#define PAVE_SLICE_PTRC_CHAR
+
+#include <stdint.h>
+
+struct slice_ptrc_char { char const** data; uintptr_t length; };
+
+#line 2 "src/std/Slice.pv"
+struct ArrayIter_ref_ptrc_char slice_ptrc_char__iter(struct slice_ptrc_char self);
+
+#endif

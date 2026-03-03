@@ -1,0 +1,118 @@
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+#include "pipes.h"
+
+use std
+use analyzer
+
+struct LanguageServer {
+    allocator: &ArenaAllocator,
+    root: &Root,
+    args: Array<*const char>,
+    clang_args: Array<*const char>,
+    analysis_alloc: ArenaAllocator,
+    analysis: Analysis,
+    file_map: HashMap<str, str>,
+    pipe_read: pipe_t,
+    pipe_write: pipe_t,
+}
+
+impl LanguageServer {
+    fn new(allocator: &ArenaAllocator, args: &Array<*const char>) -> &LanguageServer {
+        let self = allocator.store(LanguageServer {
+            allocator,
+            args: Array<*const char>::new(allocator),
+            clang_args: Array<*const char>::new(allocator),
+        });
+
+        let use_stdio = true;
+        for *arg in args.iter().skip(1) {
+            if strncmp(arg, "--pipe=", 7) == 0 {
+                let pipe_name = arg + 7;
+
+                self.pipe_read = open_pipe(pipe_name);
+                if self.pipe_read == INVALID_PIPE {
+                    return 0;
+                }
+                self.pipe_write = self.pipe_read;
+
+                fprintf(stderr, "LSP Server started (using pipe %s)...\n", pipe_name);
+                use_stdio = false;
+            }
+        }
+
+        if use_stdio {
+            self.pipe_read = get_stdin_pipe();
+            self.pipe_write = get_stdout_pipe();
+            fprintf(stderr, "LSP Server started (using stdio)...\n");
+        }
+
+        return self;
+    }
+
+    fn add_arg(&self, arg: *const char) {
+        self.args.append(arg);
+    }
+
+    fn add_clang_arg(&self, arg: *const char) {
+        self.clang_args.append(arg);
+    }
+
+    fn analyze(&self) -> &Analysis {
+        self.analysis_alloc.destroy();
+        self.analysis_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+        self.analysis = Analysis::new(&self.analysis_alloc);
+        self.file_map = HashMap<str, str>::new(&self.analysis_alloc);
+        let analysis = &self.analysis;
+
+        self.root = Root::new(&self.analysis_alloc, &self.args, &self.clang_args, analysis);
+        let root = self.root;
+
+        for (filename, _) in analysis.files {
+            let uri = Uri::file(&self.analysis_alloc, filename);
+            self.file_map.insert(uri, filename);
+        }
+
+        if analysis.diagnostics.length > 0 { return analysis; }
+
+        root.add_use_namespaces();
+        if analysis.diagnostics.length > 0 { return analysis; }
+
+        root.fill_namespace();
+        if analysis.diagnostics.length > 0 { return analysis; }
+
+        root.prefill_types();
+        if analysis.diagnostics.length > 0 { return analysis; }
+
+        root.parse_declarations();
+        if analysis.diagnostics.length > 0 { return analysis; }
+
+        root.parse_functions();
+        if analysis.diagnostics.length > 0 { return analysis; }
+
+        return analysis;
+    }
+
+    fn alloc(&self, size: usize) -> &void {
+        return self.allocator.alloc(size);
+    }
+
+    fn destroy(&self) {
+        self.allocator.destroy();
+    }
+
+    fn run(&self) -> i32 {
+        let run = true;
+        while run {
+            let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+
+            let processor = Processor::new(&allocator, self.pipe_read, self.pipe_write);
+            run = processor.process(self);
+
+            allocator.destroy();
+        }
+
+        return 0;
+    }
+}

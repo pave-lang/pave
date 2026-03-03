@@ -1,0 +1,4 @@
+struct TypeId(u64);
+impl Hash for TypeId {
+    fn hash(&self) -> Hashed { return Hashed(self._0); }
+}

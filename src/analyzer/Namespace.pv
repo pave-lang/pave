@@ -1,0 +1,162 @@
+#include "fs.h"
+
+use std
+
+struct Namespace {
+    root: &Root,
+    parent: *Namespace,
+    name: str,
+    path: str,
+    children: HashMap<str, &Namespace>,
+    modules: HashMap<str, &Module>,
+    types: HashMap<str, Type>,
+    traits: HashMap<str, &Trait>,
+    functions: HashMap<str, Type>,
+}
+
+impl Namespace {
+    fn new(root: &Root, parent: *Namespace, name: str, path: str) -> &Self {
+        let allocator = root.allocator;
+        let self: &Self = allocator.alloc(sizeof(Self));
+        
+        *self = Self {
+            root,
+            parent,
+            name,
+            path,
+            children: HashMap<str, &Namespace>::new(allocator),
+            modules: HashMap<str, &Module>::new(allocator),
+            types: HashMap<str, Type>::new(allocator),
+            traits: HashMap<str, &Trait>::new(allocator),
+            functions: HashMap<str, Type>::new(allocator),
+        };
+
+        return self;
+    }
+
+    fn parse(&self) -> bool {
+        return self.add_module("ns");
+    }
+
+    fn add_namespace(&self, name: str, path: str) -> bool {
+        let child = Namespace::new(self.root, self, name, path);
+        self.children.insert(name, child);
+        return child.parse();
+    }
+
+    fn add_namespace_subfolder(&self, name: str) -> bool {
+        let path = String::new(self.root.allocator);
+        path.append(self.path);
+        path.append("/");
+        path.append(name);
+        return self.add_namespace(name, path.as_str());
+    }
+
+    fn find_namespace(&self, name: str) -> *Namespace {
+        let child = self.children.find(&name);
+        if child != 0 { return *child; }
+
+        if self.parent != 0 {
+            return self.parent.find_namespace(name);
+        } else {
+            return self.root.find_namespace(name);
+        }
+    }
+
+    fn add_module(&self, name: str) -> bool {
+        if self.modules.find(&name) != 0 {
+            return true;
+        }
+
+        let path = String::new(self.root.allocator);
+        path.append(self.path);
+        path.append("/");
+        path.append(name);
+        path.append(".pave");
+
+        if !path_exists(path.c_str()) {
+            path.array.length -= 5;
+            path.append(".pv");
+        }
+
+        let module = Module::new(self, path.as_str());
+        self.modules.insert(name, module);
+        return module.parse();
+    }
+
+    fn add_use_namespaces(&self) -> bool {
+        for (_, module) in self.modules {
+            module.add_use_namespaces();
+        }
+
+        for (_, child) in self.children {
+            child.add_use_namespaces();
+        }
+
+        return 1;
+    }
+
+    fn fill_namespace(&self) -> bool {
+        let success = true;
+
+        for (_, child) in self.children {
+            success = child.fill_namespace() && success;
+        }
+
+        for (_, module) in self.modules {
+            success = module.fill_namespace() && success;
+        }
+
+        return success;
+    }
+
+    fn prefill_types(&self) -> bool {
+        for (_, child) in self.children {
+            child.prefill_types();
+        }
+
+        for (_, module) in self.modules {
+            module.prefill_types();
+        }
+
+        return true;
+    }
+
+    fn parse_declarations(&self) -> bool {
+        for (_, module) in self.modules {
+            module.parse_declarations();
+        }
+
+        for (_, child) in self.children {
+            child.parse_declarations();
+        }
+
+        return 1;
+    }
+
+    fn parse_functions(&self) -> bool {
+        for (_, module) in self.modules {
+            module.parse_functions();
+        }
+        
+        for (_, child) in self.children {
+            child.parse_functions();
+        }
+
+        return 1;
+    }
+
+    fn find_type(&self, name: str) -> &Type {
+        return self.types.find(&name);
+    }
+
+    fn find_trait(&self, name: str) -> &Trait {
+        let trait_info = self.traits.find(&name);
+        if trait_info == 0 { return 0; }
+        return *trait_info;
+    }
+
+    fn find_function(&self, name: str) -> &Type {
+        return self.functions.find(&name);
+    }
+}

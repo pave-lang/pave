@@ -1,0 +1,56 @@
+# Makefile.build - Single stage build
+# Usage: make -f Makefile.build GENERATOR=<path> BUILD_DIR=<path> GEN_FLAGS=<flags> TARGET=<target>
+
+SRC_DIR := $(BUILD_DIR)/src
+OBJ_DIR := $(BUILD_DIR)/obj
+SRCS_LST := $(BUILD_DIR)/sources.lst
+OBJS_LST := $(BUILD_DIR)/objects.lst
+
+ifeq ($(OS),Windows_NT)
+	EXE := .exe
+	CC := clang
+	CXX := clang++
+else
+	EXE :=
+	CC := clang-20
+	CXX := clang++-20
+endif
+
+ifneq ($(wildcard $(SRCS_LST)),)
+    FILE_LIST := $(shell cat $(SRCS_LST))
+
+    OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(FILE_LIST))) \
+            $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(FILE_LIST)))
+endif
+
+.PHONY: all build-objs generate
+
+all: generate
+	@echo "Compiling generated files..."
+	$(eval GEN_FILES := $(shell cat $(SRCS_LST)))
+	$(eval CURRENT_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(GEN_FILES))) \
+                           $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(GEN_FILES))))
+
+	@$(MAKE) -f Makefile.build build-objs
+
+	@echo "Linking..."
+	$(file >$(OBJS_LST),$(CURRENT_OBJS))
+	$(CC) @$(OBJS_LST) $(LDFLAGS) -o $(TARGET)
+	@echo "Build complete: $(TARGET)"
+
+generate:
+	@echo "Generating C files..."
+	@mkdir -p $(SRC_DIR)
+	$(GENERATOR) -o $(SRC_DIR) $(GEN_FLAGS) > $(SRCS_LST)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -I$(SRC_DIR) -MMD -MP -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) -MMD -MP -c $< -o $@
+
+build-objs: $(OBJS)
+
+-include $(wildcard $(OBJ_DIR)/*.d)

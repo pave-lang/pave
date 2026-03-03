@@ -1,0 +1,167 @@
+#include "math.h"
+
+use std
+
+enum JsonNode {
+    Array(Array<JsonNode>),
+    Object(HashMap<str, JsonNode>),
+    Number(f64),
+    String(str),
+    Boolean(bool),
+    Null,
+    Undefined,
+}
+
+impl JsonNode {
+    fn is_array(&self) -> bool {
+        match self {
+            JsonNode::Array(_) => { return true; },
+            _ => { return false; },
+        }
+    }
+
+    fn is_object(&self) -> bool {
+        match self {
+            JsonNode::Object(_) => { return true; },
+            _ => { return false; },
+        }
+    }
+
+    fn key(&self, key: str) -> &JsonNode {
+        match self {
+            JsonNode::Object(&object) => {
+                let result = object.find(&key);
+                if result != 0 { return result; }
+            },
+            _ => {},
+        }
+
+        return JsonParser::undefined();
+    }
+
+    fn index(&self, i: usize) -> &JsonNode {
+        match self {
+            JsonNode::Array(&array) => {
+                if i < array.length { return array.data + i; }
+            },
+            _ => {},
+        }
+        return JsonParser::undefined();
+    }
+
+    fn array(&self) -> &Array<JsonNode> {
+        match self {
+            JsonNode::Array(&value) => {
+                return value;
+            },
+            _ => {},
+        }
+        return 0;
+    }
+
+    fn object(&self) -> &HashMap<str, JsonNode> {
+        match self {
+            JsonNode::Object(&value) => {
+                return value;
+            },
+            _ => {},
+        }
+        return 0;
+    }
+
+    fn string(&self) -> str {
+        match self {
+            JsonNode::String(value) => {
+                return value;
+            },
+            _ => {},
+        }
+        return str {};
+    }
+
+    fn number(&self) -> f64 {
+        match self {
+            JsonNode::Number(value) => {
+                return value;
+            },
+            _ => {},
+        }
+        return NAN;
+    }
+
+    fn to_string(&self, allocator: &ArenaAllocator) -> String {
+        let result = String::new(allocator);
+        self.append_to(&result);
+        return result;
+    }
+
+    fn append_to(&self, result: &String) {
+        match self {
+            JsonNode::Array(array) => {
+                result.append("[");
+
+                let first = true;
+                for node in array {
+                    if first { first = false; } else { result.append(","); }
+                    node.append_to(result);
+                }
+
+                result.append("]");
+            },
+            JsonNode::Object(object) => {
+                result.append("{");
+
+                let first = true;
+                for (key, &value) in object {
+                    if first { first = false; } else { result.append(","); }
+
+                    // write_string
+                    result.append("\"");
+                    result.append(key);
+                    result.append("\"");
+
+                    result.append(":");
+                    value.append_to(result);
+                }
+
+                result.append("}");
+            },
+            JsonNode::Number(value) => {
+                result.append_f64(value);
+            },
+            JsonNode::String(value) => {
+                self.append_string(result, value);
+            },
+            JsonNode::Boolean(value) => {
+                if value { result.append("true"); }
+                else { result.append("false"); }
+            },
+            JsonNode::Null => {
+                result.append("null");
+            },
+            JsonNode::Undefined => {
+                result.append("null");
+            },
+        }
+    }
+
+    fn append_string(&self, result: &String, value: str) {
+        result.append("\"");
+
+        let pos: usize = 0;
+        let start: usize = 0;
+        while pos < value.length {
+            // result.append(value);
+            let c = value.ptr[pos];
+            pos += 1;
+
+            if c == '"' { result.append(value.slice(start, pos - 1)); result.append("\\\""); start = pos; }
+            if c == '\r' { result.append(value.slice(start, pos - 1)); result.append("\\n"); start = pos; }
+            if c == '\n' { result.append(value.slice(start, pos - 1)); result.append("\\n"); start = pos; }
+        }
+
+        result.append(value.slice(start, pos));
+
+        result.append("\"");
+    }
+}

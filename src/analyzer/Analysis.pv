@@ -1,0 +1,67 @@
+#include "stdio.h"
+
+use std
+
+struct Position {
+    line: usize,
+    character: usize,
+}
+
+struct Range {
+    start: Position,
+    end: Position,
+}
+
+struct Diagnostic {
+    message: str,
+    code: str,
+    range: Range,
+}
+
+enum InlayHintKind {
+    Unknown,
+    Type,
+    Parameter,
+}
+
+struct InlayHint {
+    position: Position,
+    label: str,
+    kind: InlayHintKind,
+    padding_left: bool,
+    padding_right: bool,
+}
+
+struct Analysis {
+    files: HashMap<str, bool>,
+    diagnostics: HashMap<str, Array<Diagnostic>>,
+    inlay_hints: HashMap<str, Array<InlayHint>>,
+}
+
+impl Analysis {
+    fn new(allocator: &ArenaAllocator) -> Analysis {
+        return Analysis {
+            files: HashMap<str, bool>::new(allocator),
+            diagnostics: HashMap<str, Array<Diagnostic>>::new(allocator),
+            inlay_hints: HashMap<str, Array<InlayHint>>::new(allocator),
+        };
+    }
+
+    fn print_diagnostics(&self) {
+        for (filename, &diagnostics) in self.diagnostics {
+            for diagnostic in diagnostics {
+                let filename_length: i32 = filename.length;
+                let message_length: i32 = diagnostic.message.length;
+
+                fprintf(stderr, "%.*s:%zu:%zu %.*s", filename_length, filename.ptr, diagnostic.range.start.line + 1, diagnostic.range.start.character + 1, message_length, diagnostic.message.ptr);
+
+                if diagnostic.code.length > 0 {
+                    let code_length: i32 = diagnostic.code.length;
+                    fprintf(stderr, " %.*s", code_length, diagnostic.code.ptr);
+                }
+
+                fprintf(stderr, "\n");
+            }
+        }
+    }
+}

@@ -1,0 +1,4018 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include "fs.h"
+
+use std
+use analyzer
+
+struct FunctionScope {
+    break_target: bool,
+    continue_target: bool,
+    defer_statements: Array<&Expression>,
+    variable_replacements: HashMap<str, str>,
+}
+
+impl FunctionScope {
+    fn new(allocator: &ArenaAllocator, break_target: bool, continue_target: bool) -> Self {
+        return Self {
+            break_target,
+            continue_target,
+            defer_statements: Array<&Expression>::new(allocator),
+            variable_replacements: HashMap<str, str>::new(allocator),
+        };
+    }
+}
+
+struct FunctionCoroutine {
+    yield_count: usize,
+    variables: HashMap<str, &Type>,
+}
+
+impl FunctionCoroutine {
+    fn new(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            variables: HashMap<str, &Type>::new(allocator),
+        };
+    }
+}
+
+struct FunctionContext {
+    allocator: &ArenaAllocator,
+    func_info: &Function,
+    use_scopes: bool,
+    scopes: Array<FunctionScope>, 
+    coroutine: FunctionCoroutine,   
+}
+
+impl FunctionContext {
+    fn new(allocator: &ArenaAllocator, func_info: &Function, use_scopes: bool) -> Self {
+        let self = Self {
+            allocator,
+            func_info,
+            use_scopes,
+            scopes: Array<FunctionScope>::new(allocator),
+        };
+        
+        if self.use_scopes {
+            self.scopes = Array<FunctionScope>::new(allocator);
+            self.push_scope(false, false);
+        }
+
+        if func_info.type == FunctionType::Coroutine {
+            self.coroutine = FunctionCoroutine::new(allocator);
+            for param in func_info.parameters {
+                self.add_variable(param.name.value, &param.type);
+            }
+        }
+
+        return self;
+    }
+
+    fn push_scope(&self, break_target: bool, continue_target: bool) {
+        self.scopes.append(FunctionScope::new(self.allocator, break_target, continue_target));
+    }
+
+    fn pop_scope(&self) {
+        self.scopes.remove_back();
+    }
+
+    fn get_variable_replacement(&self, name: str) -> str {
+        for scope in self.scopes.iter().reverse() {
+            let variable = scope.variable_replacements.find(&name);
+            if variable != 0 {
+                return *variable;
+            }
+        }
+
+        return name;
+    }
+
+    fn add_variable(&self, name: str, type: &Type) {
+        if self.func_info.type != FunctionType::Coroutine {
+            return;
+        }
+
+        let new_name = String::new(self.allocator);
+        new_name.append(name);
+
+        if self.coroutine.variables.find(&name) == 0 {
+            self.coroutine.variables.insert(name, type);
+
+            if self.use_scopes {
+                let scope = self.scopes.back();
+                new_name.prepend("ctx->");
+                scope.variable_replacements.insert(name, new_name.as_str());
+            }
+
+            return;
+        }
+
+        new_name.append("_x");
+        let i = 1;
+        while true {
+            if i == 10 { new_name.append("x"); }
+            if i > 9 {
+                new_name.array.data[new_name.length() - 2] = '0' + (i / 10);
+                new_name.array.data[new_name.length() - 1] = '0' + (i % 10);
+            } else {
+                new_name.array.data[new_name.length() - 1] = '0' + i;
+            }
+
+            let new_name_str = new_name.as_str();
+            if self.coroutine.variables.find(&new_name_str) == 0 {
+                new_name.prepend("ctx->");
+                new_name_str = new_name.as_str();
+                self.coroutine.variables.insert(new_name_str.slice(5, new_name_str.length), type);
+
+                if self.use_scopes {
+                    let scope = self.scopes.back();
+                    scope.variable_replacements.insert(name, new_name.as_str());
+                }
+                return;
+            }
+            i += 1;
+        }
+    }
+}
+
+struct Generator {
+    allocator: &ArenaAllocator,
+    path: *const char,
+    root: &Root,
+    primitives: HashMap<str, str>,
+    primitive_includes: HashMap<str, str>,
+    indent: i16,
+    code_files: Array<String>,
+    error: FileWriter,
+    output_line_directives: bool,
+    naming_decl: &Naming,
+    naming_ident: Naming,
+    naming_c99: Naming,
+    function_context: &FunctionContext,
+}
+
+struct GeneratorInclude {
+    type: &Type,
+    name: str,
+}
+
+impl Generator {
+    fn overwrite_if_different(&self, file_name: *const char, source: &FILE) -> bool {
+        let orig: &FILE = fopen(file_name, "r");
+        let different = true;
+
+        if orig != 0 {
+            rewind(source);
+            let c1: i32 = 0;
+            let c2: i32 = 0;
+            different = false;
+            while !different && c1 != EOF && c2 != EOF {
+                c1 = fgetc(source);
+                c2 = fgetc(orig);
+                different = c1 != c2;
+            }
+
+            fclose(orig);
+        }
+
+        if !different { return false; }
+
+        rewind(source);
+
+        let out: &FILE = fopen(file_name, "w");
+        if (!out) { perror("fopen"); return false; }
+
+        let c: i32 = fgetc(source);
+        while c != EOF {
+            fputc(c, out);
+            c = fgetc(source);
+        }
+
+        fclose(out);
+        return true;
+    }
+
+    fn write_indent(&self, file: &FILE) {
+        let i: i16 = 0;
+
+        while i < self.indent {
+            fprintf(file, "    ");
+            i += 1;
+        }
+    }
+
+    fn write_str(&self, file: &FILE, s: str) -> bool {
+        let length: i32 = s.length;
+        fprintf(file, "%.*s", length, s.ptr);
+        return 1;
+    }
+
+    fn write_string(&self, file: &FILE, s: &String) -> bool {
+        return self.write_str(file, s.as_str());
+    }
+
+    fn write_str_title(&self, file: &FILE, s: str) -> bool {
+        let i: usize = 0;
+        let length = s.length;
+        let was_lowercase = false;
+        
+        while i < length {
+            let c: char = s.ptr[i];
+            
+            if c >= 'a' && c <= 'z' {
+                fprintf(file, "%c", c - 32);
+                was_lowercase = 1;
+            } else {
+                if was_lowercase && c >= 'A' && c <= 'Z' {
+                    fprintf(file, "_");
+                }
+
+                fprintf(file, "%c", c);
+                was_lowercase = 0;
+            }
+
+            i += 1;
+        }
+
+        return 1;
+    }
+
+    fn write_str_lowercase(&self, file: &FILE, s: str) -> bool {
+        let i: usize = 0;
+        let length = s.length;
+
+        while i < length {
+            let c: char = s.ptr[i];
+
+            if c >= 'A' && c <= 'Z' {
+                fprintf(file, "%c", c + 32);
+            } else {
+                fprintf(file, "%c", c);
+            }
+
+            i += 1;
+        }
+
+        return 1;
+    }
+
+    fn write_token(&self, file: &FILE, token: &Token) -> bool {
+        return self.write_str(file, token.value);
+    }
+
+    fn is_discriminated_union(enum_info: &Enum) -> bool {
+        for (_, &variant_info) in enum_info.variants {
+            if variant_info.types.length > 0 {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    fn type_is_discriminated_union(&self, type: &Type, generics: &GenericMap) -> bool {
+        match type {
+            Type::Indirect(indirect) => { return self.type_is_discriminated_union(&indirect.to, generics); },
+            Type::Enum(enum_info, _) => { return Generator::is_discriminated_union(enum_info); },
+            Type::Self => { return self.type_is_discriminated_union(generics.self_type, generics); },
+            _ => {},
+        }
+
+        return 0;
+    }
+
+    fn write_type(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
+        let type_name = self.naming_c99.get_type_name(type, generics.self_type, generics);
+        self.write_str(file, type_name.as_str());
+        type_name.release();
+        return true;
+    }
+
+    fn write_variable_decl(&self, file: &FILE, name: str, type: &Type, generics: &GenericMap) -> bool {
+        let self_type = type;
+        if generics != 0 { self_type = generics.self_type; }
+
+        let variable_decl = self.naming_c99.get_variable_decl(name, type, self_type, generics);
+        self.write_str(file, variable_decl.as_str());
+        variable_decl.release();
+        return true;
+    }
+
+    fn write_function_name(&self, file: &FILE, func_info: &Function, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+        defer name.release();
+
+        self.write_str(file, name.as_str());
+
+        return true;
+    }
+
+    fn is_reference(type: &Type) -> bool {
+        match type {
+            Type::Indirect(_) => { return true; },
+            Type::TypedefC(info) => { return Generator::is_reference(info.type); },
+            _ => { return false; }
+        }
+    }
+
+    fn is_type_single_value_struct(&self, type: &Type, generics: &GenericMap) -> bool {
+        match type.deref() {
+            Type::Struct(struct_info, _) => { return struct_info.is_newtype(); },
+            Type::Self => { return self.is_type_single_value_struct(generics.self_type, generics); },
+            _ => { return false; },
+        }
+    }
+
+    fn get_function(&self, type: &Type, func_name: str, generic_map: &GenericMap) -> &Function {
+        match type {
+            Type::Self => { return self.get_function(generic_map.self_type, func_name, generic_map); },
+            Type::Indirect(indirect) => { return self.get_function(&indirect.to, func_name, generic_map); },
+            Type::Generic(generic) => {
+                if generic_map == 0 {
+                    fprintf(stderr, "Getting generic for function, but no generic map input\n");
+                    return 0;
+                }
+
+                let generic_type = generic_map.get(generic.name.value);
+                if generic_type == 0 {
+                    fprintf(stderr, "Getting generic for function, no item in generic map found\n");
+                    return 0;
+                }
+
+                return self.get_function(generic_type, func_name, generic_map);
+            },
+            Type::Primitive(primitive_info) => {
+                if primitive_info == 0 {
+                    let name_length: i32 = primitive_info.name.length;
+                    fprintf(stderr, "Could not find primitive_info %.*s for get_function\n", name_length, primitive_info.name.ptr);
+                    return 0;
+                }
+
+                let func_info: &Function = 0;
+
+                let impl_iter = primitive_info.impls.iter();
+                while func_info == 0 && impl_iter.next() {
+                    let impl_info = *impl_iter.value();
+                    func_info = impl_info.functions.find(&func_name);
+                }
+
+                if func_info == 0 {
+                    let name_length: i32 = primitive_info.name.length;
+                    let func_name_length: i32 = func_name.length;
+                    fprintf(stderr, "Could not find primitives %.*s function %.*s for get_function\n", name_length, primitive_info.name.ptr, func_name_length, func_name.ptr);
+                }
+
+                return func_info;
+            },
+            Type::Enum(enum_info, _) => {
+                if enum_info == 0 {
+                    let name_length: i32 = enum_info.name.value.length;
+                    fprintf(stderr, "Could not find enum %.*s for get_function\n", name_length, enum_info.name.value.ptr);
+                    return 0;
+                }
+
+                let func_info: &Function = 0;
+
+                let impl_iter = enum_info.impls.iter();
+                while func_info == 0 && impl_iter.next() {
+                    let impl_info = *impl_iter.value();
+                    func_info = impl_info.functions.find(&func_name);
+                }
+
+                if func_info == 0 {
+                    let name_length: i32 = enum_info.name.value.length;
+                    let func_name_length: i32 = func_name.length;
+                    fprintf(stderr, "Could not find enums %.*s function %.*s for get_function\n", name_length, enum_info.name.value.ptr, func_name_length, func_name.ptr);
+                }
+
+                return func_info;
+            },
+            Type::Struct(struct_info, _) => {
+                if struct_info == 0 {
+                    let name_length: i32 = struct_info.name.value.length;
+                    fprintf(stderr, "Could not find struct %.*s for get_function\n", name_length, struct_info.name.value.ptr);
+                    return 0;
+                }
+
+                let func_info: &Function = 0;
+
+                for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
+                    func_info = impl_info.functions.find(&func_name);
+
+                    if func_info != 0 { break; }
+
+                    func_info = impl_info.trait_.functions.find(&func_name);
+
+                    if func_info != 0 {
+                        func_info = self.allocator.store(*func_info);
+                        func_info.parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
+                        break;
+                    }
+                }
+
+                if func_info == 0 {
+                    let name_length: i32 = struct_info.name.value.length;
+                    let func_name_length: i32 = func_name.length;
+                    fprintf(stderr, "Could not find structs %.*s function %.*s for get_function\n", name_length, struct_info.name.value.ptr, func_name_length, func_name.ptr);
+                }
+
+                return func_info;
+            },
+            Type::Trait(trait_info, _) => {
+                if trait_info == 0 {
+                    let name_length: i32 = trait_info.name.value.length;
+                    fprintf(stderr, "Could not find trait %.*s for get_function\n", name_length, trait_info.name.value.ptr);
+                    return 0;
+                }
+
+                let func_info = trait_info.functions.find(&func_name);
+
+                if func_info == 0 {
+                    let name_length: i32 = trait_info.name.value.length;
+                    let func_name_length: i32 = func_name.length;
+                    fprintf(stderr, "Could not find traits %.*s function %.*s for get_function\n", name_length, trait_info.name.value.ptr, func_name_length, func_name.ptr);
+                }
+
+                return func_info;
+            },
+            _ => { 
+                fprintf(stderr, "Unhandled type for getting function %s\n", type.name());
+            },
+        }
+
+        return 0;
+    }
+
+    fn write_enum_variant_name(&self, file: &FILE, type: &Type, variant: &EnumVariant) -> bool {
+        let parent: &Enum = variant.parent;
+        let name = parent.name;
+        self.write_str_title(file, name.value);
+        fprintf(file, "__");
+        let variant_name = variant.name;
+        self.write_str_title(file, variant_name.value);
+
+        return 1;
+    }
+
+    fn write_deref_if_needed(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
+        match type {
+            Type::Indirect(indirect) => {
+                fprintf(file, "*");
+                return Generator::write_deref_if_needed(self, file, &indirect.to, generics);
+            },
+            Type::TypedefC(info) => {
+                return Generator::write_deref_if_needed(self, file, info.type, generics);
+            },
+            _ => {},
+        }
+
+        return 1;
+    }
+
+    fn write_static_member_accessor(&self, file: &FILE, generics: &GenericMap) -> bool {
+        fprintf(file, "::");
+
+        return true;
+    }
+
+    fn write_instance_member_accessor(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
+        if type.is_fat_pointer() {
+            fprintf(file, ".");
+            return true;
+        }
+
+        match type {
+            Type::Indirect(_) => {
+                fprintf(file, "->");
+            },
+            Type::Self => {
+                return self.write_instance_member_accessor(file, generics.self_type, generics);
+            },
+            _ => {
+                fprintf(file, ".");
+            },
+        }
+
+        return true;
+    }
+
+    fn write_literal(&self, file: &FILE, type: &Type, value: str) -> bool {
+        self.write_str(file, value);
+
+        match type {
+            Type::Primitive(primitive_info) => {
+                if primitive_info.name.eq("u64") {
+                    fprintf(file, "ULL");
+                }
+            },
+            _ => {},
+        }
+
+        return true;
+    }
+
+    fn write_typeid(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
+        let type_name = self.naming_decl.get_type_decl(type, generics.self_type, generics);
+        defer type_name.release();
+
+        let type_id = Fnv1a::hash(type_name.array.data, type_name.length());
+
+        fprintf(file, "%zuULL", type_id._0);
+
+        return true;
+    }
+
+    fn write_line_directive(&self, file: &FILE, context: &Context, token: &Token) {
+        if self.output_line_directives {
+            self.write_indent(file);
+            fprintf(file, "#line %zu \"", token.start_line + 1);
+            self.write_str(file, context.path);
+            fprintf(file, "\"\n");
+        }
+    }
+
+    fn write_str_cast(&self, file: &FILE, inner_expr: &Expression, generics: &GenericMap, reference: bool) {
+        if reference { fprintf(file, "&"); }
+        fprintf(file, "(struct str){ .ptr = ");
+        self.write_expression(file, inner_expr, generics);
+        fprintf(file, ", .length = strlen(");
+        self.write_expression(file, inner_expr, generics);
+        fprintf(file, ") }");
+    }
+
+    fn write_trait_cast(&self, file: &FILE, inner_expr: &Expression, type: &Type, generics: &GenericMap) {
+        match inner_expr.return_type.deref() {
+            Type::Function(func_info, func_generics) => {
+                if func_info.type == FunctionType::Coroutine {
+                    fprintf(file, "(struct DynCo_CoroutineStatus) { .vtable = &");
+
+                    match func_info.parent {
+                        FunctionParent::Struct(struct_info, _, _) => {
+                            self.write_str_title(file, struct_info.name.value);
+                            fprintf(file, "__");
+                        },
+                        _ => {},
+                    }
+    
+                    self.write_str_title(file, func_info.name.value);
+                    fprintf(file, "__VTABLE__DYN_CO, .instance = &(struct ");
+                    self.write_function_name(file, func_info, func_generics);
+                    fprintf(file, "__DynCo_CoroutineStatus__Instance) {}");
+                    
+                    fprintf(file, " }");
+                } else {
+                    fprintf(file, "(struct DynFn) { .vtable = &");
+
+                    match func_info.parent {
+                        FunctionParent::Struct(struct_info, _, _) => {
+                            self.write_str_title(file, struct_info.name.value);
+                            fprintf(file, "__");
+                        },
+                        _ => {},
+                    }
+    
+                    self.write_str_title(file, func_info.name.value);
+                    fprintf(file, "__VTABLE__DYN_FN, .instance = &(struct ");
+                    self.write_function_name(file, func_info, func_generics);
+                    fprintf(file, "__DynFn__Instance) {}");
+                    
+                    fprintf(file, " }");
+                }
+
+                return;
+            },
+            _ => {},
+        }
+
+        match type {
+            Type::Trait(trait_info, _) => {
+                fprintf(file, "(");
+                self.write_type(file, type, generics);
+                fprintf(file, ") { .vtable = &");
+
+                let inner_type = Context::resolve_type(self.allocator, inner_expr.return_type.deref(), generics, 0);
+                let inner_type_name = self.naming_ident.get_type_name(inner_type, generics.array.data, generics);
+                self.write_str_title(file, inner_type_name.as_str());
+
+                fprintf(file, "__VTABLE__");
+                self.write_str_title(file, trait_info.name.value);
+                fprintf(file, ", .instance = ");
+                self.write_expression(file, inner_expr, generics);
+                fprintf(file, " }");
+            },
+            _ => { self.write_expression(file, inner_expr, generics); },
+        }
+    }
+
+    fn write_sequence_cast(&self, file: &FILE, inner_expr: &Expression, sequence: &Sequence, generics: &GenericMap) {
+        let inner_sequence: &Sequence = 0;
+
+        match inner_expr.return_type {
+            Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Sequence(inner_sequence_2) => { inner_sequence = inner_sequence_2; },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        if inner_sequence == 0 {
+            fprintf(file, " !!ERROR INVALID SEQUENCE TYPE TO CONVERT INTO SLICE!! ");
+            return;
+        }
+
+        let length: usize = 0;
+        match inner_sequence.type {
+            SequenceType::FixedArray(seq_length) => { length = seq_length; },
+            _ => {
+                fprintf(file, " !!ERROR INVALID SEQUENCE TYPE TO CONVERT INTO SLICE!! ");
+                return;
+            },
+        }
+
+        let sequence_type = Type::Sequence(sequence);
+
+        let name = self.naming_c99.get_type_name(&sequence_type, &sequence_type, generics);
+        let unary_inner: &Expression = 0;
+
+        match inner_expr.data {
+            ExpressionData::UnaryExpression(expr, inner) => {
+                if expr.eq("&") {
+                    unary_inner = inner;
+                }
+            },
+            _ => {},
+        }
+
+        fprintf(file, "(");
+        self.write_string(file, &name);
+        fprintf(file, ") { .data = ");
+
+        if unary_inner != 0 {
+            self.write_expression(file, unary_inner, generics);
+        } else {
+            fprintf(file, "*");
+            self.write_expression(file, inner_expr, generics);
+        }
+
+        fprintf(file, ", .length = %zu }", length);
+    }
+
+    fn write_struct_construction(&self, file: &FILE, type: &Type, fields: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        if self.is_type_single_value_struct(type, generics) {
+            if fields.length > 1 {
+                fprintf(file, "expected a single field as a value into this struct");
+            } else if fields.length == 1 {
+                let field = fields.data;
+                self.write_expression(file, field.value, generics);
+            } else {
+                fprintf(file, "0");
+            }
+        } else {
+            let compact = fields.length <= 1 || fields.data[0].value.token.start_line == fields.data[fields.length - 1].value.token.start_line;
+
+            fprintf(file, "(");
+            self.write_type(file, type, generics);
+
+            if fields.length == 0 {
+                fprintf(file, ") {}");
+            } else {
+                fprintf(file, ") {");
+                if !compact { fprintf(file, "\n"); }
+            }
+
+            self.indent += 1;
+            for (i, field) in fields.iter().enumerate() {
+                if compact {
+                    if i > 0 { fprintf(file, ", ."); }
+                    else { fprintf(file, " ."); }
+                } else {
+                    self.write_indent(file);
+                    fprintf(file, ".");
+                }
+
+                self.write_token(file, field.name);
+                fprintf(file, " = ");
+                self.write_expression(file, field.value, generics);
+                if !compact { fprintf(file, ",\n"); }
+            }
+
+            self.indent -= 1;
+
+            if fields.length != 0 {
+                if compact {
+                    fprintf(file, " }");
+                } else {
+                    self.write_indent(file);
+                    fprintf(file, "}");
+                }
+            }
+        }
+
+        return true;
+    }
+
+    fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let parent: &Enum = variant.parent;
+
+        if Generator::is_discriminated_union(parent) == 0 {
+            self.write_enum_variant_name(file, type, variant);
+            return true;
+        } 
+
+        fprintf(file, "(");
+        self.write_type(file, type, generics);
+        fprintf(file, ") { .type = ");
+        self.write_enum_variant_name(file, type, variant);
+
+        if arguments == 0 {
+            fprintf(file, " }");
+            return true;
+        }
+
+        if arguments.length > 0 {
+            fprintf(file, ", .");
+            let name = variant.name;
+            self.write_str_lowercase(file, name.value);
+            fprintf(file, "_value = ");
+        }
+
+        if arguments.length == 1 {
+            self.write_expression(file, arguments.data[0].value, generics);
+        } else if arguments.length > 1 {
+            fprintf(file, "{ ");
+
+            let i: usize = 0;
+            for *arg in arguments {
+                if i > 0 {
+                    fprintf(file, ", ");
+                }
+
+                fprintf(file, "._%zu = ", i);
+
+                self.write_expression(file, arg.value, generics);
+                i += 1;
+            }
+
+            fprintf(file, "}");
+        }
+
+        fprintf(file, " }");
+
+        return true;
+    }
+
+    fn write_coroutine_invoke(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let data: &ExpressionData = &expression.data;
+
+        match data {
+            ExpressionData::Type(type) => {
+                match type {
+                    Type::Function(func_info, generic_map) => {
+                        let resolved_generics = generic_map.resolve_types(self.allocator, generics);
+
+                        fprintf(file, "(struct ");
+                        self.write_function_name(file, func_info, &resolved_generics);
+                        fprintf(file, ") {");
+
+                        let i: usize = 0;
+                        for param in func_info.parameters {
+                            if i == 0 {
+                                fprintf(file, " .");
+                            } else {
+                                fprintf(file, ", .");
+                            }
+
+                            self.write_token(file, param.name);
+                            fprintf(file, " = ");
+
+                            if i < arguments.length {
+                                self.write_expression(file, arguments.data[i].value, generics);
+                            } else {
+                                fprintf(file, "0");
+                            }
+
+                            i += 1;
+                        }
+
+                        fprintf(file, " }");
+                        return true;
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+
+        fprintf(stderr, "coroutine invoke unsupported expression\n");
+        return false;
+    }
+
+    fn write_builtin_function_invoke(&self, file: &FILE, func_info: &Function, arguments: &Array<InvokeArgument>, func_generics: &GenericMap, generics: &GenericMap) -> bool {
+        let name = func_info.name.value;
+
+        if name.eq("typeid") {
+            let resolved_generics = func_generics.resolve_types(self.allocator, generics);
+            
+            let type = resolved_generics.get("T");
+            if type == 0 { return false; }
+
+            return self.write_typeid(file, type, generics);
+        }
+
+        if name.eq("cast") {
+            let resolved_generics = func_generics.resolve_types(self.allocator, generics);
+
+            let arg = arguments.get(0);
+            if arg == 0 { return false; }
+
+            let type = resolved_generics.get("T");
+            if type == 0 { return false; }
+
+            fprintf(file, "(");
+            self.write_type(file, type, generics);
+            fprintf(file, ")(");
+            self.write_expression(file, arg.value, generics);
+            fprintf(file, ")");
+            return true;
+        }
+
+        self.write_token(file, func_info.name);
+
+        fprintf(file, "(");
+        let first = true;
+        for arg in arguments {
+            if first { first = false; } else { fprintf(file, ", "); }
+            self.write_expression(file, arg.value, generics);
+        }
+
+        fprintf(file, ")");
+
+        return true;
+    }
+
+    fn write_invoke(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let data: &ExpressionData = &expression.data;
+        match data {
+            ExpressionData::Variable(name) => {
+                let success = self.write_str(file, name);
+                fprintf(file, "(");
+
+                let first = true;
+                for arg in arguments {
+                    if first { first = false; } else { fprintf(file, ", "); }
+                    success = self.write_expression(file, arg.value, generics) && success;
+                }
+
+                fprintf(file, ")");
+
+                return success;
+            },
+            ExpressionData::MemberStaticExpression(_, _) => {
+                let success = self.write_expression(file, expression, generics);
+                fprintf(file, "(");
+
+                let first = true;
+                for arg in arguments {
+                    if first { first = false; } else { fprintf(file, ", "); }
+                    success = self.write_expression(file, arg.value, generics) && success;
+                }
+
+                fprintf(file, ")");
+
+                return success;
+            },
+            ExpressionData::MemberInstanceExpression(_, _) => {
+                let success = self.write_expression(file, expression, generics);
+                fprintf(file, "(");
+
+                let first = true;
+                for arg in arguments {
+                    if first { first = false; } else { fprintf(file, ", "); }
+                    success = self.write_expression(file, arg.value, generics) && success;
+                }
+
+                fprintf(file, ")");
+
+                return success;
+            },
+            ExpressionData::EnumVariant(variant) => {
+                return self.write_enum_variant(file, variant, &expression.return_type, arguments, generics);
+            },
+            ExpressionData::Type(type) => {
+                match type {
+                    Type::Self => { type = generics.self_type; },
+                    _ => {},
+                }
+
+                match type.resolve_typedef() {
+                    Type::Struct(_, _) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::StructC(_) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::UnionC(_) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::Tuple(_) => {
+
+
+                        return self.write_struct_construction(file, type, arguments, generics);
+
+
+
+                    },
+                    Type::Function(func_info, generic_map) => {
+                        match func_info.type {
+                            FunctionType::Coroutine => {
+                                return self.write_coroutine_invoke(file, expression, arguments, generics);
+                            },
+                            FunctionType::Builtin => {
+                                return self.write_builtin_function_invoke(file, func_info, arguments, generic_map, generics);
+                            },
+                            _ => {},
+                        }
+
+                        let name = func_info.name.value;
+                        let resolved_generics = generic_map.resolve_types(self.allocator, generics);
+
+                        let args = arguments.iter();
+                        let success = true;
+                        let first = true;
+
+                        match func_info.parent {
+                            FunctionParent::Trait(trait_info) => {
+                                if !args.next() {
+                                    fprintf(stderr, "Trait function call missing instance argument\n");
+                                    return false;
+                                }
+
+                                let arg = args.value();
+
+                                if arg.value.return_type.deref().is_trait() {
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    fprintf(file, ".vtable->");
+                                    success = self.write_str(file, name) && success;
+                                    fprintf(file, "(");
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    fprintf(file, ".instance");
+
+                                    first = false;
+                                } else {
+                                    let parent_name = self.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
+                                    success = self.write_str(file, parent_name.as_str()) && success;
+                                    fprintf(file, "__");
+
+                                    success = self.write_str(file, trait_info.name.value) && success;
+                                    fprintf(file, "__");
+
+                                    success = self.write_str(file, func_info.name.value) && success;
+                                    fprintf(file, "(");
+
+                                    success = self.write_expression(file, arg.value, generics) && success;
+
+                                    first = false;
+                                }
+
+                            },
+                            _ => {
+                                success = self.write_function_name(file, func_info, &resolved_generics) && success;
+                                fprintf(file, "(");
+                            },
+                        }
+
+                        for arg in args {
+                            if first { first = false; } else { fprintf(file, ", "); }
+                            success = self.write_expression(file, arg.value, generics) && success;
+                        }
+
+                        fprintf(file, ")");
+
+                        return success;
+                    },
+                    Type::FunctionC(func_info) => {
+                        let name = func_info.name;
+
+                        let success = self.write_str(file, name);
+                        fprintf(file, "(");
+
+                        let first = true;
+                        for arg in arguments {
+                            if first { first = false; } else { fprintf(file, ", "); }
+                            success = self.write_expression(file, arg.value, generics) && success;
+                        }
+
+                        fprintf(file, ")");
+
+                        return success;
+                    },
+                    Type::Sequence(sequence) => {
+                        let success = true;
+
+                        match sequence.type {
+                            SequenceType::FixedArray(_) => {
+                                fprintf(file, "{");
+
+                                let first = true;
+                                for arg in arguments {
+                                    if first { first = false; } else { fprintf(file, ", "); }
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                }
+
+                                fprintf(file, "}");
+                            },
+                            SequenceType::Slice => {
+                                fprintf(file, "(");
+                                self.write_type(file, &expression.return_type, generics);
+                                fprintf(file, ") {");
+
+                                let first = true;
+                                for arg in arguments {
+                                    if first { first = false; fprintf(file, " ."); } else { fprintf(file, ", ."); }
+                                    success = self.write_str(file, arg.name.value) && success;
+                                    fprintf(file, " = ");
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                }
+
+                                fprintf(file, " }"); 
+                            },
+                        }
+
+
+                        return success;
+                    },
+                    Type::ClassCpp(class_info) => {
+                        let name = class_info.name;
+
+                        let success = self.write_str(file, name);
+                        let function_mode = arguments.length > 0 && arguments.data[0].name == 0;
+
+                        if function_mode {
+                            fprintf(file, "(");
+
+                            let first = true;
+                            for arg in arguments {
+                                if first { first = false; } else { fprintf(file, ", "); }
+                                success = self.write_expression(file, arg.value, generics) && success;
+                            }
+
+                            fprintf(file, ")");
+                        } else {
+                            fprintf(file, " {");
+
+                            let first = true;
+                            for arg in arguments {
+                                if first { first = false; fprintf(file, " ."); } else { fprintf(file, ", ."); }
+                                success = self.write_str(file, arg.name.value) && success;
+                                fprintf(file, " = ");
+                                success = self.write_expression(file, arg.value, generics) && success;
+                            }
+
+                            fprintf(file, " }");
+                        }
+
+                        return success;
+                    },
+                    _ => {
+                        fprintf(stderr, "Invoke unsupported expression type\n");
+                        return false;
+                    }
+                }
+            },
+            _ => {},
+        }
+
+        fprintf(stderr, "Invoke unsupported expression\n");
+        return false;
+    }
+
+    fn write_expression(&self, file: &FILE, expression: &Expression, generics: &GenericMap) -> bool {
+        let data: &ExpressionData = &expression.data;
+
+        match data {
+            ExpressionData::Variable(name) => {
+                self.write_variable(file, name);
+                return true;
+            },
+            ExpressionData::Literal(value) => {
+                self.write_literal(file, &expression.return_type, value);
+                return true;
+            },
+            ExpressionData::Invoke(target, &arguments) => {
+                return self.write_invoke(file, target, arguments, generics);
+            },
+            ExpressionData::EnumVariant(variant) => {
+                return self.write_enum_variant(file, variant, &expression.return_type, 0, generics);
+            },
+            ExpressionData::UnaryExpression(operator, inner) => {
+                let skip_operator = operator.eq("&") && expression.return_type.is_fat_pointer();
+                if !skip_operator { self.write_str(file, operator); }
+                self.write_expression(file, inner, generics);
+                return true;
+            },
+            ExpressionData::BinaryExpression(left, operator, right) => {
+                self.write_expression(file, left, generics);
+                fprintf(file, " ");
+                self.write_str(file, operator);
+                fprintf(file, " ");
+                self.write_expression(file, right, generics);
+                return true;
+            },
+            ExpressionData::MemberStaticExpression(parent, member) => {
+                self.write_expression(file, parent, generics);
+                self.write_static_member_accessor(file, generics);
+                self.write_str(file, member);
+ 
+                return true;
+            },
+            ExpressionData::MemberInstanceExpression(parent, member) => {
+                let parent_type = &parent.return_type;
+
+                if self.is_type_single_value_struct(parent_type, generics) {
+                    let is_ref = Generator::is_reference(parent_type);
+                    if (is_ref) { fprintf(file, "(*"); }
+                    self.write_expression(file, parent, generics);
+                    if (is_ref) { fprintf(file, ")"); }
+                    return true;
+                }
+
+                match parent_type {
+                    Type::Sequence(sequence) => {
+                        match sequence.type {
+                            SequenceType::FixedArray(length) => {
+                                if member.eq("length") {
+                                    fprintf(file, "%zu", length);
+                                } else {
+                                    fprintf(file, "!!ERROR NO MEMBER ");
+                                    self.write_str(file, member);
+                                    fprintf(file, "!!");
+                                }
+                            },
+                            SequenceType::Slice => {
+                                fprintf(file, "!!ERROR TODO MEMBERS FOR DYNAMIC SEQUENCES!!");
+                            },
+                        }
+                    },
+                    _ => {
+                        self.write_expression(file, parent, generics);
+                        self.write_instance_member_accessor(file, &parent.return_type, generics);
+                        if member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9' { fprintf(file, "_"); }
+                        self.write_str(file, member);
+                    },
+                }
+ 
+                return true;
+            },
+            ExpressionData::Type(type) => {
+                self.write_type(file, type, generics);
+                return true;
+            },
+            ExpressionData::IndexExpression(array_expr, index_expr) => {
+                self.write_expression(file, array_expr, generics);
+
+                if array_expr.return_type.is_reference_sequence_dynamic() {
+                    fprintf(file, ".data");
+                }
+
+                fprintf(file, "[");
+                self.write_expression(file, index_expr, generics);
+                fprintf(file, "]");
+
+                return true;
+            },
+            ExpressionData::ParenthesizedExpression(expr) => {
+                fprintf(file, "(");
+                self.write_expression(file, expr, generics);
+                fprintf(file, ")");
+
+                return true;
+            },
+            ExpressionData::CppExpression(cpp_expression) => {
+                match cpp_expression {
+                    CppExpression::New(placement, new_expression) => {
+                        if placement != 0 {
+                            fprintf(file, "new(");
+                            self.write_expression(file, placement, generics);
+                            fprintf(file, ") ");
+                        } else {
+                            fprintf(file, "new ");
+                        }
+
+                        self.write_expression(file, new_expression, generics);
+                    },
+                    CppExpression::Delete(delete_expression) => {
+                        fprintf(file, "delete ");
+                        self.write_expression(file, delete_expression, generics);
+                    }
+                }
+
+                return true;
+            },
+            ExpressionData::ImplicitCast(inner_expr) => {
+                match expression.return_type {
+                    Type::Struct(struct_info, _) => {
+                        if struct_info.name.value.eq("str") {
+                            self.write_str_cast(file, inner_expr, generics, false);
+                        }
+                    },
+                    Type::Indirect(indirect) => {
+                        match indirect.to {
+                            Type::Struct(struct_info, _) => {
+                                if struct_info.name.value.eq("str") {
+                                    self.write_str_cast(file, inner_expr, generics, true);
+                                } else {
+                                    self.write_trait_cast(file, inner_expr, &indirect.to, generics);
+                                }
+                            },
+                            Type::Sequence(sequence) => { self.write_sequence_cast(file, inner_expr, sequence, generics); },
+                            _ => { self.write_trait_cast(file, inner_expr, &indirect.to, generics); },
+                        }
+                    },
+                    _ => { self.write_expression(file, inner_expr, generics); },
+                }
+            },
+        }
+
+        return 0;
+    }
+
+    fn write_defer_statements(&self, file: &FILE, return_type: &Type, defer_statements: &Array<DeferStatement>, generics: &GenericMap) -> bool {
+        for defer_info in defer_statements {
+            match defer_info {
+                DeferStatement::Expression(expression) => {
+                    self.write_indent(file);
+                    self.write_expression(file, expression, generics);
+                    fprintf(file, ";\n");
+                },
+                DeferStatement::Block(block) => {
+                    self.write_indent(file);
+                    self.function_context.push_scope(false, false);
+                    self.write_block(file, return_type, block, generics, 0, 0);
+                    self.function_context.pop_scope();
+                },
+            }
+        }
+
+        return true;
+    }
+
+    fn is_coroutine(&self) -> bool {
+        return self.function_context.func_info.type == FunctionType::Coroutine;
+    }
+
+    fn write_variable(&self, file: &FILE, name: str) {
+        name = self.function_context.get_variable_replacement(name);
+        self.write_str(file, name);
+    }
+
+    fn write_block(&self, file: &FILE, return_type: &Type, block: &Block, generics: &GenericMap, inline_: bool, no_brackets: bool) -> bool {
+        if block == 0 {
+            fprintf(file, "{}\n");
+            return 0;
+        }
+
+        if no_brackets == 0 {
+            fprintf(file, "{\n");
+            self.indent += 1;
+        }
+
+        if block.is_top_level_and_has_defer_statements_inside && !return_type.is_void() {
+            self.write_indent(file);
+            self.write_type(file, return_type, generics);
+            fprintf(file, " __result;\n\n");
+        }
+
+        let last_statement_is_return = false;
+
+        for statement in block.statements {
+            if statement > block.statements.data {
+                let prev_statement = statement - 1;
+
+                if prev_statement.last_token.end_line < statement.first_token.start_line - 1 {
+                    fprintf(file, "\n");
+                }
+            }
+
+            self.write_line_directive(file, block.context, statement.first_token);
+
+            last_statement_is_return = false;
+
+            match statement.data {
+                StatementData::BlockStatement(child_block) => {
+                    self.write_indent(file);
+                    self.function_context.push_scope(false, false);
+                    if self.write_block(file, return_type, child_block, generics, 0, 0) == 0 {
+                        return 0;
+                    }
+                    self.function_context.pop_scope();
+                },
+                StatementData::LetStatement(let_statement) => {
+                    let name = let_statement.name;
+                    let type = let_statement.type;
+                    let value = let_statement.value;
+
+                    self.write_indent(file);
+
+                    if !let_statement.is_static {
+                        self.function_context.add_variable(name.value, type);
+                    }
+                    
+                    if let_statement.is_static {
+                        fprintf(file, "static ");
+                    }
+
+                    if self.is_coroutine() {
+                        self.write_variable(file, name.value);
+                    } else {
+                        self.write_variable_decl(file, name.value, type, generics);
+                    }
+
+                    if value != 0 {
+                        fprintf(file, " = ");
+                        self.write_expression(file, value, generics);
+                    }
+
+                    fprintf(file, ";\n");
+                },
+                
+                StatementData::YieldStatement(value) => {
+                    self.function_context.coroutine.yield_count += 1;
+
+                    self.write_indent(file);
+                    let yield_number = self.function_context.coroutine.yield_count;
+                    fprintf(file, "ctx->_value = ");
+                    self.write_expression(file, value, generics);
+                    fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:\n", yield_number, yield_number);
+                },
+                StatementData::ReturnStatement(value, &defer_statements) => {
+                    if value == 0 {
+                        self.write_defer_statements(file, return_type, defer_statements, generics);
+                        self.write_indent(file);
+                        fprintf(file, "return;\n");
+                    } else if defer_statements.length > 0 {
+                        self.write_indent(file);
+                        fprintf(file, "__result = ");
+                        self.write_expression(file, value, generics);
+                        fprintf(file, ";\n");
+
+                        self.write_defer_statements(file, return_type, defer_statements, generics);
+
+                        self.write_indent(file);
+                        fprintf(file, "return __result;\n");
+                    } else {
+                        self.write_indent(file);
+                        fprintf(file, "return ");
+                        self.write_expression(file, value, generics);
+                        fprintf(file, ";\n");
+                    }
+
+                    last_statement_is_return = true;
+                },
+                StatementData::IfStatement(expression, if_block, &else_statements) => {
+                    self.write_indent(file);
+                    fprintf(file, "if (");
+                    self.write_expression(file, expression, generics);
+                    fprintf(file, ") ");
+                    self.function_context.push_scope(false, false);
+                    if self.write_block(file, return_type, if_block, generics, 1, 0) == 0 { return 0; }
+                    self.function_context.pop_scope();
+
+                    for else_statement in else_statements {
+                        fprintf(file, " else ");
+
+                        if else_statement.expression != 0 {
+                            fprintf(file, "if (");
+                            self.write_expression(file, else_statement.expression, generics);
+                            fprintf(file, ") ");
+                        }
+
+                        self.function_context.push_scope(false, false);
+                        if self.write_block(file, return_type, else_statement.block, generics, 1, 0) == 0 { return 0; }
+                        self.function_context.pop_scope();
+                    }
+
+                    fprintf(file, "\n");
+                },
+                StatementData::MatchStatement(expression, &cases) => {
+                    let return_type = &expression.return_type;
+                    let is_discriminated_union = self.type_is_discriminated_union(return_type, generics);
+
+                    self.write_indent(file);
+                    fprintf(file, "switch (");
+
+                    if is_discriminated_union == 0 {
+                        self.write_deref_if_needed(file, return_type, generics);
+                    }
+
+                    self.write_expression(file, expression, generics);
+
+                    if is_discriminated_union {
+                        self.write_instance_member_accessor(file, return_type, generics);
+                        fprintf(file, "type");
+                    }
+
+                    fprintf(file, ") {\n");
+                    self.indent += 1;
+
+                    for case_info in cases {
+                        self.write_line_directive(file, block.context, case_info.first_token);
+
+                        self.write_indent(file);
+
+                        let pattern: &MatchPattern = &case_info.pattern;
+                        
+                        match pattern {
+                            MatchPattern::EnumCValue(name) => {
+                                fprintf(file, "case ");
+                                self.write_token(file, name);
+                                fprintf(file, ": {\n");
+                                self.indent += 1;
+                            },
+                            MatchPattern::EnumVariant(enum_variant, &parameters) => {
+                                fprintf(file, "case ");
+                                self.write_enum_variant_name(file, generics.self_type, enum_variant);
+                                fprintf(file, ": {\n");
+                                self.indent += 1;
+
+                                let types = &enum_variant.types;
+
+                                let param_i: usize = 0;
+                                for param_iter in parameters {
+                                    if param_iter.variable.eq(TokenType::Identifier, "_") {
+                                        param_i += 1;
+                                        continue;
+                                    }
+
+                                    let param_type = types.data + param_i;
+                                    let variable_expression: &Expression = expression;
+                                    let accessor = String::new(self.allocator);
+
+                                    accessor.append_str_lowercase(enum_variant.name.value);
+                                    accessor.append("_value");
+
+                                    if types.length > 1 {
+                                        accessor.append("._");
+                                        accessor.append_usize(param_i);
+                                    }
+
+                                    variable_expression = Expression::make(self.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
+
+                                    let name = param_iter.variable;
+
+                                    self.write_line_directive(file, block.context, name);
+
+                                    self.write_indent(file);
+                                    self.write_type(file, param_type, generics);
+                                    if param_iter.ref { fprintf(file, "*"); }
+
+                                    fprintf(file, " ");
+
+                                    self.write_token(file, name);
+                                    fprintf(file, " = ");
+
+                                    if param_iter.ref { fprintf(file, "&"); }
+                                    self.write_expression(file, variable_expression, generics);
+
+                                    fprintf(file, ";\n");
+
+                                    param_i += 1;
+                                }
+                            },
+                            MatchPattern::Default => {
+                                fprintf(file, "default: {\n");
+                                self.indent += 1;
+                            },
+                        }
+
+                        self.function_context.push_scope(true, false);
+                        if self.write_block(file, return_type, case_info.body, generics, 1, 1) == 0 { return 0; }
+                        self.function_context.pop_scope();
+
+                        self.indent -= 1;
+                        self.write_indent(file);
+                        fprintf(file, "} break;\n");
+                    }
+
+                    self.indent -= 1;
+                    self.write_indent(file);
+                    fprintf(file, "}\n");
+                },
+                StatementData::WhileStatement(expression, while_block) => {
+                    self.write_indent(file);
+                    fprintf(file, "while (");
+                    self.write_expression(file, expression, generics);
+                    fprintf(file, ") ");
+                    self.function_context.push_scope(true, true);
+                    if self.write_block(file, return_type, while_block, generics, 0, 0) == 0 { return 0; }
+                    self.function_context.pop_scope();
+                },
+                StatementData::ForStatement(for_statement) => {
+                    let is_iterator = false;
+
+                    match for_statement.type {
+                        ForStatementType::Range(start, end) => {
+                            is_iterator = true;
+                            let variable = &for_statement.variables.data[0];
+                            let variable_name = variable.name.value;
+
+                            self.write_indent(file);
+                            fprintf(file, "for (");
+
+                            self.function_context.add_variable(variable_name, variable.type);
+                            
+                            if self.is_coroutine() {
+                                self.write_variable(file, variable_name);
+                            } else {
+                                self.write_variable_decl(file, variable_name, variable.type, generics);
+                            }
+
+                            fprintf(file, " = ");
+                            self.write_expression(file, start, generics);
+                            fprintf(file, "; ");
+                            self.write_variable(file, variable_name);
+                            fprintf(file, " < ");
+                            self.write_expression(file, end, generics);
+                            fprintf(file, "; ");
+                            self.write_variable(file, variable_name);
+                            fprintf(file, "++) {");
+                            self.indent += 1;
+                        },
+                        ForStatementType::Iter(iter_expression) => {
+                            is_iterator = for_statement.iter_type.deref().is_iterator();
+                            if is_iterator {
+                                self.write_indent(file);
+                                fprintf(file, "while (");
+                                self.write_expression(file, iter_expression, generics);
+                                fprintf(file, ".vtable->next(");
+                                self.write_expression(file, iter_expression, generics);
+                                fprintf(file, ".instance)) {");
+
+                                self.indent += 1;
+
+                                let i: usize = 0;
+                                for variable in for_statement.variables {
+                                    if !variable.name.value.eq("_") {
+                                        self.write_line_directive(file, block.context, variable.name);
+
+                                        self.write_indent(file);
+                                        self.write_type(file, variable.type, generics);
+                                        fprintf(file, " ");
+                                        self.write_token(file, variable.name);
+                                        fprintf(file, " = ");
+                                        if variable.ref { fprintf(file, "&"); }
+                                        if variable.deref { fprintf(file, "*"); }
+                                        self.write_expression(file, iter_expression, generics);
+                                        fprintf(file, ".vtable->value");
+                                        if for_statement.variables.length > 1 { fprintf(file, "_%zu", i); }
+                                        fprintf(file, "(");
+                                        self.write_expression(file, iter_expression, generics);
+                                        fprintf(file, ".instance);\n");
+                                    }
+
+                                    i += 1;
+                                }
+                            } else {
+                                let iter_type_name = self.naming_ident.get_type_name(for_statement.iter_type, generics.self_type, generics);
+
+                                self.write_indent(file);
+                                fprintf(file, "{ ");
+                                self.write_type(file, for_statement.iter_type, generics);
+                                fprintf(file, " __iter = ");
+                                self.write_expression(file, iter_expression, generics);
+                                fprintf(file, ";\n");
+
+                                self.write_line_directive(file, block.context, iter_expression.token);
+
+                                self.write_indent(file);
+                                fprintf(file, "while (");
+                                self.write_string(file, &iter_type_name);
+                                fprintf(file, "__next(&__iter)) {\n");
+
+                                self.indent += 1;
+
+                                let i: usize = 0;
+                                for variable in for_statement.variables {
+                                    if !variable.name.value.eq("_") {
+                                        self.write_line_directive(file, block.context, variable.name);
+
+                                        self.write_indent(file);
+                                        self.write_type(file, variable.type, generics);
+                                        fprintf(file, " ");
+                                        self.write_token(file, variable.name);
+                                        fprintf(file, " = ");
+                                        if variable.ref { fprintf(file, "&"); }
+                                        if variable.deref { fprintf(file, "*"); }
+                                        self.write_string(file, &iter_type_name);
+                                        fprintf(file, "__value");
+                                        if !for_statement.value_type.deref().is_tuple() && for_statement.variables.length > 1 {
+                                            fprintf(file, "_%zu", i);
+                                        }
+                                        fprintf(file, "(&__iter)");
+
+                                        if for_statement.value_type.deref().is_tuple() && for_statement.variables.length > 1 {
+                                            self.write_instance_member_accessor(file, for_statement.value_type, generics);
+                                            fprintf(file, "_%zu", i);
+                                        }
+
+                                        fprintf(file, ";\n");
+                                    }
+
+                                    i += 1;
+                                }
+                            }
+                        },
+                    }
+
+                    fprintf(file, "\n");
+
+                    self.function_context.push_scope(true, true);
+                    if self.write_block(file, return_type, for_statement.block, generics, 0, 1) == 0 { return 0; }
+                    self.function_context.pop_scope();
+
+                    self.indent -= 1;
+                    self.write_indent(file);
+                    if is_iterator {
+                        fprintf(file, "}\n");
+                    } else {
+                        fprintf(file, "} }\n");
+                    }
+                },
+                StatementData::AssignmentStatement(left, operator, right) => {
+                    let op = operator;
+                    
+                    self.write_indent(file);
+                    self.write_expression(file, left, generics);
+                    fprintf(file, " ");
+                    self.write_str(file, op.value);
+                    fprintf(file, " ");
+                    self.write_expression(file, right, generics);
+                    fprintf(file, ";\n");
+                },
+                StatementData::ExpressionStatement(expr) => {
+                    self.write_indent(file);
+                    self.write_expression(file, expr, generics);
+                    fprintf(file, ";\n");
+                },
+                StatementData::ContinueStatement(&defer_statements) => {
+                    self.write_defer_statements(file, return_type, defer_statements, generics);
+                    self.write_indent(file);
+                    fprintf(file, "continue;\n");
+                },
+                StatementData::BreakStatement(&defer_statements) => {
+                    self.write_defer_statements(file, return_type, defer_statements, generics);
+                    self.write_indent(file);
+                    fprintf(file, "break;\n");
+                },
+            }
+        }
+
+        if !last_statement_is_return {
+            self.write_defer_statements(file, return_type, &block.defer_statements, generics);
+        }
+
+        if no_brackets == 0 {
+            self.indent -= 1;
+            self.write_indent(file);
+
+            if (inline_) {
+                fprintf(file, "}");
+            } else {
+                fprintf(file, "}\n");
+            }
+        }
+
+        return true;
+    }
+
+    fn add_primitive_type_include(&self, includes: &HashMap<str, GeneratorInclude>, name: str) -> bool {
+        let include = self.primitive_includes.find(&name);
+        if include == 0 { return false; }
+
+        let include_string = String::new(self.allocator);
+        include_string.append(*include);
+
+        includes.insert(*include, GeneratorInclude { type: 0, name: include_string.as_str() });
+
+        return true;
+    }
+
+    fn add_type_include_inner(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, includes_primitives: &HashMap<str, GeneratorInclude>, type: &Type, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(type, generics.array.data, generics);
+        let name_str = name.as_str();
+
+        if includes.find(&name_str) == 0 {
+            includes.insert(name_str, GeneratorInclude { type, name: name_str });
+        }
+
+        return true;
+    }
+
+    fn add_type_include(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, includes_primitives: &HashMap<str, GeneratorInclude>, type: &Type, generics: &GenericMap) -> bool {
+        if type == 0 { return true; }
+
+        let children: &Array<Type> = 0;
+
+        if type.is_fat_pointer() {
+            return self.add_type_include(includes, refs, includes_primitives, type.deref_1(), generics);
+        }
+
+        match type {
+            Type::Indirect(indirect) => {
+                if refs != 0 {
+                    return self.add_type_include(refs, 0, includes_primitives, &indirect.to, generics);
+                }
+                
+                return self.add_type_include(includes, refs, includes_primitives, &indirect.to, generics);
+            },
+            Type::Sequence(sequence) => {
+                if sequence.is_fixed_array() {
+                    return self.add_type_include(includes, refs, includes_primitives, &sequence.element, generics);
+                }
+            },
+            Type::Tuple(tuple) => {
+                for element in tuple.elements {
+                    self.add_type_include(includes, refs, includes_primitives, element, generics);
+                }
+            },
+            Type::Primitive(primitive_info) => {
+                if primitive_info != 0 {
+                    let name = primitive_info.name;
+                    return self.add_primitive_type_include(includes_primitives, name);
+                }
+
+                return true;
+            },
+            Type::Function(func_info, child_types) => {
+                if func_info.type == FunctionType::MethodCpp { return true; }
+
+                let resolved_generics = child_types.resolve_types(self.allocator, generics);
+
+                for param in func_info.parameters {
+                    self.add_type_include(includes, refs, includes_primitives, &param.type, &resolved_generics);
+                }
+
+                self.add_type_include(includes, refs, includes_primitives, &func_info.return_type, &resolved_generics);
+
+                if func_info.type == FunctionType::Builtin || func_info.name == 0 { return true; }
+
+                match func_info.parent {
+                    FunctionParent::None => {
+                        children = &child_types.array;
+                    },
+                    FunctionParent::Primitive(_, _, _) => {
+                        return true;
+                    },
+                    FunctionParent::Enum(_, _, _) => { return true; },
+                    FunctionParent::Struct(struct_info, _, _) => {
+                        if child_types.array.length == 0 {
+                            let parent_type = self.allocator.store(Type::Struct(struct_info, generics));
+                            return self.add_type_include(includes, refs, includes_primitives, parent_type, generics);
+                        } else {
+                            let parent_type = self.allocator.store(Type::Struct(struct_info, child_types));
+                            return self.add_type_include(includes, refs, includes_primitives, parent_type, generics);
+                        }
+                    },
+                    FunctionParent::Trait(_) => { return true; },
+                    FunctionParent::Type(_, _, _) => { return true; }
+                }
+            },
+            Type::CoroutineInstance(func_info, child_types) => {
+                let func_type = self.allocator.store(Type::Function(func_info, child_types));
+                return self.add_type_include(includes, refs, includes_primitives, func_type, generics);
+            },
+            Type::Enum(_, child_types) => {
+                children = &child_types.array;
+            },
+            Type::Struct(struct_info, child_types) => {
+                if struct_info.is_newtype() {
+                    self.add_type_include(includes, refs, includes_primitives, &struct_info.fields.data.value.type, generics);
+                }
+
+                children = &child_types.array;
+            },
+            Type::Trait(_, child_types) => {
+                children = &child_types.array;
+            },
+            Type::Generic(generic) => {
+                let name = generic.name.value;
+                let resolved_type = generics.get(name);
+
+                if resolved_type != 0 {
+                    return self.add_type_include(includes, refs, includes_primitives, resolved_type, generics);
+                }
+
+                return true;
+            },
+            Type::Unknown(_, &child_types) => {
+                children = child_types;
+            },
+            _ => { return true; },
+        }
+
+        self.add_type_include_inner(includes, refs, includes_primitives, type, generics);
+
+        if children == 0 { return true; }
+
+        for child in children {
+            self.add_type_include(includes, refs, includes_primitives, child, generics);
+        }
+
+        return true;
+    }
+
+    fn add_function_includes(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, func_info: &Function, generics: &GenericMap) -> bool {
+        if func_info.type == FunctionType::Coroutine {
+            self.add_type_include(includes, refs, includes, &func_info.return_type, generics);
+        } else if refs != 0 {
+            self.add_type_include(refs, 0, includes, &func_info.return_type, generics);
+        } else {
+            self.add_type_include(includes, 0, includes, &func_info.return_type, generics);
+        }
+
+        for parameter_iter in func_info.parameters {
+            if func_info.type == FunctionType::Coroutine || parameter_iter.type.is_fat_pointer() {
+                self.add_type_include(includes, refs, includes, &parameter_iter.type, generics);
+            } else if refs != 0 {
+                self.add_type_include(refs, 0, includes, &parameter_iter.type, generics);
+            } else {
+                self.add_type_include(includes, 0, includes, &parameter_iter.type, generics);
+            }
+        }
+
+        return true;
+    }
+
+    fn add_block_includes(&self, includes: &HashMap<str, GeneratorInclude>, block: &Block, generics: &GenericMap) -> bool {
+        if block == 0 { return false; }
+
+        for statement_iter in block.statements {
+            match statement_iter.data {
+                StatementData::BlockStatement(child_block) => {
+                    self.add_block_includes(includes, child_block, generics);
+                },
+                StatementData::LetStatement(let_statement) => {
+                    let type = let_statement.type;
+                    let value = let_statement.value;
+
+                    self.add_type_include(includes, 0, includes, type, generics);
+
+                    if value != 0 {
+                        self.add_expression_includes(includes, value, generics);
+                    }
+                },
+                StatementData::ReturnStatement(expression, _) => {
+                    if expression {
+                        self.add_expression_includes(includes, expression, generics);
+                    }
+                },
+                StatementData::YieldStatement(expression) => {
+                    if self.function_context != 0 {
+                        self.function_context.coroutine.yield_count += 1;
+                    }
+
+                    if expression {
+                        self.add_expression_includes(includes, expression, generics);
+                    }
+                },
+                StatementData::IfStatement(condition, if_block, &else_statements) => {
+                    self.add_block_includes(includes, if_block, generics);
+                    self.add_expression_includes(includes, condition, generics);
+
+                    for else_statement in else_statements {
+                        self.add_block_includes(includes, else_statement.block, generics);
+                    }
+                },
+                StatementData::MatchStatement(condition, &cases) => {
+                    self.add_expression_includes(includes, condition, generics);
+
+                    for case_info in cases {
+                        if case_info.type != 0 && (&condition.return_type) != case_info.type {
+                            self.add_type_include(includes, 0, includes, case_info.type, generics);
+                        }
+
+                        self.add_block_includes(includes, case_info.body, generics);
+                    }
+                },
+                StatementData::WhileStatement(condition, while_block) => {
+                    self.add_expression_includes(includes, condition, generics);
+                    self.add_block_includes(includes, while_block, generics);
+                },
+                StatementData::ForStatement(for_statement) => {
+                    self.add_type_include(includes, 0, includes, for_statement.value_type, generics);
+
+                    match for_statement.type {
+                        ForStatementType::Range(start, end) => {
+                            self.add_expression_includes(includes, start, generics);
+                            self.add_expression_includes(includes, end, generics);
+                        },
+                        ForStatementType::Iter(iter_expression) => {
+                            self.add_expression_includes(includes, iter_expression, generics);
+                        }
+                    }
+
+                    self.add_block_includes(includes, for_statement.block, generics);
+                },
+                StatementData::AssignmentStatement(left, _, right) => {
+                    self.add_expression_includes(includes, left, generics);
+                    self.add_expression_includes(includes, right, generics);
+                },
+                StatementData::ExpressionStatement(expression) => {
+                    self.add_expression_includes(includes, expression, generics);
+                },
+                StatementData::ContinueStatement(_) => {},
+                StatementData::BreakStatement(_) => {},
+            }
+        }
+
+        return true;
+    }
+
+    fn add_expression_includes(&self, includes: &HashMap<str, GeneratorInclude>, expression: &Expression, generics: &GenericMap) -> bool {
+        self.add_type_include(includes, 0, includes, &expression.return_type, generics);
+
+        match expression.data {
+            ExpressionData::Invoke(target, &arguments) => {
+                self.add_expression_includes(includes, target, generics);
+                for arg in arguments {
+                    self.add_expression_includes(includes, arg.value, generics);
+                }
+
+                // for when we invoke on a trait, if its on a primitive we need to include that primitives .h file
+                match target.return_type {
+                    Type::Function(func_info, _) => {
+                        match func_info.parent {
+                            FunctionParent::Trait(_) => {
+                                if arguments.length > 0 {
+                                    let type = arguments.data[0].value.return_type.deref();
+
+                                    match type {
+                                        Type::Generic(generic) => {
+                                            let name = generic.name.value;
+                                            let resolved_type = generics.get(name);
+                                            if resolved_type != 0 { type = resolved_type; }
+                                        },
+                                        _ => {},
+                                    }
+                                    
+                                    if type.is_primitive_or_c_type() {
+                                        self.add_type_include_inner(includes, 0, includes, type, generics);
+                                    }
+                                }
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
+            },
+            ExpressionData::EnumVariant(_) => {},
+            ExpressionData::Type(type) => { self.add_type_include(includes, 0, includes, type, generics); },
+            ExpressionData::Literal(_) => {},
+            ExpressionData::Variable(_) => {},
+            ExpressionData::UnaryExpression(_, inner) => {
+                self.add_expression_includes(includes, inner, generics);
+            },
+            ExpressionData::BinaryExpression(left, _, right) => {
+                self.add_expression_includes(includes, left, generics);
+                self.add_expression_includes(includes, right, generics);
+            },
+            ExpressionData::MemberStaticExpression(inner, _) => {
+                self.add_expression_includes(includes, inner, generics);
+            },
+            ExpressionData::MemberInstanceExpression(inner, _) => {
+                self.add_expression_includes(includes, inner, generics);
+            },
+            ExpressionData::IndexExpression(inner, index) => {
+                self.add_expression_includes(includes, inner, generics);
+                self.add_expression_includes(includes, index, generics);
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                self.add_expression_includes(includes, inner, generics);
+            },
+            ExpressionData::CppExpression(cpp_expression) => {
+                match cpp_expression {
+                    CppExpression::New(placement, new_expression) => {
+                        if placement != 0 { self.add_expression_includes(includes, placement, generics); }
+                        self.add_expression_includes(includes, new_expression, generics);
+                    },
+                    CppExpression::Delete(delete_expression) => {
+                        self.add_expression_includes(includes, delete_expression, generics);
+                    }
+                }
+            },
+            ExpressionData::ImplicitCast(inner) => {
+                self.add_expression_includes(includes, inner, generics);
+            },
+        }
+
+        return 1;
+    }
+    
+
+    fn write_c_type_include(&self, file: &FILE, type: &Type) {
+        match type {
+            Type::EnumC(info) => {
+                let path = info.include.path;
+
+                fprintf(file, "#include ");
+                self.write_str(file, path);
+                fprintf(file, "\n");
+            },
+            Type::StructC(info) => {
+                let path = info.include.path;
+
+                fprintf(file, "#include ");
+                self.write_str(file, path);
+                fprintf(file, "\n");
+            },
+            Type::TypedefC(info) => {
+                let path = info.include.path;
+
+                fprintf(file, "#include ");
+                self.write_str(file, path);
+                fprintf(file, "\n");
+            },
+            _ => {},
+        }
+    }
+    
+    fn write_includes_raw(&self, file: &FILE, includes: &HashMap<str, &Include>) {
+        for (_, include) in includes {
+            let path = include.path;
+            if path.length > 0 {
+                fprintf(file, "#include <%.*s>\n", cast<i32>(path.length - 2), path.ptr + 1);
+            }
+        }
+
+        if includes.length > 0 {
+            fprintf(file, "\n");
+        }
+    }
+
+    fn write_impl_includes_raw(&self, file: &FILE, impls: &Array<&Impl>) {
+        let written = HashSet<str>::new(self.allocator);
+        defer written.release();
+
+        for *impl_info in impls {
+            for (_, include) in impl_info.context.module.includes {
+                if !written.insert(include.path) { continue; }
+                fprintf(file, "#include ");
+                self.write_str(file, include.path);
+                fprintf(file, "\n");
+            }
+        }
+    }
+
+    fn write_includes(&self, file: &FILE, includes: &HashMap<str, GeneratorInclude>) {
+        for (_, &include) in includes {
+            if include.type == 0 {
+                fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.name.length), include.name.ptr);
+            } else {
+                let module = include.type.get_module();
+                let path = self.make_rel_path(module, include.name, ".h");
+
+                fprintf(file, "#include <%.*s>\n", path.len_i32(), path.array.data);
+            }
+        }
+
+        if includes.length > 0 {
+            fprintf(file, "\n");
+        }
+    }
+
+    fn write_refs(&self, file: &FILE, refs: &HashMap<str, GeneratorInclude>) {
+        for (_, &ref_info) in refs {
+            let type = ref_info.type;
+            let name = ref_info.name;
+
+            match type {
+                Type::Struct(struct_info, generics) => {
+                    if struct_info.is_newtype() {
+                        let field = &struct_info.fields.data.value;
+
+                        fprintf(file, "typedef ");
+                        self.write_type(file, &field.type, generics);
+                        fprintf(file, " %.*s;\n", cast<i32>(name.length), name.ptr);
+                    } else {
+                        fprintf(file, "struct %.*s;\n", cast<i32>(name.length), name.ptr);
+                    }
+                },
+                Type::Enum(enum_info, _) => {
+                    if Generator::is_discriminated_union(enum_info) == 0 {
+                        let path = self.make_rel_path(enum_info.context.module, name, ".h");
+                        fprintf(file, "#include <%.*s>\n", cast<i32>(path.array.length), path.array.data);
+                    } else {
+                        fprintf(file, "struct %.*s;\n", cast<i32>(name.length), name.ptr);
+                    }
+                },
+                Type::Trait(_, _) => {
+                    fprintf(file, "struct %.*s;\n", cast<i32>(name.length), name.ptr);
+                },
+                _ => {}
+            }
+        }
+
+        if refs.length > 0 {
+            fprintf(file, "\n");
+        }
+    }
+
+    fn has_void_self_replacement(parameter: &Parameter, generics: &GenericMap) -> bool {
+        if generics == 0 || generics.self_type == 0 { return false; }
+
+        match generics.self_type {
+            Type::Primitive(primitive_info) => {
+                if primitive_info != 0 && !primitive_info.name.eq("void") {
+                    return false;
+                }
+            },
+            _ => { return false; },
+        }
+
+        let ref: &Type = 0;
+
+        match parameter.type {
+            Type::Indirect(indirect) => {
+                ref = &indirect.to;
+            },
+            _ => { return false; },
+        }
+
+        if ref == 0 { return false; }
+
+        match ref {
+            Type::Self => { return true; },
+            _ => { return false; },
+        }
+    }
+
+    fn write_function_definition(&self, file: &FILE, func_info: &Function, generics: &GenericMap, custom_name: &String) -> bool {
+        self.write_line_directive(file, func_info.context, func_info.name);
+
+        if func_info.type == FunctionType::Coroutine {
+            fprintf(file, "bool");
+        } else {
+            if self.write_type(file, &func_info.return_type, generics) == 0 { return 0; }
+        }
+
+        fprintf(file, " ");
+        if custom_name != 0 {
+            self.write_string(file, custom_name);
+        } else {
+            if func_info.generics.map.length > 0 {
+                let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+                self.write_string(file, &name);
+            } else {
+                if self.write_function_name(file, func_info, generics) == 0 { return 0; }
+            }
+        }
+
+        if func_info.type == FunctionType::Coroutine {
+            fprintf(file, "__next(void* _ctx)");
+            return true;
+        }
+
+        fprintf(file, "(");
+
+        let success = true;
+        let first = true;
+
+        for parameter_iter in func_info.parameters {
+            if first { first = false; } else { fprintf(file, ", "); }
+
+            if Generator::has_void_self_replacement(parameter_iter, generics) {
+                success = self.write_variable_decl(file, "__self", &parameter_iter.type, generics) && success;
+            } else {
+                success = self.write_variable_decl(file, parameter_iter.name.value, &parameter_iter.type, generics) && success;
+            }
+        }
+
+        fprintf(file, ")");
+
+        return success;
+    }
+
+    fn generate_function_loop(&self, usage: &TypeFunctionUsage) -> bool {
+        let success = true;
+        let function_info = usage.type;
+
+        for *generics in usage.generic_maps {
+            success = self.generate_function(function_info, generics) && success;
+        }
+
+        return success;
+    }
+
+    fn write_function_block(&self, file: &FILE, name: str, func_info: &Function, generics: &GenericMap) -> bool {
+        if func_info.type == FunctionType::Coroutine {
+            fprintf(file, " {\n");
+            self.indent += 1;
+
+            self.write_indent(file);
+            fprintf(file, "struct ");
+            self.write_function_name(file, func_info, generics);
+            fprintf(file, "* ctx = _ctx;\n");
+
+            self.write_indent(file);
+            fprintf(file, "switch (ctx->_state) {\n");
+            self.indent += 1;
+
+            self.write_indent(file);
+            fprintf(file, "case -1: return false;\n");
+
+            let i: usize = 0;
+            while i < self.function_context.coroutine.yield_count {
+                i += 1;
+
+                self.write_indent(file);
+                fprintf(file, "case %zu: goto yield_%zu;\n", i, i);
+            }
+
+            self.indent -= 1;
+            self.write_indent(file);
+            fprintf(file, "}\n\n");
+
+            self.function_context.coroutine.yield_count = 0;
+            if self.write_block(file, &func_info.return_type, func_info.body, generics, false, true) == 0 {
+                let name_length: u32 = name.length;
+                fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+                fclose(file);
+                return false;
+            }
+            
+            self.write_indent(file);
+            fprintf(file, "ctx->_state = -1; return false;\n");
+
+            self.indent -= 1;
+            fprintf(file, "}\n");
+
+            self.write_type(file, &func_info.return_type, generics);
+            fprintf(file, " ");
+            self.write_function_name(file, func_info, generics);
+            fprintf(file, "__value(void* ctx) { return ((struct ");
+            self.write_function_name(file, func_info, generics);
+            fprintf(file, "*)ctx)->_value; }\n");
+
+            fprintf(file, "struct Iter_");
+
+            let name = self.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+            self.write_string(file, &name);
+            name.release();
+
+            fprintf(file, "VTable ");
+
+            match func_info.parent {
+                FunctionParent::Struct(struct_info, _, _) => {
+                    self.write_str_title(file, struct_info.name.value);
+                    fprintf(file, "__");
+                },
+                _ => {},
+            }
+
+            self.write_str_title(file, func_info.name.value);
+
+            fprintf(file, "__VTABLE__ITER = { .next = ");
+            self.write_function_name(file, func_info, generics);
+            fprintf(file, "__next, .value = ");
+            self.write_function_name(file, func_info, generics);
+            fprintf(file, "__value };\n\n");
+
+            return true;
+        }
+
+        fprintf(file, " ");
+        if self.write_block(file, &func_info.return_type, func_info.body, generics, 0, 0) == 0 {
+            let name_length: u32 = name.length;
+            fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+            fclose(file);
+            return false;
+        }
+
+        return true;
+    }
+
+    fn write_function_coroutine(&self, file: &FILE, func_info: &Function, generics: &GenericMap) -> bool {
+        fprintf(file, "struct ");
+        self.write_function_name(file, func_info, generics);
+        fprintf(file, " {\n");
+        self.indent += 1;
+        
+        self.write_indent(file);
+        fprintf(file, "int32_t _state;\n");
+
+        self.write_indent(file);
+        self.write_type(file, &func_info.return_type, generics);
+        fprintf(file, " _value;\n\n");
+
+        for (name, type) in self.function_context.coroutine.variables {
+            self.write_indent(file);
+            self.write_type(file, type, generics);
+            fprintf(file, " ");
+            self.write_str(file, name);
+            fprintf(file, ";\n");
+        }
+
+        self.indent -= 1;
+        fprintf(file, "};\n\n");
+
+        fprintf(file, "#include <std/Iter_");
+
+        let name = self.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+        self.write_string(file, &name);
+
+        fprintf(file, ".h>\n");
+
+        self.write_type(file, &func_info.return_type, generics);
+        fprintf(file, " ");
+        self.write_function_name(file, func_info, generics);
+        fprintf(file, "__value(void* ctx);\n");
+
+        fprintf(file, "extern struct Iter_");
+        self.write_string(file, &name);
+        name.release();
+
+        fprintf(file, "VTable ");
+
+        self.write_str_title(file, func_info.name.value);
+        fprintf(file, "__VTABLE__ITER;\n");
+
+        return 1;
+    }
+
+    fn generate_function(&self, func_info: &Function, generics: &GenericMap) -> bool {
+        if func_info.type == FunctionType::Builtin { return true; }
+
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_str = name.as_str();
+        let func_context = FunctionContext::new(self.allocator, func_info, true);
+        self.function_context = &func_context;
+
+        let code = self.make_path(func_info.context.module, name_str, ".c");
+        let code_file: &FILE = 0;
+        let code_tmp: *const char = 0;
+        
+        code_tmp = tmpnam(0);
+        code_file = fopen(code_tmp, "w+");
+
+        self.code_files.append(code);
+
+        if code_file == 0 { perror(code.c_str()); return 0; }
+
+        let includes: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_block_includes(&includes, func_info.body, generics) == 0 { return 0; }
+        self.write_includes_raw(code_file, &func_info.context.module.includes);
+        self.write_includes(code_file, &includes);
+
+        let header_rel = self.make_rel_path(func_info.context.module, name_str, ".h");
+        fprintf(code_file, "#include <");
+        self.write_str(code_file, header_rel.as_str());
+        fprintf(code_file, ">\n\n");
+
+        if self.write_function_definition(code_file, func_info, generics, 0) == 0 { fclose(code_file); return 0; }
+
+        self.write_function_block(code_file, name_str, func_info, generics);
+
+        self.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        let header = self.make_path(func_info.context.module, name_str, ".h");
+        let header_file: &FILE = 0;
+        let header_tmp: *const char = 0;
+        header_tmp = tmpnam(0);
+        header_file = fopen(header_tmp, "w+");
+
+        if header_file == 0 { perror(header.c_str()); return 0; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name_str);
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name_str);
+        fprintf(header_file, "\n\n");
+
+        includes = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_function_includes(&includes, 0, func_info, generics) == 0 { fclose(header_file); return 0; }
+        self.write_includes_raw(header_file, &func_info.context.module.includes);
+        self.write_includes(header_file, &includes);
+
+        if self.is_coroutine() {
+            self.write_function_coroutine(header_file, func_info, generics);
+        }
+
+        if self.write_function_definition(header_file, func_info, generics, 0) == 0 { fclose(header_file); return 0; }
+        fprintf(header_file, ";\n");
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        self.function_context = 0;
+
+        return 1;
+    }
+
+    fn add_enum_definition_includes(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, enum_info: &Enum, generics: &GenericMap) -> bool {
+        for (_, &variant) in enum_info.variants {
+            if variant.types.length > 0 {
+                for type in variant.types {
+                    self.add_type_include(includes, refs, includes, type, generics);
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, generics: &GenericMap) -> bool {
+        let enum_name = enum_info.name;
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_length: u32 = name.array.length;
+        let is_discriminated_union = Generator::is_discriminated_union(enum_info);
+
+        self.write_line_directive(file, enum_info.context, enum_info.name);
+
+        if !is_discriminated_union {
+            fprintf(file, "enum ");
+            self.write_str(file, enum_name.value);
+            fprintf(file, " {\n");
+            self.indent += 1;
+
+            for (_, &variant) in enum_info.variants {
+                self.write_indent(file);
+                self.write_enum_variant_name(file, generics.self_type, variant);
+
+                if variant.value != 0 {
+                    fprintf(file, " = ");
+                    self.write_expression(file, variant.value, generics);
+                }
+
+                fprintf(file, ",\n");
+            }
+
+            self.indent -= 1;
+            fprintf(file, "};\n");
+        } else {
+            let has_generics = enum_info.generics.array.length > 0;
+
+            if has_generics {
+                fprintf(file, "#ifndef PAVE_");
+                self.write_str_title(file, enum_info.name.value);
+                self.write_str_title(file, self.naming_ident.enum_generic_type_suffix);
+                fprintf(file, "\n#define PAVE_");
+                self.write_str_title(file, enum_info.name.value);
+                self.write_str_title(file, self.naming_ident.enum_generic_type_suffix);
+                fprintf(file, "\n");
+
+                fprintf(file, "enum ");
+                self.write_token(file, enum_info.name);
+                self.write_str(file, self.naming_ident.enum_generic_type_suffix);
+                fprintf(file, " {\n");
+
+                self.indent += 1;
+
+                for (_, &variant) in enum_info.variants {
+                    self.write_indent(file);
+                    self.write_enum_variant_name(file, generics.self_type, variant);
+
+                    if variant.value != 0 {
+                        fprintf(file, " = ");
+                        self.write_expression(file, variant.value, generics);
+                    }
+
+                    fprintf(file, ",\n");
+                }
+
+                self.indent -= 1;
+                fprintf(file, "};\n");
+                fprintf(file, "#endif\n");
+                fprintf(file, "\n");
+            }
+
+            fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+            self.indent += 1;
+
+            if !has_generics {
+                self.write_indent(file);
+                fprintf(file, "enum {\n");
+                self.indent += 1;
+
+                for (_, &variant) in enum_info.variants {
+                    self.write_indent(file);
+                    self.write_enum_variant_name(file, generics.self_type, variant);
+                    fprintf(file, ",\n");
+                }
+
+                self.indent -= 1;
+                self.write_indent(file);
+                fprintf(file, "} type;\n");
+                fprintf(file, "\n");
+            } else {
+                self.write_indent(file);
+                fprintf(file, "enum ");
+                self.write_token(file, enum_info.name);
+                self.write_str(file, self.naming_ident.enum_generic_type_suffix);
+                fprintf(file, " type;\n");
+            }
+
+            let variants_with_data: usize = 0;
+            for (_, &variant) in enum_info.variants {
+                variants_with_data += variant.types.length > 0;
+            }
+
+            if variants_with_data > 1 {
+                self.write_indent(file);
+                fprintf(file, "union {\n");
+                self.indent += 1;
+            }
+
+            for (_, &variant) in enum_info.variants {
+                if variant.types.length == 1 {
+                    self.write_indent(file);
+                    self.write_type(file, variant.types.data, generics);
+                    fprintf(file, " ");
+
+                    let name = variant.name;
+                    self.write_str_lowercase(file, name.value);
+                    fprintf(file, "_value;\n");
+                } else if variant.types.length > 1 {
+                    self.write_indent(file);
+                    fprintf(file, "struct { ");
+
+                    for type in variant.types {
+                        self.write_type(file, type, generics);
+                        fprintf(file, " _%zu; ", type - variant.types.data);
+                    }
+
+                    fprintf(file, "} ");
+                    let name = variant.name;
+                    self.write_str_lowercase(file, name.value);
+                    fprintf(file, "_value;\n");
+                }
+            }
+
+            if variants_with_data > 1 {
+                self.indent -= 1;
+                self.write_indent(file);
+                fprintf(file, "};\n");
+            }
+
+            self.indent -= 1;
+            fprintf(file, "};\n");
+        }
+
+        for *impl_info in enum_info.impls {
+            fprintf(file, "\n");
+
+            for (_, &func_info) in impl_info.functions {
+                if self.write_function_definition(file, func_info, generics, 0) == 0 { return 0; }
+                fprintf(file, ";\n");
+            }
+        }
+
+        return 1;
+    }
+
+    fn generate_enum_loop(&self, usage: &TypeUsage<Enum>) -> bool {
+        let success = true;
+        let enum_info = usage.type;
+
+        for *generics in usage.generic_maps {
+            success = self.generate_enum(enum_info, generics) && success;
+        }
+
+        return success;
+    }
+
+    fn generate_enum(&self, enum_info: &Enum, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let header = self.make_path(enum_info.context.module, name.as_str(), ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n\n");
+
+        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_enum_definition_includes(&includes_definition, &refs_definition, enum_info, generics) == 0 { fclose(header_file); return 0; }
+        if self.add_impl_definition_includes(&includes_definition, &refs_definition, &enum_info.impls, 0, generics) == 0 { fclose(header_file); return 0; }
+        self.write_includes_raw(header_file, &enum_info.context.module.includes);
+        self.write_includes(header_file, &includes_definition);
+        self.write_refs(header_file, &refs_definition);
+
+        if self.write_enum_definition(header_file, enum_info, generics) == 0 { fclose(header_file); return 0; }
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        if enum_info.impls.length == 0 { return true; }
+
+        let code = self.make_path(enum_info.context.module, name.as_str(), ".c");
+        self.code_files.append(code);
+
+        let code_tmp: *const char = tmpnam(0);
+        let code_file: &FILE = fopen(code_tmp, "w+");
+        if code_file == 0 { perror(code.c_str()); return false; }
+
+        let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_impl_includes(&includes_code, &enum_info.impls, 0, generics) == 0 { fclose(code_file); return 0; }
+        self.write_includes_raw(code_file, &enum_info.context.module.includes);
+        self.write_includes(code_file, &includes_code);
+
+        if self.write_impls(code_file, enum_info.context.module, &enum_info.impls, 0, generics) == 0 { fclose(code_file); return 0; }
+
+        self.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        return 1;
+    }
+
+    fn add_impl_definition_includes(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap) -> bool {
+        for (impl_index, *impl_info) in impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
+
+            if trait_info != 0 {
+                let type = self.allocator.store(Type::Trait(trait_info, generics));
+                self.add_type_include(includes, refs, includes, type, generics);
+            }
+
+            for (_, &func_info) in impl_info.functions {
+                if func_info.generics.array.length > 0 && impl_functions_for_impl != 0 {
+                    let func_ptr = cast<usize>(func_info);
+                    let function_usage = impl_functions_for_impl.find(&func_ptr);
+                    if function_usage != 0 {
+                        for *generics_impl in function_usage.generic_maps {
+                            self.add_function_includes(includes, refs, func_info, generics_impl);
+                        }
+                    }
+                    continue;
+                }
+
+                self.add_function_includes(includes, refs, func_info, generics);
+            }
+
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    
+                    self.add_function_includes(includes, refs, func_info, generics);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    fn add_struct_definition_includes(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, struct_info: &Struct, generics: &GenericMap) -> bool {
+        for (_, &field) in struct_info.fields {
+            self.add_type_include(includes, refs, includes, &field.type, generics);
+        }
+
+        for (_, trait_info) in struct_info.traits {
+            let trait_generic_map = self.allocator.store(GenericMap {});
+            let trait_type = self.allocator.store(Type::Trait(trait_info, trait_generic_map));
+            trait_generic_map.self_type = trait_type;
+
+            self.add_type_include(includes, refs, includes, trait_type, trait_generic_map);
+        }
+
+        return 1;
+    }
+
+    fn add_impl_includes(&self, includes: &HashMap<str, GeneratorInclude>, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap) -> bool {
+        for (impl_index, *impl_info) in impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
+
+            for (_, &func_info) in impl_info.functions {
+                if func_info.generics.array.length == 0 {
+                    self.add_function_includes(includes, 0, func_info, generics);
+                    self.add_block_includes(includes, func_info.body, generics);
+                } else if impl_functions_for_impl != 0 {
+                    let func_ptr = cast<usize>(func_info);
+                    let function_usage = impl_functions_for_impl.find(&func_ptr);
+                    if function_usage != 0 {
+                        for *generics3 in function_usage.generic_maps {
+                            self.add_function_includes(includes, 0, func_info, generics3);
+                            self.add_block_includes(includes, func_info.body, generics3);
+                        }
+                    }
+                }
+            }
+
+            // trait_default_implementations
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    
+                    self.add_function_includes(includes, 0, func_info, generics);
+                    self.add_block_includes(includes, func_info.body, generics);
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    fn add_trait_definition_includes(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, trait_info: &Trait, generics: &GenericMap) -> bool {
+        for (_, &func_info) in trait_info.functions {
+            self.add_function_includes(includes, refs, func_info, generics);
+        }
+
+        return 1;
+    }
+
+    fn write_struct_definition(&self, file: &FILE, struct_info: &Struct, usage: &TypeUsage<Struct>, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_length: i32 = name.array.length;
+        let impl_functions = &usage.impl_functions;
+
+        self.write_line_directive(file, &struct_info.module.context, struct_info.name);
+
+        if struct_info.type == StructType::Incomplete {
+            fprintf(file, "struct %.*s;\n", name_length, name.array.data);
+        } else if struct_info.is_newtype() {
+            let field = &struct_info.fields.data[0].value;
+
+            fprintf(file, "typedef ");
+            self.write_type(file, &field.type, generics);
+            fprintf(file, " %.*s;\n", name_length, name.array.data);
+        } else {
+            fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+            self.indent += 1;
+
+            for (_, &field) in struct_info.fields {
+                self.write_indent(file);
+                self.write_variable_decl(file, field.name.value, &field.type, generics);
+                fprintf(file, ";\n");
+            }
+
+            self.indent -= 1;
+            fprintf(file, "};\n");
+        }
+
+        for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
+
+            for (_, &func_info) in impl_info.functions {
+                let func_ptr = cast<usize>(func_info);
+                let function_usage: &TypeFunctionUsage = 0;
+                if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                if func_info.generics.array.length == 0 {
+                    if trait_info == 0 {
+                        if func_info.type == FunctionType::Coroutine && function_usage != 0 {
+                            self.function_context = &function_usage.function_context;
+                            self.write_function_coroutine(file, func_info, generics);
+                            self.function_context = 0;
+                        }
+
+                        fprintf(file, "\n");
+                        if self.write_function_definition(file, func_info, generics, 0) == 0 { return 0; }
+                    } else {
+                        let generics_void = *generics;
+                        generics_void.self_type = &self.root.type_void;
+
+                        let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                        fprintf(file, "\n");
+                        if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 { return 0; }
+                    }
+
+                    fprintf(file, ";\n");
+                }
+                
+                if impl_functions_for_impl != 0 {
+                    let function_usage = impl_functions_for_impl.find(&func_ptr);
+                    if function_usage != 0 {
+                        for *generics3 in function_usage.generic_maps {
+                            generics3.self_type = generics.self_type;
+                            fprintf(file, "\n");
+                            if self.write_function_definition(file, func_info, generics3, 0) == 0 { return 0; }
+                            fprintf(file, ";\n");
+                        }
+
+                        if function_usage.impl_dynamic_function {
+                            if func_info.type == FunctionType::Coroutine {
+                                fprintf(file, "#include <std/DynCo_CoroutineStatus.h>\n");
+                                fprintf(file, "struct ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynCo_CoroutineStatus__Instance { ");
+                                self.indent += 1;
+                                for param in func_info.parameters {
+                                    self.write_type(file, &param.type, generics);
+                                    fprintf(file, " ");
+                                    self.write_token(file, param.name);
+                                    fprintf(file, "; ");
+                                }
+                                self.indent -= 1;
+                                fprintf(file, "};\n");
+
+                                fprintf(file, "extern struct DynCo_CoroutineStatusVTable ");
+                                self.write_str_title(file, struct_info.name.value);
+                                fprintf(file, "__");
+                                self.write_str_title(file, func_info.name.value);
+                                fprintf(file, "__VTABLE__DYN_CO;\n");
+                            } else {
+                                fprintf(file, "#include <std/DynFn.h>\n");
+                                fprintf(file, "struct ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynFn__Instance { ");
+                                self.indent += 1;
+                                for param in func_info.parameters {
+                                    self.write_type(file, &param.type, generics);
+                                    fprintf(file, " ");
+                                    self.write_token(file, param.name);
+                                    fprintf(file, "; ");
+                                }
+                                self.indent -= 1;
+                                fprintf(file, "};\n");
+
+                                fprintf(file, "extern struct DynFnVTable ");
+                                self.write_str_title(file, struct_info.name.value);
+                                fprintf(file, "__");
+                                self.write_str_title(file, func_info.name.value);
+                                fprintf(file, "__VTABLE__DYN_FN;\n");
+                            }
+                        }
+                    }
+                }
+            }
+
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+
+                    fprintf(file, "\n");
+                    let generics_void = *generics;
+                    generics_void.self_type = &self.root.type_void;
+
+                    let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                    if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 { return 0; }
+                    fprintf(file, ";\n");
+                }
+            }
+        }
+
+        if struct_info.traits.length > 0 { fprintf(file, "\n"); }
+
+        for (_, trait_info) in struct_info.traits {
+            fprintf(file, "extern struct ");
+            self.write_token(file, trait_info.name);
+            fprintf(file, "VTable ");
+            self.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__");
+            self.write_str_title(file, trait_info.name.value);
+            fprintf(file, ";\n");
+        }
+
+        if usage.impl_dynamic_usage {
+            fprintf(file, "#include <std/DynStruct.h>\n");
+            fprintf(file, "extern struct DynStructVTable ");
+            self.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__DYN_STRUCT;\n");
+        }
+
+        return 1;
+    }
+
+    fn write_impl_definition(&self, file: &FILE, name: str, impl_info: &Impl, generics: &GenericMap) -> bool {
+        let trait_info = impl_info.trait_;
+
+        fprintf(file, "\n");
+
+        for (_, &func_info) in impl_info.functions {
+            if func_info.generics.array.length == 0 {
+                if trait_info == 0 {
+                    if self.write_function_definition(file, func_info, generics, 0) == 0 { return 0; }
+                } else {
+                    let generics_void = *generics;
+                    generics_void.self_type = &self.root.type_void;
+
+                    let func_name = self.get_trait_function_name(name, trait_info, func_info, generics);
+                    if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 { return 0; }
+                }
+
+                fprintf(file, ";\n");
+            } /* else { TODO } */
+        }
+
+        // write_trait_default_implementations
+        if trait_info != 0 {
+            for (func_base_name, &func_info) in trait_info.functions {
+                if impl_info.functions.find(&func_base_name) != 0 { continue; }
+
+                fprintf(file, "\n");
+                let generics_void = *generics;
+                generics_void.self_type = &self.root.type_void;
+
+                let func_name = self.get_trait_function_name(name, trait_info, func_info, generics);
+                if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 { return 0; }
+                fprintf(file, ";\n");
+            }
+        }
+
+        return true;
+    }
+
+    fn write_primitive_definition(&self, file: &FILE, primitive_info: &Primitive, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+
+        for *impl_info in primitive_info.impls {
+            self.write_impl_definition(file, name.as_str(), impl_info, generics);
+        }
+
+        if primitive_info.traits.length > 0 { fprintf(file, "\n"); }
+
+        for (_, trait_info) in primitive_info.traits {
+            fprintf(file, "extern struct ");
+            self.write_token(file, trait_info.name);
+            fprintf(file, "VTable ");
+            self.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__");
+            self.write_str_title(file, trait_info.name.value);
+            fprintf(file, ";\n");
+        }
+
+        return 1;
+    }
+
+    fn write_trait_definition(&self, file: &FILE, trait_info: &Trait, generics: &GenericMap) -> bool {
+        let void_self_generics = *generics;
+        void_self_generics.self_type = &self.root.type_void;
+
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_length: i32 = name.array.length;
+
+        self.write_line_directive(file, &trait_info.module.context, trait_info.name);
+
+        fprintf(file, "struct %.*sVTable {\n", name_length, name.array.data);
+        self.indent += 1;
+
+        for (_, &func_info) in trait_info.functions {
+            if func_info.generics.array.length == 0 {
+                let func_name = String::new(self.allocator);
+                func_name.append("(*");
+                func_name.append(func_info.name.value);
+                func_name.append(")");
+                if self.write_function_definition(file, func_info, &void_self_generics, &func_name) == 0 { return 0; }
+                fprintf(file, ";\n");
+            } /* else { TODO } */
+        }
+
+        self.indent -= 1;
+        fprintf(file, "};\n\n");
+
+        self.write_line_directive(file, &trait_info.module.context, trait_info.name);
+
+        fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+        self.indent += 1;
+
+        self.write_indent(file);
+        fprintf(file, "const struct %.*sVTable* vtable;\n", name_length, name.array.data);
+        self.write_indent(file);
+        fprintf(file, "void* instance;\n");
+
+        self.indent -= 1;
+        fprintf(file, "};\n");
+
+        return 1;
+    }
+
+    fn get_trait_function_name(&self, struct_name: str, trait_info: &Trait, func_info: &Function, generics: &GenericMap) -> String {
+        let trait_name = String::new(self.allocator);
+
+        trait_name.append(struct_name);
+        trait_name.append("__");
+        trait_name.append(trait_info.name.value);
+        trait_name.append("__");
+        trait_name.append(func_info.name.value);
+
+        return trait_name;
+    }
+
+    fn write_impls(&self, file: &FILE, module: &Module, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap) -> bool {
+        // Deref is for slices
+        let name = self.naming_ident.get_type_name(generics.self_type.deref(), generics.self_type, generics);
+        let name_length: i32 = name.array.length;
+        let path = self.make_rel_path(module, name.as_str(), ".h");
+
+        fprintf(file, "#include <%.*s>\n", cast<i32>(path.array.length), path.array.data);
+
+        for (impl_index, *impl_info) in impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
+
+            for (_, &func_info) in impl_info.functions {
+                let func_ptr = cast<usize>(func_info);
+                let function_usage: &TypeFunctionUsage = 0;
+                if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                if func_info.generics.array.length == 0 {
+                    fprintf(file, "\n");
+                    if trait_info != 0 {
+                        let generics_void = *generics;
+                        generics_void.self_type = &self.root.type_void;
+
+                        let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                        if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        fprintf(file, " {\n");
+                        self.indent += 1;
+
+                        self.write_indent(file);
+                        self.write_type(file, generics.self_type, generics);
+                        fprintf(file, "* self = __self; (void)self;\n");
+
+                        let func_context = FunctionContext::new(self.allocator, func_info, true);
+                        if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
+                        self.function_context = &func_context;
+
+                        if self.write_block(file, &func_info.return_type, func_info.body, generics, 0, 1) == 0 {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        self.indent -= 1;
+                        self.write_indent(file);
+                        fprintf(file, "}\n");
+
+                        self.function_context = 0;
+                    } else {
+                        if self.write_function_definition(file, func_info, generics, 0) == 0 {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        let func_context = FunctionContext::new(self.allocator, func_info, true);
+                        if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
+                        self.function_context = &func_context;
+
+                        if !self.write_function_block(file, name.as_str(), func_info, generics) {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        let function_usage: &TypeFunctionUsage = 0;
+                        if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                        if function_usage != 0 && function_usage.impl_dynamic_function {
+                            fprintf(file, "\n");
+                            if self.is_coroutine() {
+                                fprintf(file, "#include <std/Allocator.h>\n");
+                            }
+
+                            fprintf(file, "#include <std/Array_TypeId.h>\n");
+                            fprintf(file, "struct Array_TypeId* ");
+                            self.write_function_name(file, func_info, generics);
+
+                            if self.is_coroutine() {
+                                fprintf(file, "__DynCo__get_params(void* __self) {\n");
+                            } else {
+                                fprintf(file, "__DynFn__get_params(void* __self) {\n");
+                            }
+
+                            self.indent += 1;
+                            self.write_indent(file);
+                            fprintf(file, "static TypeId type_ids[] = { ");
+
+                            let first = true;
+                            for param in func_info.parameters {
+                                if first { first = false; } else { fprintf(file, ", "); }
+                                self.write_typeid(file, &param.type, generics);
+                            }
+
+                            fprintf(file, " };\n");
+                            self.write_indent(file);
+                            fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info.parameters.length);
+                            self.write_indent(file);
+                            fprintf(file, "return &result;\n");
+                            self.indent -= 1;
+                            fprintf(file, "}\n");
+
+                            fprintf(file, "bool ");
+                            self.write_function_name(file, func_info, generics);
+
+                            if self.is_coroutine() {
+                                fprintf(file, "__DynCo__set_arg(void* __self, uintptr_t index, void* value) {\n");
+                            } else {
+                                fprintf(file, "__DynFn__set_arg(void* __self, uintptr_t index, void* value) {\n");
+                            }
+
+                            self.indent += 1;
+
+                            self.write_indent(file);
+                            fprintf(file, "struct ");
+                            self.write_function_name(file, func_info, generics);
+
+                            if self.is_coroutine() {
+                                fprintf(file, "__DynCo_CoroutineStatus__Instance* self = __self;\n");
+                            } else {
+                                fprintf(file, "__DynFn__Instance* self = __self;\n");
+                            }
+
+                            self.write_indent(file);
+                            fprintf(file, "switch (index) {\n");
+                            self.indent += 1;
+
+                            let i: usize = 0;
+                            for param in func_info.parameters {
+                                self.write_indent(file);
+                                fprintf(file, "case %zu: self->", i);
+                                self.write_token(file, param.name);
+                                fprintf(file, " = ");
+
+                                if !Generator::is_reference(&param.type) {
+                                    fprintf(file, "*(");
+                                    self.write_type(file, &param.type, generics);
+                                    fprintf(file, "*)");
+                                }
+
+                                fprintf(file, "value; return true;\n");
+                                i += 1;
+                            }
+
+                            self.indent -= 1;
+                            self.write_indent(file);
+                            fprintf(file, "}\n");
+
+                            self.write_indent(file);
+                            fprintf(file, "return false;\n");
+
+                            self.indent -= 1;
+                            fprintf(file, "}\n");
+
+                            if self.is_coroutine() {
+                                fprintf(file, "struct Iter_CoroutineStatus ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynCo__init(void* __self, struct Allocator allocator) {\n");
+
+                                self.indent += 1;
+
+                                self.write_indent(file);
+                                fprintf(file, "struct ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynCo_CoroutineStatus__Instance* self = __self;\n");
+
+                                self.write_indent(file);
+                                fprintf(file, "struct ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "));\n");
+
+                                for param in func_info.parameters {
+                                    self.write_indent(file);
+                                    fprintf(file, "instance->");
+                                    self.write_token(file, param.name);
+                                    fprintf(file, " = ");
+                                    fprintf(file, "self->");
+                                    self.write_token(file, param.name);
+                                    fprintf(file, ";\n");
+                                }
+
+                                self.write_indent(file);
+                                fprintf(file, "return (struct Iter_CoroutineStatus) { .vtable = &");
+
+                                match func_info.parent {
+                                    FunctionParent::Struct(struct_info, _, _) => {
+                                        self.write_str_title(file, struct_info.name.value);
+                                        fprintf(file, "__");
+                                    },
+                                    _ => {},
+                                }
+                                self.write_str_title(file, func_info.name.value);
+
+                                fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
+
+                                self.indent -= 1;
+                                fprintf(file, "}\n");
+                            } else {
+                                fprintf(file, "void ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynFn__execute(void* __self) {\n");
+
+                                self.indent += 1;
+
+                                self.write_indent(file);
+                                fprintf(file, "struct ");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynFn__Instance* self = __self;\n");
+
+                                self.write_indent(file);
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "(");
+
+                                first = true;
+                                for param in func_info.parameters {
+                                    if first { first = false; } else { fprintf(file, ", "); }
+                                    fprintf(file, "self->");
+                                    self.write_token(file, param.name);
+                                }
+
+                                fprintf(file, ");\n");
+
+                                self.indent -= 1;
+                                fprintf(file, "}\n");
+                            }
+
+                            if self.is_coroutine() {
+                                fprintf(file, "struct DynCo_CoroutineStatusVTable ");
+                            } else {
+                                fprintf(file, "struct DynFnVTable ");
+                            }
+
+                            match func_info.parent {
+                                FunctionParent::Struct(struct_info, _, _) => {
+                                    self.write_str_title(file, struct_info.name.value);
+                                    fprintf(file, "__");
+                                },
+                                _ => {},
+                            }
+                            self.write_str_title(file, func_info.name.value);
+
+                            if self.is_coroutine() {
+                                fprintf(file, "__VTABLE__DYN_CO");
+                            } else {
+                                fprintf(file, "__VTABLE__DYN_FN");
+                            }
+
+                            fprintf(file, " = { .get_params = &");
+                            self.write_function_name(file, func_info, generics);
+
+                            if self.is_coroutine() {
+                                fprintf(file, "__DynCo__get_params, .set_arg = &");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynCo__set_arg, .init = &");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynCo__init };\n");
+                            } else {
+                                fprintf(file, "__DynFn__get_params, .set_arg = &");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynFn__set_arg, .execute = &");
+                                self.write_function_name(file, func_info, generics);
+                                fprintf(file, "__DynFn__execute };\n");
+                            }
+                        }
+
+                        self.function_context = 0;
+                    }
+                } else if impl_functions_for_impl != 0 {
+                    if function_usage != 0 {
+                        let func2: &Function = self.allocator.alloc(sizeof(Function));
+                        *func2 = *func_info;
+                        // func2.parent_type = generics.self_type;
+
+                        for *generics3 in function_usage.generic_maps {
+                            generics3.self_type = generics.self_type;
+
+                            fprintf(file, "\n");
+                            if self.write_function_definition(file, func_info, generics3, 0) == 0 {
+                                let func_name_length: u32 = func_info.name.value.length;
+                                fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                                return false;
+                            }
+
+                            let func_context = FunctionContext::new(self.allocator, func_info, true);
+                            func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count;
+                            self.function_context = &func_context;
+
+                            self.write_function_block(file, name.as_str(), func_info, generics3);
+                            
+                            self.function_context = 0;
+                        }
+                    }
+                }
+            }
+
+            // write_trait_default_implementations
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+
+                    fprintf(file, "\n");
+                    let generics_void = *generics;
+                    generics_void.self_type = &self.root.type_void;
+
+                    let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                    if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 {
+                        let func_name_length: u32 = func_info.name.value.length;
+                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                        return false;
+                    }
+
+                    fprintf(file, " {\n");
+                    self.indent += 1;
+
+                    self.write_indent(file);
+                    self.write_type(file, generics.self_type, generics);
+                    fprintf(file, "* self = __self; (void)self;\n");
+
+                    let func_context = FunctionContext::new(self.allocator, func_info, true);
+                    self.function_context = &func_context;
+
+                    if self.write_block(file, &func_info.return_type, func_info.body, generics, 0, 1) == 0 {
+                        let func_name_length: u32 = func_info.name.value.length;
+                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                        return false;
+                    }
+
+                    self.indent -= 1;
+                    self.write_indent(file);
+                    fprintf(file, "}\n");
+
+                    self.function_context = 0;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    fn generate_struct_loop(&self, usage: &TypeUsage<Struct>) -> bool {
+        let success = true;
+        let struct_info = usage.type;
+
+        for *generics in usage.generic_maps {
+            success = self.generate_struct(struct_info, usage, generics) && success;
+        }
+
+        return success;
+    }
+
+    fn make_path(&self, module: *Module, name: str, ext: str) -> String {
+        let result = self.make_rel_path(module, name, ext);
+        result.prepend("/");
+        result.prepend(self.path);
+        return result;
+    }
+
+    fn make_rel_path(&self, module: *Module, name: str, ext: str) -> String {
+        let result = String::new(self.allocator);
+        let namespace: *Namespace = 0;
+        if module != 0 { namespace = module.namespace; }
+
+        while namespace != 0 {
+            result.prepend("/");
+            result.prepend(namespace.name);
+            namespace = namespace.parent;
+        }
+
+        result.append(name);
+        result.append(ext);
+
+        return result;
+    }
+        
+    fn generate_struct(&self, struct_info: &Struct, usage: &TypeUsage<Struct>, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let header = self.make_path(struct_info.module, name.as_str(), ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n\n");
+
+        if struct_info.module.mode_cpp || usage.usage_context.cpp_usages.length > 0 {
+            fprintf(header_file, "#ifdef __cplusplus\n");
+
+            for (name, type) in usage.usage_context.cpp_usages {
+                match type {
+                    Type::ClassCpp(class_info) => {
+                        if class_info.is_struct {
+                             fprintf(header_file, "struct %.*s;\n", cast<i32>(name.length), name.ptr);
+                        } else {
+                            fprintf(header_file, "class %.*s;\n", cast<i32>(name.length), name.ptr);
+                        }
+                    },
+                    _ => {},
+                }
+            }
+
+            if struct_info.module.mode_cpp {
+                if usage.usage_context.cpp_usages.length > 0 { fprintf(header_file, "\n"); }
+                fprintf(header_file, "extern \"C\" {\n");
+            }
+
+            fprintf(header_file, "#else\n");
+
+            for (name, _) in usage.usage_context.cpp_usages {
+                fprintf(header_file, "typedef struct %.*s %.*s;\n", cast<i32>(name.length), name.ptr, cast<i32>(name.length), name.ptr);
+            }
+
+            fprintf(header_file, "#endif\n\n");
+        }
+
+        for type in generics.array {
+            self.write_c_type_include(header_file, type.deref());
+        }
+
+        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_struct_definition_includes(&includes_definition, &refs_definition, struct_info, generics) == 0 { fclose(header_file); return false; }
+        if self.add_impl_definition_includes(&includes_definition, &refs_definition, &struct_info.impls, &usage.impl_functions, generics) == 0 { fclose(header_file); return false; }
+        self.write_includes(header_file, &includes_definition);
+        self.write_refs(header_file, &refs_definition);
+        if !struct_info.module.mode_cpp {
+            self.write_includes_raw(header_file, &struct_info.module.includes);
+        }
+
+        if self.write_struct_definition(header_file, struct_info, usage, generics) == 0 { fclose(header_file); return false; }
+
+        if struct_info.module.mode_cpp {
+            fprintf(header_file, "\n#ifdef __cplusplus\n");
+            fprintf(header_file, "}\n");
+            fprintf(header_file, "#endif\n");
+        }
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        if struct_info.impls.length == 0 && !usage.impl_dynamic_usage {
+            return true;
+        }
+
+        let ext: str;
+        if struct_info.module.mode_cpp {
+            ext = ".cpp";
+        } else {
+            ext = ".c";
+        }
+
+        let code = self.make_path(struct_info.module, name.as_str(), ext);
+        self.code_files.append(code);
+
+        let code_tmp: *const char = tmpnam(0);
+        let code_file: &FILE = fopen(code_tmp, "w+");
+        if code_file == 0 { perror(code.c_str()); return false; }
+
+        let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_impl_includes(&includes_code, &struct_info.impls, &usage.impl_functions, generics) == 0 { fclose(code_file); return false; }
+        self.write_includes_raw(code_file, &struct_info.module.includes);
+
+        let name_str = name.as_str();
+        includes_code.remove(&name_str);
+
+        self.write_includes(code_file, &includes_code);
+
+        if self.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics) == 0 { fclose(code_file); return false; }
+
+        if struct_info.traits.length > 0 {
+            fprintf(code_file, "\n");
+        }
+
+        for (_, trait_info) in struct_info.traits {
+            fprintf(code_file, "struct ");
+            self.write_token(code_file, trait_info.name);
+            fprintf(code_file, "VTable ");
+            self.write_str_title(code_file, name.as_str());
+            fprintf(code_file, "__VTABLE__");
+            self.write_str_title(code_file, trait_info.name.value);
+            fprintf(code_file, " = { ");
+
+            let first = true;
+            for (_, &func_info) in trait_info.functions {
+                if first { first = false; }
+                else { fprintf(code_file, ", "); }
+
+                fprintf(code_file, ".");
+                self.write_token(code_file, func_info.name);
+                fprintf(code_file, " = &");
+                let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                self.write_string(code_file, &func_name);
+            }
+
+            fprintf(code_file, " };\n");
+        }
+
+        if usage.impl_dynamic_usage {
+            fprintf(code_file, "\n");
+
+            fprintf(code_file, "#include <std/DynStructField.h>\n");
+            fprintf(code_file, "#include <slice_DynStructField.h>\n");
+            fprintf(code_file, "struct slice_DynStructField ");
+            self.write_string(code_file, &name);
+            fprintf(code_file, "__DynStruct__get_fields(void* __self) {\n");
+
+            self.indent += 1;
+            self.write_indent(code_file);
+            fprintf(code_file, "static struct DynStructField fields[] = { ");
+
+            let first = true;
+            for (_, &field) in struct_info.fields {
+                if first { first = false; } else { fprintf(code_file, ", "); }
+                fprintf(code_file, "(struct DynStructField){ .name = (struct str){ .ptr = \"");
+                self.write_token(code_file, field.name);
+                fprintf(code_file, "\", .length = %zu }, .typeid = ", field.name.value.length);
+                self.write_typeid(code_file, &field.type, generics);
+                fprintf(code_file, " }");
+            }
+
+            fprintf(code_file, " };\n");
+            self.write_indent(code_file);
+            fprintf(code_file, "return (struct slice_DynStructField){ .data = fields, .length = %zu };\n", struct_info.fields.length);
+            self.indent -= 1;
+            fprintf(code_file, "}\n");
+
+            fprintf(code_file, "void* ");
+            self.write_string(code_file, &name);
+
+            fprintf(code_file, "__DynStruct__get_field(void* __self, uintptr_t index) {\n");
+
+            self.indent += 1;
+
+            self.write_indent(code_file);
+            fprintf(code_file, "struct ");
+            self.write_string(code_file, &name);
+            fprintf(code_file, "* self = __self;\n");
+
+            self.write_indent(code_file);
+            fprintf(code_file, "switch (index) {\n");
+            self.indent += 1;
+
+            let i: usize = 0;
+            for (_, &field) in struct_info.fields {
+                self.write_indent(code_file);
+                fprintf(code_file, "case %zu: return ", i);
+
+                if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
+                    fprintf(code_file, "&");
+                }
+
+                fprintf(code_file, "self->");
+                self.write_token(code_file, field.name);
+                fprintf(code_file, ";\n");
+                i += 1;
+            }
+
+            self.indent -= 1;
+            self.write_indent(code_file);
+            fprintf(code_file, "}\n");
+
+            self.write_indent(code_file);
+            fprintf(code_file, "return 0;\n");
+
+            self.indent -= 1;
+            fprintf(code_file, "}\n");
+
+            fprintf(code_file, "bool ");
+            self.write_string(code_file, &name);
+
+            fprintf(code_file, "__DynStruct__set_field(void* __self, uintptr_t index, void* value) {\n");
+
+            self.indent += 1;
+
+            self.write_indent(code_file);
+            fprintf(code_file, "struct ");
+            self.write_string(code_file, &name);
+            fprintf(code_file, "* self = __self;\n");
+
+            self.write_indent(code_file);
+            fprintf(code_file, "switch (index) {\n");
+            self.indent += 1;
+
+            i = 0;
+            for (_, &field) in struct_info.fields {
+                self.write_indent(code_file);
+                fprintf(code_file, "case %zu: self->", i);
+                self.write_token(code_file, field.name);
+                fprintf(code_file, " = ");
+
+                if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
+                    fprintf(code_file, "*(");
+                    self.write_type(code_file, &field.type, generics);
+                    fprintf(code_file, "*)");
+                }
+
+                fprintf(code_file, "value; return true;\n");
+                i += 1;
+            }
+
+            self.indent -= 1;
+            self.write_indent(code_file);
+            fprintf(code_file, "}\n");
+
+            self.write_indent(code_file);
+            fprintf(code_file, "return false;\n");
+
+            self.indent -= 1;
+            fprintf(code_file, "}\n");
+
+            fprintf(code_file, "struct DynStructVTable ");
+            self.write_str_title(code_file, name.as_str());
+            fprintf(code_file, "__VTABLE__DYN_STRUCT");
+            fprintf(code_file, " = { .get_fields = &");
+            self.write_string(code_file, &name);
+
+            fprintf(code_file, "__DynStruct__get_fields, .get_field = &");
+            self.write_string(code_file, &name);
+            fprintf(code_file, "__DynStruct__get_field, .set_field = &");
+            self.write_string(code_file, &name);
+            fprintf(code_file, "__DynStruct__set_field };\n");
+        }
+
+        self.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        return true;
+    }
+
+    fn generate_primitive(&self, usage: &TypeUsage<Primitive>) -> bool {
+        let primitive_info = usage.type;
+        let self_type = Type::Primitive(primitive_info);
+        let generics = GenericMap { self_type: &self_type };
+        let name = primitive_info.name;
+
+        let header = self.make_path(0, name, ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name);
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name);
+        fprintf(header_file, "\n\n");
+
+        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_impl_definition_includes(&includes_definition, &refs_definition, &primitive_info.impls, &usage.impl_functions, &generics) == 0 { fclose(header_file); return false; }
+
+        self.write_impl_includes_raw(header_file, &primitive_info.impls);
+        self.write_includes(header_file, &includes_definition);
+        self.write_refs(header_file, &refs_definition);
+
+        if self.write_primitive_definition(header_file, primitive_info, &generics) == 0 { fclose(header_file); return false; }
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        if primitive_info.impls.length == 0 {
+            return true;
+        }
+
+        let code = self.make_path(0, name, ".c");
+        self.code_files.append(code);
+
+        let code_tmp: *const char = tmpnam(0);
+        let code_file: &FILE = fopen(code_tmp, "w+");
+        if code_file == 0 { perror(code.c_str()); return false; }
+
+        let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_impl_includes(&includes_code, &primitive_info.impls, &usage.impl_functions, &generics) == 0 { fclose(code_file); return false; }
+        self.write_includes(code_file, &includes_code);
+
+        if self.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, &generics) == 0 { fclose(code_file); return false; }
+
+        for (_, trait_info) in primitive_info.traits {
+            fprintf(code_file, "\nstruct ");
+            self.write_token(code_file, trait_info.name);
+            fprintf(code_file, "VTable ");
+            self.write_str_title(code_file, name);
+            fprintf(code_file, "__VTABLE__");
+            self.write_str_title(code_file, trait_info.name.value);
+            fprintf(code_file, " = { ");
+
+            let first = true;
+            for (_, &func_info) in trait_info.functions {
+                if first { first = false; }
+                else { fprintf(code_file, ", "); }
+
+                fprintf(code_file, ".");
+                self.write_token(code_file, func_info.name);
+                fprintf(code_file, " = &");
+                let func_name = self.get_trait_function_name(name, trait_info, func_info, &generics);
+                self.write_string(code_file, &func_name);
+            }
+
+            fprintf(code_file, " };\n");
+        }
+
+        self.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        return true;
+    }
+
+    fn generate_slice(&self, element_type: &Type) -> bool {
+        let generics = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        generics.insert("T", *element_type);
+
+        let sequence = Sequence { type: SequenceType::Slice, element: *element_type };
+        let sequence_type = Type::Sequence(&sequence);
+        let sequence_indirect = Indirect { type: IndirectType::Reference, to: sequence_type };
+
+        let element_indirect = Indirect { type: IndirectType::Reference, to: *element_type };
+        let element_reference_type = Type::Indirect(&element_indirect);
+
+        generics.self_type = self.allocator.store(Type::Indirect(&sequence_indirect));
+
+        let name = self.naming_ident.get_type_name(&sequence_type, &sequence_type, &generics);
+
+        let header = self.make_path(0, name.as_str(), ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n\n");
+
+        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+
+        self.write_c_type_include(header_file, element_type);
+
+        self.add_type_include(&includes_definition, &refs_definition, &includes_definition, &element_reference_type, &generics);
+        self.add_type_include(&includes_definition, &refs_definition, &includes_definition, &self.root.type_usize, &generics);
+
+        self.write_includes(header_file, &includes_definition);
+        self.write_refs(header_file, &refs_definition);
+
+        fprintf(header_file, "struct ");
+        self.write_string(header_file, &name);
+        fprintf(header_file, " { ");
+
+        self.write_variable_decl(header_file, "data", &element_reference_type, &generics);
+        fprintf(header_file, "; ");
+        self.write_variable_decl(header_file, "length", &self.root.type_usize, &generics);
+
+        fprintf(header_file, "; };\n");
+
+        self.write_impl_definition(header_file, name.as_str(), self.root.hack_type_impl.impl_info, &generics);
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        let code = self.make_path(0, name.as_str(), ".c");
+        self.code_files.append(code);
+
+        let code_tmp: *const char = tmpnam(0);
+        let code_file: &FILE = fopen(code_tmp, "w+");
+        if code_file == 0 { perror(code.c_str()); return false; }
+
+        let impls_base = [self.root.hack_type_impl.impl_info];
+        let impls = Array<&Impl> { data: impls_base, length: impls_base.length };
+        let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: 0, length: 0 };
+
+        let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_impl_includes(&includes_code, &impls, &impl_functions, &generics) == 0 { fclose(code_file); return false; }
+        self.write_includes(code_file, &includes_code);
+
+        if self.write_impls(code_file, 0, &impls, &impl_functions, &generics) == 0 { fclose(code_file); return false; }
+
+        self.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        return true;
+    }
+
+    fn generate_tuple(&self, tuple: &Tuple) -> bool {
+        let element_types = &tuple.elements;
+        let generics = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        let tuple_type = Type::Tuple(tuple);
+
+        generics.self_type = self.allocator.store(tuple_type);
+
+        let name = self.naming_ident.get_type_name(&tuple_type, &tuple_type, &generics);
+
+        let header = self.make_path(0, name.as_str(), ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n\n");
+
+        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+
+        for type in element_types {
+            self.write_c_type_include(header_file, type);
+            self.add_type_include(&includes_definition, &refs_definition, &includes_definition, type, &generics);
+        }
+
+        self.write_includes(header_file, &includes_definition);
+        self.write_refs(header_file, &refs_definition);
+
+        fprintf(header_file, "struct ");
+        self.write_string(header_file, &name);
+        fprintf(header_file, " {\n");
+        self.indent += 1;
+
+        for (i, element) in element_types.iter().enumerate() {
+            let element_name = String::new(self.allocator);
+            element_name.append("_");
+            element_name.append_usize(i);
+
+            self.write_indent(header_file);
+            self.write_variable_decl(header_file, element_name.as_str(), element, &generics);
+
+            fprintf(header_file, ";\n");
+
+            element_name.release();
+        }
+
+        self.indent -= 1;
+        fprintf(header_file, "};\n");
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        return true;
+    }
+
+    fn generate_trait_loop(&self, usage: &TypeUsage<Trait>) -> bool {
+        let success = true;
+        let trait_info = usage.type;
+
+        for *generics in usage.generic_maps {
+            success = self.generate_trait(trait_info, generics) && success;
+        }
+
+        return success;
+    }
+
+    fn generate_trait(&self, trait_info: &Trait, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let header = self.make_path(trait_info.module, name.as_str(), ".h");
+
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n\n");
+
+        if trait_info.module.mode_cpp {
+            fprintf(header_file, "#ifdef __cplusplus\n");
+            fprintf(header_file, "extern \"C\" {\n");
+            fprintf(header_file, "#endif\n\n");
+        }
+
+        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
+        if self.add_trait_definition_includes(&includes_definition, &refs_definition, trait_info, generics) == 0 { fclose(header_file); return 0; }
+        self.write_includes(header_file, &includes_definition);
+        self.write_refs(header_file, &refs_definition);
+        if !trait_info.module.mode_cpp {
+            self.write_includes_raw(header_file, &trait_info.module.includes);
+        }
+
+        if self.write_trait_definition(header_file, trait_info, generics) == 0 { fclose(header_file); return 0; }
+
+        if trait_info.module.mode_cpp {
+            fprintf(header_file, "\n#ifdef __cplusplus\n");
+            fprintf(header_file, "}\n");
+            fprintf(header_file, "#endif\n");
+        }
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        return 1;
+    }
+
+    fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {
+        for (name, namespace) in children {
+            let path = String::new(self.allocator);
+            path.append(base_path);
+            path.append("/");
+            path.append(name);
+            create_directory(path.c_str());
+
+            self.create_directories(path.as_str(), &namespace.children);
+        }
+    }
+
+    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, root: &Root) -> bool {
+        let result = true;
+
+        let self: Generator = Generator {
+            allocator,
+            path,
+            root,
+            primitives: HashMap<str, str>::new(allocator),
+            primitive_includes: HashMap<str, str>::new(allocator),
+            code_files: Array<String>::new(allocator),
+            error: FileWriter::new(stderr),
+            output_line_directives,
+            naming_decl: &root.naming_decl,
+            naming_ident: Naming::new_ident(allocator),
+        };
+
+        self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);
+
+        let primitives: &HashMap<str, str> = &self.primitives;
+        primitives.insert("bool", "bool");
+        primitives.insert("i8", "int8_t");
+        primitives.insert("i16", "int16_t");
+        primitives.insert("i32", "int32_t");
+        primitives.insert("i64", "int64_t");
+        primitives.insert("isize", "intptr_t");
+        primitives.insert("u8", "uint8_t");
+        primitives.insert("u16", "uint16_t");
+        primitives.insert("u32", "uint32_t");
+        primitives.insert("u64", "uint64_t");
+        primitives.insert("usize", "uintptr_t");
+        primitives.insert("f32", "float");
+        primitives.insert("f64", "double");
+        primitives.insert("char", "char");
+        primitives.insert("void", "void");
+
+        let primitive_includes: &HashMap<str, str> = &self.primitive_includes;
+        primitive_includes.insert("i8", "stdint");
+        primitive_includes.insert("u8", "stdint");
+        primitive_includes.insert("i16", "stdint");
+        primitive_includes.insert("u16", "stdint");
+        primitive_includes.insert("i32", "stdint");
+        primitive_includes.insert("u32", "stdint");
+        primitive_includes.insert("i64", "stdint");
+        primitive_includes.insert("u64", "stdint");
+        primitive_includes.insert("isize", "stdint");
+        primitive_includes.insert("usize", "stdint");
+        primitive_includes.insert("bool", "stdbool");
+
+        self.create_directories(path, &root.children);
+
+        let usages = Usages::new(&self);
+        for (_, &usage) in usages.primitives { self.generate_primitive(usage); }
+        for (_, &usage) in usages.structs { self.generate_struct_loop(usage); }
+        for (_, &usage) in usages.enums { self.generate_enum_loop(usage); }
+        for (_, &usage) in usages.traits { self.generate_trait_loop(usage); }
+        for (_, &usage) in usages.functions { self.generate_function_loop(usage); }
+        for element in usages.sequences { self.generate_slice(element); }
+        for *tuple in usages.tuples { self.generate_tuple(tuple); }
+
+        if self.code_files.length > 0 {
+            let command = String::new(self.allocator);
+
+            for code_file in self.code_files {
+                if command.array.length > 0 {
+                    command.append(output_seperator);
+                }
+
+                command.append(code_file.as_str());
+            }
+
+            let length: u32 = command.array.length;
+            printf("%.*s\n", length, command.array.data);
+        }
+
+        return result;
+    }
+}

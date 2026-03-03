@@ -1,0 +1,405 @@
+#include "pipes.h"
+
+use std
+use analyzer
+
+struct Processor {
+    allocator: &ArenaAllocator,
+    pipe_read: pipe_t,
+    pipe_write: pipe_t,
+}
+
+impl Processor {
+    fn new(allocator: &ArenaAllocator, pipe_read: pipe_t, pipe_write: pipe_t) -> Self {
+        return Self {
+            allocator,
+            pipe_read,
+            pipe_write,
+        };
+    }
+
+    fn read_headers(&self, content_length: &usize) -> bool {
+        let MAX_LENGTH: usize = 1024;
+        let buf: *char = self.allocator.alloc(1024);
+        defer self.allocator.free(buf);
+        let pipe = self.pipe_read;
+
+        let pos: usize = 0;
+        let c: char = 0;
+        let newlines: usize = 0;
+        while (pos < MAX_LENGTH - 1) {
+            if !read_pipe(pipe, &c, 1) { return false; }
+
+            buf[pos] = c;
+            pos += 1;
+            
+            if c == '\n' {
+                newlines += 1;
+                if newlines == 2 && pos >= 4 && buf[pos-4] == '\r' && buf[pos-3] == '\n' && buf[pos-2] == '\r' && buf[pos-1] == '\n' {
+                    buf[pos] = '\0';
+                    
+                    let cl = strstr(buf, "Content-Length:");
+                    if cl { *content_length = strtoul(cl + 15, 0, 10); }
+
+                    return true;
+                }
+            } else if c != '\r' {
+                newlines = 0;
+            }
+      }
+
+      return false;
+    }
+
+    fn read_message(&self) -> String {
+        let content_length: usize = 0;
+        if !self.read_headers(&content_length) { return String::new(self.allocator); }
+
+        let content = String::new(self.allocator);
+        content.ensure_can_hold(content_length);
+
+        content.array.length = content_length;
+        read_pipe(self.pipe_read, content.array.data, content_length);
+
+        fprintf(stderr, "Receved: %s\n\n", content.c_str());
+
+        return content;
+    }
+
+    fn send_message(&self, method: *const char, params: JsonNode) {
+        let response = HashMap<str, JsonNode>::new(self.allocator);
+        response.insert("jsonrpc", JsonNode::String("2.0"));
+        response.insert("method", JsonNode::String(method));
+        response.insert("params", params);
+        
+        let text = JsonNode::Object(response).to_string(self.allocator);
+        self.send_response_text(text.as_str());
+    }
+
+    fn send_message_no_params(&self, method: *const char) {
+        let response = HashMap<str, JsonNode>::new(self.allocator);
+        response.insert("jsonrpc", JsonNode::String("2.0"));
+        response.insert("method", JsonNode::String(method));
+        
+        let text = JsonNode::Object(response).to_string(self.allocator);
+        self.send_response_text(text.as_str());
+    }
+
+    // fn send_message_id(&self, id: f64, method: *const char, params: JsonNode) {
+    //     let response = HashMap<str, JsonNode>::new(self.allocator);
+    //     response.insert("jsonrpc", JsonNode::String("2.0"));
+    //     response.insert("id", JsonNode::Number(id));
+    //     response.insert("method", JsonNode::String(method));
+    //     response.insert("params", params);
+        
+    //     let text = JsonNode::Object(response).to_string(self.allocator);
+    //     self.send_response_text(text.as_str());
+    // }
+
+    fn send_response(&self, id: f64, result: JsonNode) {
+        let response = HashMap<str, JsonNode>::new(self.allocator);
+        response.insert("jsonrpc", JsonNode::String("2.0"));
+        response.insert("id", JsonNode::Number(id));
+        response.insert("result", result);
+        
+        let text = JsonNode::Object(response).to_string(self.allocator);
+        self.send_response_text(text.as_str());
+    }
+
+    fn send_response_text(&self, string: str) {
+        let header: *char = self.allocator.alloc(128);
+        defer self.allocator.free(header);
+
+        let header_len: usize = snprintf(header, 128, "Content-Length: %zu\r\n\r\n", string.length);
+
+        write_pipe(self.pipe_write, header, header_len);
+        write_pipe(self.pipe_write, string.ptr, string.length);
+
+        fprintf(stderr, "Sent: %s\n\n", string.ptr);
+    }
+
+    fn initialize(&self, params: &JsonNode) -> JsonNode {
+        let result = HashMap<str, JsonNode>::new(self.allocator);
+
+        let capabilities = HashMap<str, JsonNode>::new(self.allocator);
+
+        let text_document_sync = HashMap<str, JsonNode>::new(self.allocator);
+        text_document_sync.insert("openClose", JsonNode::Boolean(true));
+        text_document_sync.insert("change", JsonNode::Number(2));
+    
+        let save = HashMap<str, JsonNode>::new(self.allocator);
+        save.insert("includeText", JsonNode::Boolean(false));
+        text_document_sync.insert("save", JsonNode::Object(save));
+
+        capabilities.insert("textDocumentSync", JsonNode::Object(text_document_sync));
+
+        let inlay_hint_provider = HashMap<str, JsonNode>::new(self.allocator);
+        inlay_hint_provider.insert("resolveProvider", JsonNode::Boolean(false));
+        capabilities.insert("inlayHintProvider", JsonNode::Object(inlay_hint_provider));
+
+        let has_workspace_folder_capability = true;
+        if has_workspace_folder_capability {
+            let workspace = HashMap<str, JsonNode>::new(self.allocator);
+            let workspace_folders = HashMap<str, JsonNode>::new(self.allocator);
+            workspace_folders.insert("supported", JsonNode::Boolean(true));
+            workspace.insert("workspaceFolders", JsonNode::Object(workspace_folders));
+            capabilities.insert("workspace", JsonNode::Object(workspace));
+        }
+
+        result.insert("capabilities", JsonNode::Object(capabilities));
+
+        return JsonNode::Object(result);
+    }
+
+    // fn register_capabilities(&self) {
+    //     let params = HashMap<str, JsonNode>::new(self.allocator);
+    //     let registrations = Array<JsonNode>::new(self.allocator);
+    //     let inlay_hint = HashMap<str, JsonNode>::new(self.allocator);
+
+    //     inlay_hint.insert("id", JsonNode::String("inlay-hint-registration"));
+    //     inlay_hint.insert("method", JsonNode::String("textDocument/inlayHint"));
+
+    //     let register_options = HashMap<str, JsonNode>::new(self.allocator);
+
+    //     let document_selector = Array<JsonNode>::new(self.allocator);
+    //     let document_selector_pave = HashMap<str, JsonNode>::new(self.allocator);
+    //     document_selector_pave.insert("language", JsonNode::String("pave"));
+    //     document_selector.append(JsonNode::Object(document_selector_pave));
+
+    //     register_options.insert("documentSelector", JsonNode::Array(document_selector));
+    //     register_options.insert("resolveProvider", JsonNode::Boolean(false));
+
+    //     inlay_hint.insert("registerOptions", JsonNode::Object(register_options));
+
+    //     registrations.append(JsonNode::Object(inlay_hint));
+
+    //     params.insert("registrations", JsonNode::Array(registrations));
+
+    //     self.send_message_id(1, "client/registerCapability", JsonNode::Object(params));
+    // }
+
+    fn did_change_configuration(&self, ls: &LanguageServer, params: &JsonNode) -> bool {
+        let settings = params.key("settings").key("pave");
+        let args = settings.key("args").array();
+        let clang_args = settings.key("clang_args").array();
+
+        ls.args.clear();
+        if args != 0 {
+            for *arg in args {
+                let arg_string = arg.string();
+                let copy: *char = ls.allocator.alloc(arg_string.length + 1);
+                memcpy(copy, arg_string.ptr, arg_string.length);
+                ls.args.append(copy);
+            }
+        }
+
+        ls.clang_args.clear();
+        if clang_args != 0 {
+            for *arg in clang_args {
+                let arg_string = arg.string();
+                let copy: *char = ls.allocator.alloc(arg_string.length + 1);
+                memcpy(copy, arg_string.ptr, arg_string.length);
+                ls.clang_args.append(copy);
+            }
+        }
+
+        let analysis = ls.analyze();
+        self.publish_diagnostics(analysis);
+        self.inlay_hint_refresh();
+
+        return true;
+    }
+
+    fn publish_diagnostics(&self, analysis: &Analysis) {
+        let blank_diagnostics = Array<Diagnostic> {};
+
+        for (filename, _) in analysis.files {
+            if analysis.diagnostics.find(&filename) == 0 {
+                self.publish_diagnostics_file(filename, &blank_diagnostics);
+            }
+        }
+
+        for (filename, &analysis_diagnostics) in analysis.diagnostics {
+            self.publish_diagnostics_file(filename, analysis_diagnostics);
+        }        
+    }
+
+    fn publish_diagnostics_file(&self, filename: str, analysis_diagnostics: &Array<Diagnostic>) {
+        let source = JsonNode::String("pave");
+        let params = HashMap<str, JsonNode>::new(self.allocator);
+
+        let uri = Uri::file(self.allocator, filename);
+
+        params.insert("uri", JsonNode::String(uri));
+        let diagnostics = Array<JsonNode>::new(self.allocator);
+
+        for diagnostic in analysis_diagnostics {
+            let entry = HashMap<str, JsonNode>::new(self.allocator);
+            let range = HashMap<str, JsonNode>::new(self.allocator);
+
+            let start = HashMap<str, JsonNode>::new(self.allocator);
+            start.insert("line", JsonNode::Number(diagnostic.range.start.line));
+            start.insert("character", JsonNode::Number(diagnostic.range.start.character));
+            range.insert("start", JsonNode::Object(start));
+
+            let end = HashMap<str, JsonNode>::new(self.allocator);
+            end.insert("line", JsonNode::Number(diagnostic.range.end.line));
+            end.insert("character", JsonNode::Number(diagnostic.range.end.character));
+            range.insert("end", JsonNode::Object(end));
+
+            entry.insert("range", JsonNode::Object(range));
+            entry.insert("severity", JsonNode::Number(1));
+            entry.insert("source", source);
+            entry.insert("message", JsonNode::String(diagnostic.message));
+
+            diagnostics.append(JsonNode::Object(entry));
+        }
+
+        params.insert("diagnostics", JsonNode::Array(diagnostics));
+
+        self.send_message("textDocument/publishDiagnostics", JsonNode::Object(params));
+    }
+
+    fn did_change(&self, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        if uri.length == 0 { return; }
+
+        let filename = ls.file_map.find(&uri);
+        if filename == 0 { return; }
+
+        let diagnostics = ls.analysis.diagnostics.find(filename);
+        let inlay_hints = ls.analysis.inlay_hints.find(filename);
+
+        let content_changes = params.key("contentChanges").array();
+        if content_changes == 0 { return; }
+
+        for change in content_changes {
+            let range = change.key("range");
+            let start_line = range.key("start").key("line").number();
+            let start_character = range.key("start").key("character").number();
+            let end_line = range.key("end").key("line").number();
+            // let end_character = range.key("end").key("character").number();
+            let range_length = change.key("rangeLength").number();
+            let text = change.key("text").string();
+
+            let change_lines: isize = start_line - end_line;
+
+            let change_characters: isize = 0;
+            for i in 0..text.length {
+                if text.ptr[i] == '\n' { change_lines += 1; change_characters = -1; }
+                change_characters += 1;
+            }
+
+            change_characters -= range_length;
+
+            if diagnostics != 0 {
+                for diagnostic in diagnostics {
+                    if start_line == diagnostic.range.start.line && start_character <= diagnostic.range.start.character {
+                        diagnostic.range.start.character += change_characters;
+                        diagnostic.range.start.line += change_lines;
+                    } else if start_line < diagnostic.range.start.line {
+                        diagnostic.range.start.line += change_lines;
+                    }
+
+                    if start_line == diagnostic.range.end.line && start_character <= diagnostic.range.end.character {
+                        diagnostic.range.end.character += change_characters;
+                        diagnostic.range.end.line += change_lines;
+                    } else if start_line < diagnostic.range.end.line {
+                        diagnostic.range.end.line += change_lines;
+                    }
+                }
+            }
+
+            if inlay_hints != 0 {
+                for inlay_hint in inlay_hints {
+                    if start_line == inlay_hint.position.line && start_character <= inlay_hint.position.character {
+                        inlay_hint.position.character += change_characters;
+                        inlay_hint.position.line += change_lines;
+                    } else if start_line < inlay_hint.position.line {
+                        inlay_hint.position.line += change_lines;
+                    }
+                }
+            }
+        }
+
+        if diagnostics != 0 {
+            self.publish_diagnostics_file(*filename, diagnostics);
+        }
+    }
+
+    fn inlay_hint(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        if uri.length == 0 { return; }
+
+        let filename = ls.file_map.find(&uri);
+        if filename == 0 { return; }
+
+        let inlay_hints = ls.analysis.inlay_hints.find(filename);
+        if inlay_hints == 0 { return; }
+
+        let result = Array<JsonNode>::new(self.allocator);
+
+        for inlay_hint in inlay_hints {
+            let item = HashMap<str, JsonNode>::new(self.allocator);
+
+            let position = HashMap<str, JsonNode>::new(self.allocator);
+            position.insert("line", JsonNode::Number(inlay_hint.position.line));
+            position.insert("character", JsonNode::Number(inlay_hint.position.character));
+            item.insert("position", JsonNode::Object(position));
+
+            item.insert("label", JsonNode::String(inlay_hint.label));
+
+            match inlay_hint.kind {
+                InlayHintKind::Type => { item.insert("kind", JsonNode::Number(1)); },
+                InlayHintKind::Parameter => { item.insert("kind", JsonNode::Number(2)); },
+                InlayHintKind::Unknown => { item.insert("kind", JsonNode::Number(0)); },
+            }
+
+            item.insert("padding_left", JsonNode::Boolean(inlay_hint.padding_left));
+            item.insert("padding_right", JsonNode::Boolean(inlay_hint.padding_right));
+
+            result.append(JsonNode::Object(item));
+        }
+
+        self.send_response(id, JsonNode::Array(result));
+    }
+
+    fn inlay_hint_refresh(&self) {
+        self.send_message_no_params("workspace/inlayHint/refresh");
+    }
+
+    fn process(&self, ls: &LanguageServer) -> bool {
+        let msg_str = self.read_message();
+        defer msg_str.release();
+        let msg_json = JsonNode::Undefined;
+
+        if !JsonParser::parse(self.allocator, &msg_json, msg_str.as_str()) {
+            fprintf(stderr, "Failed to parse json: %.*s\n\n", msg_str.len_i32(), msg_str.c_str());
+            return true;
+        }
+
+        let id = msg_json.key("id").number();
+        let method = msg_json.key("method").string();
+
+        if method.eq("initialize") {
+            let result = self.initialize(msg_json.key("params"));
+            self.send_response(id, result);
+        // } else if method.eq("initialized") {
+        //     self.register_capabilities();
+        } else if method.eq("workspace/didChangeConfiguration") {
+            self.did_change_configuration(ls, msg_json.key("params"));
+        } else if method.eq("textDocument/didSave") {
+            let analysis = ls.analyze();
+            self.publish_diagnostics(analysis);
+            self.inlay_hint_refresh();
+        } else if method.eq("textDocument/didChange") {
+            self.did_change(ls, msg_json.key("params"));
+        } else if method.eq("textDocument/inlayHint") {
+            self.inlay_hint(id, ls, msg_json.key("params"));
+        } else if method.eq("exit") {
+            return false;
+        }
+
+        return true;
+    }
+}

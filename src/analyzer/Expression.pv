@@ -1,0 +1,1366 @@
+#include "stdlib.h"
+
+use std
+
+struct InvokeArgument {
+    name: &Token,
+    value: &Expression,
+}
+
+enum CppExpression {
+    New(&Expression, &Expression),
+    Delete(&Expression),
+}
+
+enum ExpressionData {
+    EnumVariant(&EnumVariant),
+    Type(&Type),
+    Literal(str),
+    Variable(str),
+    BinaryExpression(&Expression, str, &Expression),
+    UnaryExpression(str, &Expression),
+    MemberStaticExpression(&Expression, str),
+    MemberInstanceExpression(&Expression, str),
+    IndexExpression(&Expression, &Expression),
+    ParenthesizedExpression(&Expression),
+    CppExpression(CppExpression),
+    ImplicitCast(&Expression),
+    Invoke(&Expression, Array<InvokeArgument>),
+}
+
+struct Expression {
+    token: &Token,
+    data: ExpressionData,
+    return_type: Type,
+}
+
+impl Expression {
+    fn make(allocator: &ArenaAllocator, token: &Token, data: ExpressionData, return_type: &Type) -> &Expression {
+        return allocator.store(Expression {
+            token,
+            data,
+            return_type: *return_type
+        });
+    }
+
+    fn make_next(context: &Context, node: Expression) -> &Expression {
+        let result: &Expression = context.allocator.store(node);
+
+        context.next_token();
+
+        return result;
+    }
+
+    fn get_enum_variant(context: &Context, type: &Type, token: &Token) -> &EnumVariant {
+        match type {
+            Type::Indirect(indirect) => {
+                return Expression::get_enum_variant(context, &indirect.to, token);
+            },
+            Type::Self => {
+                return Expression::get_enum_variant(context, context.type_self, token);
+            },
+            Type::Enum(enum_info, _) => {
+                let variant = enum_info.variants.find(&token.value);
+                if variant == 0 { context.error_token(token, "Variant not found in enum"); }
+
+                return variant;
+            },
+            _ => { return 0; }
+        }
+
+        return 0;
+    }
+
+    fn get_member_type(context: &Context, type: &Type, member: &Token, output_error: bool) -> &Type {
+        match type {
+            Type::Indirect(indirect) => {
+                return Expression::get_member_type(context, &indirect.to, member, output_error);
+            },
+            Type::Self => {
+                return Expression::get_member_type(context, context.type_self, member, output_error);
+            },
+            Type::Primitive(primitive_info) => {
+                for *impl_info in primitive_info.impls {
+                    let function: &Function = impl_info.functions.find(&member.value);
+                    if function != 0 {
+                        return context.allocator.store(Type::Function(function, context.allocator.store(GenericMap { self_type: type })));
+                    }
+                }
+
+                if output_error { context.error_token(member, "Function not implemented on primitive"); }
+                return 0;
+            },
+            Type::Struct(struct_info, generic_map) => {
+                let field: &StructField = struct_info.fields.find(&member.value);
+                if field != 0 {
+                    return &field.type;
+                }
+
+                for *impl_info in struct_info.impls {
+                    let function: &Function = impl_info.functions.find(&member.value);
+                    if function != 0 {
+                        return context.allocator.store(Type::Function(function, generic_map));
+                    }
+                }
+
+                if output_error {
+                    context.error_token_value(member, "Field or function not found in struct", member.value);
+                }
+                return 0;
+            },
+            Type::CoroutineInstance(func_info, generic_map) => {
+                if member.value.eq("next") {
+                    let func_next = context.allocator.store(context.root.func_next);
+                    func_next.parent = FunctionParent::Type(type, 0, 0);
+                    return context.allocator.store(Type::Function(func_next, generic_map));
+                }
+
+                if member.value.eq("value") {
+                    let func_value = context.allocator.store(context.root.func_value);
+                    func_value.parent = FunctionParent::Type(type, 0, 0);
+                    func_value.return_type = func_info.return_type;
+                    return context.allocator.store(Type::Function(func_value, generic_map));
+                }
+
+                if output_error { context.error_token(member, "Only next() and value() functions exist on coroutine instances"); }
+                return 0;
+            },
+            Type::Enum(enum_info, generic_map) => {
+                for *impl_info in enum_info.impls {
+                    let function: &Function = impl_info.functions.find(&member.value);
+                    if function != 0 {
+                        return context.allocator.store(Type::Function(function, generic_map));
+                    }
+                }
+
+                if output_error { context.error_token(member, "Function not found in enum"); }
+                return 0;
+            },
+            Type::Trait(trait_info, generic_map) => {
+                if member.value.eq("instance") {
+                    return context.allocator.store(Type::Indirect(Indirect::new_pointer(context.allocator, context.root.type_void)));
+                }
+
+                let function: &Function = trait_info.functions.find(&member.value);
+                if function == 0 {
+                    if output_error { context.error_token(member, "Function not found in trait"); }
+                    return 0;
+                }
+
+                return context.allocator.store(Type::Function(function, generic_map));
+            },
+            Type::TypedefC(typedef_info) => {
+                return Expression::get_member_type(context, typedef_info.type, member, output_error);
+            },
+            Type::StructC(struct_info) => {
+                let field = struct_info.fields.find(&member.value);
+                if field != 0 { return &field.type; }
+
+                if output_error { context.error_token(member, "Field not found in C struct"); }
+                return 0;
+            },
+            Type::UnionC(union_info) => {
+                let field = union_info.fields.find(&member.value);
+                if field != 0 { return &field.type; }
+
+                if output_error { context.error_token(member, "Field not found in C union"); }
+                return 0;
+            },
+            Type::ClassCpp(class_info) => {
+                let field_type = class_info.fields.find(&member.value);
+                if field_type != 0 { return field_type; }
+
+                let value_type = class_info.values.find(&member.value);
+                if value_type != 0 { return value_type; }
+
+                if output_error { context.error_token(member, "Field not found in Cpp class/struct"); }
+                return 0;
+            },
+            Type::Generic(generic) => {
+                for *trait_info in generic.traits {
+                    let function: &Function = trait_info.functions.find(&member.value);
+                    if function != 0 {
+                        return context.allocator.store(Type::Function(function, context.allocator.store(GenericMap {})));
+                    }
+                }
+
+                if output_error { context.error_token(member, "Function not found in Generic traits"); }
+                return 0;
+            },
+            Type::Sequence(sequence) => {
+                if member.value.eq("data") {
+                    return &sequence.element_pointer;
+                }
+
+                if member.value.eq("length") {
+                    return &context.root.type_usize;
+                }
+
+                let impl_info = context.root.hack_type_impl.impl_info;
+
+                let function: &Function = impl_info.functions.find(&member.value);
+                if function != 0 {
+                    let generic_map = GenericMap::new(context.allocator, &Generics {}, &Array<Type> {});
+                    generic_map.insert("T", sequence.element);
+                    generic_map.self_type = context.allocator.store(Type::Indirect(Indirect::new_reference(context.allocator, Type::Sequence(sequence))));
+
+                    return context.allocator.store(Type::Function(function, context.allocator.store(generic_map)));
+                }
+
+                if output_error { context.error_token(member, "Sequences do not have this member"); }
+                return 0;
+            },
+            Type::Tuple(tuple) => {
+                if member.type != TokenType::Number {
+                    context.error_token(member, "Tuples do not have this member");
+                    return 0;
+                }
+
+                let index: usize = strtoul(member.value.ptr, 0, 10);
+                if index >= tuple.elements.length {
+                    context.error_token(member, "Tuple does not have this member");
+                    return 0;
+                }
+
+                return &tuple.elements.data[index];
+            },
+            Type::NamespaceCpp(ns_info) => {
+                let type = ns_info.types.find(&member.value);
+                if type != 0 { return type; }
+
+                let value = ns_info.values.find(&member.value);
+                if value != 0 { return value; }
+                
+                if output_error { context.error_token(member, "Namespace does not have this member"); }
+
+                return 0;
+            },
+            Type::Unknown(_, _) => { return type; },
+            _ => { context.error_token(member, "Type does not have members"); },
+        }
+
+        return 0;
+    }
+
+    fn resolve_function_generics(context: &Context, func_info: &Function, generics: &Array<Type>, arguments: &Array<InvokeArgument>) -> &GenericMap {
+        let generic_map = GenericMap::from_generics(context.allocator, &func_info.generics);
+
+        let i: usize = 0;
+        for generic in generics {
+            let target = generic_map.array.get(i);
+            if target != 0 { *target = *generic; }
+            i += 1;
+        }
+
+        if i == generic_map.array.length {
+            return context.allocator.store(generic_map);
+        }
+
+        let params = func_info.parameters.iter();
+        let args = arguments.iter();
+
+        while params.next() && args.next() {
+            let param_type = &params.value().type;
+            let arg_type = &args.value().value.return_type;
+            
+            Expression::resolve_generic_type(context, param_type, arg_type, &generic_map);
+        }
+
+        return context.allocator.store(generic_map);
+    }
+
+    fn resolve_generic_type(context: &Context, param_type: &Type, arg_type: &Type, generic_map: &GenericMap) {
+        match param_type {
+            Type::Generic(generic) => {
+                let generic_type = generic_map.get(generic.name.value);
+                if generic_type != 0 { *generic_type = *arg_type; }
+            },
+            Type::Indirect(indirect_type) => {
+                match arg_type {
+                    Type::Indirect(indirect) => {
+                        Expression::resolve_generic_type(context, &indirect_type.to, &indirect.to, generic_map);
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+    }
+
+    fn validate_arguments(context: &Context, token: &Token, type: &Type, arguments: &Array<InvokeArgument>, generic_map: *GenericMap, is_member_call: bool) -> bool {
+        let arguments_length = arguments.length;
+
+        match type {
+            Type::Self => { { type = context.type_self; } },
+            _ => {},
+        }
+
+        match type {
+            Type::TypedefC(_) => { return true; },
+            Type::UnionC(_) => { return true; },
+            Type::StructC(_) => { return true; },
+            Type::Tuple(_) => { return true; },
+            Type::Struct(struct_info, generic_map2) => {
+                for arg in arguments {
+                    let param = struct_info.fields.find(&arg.name.value);
+
+                    if param == 0 {
+                        context.error_token(arg.name, "Unable to find field in struct");
+                        return false;
+                    }
+
+                    let param_type = &param.type;
+
+                    if generic_map2.map.length > 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
+                    } else if generic_map != 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                    }
+
+                    if param_type == 0 {
+                        context.error_token(arg.value.token, "Unable to resolve field type");
+                        return false;
+                    }
+
+                    if param_type.needs_implicit_cast(&arg.value.return_type) {
+                        arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
+                    } else if param_type.eq(&arg.value.return_type) == 0 {
+                        let message = String::new(context.allocator);
+                        message.append("Field type ");
+                        let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
+                        message.append(return_type_name.as_str());
+                        message.append(" does not match expression type of ");
+                        let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
+                        message.append(param_type_name.as_str());
+                        context.error_token(arg.value.token, message.c_str());
+                        return false;
+                    } 
+                }
+
+                return true;
+            },
+            Type::Function(function, generic_map2) => {
+                if function == 0 || function.type == FunctionType::MethodCpp { return true; }
+
+                if function.parameters.length != arguments_length {
+                    let message = String::new(context.allocator);
+                    message.append("Number of arguments does not match, expected ");
+
+                    if is_member_call {
+                        message.append_usize(function.parameters.length - 1);
+                    } else {
+                        message.append_usize(function.parameters.length);
+                    }
+
+                    context.error_token(token, message.c_str());
+                    return false;
+                }
+
+                let param_iter = function.parameters.iter();
+                let args_iter = arguments.iter();
+
+                if (is_member_call) {
+                    param_iter.next();
+                    args_iter.next();
+
+                    let arg = args_iter.value();
+                    let param_type = &param_iter.value().type;
+
+                    if param_type.is_indirect() && !arg.value.return_type.is_indirect() {
+                        let new_type = context.allocator.store(Type::Indirect(Indirect::new_reference(context.allocator, arg.value.return_type)));
+                        arg.value = Expression::make(context.allocator, token, ExpressionData::UnaryExpression("&", arg.value), new_type);
+                    }
+                }
+
+                while param_iter.next() && args_iter.next() {
+                    let arg = args_iter.value();
+                    let param = param_iter.value();
+                    let param_type = &param.type;
+
+                    if generic_map2.map.length > 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
+                    } else if generic_map != 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                    }
+
+                    if param_type == 0 {
+                        context.error_token(arg.value.token, "Unable to resolve parameter type");
+                        return false;
+                    }
+
+                    if param_type.needs_implicit_cast(&arg.value.return_type) {
+                        arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
+                    } else if param_type.eq(&arg.value.return_type) == 0 {
+                        let message = String::new(context.allocator);
+                        message.append("Argument ");
+                        let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
+                        message.append(return_type_name.as_str());
+                        message.append(" does not match function parameter type of ");
+                        let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
+                        message.append(param_type_name.as_str());
+                        context.error_token(arg.value.token, message.c_str());
+                        return false;
+                    } 
+                }
+
+                return true;
+            },
+            Type::FunctionC(_) => { return true; },
+            Type::ClassCpp(_) => { return true; },
+            Type::Unknown(_, _) => { return true; },
+            _ => { context.error_token(token, "Type can't be called"); },
+        }
+
+        return false;
+    }
+
+    fn validate_enum_arguments(context: &Context, token: &Token, variant: &EnumVariant, arguments: &Array<InvokeArgument>, generic_map: *GenericMap) -> bool {
+        let arguments_length = arguments.length;
+
+        if variant.types.length != arguments_length {
+            let message = String::new(context.allocator);
+            message.append("Number of arguments does not match, expected ");
+            message.append_usize(variant.types.length);
+            context.error_token(token, message.c_str());
+            return false;
+        }
+
+        let param_iter = variant.types.iter();
+        let args_iter = arguments.iter();
+
+        while param_iter.next() && args_iter.next() {
+            let arg = args_iter.value();
+            let param_type = param_iter.value();
+
+            if generic_map != 0 {
+                param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+            }
+
+            if param_type == 0 {
+                context.error_token(arg.value.token, "Unable to resolve parameter type");
+                return false;
+            }
+
+            if param_type.needs_implicit_cast(&arg.value.return_type) {
+                arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
+            } else if param_type.eq(&arg.value.return_type) == 0 {
+                let message = String::new(context.allocator);
+                message.append("Argument ");
+                let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
+                message.append(return_type_name.as_str());
+                message.append(" does not match enum parameter type of ");
+                let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
+                message.append(param_type_name.as_str());
+                context.error_token(arg.value.token, message.c_str());
+                return false;
+            } 
+        }
+
+        return true;
+    }
+
+    fn get_return_type(context: &Context, type: &Type, token: &Token, generic_map: &GenericMap) -> &Type {
+        match type {
+            Type::Tuple(_) => { return type; },
+            Type::Function(func_info, func_generic_map) => { 
+                return Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, generic_map);
+            },
+            Type::FunctionC(func_info) => { return &func_info.return_type; },
+            Type::Unknown(_, _) => { return type; },
+            _ => { context.error_token(token, "Type can't be called"); },
+        }
+
+        return 0;
+    }
+
+    fn make_type_function_call(context: &Context, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> &Expression {
+        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return 0; }
+
+        let func_return_type = Expression::get_return_type(context, type, token, generic_map);
+        if func_return_type == 0 { return 0; }
+
+        let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(type), type);
+        return Expression::make(context.allocator, token, ExpressionData::Invoke(parent_expression, arguments), func_return_type);
+    }
+
+    fn make_member_function_call(context: &Context, inner: &Expression, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> &Expression {
+        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return 0; }
+
+        let func_return_type = Expression::get_return_type(context, type, token, generic_map);
+        if func_return_type == 0 { return 0; }
+
+        return Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), func_return_type);
+    }
+
+    fn parse_enum(context: &Context, token: &Token, enum_type: &Type, generics: &Generics) -> &Expression {
+        if context.check_next(TokenType::Symbol, "::") {
+            let variant_name = context.expect(TokenType::Identifier);
+            if variant_name == 0 { return 0; }
+
+            let variant = Expression::get_enum_variant(context, enum_type, variant_name);
+            if variant == 0 { return 0; }
+
+            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+            if context.check_value(TokenType::Symbol, "(") {
+                if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                while context.check_value(TokenType::Symbol, ")") == 0 {
+                    let argument = Expression::parse(context, generics);
+                    if argument == 0 { return 0; }
+
+                    arguments.append(InvokeArgument { value: argument });
+
+                    if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                        context.expect_value(TokenType::Symbol, ")");
+                        return 0;
+                    }
+                }
+                
+                if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+            }
+
+            let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
+
+            let generic_map = enum_type.get_generic_map(context);
+            if !Expression::validate_enum_arguments(context, token, variant, &arguments, generic_map) { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
+        }
+
+        return Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+    }
+
+    fn parse_struct(context: &Context, token: &Token, struct_type: &Type, generics: &Generics) -> &Expression {
+        if context.check_next(TokenType::Symbol, "::") {
+            let member = context.expect(TokenType::Identifier);
+            if member == 0 { return 0; }
+
+            let member_type = Expression::get_member_type(context, struct_type, member, true);
+            if member_type == 0 { return 0; }
+
+            let generic_map = struct_type.get_generic_map(context);
+
+            if context.check_value(TokenType::Symbol, "(") == 0 {
+                return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+            } else {
+                if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                while context.check_value(TokenType::Symbol, ")") == 0 {
+                    let argument = Expression::parse(context, generics);
+                    if argument == 0 { return 0; }
+
+                    arguments.append(InvokeArgument { value: argument });
+
+                    if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                        context.expect_value(TokenType::Symbol, ")");
+                        return 0;
+                    }
+                }
+                
+                if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+                if !Expression::validate_arguments(context, token, member_type, &arguments, generic_map, false) { return 0; }
+
+                let func_return_type = Expression::get_return_type(context, member_type, token, generic_map);
+                if func_return_type == 0 { return 0; }
+
+                let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                return Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
+            }
+        } else if context.check_next(TokenType::Symbol, "{") {
+            let fields: Array<InvokeArgument> = Array<InvokeArgument>::new(context.allocator);
+
+            while context.check_value(TokenType::Symbol, "}") == 0 {
+                let name = context.expect(TokenType::Identifier);
+                if name == 0 { return 0; }
+
+                let value: &Expression = 0;
+                if context.check_next(TokenType::Symbol, ":") {
+                    value = Expression::parse(context, generics);
+                } else {
+                    let return_type = context.get_value(name.value);
+                    if return_type == 0 {
+                        context.error_token(name, "Unable to find variable with this name");
+                        return 0;
+                    }
+                    
+                    value = Expression::make(context.allocator, name, ExpressionData::Variable(name.value), return_type);
+                }
+
+                if value == 0 { return 0; }
+
+                fields.append(InvokeArgument { name, value });
+
+                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, "}") == 0 {
+                    context.expect_value(TokenType::Symbol, "}");
+                    return 0;
+                }
+            }
+
+            if context.expect_value(TokenType::Symbol, "}") == 0 { return 0; }
+
+            let generic_map = struct_type.get_generic_map(context);
+            if !Expression::validate_arguments(context, token, struct_type, &fields, generic_map, false) { return 0; }
+
+            let struct_expression = Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(struct_expression, fields), struct_type);
+        } else if context.check_next(TokenType::Symbol, "(") {
+            let fields: Array<InvokeArgument> = Array<InvokeArgument>::new(context.allocator);
+
+            let field_index: usize = 0;
+            while context.check_value(TokenType::Symbol, ")") == 0 {
+                let name = String::new(context.allocator);
+                name.append("_");
+                name.append_usize(field_index);
+                let name_str = name.as_str();
+
+                let name_token = *context.current();
+                name_token.value = name_str;
+
+                let value = Expression::parse(context, generics);
+                if value == 0 { return 0; }
+
+                fields.append(InvokeArgument {
+                    name: context.allocator.store(name_token),
+                    value,
+                });
+
+                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                    context.expect_value(TokenType::Symbol, ")");
+                    return 0;
+                }
+
+                field_index += 1;
+            }
+
+            if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+            let struct_expression = Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(struct_expression, fields), struct_type);
+        }
+        
+        return Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+    }
+
+    fn parse_class(context: &Context, token: &Token, parent: &Expression, generics: &Generics) -> &Expression {
+        if context.check_next(TokenType::Symbol, "{") {
+            let fields: Array<InvokeArgument> = Array<InvokeArgument>::new(context.allocator);
+
+            while context.check_value(TokenType::Symbol, "}") == 0 {
+                let name = context.expect(TokenType::Identifier);
+                if name == 0 { return 0; }
+
+                let value: &Expression = 0;
+                if context.check_next(TokenType::Symbol, ":") {
+                    value = Expression::parse(context, generics);
+                } else {
+                    let return_type = context.get_value(name.value);
+                    if return_type == 0 {
+                        context.error_token(name, "Unable to find variable with this name");
+                        return 0;
+                    }
+                    
+                    value = Expression::make(context.allocator, name, ExpressionData::Variable(name.value), return_type);
+                }
+
+                if value == 0 { return 0; }
+
+                fields.append(InvokeArgument { name, value });
+
+                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, "}") == 0 {
+                    context.expect_value(TokenType::Symbol, "}");
+                    return 0;
+                }
+            }
+
+            if context.expect_value(TokenType::Symbol, "}") == 0 { return 0; }
+
+            if !Expression::validate_arguments(context, token, &parent.return_type, &fields, 0, false) { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(parent, fields), &parent.return_type);
+        } else if context.check_next(TokenType::Symbol, "(") {
+            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+            while context.check_value(TokenType::Symbol, ")") == 0 {
+                let argument = Expression::parse(context, generics);
+                if argument == 0 { return 0; }
+
+                arguments.append(InvokeArgument { value: argument });
+
+                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                    context.expect_value(TokenType::Symbol, ")");
+                    return 0;
+                }
+            }
+            
+            if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(parent, arguments), &parent.return_type);
+        }
+        
+        return parent;
+    }
+
+    fn parse_cpp(context: &Context, generics: &Generics) -> &Expression {
+        let token = &context.tokens[context.pos];
+
+        if context.check_next(TokenType::Identifier, "new") {
+            let placement: &Expression = 0;
+            if context.check_next(TokenType::Symbol, "(") {
+                placement = Expression::parse(context, generics);
+                if placement == 0 { return 0; }
+                if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+            }
+
+            let expression = Expression::parse(context, generics);
+            if expression == 0 { return 0; }
+
+            let indirect = Indirect::new_pointer(context.allocator, expression.return_type);
+            return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::New(placement, expression)), &Type::Indirect(indirect));
+        } else if context.check_next(TokenType::Identifier, "delete") {
+            let expression = Expression::parse(context, generics);
+            if expression == 0 { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::Delete(expression)), &Type::Primitive(0));
+        }
+
+        context.error("Expected new or delete in cpp expression");
+        return 0;
+    }
+
+    fn parse_type_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> &Expression {
+        if !context.expect_value(TokenType::Symbol, "::") { return false; }
+
+        match inner.return_type {
+            Type::NamespaceCpp(_) => {},
+            Type::ClassCpp(_) => {},
+            _ => {
+                context.error("Unhandled type member expression");
+                return 0;
+            }
+        }
+
+        let member = context.expect(TokenType::Identifier);
+        if member == 0 { return 0; }
+
+        let member_type = Expression::get_member_type(context, &inner.return_type, member, true);
+        if member_type == 0 { return 0; }
+
+        return Expression::make(context.allocator, member, ExpressionData::MemberStaticExpression(inner, member.value), member_type);
+    }
+
+    fn parse_instance_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> &Expression {
+        if !context.expect_value(TokenType::Symbol, ".") { return false; }
+
+        let member_name = context.current();
+        if member_name == 0 { return 0; }
+
+        if member_name.type != TokenType::Number && member_name.type != TokenType::Identifier {
+            context.error("Unexpected token, expected Identifier or Number");
+        }
+
+        context.next_token();
+
+        let member_type = Expression::get_member_type(context, &inner.return_type, member_name, true);
+        if member_type == 0 { return 0; }
+        
+        let generic_map = inner.return_type.get_generic_map(context);
+        let parsed_generics = Array<Type> {};
+        let func_info: &Function = 0;
+
+        let is_function = false;
+        match member_type {
+            Type::Function(func_info2, _) => {
+                is_function = true;
+                func_info = func_info2;
+            },
+            Type::FunctionC(_) => { is_function = true; },
+            Type::Unknown(_, _) => { is_function = true; },
+            _ => {},
+        }
+        
+        if is_function && context.check_value(TokenType::Symbol, "<") {
+            parsed_generics = context.parse_generics(generics);
+        }
+
+        if is_function && context.check_value(TokenType::Symbol, "(") {
+            if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+            if func_info != 0 && func_info.parameters.length > 0 && func_info.parameters.data[0].name.value.eq("self") {
+                arguments.append(InvokeArgument { value: inner });
+            }
+
+            while context.check_value(TokenType::Symbol, ")") == 0 {
+                let argument = Expression::parse(context, generics);
+                if argument == 0 { return 0; }
+                arguments.append(InvokeArgument { value: argument });
+
+                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                    context.expect_value(TokenType::Symbol, ")");
+                    return 0;
+                }
+            }
+
+            if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+            if func_info != 0 && func_info.generics.array.length > 0 {
+                let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
+                member_type = context.module.make_type_usage(member_type, &func_generics.array);
+            }
+
+            if func_info != 0 && (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {
+                let member_expression = Expression::make(context.allocator, member_name, ExpressionData::MemberInstanceExpression(inner, member_name.value), member_type);
+                return Expression::make_member_function_call(context, member_expression, member_name, member_type, arguments, generic_map);
+            } else {
+                return Expression::make_type_function_call(context, member_name, member_type, arguments, generic_map);
+            }
+        } else {
+            if generic_map != 0 {
+                member_type = Context::resolve_type(context.allocator, member_type, generic_map, 0);
+            }
+
+            return Expression::make(context.allocator, member_name, ExpressionData::MemberInstanceExpression(inner, member_name.value), member_type);
+        }
+    }
+
+    fn parse_index_expression(context: &Context, inner: &Expression, generics: &Generics) -> &Expression {
+        if context.expect_value(TokenType::Symbol, "[") == 0 { return 0; }
+
+        let index_expr = Expression::parse(context, generics);
+        if index_expr == 0 { return 0; }
+
+        if context.expect_value(TokenType::Symbol, "]") == 0 { return 0; }
+
+        match index_expr.data {
+            ExpressionData::Invoke(target, args) => {
+                match target.return_type {
+                    Type::Enum(enum_info, _) => {
+                        if enum_info.name.value.eq("Range") {
+                            let sequence = context.allocator.store(Sequence {
+                                type: SequenceType::Slice,
+                                element: *inner.return_type.deref(),
+                                element_pointer: inner.return_type,
+                            });
+
+                            let start = args.data[0].value;
+                            let end = args.data[1].value;
+
+                            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                            let argument_name_data = context.allocator.store(*index_expr.token);
+                            argument_name_data.type = TokenType::Identifier;
+                            argument_name_data.value = "data";
+
+                            let argument_name_length = context.allocator.store(*argument_name_data);
+                            argument_name_length.value = "length";
+
+                            arguments.append(InvokeArgument {
+                                name: argument_name_data,
+                                value: Expression::make(context.allocator, index_expr.token, ExpressionData::BinaryExpression(inner, "+", start), &sequence.element_pointer),
+                            });
+
+                            arguments.append(InvokeArgument {
+                                name: argument_name_length,
+                                value: Expression::make(context.allocator, index_expr.token, ExpressionData::BinaryExpression(end, "-", start), &context.root.type_usize),
+                            });
+
+                            let sequence_type = context.allocator.store(Type::Sequence(sequence));
+                            let sequence_expr = Expression::make(context.allocator, index_expr.token, ExpressionData::Type(sequence_type), sequence_type);
+                            return Expression::make(context.allocator, index_expr.token, ExpressionData::Invoke(sequence_expr, arguments), sequence_type);
+                        }
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        let inner_return_type = &inner.return_type;
+        let element_type: &Type = 0;
+
+        if inner_return_type.is_reference_sequence_dynamic() {
+            match inner_return_type.deref_1() {
+                Type::Sequence(sequence) => {
+                    element_type = &sequence.element;
+                },
+                _ => {},
+            }
+        } else {
+            match inner_return_type {
+                Type::Indirect(indirect) => {
+                    element_type = &indirect.to;
+                },
+                Type::Sequence(sequence) => {
+                    element_type = &sequence.element;
+                },
+                _ => {},
+            }
+        }
+
+        if element_type == 0 && context.module.mode_cpp {
+            element_type = Type::Unknown("", Array<Type> {}).to_ptr(context.allocator);
+        }
+
+        if element_type == 0 {
+            context.error_token(index_expr.token, "Type is not indexable");
+            return 0;
+        }
+
+        return Expression::make(context.allocator, index_expr.token, ExpressionData::IndexExpression(inner, index_expr), element_type);
+    }
+
+    fn parse_inner(context: &Context, inner: &Expression, generics: &Generics) -> &Expression {
+        let token = context.current();
+        let result: &Expression = 0;
+
+        if token.eq(TokenType::Symbol, ".") {
+            result = Expression::parse_instance_member_expression(context, inner, generics);
+        } else if token.eq(TokenType::Symbol, "::") {
+            result = Expression::parse_type_member_expression(context, inner, generics);
+        } else if token.eq(TokenType::Symbol, "[") {
+            result = Expression::parse_index_expression(context, inner, generics);
+        } else if token.eq(TokenType::Symbol, "+") || token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "*") || token.eq(TokenType::Symbol, "/") || token.eq(TokenType::Symbol, "%") || token.eq(TokenType::Symbol, "^") || token.eq(TokenType::Symbol, "|") || token.eq(TokenType::Symbol, "&") || token.eq(TokenType::Symbol, "<<") {
+            let operator = context.expect(TokenType::Symbol);
+            if operator == 0 { return 0; }
+
+            let value = Expression::parse(context, generics);
+            if value == 0 { return 0; }
+
+            result = Expression::make(context.allocator, token, ExpressionData::BinaryExpression(inner, operator.value, value), &inner.return_type);
+        } else if token.eq(TokenType::Symbol, "==") || token.eq(TokenType::Symbol, "!=") || token.eq(TokenType::Symbol, "<=") || token.eq(TokenType::Symbol, ">=") || token.eq(TokenType::Symbol, "<") || token.eq(TokenType::Symbol, ">") || token.eq(TokenType::Symbol, "||") || token.eq(TokenType::Symbol, "&&") {
+            let operator = context.expect(TokenType::Symbol);
+            if operator == 0 { return 0; }
+
+            let value = Expression::parse(context, generics);
+            if value == 0 { return 0; }
+
+            result = Expression::make(context.allocator, token, ExpressionData::BinaryExpression(inner, operator.value, value), Type::Primitive(context.module.find_primitive("bool")).to_ptr(context.allocator));
+        } else if token.eq(TokenType::Symbol, "(") {
+            match inner.return_type.resolve_typedef_function() {
+                Type::FunctionC(func_info) => {
+                    if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                    while context.check_value(TokenType::Symbol, ")") == 0 {
+                        let argument = Expression::parse(context, generics);
+                        arguments.append(InvokeArgument { value: argument });
+
+                        if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                            context.expect_value(TokenType::Symbol, ")");
+                            return 0;
+                        }
+                    }
+                    
+                    if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+                    result = Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), &func_info.return_type);
+                },
+                Type::ClassCpp(_) => {
+                    let expr = Expression::parse_class(context, token, inner, generics);
+                    if expr == 0 { return 0; }
+
+                    return expr;
+                },
+                _ => {
+                    context.error_token(token, "Unexpected token when parsing open bracket");
+                    return 0;
+                },
+            }
+        } else {
+            return inner;
+        }
+
+        if result == 0 { return 0; }
+
+        return Expression::parse_inner(context, result, generics);
+    }
+
+    fn parse(context: &Context, generics: &Generics) -> &Expression {
+        let token = context.current();
+        let token_type = token.type;
+        let result: &Expression = 0;
+
+        match token_type {
+            TokenType::Identifier => {
+                let return_type = context.get_value(token.value);
+
+                if context.module.mode_cpp && (token.value.eq("new") || token.value.eq("delete")) {
+                    return Expression::parse_cpp(context, generics);
+                } else if return_type == 0 {
+                    let type = context.parse_type2(generics);
+                    if type != 0 {
+                        match type.resolve_typedef() {
+                            Type::Enum(_, _) => { result = Expression::parse_enum(context, token, type, generics); },
+                            Type::EnumC(_) => { result = Expression::parse_enum(context, token, type, generics); },
+                            Type::Self => { result = Expression::parse_struct(context, token, type, generics); },
+                            Type::Struct(_, _) => { result = Expression::parse_struct(context, token, type, generics); },
+                            Type::StructC(_) => { result = Expression::parse_struct(context, token, type, generics); },
+                            Type::UnionC(_) => { result = Expression::parse_struct(context, token, type, generics); },
+                            Type::ClassCpp(_) => { result = Expression::parse_class(context, token, Expression::make(context.allocator, token, ExpressionData::Type(type), type), generics); },
+                            Type::NamespaceCpp(_) => { result = Expression::make(context.allocator, token, ExpressionData::Type(type), type); },
+                            _ => { result = Expression::make(context.allocator, token, ExpressionData::Type(type), type); },
+                        }
+                    } else if generics.has(token.value) {
+                        let generic = generics.find(token.value);
+                        result = Expression::make_next(context, Expression {
+                            token,
+                            return_type: Type::Generic(generic),
+                        });
+
+                        result.data = ExpressionData::Type(&result.return_type);
+                    } else {
+                        context.error_token(token, "Unable to find variable or type with this name");
+                        return 0;
+                    }
+                } else {
+                    match return_type {
+                        Type::Function(func_info, _) => {
+                            context.next_token();
+                            let func_type = return_type;
+                            let parsed_generics = Array<Type> {};
+    
+                            if context.check_value(TokenType::Symbol, "<") {
+                                parsed_generics = context.parse_generics(generics);
+                            }
+
+                            if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                            while context.check_value(TokenType::Symbol, ")") == 0 {
+                                let argument = Expression::parse(context, generics);
+                                if argument == 0 { return 0; }
+                                arguments.append(InvokeArgument { value: argument });
+
+                                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                                    context.expect_value(TokenType::Symbol, ")");
+                                    return 0;
+                                }
+                            }
+                            
+                            if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                            if func_info.generics.array.length > 0 {
+                                let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
+                                func_type = context.module.make_type_usage(func_type, &func_generics.array);
+                            }
+
+                            if !Expression::validate_arguments(context, token, func_type, &arguments, 0, false) { return 0; }
+
+                            let func_return_type: &Type = 0;
+                            match func_type {
+                                Type::Function(_, func_generic_map) => {
+                                    match func_info.type {
+                                        FunctionType::Coroutine => {
+                                            func_return_type = context.allocator.store(Type::CoroutineInstance(func_info, func_generic_map));
+                                        },
+                                        _ => {
+                                            func_return_type = Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, 0);
+                                        },
+                                    }
+                                },
+                                _ => {},
+                            }
+
+                            let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(func_type), func_type);
+                            result = Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
+                        },
+                        Type::CoroutineInstance(_, _) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Indirect(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Sequence(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Tuple(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Primitive(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Enum(_, _) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Struct(_, _) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Generic(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Self => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::TypedefC(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::StructC(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::UnionC(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::ClassCpp(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::EnumC(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::FunctionC(func_info) => {
+                            context.next_token();
+                            if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                            while context.check_value(TokenType::Symbol, ")") == 0 {
+                                let argument = Expression::parse(context, generics);
+                                arguments.append(InvokeArgument { value: argument });
+
+                                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                                    context.expect_value(TokenType::Symbol, ")");
+                                    return 0;
+                                }
+                            }
+                            
+                            if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+                            let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(return_type), return_type);
+
+                            result = Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), &func_info.return_type);
+                        },
+                        _ => {
+                            context.error("Expression::parse issue");
+                        },
+                    }
+                }
+            },
+            TokenType::String => {
+                result = Expression::make_next(context, Expression {
+                    token,
+                    data: ExpressionData::Literal(token.value),
+                    return_type: Type::Indirect(&context.pointer_const_char),
+                });
+            },
+            TokenType::Number => {
+                let primitive = "i32";
+
+                if token.value.ends_with("f") {
+                    primitive = "f32";
+                } else if token.value.contains(".") {
+                    primitive = "f64";
+                }
+
+                result = Expression::make_next(context, Expression {
+                    token,
+                    data: ExpressionData::Literal(token.value),
+                    return_type: Type::Primitive(context.module.find_primitive(primitive)),
+                });
+            },
+            TokenType::Symbol => {
+                if token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+") || token.eq(TokenType::Symbol, "!") || token.eq(TokenType::Symbol, "&") || token.eq(TokenType::Symbol, "*") || token.eq(TokenType::Symbol, "/") || token.eq(TokenType::Symbol, "%") || token.eq(TokenType::Symbol, "~") {
+                    let operator = context.expect(TokenType::Symbol);
+                    if operator == 0 { return 0; }
+
+                    if operator.value.eq("*") && context.check_value(TokenType::Keyword, "const") {
+                        context.pos -= 1;
+                        let new_type = context.parse_type2(generics);
+                        result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
+                    } else {
+                        let child = Expression::parse(context, generics);
+                        if child == 0 { return 0; }
+
+                        if operator.value.eq("&") {
+                            match child.data {
+                                ExpressionData::Type(type) => {
+                                    let new_type = context.allocator.store(Type::Indirect(Indirect::new_reference(context.allocator, *type)));
+                                    result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
+                                },
+                                _ => {
+                                    let return_type = Type::Indirect(Indirect::new_reference(context.allocator, child.return_type));
+                                    result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), &return_type);
+                                },
+                            }
+                        } else if operator.value.eq("*") {
+                            match child.data {
+                                ExpressionData::Type(type) => {
+                                    let new_indirect = Indirect::new_pointer(context.allocator, *type);
+                                    let new_type = context.allocator.store(Type::Indirect(new_indirect));
+                                    result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
+                                },
+                                _ => { result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), child.return_type.deref()); },
+                            }                            
+                        } else {
+                            result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), &child.return_type);
+                        }
+                    }
+                } else if token.eq(TokenType::Symbol, "(") {
+                    if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                    let expr = Expression::parse(context, generics);
+                    if expr == 0 { return 0; }
+
+                    if context.check_next(TokenType::Symbol, ",") {
+                        let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                        let name = context.allocator.store(*expr.token);
+                        name.value = "_0";
+
+                        arguments.append(InvokeArgument { name, value: expr });
+
+                        while !context.check_next(TokenType::Symbol, ")") {
+                            let name_string = String::new(context.allocator);
+                            name_string.append("_");
+                            name_string.append_usize(arguments.length);
+
+                            let name = context.allocator.store(*context.current());
+                            name.value = name_string.as_str();
+
+                            let value = Expression::parse(context, generics);
+                            if value == 0 { return 0; }
+
+                            arguments.append(InvokeArgument { name, value });
+
+                            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                                context.error("Expected , or )");
+                                return 0;
+                            }
+                        }
+
+                        let tuple = context.allocator.store(Tuple {});
+                        tuple.elements = Array<Type>::new_with_length(context.allocator, arguments.length);
+                        for (i, *expr) in arguments.iter().enumerate() {
+                            tuple.elements.data[i] = expr.value.return_type;
+                        }
+
+                        result = Expression::make_type_function_call(context, token, context.allocator.store(Type::Tuple(tuple)), arguments, 0);
+                    } else {
+                        if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
+                        result = Expression::make(context.allocator, token, ExpressionData::ParenthesizedExpression(expr), &expr.return_type);
+                    }
+                } else if token.eq(TokenType::Symbol, "[") {
+                    if context.expect_value(TokenType::Symbol, "[") == 0 { return 0; }
+
+                    let element_type: &Type = 0;
+                    let elements = Array<InvokeArgument>::new(context.allocator);
+
+                    while context.check_value(TokenType::Symbol, "]") == 0 {
+                        let element = Expression::parse(context, generics);
+                        if element == 0 { return 0; }
+
+                        elements.append(InvokeArgument { value: element });
+
+                        if element_type == 0 {
+                            element_type = &element.return_type;
+                        }
+
+                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "]") {
+                            context.expect_value(TokenType::Symbol, "]");
+                            return 0;
+                        }
+                    }
+                    
+                    context.expect_value(TokenType::Symbol, "]");
+
+                    let parent_sequence = context.allocator.store(Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type });
+                    let parent_type = context.allocator.store(Type::Sequence(parent_sequence));
+                    let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(parent_type), parent_type);
+
+                    result = Expression::make(context.allocator, token, ExpressionData::Invoke(parent_expression, elements), parent_type);
+                } else {
+                    context.error("Unhandled symbol");
+                }
+            },
+            TokenType::Keyword => {
+                if token.value.eq("true") || token.value.eq("false") {
+                    result = Expression::make_next(context, Expression {
+                        token,
+                        data: ExpressionData::Literal(token.value),
+                        return_type: Type::Primitive(context.module.find_primitive("bool")),
+                    });
+                } else {
+                    context.error("Only true + false keywords are valid in expressions");
+                }
+            },
+            TokenType::Comment => {
+                context.error("Comment should be skipped");
+            },
+        }
+
+        if result == 0 { return 0; }
+
+        result = Expression::parse_inner(context, result, generics);
+
+        if context.check_value(TokenType::Symbol, "..") {
+            let token = context.expect(TokenType::Symbol);
+
+            let range_start = result;
+            let range_end = Expression::parse(context, generics);
+            if range_end == 0 { return 0; }
+
+            let enum_type = context.module.find_make_type("Range", &Array<Type> { data: &range_end.return_type, length: 1 });
+            if enum_type == 0 {
+                context.error_token(token, "Could not find Range type, include std library");
+                return 0;
+            }
+
+            let variant_name = *token;
+            variant_name.type = TokenType::Identifier;
+            variant_name.value = "StartEnd";
+
+            let variant = Expression::get_enum_variant(context, enum_type, &variant_name);
+            if variant == 0 { return 0; }
+
+            let arguments = Array<InvokeArgument>::new(context.allocator);
+            arguments.append(InvokeArgument { value: range_start });
+            arguments.append(InvokeArgument { value: range_end });
+
+            let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
+
+            result = Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
+        }
+
+        return result;
+    }
+
+    // fn apply_implicit_casts(&self, type: &Type) -> bool {
+    //     match self {
+    //         ExpressionData::Invoke(_, &arguments) => {
+    //             match type {
+    //                 Type::Tuple(tuple) => {
+    //                     let success = true;
+
+    //                     for i in 0..arguments.length {
+    //                         success = arguments.data[i].value.apply_implicit_casts(&tuple.elements.data[i]) && success;
+    //                     }
+
+    //                     return success;
+    //                 },
+    //                 _ => { return true; }
+    //             }
+    //         },
+    //         _ => { return true; },
+    //     }
+    // }
+}

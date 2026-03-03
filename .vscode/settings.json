@@ -1,0 +1,19 @@
+{
+  "pave.args": [
+    "std=src/std",
+    "analyzer=src/analyzer",
+    "compiler=src/compiler",
+    "language_server=src/language_server",
+  ],
+  "pave.clang_args": [
+    "-IC:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt",
+    "-IC:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.43.34808/include",
+    "-IC:/Program Files/LLVM/include",
+    "-Isrc/compiler",
+    "-Isrc/language_server",
+    "-target", "x86_64-pc-windows-msvc",
+  ],
+  "files.associations": {
+    "Makefile.build": "makefile"
+  }
+}

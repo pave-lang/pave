@@ -1,0 +1,26 @@
+#include "stdlib.h"
+
+struct GeneralPurposeAllocator {}
+
+impl GeneralPurposeAllocator {
+    fn default() -> &GeneralPurposeAllocator {
+        let static self = GeneralPurposeAllocator {};
+        return &self;
+    }
+}
+
+impl Allocator for GeneralPurposeAllocator {
+    fn alloc(&self, size: usize) -> *void {
+        return calloc(size, sizeof(u8));
+    }
+    
+    fn realloc(&self, ptr: &void, new_size: usize) -> *void {
+        return realloc(ptr, new_size * sizeof(u8));
+    }
+
+    fn free(&self, ptr: &void) -> bool {
+        free(ptr);
+
+        return true;
+    }
+}

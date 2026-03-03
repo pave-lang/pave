@@ -1,0 +1,13 @@
+#ifndef PAVE_SLICE_IMPL
+#define PAVE_SLICE_IMPL
+
+#include <stdint.h>
+
+struct Impl;
+
+struct slice_Impl { struct Impl* data; uintptr_t length; };
+
+#line 2 "src/std/Slice.pv"
+struct ArrayIter_ref_Impl slice_Impl__iter(struct slice_Impl self);
+
+#endif

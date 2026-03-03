@@ -1,0 +1,24 @@
+#include "stdio.h"
+
+use std
+
+co running_total(steps: usize, increment: f32) -> f32 {
+    let total = 0.0f;
+
+    for i in 0..steps {
+        yield total;
+
+        total += increment;
+    }
+
+    yield total;
+}
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    let totals = running_total(5, 1.5f);
+    for total in totals {
+        printf("Total: %f\n", total);
+    }
+
+    return 0;
+}

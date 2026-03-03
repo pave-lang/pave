@@ -1,0 +1,48 @@
+#include "stdio.h"
+
+use std
+
+enum TokenType {
+    Symbol,
+    Identifier,
+    String,
+    Number,
+    Keyword,
+    Comment,
+}
+
+impl TokenType {
+    fn get_name(&self) -> *const char {
+        match self {
+            TokenType::Symbol => { return "Symbol"; },
+            TokenType::Identifier => { return "Identifier"; },
+            TokenType::String => { return "String"; },
+            TokenType::Number => { return "Number"; },
+            TokenType::Keyword => { return "Keyword"; },
+            TokenType::Comment => { return "Comment"; },
+        }
+
+        return "Unknown";
+    }
+}
+
+struct Token {
+    type: TokenType,
+    value: str,
+    start_line: usize,
+    start_column: usize,
+    end_line: usize,
+    end_column: usize,
+}
+
+impl Token {
+    fn eq(&self, type: TokenType, value: *const char) -> bool {
+        let v = self.value;
+
+        return self.type == type && v.eq(value);
+    }
+
+    fn print(&self, path: *const char, message: *const char) {
+        fprintf(stderr, "%s:%zu:%zu %s\n", path, self.start_line + 1, self.start_column + 1, message);
+    }
+}

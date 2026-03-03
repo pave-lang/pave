@@ -1,0 +1,13 @@
+#ifndef PAVE_SLICE_STRING
+#define PAVE_SLICE_STRING
+
+#include <stdint.h>
+
+struct String;
+
+struct slice_String { struct String* data; uintptr_t length; };
+
+#line 2 "src/std/Slice.pv"
+struct ArrayIter_ref_String slice_String__iter(struct slice_String self);
+
+#endif

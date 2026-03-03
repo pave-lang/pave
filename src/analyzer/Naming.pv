@@ -1,0 +1,425 @@
+#include "stdio.h"
+
+use std
+
+enum NamingType {
+    Ident,
+    Decl,
+    C99,
+}
+
+struct Naming {
+    allocator: &ArenaAllocator,
+    type: NamingType,
+    generic_start: str,
+    generic_seperator: str,
+    generic_end: str,
+    pointer_prefix: str,
+    pointer_suffix: str,
+    pointer_const_prefix: str,
+    pointer_const_suffix: str,
+    reference_prefix: str,
+    reference_suffix: str,
+    sequence_slice_prefix: str,
+    sequence_open: str,
+    sequence_fixed_delimiter: str,
+    sequence_close: str,
+    tuple_prefix: str,
+    tuple_open: str,
+    tuple_close: str,
+    enum_generic_type_suffix: str,
+    enum_prefix: str,
+    struct_prefix: str,
+    trait_prefix: str,
+    union_prefix: str,
+    coroutine_instance_prefix: str,
+    primitives: HashMap<str, str>,
+    naming_ident: &Naming,
+}
+
+impl Naming {
+    fn new_decl(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            allocator,
+            type: NamingType::Decl,
+            generic_start: "<",
+            generic_seperator: ", ",
+            generic_end: ">",
+            pointer_prefix: "*",
+            pointer_const_prefix: "*const ",
+            reference_prefix: "&",
+            sequence_open: "[",
+            sequence_fixed_delimiter: "; ",
+            sequence_close: "]",
+            tuple_open: "(",
+        };
+    }
+
+    fn new_ident(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            allocator,
+            type: NamingType::Ident,
+            generic_start: "_",
+            generic_seperator: "_",
+            pointer_prefix: "ptr_",
+            pointer_const_prefix: "ptrc_",
+            reference_prefix: "ref_",
+            sequence_slice_prefix: "slice_",
+            enum_generic_type_suffix: "__Type",
+            tuple_prefix: "tuple_",
+        };
+    }
+
+    fn new_c99(allocator: &ArenaAllocator, naming_ident: &Naming) -> Self {
+        let primitives = HashMap<str, str>::new(allocator);
+        primitives.insert("bool", "bool");
+        primitives.insert("i8", "int8_t");
+        primitives.insert("i16", "int16_t");
+        primitives.insert("i32", "int32_t");
+        primitives.insert("i64", "int64_t");
+        primitives.insert("isize", "intptr_t");
+        primitives.insert("u8", "uint8_t");
+        primitives.insert("u16", "uint16_t");
+        primitives.insert("u32", "uint32_t");
+        primitives.insert("u64", "uint64_t");
+        primitives.insert("usize", "uintptr_t");
+        primitives.insert("f32", "float");
+        primitives.insert("f64", "double");
+        primitives.insert("char", "char");
+        primitives.insert("void", "void");
+
+        return Self {
+            allocator,
+            type: NamingType::C99,
+            generic_start: "_",
+            generic_seperator: "_",
+            pointer_suffix: "*",
+            pointer_const_suffix: " const*",
+            reference_suffix: "*",
+            sequence_slice_prefix: "struct slice_",
+            sequence_open: "[",
+            sequence_close: "]",
+            tuple_prefix: "struct tuple_",
+            enum_prefix: "enum ",
+            struct_prefix: "struct ",
+            trait_prefix: "struct ",
+            union_prefix: "union ",
+            coroutine_instance_prefix: "struct ",
+            primitives,
+            naming_ident,
+        };
+    }
+
+    fn get_type_name(&self, type: &Type, type_self: &Type, generics_map: &GenericMap) -> String {
+        let result = String::new(self.allocator);
+        let generics = Array<Type> {};
+        let generic_start = self.generic_start;
+        let generic_end = self.generic_end;
+
+        match type {
+            Type::Indirect(indirect) => {
+                match indirect.type {
+                    IndirectType::Pointer => { result.append(self.pointer_prefix); },
+                    IndirectType::ConstPointer => { result.append(self.pointer_const_prefix); },
+                    IndirectType::Reference => { result.append(self.reference_prefix); },
+                }
+
+                let child_name = self.get_type_name(&indirect.to, type_self, generics_map);
+                result.append(child_name.as_str());
+
+                match indirect.to {
+                    Type::Trait(_, _) => {},
+                    Type::Sequence(sequence) => {
+                        if !sequence.is_slice() { result.append(self.reference_suffix); }
+                    },
+                    _ => {
+                        match indirect.type {
+                            IndirectType::Pointer => { result.append(self.pointer_suffix); },
+                            IndirectType::ConstPointer => { result.append(self.pointer_const_suffix); },
+                            IndirectType::Reference => { result.append(self.reference_suffix); },
+                        }
+                    },
+                }
+            },
+            Type::Sequence(sequence) => {
+                let element_name = self.get_type_name(&sequence.element, type_self, generics_map);
+
+                match sequence.type {
+                    SequenceType::Slice => {
+                        if self.naming_ident != 0 {
+                            element_name.release();
+                            element_name = self.naming_ident.get_type_name(&sequence.element, type_self, generics_map);
+                        }
+
+                        result.append(self.sequence_slice_prefix);
+                    },
+                    _ => {},
+                }
+
+                if self.type == NamingType::C99 {
+                    result.append(element_name.as_str());
+                } else {
+                    match sequence.type {
+                        SequenceType::FixedArray(length) => {
+                            result.append(self.sequence_open);
+                            result.append(element_name.as_str());
+                            result.append(self.sequence_fixed_delimiter);
+                            result.append_usize(length);
+                            result.append(self.sequence_close);
+                        },
+                        SequenceType::Slice => {
+                            result.append(self.sequence_open);
+                            result.append(element_name.as_str());
+                            result.append(self.sequence_close);
+                        }
+                    }
+                }
+            },
+            Type::Tuple(tuple) => {
+                result.append(self.tuple_prefix);
+                generic_start = self.tuple_open;
+                generic_end = self.tuple_close;
+                generics = tuple.elements;
+            },
+            Type::Primitive(primitive_info) => {
+                if primitive_info == 0 {
+                    result.append("void");
+                } else {
+                    let translation = self.primitives.find(&primitive_info.name);
+
+                    if translation != 0 {
+                        result.append(*translation);
+                    } else {
+                        result.append(primitive_info.name);
+                    }
+                }
+            },
+            Type::Enum(enum_info, generics2) => {
+                match enum_info.type {
+                    EnumType::Standard => { result.append(self.enum_prefix); },
+                    EnumType::DiscriminatedUnion => { result.append(self.struct_prefix); },
+                }
+
+                result.append(enum_info.name.value);
+                generics = generics2.array;
+            },
+            Type::Struct(struct_info, generics2) => {
+                if !struct_info.is_newtype() {
+                    result.append(self.struct_prefix);
+                }
+
+                result.append(struct_info.name.value);
+
+                if (struct_info.generics.array.length > 0) {
+                    generics = generics2.array;
+                }
+            },
+            Type::Trait(trait_info, generics2) => {
+                result.append(self.trait_prefix);
+                result.append(trait_info.name.value);
+                generics = generics2.array;
+            },
+            Type::Generic(generic) => {
+                let name = generic.name.value;
+
+                if generics_map == 0 {
+                    result.append(name);
+                    return result;
+                }
+
+                let generic_type = generics_map.get(name);
+                if generic_type == 0 {
+                    let len: u32 = name.length;
+                    fprintf(stderr, "Naming.get_type_name: Attempt to retrieve generic %.*s but it does not exist in generics\n", len, name.ptr);
+                }
+                
+                return self.get_type_name(generic_type, type_self, generics_map);
+            },
+            Type::Unknown(name, generics2) => {
+                result.append(name);
+                generics = generics2;
+            },
+            Type::Function(func_info, generics2) => {
+                let has_parent = false;
+                let parent_type = Type::Primitive(0);
+                let trait_info: &Trait = 0;
+
+                match func_info.parent {
+                    FunctionParent::None => {},
+                    FunctionParent::Primitive(primitive, _, trait_info2) => {
+                        parent_type = Type::Primitive(primitive);
+                        trait_info = trait_info2;
+                        has_parent = true;
+                    },
+                    FunctionParent::Enum(enum_info, _, trait_info2) => {
+                        parent_type = Type::Enum(enum_info, generics2);
+                        trait_info = trait_info2;
+                        has_parent = true;
+                    },
+                    FunctionParent::Struct(struct_info, _, trait_info2) => {
+                        parent_type = Type::Struct(struct_info, generics2);
+                        trait_info = trait_info2;
+                        has_parent = true;
+                    },
+                    FunctionParent::Trait(_) => {},
+                    FunctionParent::Type(type, _, _) => {
+                        if type.is_fat_pointer() {
+                            parent_type = *type.deref_1();
+                        } else {
+                            parent_type = *type;
+                        }
+
+                        has_parent = true;
+                    },
+                }
+
+                if has_parent {
+                    if self.naming_ident != 0 {
+                        let parent_type_name = self.naming_ident.get_type_name(&parent_type, type_self, generics_map);
+                        result.append_string(&parent_type_name);
+                        result.append("__");
+                    } else {
+                        let parent_type_name = self.get_type_name(&parent_type, type_self, generics_map);
+                        result.append_string(&parent_type_name);
+                        result.append("__");
+                    }
+                }
+
+                if trait_info != 0 {
+                    result.append(trait_info.name.value);
+                    result.append("__");
+                }
+
+                result.append(func_info.name.value);
+                if func_info.generics.map.length > 0 {
+                    generics = generics2.array;
+                }
+            },
+            Type::CoroutineInstance(func_info, _) => {
+                result.append(self.coroutine_instance_prefix);
+                result.append(func_info.name.value);
+            },
+            Type::Self => {
+                return self.get_type_name(type_self, type_self, generics_map);
+            },
+            Type::TypedefC(info) => {
+                result.append(info.name);
+            },
+            Type::EnumC(enum_info) => {
+                if self.type == NamingType::C99 { result.append("enum "); }
+                result.append(enum_info.name);
+            },
+            Type::StructC(struct_info) => {
+                if self.type == NamingType::C99 { result.append("struct "); }
+                result.append(struct_info.name);
+            },
+            Type::UnionC(union_info) => {
+                if self.type == NamingType::C99 { result.append("union "); }
+                result.append(union_info.name);
+            },
+            Type::ClassCpp(class_info) => {
+                result.append(class_info.name);
+            },
+            Type::FunctionC(func_info) => {
+                result.append(func_info.name);
+            },
+            Type::NamespaceCpp(namespace_info) => {
+                result.append(namespace_info.name);
+            }
+        }
+
+        if generics.length > 0 {
+            result.append(generic_start);
+
+            let first = true;
+            for generic in generics {
+                if first { first = false; } else { result.append(self.generic_seperator); }
+
+                if self.naming_ident != 0 {
+                    let generic_name = self.naming_ident.get_type_name(generic, type_self, generics_map);            
+                    result.append(generic_name.as_str());
+                } else {
+                    let generic_name = self.get_type_name(generic, type_self, generics_map);            
+                    result.append(generic_name.as_str());
+                }
+            }
+
+            result.append(generic_end);
+        }
+
+        return result;
+    }
+    
+    fn get_type_decl(&self, type: &Type, type_self: &Type, generics_map: &GenericMap) -> String {
+        match type {
+            Type::Function(func_info, _) => {
+                let result = String::new(self.allocator);
+                result.append("fn(");
+
+                let first = true;
+                for param in func_info.parameters {
+                    if first { first = false; } else { result.append(", "); }
+                    let param_name = self.get_type_decl(&param.type, type_self, generics_map);
+                    result.append_string(&param_name);
+                }
+                result.append(")");
+
+                let return_name = self.get_type_decl(&func_info.return_type, type_self, generics_map);
+                if !return_name.as_str().eq("void") {
+                    result.append(") -> ");
+                    result.append_string(&return_name);
+                }
+
+                return result;
+            },
+            _ => {},
+        }
+
+        return self.get_type_name(type, type_self, generics_map);
+    }
+
+    fn get_variable_decl(&self, variable_name: str, type: &Type, type_self: &Type, generics_map: &GenericMap) -> String {
+        match type {
+            Type::Function(func_info, _) => {
+                let result = self.get_type_name(&func_info.return_type, type_self, generics_map);
+                result.append(" (*");
+                result.append(variable_name);
+                result.append(")(");
+
+                for (i, param) in func_info.parameters.iter().enumerate() {
+                    if i > 0 { result.append(", "); }
+
+                    let param_type_name = self.get_type_name(&param.type, type_self, generics_map);
+                    result.append_string(&param_type_name);
+                    param_type_name.release();
+                }
+
+                result.append(")");
+
+                return result;
+            },
+            _ => {},
+        }
+
+        // TODO fix when a sequence is inside a sequence, e.g. [[char; 128]; 1024] should convert to [1024][128]
+        let result = self.get_type_name(type, type_self, generics_map);
+        result.append(" ");
+        result.append(variable_name);
+
+        match type {
+            Type::Sequence(sequence) => {
+                match sequence.type {
+                    SequenceType::FixedArray(length) => {
+                        result.append(self.sequence_open);
+                        result.append_usize(length);
+                        result.append(self.sequence_close);
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        return result;
+    }
+}

@@ -1,0 +1,56 @@
+#ifndef PAVE_HASH_MAP_STR_ARRAY_INLAY_HINT
+#define PAVE_HASH_MAP_STR_ARRAY_INLAY_HINT
+
+#include <std/Allocator.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+struct HashMapBucket_str_Array_InlayHint;
+struct str;
+struct Array_InlayHint;
+struct InlayHint;
+struct HashMapIter_str_Array_InlayHint;
+
+#include <stdio.h>
+#include <string.h>
+
+#line 26 "src/std/HashMap.pv"
+struct HashMap_str_Array_InlayHint {
+    struct Allocator allocator;
+    struct HashMapBucket_str_Array_InlayHint** buckets;
+    struct HashMapBucket_str_Array_InlayHint* data;
+    uintptr_t capacity;
+    uintptr_t length;
+};
+
+#line 35 "src/std/HashMap.pv"
+struct HashMap_str_Array_InlayHint HashMap_str_Array_InlayHint__new(struct Allocator allocator);
+
+#line 46 "src/std/HashMap.pv"
+void HashMap_str_Array_InlayHint__resize(struct HashMap_str_Array_InlayHint* self, uintptr_t new_capacity);
+
+#line 53 "src/std/HashMap.pv"
+struct Array_InlayHint* HashMap_str_Array_InlayHint__find(struct HashMap_str_Array_InlayHint* self, struct str* key);
+
+#line 70 "src/std/HashMap.pv"
+struct Array_InlayHint* HashMap_str_Array_InlayHint__insert(struct HashMap_str_Array_InlayHint* self, struct str key, struct Array_InlayHint value);
+
+#line 102 "src/std/HashMap.pv"
+bool HashMap_str_Array_InlayHint__remove(struct HashMap_str_Array_InlayHint* self, struct str* key);
+
+#line 126 "src/std/HashMap.pv"
+void HashMap_str_Array_InlayHint__release(struct HashMap_str_Array_InlayHint* self);
+
+#line 135 "src/std/HashMap.pv"
+void HashMap_str_Array_InlayHint__fill_buckets(struct HashMap_str_Array_InlayHint* self);
+
+#line 153 "src/std/HashMap.pv"
+struct HashMap_str_Array_InlayHint HashMap_str_Array_InlayHint__clone(struct HashMap_str_Array_InlayHint* self, struct Allocator allocator);
+
+#line 167 "src/std/HashMap.pv"
+struct HashMapIter_str_Array_InlayHint HashMap_str_Array_InlayHint__iter(struct HashMap_str_Array_InlayHint* self);
+
+#line 174 "src/std/HashMap.pv"
+void HashMap_str_Array_InlayHint__clear(struct HashMap_str_Array_InlayHint* self);
+
+#endif
