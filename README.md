@@ -10,7 +10,7 @@ Pave is an _experimental_ systems language that compiles/transpiles to C99. The 
 - Enums with disciminated unions
 - Coroutines
 - Generics
-- C and CPP can be used directly
+- C and CPP can be used directly, you can also implement on C/CPP types
 - Iterators
 - Dynamic functions, structs etc
 - Defer
@@ -65,5 +65,31 @@ fn iterators(argc: i32, argv: **const char) -> i32 {
     for *a in array {
         printf("array: %d\n", a);
     }
+}
+
+trait Print {
+    fn print(&self);
+}
+
+struct Data1 { a: f32, b: i32 }
+impl Print for Data1 {
+    fn print(&self) {
+        printf("%.2f %d\n", self.a, self.b);
+    }
+}
+
+struct Data2 { a: i32, b: f32 }
+impl Print for Data2 {
+    fn print(&self) {
+        printf("%d %.2f\n", self.a, self.b);
+    }
+}
+
+fn dyn_print(data: &dyn Print) {
+    data.print();
+}
+
+fn generic_print<T: Print>(data: &T) {
+    data.print();
 }
 ```
