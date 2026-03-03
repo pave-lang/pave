@@ -14,6 +14,8 @@ Pave is an _experimental_ systems language that compiles/transpiles to C99. The 
 - Iterators
 - Dynamic functions, structs etc
 - Defer
+- Slices
+- Tuples
 
 ## Examples
 
