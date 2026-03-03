@@ -6,7 +6,7 @@ struct NamespacePath {
 }
 
 impl NamespacePath {
-    fn new(allocator: &Allocator) -> Self {
+    fn new(allocator: &dyn Allocator) -> Self {
         return Self { parts: Array<&Token>::new(allocator) };
     }
 

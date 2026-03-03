@@ -544,7 +544,7 @@ impl Generator {
         match inner_expr.return_type.deref() {
             Type::Function(func_info, func_generics) => {
                 if func_info.type == FunctionType::Coroutine {
-                    fprintf(file, "(struct DynCo_CoroutineStatus) { .vtable = &");
+                    fprintf(file, "(struct Co_CoroutineStatus) { .vtable = &");
 
                     match func_info.parent {
                         FunctionParent::Struct(struct_info, _, _) => {
@@ -557,11 +557,11 @@ impl Generator {
                     self.write_str_title(file, func_info.name.value);
                     fprintf(file, "__VTABLE__DYN_CO, .instance = &(struct ");
                     self.write_function_name(file, func_info, func_generics);
-                    fprintf(file, "__DynCo_CoroutineStatus__Instance) {}");
+                    fprintf(file, "__Co_CoroutineStatus__Instance) {}");
                     
                     fprintf(file, " }");
                 } else {
-                    fprintf(file, "(struct DynFn) { .vtable = &");
+                    fprintf(file, "(struct Fn) { .vtable = &");
 
                     match func_info.parent {
                         FunctionParent::Struct(struct_info, _, _) => {
@@ -574,7 +574,7 @@ impl Generator {
                     self.write_str_title(file, func_info.name.value);
                     fprintf(file, "__VTABLE__DYN_FN, .instance = &(struct ");
                     self.write_function_name(file, func_info, func_generics);
-                    fprintf(file, "__DynFn__Instance) {}");
+                    fprintf(file, "__Fn__Instance) {}");
                     
                     fprintf(file, " }");
                 }
@@ -2810,10 +2810,10 @@ impl Generator {
 
                         if function_usage.impl_dynamic_function {
                             if func_info.type == FunctionType::Coroutine {
-                                fprintf(file, "#include <std/DynCo_CoroutineStatus.h>\n");
+                                fprintf(file, "#include <std/Co_CoroutineStatus.h>\n");
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynCo_CoroutineStatus__Instance { ");
+                                fprintf(file, "__Co_CoroutineStatus__Instance { ");
                                 self.indent += 1;
                                 for param in func_info.parameters {
                                     self.write_type(file, &param.type, generics);
@@ -2824,16 +2824,16 @@ impl Generator {
                                 self.indent -= 1;
                                 fprintf(file, "};\n");
 
-                                fprintf(file, "extern struct DynCo_CoroutineStatusVTable ");
+                                fprintf(file, "extern struct Co_CoroutineStatusVTable ");
                                 self.write_str_title(file, struct_info.name.value);
                                 fprintf(file, "__");
                                 self.write_str_title(file, func_info.name.value);
                                 fprintf(file, "__VTABLE__DYN_CO;\n");
                             } else {
-                                fprintf(file, "#include <std/DynFn.h>\n");
+                                fprintf(file, "#include <std/Fn.h>\n");
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynFn__Instance { ");
+                                fprintf(file, "__Fn__Instance { ");
                                 self.indent += 1;
                                 for param in func_info.parameters {
                                     self.write_type(file, &param.type, generics);
@@ -2844,7 +2844,7 @@ impl Generator {
                                 self.indent -= 1;
                                 fprintf(file, "};\n");
 
-                                fprintf(file, "extern struct DynFnVTable ");
+                                fprintf(file, "extern struct FnVTable ");
                                 self.write_str_title(file, struct_info.name.value);
                                 fprintf(file, "__");
                                 self.write_str_title(file, func_info.name.value);
@@ -2883,8 +2883,8 @@ impl Generator {
         }
 
         if usage.impl_dynamic_usage {
-            fprintf(file, "#include <std/DynStruct.h>\n");
-            fprintf(file, "extern struct DynStructVTable ");
+            fprintf(file, "#include <std/Struct.h>\n");
+            fprintf(file, "extern struct StructVTable ");
             self.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__DYN_STRUCT;\n");
         }
@@ -3091,9 +3091,9 @@ impl Generator {
                             self.write_function_name(file, func_info, generics);
 
                             if self.is_coroutine() {
-                                fprintf(file, "__DynCo__get_params(void* __self) {\n");
+                                fprintf(file, "__Co__get_params(void* __self) {\n");
                             } else {
-                                fprintf(file, "__DynFn__get_params(void* __self) {\n");
+                                fprintf(file, "__Fn__get_params(void* __self) {\n");
                             }
 
                             self.indent += 1;
@@ -3118,9 +3118,9 @@ impl Generator {
                             self.write_function_name(file, func_info, generics);
 
                             if self.is_coroutine() {
-                                fprintf(file, "__DynCo__set_arg(void* __self, uintptr_t index, void* value) {\n");
+                                fprintf(file, "__Co__set_arg(void* __self, uintptr_t index, void* value) {\n");
                             } else {
-                                fprintf(file, "__DynFn__set_arg(void* __self, uintptr_t index, void* value) {\n");
+                                fprintf(file, "__Fn__set_arg(void* __self, uintptr_t index, void* value) {\n");
                             }
 
                             self.indent += 1;
@@ -3130,9 +3130,9 @@ impl Generator {
                             self.write_function_name(file, func_info, generics);
 
                             if self.is_coroutine() {
-                                fprintf(file, "__DynCo_CoroutineStatus__Instance* self = __self;\n");
+                                fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
                             } else {
-                                fprintf(file, "__DynFn__Instance* self = __self;\n");
+                                fprintf(file, "__Fn__Instance* self = __self;\n");
                             }
 
                             self.write_indent(file);
@@ -3169,14 +3169,14 @@ impl Generator {
                             if self.is_coroutine() {
                                 fprintf(file, "struct Iter_CoroutineStatus ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynCo__init(void* __self, struct Allocator allocator) {\n");
+                                fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
 
                                 self.indent += 1;
 
                                 self.write_indent(file);
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynCo_CoroutineStatus__Instance* self = __self;\n");
+                                fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
 
                                 self.write_indent(file);
                                 fprintf(file, "struct ");
@@ -3214,14 +3214,14 @@ impl Generator {
                             } else {
                                 fprintf(file, "void ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynFn__execute(void* __self) {\n");
+                                fprintf(file, "__Fn__execute(void* __self) {\n");
 
                                 self.indent += 1;
 
                                 self.write_indent(file);
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynFn__Instance* self = __self;\n");
+                                fprintf(file, "__Fn__Instance* self = __self;\n");
 
                                 self.write_indent(file);
                                 self.write_function_name(file, func_info, generics);
@@ -3241,9 +3241,9 @@ impl Generator {
                             }
 
                             if self.is_coroutine() {
-                                fprintf(file, "struct DynCo_CoroutineStatusVTable ");
+                                fprintf(file, "struct Co_CoroutineStatusVTable ");
                             } else {
-                                fprintf(file, "struct DynFnVTable ");
+                                fprintf(file, "struct FnVTable ");
                             }
 
                             match func_info.parent {
@@ -3265,17 +3265,17 @@ impl Generator {
                             self.write_function_name(file, func_info, generics);
 
                             if self.is_coroutine() {
-                                fprintf(file, "__DynCo__get_params, .set_arg = &");
+                                fprintf(file, "__Co__get_params, .set_arg = &");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynCo__set_arg, .init = &");
+                                fprintf(file, "__Co__set_arg, .init = &");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynCo__init };\n");
+                                fprintf(file, "__Co__init };\n");
                             } else {
-                                fprintf(file, "__DynFn__get_params, .set_arg = &");
+                                fprintf(file, "__Fn__get_params, .set_arg = &");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynFn__set_arg, .execute = &");
+                                fprintf(file, "__Fn__set_arg, .execute = &");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__DynFn__execute };\n");
+                                fprintf(file, "__Fn__execute };\n");
                             }
                         }
 
@@ -3519,20 +3519,20 @@ impl Generator {
         if usage.impl_dynamic_usage {
             fprintf(code_file, "\n");
 
-            fprintf(code_file, "#include <std/DynStructField.h>\n");
-            fprintf(code_file, "#include <slice_DynStructField.h>\n");
-            fprintf(code_file, "struct slice_DynStructField ");
+            fprintf(code_file, "#include <std/StructField.h>\n");
+            fprintf(code_file, "#include <slice_StructField.h>\n");
+            fprintf(code_file, "struct slice_StructField ");
             self.write_string(code_file, &name);
-            fprintf(code_file, "__DynStruct__get_fields(void* __self) {\n");
+            fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
 
             self.indent += 1;
             self.write_indent(code_file);
-            fprintf(code_file, "static struct DynStructField fields[] = { ");
+            fprintf(code_file, "static struct StructField fields[] = { ");
 
             let first = true;
             for (_, &field) in struct_info.fields {
                 if first { first = false; } else { fprintf(code_file, ", "); }
-                fprintf(code_file, "(struct DynStructField){ .name = (struct str){ .ptr = \"");
+                fprintf(code_file, "(struct StructField){ .name = (struct str){ .ptr = \"");
                 self.write_token(code_file, field.name);
                 fprintf(code_file, "\", .length = %zu }, .typeid = ", field.name.value.length);
                 self.write_typeid(code_file, &field.type, generics);
@@ -3541,14 +3541,14 @@ impl Generator {
 
             fprintf(code_file, " };\n");
             self.write_indent(code_file);
-            fprintf(code_file, "return (struct slice_DynStructField){ .data = fields, .length = %zu };\n", struct_info.fields.length);
+            fprintf(code_file, "return (struct slice_StructField){ .data = fields, .length = %zu };\n", struct_info.fields.length);
             self.indent -= 1;
             fprintf(code_file, "}\n");
 
             fprintf(code_file, "void* ");
             self.write_string(code_file, &name);
 
-            fprintf(code_file, "__DynStruct__get_field(void* __self, uintptr_t index) {\n");
+            fprintf(code_file, "__Struct__get_field(void* __self, uintptr_t index) {\n");
 
             self.indent += 1;
 
@@ -3589,7 +3589,7 @@ impl Generator {
             fprintf(code_file, "bool ");
             self.write_string(code_file, &name);
 
-            fprintf(code_file, "__DynStruct__set_field(void* __self, uintptr_t index, void* value) {\n");
+            fprintf(code_file, "__Struct__set_field(void* __self, uintptr_t index, void* value) {\n");
 
             self.indent += 1;
 
@@ -3629,17 +3629,17 @@ impl Generator {
             self.indent -= 1;
             fprintf(code_file, "}\n");
 
-            fprintf(code_file, "struct DynStructVTable ");
+            fprintf(code_file, "struct StructVTable ");
             self.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__DYN_STRUCT");
             fprintf(code_file, " = { .get_fields = &");
             self.write_string(code_file, &name);
 
-            fprintf(code_file, "__DynStruct__get_fields, .get_field = &");
+            fprintf(code_file, "__Struct__get_fields, .get_field = &");
             self.write_string(code_file, &name);
-            fprintf(code_file, "__DynStruct__get_field, .set_field = &");
+            fprintf(code_file, "__Struct__get_field, .set_field = &");
             self.write_string(code_file, &name);
-            fprintf(code_file, "__DynStruct__set_field };\n");
+            fprintf(code_file, "__Struct__set_field };\n");
         }
 
         self.overwrite_if_different(code.c_str(), code_file);

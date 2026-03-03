@@ -1,7 +1,7 @@
 #include <std/Array_TypeId.h>
 #include <stdint.h>
 #include <std/TypeId.h>
-#include <std/DynFn.h>
+#include <std/Fn.h>
 #include <dynamic_fn/Object.h>
 #include <std/ArrayIter_ref_Object.h>
 #include <slice_Object.h>
@@ -15,7 +15,7 @@
 
 #include <dynamic_fn/run.h>
 
-void run(struct DynFn func, struct slice_Object objects, struct Time time, struct Physics physics) {
+void run(struct Fn func, struct slice_Object objects, struct Time time, struct Physics physics) {
     struct Array_TypeId* params = func.vtable->get_params(func.instance);
 
     { struct ArrayIter_ref_Object __iter = slice_Object__iter(objects);

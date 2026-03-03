@@ -18,6 +18,6 @@ mod TypeId
 mod Ops
 
 // mod DynArg
-mod DynCo
-mod DynFn
-mod DynStruct
+mod Co
+mod Fn
+mod Struct

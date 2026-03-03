@@ -256,7 +256,6 @@ impl Module {
         }
 
         for (_, &trait_info) in self.traits {
-            namespace.types.insert(trait_info.name.value, Type::Trait(trait_info, blank_generics));
             namespace.traits.insert(trait_info.name.value, trait_info);
         }
 

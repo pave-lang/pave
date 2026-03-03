@@ -3,13 +3,13 @@
 #include "string.h"
 
 struct ArenaAllocator {
-    allocator: &Allocator,
+    allocator: &dyn Allocator,
     block_size: usize,
     last_block: &ArenaBlock,
 }
 
 struct ArenaBlock {
-    allocator: &Allocator,
+    allocator: &dyn Allocator,
     buffer: &u8,
     capacity: usize,
     offset: usize,
@@ -17,7 +17,7 @@ struct ArenaBlock {
 }
 
 impl ArenaBlock {
-    fn new(allocator: &Allocator, capacity: usize, prev: &ArenaBlock) -> &Self {
+    fn new(allocator: &dyn Allocator, capacity: usize, prev: &ArenaBlock) -> &Self {
         let buffer: &u8 = allocator.alloc(capacity);
         if buffer == 0 {
             fprintf(stderr, "ArenaBlock::new: failed to allocate capacity %zu\n", capacity);
@@ -139,7 +139,7 @@ struct ArenaAllocation {
 }
 
 impl ArenaAllocator {
-    fn new(allocator: &Allocator, block_size: usize) -> Self {
+    fn new(allocator: &dyn Allocator, block_size: usize) -> Self {
         let block = ArenaBlock::new(allocator, block_size, 0);
         if block == 0 { return Self {}; }
         

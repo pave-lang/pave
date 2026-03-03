@@ -574,7 +574,7 @@ impl Usages {
                             Type::Indirect(indirect) => {
                                 match indirect.to {
                                     Type::Trait(trait_info, _) => {
-                                        if trait_info.name.value.eq("DynStruct") {
+                                        if trait_info.name.value.eq("Struct") {
                                             let ptr = cast<usize>(struct_info);
                                             let usage = self.structs.find(&ptr);
                                             usage.impl_dynamic_usage = true;

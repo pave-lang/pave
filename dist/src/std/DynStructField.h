@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/TypeId.h>
 
-#line 1 "src/std/DynStruct.pv"
+#line 1 "src/std/Struct.pv"
 struct DynStructField {
     struct str name;
     TypeId typeid;

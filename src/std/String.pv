@@ -7,7 +7,7 @@ struct String {
 }
 
 impl String {
-    fn new(allocator: &Allocator) -> Self {
+    fn new(allocator: &dyn Allocator) -> Self {
         return Self { array: Array<char>::new(allocator) };
     }
 
