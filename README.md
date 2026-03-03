@@ -19,7 +19,7 @@ Pave is an _experimental_ systems language that compiles/transpiles to C99. The 
 
 More detailed examples and their outputs can be found in the [examples](https://github.com/pave-lang/pave/tree/main/examples) folder
 
-```pave
+```rust
 struct Counter { value: u32 }
 
 impl Counter {
