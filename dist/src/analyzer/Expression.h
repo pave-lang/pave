@@ -88,7 +88,10 @@ struct Expression* Expression__parse_inner(struct Context* context, struct Expre
 #line 989 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1372 "src/analyzer/Expression.pv"
+#line 1352 "src/analyzer/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
+
+#line 1359 "src/analyzer/Expression.pv"
+bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type);
 
 #endif

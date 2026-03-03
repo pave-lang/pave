@@ -917,12 +917,7 @@ impl Generator {
                         return self.write_struct_construction(file, type, arguments, generics);
                     },
                     Type::Tuple(_) => {
-
-
                         return self.write_struct_construction(file, type, arguments, generics);
-
-
-
                     },
                     Type::Function(func_info, generic_map) => {
                         match func_info.type {

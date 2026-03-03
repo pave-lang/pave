@@ -52,20 +52,21 @@ impl Block {
                 type_name.prepend(": ");
                 context.inlay_hint(name, type_name.c_str(), InlayHintKind::Type, false, false);
             } else {
-                if type.needs_implicit_cast(&expression.return_type) {
-                    expression = Expression::make(context.allocator, name, ExpressionData::ImplicitCast(expression), type);
-                } else if type.eq(&expression.return_type) == 0 {
-                    let message = String::new(context.allocator);
-                    message.append("Type ");
-                    let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
-                    message.append(type_name.as_str());
-                    message.append(" does not match expression return type of ");
-                    let return_type_name = context.root.naming_decl.get_type_decl(&expression.return_type, context.type_self, 0);
-                    message.append(return_type_name.as_str());
-                    context.error_token(name, message.c_str());
-                } else {
-                    expression.return_type = *type;
-                }
+                expression.validate_type(context, type);
+                // if type.needs_implicit_cast(&expression.return_type) {
+                //     expression = Expression::make(context.allocator, name, ExpressionData::ImplicitCast(expression), type);
+                // } else if type.eq(&expression.return_type) == 0 {
+                //     let message = String::new(context.allocator);
+                //     message.append("Type ");
+                //     let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+                //     message.append(type_name.as_str());
+                //     message.append(" does not match expression return type of ");
+                //     let return_type_name = context.root.naming_decl.get_type_decl(&expression.return_type, context.type_self, 0);
+                //     message.append(return_type_name.as_str());
+                //     context.error_token(name, message.c_str());
+                // } else {
+                //     expression.return_type = *type;
+                // }
             }
         }
 
