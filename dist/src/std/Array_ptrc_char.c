@@ -190,5 +190,5 @@ struct ArrayIter_ref_ptrc_char Array_ptrc_char__iter(struct Array_ptrc_char* sel
 #line 189 "src/std/Array.pv"
 struct slice_ptrc_char Array_ptrc_char__as_slice(struct Array_ptrc_char* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ptrc_char) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ptrc_char) { .data = self->data, .length = self->length };
 }

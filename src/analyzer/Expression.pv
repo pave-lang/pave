@@ -860,15 +860,20 @@ impl Expression {
                             let argument_name_length = context.allocator.store(*argument_name_data);
                             argument_name_length.value = "length";
 
-                            arguments.append(InvokeArgument {
-                                name: argument_name_data,
-                                value: Expression::make(context.allocator, index_expr.token, ExpressionData::BinaryExpression(inner, "+", start), &sequence.element_pointer),
-                            });
+                            if start.is_zero() {
+                                arguments.append(InvokeArgument { name: argument_name_data, value: inner });
+                                arguments.append(InvokeArgument { name: argument_name_length, value: end });
+                            } else {
+                                arguments.append(InvokeArgument {
+                                    name: argument_name_data,
+                                    value: Expression::make(context.allocator, index_expr.token, ExpressionData::BinaryExpression(inner, "+", start), &sequence.element_pointer),
+                                });
 
-                            arguments.append(InvokeArgument {
-                                name: argument_name_length,
-                                value: Expression::make(context.allocator, index_expr.token, ExpressionData::BinaryExpression(end, "-", start), &context.root.type_usize),
-                            });
+                                arguments.append(InvokeArgument {
+                                    name: argument_name_length,
+                                    value: Expression::make(context.allocator, index_expr.token, ExpressionData::BinaryExpression(end, "-", start), &context.root.type_usize),
+                                });
+                            }
 
                             let sequence_type = context.allocator.store(Type::Sequence(sequence));
                             let sequence_expr = Expression::make(context.allocator, index_expr.token, ExpressionData::Type(sequence_type), sequence_type);
@@ -1344,7 +1349,7 @@ impl Expression {
         return result;
     }
 
-    // fn apply_implicit_casts(&self, type: &Type) -> bool {
+    // fn validate_type(&self, type: &Type) -> bool {
     //     match self {
     //         ExpressionData::Invoke(_, &arguments) => {
     //             match type {
@@ -1352,7 +1357,7 @@ impl Expression {
     //                     let success = true;
 
     //                     for i in 0..arguments.length {
-    //                         success = arguments.data[i].value.apply_implicit_casts(&tuple.elements.data[i]) && success;
+    //                         success = arguments.data[i].value.validate_type(&tuple.elements.data[i]) && success;
     //                     }
 
     //                     return success;
@@ -1363,4 +1368,11 @@ impl Expression {
     //         _ => { return true; },
     //     }
     // }
+
+    fn is_zero(&self) -> bool {
+        match self.data {
+            ExpressionData::Literal(value) => { return value.eq("0"); },
+            _ => { return false; },
+        }
+    }
 }

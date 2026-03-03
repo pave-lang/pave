@@ -191,5 +191,5 @@ struct ArrayIter_ref_EnumVariantParameter Array_EnumVariantParameter__iter(struc
 #line 189 "src/std/Array.pv"
 struct slice_EnumVariantParameter Array_EnumVariantParameter__as_slice(struct Array_EnumVariantParameter* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_EnumVariantParameter) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_EnumVariantParameter) { .data = self->data, .length = self->length };
 }

@@ -191,5 +191,5 @@ struct ArrayIter_ref_String Array_String__iter(struct Array_String* self) {
 #line 189 "src/std/Array.pv"
 struct slice_String Array_String__as_slice(struct Array_String* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_String) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_String) { .data = self->data, .length = self->length };
 }

@@ -191,5 +191,5 @@ struct ArrayIter_ref_Type Array_Type__iter(struct Array_Type* self) {
 #line 189 "src/std/Array.pv"
 struct slice_Type Array_Type__as_slice(struct Array_Type* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_Type) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_Type) { .data = self->data, .length = self->length };
 }

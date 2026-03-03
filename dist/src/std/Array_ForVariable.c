@@ -191,5 +191,5 @@ struct ArrayIter_ref_ForVariable Array_ForVariable__iter(struct Array_ForVariabl
 #line 189 "src/std/Array.pv"
 struct slice_ForVariable Array_ForVariable__as_slice(struct Array_ForVariable* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ForVariable) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ForVariable) { .data = self->data, .length = self->length };
 }

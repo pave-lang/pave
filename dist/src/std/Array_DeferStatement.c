@@ -191,5 +191,5 @@ struct ArrayIter_ref_DeferStatement Array_DeferStatement__iter(struct Array_Defe
 #line 189 "src/std/Array.pv"
 struct slice_DeferStatement Array_DeferStatement__as_slice(struct Array_DeferStatement* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_DeferStatement) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_DeferStatement) { .data = self->data, .length = self->length };
 }

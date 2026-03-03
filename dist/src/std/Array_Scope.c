@@ -191,5 +191,5 @@ struct ArrayIter_ref_Scope Array_Scope__iter(struct Array_Scope* self) {
 #line 189 "src/std/Array.pv"
 struct slice_Scope Array_Scope__as_slice(struct Array_Scope* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_Scope) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_Scope) { .data = self->data, .length = self->length };
 }

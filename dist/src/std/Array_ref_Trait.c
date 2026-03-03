@@ -191,5 +191,5 @@ struct ArrayIter_ref_ref_Trait Array_ref_Trait__iter(struct Array_ref_Trait* sel
 #line 189 "src/std/Array.pv"
 struct slice_ref_Trait Array_ref_Trait__as_slice(struct Array_ref_Trait* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ref_Trait) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ref_Trait) { .data = self->data, .length = self->length };
 }

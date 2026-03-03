@@ -191,5 +191,5 @@ struct ArrayIter_ref_ref_GenericMap Array_ref_GenericMap__iter(struct Array_ref_
 #line 189 "src/std/Array.pv"
 struct slice_ref_GenericMap Array_ref_GenericMap__as_slice(struct Array_ref_GenericMap* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ref_GenericMap) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ref_GenericMap) { .data = self->data, .length = self->length };
 }

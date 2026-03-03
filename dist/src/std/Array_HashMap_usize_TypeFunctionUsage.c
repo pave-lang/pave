@@ -192,5 +192,5 @@ struct ArrayIter_ref_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFun
 #line 189 "src/std/Array.pv"
 struct slice_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFunctionUsage__as_slice(struct Array_HashMap_usize_TypeFunctionUsage* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_HashMap_usize_TypeFunctionUsage) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_HashMap_usize_TypeFunctionUsage) { .data = self->data, .length = self->length };
 }

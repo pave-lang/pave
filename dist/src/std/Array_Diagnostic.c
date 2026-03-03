@@ -191,5 +191,5 @@ struct ArrayIter_ref_Diagnostic Array_Diagnostic__iter(struct Array_Diagnostic* 
 #line 189 "src/std/Array.pv"
 struct slice_Diagnostic Array_Diagnostic__as_slice(struct Array_Diagnostic* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_Diagnostic) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_Diagnostic) { .data = self->data, .length = self->length };
 }

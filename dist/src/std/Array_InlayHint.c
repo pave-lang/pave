@@ -191,5 +191,5 @@ struct ArrayIter_ref_InlayHint Array_InlayHint__iter(struct Array_InlayHint* sel
 #line 189 "src/std/Array.pv"
 struct slice_InlayHint Array_InlayHint__as_slice(struct Array_InlayHint* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_InlayHint) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_InlayHint) { .data = self->data, .length = self->length };
 }

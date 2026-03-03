@@ -191,5 +191,5 @@ struct ArrayIter_ref_InvokeArgument Array_InvokeArgument__iter(struct Array_Invo
 #line 189 "src/std/Array.pv"
 struct slice_InvokeArgument Array_InvokeArgument__as_slice(struct Array_InvokeArgument* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_InvokeArgument) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_InvokeArgument) { .data = self->data, .length = self->length };
 }

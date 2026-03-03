@@ -191,5 +191,5 @@ struct ArrayIter_ref_ref_Tuple Array_ref_Tuple__iter(struct Array_ref_Tuple* sel
 #line 189 "src/std/Array.pv"
 struct slice_ref_Tuple Array_ref_Tuple__as_slice(struct Array_ref_Tuple* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ref_Tuple) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ref_Tuple) { .data = self->data, .length = self->length };
 }

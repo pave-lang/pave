@@ -191,5 +191,5 @@ struct ArrayIter_ref_ref_Expression Array_ref_Expression__iter(struct Array_ref_
 #line 189 "src/std/Array.pv"
 struct slice_ref_Expression Array_ref_Expression__as_slice(struct Array_ref_Expression* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ref_Expression) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ref_Expression) { .data = self->data, .length = self->length };
 }

@@ -191,5 +191,5 @@ struct ArrayIter_ref_Token Array_Token__iter(struct Array_Token* self) {
 #line 189 "src/std/Array.pv"
 struct slice_Token Array_Token__as_slice(struct Array_Token* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_Token) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_Token) { .data = self->data, .length = self->length };
 }

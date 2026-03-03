@@ -25,7 +25,7 @@ fn main(argc: i32, argv: **const char) -> i32 {
     print_values(values_array.as_slice());
     values_array.release();
 
-    let values_data = malloc(3 * sizeof(f32));
+    let values_data: *f32 = malloc(3 * sizeof(f32));
     values_data[0] = 1.0f;
     values_data[1] = 0.5f;
     values_data[2] = 3.5f;

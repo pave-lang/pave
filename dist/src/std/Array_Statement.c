@@ -191,5 +191,5 @@ struct ArrayIter_ref_Statement Array_Statement__iter(struct Array_Statement* sel
 #line 189 "src/std/Array.pv"
 struct slice_Statement Array_Statement__as_slice(struct Array_Statement* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_Statement) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_Statement) { .data = self->data, .length = self->length };
 }

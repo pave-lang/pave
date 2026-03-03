@@ -7,7 +7,6 @@
 #include <std/Allocator.h>
 #include <std/GeneralPurposeAllocator.h>
 #include <stdint.h>
-#include <slice_void.h>
 
 #include <slice/main.h>
 
@@ -23,11 +22,11 @@ int32_t main(int32_t argc, char const** argv) {
     print_values(Array_f32__as_slice(&values_array));
     Array_f32__release(&values_array);
 
-    void* values_data = malloc(3 * sizeof(float));
+    float* values_data = malloc(3 * sizeof(float));
     values_data[0] = 1.0f;
     values_data[1] = 0.5f;
     values_data[2] = 3.5f;
-    print_values((struct slice_void) { .data = values_data + 0, .length = 3 - 0 });
+    print_values((struct slice_f32) { .data = values_data, .length = 3 });
     free(values_data);
 
     return 0;

@@ -191,5 +191,5 @@ struct ArrayIter_ref_Generic Array_Generic__iter(struct Array_Generic* self) {
 #line 189 "src/std/Array.pv"
 struct slice_Generic Array_Generic__as_slice(struct Array_Generic* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_Generic) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_Generic) { .data = self->data, .length = self->length };
 }

@@ -191,5 +191,5 @@ struct ArrayIter_ref_MatchCase Array_MatchCase__iter(struct Array_MatchCase* sel
 #line 189 "src/std/Array.pv"
 struct slice_MatchCase Array_MatchCase__as_slice(struct Array_MatchCase* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_MatchCase) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_MatchCase) { .data = self->data, .length = self->length };
 }

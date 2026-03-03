@@ -191,5 +191,5 @@ struct ArrayIter_ref_TypeImpl Array_TypeImpl__iter(struct Array_TypeImpl* self) 
 #line 189 "src/std/Array.pv"
 struct slice_TypeImpl Array_TypeImpl__as_slice(struct Array_TypeImpl* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_TypeImpl) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_TypeImpl) { .data = self->data, .length = self->length };
 }

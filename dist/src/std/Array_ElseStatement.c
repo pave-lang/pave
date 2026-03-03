@@ -191,5 +191,5 @@ struct ArrayIter_ref_ElseStatement Array_ElseStatement__iter(struct Array_ElseSt
 #line 189 "src/std/Array.pv"
 struct slice_ElseStatement Array_ElseStatement__as_slice(struct Array_ElseStatement* self) {
     #line 190 "src/std/Array.pv"
-    return (struct slice_ElseStatement) { .data = self->data + 0, .length = self->length - 0 };
+    return (struct slice_ElseStatement) { .data = self->data, .length = self->length };
 }
