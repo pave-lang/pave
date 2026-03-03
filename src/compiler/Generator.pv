@@ -555,7 +555,7 @@ impl Generator {
                     }
     
                     self.write_str_title(file, func_info.name.value);
-                    fprintf(file, "__VTABLE__DYN_CO, .instance = &(struct ");
+                    fprintf(file, "__VTABLE__CO, .instance = &(struct ");
                     self.write_function_name(file, func_info, func_generics);
                     fprintf(file, "__Co_CoroutineStatus__Instance) {}");
                     
@@ -2828,7 +2828,7 @@ impl Generator {
                                 self.write_str_title(file, struct_info.name.value);
                                 fprintf(file, "__");
                                 self.write_str_title(file, func_info.name.value);
-                                fprintf(file, "__VTABLE__DYN_CO;\n");
+                                fprintf(file, "__VTABLE__CO;\n");
                             } else {
                                 fprintf(file, "#include <std/Fn.h>\n");
                                 fprintf(file, "struct ");
@@ -2886,7 +2886,7 @@ impl Generator {
             fprintf(file, "#include <std/Struct.h>\n");
             fprintf(file, "extern struct StructVTable ");
             self.write_str_title(file, name.as_str());
-            fprintf(file, "__VTABLE__DYN_STRUCT;\n");
+            fprintf(file, "__VTABLE__STRUCT;\n");
         }
 
         return 1;
@@ -3256,7 +3256,7 @@ impl Generator {
                             self.write_str_title(file, func_info.name.value);
 
                             if self.is_coroutine() {
-                                fprintf(file, "__VTABLE__DYN_CO");
+                                fprintf(file, "__VTABLE__CO");
                             } else {
                                 fprintf(file, "__VTABLE__DYN_FN");
                             }
@@ -3519,20 +3519,20 @@ impl Generator {
         if usage.impl_dynamic_usage {
             fprintf(code_file, "\n");
 
-            fprintf(code_file, "#include <std/StructField.h>\n");
-            fprintf(code_file, "#include <slice_StructField.h>\n");
-            fprintf(code_file, "struct slice_StructField ");
+            fprintf(code_file, "#include <std/DynStructField.h>\n");
+            fprintf(code_file, "#include <slice_DynStructField.h>\n");
+            fprintf(code_file, "struct slice_DynStructField ");
             self.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
 
             self.indent += 1;
             self.write_indent(code_file);
-            fprintf(code_file, "static struct StructField fields[] = { ");
+            fprintf(code_file, "static struct DynStructField fields[] = { ");
 
             let first = true;
             for (_, &field) in struct_info.fields {
                 if first { first = false; } else { fprintf(code_file, ", "); }
-                fprintf(code_file, "(struct StructField){ .name = (struct str){ .ptr = \"");
+                fprintf(code_file, "(struct DynStructField){ .name = (struct str){ .ptr = \"");
                 self.write_token(code_file, field.name);
                 fprintf(code_file, "\", .length = %zu }, .typeid = ", field.name.value.length);
                 self.write_typeid(code_file, &field.type, generics);
@@ -3541,7 +3541,7 @@ impl Generator {
 
             fprintf(code_file, " };\n");
             self.write_indent(code_file);
-            fprintf(code_file, "return (struct slice_StructField){ .data = fields, .length = %zu };\n", struct_info.fields.length);
+            fprintf(code_file, "return (struct slice_DynStructField){ .data = fields, .length = %zu };\n", struct_info.fields.length);
             self.indent -= 1;
             fprintf(code_file, "}\n");
 
@@ -3631,7 +3631,7 @@ impl Generator {
 
             fprintf(code_file, "struct StructVTable ");
             self.write_str_title(code_file, name.as_str());
-            fprintf(code_file, "__VTABLE__DYN_STRUCT");
+            fprintf(code_file, "__VTABLE__STRUCT");
             fprintf(code_file, " = { .get_fields = &");
             self.write_string(code_file, &name);
 

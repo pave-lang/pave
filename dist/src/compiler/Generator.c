@@ -900,7 +900,7 @@ void Generator__write_trait_cast(struct Generator* self, FILE* file, struct Expr
                 #line 557 "src/compiler/Generator.pv"
                 Generator__write_str_title(self, file, func_info->name->value);
                 #line 558 "src/compiler/Generator.pv"
-                fprintf(file, "__VTABLE__DYN_CO, .instance = &(struct ");
+                fprintf(file, "__VTABLE__CO, .instance = &(struct ");
                 #line 559 "src/compiler/Generator.pv"
                 Generator__write_function_name(self, file, func_info, func_generics);
                 #line 560 "src/compiler/Generator.pv"
@@ -5551,7 +5551,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                             #line 2830 "src/compiler/Generator.pv"
                             Generator__write_str_title(self, file, func_info->name->value);
                             #line 2831 "src/compiler/Generator.pv"
-                            fprintf(file, "__VTABLE__DYN_CO;\n");
+                            fprintf(file, "__VTABLE__CO;\n");
                         } else {
                             #line 2833 "src/compiler/Generator.pv"
                             fprintf(file, "#include <std/Fn.h>\n");
@@ -5675,7 +5675,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
         #line 2888 "src/compiler/Generator.pv"
         Generator__write_str_title(self, file, String__as_str(&name));
         #line 2889 "src/compiler/Generator.pv"
-        fprintf(file, "__VTABLE__DYN_STRUCT;\n");
+        fprintf(file, "__VTABLE__STRUCT;\n");
     }
 
     #line 2892 "src/compiler/Generator.pv"
@@ -6399,7 +6399,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                         #line 3258 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
                             #line 3259 "src/compiler/Generator.pv"
-                            fprintf(file, "__VTABLE__DYN_CO");
+                            fprintf(file, "__VTABLE__CO");
                         } else {
                             #line 3261 "src/compiler/Generator.pv"
                             fprintf(file, "__VTABLE__DYN_FN");
@@ -6920,11 +6920,11 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
         fprintf(code_file, "\n");
 
         #line 3522 "src/compiler/Generator.pv"
-        fprintf(code_file, "#include <std/StructField.h>\n");
+        fprintf(code_file, "#include <std/DynStructField.h>\n");
         #line 3523 "src/compiler/Generator.pv"
-        fprintf(code_file, "#include <slice_StructField.h>\n");
+        fprintf(code_file, "#include <slice_DynStructField.h>\n");
         #line 3524 "src/compiler/Generator.pv"
-        fprintf(code_file, "struct slice_StructField ");
+        fprintf(code_file, "struct slice_DynStructField ");
         #line 3525 "src/compiler/Generator.pv"
         Generator__write_string(self, code_file, &name);
         #line 3526 "src/compiler/Generator.pv"
@@ -6935,7 +6935,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
         #line 3529 "src/compiler/Generator.pv"
         Generator__write_indent(self, code_file);
         #line 3530 "src/compiler/Generator.pv"
-        fprintf(code_file, "static struct StructField fields[] = { ");
+        fprintf(code_file, "static struct DynStructField fields[] = { ");
 
         #line 3532 "src/compiler/Generator.pv"
         bool first = true;
@@ -6955,7 +6955,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
                 fprintf(code_file, ", ");
             }
             #line 3535 "src/compiler/Generator.pv"
-            fprintf(code_file, "(struct StructField){ .name = (struct str){ .ptr = \"");
+            fprintf(code_file, "(struct DynStructField){ .name = (struct str){ .ptr = \"");
             #line 3536 "src/compiler/Generator.pv"
             Generator__write_token(self, code_file, field->name);
             #line 3537 "src/compiler/Generator.pv"
@@ -6971,7 +6971,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
         #line 3543 "src/compiler/Generator.pv"
         Generator__write_indent(self, code_file);
         #line 3544 "src/compiler/Generator.pv"
-        fprintf(code_file, "return (struct slice_StructField){ .data = fields, .length = %zu };\n", struct_info->fields.length);
+        fprintf(code_file, "return (struct slice_DynStructField){ .data = fields, .length = %zu };\n", struct_info->fields.length);
         #line 3545 "src/compiler/Generator.pv"
         self->indent -= 1;
         #line 3546 "src/compiler/Generator.pv"
@@ -7134,7 +7134,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
         #line 3633 "src/compiler/Generator.pv"
         Generator__write_str_title(self, code_file, String__as_str(&name));
         #line 3634 "src/compiler/Generator.pv"
-        fprintf(code_file, "__VTABLE__DYN_STRUCT");
+        fprintf(code_file, "__VTABLE__STRUCT");
         #line 3635 "src/compiler/Generator.pv"
         fprintf(code_file, " = { .get_fields = &");
         #line 3636 "src/compiler/Generator.pv"
