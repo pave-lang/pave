@@ -7,9 +7,9 @@ trait Sub<T> {
 }
 
 trait Mul<T> {
-    fn sub(&self, other: T) -> void;
+    fn mul(&self, other: T) -> void;
 }
 
 trait Div<T> {
-    fn sub(&self, other: T) -> void;
+    fn div(&self, other: T) -> void;
 }
