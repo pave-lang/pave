@@ -6,7 +6,6 @@
 #include <std/str.h>
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
-#include <stdint.h>
 #include <tuple_str_Array_Diagnostic.h>
 
 #include <std/HashMapIter_str_Array_Diagnostic.h>

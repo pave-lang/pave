@@ -6,7 +6,6 @@
 #include <std/str.h>
 #include <std/Array_InlayHint.h>
 #include <analyzer/InlayHint.h>
-#include <stdint.h>
 #include <tuple_str_Array_InlayHint.h>
 
 #include <std/HashMapIter_str_Array_InlayHint.h>

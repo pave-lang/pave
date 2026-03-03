@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_EnumVariant.h>
 #include <std/str.h>
 #include <analyzer/EnumVariant.h>
-#include <stdint.h>
 #include <tuple_str_EnumVariant.h>
 
 #include <std/HashMapIter_str_EnumVariant.h>

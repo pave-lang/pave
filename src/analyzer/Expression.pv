@@ -322,19 +322,7 @@ impl Expression {
                         return false;
                     }
 
-                    if param_type.needs_implicit_cast(&arg.value.return_type) {
-                        arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
-                    } else if param_type.eq(&arg.value.return_type) == 0 {
-                        let message = String::new(context.allocator);
-                        message.append("Field type ");
-                        let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
-                        message.append(return_type_name.as_str());
-                        message.append(" does not match expression type of ");
-                        let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
-                        message.append(param_type_name.as_str());
-                        context.error_token(arg.value.token, message.c_str());
-                        return false;
-                    } 
+                    arg.value.validate_type(context, param_type);
                 }
 
                 return true;
@@ -388,19 +376,7 @@ impl Expression {
                         return false;
                     }
 
-                    if param_type.needs_implicit_cast(&arg.value.return_type) {
-                        arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
-                    } else if param_type.eq(&arg.value.return_type) == 0 {
-                        let message = String::new(context.allocator);
-                        message.append("Argument ");
-                        let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
-                        message.append(return_type_name.as_str());
-                        message.append(" does not match function parameter type of ");
-                        let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
-                        message.append(param_type_name.as_str());
-                        context.error_token(arg.value.token, message.c_str());
-                        return false;
-                    } 
+                    arg.value.validate_type(context, param_type);
                 }
 
                 return true;
@@ -441,19 +417,7 @@ impl Expression {
                 return false;
             }
 
-            if param_type.needs_implicit_cast(&arg.value.return_type) {
-                arg.value = Expression::make(context.allocator, token, ExpressionData::ImplicitCast(arg.value), param_type);
-            } else if param_type.eq(&arg.value.return_type) == 0 {
-                let message = String::new(context.allocator);
-                message.append("Argument ");
-                let return_type_name = context.root.naming_decl.get_type_decl(&arg.value.return_type, context.type_self, 0);
-                message.append(return_type_name.as_str());
-                message.append(" does not match enum parameter type of ");
-                let param_type_name = context.root.naming_decl.get_type_decl(param_type, context.type_self, 0);
-                message.append(param_type_name.as_str());
-                context.error_token(arg.value.token, message.c_str());
-                return false;
-            } 
+            arg.value.validate_type(context, param_type);
         }
 
         return true;
@@ -1349,30 +1313,56 @@ impl Expression {
         return result;
     }
 
-    // fn validate_type(&self, type: &Type) -> bool {
-    //     match self {
-    //         ExpressionData::Invoke(_, &arguments) => {
-    //             match type {
-    //                 Type::Tuple(tuple) => {
-    //                     let success = true;
-
-    //                     for i in 0..arguments.length {
-    //                         success = arguments.data[i].value.validate_type(&tuple.elements.data[i]) && success;
-    //                     }
-
-    //                     return success;
-    //                 },
-    //                 _ => { return true; }
-    //             }
-    //         },
-    //         _ => { return true; },
-    //     }
-    // }
-
     fn is_zero(&self) -> bool {
         match self.data {
             ExpressionData::Literal(value) => { return value.eq("0"); },
             _ => { return false; },
         }
+    }
+
+    fn validate_type(&self, context: &Context, type: &Type) -> bool {
+        let success = true;
+
+        match self.data {
+            ExpressionData::Invoke(invoke, &arguments) => {
+                match type {
+                    Type::Tuple(tuple) => {
+                        for (i, argument) in arguments.iter().enumerate() {
+                            success = argument.value.validate_type(context, &tuple.elements.data[i]) && success;
+                        }
+
+                        invoke.data = ExpressionData::Type(type);
+                        invoke.return_type = *type;
+                        self.return_type = *type;
+
+                        return success;
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        if type.needs_implicit_cast(&self.return_type) {
+            let expression = context.allocator.store(*self);
+            self.data = ExpressionData::ImplicitCast(expression);
+            self.return_type = *type;
+            return true;
+        }
+        
+        if !type.eq(&self.return_type) {
+            let message = String::new(context.allocator);
+            message.append("Type ");
+            let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+            message.append(type_name.as_str());
+            message.append(" does not match expression return type of ");
+            let return_type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, 0);
+            message.append(return_type_name.as_str());
+            context.error_token(self.token, message.c_str());
+            return false;
+        }
+        
+        self.return_type = *type;
+        return true;
     }
 }

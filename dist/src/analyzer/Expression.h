@@ -49,46 +49,49 @@ void Expression__resolve_generic_type(struct Context* context, struct Type* para
 #line 290 "src/analyzer/Expression.pv"
 bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call);
 
-#line 417 "src/analyzer/Expression.pv"
+#line 393 "src/analyzer/Expression.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map);
 
-#line 462 "src/analyzer/Expression.pv"
+#line 426 "src/analyzer/Expression.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map);
 
-#line 476 "src/analyzer/Expression.pv"
+#line 440 "src/analyzer/Expression.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 486 "src/analyzer/Expression.pv"
+#line 450 "src/analyzer/Expression.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 495 "src/analyzer/Expression.pv"
+#line 459 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_enum(struct Context* context, struct Token* token, struct Type* enum_type, struct Generics* generics);
 
-#line 535 "src/analyzer/Expression.pv"
+#line 499 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_struct(struct Context* context, struct Token* token, struct Type* struct_type, struct Generics* generics);
 
-#line 649 "src/analyzer/Expression.pv"
+#line 613 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_class(struct Context* context, struct Token* token, struct Expression* parent, struct Generics* generics);
 
-#line 708 "src/analyzer/Expression.pv"
+#line 672 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_cpp(struct Context* context, struct Generics* generics);
 
-#line 735 "src/analyzer/Expression.pv"
+#line 699 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_type_member_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 756 "src/analyzer/Expression.pv"
+#line 720 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_instance_member_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 832 "src/analyzer/Expression.pv"
+#line 796 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 923 "src/analyzer/Expression.pv"
+#line 887 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_inner(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 989 "src/analyzer/Expression.pv"
+#line 953 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1372 "src/analyzer/Expression.pv"
+#line 1316 "src/analyzer/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
+
+#line 1323 "src/analyzer/Expression.pv"
+bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type);
 
 #endif

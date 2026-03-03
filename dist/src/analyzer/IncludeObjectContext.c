@@ -19,7 +19,7 @@
 #include <std/Allocator.h>
 #include <analyzer/Token.h>
 #include <analyzer/FunctionType.h>
-#include <stdint.h>
+#include <analyzer/GenericMap.h>
 
 #include <analyzer/IncludeObjectContext.h>
 

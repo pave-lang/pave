@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <std/HashMapBucket_str_str.h>
 #include <std/str.h>
-#include <stdint.h>
 #include <tuple_str_str.h>
 
 #include <std/HashMapIter_str_str.h>

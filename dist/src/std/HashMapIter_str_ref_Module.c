@@ -5,7 +5,6 @@
 #include <std/HashMapBucket_str_ref_Module.h>
 #include <std/str.h>
 #include <analyzer/Module.h>
-#include <stdint.h>
 #include <tuple_str_ref_Module.h>
 
 #include <std/HashMapIter_str_ref_Module.h>
