@@ -40,16 +40,16 @@ void Include__add_typedef_primitive(struct Include* self, char const* type, char
 #line 87 "src/analyzer/Include.pv"
 bool Include__process(struct Include* self);
 
-#line 177 "src/analyzer/Include.pv"
+#line 178 "src/analyzer/Include.pv"
 struct Type* Include__parse_type(struct Include* self, CXType type);
 
-#line 224 "src/analyzer/Include.pv"
+#line 225 "src/analyzer/Include.pv"
 struct EnumC* Include__find_enum(struct Include* self, char const* name);
 
-#line 235 "src/analyzer/Include.pv"
+#line 236 "src/analyzer/Include.pv"
 char* Include__make_string(struct Include* self, CXString s);
 
-#line 242 "src/analyzer/Include.pv"
+#line 243 "src/analyzer/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor);
 
 #endif

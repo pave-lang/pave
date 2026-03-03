@@ -122,6 +122,7 @@ impl Naming {
                     IndirectType::Pointer => { result.append(self.pointer_prefix); },
                     IndirectType::ConstPointer => { result.append(self.pointer_const_prefix); },
                     IndirectType::Reference => { result.append(self.reference_prefix); },
+                    IndirectType::DynamicDispatch => { result.append(self.reference_prefix); },
                 }
 
                 let child_name = self.get_type_name(&indirect.to, type_self, generics_map);
@@ -137,6 +138,7 @@ impl Naming {
                             IndirectType::Pointer => { result.append(self.pointer_suffix); },
                             IndirectType::ConstPointer => { result.append(self.pointer_const_suffix); },
                             IndirectType::Reference => { result.append(self.reference_suffix); },
+                            IndirectType::DynamicDispatch => { result.append(self.reference_suffix); },
                         }
                     },
                 }
@@ -318,6 +320,12 @@ impl Naming {
                 result.append(union_info.name);
             },
             Type::ClassCpp(class_info) => {
+                let namespace = class_info.namespace;
+                while namespace {
+                    result.prepend("::");
+                    result.prepend(namespace.name);
+                    namespace = namespace.parent;
+                }
                 result.append(class_info.name);
             },
             Type::FunctionC(func_info) => {

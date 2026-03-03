@@ -1,0 +1,17 @@
+#cpp
+#include "cpp.hpp"
+
+struct CppTest {}
+impl CppTest {
+    fn run() {
+        let a = TestCpp::Vec4();
+        let b = TestCpp::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        TestCpp::print_vec(a);
+        TestCpp::print_vec(b);
+
+        b.x = 0.0f;
+
+        TestCpp::print_vec(b);
+    }
+}

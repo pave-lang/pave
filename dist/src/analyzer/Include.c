@@ -17,6 +17,7 @@
 #include <std/Array_ptrc_char.h>
 #include <std/String.h>
 #include <analyzer/IncludeContext.h>
+#include <analyzer/NamespaceCpp.h>
 #include <analyzer/Indirect.h>
 
 #include <analyzer/Include.h>
@@ -149,302 +150,304 @@ bool Include__process(struct Include* self) {
     #line 95 "src/analyzer/Include.pv"
     struct String file_content = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
     #line 96 "src/analyzer/Include.pv"
-    String__append(&file_content, (struct str){ .ptr = "#include ", .length = strlen("#include ") });
+    String__append(&file_content, (struct str){ .ptr = "#include <", .length = strlen("#include <") });
     #line 97 "src/analyzer/Include.pv"
-    String__append(&file_content, self->path);
+    String__append(&file_content, String__as_str(&path));
+    #line 98 "src/analyzer/Include.pv"
+    String__append(&file_content, (struct str){ .ptr = ">", .length = strlen(">") });
 
-    #line 99 "src/analyzer/Include.pv"
-    char const* filename = "__temp.c";
     #line 100 "src/analyzer/Include.pv"
+    char const* filename = "__temp.c";
+    #line 101 "src/analyzer/Include.pv"
     if (self->mode_cpp) {
-        #line 101 "src/analyzer/Include.pv"
-        filename = "__temp.cpp";
         #line 102 "src/analyzer/Include.pv"
-        clang_args = Array_ptrc_char__clone(&clang_args, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
+        filename = "__temp.cpp";
         #line 103 "src/analyzer/Include.pv"
-        Array_ptrc_char__append(&clang_args, "-std=c++17");
+        clang_args = Array_ptrc_char__clone(&clang_args, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
         #line 104 "src/analyzer/Include.pv"
+        Array_ptrc_char__append(&clang_args, "-std=c++17");
+        #line 105 "src/analyzer/Include.pv"
         release_clang_args = true;
     }
 
-    #line 107 "src/analyzer/Include.pv"
+    #line 108 "src/analyzer/Include.pv"
     struct CXUnsavedFile unsaved = (struct CXUnsavedFile) {
         .Filename = filename,
         .Contents = String__c_str(&file_content),
         .Length = String__length(&file_content),
     };
 
-    #line 113 "src/analyzer/Include.pv"
-    CXIndex index = clang_createIndex(0, 1);
     #line 114 "src/analyzer/Include.pv"
+    CXIndex index = clang_createIndex(0, 1);
+    #line 115 "src/analyzer/Include.pv"
     if (index == 0) {
-        #line 115 "src/analyzer/Include.pv"
-        Root__error(self->root, self->path, 0, 0, 0, 0, "clang_createIndex failed\n");
         #line 116 "src/analyzer/Include.pv"
+        Root__error(self->root, self->path, 0, 0, 0, 0, "clang_createIndex failed\n");
+        #line 117 "src/analyzer/Include.pv"
         return 0;
     }
 
-    #line 119 "src/analyzer/Include.pv"
+    #line 120 "src/analyzer/Include.pv"
     struct CXTranslationUnitImpl* unit = 0;
 
-    #line 121 "src/analyzer/Include.pv"
+    #line 122 "src/analyzer/Include.pv"
     enum CXErrorCode result = clang_parseTranslationUnit2(index, filename, clang_args.data, clang_args.length, &unsaved, 1, CXTranslationUnit_None | CXTranslationUnit_DetailedPreprocessingRecord | CXTranslationUnit_Incomplete | CXTranslationUnit_SkipFunctionBodies, &unit);
 
-    #line 130 "src/analyzer/Include.pv"
+    #line 131 "src/analyzer/Include.pv"
     if (release_clang_args) {
-        #line 131 "src/analyzer/Include.pv"
+        #line 132 "src/analyzer/Include.pv"
         Array_ptrc_char__release(&clang_args);
     }
 
-    #line 139 "src/analyzer/Include.pv"
+    #line 140 "src/analyzer/Include.pv"
     switch (result) {
-        #line 140 "src/analyzer/Include.pv"
+        #line 141 "src/analyzer/Include.pv"
         case CXError_Failure: {
-            #line 141 "src/analyzer/Include.pv"
-            uintptr_t num_errors = clang_getNumDiagnostics(unit);
             #line 142 "src/analyzer/Include.pv"
+            uintptr_t num_errors = clang_getNumDiagnostics(unit);
+            #line 143 "src/analyzer/Include.pv"
             uintptr_t display_options = clang_defaultDiagnosticDisplayOptions();
 
-            #line 144 "src/analyzer/Include.pv"
+            #line 145 "src/analyzer/Include.pv"
             if (num_errors == 0) {
-                #line 145 "src/analyzer/Include.pv"
+                #line 146 "src/analyzer/Include.pv"
                 Root__error(self->root, self->path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure no errors");
             } else {
-                #line 147 "src/analyzer/Include.pv"
+                #line 148 "src/analyzer/Include.pv"
                 Root__error(self->root, self->path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure has errors");
             }
 
-            #line 150 "src/analyzer/Include.pv"
-            uintptr_t i = 0;
             #line 151 "src/analyzer/Include.pv"
+            uintptr_t i = 0;
+            #line 152 "src/analyzer/Include.pv"
             while (i < num_errors) {
-                #line 152 "src/analyzer/Include.pv"
-                CXDiagnostic diag = clang_getDiagnostic(unit, i);
                 #line 153 "src/analyzer/Include.pv"
+                CXDiagnostic diag = clang_getDiagnostic(unit, i);
+                #line 154 "src/analyzer/Include.pv"
                 CXString str = clang_formatDiagnostic(diag, display_options);
 
-                #line 155 "src/analyzer/Include.pv"
+                #line 156 "src/analyzer/Include.pv"
                 Root__error(self->root, self->path, 0, 0, 0, 0, clang_getCString(str));
 
-                #line 157 "src/analyzer/Include.pv"
-                clang_disposeString(str);
                 #line 158 "src/analyzer/Include.pv"
-                clang_disposeDiagnostic(diag);
+                clang_disposeString(str);
                 #line 159 "src/analyzer/Include.pv"
+                clang_disposeDiagnostic(diag);
+                #line 160 "src/analyzer/Include.pv"
                 i += 1;
             }
         } break;
-        #line 162 "src/analyzer/Include.pv"
+        #line 163 "src/analyzer/Include.pv"
         case CXError_Crashed: {
-            #line 162 "src/analyzer/Include.pv"
+            #line 163 "src/analyzer/Include.pv"
             Root__error(self->root, self->path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Crashed");
         } break;
-        #line 163 "src/analyzer/Include.pv"
+        #line 164 "src/analyzer/Include.pv"
         case CXError_InvalidArguments: {
-            #line 163 "src/analyzer/Include.pv"
+            #line 164 "src/analyzer/Include.pv"
             Root__error(self->root, self->path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_InvalidArguments");
         } break;
-        #line 164 "src/analyzer/Include.pv"
+        #line 165 "src/analyzer/Include.pv"
         case CXError_ASTReadError: {
-            #line 164 "src/analyzer/Include.pv"
+            #line 165 "src/analyzer/Include.pv"
             Root__error(self->root, self->path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_ASTReadError");
         } break;
-        #line 165 "src/analyzer/Include.pv"
+        #line 166 "src/analyzer/Include.pv"
         case CXError_Success: {
         } break;
     }
 
-    #line 168 "src/analyzer/Include.pv"
-    CXCursor cursor = clang_getTranslationUnitCursor(unit);
     #line 169 "src/analyzer/Include.pv"
-    clang_visitChildren(cursor, IncludeContext__visitor, &(struct IncludeContext) { .include = self, .parent = 0, .types = &self->types, .values = &self->values });
+    CXCursor cursor = clang_getTranslationUnitCursor(unit);
+    #line 170 "src/analyzer/Include.pv"
+    clang_visitChildren(cursor, IncludeContext__visitor, &(struct IncludeContext) { .include = self, .parent = 0, .types = &self->types, .values = &self->values, .namespace = 0 });
 
-    #line 171 "src/analyzer/Include.pv"
-    clang_disposeTranslationUnit(unit);
     #line 172 "src/analyzer/Include.pv"
+    clang_disposeTranslationUnit(unit);
+    #line 173 "src/analyzer/Include.pv"
     clang_disposeIndex(index);
 
-    #line 174 "src/analyzer/Include.pv"
+    #line 175 "src/analyzer/Include.pv"
     return 1;
 }
 
-#line 177 "src/analyzer/Include.pv"
+#line 178 "src/analyzer/Include.pv"
 struct Type* Include__parse_type(struct Include* self, CXType type) {
-    #line 178 "src/analyzer/Include.pv"
-    uint32_t type_u32 = (uint32_t)(type.kind);
     #line 179 "src/analyzer/Include.pv"
+    uint32_t type_u32 = (uint32_t)(type.kind);
+    #line 180 "src/analyzer/Include.pv"
     struct Type* lookup = HashMap_u32_Type__find(&self->cxtype_to_type, &type_u32);
 
-    #line 181 "src/analyzer/Include.pv"
+    #line 182 "src/analyzer/Include.pv"
     if (lookup != 0) {
-        #line 182 "src/analyzer/Include.pv"
+        #line 183 "src/analyzer/Include.pv"
         return lookup;
     }
 
-    #line 185 "src/analyzer/Include.pv"
+    #line 186 "src/analyzer/Include.pv"
     if (type.kind == CXType_Pointer) {
-        #line 186 "src/analyzer/Include.pv"
-        CXType pointee_type = clang_getPointeeType(type);
         #line 187 "src/analyzer/Include.pv"
-        bool is_pointee_const = clang_isConstQualifiedType(pointee_type) != 0;
+        CXType pointee_type = clang_getPointeeType(type);
         #line 188 "src/analyzer/Include.pv"
+        bool is_pointee_const = clang_isConstQualifiedType(pointee_type) != 0;
+        #line 189 "src/analyzer/Include.pv"
         struct Type* resolved_pointee_type = Include__parse_type(self, pointee_type);
 
-        #line 190 "src/analyzer/Include.pv"
-        struct Indirect* indirect;
         #line 191 "src/analyzer/Include.pv"
+        struct Indirect* indirect;
+        #line 192 "src/analyzer/Include.pv"
         if (is_pointee_const) {
-            #line 192 "src/analyzer/Include.pv"
+            #line 193 "src/analyzer/Include.pv"
             indirect = Indirect__new_const_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator }, *resolved_pointee_type);
         } else {
-            #line 194 "src/analyzer/Include.pv"
+            #line 195 "src/analyzer/Include.pv"
             indirect = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator }, *resolved_pointee_type);
         }
 
-        #line 197 "src/analyzer/Include.pv"
+        #line 198 "src/analyzer/Include.pv"
         return ArenaAllocator__store_Type(self->root->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
     }
 
-    #line 200 "src/analyzer/Include.pv"
+    #line 201 "src/analyzer/Include.pv"
     if (type.kind == CXType_Elaborated) {
-        #line 201 "src/analyzer/Include.pv"
-        CXCursor decl = clang_getTypeDeclaration(type);
         #line 202 "src/analyzer/Include.pv"
-        CXString name_spelling = clang_getCursorSpelling(decl);
+        CXCursor decl = clang_getTypeDeclaration(type);
         #line 203 "src/analyzer/Include.pv"
+        CXString name_spelling = clang_getCursorSpelling(decl);
+        #line 204 "src/analyzer/Include.pv"
         char const* name = clang_getCString(name_spelling);
 
-        #line 205 "src/analyzer/Include.pv"
-        struct Type* resolve = HashMap_str_Type__find(&self->typedef_to_type, &(struct str){ .ptr = name, .length = strlen(name) });
         #line 206 "src/analyzer/Include.pv"
+        struct Type* resolve = HashMap_str_Type__find(&self->typedef_to_type, &(struct str){ .ptr = name, .length = strlen(name) });
+        #line 207 "src/analyzer/Include.pv"
         if (resolve != 0) {
-            #line 207 "src/analyzer/Include.pv"
-            clang_disposeString(name_spelling);
             #line 208 "src/analyzer/Include.pv"
+            clang_disposeString(name_spelling);
+            #line 209 "src/analyzer/Include.pv"
             return resolve;
         }
 
-        #line 211 "src/analyzer/Include.pv"
-        struct Type* lookup = HashMap_str_Type__find(&self->types, &(struct str){ .ptr = name, .length = strlen(name) });
         #line 212 "src/analyzer/Include.pv"
+        struct Type* lookup = HashMap_str_Type__find(&self->types, &(struct str){ .ptr = name, .length = strlen(name) });
+        #line 213 "src/analyzer/Include.pv"
         if (lookup == 0) {
         }
 
-        #line 214 "src/analyzer/Include.pv"
+        #line 215 "src/analyzer/Include.pv"
         clang_disposeString(name_spelling);
 
-        #line 216 "src/analyzer/Include.pv"
+        #line 217 "src/analyzer/Include.pv"
         if (lookup == 0) {
-            #line 216 "src/analyzer/Include.pv"
+            #line 217 "src/analyzer/Include.pv"
             return &self->root->type_void;
         }
 
-        #line 218 "src/analyzer/Include.pv"
+        #line 219 "src/analyzer/Include.pv"
         return lookup;
     }
 
-    #line 221 "src/analyzer/Include.pv"
+    #line 222 "src/analyzer/Include.pv"
     return &self->root->type_void;
 }
 
-#line 224 "src/analyzer/Include.pv"
+#line 225 "src/analyzer/Include.pv"
 struct EnumC* Include__find_enum(struct Include* self, char const* name) {
-    #line 225 "src/analyzer/Include.pv"
+    #line 226 "src/analyzer/Include.pv"
     struct Type* type_info = HashMap_str_Type__find(&self->types, &(struct str){ .ptr = name, .length = strlen(name) });
 
-    #line 227 "src/analyzer/Include.pv"
+    #line 228 "src/analyzer/Include.pv"
     switch (type_info->type) {
-        #line 228 "src/analyzer/Include.pv"
+        #line 229 "src/analyzer/Include.pv"
         case TYPE__ENUM_C: {
-            #line 228 "src/analyzer/Include.pv"
+            #line 229 "src/analyzer/Include.pv"
             struct EnumC* enum_info = type_info->enumc_value;
-            #line 228 "src/analyzer/Include.pv"
+            #line 229 "src/analyzer/Include.pv"
             return enum_info;
         } break;
-        #line 229 "src/analyzer/Include.pv"
+        #line 230 "src/analyzer/Include.pv"
         default: {
         } break;
     }
 
-    #line 232 "src/analyzer/Include.pv"
+    #line 233 "src/analyzer/Include.pv"
     return 0;
 }
 
-#line 235 "src/analyzer/Include.pv"
+#line 236 "src/analyzer/Include.pv"
 char* Include__make_string(struct Include* self, CXString s) {
-    #line 236 "src/analyzer/Include.pv"
-    uintptr_t length = strlen(clang_getCString(s));
     #line 237 "src/analyzer/Include.pv"
-    char* result = ArenaAllocator__Allocator__alloc(self->root->allocator, length + 1);
+    uintptr_t length = strlen(clang_getCString(s));
     #line 238 "src/analyzer/Include.pv"
-    memcpy(result, clang_getCString(s), length + 1);
+    char* result = ArenaAllocator__Allocator__alloc(self->root->allocator, length + 1);
     #line 239 "src/analyzer/Include.pv"
+    memcpy(result, clang_getCString(s), length + 1);
+    #line 240 "src/analyzer/Include.pv"
     return result;
 }
 
-#line 242 "src/analyzer/Include.pv"
+#line 243 "src/analyzer/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
-    #line 243 "src/analyzer/Include.pv"
-    CXSourceRange range = clang_getCursorExtent(cursor);
     #line 244 "src/analyzer/Include.pv"
+    CXSourceRange range = clang_getCursorExtent(cursor);
+    #line 245 "src/analyzer/Include.pv"
     CXTranslationUnit tu = clang_Cursor_getTranslationUnit(cursor);
 
-    #line 246 "src/analyzer/Include.pv"
-    CXToken* tokens = 0;
     #line 247 "src/analyzer/Include.pv"
-    uint32_t num_tokens = 0;
+    CXToken* tokens = 0;
     #line 248 "src/analyzer/Include.pv"
+    uint32_t num_tokens = 0;
+    #line 249 "src/analyzer/Include.pv"
     clang_tokenize(tu, range, &tokens, &num_tokens);
 
-    #line 250 "src/analyzer/Include.pv"
+    #line 251 "src/analyzer/Include.pv"
     if (num_tokens < 2) {
-        #line 251 "src/analyzer/Include.pv"
-        clang_disposeTokens(tu, tokens, num_tokens);
         #line 252 "src/analyzer/Include.pv"
+        clang_disposeTokens(tu, tokens, num_tokens);
+        #line 253 "src/analyzer/Include.pv"
         return 0;
     }
 
-    #line 255 "src/analyzer/Include.pv"
-    CXString spelling = clang_getTokenSpelling(tu, tokens[1]);
     #line 256 "src/analyzer/Include.pv"
+    CXString spelling = clang_getTokenSpelling(tu, tokens[1]);
+    #line 257 "src/analyzer/Include.pv"
     char const* txt = clang_getCString(spelling);
 
-    #line 258 "src/analyzer/Include.pv"
+    #line 259 "src/analyzer/Include.pv"
     bool result = 0;
 
-    #line 260 "src/analyzer/Include.pv"
+    #line 261 "src/analyzer/Include.pv"
     if (strcmp(txt, "(") == 0) {
-        #line 261 "src/analyzer/Include.pv"
-        CXSourceLocation loc_name_end = clang_getRangeEnd(clang_getTokenExtent(tu, tokens[0]));
         #line 262 "src/analyzer/Include.pv"
+        CXSourceLocation loc_name_end = clang_getRangeEnd(clang_getTokenExtent(tu, tokens[0]));
+        #line 263 "src/analyzer/Include.pv"
         CXSourceLocation loc_paren = clang_getTokenLocation(tu, tokens[1]);
 
-        #line 264 "src/analyzer/Include.pv"
-        uint32_t line1 = 0;
         #line 265 "src/analyzer/Include.pv"
-        uint32_t col1 = 0;
+        uint32_t line1 = 0;
         #line 266 "src/analyzer/Include.pv"
-        uint32_t line2 = 0;
+        uint32_t col1 = 0;
         #line 267 "src/analyzer/Include.pv"
+        uint32_t line2 = 0;
+        #line 268 "src/analyzer/Include.pv"
         uint32_t col2 = 0;
 
-        #line 269 "src/analyzer/Include.pv"
-        clang_getSpellingLocation(loc_name_end, 0, &line1, &col1, 0);
         #line 270 "src/analyzer/Include.pv"
+        clang_getSpellingLocation(loc_name_end, 0, &line1, &col1, 0);
+        #line 271 "src/analyzer/Include.pv"
         clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
-        #line 272 "src/analyzer/Include.pv"
+        #line 273 "src/analyzer/Include.pv"
         if (line1 == line2 && col1 == col2) {
-            #line 273 "src/analyzer/Include.pv"
+            #line 274 "src/analyzer/Include.pv"
             result = 1;
         }
     }
 
-    #line 277 "src/analyzer/Include.pv"
-    clang_disposeString(spelling);
     #line 278 "src/analyzer/Include.pv"
+    clang_disposeString(spelling);
+    #line 279 "src/analyzer/Include.pv"
     clang_disposeTokens(tu, tokens, num_tokens);
 
-    #line 280 "src/analyzer/Include.pv"
+    #line 281 "src/analyzer/Include.pv"
     return result;
 }

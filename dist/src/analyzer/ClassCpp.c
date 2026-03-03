@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <analyzer/Include.h>
+#include <analyzer/NamespaceCpp.h>
 #include <stdbool.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
@@ -14,7 +15,7 @@
 #include <analyzer/ClassCpp.h>
 
 #line 783 "src/analyzer/Include.pv"
-struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, bool is_struct) {
+struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct) {
     #line 784 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
@@ -25,5 +26,6 @@ struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, bool i
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .fields = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .values = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .namespace = namespace,
     });
 }

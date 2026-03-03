@@ -93,8 +93,9 @@ impl Include {
         path.append(self.path.slice(1, self.path.length - 1));
 
         let file_content = String::new(root.allocator);
-        file_content.append("#include ");
-        file_content.append(self.path);
+        file_content.append("#include <");
+        file_content.append(path.as_str());
+        file_content.append(">");
 
         let filename: *const char = "__temp.c";
         if self.mode_cpp {
@@ -166,7 +167,7 @@ impl Include {
         }
 
         let cursor = clang_getTranslationUnitCursor(unit);
-        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent: 0, types: &self.types, values: &self.values });
+        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent: 0, types: &self.types, values: &self.values, namespace: 0 });
 
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
@@ -286,6 +287,7 @@ struct IncludeContext {
     parent: &IncludeContext,
     types: &HashMap<str, Type>,
     values: &HashMap<str, Type>,
+    namespace: *NamespaceCpp,
 }
 
 struct IncludeObjectContext {
@@ -336,12 +338,6 @@ impl IncludeContext {
         return struct_info;
     }
 
-    fn add_class(&self, name: *const char, is_struct: bool) -> &ClassCpp {
-        let class_info = ClassCpp::new(self.include, name, is_struct);
-        self.insert_type(name, Type::ClassCpp(class_info));
-        return class_info;
-    }
-
     fn add_enum(&self, name: *const char) -> &EnumC {
         let enum_info: &EnumC = EnumC::new(self.include, name);
         self.insert_type(name, Type::EnumC(enum_info));
@@ -367,13 +363,14 @@ impl IncludeContext {
                         parent: self,
                         types: &ns_info.types,
                         values: &ns_info.values,
+                        namespace: ns_info,
                     });
                 },
                 _ => {},
             }
         }
 
-        let ns_info = NamespaceCpp::new(include, name);
+        let ns_info = NamespaceCpp::new(include, name, self.namespace);
         self.insert_type(name, Type::NamespaceCpp(ns_info));
 
         return allocator.store(IncludeContext {
@@ -381,6 +378,7 @@ impl IncludeContext {
             parent: self,
             types: &ns_info.types,
             values: &ns_info.values,
+            namespace: ns_info,
         });
     }
 
@@ -503,7 +501,8 @@ impl IncludeContext {
             defer include.root.allocator.free(type_name);
 
             if language == CXLanguage_CPlusPlus {
-                let class_info = self.add_class(name, kind == CXCursor_StructDecl);
+                let class_info = ClassCpp::new(include, name, self.namespace, kind == CXCursor_StructDecl);
+                self.insert_type(name, Type::ClassCpp(class_info));
 
                 clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
                     context: self,
@@ -777,10 +776,11 @@ struct ClassCpp {
     name: str,
     fields: HashMap<str, Type>,
     values: HashMap<str, Type>,
+    namespace: *NamespaceCpp,
 }
 
 impl ClassCpp {
-    fn new(include: &Include, name: *const char, is_struct: bool) -> &Self {
+    fn new(include: &Include, name: *const char, namespace: *NamespaceCpp, is_struct: bool) -> &Self {
         let allocator = include.root.allocator;
 
         return allocator.store(Self {
@@ -789,6 +789,7 @@ impl ClassCpp {
             name: name,
             fields: HashMap<str, Type>::new(allocator),
             values: HashMap<str, Type>::new(allocator),
+            namespace,
         });
     }
 }
@@ -815,12 +816,13 @@ impl FunctionC {
 struct NamespaceCpp {
     include: &Include,
     name: str,
+    parent: *NamespaceCpp,
     types: HashMap<str, Type>,
     values: HashMap<str, Type>,
 }
 
 impl NamespaceCpp {
-    fn new(include: &Include, name: *const char) -> &Self {
+    fn new(include: &Include, name: *const char, parent: *NamespaceCpp) -> &Self {
         let allocator = include.root.allocator;
 
         return allocator.store(Self {
@@ -828,6 +830,7 @@ impl NamespaceCpp {
             name: name,
             types: HashMap<str, Type>::new(allocator),
             values: HashMap<str, Type>::new(allocator),
+            parent,
         });
     }
 }

@@ -7,21 +7,23 @@
 #include <analyzer/Type.h>
 
 struct Include;
+struct NamespaceCpp;
 
 #include <clang-c/Index.h>
 #include <stdio.h>
 #include <string.h>
 
-#line 774 "src/analyzer/Include.pv"
+#line 773 "src/analyzer/Include.pv"
 struct ClassCpp {
     struct Include* include;
     bool is_struct;
     struct str name;
     struct HashMap_str_Type fields;
     struct HashMap_str_Type values;
+    struct NamespaceCpp* namespace;
 };
 
 #line 783 "src/analyzer/Include.pv"
-struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, bool is_struct);
+struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct);
 
 #endif

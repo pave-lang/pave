@@ -56,10 +56,10 @@ struct Naming Naming__new_c99(struct ArenaAllocator* allocator, struct Naming* n
 #line 113 "src/analyzer/Naming.pv"
 struct String Naming__get_type_name(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 353 "src/analyzer/Naming.pv"
+#line 361 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 381 "src/analyzer/Naming.pv"
+#line 389 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
 #endif
