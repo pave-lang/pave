@@ -171,6 +171,7 @@ impl Tokenizer {
         keywords.append("mod");
         keywords.append("use");
         keywords.append("static");
+        keywords.append("dyn");
 
         // unused for now
         keywords.append("export");

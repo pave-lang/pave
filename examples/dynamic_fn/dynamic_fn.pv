@@ -14,7 +14,7 @@ impl Physics {
     }
 }
 
-fn run(func: &DynFn, objects: &[Object], time: Time, physics: Physics) {
+fn run(func: &dyn Fn, objects: &[Object], time: Time, physics: Physics) {
     let params = func.get_params();
 
     for obj in objects {

@@ -1,5 +1,5 @@
-trait DynFn {
+trait Co<T> {
     fn get_params(&self) -> &Array<TypeId>;
     fn set_arg(&self, index: usize, value: *void) -> bool;
-    fn execute(&self);
+    fn init(&self, allocator: &dyn Allocator) -> &dyn Iter<T>;
 }

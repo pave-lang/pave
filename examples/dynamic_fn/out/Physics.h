@@ -9,8 +9,8 @@ struct Physics {
 };
 
 void Physics__apply_physics(struct Physics* self, struct Position* data, struct Time time);
-#include <std/DynFn.h>
-struct Physics__apply_physics__DynFn__Instance { struct Physics* self; struct Position* data; struct Time time; };
-extern struct DynFnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN;
+#include <std/Fn.h>
+struct Physics__apply_physics__Fn__Instance { struct Physics* self; struct Position* data; struct Time time; };
+extern struct FnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN;
 
 #endif

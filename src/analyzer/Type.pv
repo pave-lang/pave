@@ -3,9 +3,10 @@
 use std
 
 enum IndirectType {
+    Reference,
+    DynamicDispatch,
     Pointer,
     ConstPointer,
-    Reference,
 }
 
 struct Indirect {
@@ -14,19 +15,25 @@ struct Indirect {
 }
 
 impl Indirect {
-    fn new_reference(allocator: &Allocator, to: Type) -> &Self {
+    fn new_reference(allocator: &dyn Allocator, to: Type) -> &Self {
         let result: &Self = allocator.alloc(sizeof(Self));
         *result = Self { type: IndirectType::Reference, to };
         return result;
     }
 
-    fn new_pointer(allocator: &Allocator, to: Type) -> &Self {
+    fn new_dynamic_dispatch(allocator: &dyn Allocator, to: Type) -> &Self {
+        let result: &Self = allocator.alloc(sizeof(Self));
+        *result = Self { type: IndirectType::DynamicDispatch, to };
+        return result;
+    }
+
+    fn new_pointer(allocator: &dyn Allocator, to: Type) -> &Self {
         let result: &Self = allocator.alloc(sizeof(Self));
         *result = Self { type: IndirectType::Pointer, to };
         return result;
     }
 
-    fn new_const_pointer(allocator: &Allocator, to: Type) -> &Self {
+    fn new_const_pointer(allocator: &dyn Allocator, to: Type) -> &Self {
         let result: &Self = allocator.alloc(sizeof(Self));
         *result = Self { type: IndirectType::ConstPointer, to };
         return result;
@@ -65,7 +72,7 @@ struct Tuple {
 }
 
 impl Tuple {
-    fn clone(&self, allocator: &Allocator) -> Self {
+    fn clone(&self, allocator: &dyn Allocator) -> Self {
         return Self { elements: self.elements.clone(allocator) };
     }
 }

@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#line 36 "src/analyzer/Type.pv"
+#line 43 "src/analyzer/Type.pv"
 struct SequenceType {
     enum {
         SEQUENCE_TYPE__FIXED_ARRAY,

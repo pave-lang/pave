@@ -47,7 +47,7 @@ impl Function {
         };
     }
 
-    fn new_allocator(allocator: &Allocator) -> Self {
+    fn new_allocator(allocator: &dyn Allocator) -> Self {
         return Self {
             generics: Generics::new(allocator),
             parameters: Array<Parameter>::new(allocator),

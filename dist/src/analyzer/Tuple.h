@@ -7,12 +7,12 @@
 
 #include <stdio.h>
 
-#line 63 "src/analyzer/Type.pv"
+#line 70 "src/analyzer/Type.pv"
 struct Tuple {
     struct Array_Type elements;
 };
 
-#line 68 "src/analyzer/Type.pv"
+#line 75 "src/analyzer/Type.pv"
 struct Tuple Tuple__clone(struct Tuple* self, struct Allocator allocator);
 
 #endif

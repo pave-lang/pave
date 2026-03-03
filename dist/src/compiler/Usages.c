@@ -1198,7 +1198,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                     #line 576 "src/compiler/Usages.pv"
                                     struct Trait* trait_info = indirect->to.trait_value._0;
                                     #line 577 "src/compiler/Usages.pv"
-                                    if (str__eq(trait_info->name->value, (struct str){ .ptr = "DynStruct", .length = strlen("DynStruct") })) {
+                                    if (str__eq(trait_info->name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
                                         #line 578 "src/compiler/Usages.pv"
                                         uintptr_t ptr = (uintptr_t)(struct_info);
                                         #line 579 "src/compiler/Usages.pv"

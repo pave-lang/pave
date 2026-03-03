@@ -6,7 +6,7 @@ struct Generic {
 }
 
 impl Generic {
-    fn new(allocator: &Allocator) -> Self {
+    fn new(allocator: &dyn Allocator) -> Self {
         return Self { traits: Array<&Trait>::new(allocator) };
     }
 
@@ -45,7 +45,7 @@ struct Generics {
 }
 
 impl Generics {
-    fn new(allocator: &Allocator) -> Self {
+    fn new(allocator: &dyn Allocator) -> Self {
         return Self {
             array: Array<Generic>::new(allocator),
             map: HashMap<str, usize>::new(allocator),

@@ -67,25 +67,25 @@ impl<T> IterEnumerate<T> {
 }
 
 struct Array<T> {
-    allocator: &Allocator,
+    allocator: &dyn Allocator,
     data: &T,
     length: usize,
     capacity: usize,
 }
 
 impl<T> Array<T> {
-    fn new(allocator: &Allocator) -> Self {
+    fn new(allocator: &dyn Allocator) -> Self {
         return Self { allocator };
     }
     
-    fn new_with_length(allocator: &Allocator, length: usize) -> Self {
+    fn new_with_length(allocator: &dyn Allocator, length: usize) -> Self {
         let self = Self { allocator };
         self.reserve(length);
         self.length = length;
         return self;
     }
     
-    fn new_with_capacity(allocator: &Allocator, length: usize) -> Self {
+    fn new_with_capacity(allocator: &dyn Allocator, length: usize) -> Self {
         let self = Self { allocator };
         self.reserve(length);
         return self;
@@ -169,7 +169,7 @@ impl<T> Array<T> {
         self.capacity = 0;
     }
 
-    fn clone(&self, allocator: &Allocator) -> Self {
+    fn clone(&self, allocator: &dyn Allocator) -> Self {
         let data: *T = allocator.alloc(self.capacity * sizeof(T));
         memcpy(data, self.data, self.length * sizeof(T));
 

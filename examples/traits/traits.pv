@@ -26,7 +26,7 @@ impl Print for Data2 {
     }
 }
 
-fn dyn_print(data: &Print) {
+fn dyn_print(data: &dyn Print) {
     data.print();
 }
 
