@@ -3038,7 +3038,16 @@ impl Generator {
 
                         self.write_indent(file);
                         self.write_type(file, generics.self_type, generics);
-                        fprintf(file, "* self = __self; (void)self;\n");
+                        fprintf(file, "* self = ");
+
+                        if module != 0 && module.mode_cpp {
+                            fprintf(file, "(");
+                            self.write_type(file, generics.self_type, generics);
+                            fprintf(file, "*)");
+                        }
+
+                        fprintf(file, "__self");
+                        fprintf(file, "; (void)self;\n");
 
                         let func_context = FunctionContext::new(self.allocator, func_info, true);
                         if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
@@ -3325,7 +3334,16 @@ impl Generator {
 
                     self.write_indent(file);
                     self.write_type(file, generics.self_type, generics);
-                    fprintf(file, "* self = __self; (void)self;\n");
+                    
+                    fprintf(file, "* self = ");
+
+                    if module != 0 && module.mode_cpp {
+                        fprintf(file, "(");
+                        self.write_type(file, generics.self_type, generics);
+                        fprintf(file, "*)");
+                    }
+
+                    fprintf(file, "__self; (void)self;\n");
 
                     let func_context = FunctionContext::new(self.allocator, func_info, true);
                     self.function_context = &func_context;

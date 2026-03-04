@@ -1353,10 +1353,10 @@ impl Expression {
         if !type.eq(&self.return_type) {
             let message = String::new(context.allocator);
             message.append("Type ");
-            let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+            let type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, 0);
             message.append(type_name.as_str());
             message.append(" does not match expression return type of ");
-            let return_type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, 0);
+            let return_type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
             message.append(return_type_name.as_str());
             context.error_token(self.token, message.c_str());
             return false;

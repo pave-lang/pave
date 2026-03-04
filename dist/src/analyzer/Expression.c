@@ -2682,13 +2682,13 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
         #line 1355 "src/analyzer/Expression.pv"
         String__append(&message, (struct str){ .ptr = "Type ", .length = strlen("Type ") });
         #line 1356 "src/analyzer/Expression.pv"
-        struct String type_name = Naming__get_type_decl(&context->root->naming_decl, type, context->type_self, 0);
+        struct String type_name = Naming__get_type_decl(&context->root->naming_decl, &self->return_type, context->type_self, 0);
         #line 1357 "src/analyzer/Expression.pv"
         String__append(&message, String__as_str(&type_name));
         #line 1358 "src/analyzer/Expression.pv"
         String__append(&message, (struct str){ .ptr = " does not match expression return type of ", .length = strlen(" does not match expression return type of ") });
         #line 1359 "src/analyzer/Expression.pv"
-        struct String return_type_name = Naming__get_type_decl(&context->root->naming_decl, &self->return_type, context->type_self, 0);
+        struct String return_type_name = Naming__get_type_decl(&context->root->naming_decl, type, context->type_self, 0);
         #line 1360 "src/analyzer/Expression.pv"
         String__append(&message, String__as_str(&return_type_name));
         #line 1361 "src/analyzer/Expression.pv"
