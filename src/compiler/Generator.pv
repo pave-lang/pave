@@ -3442,6 +3442,10 @@ impl Generator {
             }
 
             fprintf(header_file, "#endif\n\n");
+        } else if self.root.mode_cpp {
+            fprintf(header_file, "#ifdef __cplusplus\n");
+            fprintf(header_file, "extern \"C\" {\n");
+            fprintf(header_file, "#endif\n\n");
         }
 
         for type in generics.array {
@@ -3460,7 +3464,7 @@ impl Generator {
 
         if self.write_struct_definition(header_file, struct_info, usage, generics) == 0 { fclose(header_file); return false; }
 
-        if struct_info.module.mode_cpp {
+        if struct_info.module.mode_cpp || self.root.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");
             fprintf(header_file, "}\n");
             fprintf(header_file, "#endif\n");

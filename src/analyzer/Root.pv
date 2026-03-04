@@ -26,7 +26,7 @@ struct Root {
     hack_type_impl: &TypeImpl,
     includes_c: HashMap<str, &Include>,
     includes_cpp: HashMap<str, &Include>,
-
+    mode_cpp: bool,
 }
 
 impl Root {

@@ -55,6 +55,7 @@ struct Root {
     struct TypeImpl* hack_type_impl;
     struct HashMap_str_ref_Include includes_c;
     struct HashMap_str_ref_Include includes_cpp;
+    bool mode_cpp;
 };
 
 #line 33 "src/analyzer/Root.pv"
