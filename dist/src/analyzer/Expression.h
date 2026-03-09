@@ -85,13 +85,13 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
 #line 887 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse_inner(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 953 "src/analyzer/Expression.pv"
+#line 971 "src/analyzer/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1316 "src/analyzer/Expression.pv"
+#line 1334 "src/analyzer/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 1323 "src/analyzer/Expression.pv"
+#line 1341 "src/analyzer/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type);
 
 #endif

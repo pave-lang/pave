@@ -507,6 +507,13 @@ impl Context {
 
         let new_type = self.module.find_make_type(name.value, &generics_);
 
+        match new_type {
+            Type::NamespaceCpp(ns_info) => {
+                return self.parse_type_namespace_cpp(ns_info, type, generics);
+            },
+            _ => {},
+        }
+
         if new_type != 0 {
             *type = *new_type;
             return true;
@@ -516,6 +523,33 @@ impl Context {
         *type = Type::Unknown(name.value, generics_);
     
         return false;
+    }
+
+    fn parse_type_namespace_cpp(&self, parent: &NamespaceCpp, type: &Type, generics: &Generics) -> bool {
+        let start_pos = self.pos;
+
+        if !self.expect_value(TokenType::Symbol, "::") { return false; }
+
+        let name = self.expect(TokenType::Identifier);
+        if name == 0 { return false; }
+
+        let find_type = parent.types.find(&name.value);
+        if find_type == 0 {
+            self.pos = start_pos;
+            *type = Type::NamespaceCpp(parent);
+            return true;
+        }
+
+        match find_type {
+            Type::NamespaceCpp(ns_info) => {
+                return self.parse_type_namespace_cpp(ns_info, type, generics);
+            },
+            _ => {},
+        }
+
+        *type = *find_type;
+
+        return true;
     }
 
     fn parse_type_trait(&self, type: &Type, generics: &Generics) -> bool {

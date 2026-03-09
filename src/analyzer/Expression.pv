@@ -912,6 +912,24 @@ impl Expression {
             result = Expression::make(context.allocator, token, ExpressionData::BinaryExpression(inner, operator.value, value), Type::Primitive(context.module.find_primitive("bool")).to_ptr(context.allocator));
         } else if token.eq(TokenType::Symbol, "(") {
             match inner.return_type.resolve_typedef_function() {
+                Type::Function(func_info, _) => {
+                    if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                    while context.check_value(TokenType::Symbol, ")") == 0 {
+                        let argument = Expression::parse(context, generics);
+                        arguments.append(InvokeArgument { value: argument });
+
+                        if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                            context.expect_value(TokenType::Symbol, ")");
+                            return 0;
+                        }
+                    }
+                    
+                    if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+                    result = Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), &func_info.return_type);
+                },
                 Type::FunctionC(func_info) => {
                     if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
 
