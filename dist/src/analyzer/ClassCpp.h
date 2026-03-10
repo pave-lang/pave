@@ -14,7 +14,7 @@ struct NamespaceCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 811 "src/analyzer/Include.pv"
+#line 825 "src/analyzer/Include.pv"
 struct ClassCpp {
     struct Include* include;
     bool is_struct;
@@ -25,7 +25,7 @@ struct ClassCpp {
     struct Array_Type bases;
 };
 
-#line 822 "src/analyzer/Include.pv"
+#line 836 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct);
 
 #endif

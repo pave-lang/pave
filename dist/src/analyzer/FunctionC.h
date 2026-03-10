@@ -12,7 +12,7 @@ struct Expression;
 #include <stdio.h>
 #include <string.h>
 
-#line 837 "src/analyzer/Include.pv"
+#line 851 "src/analyzer/Include.pv"
 struct FunctionC {
     struct Include* include;
     struct str name;
@@ -20,7 +20,7 @@ struct FunctionC {
     struct Type return_type;
 };
 
-#line 845 "src/analyzer/Include.pv"
+#line 859 "src/analyzer/Include.pv"
 struct FunctionC* FunctionC__new(struct Include* include, char const* name);
 
 #endif

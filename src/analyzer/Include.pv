@@ -534,8 +534,22 @@ impl IncludeContext {
             defer include.root.allocator.free(type_name);
 
             if language == CXLanguage_CPlusPlus {
-                let class_info = ClassCpp::new(include, name, self.namespace, kind == CXCursor_StructDecl);
-                self.insert_type(name, Type::ClassCpp(class_info));
+                let class_info: *ClassCpp = 0;
+                let class_type = self.types.find(name);
+
+                if class_type != 0 {
+                    match class_type {
+                        Type::ClassCpp(class_info2) => {
+                            class_info = class_info2;
+                        },
+                        _ => {}
+                    }
+                }
+
+                if class_info == 0 {
+                    class_info = ClassCpp::new(include, name, self.namespace, kind == CXCursor_StructDecl);
+                    self.insert_type(name, Type::ClassCpp(class_info));
+                }
 
                 clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
                     context: self,

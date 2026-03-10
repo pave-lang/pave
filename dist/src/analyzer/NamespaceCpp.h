@@ -12,7 +12,7 @@ struct NamespaceCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 856 "src/analyzer/Include.pv"
+#line 870 "src/analyzer/Include.pv"
 struct NamespaceCpp {
     struct Include* include;
     struct str name;
@@ -21,7 +21,7 @@ struct NamespaceCpp {
     struct HashMap_str_Type values;
 };
 
-#line 865 "src/analyzer/Include.pv"
+#line 879 "src/analyzer/Include.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct NamespaceCpp* parent);
 
 #endif

@@ -13,13 +13,13 @@ struct IncludeObjectContext {
     void* object;
 };
 
-#line 649 "src/analyzer/Include.pv"
+#line 663 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_struct(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 669 "src/analyzer/Include.pv"
+#line 683 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 731 "src/analyzer/Include.pv"
+#line 745 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif
