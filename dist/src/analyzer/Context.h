@@ -29,7 +29,6 @@ struct Parameter;
 struct Block;
 struct Generics;
 struct NamespaceCpp;
-struct ClassCpp;
 struct GenericMap;
 struct Array_DeferStatement;
 struct DeferStatement;
@@ -132,9 +131,6 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
 
 #line 526 "src/analyzer/Context.pv"
 bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp* parent, struct Type* type, struct Generics* generics);
-
-#line 556 "src/analyzer/Context.pv"
-bool Context__parse_type_class_cpp(struct Context* self, struct ClassCpp* parent, struct Type* type, struct Generics* generics);
 
 #line 583 "src/analyzer/Context.pv"
 bool Context__parse_type_trait(struct Context* self, struct Type* type, struct Generics* generics);

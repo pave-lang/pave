@@ -542,9 +542,9 @@ impl Context {
             Type::NamespaceCpp(ns_info) => {
                 return self.parse_type_namespace_cpp(ns_info, type, generics);
             },
-            Type::ClassCpp(class_info) => {
-                return self.parse_type_class_cpp(class_info, type, generics);
-            },
+            // Type::ClassCpp(class_info) => {
+            //     return self.parse_type_class_cpp(class_info, type, generics);
+            // },
             _ => {},
         }
 
@@ -553,32 +553,32 @@ impl Context {
         return true;
     }
 
-    fn parse_type_class_cpp(&self, parent: &ClassCpp, type: &Type, generics: &Generics) -> bool {
-        let start_pos = self.pos;
+    // fn parse_type_class_cpp(&self, parent: &ClassCpp, type: &Type, generics: &Generics) -> bool {
+    //     let start_pos = self.pos;
 
-        if !self.expect_value(TokenType::Symbol, "::") { return false; }
+    //     if !self.expect_value(TokenType::Symbol, "::") { return false; }
 
-        let name = self.expect(TokenType::Identifier);
-        if name == 0 { return false; }
+    //     let name = self.expect(TokenType::Identifier);
+    //     if name == 0 { return false; }
 
-        let find_type = parent.types.find(&name.value);
-        if find_type == 0 {
-            self.pos = start_pos;
-            *type = Type::ClassCpp(parent);
-            return true;
-        }
+    //     let find_type = parent.types.find(&name.value);
+    //     if find_type == 0 {
+    //         self.pos = start_pos;
+    //         *type = Type::ClassCpp(parent);
+    //         return true;
+    //     }
 
-        match find_type {
-            Type::ClassCpp(class_info) => {
-                return self.parse_type_class_cpp(class_info, type, generics);
-            },
-            _ => {},
-        }
+    //     match find_type {
+    //         Type::ClassCpp(class_info) => {
+    //             return self.parse_type_class_cpp(class_info, type, generics);
+    //         },
+    //         _ => {},
+    //     }
 
-        *type = *find_type;
+    //     *type = *find_type;
 
-        return true;
-    }
+    //     return true;
+    // }
 
     fn parse_type_trait(&self, type: &Type, generics: &Generics) -> bool {
         let name = self.expect(TokenType::Identifier);

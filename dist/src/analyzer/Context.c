@@ -48,7 +48,6 @@
 #include <analyzer/Tuple.h>
 #include <std/Array_Type.h>
 #include <analyzer/NamespaceCpp.h>
-#include <analyzer/ClassCpp.h>
 #include <analyzer/Trait.h>
 #include <std/ArrayIter_ref_Type.h>
 #include <analyzer/Enum.h>
@@ -906,13 +905,6 @@ bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp
             #line 543 "src/analyzer/Context.pv"
             return Context__parse_type_namespace_cpp(self, ns_info, type, generics);
         } break;
-        #line 545 "src/analyzer/Context.pv"
-        case TYPE__CLASS_CPP: {
-            #line 545 "src/analyzer/Context.pv"
-            struct ClassCpp* class_info = find_type->classcpp_value;
-            #line 546 "src/analyzer/Context.pv"
-            return Context__parse_type_class_cpp(self, class_info, type, generics);
-        } break;
         #line 548 "src/analyzer/Context.pv"
         default: {
         } break;
@@ -922,58 +914,6 @@ bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp
     *type = *find_type;
 
     #line 553 "src/analyzer/Context.pv"
-    return true;
-}
-
-#line 556 "src/analyzer/Context.pv"
-bool Context__parse_type_class_cpp(struct Context* self, struct ClassCpp* parent, struct Type* type, struct Generics* generics) {
-    #line 557 "src/analyzer/Context.pv"
-    uintptr_t start_pos = self->pos;
-
-    #line 559 "src/analyzer/Context.pv"
-    if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 559 "src/analyzer/Context.pv"
-        return false;
-    }
-
-    #line 561 "src/analyzer/Context.pv"
-    struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
-    #line 562 "src/analyzer/Context.pv"
-    if (name == 0) {
-        #line 562 "src/analyzer/Context.pv"
-        return false;
-    }
-
-    #line 564 "src/analyzer/Context.pv"
-    struct Type* find_type = HashMap_str_Type__find(&parent->types, &name->value);
-    #line 565 "src/analyzer/Context.pv"
-    if (find_type == 0) {
-        #line 566 "src/analyzer/Context.pv"
-        self->pos = start_pos;
-        #line 567 "src/analyzer/Context.pv"
-        *type = (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = parent };
-        #line 568 "src/analyzer/Context.pv"
-        return true;
-    }
-
-    #line 571 "src/analyzer/Context.pv"
-    switch (find_type->type) {
-        #line 572 "src/analyzer/Context.pv"
-        case TYPE__CLASS_CPP: {
-            #line 572 "src/analyzer/Context.pv"
-            struct ClassCpp* class_info = find_type->classcpp_value;
-            #line 573 "src/analyzer/Context.pv"
-            return Context__parse_type_class_cpp(self, class_info, type, generics);
-        } break;
-        #line 575 "src/analyzer/Context.pv"
-        default: {
-        } break;
-    }
-
-    #line 578 "src/analyzer/Context.pv"
-    *type = *find_type;
-
-    #line 580 "src/analyzer/Context.pv"
     return true;
 }
 
