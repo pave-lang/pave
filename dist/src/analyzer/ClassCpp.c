@@ -7,19 +7,20 @@
 #include <stdbool.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/Allocator.h>
+#include <std/Array_Type.h>
 #include <std/str.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/Type.h>
+#include <std/Allocator.h>
 
 #include <analyzer/ClassCpp.h>
 
-#line 816 "src/analyzer/Include.pv"
+#line 822 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct) {
-    #line 817 "src/analyzer/Include.pv"
+    #line 823 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 819 "src/analyzer/Include.pv"
+    #line 825 "src/analyzer/Include.pv"
     return ArenaAllocator__store_ClassCpp(allocator, (struct ClassCpp) {
         .include = include,
         .is_struct = is_struct,
@@ -27,5 +28,6 @@ struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct
         .fields = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .values = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .namespace = namespace,
+        .bases = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });
 }

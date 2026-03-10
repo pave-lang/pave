@@ -19,7 +19,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_struct(CXCursor cursor, CX
 #line 669 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 726 "src/analyzer/Include.pv"
+#line 731 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

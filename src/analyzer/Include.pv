@@ -674,6 +674,11 @@ impl IncludeObjectContext {
         let allocator = include.root.allocator;
 
         match kind {
+            CXCursor_CXXBaseSpecifier => {
+                let base_cx_type = clang_getCursorType(cursor);
+                let base_type = include.parse_type(base_cx_type);
+                if base_type != 0 { class_info.bases.append(*base_type); }
+            },
             CXCursor_FieldDecl => {
                 let field_spelling: CXString = clang_getCursorSpelling(cursor);
                 let field_name: *const char = include.make_string(field_spelling);
@@ -810,6 +815,7 @@ struct ClassCpp {
     fields: HashMap<str, Type>,
     values: HashMap<str, Type>,
     namespace: *NamespaceCpp,
+    bases: Array<Type>,
 }
 
 impl ClassCpp {
@@ -823,6 +829,7 @@ impl ClassCpp {
             fields: HashMap<str, Type>::new(allocator),
             values: HashMap<str, Type>::new(allocator),
             namespace,
+            bases: Array<Type>::new(allocator),
         });
     }
 }

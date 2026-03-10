@@ -11,14 +11,14 @@ struct Include;
 #include <stdio.h>
 #include <string.h>
 
-#line 761 "src/analyzer/Include.pv"
+#line 766 "src/analyzer/Include.pv"
 struct EnumC {
     struct Include* include;
     struct str name;
     struct HashMap_str_EnumCValue values;
 };
 
-#line 768 "src/analyzer/Include.pv"
+#line 773 "src/analyzer/Include.pv"
 struct EnumC* EnumC__new(struct Include* include, char const* name);
 
 #endif

@@ -173,6 +173,11 @@ impl Expression {
                 let value_type = class_info.values.find(&member.value);
                 if value_type != 0 { return value_type; }
 
+                for base in class_info.bases {
+                    let base_type = Expression::get_member_type(context, base, member, output_error);
+                    if base_type != 0 { return base_type; }
+                }
+
                 if output_error { context.error_token(member, "Field not found in Cpp class/struct"); }
                 return 0;
             },
