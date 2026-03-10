@@ -349,6 +349,20 @@ impl Module {
                     if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     primitive_info.impls.append(impl_info);
                 },
+                Type::StructC(info) => {
+                    let ctype = self.root.add_ctype(info.name.ptr);
+                    impl_info.type_self = *impl_info.type;
+
+                    if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    ctype.impls.append(impl_info);
+                },
+                Type::EnumC(info) => {
+                    let ctype = self.root.add_ctype(info.name.ptr);
+                    impl_info.type_self = *impl_info.type;
+
+                    if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    ctype.impls.append(impl_info);
+                },
                 Type::TypedefC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
                     impl_info.type_self = *impl_info.type;

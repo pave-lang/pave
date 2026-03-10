@@ -56,6 +56,8 @@
 #include <std/ArrayIter_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/Primitive.h>
+#include <analyzer/StructC.h>
+#include <analyzer/EnumC.h>
 #include <analyzer/TypedefC.h>
 #include <tuple_usize_ref_ref_Impl.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>
@@ -684,9 +686,9 @@ bool Module__parse_declarations(struct Module* self) {
                 Array_ref_Impl__append(&primitive_info->impls, impl_info);
             } break;
             #line 352 "src/analyzer/Module.pv"
-            case TYPE__TYPEDEF_C: {
+            case TYPE__STRUCT_C: {
                 #line 352 "src/analyzer/Module.pv"
-                struct TypedefC* info = impl_info->type->typedefc_value;
+                struct StructC* info = impl_info->type->structc_value;
                 #line 353 "src/analyzer/Module.pv"
                 struct Primitive* ctype = Root__add_ctype(self->root, info->name.ptr);
                 #line 354 "src/analyzer/Module.pv"
@@ -701,504 +703,538 @@ bool Module__parse_declarations(struct Module* self) {
                 Array_ref_Impl__append(&ctype->impls, impl_info);
             } break;
             #line 359 "src/analyzer/Module.pv"
-            case TYPE__INDIRECT: {
+            case TYPE__ENUM_C: {
+                #line 359 "src/analyzer/Module.pv"
+                struct EnumC* info = impl_info->type->enumc_value;
                 #line 360 "src/analyzer/Module.pv"
-                impl_info->type_self = *impl_info->type;
+                struct Primitive* ctype = Root__add_ctype(self->root, info->name.ptr);
                 #line 361 "src/analyzer/Module.pv"
+                impl_info->type_self = *impl_info->type;
+
+                #line 363 "src/analyzer/Module.pv"
+                if (impl_info->trait_ != 0) {
+                    #line 363 "src/analyzer/Module.pv"
+                    HashMap_str_ref_Trait__insert(&ctype->traits, impl_info->trait_->name->value, impl_info->trait_);
+                }
+                #line 364 "src/analyzer/Module.pv"
+                Array_ref_Impl__append(&ctype->impls, impl_info);
+            } break;
+            #line 366 "src/analyzer/Module.pv"
+            case TYPE__TYPEDEF_C: {
+                #line 366 "src/analyzer/Module.pv"
+                struct TypedefC* info = impl_info->type->typedefc_value;
+                #line 367 "src/analyzer/Module.pv"
+                struct Primitive* ctype = Root__add_ctype(self->root, info->name.ptr);
+                #line 368 "src/analyzer/Module.pv"
+                impl_info->type_self = *impl_info->type;
+
+                #line 370 "src/analyzer/Module.pv"
+                if (impl_info->trait_ != 0) {
+                    #line 370 "src/analyzer/Module.pv"
+                    HashMap_str_ref_Trait__insert(&ctype->traits, impl_info->trait_->name->value, impl_info->trait_);
+                }
+                #line 371 "src/analyzer/Module.pv"
+                Array_ref_Impl__append(&ctype->impls, impl_info);
+            } break;
+            #line 373 "src/analyzer/Module.pv"
+            case TYPE__INDIRECT: {
+                #line 374 "src/analyzer/Module.pv"
+                impl_info->type_self = *impl_info->type;
+                #line 375 "src/analyzer/Module.pv"
                 Array_TypeImpl__append(&self->type_impls, TypeImpl__new(allocator, *impl_info->type, impl_info));
-                #line 362 "src/analyzer/Module.pv"
+                #line 376 "src/analyzer/Module.pv"
                 self->root->hack_type_impl = Array_TypeImpl__back(&self->type_impls);
             } break;
-            #line 364 "src/analyzer/Module.pv"
+            #line 378 "src/analyzer/Module.pv"
             default: {
-                #line 364 "src/analyzer/Module.pv"
+                #line 378 "src/analyzer/Module.pv"
                 Context__error_token(&self->context, impl_info->name, "TODO: Currently unimplemented");
             } break;
         }
     } }
 
-    #line 368 "src/analyzer/Module.pv"
+    #line 382 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Enum __iter = HashMap_str_Enum__iter(&self->enums);
-    #line 368 "src/analyzer/Module.pv"
+    #line 382 "src/analyzer/Module.pv"
     while (HashMapIter_str_Enum__next(&__iter)) {
-        #line 368 "src/analyzer/Module.pv"
+        #line 382 "src/analyzer/Module.pv"
         struct Enum* enum_info = &HashMapIter_str_Enum__value(&__iter)->_1;
 
-        #line 369 "src/analyzer/Module.pv"
+        #line 383 "src/analyzer/Module.pv"
         struct GenericMap* generics = ArenaAllocator__store_GenericMap(allocator, (struct GenericMap) {});
-        #line 370 "src/analyzer/Module.pv"
+        #line 384 "src/analyzer/Module.pv"
         struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-        #line 371 "src/analyzer/Module.pv"
+        #line 385 "src/analyzer/Module.pv"
         generics->self_type = self_type;
-        #line 372 "src/analyzer/Module.pv"
+        #line 386 "src/analyzer/Module.pv"
         *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = generics} };
-        #line 373 "src/analyzer/Module.pv"
+        #line 387 "src/analyzer/Module.pv"
         enum_info->context->type_self = self_type;
 
-        #line 375 "src/analyzer/Module.pv"
+        #line 389 "src/analyzer/Module.pv"
         Enum__fill_variants(enum_info);
 
-        #line 377 "src/analyzer/Module.pv"
+        #line 391 "src/analyzer/Module.pv"
         { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&enum_info->impls));
-        #line 377 "src/analyzer/Module.pv"
+        #line 391 "src/analyzer/Module.pv"
         while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-            #line 377 "src/analyzer/Module.pv"
+            #line 391 "src/analyzer/Module.pv"
             uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-            #line 377 "src/analyzer/Module.pv"
+            #line 391 "src/analyzer/Module.pv"
             struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-            #line 378 "src/analyzer/Module.pv"
+            #line 392 "src/analyzer/Module.pv"
             struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__ENUM, .enum_value = { ._0 = enum_info, ._1 = impl_index, ._2 = impl_info->trait_} };
-            #line 379 "src/analyzer/Module.pv"
+            #line 393 "src/analyzer/Module.pv"
             Impl__fill_types(impl_info, parent);
 
-            #line 381 "src/analyzer/Module.pv"
+            #line 395 "src/analyzer/Module.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-            #line 381 "src/analyzer/Module.pv"
+            #line 395 "src/analyzer/Module.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 381 "src/analyzer/Module.pv"
+                #line 395 "src/analyzer/Module.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 382 "src/analyzer/Module.pv"
+                #line 396 "src/analyzer/Module.pv"
                 Function__fill_types(func_info, &impl_info->impl_generics);
             } }
         } }
     } }
 
-    #line 387 "src/analyzer/Module.pv"
+    #line 401 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Struct __iter = HashMap_str_Struct__iter(&self->structs);
-    #line 387 "src/analyzer/Module.pv"
+    #line 401 "src/analyzer/Module.pv"
     while (HashMapIter_str_Struct__next(&__iter)) {
-        #line 387 "src/analyzer/Module.pv"
+        #line 401 "src/analyzer/Module.pv"
         struct Struct* struct_info = &HashMapIter_str_Struct__value(&__iter)->_1;
 
-        #line 388 "src/analyzer/Module.pv"
+        #line 402 "src/analyzer/Module.pv"
         Struct__fill_types(struct_info);
 
-        #line 390 "src/analyzer/Module.pv"
+        #line 404 "src/analyzer/Module.pv"
         { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
-        #line 390 "src/analyzer/Module.pv"
+        #line 404 "src/analyzer/Module.pv"
         while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-            #line 390 "src/analyzer/Module.pv"
+            #line 404 "src/analyzer/Module.pv"
             uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-            #line 390 "src/analyzer/Module.pv"
+            #line 404 "src/analyzer/Module.pv"
             struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-            #line 391 "src/analyzer/Module.pv"
+            #line 405 "src/analyzer/Module.pv"
             struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__STRUCT, .struct_value = { ._0 = struct_info, ._1 = impl_index, ._2 = impl_info->trait_} };
-            #line 392 "src/analyzer/Module.pv"
+            #line 406 "src/analyzer/Module.pv"
             Impl__fill_types(impl_info, parent);
 
-            #line 394 "src/analyzer/Module.pv"
+            #line 408 "src/analyzer/Module.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-            #line 394 "src/analyzer/Module.pv"
+            #line 408 "src/analyzer/Module.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 394 "src/analyzer/Module.pv"
+                #line 408 "src/analyzer/Module.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 395 "src/analyzer/Module.pv"
+                #line 409 "src/analyzer/Module.pv"
                 Function__fill_types(func_info, &impl_info->impl_generics);
             } }
         } }
     } }
 
-    #line 400 "src/analyzer/Module.pv"
+    #line 414 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Trait __iter = HashMap_str_Trait__iter(&self->traits);
-    #line 400 "src/analyzer/Module.pv"
+    #line 414 "src/analyzer/Module.pv"
     while (HashMapIter_str_Trait__next(&__iter)) {
-        #line 400 "src/analyzer/Module.pv"
+        #line 414 "src/analyzer/Module.pv"
         struct Trait* trait_info = &HashMapIter_str_Trait__value(&__iter)->_1;
 
-        #line 401 "src/analyzer/Module.pv"
+        #line 415 "src/analyzer/Module.pv"
         struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TRAIT, .trait_value = trait_info };
-        #line 402 "src/analyzer/Module.pv"
+        #line 416 "src/analyzer/Module.pv"
         Trait__fill_types(trait_info, parent);
 
-        #line 404 "src/analyzer/Module.pv"
+        #line 418 "src/analyzer/Module.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-        #line 404 "src/analyzer/Module.pv"
+        #line 418 "src/analyzer/Module.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 404 "src/analyzer/Module.pv"
+            #line 418 "src/analyzer/Module.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 405 "src/analyzer/Module.pv"
+            #line 419 "src/analyzer/Module.pv"
             Function__fill_types(func_info, &trait_info->generics);
         } }
     } }
 
-    #line 409 "src/analyzer/Module.pv"
+    #line 423 "src/analyzer/Module.pv"
     { struct ArrayIter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
-    #line 409 "src/analyzer/Module.pv"
+    #line 423 "src/analyzer/Module.pv"
     while (ArrayIter_ref_TypeImpl__next(&__iter)) {
-        #line 409 "src/analyzer/Module.pv"
+        #line 423 "src/analyzer/Module.pv"
         struct TypeImpl* type_impl = ArrayIter_ref_TypeImpl__value(&__iter);
 
-        #line 410 "src/analyzer/Module.pv"
+        #line 424 "src/analyzer/Module.pv"
         struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = &type_impl->type, ._1 = 0, ._2 = 0} };
-        #line 411 "src/analyzer/Module.pv"
+        #line 425 "src/analyzer/Module.pv"
         Impl__fill_types(type_impl->impl_info, parent);
 
-        #line 413 "src/analyzer/Module.pv"
+        #line 427 "src/analyzer/Module.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&type_impl->impl_info->functions);
-        #line 413 "src/analyzer/Module.pv"
+        #line 427 "src/analyzer/Module.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 413 "src/analyzer/Module.pv"
+            #line 427 "src/analyzer/Module.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 414 "src/analyzer/Module.pv"
+            #line 428 "src/analyzer/Module.pv"
             Function__fill_types(func_info, &type_impl->impl_info->impl_generics);
         } }
     } }
 
-    #line 418 "src/analyzer/Module.pv"
+    #line 432 "src/analyzer/Module.pv"
     return 1;
 }
 
-#line 421 "src/analyzer/Module.pv"
+#line 435 "src/analyzer/Module.pv"
 bool Module__parse_functions(struct Module* self) {
-    #line 422 "src/analyzer/Module.pv"
+    #line 436 "src/analyzer/Module.pv"
     struct ArenaAllocator* allocator = self->namespace->root->allocator;
 
-    #line 424 "src/analyzer/Module.pv"
+    #line 438 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 424 "src/analyzer/Module.pv"
+    #line 438 "src/analyzer/Module.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 424 "src/analyzer/Module.pv"
+        #line 438 "src/analyzer/Module.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 425 "src/analyzer/Module.pv"
+        #line 439 "src/analyzer/Module.pv"
         struct Generics generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
-        #line 426 "src/analyzer/Module.pv"
+        #line 440 "src/analyzer/Module.pv"
         Function__parse_function(func_info, &generics);
     } }
 
-    #line 429 "src/analyzer/Module.pv"
+    #line 443 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Enum __iter = HashMap_str_Enum__iter(&self->enums);
-    #line 429 "src/analyzer/Module.pv"
+    #line 443 "src/analyzer/Module.pv"
     while (HashMapIter_str_Enum__next(&__iter)) {
-        #line 429 "src/analyzer/Module.pv"
+        #line 443 "src/analyzer/Module.pv"
         struct Enum* enum_info = &HashMapIter_str_Enum__value(&__iter)->_1;
 
-        #line 430 "src/analyzer/Module.pv"
+        #line 444 "src/analyzer/Module.pv"
         struct GenericMap* generics = ArenaAllocator__store_GenericMap(allocator, (struct GenericMap) {});
-        #line 431 "src/analyzer/Module.pv"
+        #line 445 "src/analyzer/Module.pv"
         struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-        #line 432 "src/analyzer/Module.pv"
+        #line 446 "src/analyzer/Module.pv"
         generics->self_type = self_type;
-        #line 433 "src/analyzer/Module.pv"
+        #line 447 "src/analyzer/Module.pv"
         *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = generics} };
-        #line 434 "src/analyzer/Module.pv"
+        #line 448 "src/analyzer/Module.pv"
         enum_info->context->type_self = self_type;
 
-        #line 436 "src/analyzer/Module.pv"
+        #line 450 "src/analyzer/Module.pv"
         { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
-        #line 436 "src/analyzer/Module.pv"
+        #line 450 "src/analyzer/Module.pv"
         while (ArrayIter_ref_ref_Impl__next(&__iter)) {
-            #line 436 "src/analyzer/Module.pv"
+            #line 450 "src/analyzer/Module.pv"
             struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
 
-            #line 437 "src/analyzer/Module.pv"
+            #line 451 "src/analyzer/Module.pv"
             Impl__parse_functions(impl_info);
         } }
-    } }
-
-    #line 441 "src/analyzer/Module.pv"
-    { struct HashMapIter_str_Struct __iter = HashMap_str_Struct__iter(&self->structs);
-    #line 441 "src/analyzer/Module.pv"
-    while (HashMapIter_str_Struct__next(&__iter)) {
-        #line 441 "src/analyzer/Module.pv"
-        struct Struct* struct_info = &HashMapIter_str_Struct__value(&__iter)->_1;
-
-        #line 442 "src/analyzer/Module.pv"
-        { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-        #line 442 "src/analyzer/Module.pv"
-        while (ArrayIter_ref_ref_Impl__next(&__iter)) {
-            #line 442 "src/analyzer/Module.pv"
-            struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
-
-            #line 443 "src/analyzer/Module.pv"
-            Impl__parse_functions(impl_info);
-        } }
-    } }
-
-    #line 447 "src/analyzer/Module.pv"
-    { struct HashMapIter_str_Trait __iter = HashMap_str_Trait__iter(&self->traits);
-    #line 447 "src/analyzer/Module.pv"
-    while (HashMapIter_str_Trait__next(&__iter)) {
-        #line 447 "src/analyzer/Module.pv"
-        struct Trait* trait_info = &HashMapIter_str_Trait__value(&__iter)->_1;
-
-        #line 448 "src/analyzer/Module.pv"
-        Trait__parse_functions(trait_info);
-    } }
-
-    #line 451 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
-    #line 451 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_TypeImpl__next(&__iter)) {
-        #line 451 "src/analyzer/Module.pv"
-        struct TypeImpl* type_impl = ArrayIter_ref_TypeImpl__value(&__iter);
-
-        #line 452 "src/analyzer/Module.pv"
-        Impl__parse_functions(type_impl->impl_info);
     } }
 
     #line 455 "src/analyzer/Module.pv"
+    { struct HashMapIter_str_Struct __iter = HashMap_str_Struct__iter(&self->structs);
+    #line 455 "src/analyzer/Module.pv"
+    while (HashMapIter_str_Struct__next(&__iter)) {
+        #line 455 "src/analyzer/Module.pv"
+        struct Struct* struct_info = &HashMapIter_str_Struct__value(&__iter)->_1;
+
+        #line 456 "src/analyzer/Module.pv"
+        { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
+        #line 456 "src/analyzer/Module.pv"
+        while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+            #line 456 "src/analyzer/Module.pv"
+            struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+
+            #line 457 "src/analyzer/Module.pv"
+            Impl__parse_functions(impl_info);
+        } }
+    } }
+
+    #line 461 "src/analyzer/Module.pv"
+    { struct HashMapIter_str_Trait __iter = HashMap_str_Trait__iter(&self->traits);
+    #line 461 "src/analyzer/Module.pv"
+    while (HashMapIter_str_Trait__next(&__iter)) {
+        #line 461 "src/analyzer/Module.pv"
+        struct Trait* trait_info = &HashMapIter_str_Trait__value(&__iter)->_1;
+
+        #line 462 "src/analyzer/Module.pv"
+        Trait__parse_functions(trait_info);
+    } }
+
+    #line 465 "src/analyzer/Module.pv"
+    { struct ArrayIter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
+    #line 465 "src/analyzer/Module.pv"
+    while (ArrayIter_ref_TypeImpl__next(&__iter)) {
+        #line 465 "src/analyzer/Module.pv"
+        struct TypeImpl* type_impl = ArrayIter_ref_TypeImpl__value(&__iter);
+
+        #line 466 "src/analyzer/Module.pv"
+        Impl__parse_functions(type_impl->impl_info);
+    } }
+
+    #line 469 "src/analyzer/Module.pv"
     return 1;
 }
 
-#line 458 "src/analyzer/Module.pv"
+#line 472 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name) {
-    #line 459 "src/analyzer/Module.pv"
+    #line 473 "src/analyzer/Module.pv"
     struct Type* type = HashMap_str_Type__find(&self->types, &name);
-    #line 460 "src/analyzer/Module.pv"
+    #line 474 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 460 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 462 "src/analyzer/Module.pv"
-    type = Namespace__find_type(self->namespace, name);
-    #line 463 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 463 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 465 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 465 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
-        #line 465 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
-
-        #line 466 "src/analyzer/Module.pv"
-        type = Namespace__find_type(namespace, name);
-        #line 467 "src/analyzer/Module.pv"
-        if (type != 0) {
-            #line 467 "src/analyzer/Module.pv"
-            return type;
-        }
-    } }
-
-    #line 470 "src/analyzer/Module.pv"
-    type = Root__find_type(self->namespace->root, name);
-    #line 471 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 471 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 473 "src/analyzer/Module.pv"
-    { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 473 "src/analyzer/Module.pv"
-    while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 473 "src/analyzer/Module.pv"
-        struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
-
         #line 474 "src/analyzer/Module.pv"
-        type = HashMap_str_Type__find(&include->types, &name);
-        #line 475 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 476 "src/analyzer/Module.pv"
+    type = Namespace__find_type(self->namespace, name);
+    #line 477 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 477 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 479 "src/analyzer/Module.pv"
+    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    #line 479 "src/analyzer/Module.pv"
+    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+        #line 479 "src/analyzer/Module.pv"
+        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
+
+        #line 480 "src/analyzer/Module.pv"
+        type = Namespace__find_type(namespace, name);
+        #line 481 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 475 "src/analyzer/Module.pv"
+            #line 481 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 478 "src/analyzer/Module.pv"
-    return 0;
-}
-
-#line 481 "src/analyzer/Module.pv"
-struct Trait* Module__find_trait(struct Module* self, struct str name) {
-    #line 482 "src/analyzer/Module.pv"
-    struct Trait* type = Root__find_trait(self->namespace->root, name);
-    #line 483 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 483 "src/analyzer/Module.pv"
-        return type;
-    }
-
+    #line 484 "src/analyzer/Module.pv"
+    type = Root__find_type(self->namespace->root, name);
     #line 485 "src/analyzer/Module.pv"
-    type = Namespace__find_trait(self->namespace, name);
-    #line 486 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 486 "src/analyzer/Module.pv"
+        #line 485 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 488 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 488 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
-        #line 488 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
-
-        #line 489 "src/analyzer/Module.pv"
-        type = Namespace__find_trait(namespace, name);
-        #line 490 "src/analyzer/Module.pv"
-        if (type != 0) {
-            #line 490 "src/analyzer/Module.pv"
-            return type;
-        }
-    } }
-
-    #line 493 "src/analyzer/Module.pv"
-    return 0;
-}
-
-#line 496 "src/analyzer/Module.pv"
-struct Type* Module__find_function(struct Module* self, struct str name) {
-    #line 497 "src/analyzer/Module.pv"
-    struct Type* type = Root__find_function(self->namespace->root, name);
-    #line 498 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 498 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 500 "src/analyzer/Module.pv"
-    type = Namespace__find_function(self->namespace, name);
-    #line 501 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 501 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 503 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 503 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
-        #line 503 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
-
-        #line 504 "src/analyzer/Module.pv"
-        type = Namespace__find_function(namespace, name);
-        #line 505 "src/analyzer/Module.pv"
-        if (type != 0) {
-            #line 505 "src/analyzer/Module.pv"
-            return type;
-        }
-    } }
-
-    #line 508 "src/analyzer/Module.pv"
-    return 0;
-}
-
-#line 511 "src/analyzer/Module.pv"
-struct Type* Module__find_value(struct Module* self, struct str name) {
-    #line 512 "src/analyzer/Module.pv"
+    #line 487 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 512 "src/analyzer/Module.pv"
+    #line 487 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 512 "src/analyzer/Module.pv"
+        #line 487 "src/analyzer/Module.pv"
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-        #line 513 "src/analyzer/Module.pv"
-        struct Type* type = HashMap_str_Type__find(&include->values, &name);
-        #line 514 "src/analyzer/Module.pv"
+        #line 488 "src/analyzer/Module.pv"
+        type = HashMap_str_Type__find(&include->types, &name);
+        #line 489 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 514 "src/analyzer/Module.pv"
+            #line 489 "src/analyzer/Module.pv"
             return type;
         }
     } }
+
+    #line 492 "src/analyzer/Module.pv"
+    return 0;
+}
+
+#line 495 "src/analyzer/Module.pv"
+struct Trait* Module__find_trait(struct Module* self, struct str name) {
+    #line 496 "src/analyzer/Module.pv"
+    struct Trait* type = Root__find_trait(self->namespace->root, name);
+    #line 497 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 497 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 499 "src/analyzer/Module.pv"
+    type = Namespace__find_trait(self->namespace, name);
+    #line 500 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 500 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 502 "src/analyzer/Module.pv"
+    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    #line 502 "src/analyzer/Module.pv"
+    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+        #line 502 "src/analyzer/Module.pv"
+        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
+
+        #line 503 "src/analyzer/Module.pv"
+        type = Namespace__find_trait(namespace, name);
+        #line 504 "src/analyzer/Module.pv"
+        if (type != 0) {
+            #line 504 "src/analyzer/Module.pv"
+            return type;
+        }
+    } }
+
+    #line 507 "src/analyzer/Module.pv"
+    return 0;
+}
+
+#line 510 "src/analyzer/Module.pv"
+struct Type* Module__find_function(struct Module* self, struct str name) {
+    #line 511 "src/analyzer/Module.pv"
+    struct Type* type = Root__find_function(self->namespace->root, name);
+    #line 512 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 512 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 514 "src/analyzer/Module.pv"
+    type = Namespace__find_function(self->namespace, name);
+    #line 515 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 515 "src/analyzer/Module.pv"
+        return type;
+    }
 
     #line 517 "src/analyzer/Module.pv"
-    return 0;
-}
+    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    #line 517 "src/analyzer/Module.pv"
+    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+        #line 517 "src/analyzer/Module.pv"
+        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
 
-#line 520 "src/analyzer/Module.pv"
-struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types) {
-    #line 521 "src/analyzer/Module.pv"
-    struct Type* type = Module__find_type(self, name);
+        #line 518 "src/analyzer/Module.pv"
+        type = Namespace__find_function(namespace, name);
+        #line 519 "src/analyzer/Module.pv"
+        if (type != 0) {
+            #line 519 "src/analyzer/Module.pv"
+            return type;
+        }
+    } }
+
     #line 522 "src/analyzer/Module.pv"
-    return Module__make_type_usage(self, type, usage_types);
+    return 0;
 }
 
 #line 525 "src/analyzer/Module.pv"
-struct Type* Module__make_type_usage(struct Module* self, struct Type* type, struct Array_Type* usage_types) {
+struct Type* Module__find_value(struct Module* self, struct str name) {
     #line 526 "src/analyzer/Module.pv"
-    if (type == 0) {
+    { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
+    #line 526 "src/analyzer/Module.pv"
+    while (HashMapIter_str_ref_Include__next(&__iter)) {
         #line 526 "src/analyzer/Module.pv"
+        struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
+
+        #line 527 "src/analyzer/Module.pv"
+        struct Type* type = HashMap_str_Type__find(&include->values, &name);
+        #line 528 "src/analyzer/Module.pv"
+        if (type != 0) {
+            #line 528 "src/analyzer/Module.pv"
+            return type;
+        }
+    } }
+
+    #line 531 "src/analyzer/Module.pv"
+    return 0;
+}
+
+#line 534 "src/analyzer/Module.pv"
+struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types) {
+    #line 535 "src/analyzer/Module.pv"
+    struct Type* type = Module__find_type(self, name);
+    #line 536 "src/analyzer/Module.pv"
+    return Module__make_type_usage(self, type, usage_types);
+}
+
+#line 539 "src/analyzer/Module.pv"
+struct Type* Module__make_type_usage(struct Module* self, struct Type* type, struct Array_Type* usage_types) {
+    #line 540 "src/analyzer/Module.pv"
+    if (type == 0) {
+        #line 540 "src/analyzer/Module.pv"
         return 0;
     }
-    #line 527 "src/analyzer/Module.pv"
+    #line 541 "src/analyzer/Module.pv"
     struct ArenaAllocator* allocator = self->namespace->root->allocator;
 
-    #line 529 "src/analyzer/Module.pv"
+    #line 543 "src/analyzer/Module.pv"
     switch (type->type) {
-        #line 530 "src/analyzer/Module.pv"
-        case TYPE__ENUM: {
-            #line 530 "src/analyzer/Module.pv"
-            struct Enum* enum_info = type->enum_value._0;
-            #line 531 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &enum_info->generics, usage_types);
-            #line 532 "src/analyzer/Module.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 533 "src/analyzer/Module.pv"
-            generics.self_type = self_type;
-            #line 534 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
-            #line 535 "src/analyzer/Module.pv"
-            return self_type;
-        } break;
-        #line 537 "src/analyzer/Module.pv"
-        case TYPE__STRUCT: {
-            #line 537 "src/analyzer/Module.pv"
-            struct Struct* struct_info = type->struct_value._0;
-            #line 538 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &struct_info->generics, usage_types);
-            #line 539 "src/analyzer/Module.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 540 "src/analyzer/Module.pv"
-            generics.self_type = self_type;
-            #line 541 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
-            #line 542 "src/analyzer/Module.pv"
-            return self_type;
-        } break;
         #line 544 "src/analyzer/Module.pv"
-        case TYPE__TRAIT: {
+        case TYPE__ENUM: {
             #line 544 "src/analyzer/Module.pv"
-            struct Trait* trait_info = type->trait_value._0;
+            struct Enum* enum_info = type->enum_value._0;
             #line 545 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &trait_info->generics, usage_types);
+            struct GenericMap generics = GenericMap__new(allocator, &enum_info->generics, usage_types);
             #line 546 "src/analyzer/Module.pv"
             struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
             #line 547 "src/analyzer/Module.pv"
             generics.self_type = self_type;
             #line 548 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
             #line 549 "src/analyzer/Module.pv"
             return self_type;
         } break;
         #line 551 "src/analyzer/Module.pv"
-        case TYPE__FUNCTION: {
+        case TYPE__STRUCT: {
             #line 551 "src/analyzer/Module.pv"
-            struct Function* function_info = type->function_value._0;
+            struct Struct* struct_info = type->struct_value._0;
             #line 552 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &function_info->generics, usage_types);
+            struct GenericMap generics = GenericMap__new(allocator, &struct_info->generics, usage_types);
             #line 553 "src/analyzer/Module.pv"
             struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
             #line 554 "src/analyzer/Module.pv"
             generics.self_type = self_type;
             #line 555 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
             #line 556 "src/analyzer/Module.pv"
             return self_type;
         } break;
         #line 558 "src/analyzer/Module.pv"
-        default: {
+        case TYPE__TRAIT: {
             #line 558 "src/analyzer/Module.pv"
+            struct Trait* trait_info = type->trait_value._0;
+            #line 559 "src/analyzer/Module.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &trait_info->generics, usage_types);
+            #line 560 "src/analyzer/Module.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 561 "src/analyzer/Module.pv"
+            generics.self_type = self_type;
+            #line 562 "src/analyzer/Module.pv"
+            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            #line 563 "src/analyzer/Module.pv"
+            return self_type;
+        } break;
+        #line 565 "src/analyzer/Module.pv"
+        case TYPE__FUNCTION: {
+            #line 565 "src/analyzer/Module.pv"
+            struct Function* function_info = type->function_value._0;
+            #line 566 "src/analyzer/Module.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &function_info->generics, usage_types);
+            #line 567 "src/analyzer/Module.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 568 "src/analyzer/Module.pv"
+            generics.self_type = self_type;
+            #line 569 "src/analyzer/Module.pv"
+            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            #line 570 "src/analyzer/Module.pv"
+            return self_type;
+        } break;
+        #line 572 "src/analyzer/Module.pv"
+        default: {
+            #line 572 "src/analyzer/Module.pv"
             return type;
         } break;
     }
 }
 
-#line 562 "src/analyzer/Module.pv"
+#line 576 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, char const* name) {
-    #line 563 "src/analyzer/Module.pv"
+    #line 577 "src/analyzer/Module.pv"
     struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
-    #line 564 "src/analyzer/Module.pv"
+    #line 578 "src/analyzer/Module.pv"
     return HashMap_str_Primitive__find(primitives, &(struct str){ .ptr = name, .length = strlen(name) });
 }
