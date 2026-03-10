@@ -13,7 +13,7 @@ struct NamespaceCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 773 "src/analyzer/Include.pv"
+#line 806 "src/analyzer/Include.pv"
 struct ClassCpp {
     struct Include* include;
     bool is_struct;
@@ -23,7 +23,7 @@ struct ClassCpp {
     struct NamespaceCpp* namespace;
 };
 
-#line 783 "src/analyzer/Include.pv"
+#line 816 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct);
 
 #endif

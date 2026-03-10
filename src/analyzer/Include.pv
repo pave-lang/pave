@@ -200,6 +200,42 @@ impl Include {
         
         if type.kind == CXType_Elaborated {
             let decl = clang_getTypeDeclaration(type);
+
+            let ns_chain = Array<CXCursor>::new(self.root.allocator);
+            let parent = clang_getCursorSemanticParent(decl);
+            while clang_getCursorKind(parent) == CXCursor_Namespace {
+                ns_chain.append(parent);
+                parent = clang_getCursorSemanticParent(parent);
+            }
+
+            if ns_chain.length > 0 {
+                let current_types = &self.types;
+                let i = ns_chain.length;
+                while i > 0 {
+                    i -= 1;
+                    let ns_spelling = clang_getCursorSpelling(ns_chain.data[i]);
+                    let ns_name = clang_getCString(ns_spelling);
+
+                    let ns_type = current_types.find(ns_name);
+                    clang_disposeString(ns_spelling);
+
+                    if ns_type == 0 { return &self.root.type_void; }
+
+                    match ns_type {
+                        Type::NamespaceCpp(ns_info) => { current_types = &ns_info.types; },
+                        _ => { return &self.root.type_void; }
+                    }
+                }
+
+                let name_spelling = clang_getCursorSpelling(decl);
+                let name = clang_getCString(name_spelling);
+                let lookup = current_types.find(name);
+                clang_disposeString(name_spelling);
+
+                if lookup != 0 { return lookup; }
+                return &self.root.type_void;
+            }
+
             let name_spelling = clang_getCursorSpelling(decl);
             let name = clang_getCString(name_spelling);
 
@@ -210,12 +246,9 @@ impl Include {
             }
 
             let lookup = self.types.find(name);
-            if lookup == 0 { /*fprintf(stderr, "Could not find elaborated type %s\n", name_str.ptr);*/ }
-
             clang_disposeString(name_spelling);
 
             if lookup == 0 { return &self.root.type_void; }
-
             return lookup;
         }
 

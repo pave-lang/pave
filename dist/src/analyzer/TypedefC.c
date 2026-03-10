@@ -10,12 +10,12 @@
 
 #include <analyzer/TypedefC.h>
 
-#line 717 "src/analyzer/Include.pv"
+#line 750 "src/analyzer/Include.pv"
 struct TypedefC* TypedefC__new(struct Include* include, char const* name, struct Type* type) {
-    #line 718 "src/analyzer/Include.pv"
+    #line 751 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 720 "src/analyzer/Include.pv"
+    #line 753 "src/analyzer/Include.pv"
     return ArenaAllocator__store_TypedefC(allocator, (struct TypedefC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

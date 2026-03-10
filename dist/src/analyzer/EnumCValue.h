@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#line 746 "src/analyzer/Include.pv"
+#line 779 "src/analyzer/Include.pv"
 struct EnumCValue {
     struct str name;
 };
