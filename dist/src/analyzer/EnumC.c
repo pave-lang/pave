@@ -12,12 +12,12 @@
 
 #include <analyzer/EnumC.h>
 
-#line 787 "src/analyzer/Include.pv"
+#line 880 "src/analyzer/Include.pv"
 struct EnumC* EnumC__new(struct Include* include, char const* name) {
-    #line 788 "src/analyzer/Include.pv"
+    #line 881 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 790 "src/analyzer/Include.pv"
+    #line 883 "src/analyzer/Include.pv"
     return ArenaAllocator__store_EnumC(allocator, (struct EnumC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

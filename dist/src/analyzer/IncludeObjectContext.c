@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <analyzer/EnumC.h>
+#include <std/HashMap_str_EnumCValue.h>
 #include <analyzer/Include.h>
 #include <analyzer/IncludeContext.h>
 #include <analyzer/StructC.h>
@@ -22,6 +22,11 @@
 #include <analyzer/Token.h>
 #include <analyzer/FunctionType.h>
 #include <analyzer/GenericMap.h>
+#include <analyzer/EnumC.h>
+#include <analyzer/IncludeObjectEnumClass.h>
+#include <analyzer/NamespaceCpp.h>
+#include <analyzer/TypedefC.h>
+#include <analyzer/EnumCValue.h>
 
 #include <analyzer/IncludeObjectContext.h>
 
@@ -152,37 +157,184 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             #line 733 "src/analyzer/Include.pv"
             HashMap_str_Type__insert(&class_info->fields, (struct str){ .ptr = method_name, .length = strlen(method_name) }, func_type);
         } break;
-        #line 739 "src/analyzer/Include.pv"
+        #line 735 "src/analyzer/Include.pv"
+        case CXCursor_EnumDecl: {
+            #line 736 "src/analyzer/Include.pv"
+            CXString spelling = clang_getCursorSpelling(cursor);
+            #line 737 "src/analyzer/Include.pv"
+            char* name = Include__make_string(include, spelling);
+            #line 738 "src/analyzer/Include.pv"
+            clang_disposeString(spelling);
+
+            #line 740 "src/analyzer/Include.pv"
+            struct EnumC* enum_info = EnumC__new(include, name);
+            #line 741 "src/analyzer/Include.pv"
+            HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info });
+
+            #line 743 "src/analyzer/Include.pv"
+            clang_visitChildren(cursor, IncludeObjectContext__visitor_enum_into_class, &(struct IncludeObjectContext) {
+                .context = self->context,
+                .object = &(struct IncludeObjectEnumClass) { .enum_info = enum_info, .class_info = class_info },
+            });
+        } break;
+        #line 748 "src/analyzer/Include.pv"
+        case CXCursor_StructDecl: {
+            #line 749 "src/analyzer/Include.pv"
+            CXString spelling = clang_getCursorSpelling(cursor);
+            #line 750 "src/analyzer/Include.pv"
+            char* name = Include__make_string(include, spelling);
+            #line 751 "src/analyzer/Include.pv"
+            clang_disposeString(spelling);
+
+            #line 753 "src/analyzer/Include.pv"
+            if (strlen(name) == 0) {
+                #line 754 "src/analyzer/Include.pv"
+                ArenaAllocator__Allocator__free(include->root->allocator, name);
+                #line 755 "src/analyzer/Include.pv"
+                return CXChildVisit_Continue;
+            }
+
+            #line 758 "src/analyzer/Include.pv"
+            struct Type* existing = HashMap_str_Type__find(&class_info->types, &(struct str){ .ptr = name, .length = strlen(name) });
+            #line 759 "src/analyzer/Include.pv"
+            if (existing == 0) {
+                #line 760 "src/analyzer/Include.pv"
+                struct ClassCpp* nested_class = ClassCpp__new(include, name, self->context->namespace, kind == CXCursor_StructDecl);
+                #line 761 "src/analyzer/Include.pv"
+                HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = nested_class });
+
+                #line 763 "src/analyzer/Include.pv"
+                clang_visitChildren(cursor, IncludeObjectContext__visitor_class, &(struct IncludeObjectContext) {
+                    .context = self->context,
+                    .object = nested_class,
+                });
+            }
+        } break;
+        #line 769 "src/analyzer/Include.pv"
+        case CXCursor_ClassDecl: {
+            #line 770 "src/analyzer/Include.pv"
+            CXString spelling = clang_getCursorSpelling(cursor);
+            #line 771 "src/analyzer/Include.pv"
+            char* name = Include__make_string(include, spelling);
+            #line 772 "src/analyzer/Include.pv"
+            clang_disposeString(spelling);
+
+            #line 774 "src/analyzer/Include.pv"
+            if (strlen(name) == 0) {
+                #line 775 "src/analyzer/Include.pv"
+                ArenaAllocator__Allocator__free(include->root->allocator, name);
+                #line 776 "src/analyzer/Include.pv"
+                return CXChildVisit_Continue;
+            }
+
+            #line 779 "src/analyzer/Include.pv"
+            struct Type* existing = HashMap_str_Type__find(&class_info->types, &(struct str){ .ptr = name, .length = strlen(name) });
+            #line 780 "src/analyzer/Include.pv"
+            if (existing == 0) {
+                #line 781 "src/analyzer/Include.pv"
+                struct ClassCpp* nested_class = ClassCpp__new(include, name, self->context->namespace, kind == CXCursor_StructDecl);
+                #line 782 "src/analyzer/Include.pv"
+                HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = nested_class });
+
+                #line 784 "src/analyzer/Include.pv"
+                clang_visitChildren(cursor, IncludeObjectContext__visitor_class, &(struct IncludeObjectContext) {
+                    .context = self->context,
+                    .object = nested_class,
+                });
+            }
+        } break;
+        #line 790 "src/analyzer/Include.pv"
+        case CXCursor_TypedefDecl: {
+            #line 791 "src/analyzer/Include.pv"
+            CXString spelling = clang_getCursorSpelling(cursor);
+            #line 792 "src/analyzer/Include.pv"
+            char* name = Include__make_string(include, spelling);
+            #line 793 "src/analyzer/Include.pv"
+            clang_disposeString(spelling);
+
+            #line 795 "src/analyzer/Include.pv"
+            if (HashMap_str_Type__find(&class_info->types, &(struct str){ .ptr = name, .length = strlen(name) }) == 0) {
+                #line 796 "src/analyzer/Include.pv"
+                CXType underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
+                #line 797 "src/analyzer/Include.pv"
+                struct Type* resolved = Include__parse_type(include, underlying_type);
+
+                #line 799 "src/analyzer/Include.pv"
+                if (resolved != 0) {
+                    #line 800 "src/analyzer/Include.pv"
+                    struct TypedefC* typedef_ = TypedefC__new(include, name, resolved);
+                    #line 801 "src/analyzer/Include.pv"
+                    HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
+                } else {
+                    #line 803 "src/analyzer/Include.pv"
+                    ArenaAllocator__Allocator__free(include->root->allocator, name);
+                }
+            } else {
+                #line 806 "src/analyzer/Include.pv"
+                ArenaAllocator__Allocator__free(include->root->allocator, name);
+            }
+        } break;
+        #line 809 "src/analyzer/Include.pv"
         default: {
         } break;
     }
 
-    #line 742 "src/analyzer/Include.pv"
+    #line 812 "src/analyzer/Include.pv"
     return CXChildVisit_Continue;
 }
 
-#line 745 "src/analyzer/Include.pv"
+#line 815 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCursor parent, CXClientData client_data) {
-    #line 746 "src/analyzer/Include.pv"
+    #line 816 "src/analyzer/Include.pv"
     struct IncludeObjectContext* self = client_data;
-    #line 747 "src/analyzer/Include.pv"
+    #line 817 "src/analyzer/Include.pv"
     struct EnumC* enum_info = self->object;
-    #line 748 "src/analyzer/Include.pv"
+    #line 818 "src/analyzer/Include.pv"
     enum CXCursorKind kind = clang_getCursorKind(cursor);
 
-    #line 750 "src/analyzer/Include.pv"
+    #line 820 "src/analyzer/Include.pv"
     if (kind == CXCursor_EnumConstantDecl) {
-        #line 751 "src/analyzer/Include.pv"
+        #line 821 "src/analyzer/Include.pv"
         CXString value_spelling = clang_getCursorSpelling(cursor);
-        #line 752 "src/analyzer/Include.pv"
+        #line 822 "src/analyzer/Include.pv"
         char const* value_name = Include__make_string(self->context->include, value_spelling);
-        #line 753 "src/analyzer/Include.pv"
+        #line 823 "src/analyzer/Include.pv"
         clang_disposeString(value_spelling);
 
-        #line 755 "src/analyzer/Include.pv"
+        #line 825 "src/analyzer/Include.pv"
         IncludeContext__add_enum_value(self->context, enum_info, value_name);
     }
 
-    #line 758 "src/analyzer/Include.pv"
+    #line 828 "src/analyzer/Include.pv"
+    return CXChildVisit_Continue;
+}
+
+#line 831 "src/analyzer/Include.pv"
+enum CXChildVisitResult IncludeObjectContext__visitor_enum_into_class(CXCursor cursor, CXCursor parent, CXClientData client_data) {
+    #line 832 "src/analyzer/Include.pv"
+    struct IncludeObjectContext* self = client_data;
+    #line 833 "src/analyzer/Include.pv"
+    struct IncludeObjectEnumClass* payload = self->object;
+    #line 834 "src/analyzer/Include.pv"
+    struct Include* include = self->context->include;
+    #line 835 "src/analyzer/Include.pv"
+    enum CXCursorKind kind = clang_getCursorKind(cursor);
+
+    #line 837 "src/analyzer/Include.pv"
+    if (kind == CXCursor_EnumConstantDecl) {
+        #line 838 "src/analyzer/Include.pv"
+        CXString value_spelling = clang_getCursorSpelling(cursor);
+        #line 839 "src/analyzer/Include.pv"
+        char const* value_name = Include__make_string(include, value_spelling);
+        #line 840 "src/analyzer/Include.pv"
+        clang_disposeString(value_spelling);
+
+        #line 842 "src/analyzer/Include.pv"
+        HashMap_str_EnumCValue__insert(&payload->enum_info->values, (struct str){ .ptr = value_name, .length = strlen(value_name) }, (struct EnumCValue) { .name = (struct str){ .ptr = value_name, .length = strlen(value_name) } });
+        #line 843 "src/analyzer/Include.pv"
+        HashMap_str_Type__insert(&payload->class_info->values, (struct str){ .ptr = value_name, .length = strlen(value_name) }, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = payload->enum_info });
+    }
+
+    #line 846 "src/analyzer/Include.pv"
     return CXChildVisit_Continue;
 }

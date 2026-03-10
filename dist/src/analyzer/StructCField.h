@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#line 820 "src/analyzer/Include.pv"
+#line 913 "src/analyzer/Include.pv"
 struct StructCField {
     struct str name;
     struct Type type;

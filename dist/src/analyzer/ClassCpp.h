@@ -14,18 +14,19 @@ struct NamespaceCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 825 "src/analyzer/Include.pv"
+#line 918 "src/analyzer/Include.pv"
 struct ClassCpp {
     struct Include* include;
     bool is_struct;
     struct str name;
     struct HashMap_str_Type fields;
     struct HashMap_str_Type values;
+    struct HashMap_str_Type types;
     struct NamespaceCpp* namespace;
     struct Array_Type bases;
 };
 
-#line 836 "src/analyzer/Include.pv"
+#line 930 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct);
 
 #endif

@@ -15,18 +15,19 @@
 
 #include <analyzer/ClassCpp.h>
 
-#line 836 "src/analyzer/Include.pv"
+#line 930 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct) {
-    #line 837 "src/analyzer/Include.pv"
+    #line 931 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 839 "src/analyzer/Include.pv"
+    #line 933 "src/analyzer/Include.pv"
     return ArenaAllocator__store_ClassCpp(allocator, (struct ClassCpp) {
         .include = include,
         .is_struct = is_struct,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .fields = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .values = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .namespace = namespace,
         .bases = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });

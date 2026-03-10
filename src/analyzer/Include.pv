@@ -731,10 +731,80 @@ impl IncludeObjectContext {
 
                 let func_type = Type::Function(allocator.store(func_info), 0);
                 class_info.fields.insert(method_name, func_type);
+            },
+            CXCursor_EnumDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
 
-                // fprintf(stderr, "Method: %s\n", method_name);
+                let enum_info: &EnumC = EnumC::new(include, name);
+                class_info.types.insert(name, Type::EnumC(enum_info));
 
-                // include.root.allocator.free(method_name);
+                clang_visitChildren(cursor, IncludeObjectContext::visitor_enum_into_class, &IncludeObjectContext {
+                    context: self.context,
+                    object: &IncludeObjectEnumClass { enum_info, class_info },
+                });
+            },
+            CXCursor_StructDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                if strlen(name) == 0 {
+                    include.root.allocator.free(name);
+                    return CXChildVisit_Continue;
+                }
+
+                let existing = class_info.types.find(name);
+                if existing == 0 {
+                    let nested_class = ClassCpp::new(include, name, self.context.namespace, kind == CXCursor_StructDecl);
+                    class_info.types.insert(name, Type::ClassCpp(nested_class));
+
+                    clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
+                        context: self.context,
+                        object: nested_class,
+                    });
+                }
+            },
+            CXCursor_ClassDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                if strlen(name) == 0 {
+                    include.root.allocator.free(name);
+                    return CXChildVisit_Continue;
+                }
+
+                let existing = class_info.types.find(name);
+                if existing == 0 {
+                    let nested_class = ClassCpp::new(include, name, self.context.namespace, kind == CXCursor_StructDecl);
+                    class_info.types.insert(name, Type::ClassCpp(nested_class));
+
+                    clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
+                        context: self.context,
+                        object: nested_class,
+                    });
+                }
+            },
+            CXCursor_TypedefDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                if class_info.types.find(name) == 0 {
+                    let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
+                    let resolved = include.parse_type(underlying_type);
+
+                    if resolved != 0 {
+                        let typedef_ = TypedefC::new(include, name, resolved);
+                        class_info.types.insert(name, Type::TypedefC(typedef_));
+                    } else {
+                        include.root.allocator.free(name);
+                    }
+                } else {
+                    include.root.allocator.free(name);
+                }
             },
             _ => {},
         }
@@ -757,6 +827,29 @@ impl IncludeObjectContext {
 
         return CXChildVisit_Continue;
     }
+
+    fn visitor_enum_into_class(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let payload: &IncludeObjectEnumClass = self.object;
+        let include = self.context.include;
+        let kind = clang_getCursorKind(cursor);
+
+        if kind == CXCursor_EnumConstantDecl {
+            let value_spelling: CXString = clang_getCursorSpelling(cursor);
+            let value_name: *const char = include.make_string(value_spelling);
+            clang_disposeString(value_spelling);
+
+            payload.enum_info.values.insert(value_name, EnumCValue { name: value_name });
+            payload.class_info.values.insert(value_name, Type::EnumC(payload.enum_info));
+        }
+
+        return CXChildVisit_Continue;
+    }
+}
+
+struct IncludeObjectEnumClass {
+    enum_info: &EnumC,
+    class_info: &ClassCpp,
 }
 
 struct TypedefC {
@@ -828,6 +921,7 @@ struct ClassCpp {
     name: str,
     fields: HashMap<str, Type>,
     values: HashMap<str, Type>,
+    types: HashMap<str, Type>,
     namespace: *NamespaceCpp,
     bases: Array<Type>,
 }
@@ -842,6 +936,7 @@ impl ClassCpp {
             name: name,
             fields: HashMap<str, Type>::new(allocator),
             values: HashMap<str, Type>::new(allocator),
+            types: HashMap<str, Type>::new(allocator),
             namespace,
             bases: Array<Type>::new(allocator),
         });
