@@ -1,6 +1,6 @@
 struct Hashed(u64);
 
-struct Fnv1a {}
+struct Fnv1a;
 impl Fnv1a {
     fn hash(value: *const void, size: usize) -> Hashed {
         let fnv_prime: u64 = 1099511628211;

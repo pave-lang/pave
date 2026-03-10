@@ -6,8 +6,7 @@
 typedef uint64_t Hashed;
 
 #line 3 "src/std/Hash.pv"
-struct Fnv1a {
-};
+struct Fnv1a;
 
 #line 5 "src/std/Hash.pv"
 Hashed Fnv1a__hash(void const* value, uintptr_t size);

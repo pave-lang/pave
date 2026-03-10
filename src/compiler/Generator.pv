@@ -3145,7 +3145,14 @@ impl Generator {
                             if self.is_coroutine() {
                                 fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
                             } else {
-                                fprintf(file, "__Fn__Instance* self = __self;\n");
+                                if module.mode_cpp {
+                                    fprintf(file, "__Fn__Instance* self = (struct ");
+                                    self.write_function_name(file, func_info, generics);
+                                    fprintf(file, "__Fn__Instance*)__self;\n");
+
+                                } else {
+                                    fprintf(file, "__Fn__Instance* self = __self;\n");
+                                }
                             }
 
                             self.write_indent(file);
@@ -3163,6 +3170,12 @@ impl Generator {
                                     fprintf(file, "*(");
                                     self.write_type(file, &param.type, generics);
                                     fprintf(file, "*)");
+                                } else {
+                                    if module.mode_cpp {
+                                        fprintf(file, "(");
+                                        self.write_type(file, &param.type, generics);
+                                        fprintf(file, ")");
+                                    }
                                 }
 
                                 fprintf(file, "value; return true;\n");
@@ -3234,7 +3247,14 @@ impl Generator {
                                 self.write_indent(file);
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Fn__Instance* self = __self;\n");
+                                if module.mode_cpp {
+                                    fprintf(file, "__Fn__Instance* self = (struct ");
+                                    self.write_function_name(file, func_info, generics);
+                                    fprintf(file, "__Fn__Instance*)__self;\n");
+
+                                } else {
+                                    fprintf(file, "__Fn__Instance* self = __self;\n");
+                                }
 
                                 self.write_indent(file);
                                 self.write_function_name(file, func_info, generics);
