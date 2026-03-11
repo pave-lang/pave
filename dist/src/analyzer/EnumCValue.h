@@ -3,12 +3,15 @@
 
 #include <std/str.h>
 
+struct EnumC;
+
 #include <clang-c/Index.h>
 #include <stdio.h>
 #include <string.h>
 
-#line 891 "src/analyzer/Include.pv"
+#line 915 "src/analyzer/Include.pv"
 struct EnumCValue {
+    struct EnumC* parent;
     struct str name;
 };
 

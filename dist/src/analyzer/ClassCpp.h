@@ -3,30 +3,31 @@
 
 #include <stdbool.h>
 #include <std/str.h>
+#include <analyzer/ParentCpp.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/Type.h>
 #include <std/Array_Type.h>
 
 struct Include;
-struct NamespaceCpp;
+struct ParentCpp;
 
 #include <clang-c/Index.h>
 #include <stdio.h>
 #include <string.h>
 
-#line 918 "src/analyzer/Include.pv"
+#line 943 "src/analyzer/Include.pv"
 struct ClassCpp {
     struct Include* include;
     bool is_struct;
     struct str name;
+    struct ParentCpp parent;
     struct HashMap_str_Type fields;
     struct HashMap_str_Type values;
     struct HashMap_str_Type types;
-    struct NamespaceCpp* namespace;
     struct Array_Type bases;
 };
 
-#line 930 "src/analyzer/Include.pv"
-struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct NamespaceCpp* namespace, bool is_struct);
+#line 955 "src/analyzer/Include.pv"
+struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct ParentCpp parent, bool is_struct);
 
 #endif

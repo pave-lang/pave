@@ -29,6 +29,7 @@ struct Parameter;
 struct Block;
 struct Generics;
 struct NamespaceCpp;
+struct ClassCpp;
 struct GenericMap;
 struct Array_DeferStatement;
 struct DeferStatement;
@@ -132,28 +133,31 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
 #line 526 "src/analyzer/Context.pv"
 bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp* parent, struct Type* type, struct Generics* generics);
 
-#line 583 "src/analyzer/Context.pv"
+#line 556 "src/analyzer/Context.pv"
+bool Context__parse_type_class_cpp(struct Context* self, struct ClassCpp* parent, struct Type* type, struct Generics* generics);
+
+#line 585 "src/analyzer/Context.pv"
 bool Context__parse_type_trait(struct Context* self, struct Type* type, struct Generics* generics);
 
-#line 617 "src/analyzer/Context.pv"
+#line 619 "src/analyzer/Context.pv"
 struct Type* Context__parse_type2(struct Context* self, struct Generics* generics);
 
-#line 628 "src/analyzer/Context.pv"
+#line 630 "src/analyzer/Context.pv"
 struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type* type, struct GenericMap* generics_map, struct GenericMap* fallback_generics_map);
 
-#line 747 "src/analyzer/Context.pv"
+#line 749 "src/analyzer/Context.pv"
 bool Context__set_value(struct Context* self, struct Token* name, struct Type* type);
 
-#line 764 "src/analyzer/Context.pv"
+#line 766 "src/analyzer/Context.pv"
 struct Type* Context__get_value(struct Context* self, struct str name);
 
-#line 781 "src/analyzer/Context.pv"
+#line 783 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_defer_statements(struct Context* self);
 
-#line 797 "src/analyzer/Context.pv"
+#line 799 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* self);
 
-#line 815 "src/analyzer/Context.pv"
+#line 817 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics);
 
 #endif

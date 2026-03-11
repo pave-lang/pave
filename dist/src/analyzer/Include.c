@@ -17,9 +17,10 @@
 #include <std/Array_ptrc_char.h>
 #include <std/String.h>
 #include <analyzer/IncludeContext.h>
-#include <analyzer/NamespaceCpp.h>
+#include <analyzer/ParentCpp.h>
 #include <analyzer/Indirect.h>
 #include <std/Array_CXCursor.h>
+#include <analyzer/NamespaceCpp.h>
 
 #include <analyzer/Include.h>
 
@@ -261,7 +262,7 @@ bool Include__process(struct Include* self) {
     #line 169 "src/analyzer/Include.pv"
     CXCursor cursor = clang_getTranslationUnitCursor(unit);
     #line 170 "src/analyzer/Include.pv"
-    clang_visitChildren(cursor, IncludeContext__visitor, &(struct IncludeContext) { .include = self, .parent = 0, .types = &self->types, .values = &self->values, .namespace = 0 });
+    clang_visitChildren(cursor, IncludeContext__visitor, &(struct IncludeContext) { .include = self, .parent_context = 0, .types = &self->types, .values = &self->values, .parent = (struct ParentCpp) { .type = PARENT_CPP__NONE } });
 
     #line 172 "src/analyzer/Include.pv"
     clang_disposeTranslationUnit(unit);
@@ -456,68 +457,80 @@ char* Include__make_string(struct Include* self, CXString s) {
 }
 
 #line 276 "src/analyzer/Include.pv"
-bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
+struct str Include__make_str(struct Include* self, CXString s) {
     #line 277 "src/analyzer/Include.pv"
-    CXSourceRange range = clang_getCursorExtent(cursor);
+    uintptr_t length = strlen(clang_getCString(s));
     #line 278 "src/analyzer/Include.pv"
+    char* ptr = ArenaAllocator__Allocator__alloc(self->root->allocator, length + 1);
+    #line 279 "src/analyzer/Include.pv"
+    memcpy(ptr, clang_getCString(s), length + 1);
+    #line 280 "src/analyzer/Include.pv"
+    return (struct str) { .ptr = ptr, .length = length };
+}
+
+#line 283 "src/analyzer/Include.pv"
+bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
+    #line 284 "src/analyzer/Include.pv"
+    CXSourceRange range = clang_getCursorExtent(cursor);
+    #line 285 "src/analyzer/Include.pv"
     CXTranslationUnit tu = clang_Cursor_getTranslationUnit(cursor);
 
-    #line 280 "src/analyzer/Include.pv"
+    #line 287 "src/analyzer/Include.pv"
     CXToken* tokens = 0;
-    #line 281 "src/analyzer/Include.pv"
+    #line 288 "src/analyzer/Include.pv"
     uint32_t num_tokens = 0;
-    #line 282 "src/analyzer/Include.pv"
+    #line 289 "src/analyzer/Include.pv"
     clang_tokenize(tu, range, &tokens, &num_tokens);
 
-    #line 284 "src/analyzer/Include.pv"
+    #line 291 "src/analyzer/Include.pv"
     if (num_tokens < 2) {
-        #line 285 "src/analyzer/Include.pv"
+        #line 292 "src/analyzer/Include.pv"
         clang_disposeTokens(tu, tokens, num_tokens);
-        #line 286 "src/analyzer/Include.pv"
+        #line 293 "src/analyzer/Include.pv"
         return 0;
     }
 
-    #line 289 "src/analyzer/Include.pv"
+    #line 296 "src/analyzer/Include.pv"
     CXString spelling = clang_getTokenSpelling(tu, tokens[1]);
-    #line 290 "src/analyzer/Include.pv"
+    #line 297 "src/analyzer/Include.pv"
     char const* txt = clang_getCString(spelling);
 
-    #line 292 "src/analyzer/Include.pv"
+    #line 299 "src/analyzer/Include.pv"
     bool result = 0;
 
-    #line 294 "src/analyzer/Include.pv"
+    #line 301 "src/analyzer/Include.pv"
     if (strcmp(txt, "(") == 0) {
-        #line 295 "src/analyzer/Include.pv"
+        #line 302 "src/analyzer/Include.pv"
         CXSourceLocation loc_name_end = clang_getRangeEnd(clang_getTokenExtent(tu, tokens[0]));
-        #line 296 "src/analyzer/Include.pv"
+        #line 303 "src/analyzer/Include.pv"
         CXSourceLocation loc_paren = clang_getTokenLocation(tu, tokens[1]);
 
-        #line 298 "src/analyzer/Include.pv"
+        #line 305 "src/analyzer/Include.pv"
         uint32_t line1 = 0;
-        #line 299 "src/analyzer/Include.pv"
+        #line 306 "src/analyzer/Include.pv"
         uint32_t col1 = 0;
-        #line 300 "src/analyzer/Include.pv"
+        #line 307 "src/analyzer/Include.pv"
         uint32_t line2 = 0;
-        #line 301 "src/analyzer/Include.pv"
+        #line 308 "src/analyzer/Include.pv"
         uint32_t col2 = 0;
 
-        #line 303 "src/analyzer/Include.pv"
+        #line 310 "src/analyzer/Include.pv"
         clang_getSpellingLocation(loc_name_end, 0, &line1, &col1, 0);
-        #line 304 "src/analyzer/Include.pv"
+        #line 311 "src/analyzer/Include.pv"
         clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
-        #line 306 "src/analyzer/Include.pv"
+        #line 313 "src/analyzer/Include.pv"
         if (line1 == line2 && col1 == col2) {
-            #line 307 "src/analyzer/Include.pv"
+            #line 314 "src/analyzer/Include.pv"
             result = 1;
         }
     }
 
-    #line 311 "src/analyzer/Include.pv"
+    #line 318 "src/analyzer/Include.pv"
     clang_disposeString(spelling);
-    #line 312 "src/analyzer/Include.pv"
+    #line 319 "src/analyzer/Include.pv"
     clang_disposeTokens(tu, tokens, num_tokens);
 
-    #line 314 "src/analyzer/Include.pv"
+    #line 321 "src/analyzer/Include.pv"
     return result;
 }

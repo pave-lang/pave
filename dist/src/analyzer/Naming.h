@@ -11,6 +11,7 @@ struct String;
 struct Type;
 struct GenericMap;
 struct str;
+struct ParentCpp;
 
 #include <stdio.h>
 
@@ -56,10 +57,13 @@ struct Naming Naming__new_c99(struct ArenaAllocator* allocator, struct Naming* n
 #line 113 "src/analyzer/Naming.pv"
 struct String Naming__get_type_name(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 361 "src/analyzer/Naming.pv"
+#line 357 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 389 "src/analyzer/Naming.pv"
+#line 385 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
+
+#line 430 "src/analyzer/Naming.pv"
+void Naming__append_cpp_path(struct Naming* self, struct String* result, struct ParentCpp parent);
 
 #endif

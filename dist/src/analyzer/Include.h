@@ -50,6 +50,9 @@ struct EnumC* Include__find_enum(struct Include* self, char const* name);
 char* Include__make_string(struct Include* self, CXString s);
 
 #line 276 "src/analyzer/Include.pv"
+struct str Include__make_str(struct Include* self, CXString s);
+
+#line 283 "src/analyzer/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor);
 
 #endif

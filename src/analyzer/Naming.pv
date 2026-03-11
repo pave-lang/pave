@@ -309,6 +309,7 @@ impl Naming {
             },
             Type::EnumC(enum_info) => {
                 if self.type == NamingType::C99 { result.append("enum "); }
+                self.append_cpp_path(&result, enum_info.parent);
                 result.append(enum_info.name);
             },
             Type::StructC(struct_info) => {
@@ -320,12 +321,7 @@ impl Naming {
                 result.append(union_info.name);
             },
             Type::ClassCpp(class_info) => {
-                let namespace = class_info.namespace;
-                while namespace {
-                    result.prepend("::");
-                    result.prepend(namespace.name);
-                    namespace = namespace.parent;
-                }
+                self.append_cpp_path(&result, class_info.parent);
                 result.append(class_info.name);
             },
             Type::FunctionC(func_info) => {
@@ -429,5 +425,21 @@ impl Naming {
         }
 
         return result;
+    }
+
+    fn append_cpp_path(&self, result: &String, parent: ParentCpp) {
+        match parent {
+            ParentCpp::None => { return; },
+            ParentCpp::Namespace(ns_info) => {
+                self.append_cpp_path(result, ns_info.parent);
+                result.append(ns_info.name);
+                result.append("::");
+            },
+            ParentCpp::Class(class_info) => {
+                self.append_cpp_path(result, class_info.parent);
+                result.append(class_info.name);
+                result.append("::");
+            },
+        }
     }
 }

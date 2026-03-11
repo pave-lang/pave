@@ -1,9 +1,10 @@
 use std
 
 enum MatchPattern {
-    EnumVariant(&EnumVariant, Array<EnumVariantParameter>),
-    EnumCValue(&Token),
     Default,
+    StaticValue(&Token),
+    EnumVariant(&EnumVariant, Array<EnumVariantParameter>),
+    EnumCValue2(&EnumCValue),
 }
 
 struct MatchCase {

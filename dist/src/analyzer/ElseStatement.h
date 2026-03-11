@@ -4,7 +4,7 @@
 struct Expression;
 struct Block;
 
-#line 16 "src/analyzer/Statement.pv"
+#line 17 "src/analyzer/Statement.pv"
 struct ElseStatement {
     struct Expression* expression;
     struct Block* block;

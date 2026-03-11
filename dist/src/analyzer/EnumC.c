@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <analyzer/Include.h>
+#include <analyzer/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <std/Allocator.h>
@@ -12,15 +13,16 @@
 
 #include <analyzer/EnumC.h>
 
-#line 880 "src/analyzer/Include.pv"
-struct EnumC* EnumC__new(struct Include* include, char const* name) {
-    #line 881 "src/analyzer/Include.pv"
+#line 903 "src/analyzer/Include.pv"
+struct EnumC* EnumC__new(struct Include* include, char const* name, struct ParentCpp parent) {
+    #line 904 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 883 "src/analyzer/Include.pv"
+    #line 906 "src/analyzer/Include.pv"
     return ArenaAllocator__store_EnumC(allocator, (struct EnumC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
+        .parent = parent,
         .values = HashMap_str_EnumCValue__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });
 }

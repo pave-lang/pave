@@ -431,6 +431,7 @@ impl Type {
     fn is_enum(&self) -> bool {
         match self {
             Type::Enum(_, _) => { return true; },
+            Type::EnumC(_) => { return true; },
             _ => { return false; },
         }
     }

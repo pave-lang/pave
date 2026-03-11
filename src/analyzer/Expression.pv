@@ -34,6 +34,12 @@ struct Expression {
     return_type: Type,
 }
 
+enum EnumVariantResult {
+    None,
+    EnumVariant(&EnumVariant),
+    EnumCValue(&EnumCValue),
+}
+
 impl Expression {
     fn make(allocator: &ArenaAllocator, token: &Token, data: ExpressionData, return_type: &Type) -> &Expression {
         return allocator.store(Expression {
@@ -51,7 +57,7 @@ impl Expression {
         return result;
     }
 
-    fn get_enum_variant(context: &Context, type: &Type, token: &Token) -> &EnumVariant {
+    fn get_enum_variant(context: &Context, type: &Type, token: &Token) -> EnumVariantResult {
         match type {
             Type::Indirect(indirect) => {
                 return Expression::get_enum_variant(context, &indirect.to, token);
@@ -61,14 +67,28 @@ impl Expression {
             },
             Type::Enum(enum_info, _) => {
                 let variant = enum_info.variants.find(&token.value);
-                if variant == 0 { context.error_token(token, "Variant not found in enum"); }
+                if variant == 0 {
 
-                return variant;
+                    context.error_token(token, "Variant not found in enum");
+
+                }
+
+                return EnumVariantResult::EnumVariant(variant);
             },
-            _ => { return 0; }
+            Type::EnumC(enum_info) => {
+                let variant = enum_info.values.find(&token.value);
+                if variant == 0 {
+
+                    context.error_token(token, "Variant not found in enum");
+                    
+                }
+
+                return EnumVariantResult::EnumCValue(variant);
+            },
+            _ => { return EnumVariantResult::None; }
         }
 
-        return 0;
+        return EnumVariantResult::None;
     }
 
     fn get_member_type(context: &Context, type: &Type, member: &Token, output_error: bool) -> &Type {
@@ -466,36 +486,57 @@ impl Expression {
             let variant_name = context.expect(TokenType::Identifier);
             if variant_name == 0 { return 0; }
 
-            let variant = Expression::get_enum_variant(context, enum_type, variant_name);
-            if variant == 0 { return 0; }
+            let variant_result = Expression::get_enum_variant(context, enum_type, variant_name);
 
-            let arguments = Array<InvokeArgument>::new(context.allocator);
+            match variant_result {
+                EnumVariantResult::None => {
+                    context.error_token(variant_name, "Unable to find enum variant");
+                    return false;
+                },
+                EnumVariantResult::EnumVariant(variant) => {
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
 
-            if context.check_value(TokenType::Symbol, "(") {
-                if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+                    if context.check_value(TokenType::Symbol, "(") {
+                        if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
 
-                while context.check_value(TokenType::Symbol, ")") == 0 {
-                    let argument = Expression::parse(context, generics);
-                    if argument == 0 { return 0; }
+                        while context.check_value(TokenType::Symbol, ")") == 0 {
+                            let argument = Expression::parse(context, generics);
+                            if argument == 0 { return 0; }
 
-                    arguments.append(InvokeArgument { value: argument });
+                            arguments.append(InvokeArgument { value: argument });
 
-                    if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
-                        context.expect_value(TokenType::Symbol, ")");
-                        return 0;
+                            if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                                context.expect_value(TokenType::Symbol, ")");
+                                return 0;
+                            }
+                        }
+                        
+                        if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+
                     }
+
+                    let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
+
+                    let generic_map = enum_type.get_generic_map(context);
+                    if !Expression::validate_enum_arguments(context, token, variant, &arguments, generic_map) { return 0; }
+
+                    return Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
+                },
+                EnumVariantResult::EnumCValue(_ /*variant*/) => {
+                    let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+                    return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), enum_type);
+                    // let enum_info = variant.parent;
+                    // match enum_info.parent {
+                    //     ParentCpp::None => {
+                    //         return Expression::make(context.allocator, variant_name, ExpressionData::Literal(variant_name.value), enum_type);
+                    //     },
+                    //     _ => {
+                    //         let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+                    //         return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), enum_type);
+                    //     },
+                    // }
                 }
-                
-                if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
-
             }
-
-            let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
-
-            let generic_map = enum_type.get_generic_map(context);
-            if !Expression::validate_enum_arguments(context, token, variant, &arguments, generic_map) { return 0; }
-
-            return Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
         }
 
         return Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
@@ -1321,8 +1362,16 @@ impl Expression {
             variant_name.type = TokenType::Identifier;
             variant_name.value = "StartEnd";
 
-            let variant = Expression::get_enum_variant(context, enum_type, &variant_name);
-            if variant == 0 { return 0; }
+            let variant_result = Expression::get_enum_variant(context, enum_type, &variant_name);
+            let variant: &EnumVariant = 0;
+            match variant_result {
+                EnumVariantResult::EnumVariant(enum_variant) => { variant = enum_variant; },
+                _ => {},
+            }
+            if variant == 0 {
+                context.error_token(token, "Could not find Range StartEnd enum variant");
+                return 0;
+            }
 
             let arguments = Array<InvokeArgument>::new(context.allocator);
             arguments.append(InvokeArgument { value: range_start });

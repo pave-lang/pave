@@ -10,14 +10,14 @@ struct Type;
 #include <stdio.h>
 #include <string.h>
 
-#line 855 "src/analyzer/Include.pv"
+#line 877 "src/analyzer/Include.pv"
 struct TypedefC {
     struct Include* include;
     struct str name;
     struct Type* type;
 };
 
-#line 862 "src/analyzer/Include.pv"
+#line 884 "src/analyzer/Include.pv"
 struct TypedefC* TypedefC__new(struct Include* include, char const* name, struct Type* type);
 
 #endif

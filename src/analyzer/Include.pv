@@ -167,7 +167,7 @@ impl Include {
         }
 
         let cursor = clang_getTranslationUnitCursor(unit);
-        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent: 0, types: &self.types, values: &self.values, namespace: 0 });
+        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: 0, types: &self.types, values: &self.values, parent: ParentCpp::None });
 
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
@@ -273,6 +273,13 @@ impl Include {
         return result;
     }
 
+    fn make_str(&self, s: CXString) -> str {
+        let length: usize = strlen(clang_getCString(s));
+        let ptr: *char = self.root.allocator.alloc(length + 1);
+        memcpy(ptr, clang_getCString(s), length + 1);
+        return str { ptr, length };
+    }
+
     fn is_function_like_macro(&self, cursor: CXCursor) -> bool {
         let range: CXSourceRange = clang_getCursorExtent(cursor);
         let tu: CXTranslationUnit = clang_Cursor_getTranslationUnit(cursor);
@@ -317,10 +324,10 @@ impl Include {
 
 struct IncludeContext {
     include: &Include,
-    parent: &IncludeContext,
+    parent_context: &IncludeContext,
     types: &HashMap<str, Type>,
     values: &HashMap<str, Type>,
-    namespace: *NamespaceCpp,
+    parent: ParentCpp,
 }
 
 struct IncludeObjectContext {
@@ -372,13 +379,13 @@ impl IncludeContext {
     }
 
     fn add_enum(&self, name: *const char) -> &EnumC {
-        let enum_info: &EnumC = EnumC::new(self.include, name);
+        let enum_info: &EnumC = EnumC::new(self.include, name, self.parent);
         self.insert_type(name, Type::EnumC(enum_info));
         return enum_info;
     }
 
     fn add_enum_value(&self, enum_info: &EnumC, value_name: *const char) {
-        enum_info.values.insert(value_name, EnumCValue { name: value_name });
+        enum_info.values.insert(value_name, EnumCValue { parent: enum_info, name: value_name });
         self.insert_value(value_name, Type::EnumC(enum_info));
     }
 
@@ -393,25 +400,25 @@ impl IncludeContext {
                 Type::NamespaceCpp(ns_info) => {
                     return allocator.store(IncludeContext {
                         include,
-                        parent: self,
+                        parent_context: self,
                         types: &ns_info.types,
                         values: &ns_info.values,
-                        namespace: ns_info,
+                        parent: ParentCpp::Namespace(ns_info),
                     });
                 },
                 _ => {},
             }
         }
 
-        let ns_info = NamespaceCpp::new(include, name, self.namespace);
+        let ns_info = NamespaceCpp::new(include, name, self.parent);
         self.insert_type(name, Type::NamespaceCpp(ns_info));
 
         return allocator.store(IncludeContext {
             include,
-            parent: self,
+            parent_context: self,
             types: &ns_info.types,
             values: &ns_info.values,
-            namespace: ns_info,
+            parent: ParentCpp::Namespace(ns_info),
         });
     }
 
@@ -547,7 +554,7 @@ impl IncludeContext {
                 }
 
                 if class_info == 0 {
-                    class_info = ClassCpp::new(include, name, self.namespace, kind == CXCursor_StructDecl);
+                    class_info = ClassCpp::new(include, name, self.parent, kind == CXCursor_StructDecl);
                     self.insert_type(name, Type::ClassCpp(class_info));
                 }
 
@@ -737,7 +744,7 @@ impl IncludeObjectContext {
                 let name = include.make_string(spelling);
                 clang_disposeString(spelling);
 
-                let enum_info: &EnumC = EnumC::new(include, name);
+                let enum_info: &EnumC = EnumC::new(include, name, ParentCpp::Class(class_info));
                 class_info.types.insert(name, Type::EnumC(enum_info));
 
                 clang_visitChildren(cursor, IncludeObjectContext::visitor_enum_into_class, &IncludeObjectContext {
@@ -757,7 +764,7 @@ impl IncludeObjectContext {
 
                 let existing = class_info.types.find(name);
                 if existing == 0 {
-                    let nested_class = ClassCpp::new(include, name, self.context.namespace, kind == CXCursor_StructDecl);
+                    let nested_class = ClassCpp::new(include, name, ParentCpp::Class(class_info), kind == CXCursor_StructDecl);
                     class_info.types.insert(name, Type::ClassCpp(nested_class));
 
                     clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
@@ -778,7 +785,7 @@ impl IncludeObjectContext {
 
                 let existing = class_info.types.find(name);
                 if existing == 0 {
-                    let nested_class = ClassCpp::new(include, name, self.context.namespace, kind == CXCursor_StructDecl);
+                    let nested_class = ClassCpp::new(include, name, ParentCpp::Class(class_info), kind == CXCursor_StructDecl);
                     class_info.types.insert(name, Type::ClassCpp(nested_class));
 
                     clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
@@ -818,8 +825,8 @@ impl IncludeObjectContext {
         let kind = clang_getCursorKind(cursor);
 
         if kind == CXCursor_EnumConstantDecl {
-            let value_spelling: CXString = clang_getCursorSpelling(cursor);
-            let value_name: *const char = self.context.include.make_string(value_spelling);
+            let value_spelling = clang_getCursorSpelling(cursor);
+            let value_name = self.context.include.make_string(value_spelling);
             clang_disposeString(value_spelling);
 
             self.context.add_enum_value(enum_info, value_name);
@@ -835,15 +842,30 @@ impl IncludeObjectContext {
         let kind = clang_getCursorKind(cursor);
 
         if kind == CXCursor_EnumConstantDecl {
-            let value_spelling: CXString = clang_getCursorSpelling(cursor);
-            let value_name: *const char = include.make_string(value_spelling);
+            let value_spelling = clang_getCursorSpelling(cursor);
+            let value_name = include.make_str(value_spelling);
             clang_disposeString(value_spelling);
 
-            payload.enum_info.values.insert(value_name, EnumCValue { name: value_name });
+            payload.enum_info.values.insert(value_name, EnumCValue { parent: payload.enum_info, name: value_name });
             payload.class_info.values.insert(value_name, Type::EnumC(payload.enum_info));
         }
 
         return CXChildVisit_Continue;
+    }
+}
+
+enum ParentCpp {
+    None,
+    Class(&ClassCpp),
+    Namespace(&NamespaceCpp),
+}
+
+impl ParentCpp {
+    fn is_none(&self) -> bool {
+        match self {
+            ParentCpp::None => { return true; },
+            _ => { return false; },
+        }
     }
 }
 
@@ -873,22 +895,25 @@ impl TypedefC {
 struct EnumC {
     include: &Include,
     name: str,
+    parent: ParentCpp,
     values: HashMap<str, EnumCValue>,
 }
 
 impl EnumC {
-    fn new(include: &Include, name: *const char) -> &Self {
+    fn new(include: &Include, name: *const char, parent: ParentCpp) -> &Self {
         let allocator = include.root.allocator;
 
         return allocator.store(Self {
             include,
             name: name,
+            parent,
             values: HashMap<str, EnumCValue>::new(allocator),
         });
     }
 }
 
 struct EnumCValue {
+    parent: &EnumC,
     name: str,
 }
 
@@ -919,25 +944,25 @@ struct ClassCpp {
     include: &Include,
     is_struct: bool,
     name: str,
+    parent: ParentCpp,
     fields: HashMap<str, Type>,
     values: HashMap<str, Type>,
     types: HashMap<str, Type>,
-    namespace: *NamespaceCpp,
     bases: Array<Type>,
 }
 
 impl ClassCpp {
-    fn new(include: &Include, name: *const char, namespace: *NamespaceCpp, is_struct: bool) -> &Self {
+    fn new(include: &Include, name: *const char, parent: ParentCpp, is_struct: bool) -> &Self {
         let allocator = include.root.allocator;
 
         return allocator.store(Self {
             include,
             is_struct,
             name: name,
+            parent,
             fields: HashMap<str, Type>::new(allocator),
             values: HashMap<str, Type>::new(allocator),
             types: HashMap<str, Type>::new(allocator),
-            namespace,
             bases: Array<Type>::new(allocator),
         });
     }
@@ -965,21 +990,21 @@ impl FunctionC {
 struct NamespaceCpp {
     include: &Include,
     name: str,
-    parent: *NamespaceCpp,
+    parent: ParentCpp,
     types: HashMap<str, Type>,
     values: HashMap<str, Type>,
 }
 
 impl NamespaceCpp {
-    fn new(include: &Include, name: *const char, parent: *NamespaceCpp) -> &Self {
+    fn new(include: &Include, name: *const char, parent: ParentCpp) -> &Self {
         let allocator = include.root.allocator;
 
         return allocator.store(Self {
             include,
             name: name,
+            parent,
             types: HashMap<str, Type>::new(allocator),
             values: HashMap<str, Type>::new(allocator),
-            parent,
         });
     }
 }

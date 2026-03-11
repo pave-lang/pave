@@ -444,7 +444,7 @@ impl Generator {
     }
 
     fn write_enum_variant_name(&self, file: &FILE, type: &Type, variant: &EnumVariant) -> bool {
-        let parent: &Enum = variant.parent;
+        let parent = variant.parent;
         let name = parent.name;
         self.write_str_title(file, name.value);
         fprintf(file, "__");
@@ -714,7 +714,7 @@ impl Generator {
     }
 
     fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
-        let parent: &Enum = variant.parent;
+        let parent = variant.parent;
 
         if Generator::is_discriminated_union(parent) == 0 {
             self.write_enum_variant_name(file, type, variant);
@@ -1038,19 +1038,8 @@ impl Generator {
 
                         return success;
                     },
-                    Type::ClassCpp(class_info) => {
-                        let name = class_info.name;
-
-                        let ns_path = String::new(self.allocator);
-                        let ns_info = class_info.namespace;
-                        while ns_info != 0 {
-                            ns_path.prepend("::");
-                            ns_path.prepend(ns_info.name);
-                            ns_info = ns_info.parent;
-                        }
-
-                        let success = self.write_str(file, ns_path.as_str());
-                        success = self.write_str(file, name) && success;
+                    Type::ClassCpp(_) => {
+                        let success = self.write_type(file, type, generics);
                         let function_mode = arguments.length > 0 && arguments.data[0].name == 0;
 
                         if function_mode {
@@ -1428,7 +1417,7 @@ impl Generator {
                         let pattern: &MatchPattern = &case_info.pattern;
                         
                         match pattern {
-                            MatchPattern::EnumCValue(name) => {
+                            MatchPattern::StaticValue(name) => {
                                 fprintf(file, "case ");
                                 self.write_token(file, name);
                                 fprintf(file, ": {\n");
@@ -1483,6 +1472,23 @@ impl Generator {
 
                                     param_i += 1;
                                 }
+                            },
+                            MatchPattern::EnumCValue2(enum_variant) => {
+                                fprintf(file, "case ");
+
+                                let enum_info = enum_variant.parent;
+                                if !enum_info.parent.is_none() {
+                                    let type_name = self.naming_decl.get_type_name(&Type::EnumC(enum_info), generics.self_type, generics);
+                                    self.write_str(file, type_name.as_str());
+                                    type_name.release();
+                                    // self.write_type(file, &Type::EnumC(enum_info), generics);
+                                    fprintf(file, "::");
+                                }
+
+                                self.write_str(file, enum_variant.name);
+                                fprintf(file, ": {\n");
+
+                                self.indent += 1;
                             },
                             MatchPattern::Default => {
                                 fprintf(file, "default: {\n");

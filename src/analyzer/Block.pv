@@ -207,15 +207,23 @@ impl Block {
 
                 if type != 0 {
                     context.next_token();
-                    pattern = MatchPattern::EnumCValue(token);
+                    pattern = MatchPattern::StaticValue(token);
                 } else {
-                    let type_find = context.module.find_type(token.value);
-                    if token.value.eq("Self") || (type_find != 0 && type_find.is_enum()) {
-                        type = context.parse_type2(generics);
-                        if !context.expect_value(TokenType::Symbol, "::") { return false; }
-                    } else {
-                        type = &expression.return_type;
+                    type = context.parse_type2(generics);
+                    if !type.is_enum() {
+                        context.error_token(token, "Type is not an enum");
+                        return false;
                     }
+
+                    if !context.expect_value(TokenType::Symbol, "::") { return false; }
+
+                    // let type_find = context.module.find_type(token.value);
+                    // if token.value.eq("Self") || (type_find != 0 && type_find.is_enum()) {
+                    //     type = context.parse_type2(generics);
+                    //     if !context.expect_value(TokenType::Symbol, "::") { return false; }
+                    // } else {
+                    //     type = &expression.return_type;
+                    // }
                     
                     let enum_variant_token = context.expect(TokenType::Identifier);
                     if enum_variant_token == 0 { return false; }
@@ -230,72 +238,88 @@ impl Block {
                     }
 
                     match type {
-                        Type::Enum(_, generics) => {
-                            generic_map = generics;
+                        Type::Enum(_, generics) => { generic_map = generics; },
+                        Type::EnumC(_) => {},
+                        _ => {
+                            context.pop_scope();
+                            context.error("Not an enum type");
+                            return false;
                         },
-                        _ => { context.pop_scope(); context.error("Not an enum type"); return false; },
                     }
 
-                    let enum_variant = Expression::get_enum_variant(context, type, enum_variant_token);
-                    if enum_variant == 0 { return false; }
+                    let enum_variant_result = Expression::get_enum_variant(context, type, enum_variant_token);
+                    match enum_variant_result {
+                        EnumVariantResult::None => {
+                            context.error("Could not find enum variant");
+                            return false;
+                        },
+                        EnumVariantResult::EnumVariant(enum_variant) => {
+                            let parameters = Array<EnumVariantParameter>::new(context.allocator);
 
-                    let parameters = Array<EnumVariantParameter>::new(context.allocator);
+                            if context.check_next(TokenType::Symbol, "(") {
+                                let variable_i: usize = 0;
 
-                    if context.check_next(TokenType::Symbol, "(") {
-                        let variable_i: usize = 0;
+                                while context.check_value(TokenType::Symbol, ")") == 0 {
+                                    let ref = context.check_next(TokenType::Symbol, "&");
+                                    let variable = context.expect(TokenType::Identifier);
+                                    if variable == 0 { context.pop_scope(); return false; }
 
-                        while context.check_value(TokenType::Symbol, ")") == 0 {
-                            let ref = context.check_next(TokenType::Symbol, "&");
-                            let variable = context.expect(TokenType::Identifier);
-                            if variable == 0 { context.pop_scope(); return false; }
+                                    parameters.append(EnumVariantParameter { ref, variable });
 
-                            parameters.append(EnumVariantParameter { ref, variable });
+                                    let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, 0);
+                                    if variable_type == 0 { return false; }
 
-                            let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, 0);
-                            if variable_type == 0 { return false; }
+                                    if ref {
+                                        let indirect = context.allocator.store(Indirect { type: IndirectType::Reference, to: *variable_type });
+                                        variable_type = context.allocator.store(Type::Indirect(indirect));
+                                    }
 
-                            if ref {
-                                let indirect = context.allocator.store(Indirect { type: IndirectType::Reference, to: *variable_type });
-                                variable_type = context.allocator.store(Type::Indirect(indirect));
+                                    let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);
+                                    variable_type_name.prepend(": ");
+                                    context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
+
+                                    if variable.eq(TokenType::Identifier, "_") == 0 {
+                                        if context.set_value(variable, variable_type) == 0 { context.pop_scope(); return false; }
+                                    }
+
+                                    if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                                        context.pop_scope();
+                                        context.pop_scope();
+                                        context.expect_value(TokenType::Symbol, ")");
+                                        return false;
+                                    }
+
+                                    variable_i += 1;
+                                }
+
+                                if context.expect_value(TokenType::Symbol, ")") == 0 { context.pop_scope(); return false; }
+
+                                if parameters.length != enum_variant.types.length {
+                                    let message = String::new(context.allocator);
+                                    message.append("Number of parameters does not match, expected ");
+                                    message.append_usize(enum_variant.types.length);
+                                    context.error_token(enum_variant_token, message.c_str());
+                                }
+                            } else {
+                                if enum_variant.types.length > 0 {
+                                    let message = String::new(context.allocator);
+                                    message.append("Expected ");
+                                    message.append_usize(enum_variant.types.length);
+                                    message.append(" parameters");
+                                    context.error_token(enum_variant_token, message.c_str());
+                                }  
                             }
 
-                            let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);
-                            variable_type_name.prepend(": ");
-                            context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
+                            pattern = MatchPattern::EnumVariant(enum_variant, parameters);
+                        },
+                        EnumVariantResult::EnumCValue(enum_variant) => {
 
-                            if variable.eq(TokenType::Identifier, "_") == 0 {
-                                if context.set_value(variable, variable_type) == 0 { context.pop_scope(); return false; }
-                            }
 
-                            if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
-                                context.pop_scope();
-                                context.pop_scope();
-                                context.expect_value(TokenType::Symbol, ")");
-                                return false;
-                            }
+                            pattern = MatchPattern::EnumCValue2(enum_variant);
 
-                            variable_i += 1;
-                        }
-
-                        if context.expect_value(TokenType::Symbol, ")") == 0 { context.pop_scope(); return false; }
-
-                        if parameters.length != enum_variant.types.length {
-                            let message = String::new(context.allocator);
-                            message.append("Number of parameters does not match, expected ");
-                            message.append_usize(enum_variant.types.length);
-                            context.error_token(enum_variant_token, message.c_str());
-                        }
-                    } else {
-                        if enum_variant.types.length > 0 {
-                            let message = String::new(context.allocator);
-                            message.append("Expected ");
-                            message.append_usize(enum_variant.types.length);
-                            message.append(" parameters");
-                            context.error_token(enum_variant_token, message.c_str());
-                        }  
+                            
+                        },
                     }
-
-                    pattern = MatchPattern::EnumVariant(enum_variant, parameters);
                 }
             }
 
