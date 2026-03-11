@@ -27,100 +27,101 @@
 
 #include <analyzer/IncludeContext.h>
 
-#line 339 "src/analyzer/Include.pv"
+#line 340 "src/analyzer/Include.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type) {
-    #line 340 "src/analyzer/Include.pv"
+    #line 341 "src/analyzer/Include.pv"
     HashMap_str_Type__insert(self->types, (struct str){ .ptr = name, .length = strlen(name) }, type);
 }
 
-#line 343 "src/analyzer/Include.pv"
+#line 344 "src/analyzer/Include.pv"
 void IncludeContext__insert_value(struct IncludeContext* self, char const* name, struct Type type) {
-    #line 344 "src/analyzer/Include.pv"
+    #line 345 "src/analyzer/Include.pv"
     HashMap_str_Type__insert(self->values, (struct str){ .ptr = name, .length = strlen(name) }, type);
 }
 
-#line 347 "src/analyzer/Include.pv"
+#line 348 "src/analyzer/Include.pv"
 bool IncludeContext__insert_function(struct IncludeContext* self, char const* name, struct Type* return_type) {
-    #line 348 "src/analyzer/Include.pv"
-    struct FunctionC* func_info = FunctionC__new(self->include, name);
     #line 349 "src/analyzer/Include.pv"
+    struct FunctionC* func_info = FunctionC__new(self->include, name);
+    #line 350 "src/analyzer/Include.pv"
     func_info->return_type = *return_type;
 
-    #line 351 "src/analyzer/Include.pv"
-    struct Type func_type = (struct Type) { .type = TYPE__FUNCTION_C, .functionc_value = func_info };
     #line 352 "src/analyzer/Include.pv"
+    struct Type func_type = (struct Type) { .type = TYPE__FUNCTION_C, .functionc_value = func_info };
+    #line 353 "src/analyzer/Include.pv"
     return HashMap_str_Type__insert(self->values, (struct str){ .ptr = name, .length = strlen(name) }, func_type);
 }
 
-#line 355 "src/analyzer/Include.pv"
+#line 356 "src/analyzer/Include.pv"
 void IncludeContext__add_function(struct IncludeContext* self, char const* name, CXCursor cursor) {
-    #line 356 "src/analyzer/Include.pv"
+    #line 357 "src/analyzer/Include.pv"
     struct Include* include = self->include;
 
-    #line 358 "src/analyzer/Include.pv"
-    CXType cursor_return_type = clang_getCursorResultType(cursor);
     #line 359 "src/analyzer/Include.pv"
-    struct Type* return_type = Include__parse_type(include, cursor_return_type);
+    CXType cursor_return_type = clang_getCursorResultType(cursor);
     #line 360 "src/analyzer/Include.pv"
+    struct Type* return_type = Include__parse_type(include, cursor_return_type);
+    #line 361 "src/analyzer/Include.pv"
     if (return_type == 0) {
-        #line 360 "src/analyzer/Include.pv"
+        #line 361 "src/analyzer/Include.pv"
         return_type = &include->root->type_void;
     }
 
-    #line 362 "src/analyzer/Include.pv"
+    #line 363 "src/analyzer/Include.pv"
     IncludeContext__insert_function(self, name, return_type);
 }
 
-#line 365 "src/analyzer/Include.pv"
+#line 366 "src/analyzer/Include.pv"
 void IncludeContext__add_basic_function(struct IncludeContext* self, char const* name) {
-    #line 366 "src/analyzer/Include.pv"
+    #line 367 "src/analyzer/Include.pv"
     IncludeContext__insert_function(self, name, &self->include->root->type_void);
 }
 
-#line 369 "src/analyzer/Include.pv"
+#line 370 "src/analyzer/Include.pv"
 struct StructC* IncludeContext__add_struct(struct IncludeContext* self, char const* name) {
-    #line 370 "src/analyzer/Include.pv"
-    struct StructC* struct_info = StructC__new(self->include, name);
     #line 371 "src/analyzer/Include.pv"
-    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__STRUCT_C, .structc_value = struct_info });
-    #line 372 "src/analyzer/Include.pv"
-    return struct_info;
-}
-
-#line 375 "src/analyzer/Include.pv"
-struct StructC* IncludeContext__add_union(struct IncludeContext* self, char const* name) {
-    #line 376 "src/analyzer/Include.pv"
     struct StructC* struct_info = StructC__new(self->include, name);
-    #line 377 "src/analyzer/Include.pv"
-    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__UNION_C, .unionc_value = struct_info });
-    #line 378 "src/analyzer/Include.pv"
+    #line 372 "src/analyzer/Include.pv"
+    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__STRUCT_C, .structc_value = struct_info });
+    #line 373 "src/analyzer/Include.pv"
     return struct_info;
 }
 
-#line 381 "src/analyzer/Include.pv"
+#line 376 "src/analyzer/Include.pv"
+struct StructC* IncludeContext__add_union(struct IncludeContext* self, char const* name) {
+    #line 377 "src/analyzer/Include.pv"
+    struct StructC* struct_info = StructC__new(self->include, name);
+    #line 378 "src/analyzer/Include.pv"
+    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__UNION_C, .unionc_value = struct_info });
+    #line 379 "src/analyzer/Include.pv"
+    return struct_info;
+}
+
+#line 382 "src/analyzer/Include.pv"
 struct EnumC* IncludeContext__add_enum(struct IncludeContext* self, char const* name) {
-    #line 382 "src/analyzer/Include.pv"
-    struct EnumC* enum_info = EnumC__new(self->include, name, self->parent);
     #line 383 "src/analyzer/Include.pv"
-    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info });
+    struct EnumC* enum_info = EnumC__new(self->include, name, self->parent);
     #line 384 "src/analyzer/Include.pv"
+    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info });
+    #line 385 "src/analyzer/Include.pv"
     return enum_info;
 }
 
-#line 387 "src/analyzer/Include.pv"
+#line 388 "src/analyzer/Include.pv"
 void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name) {
-    #line 388 "src/analyzer/Include.pv"
-    HashMap_str_EnumCValue__insert(&enum_info->values, (struct str){ .ptr = value_name, .length = strlen(value_name) }, (struct EnumCValue) { .parent = enum_info, .name = (struct str){ .ptr = value_name, .length = strlen(value_name) } });
     #line 389 "src/analyzer/Include.pv"
+    HashMap_str_EnumCValue__insert(&enum_info->values, (struct str){ .ptr = value_name, .length = strlen(value_name) }, (struct EnumCValue) { .parent = enum_info, .name = (struct str){ .ptr = value_name, .length = strlen(value_name) } });
+    #line 390 "src/analyzer/Include.pv"
     IncludeContext__insert_value(self, value_name, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info });
 }
 
-#line 392 "src/analyzer/Include.pv"
+#line 393 "src/analyzer/Include.pv"
 struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self, char const* name) {
-    #line 393 "src/analyzer/Include.pv"
-    struct Include* include = self->include;
     #line 394 "src/analyzer/Include.pv"
+    struct Include* include = self->include;
+    #line 395 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
+
     #line 397 "src/analyzer/Include.pv"
     struct Type* existing = HashMap_str_Type__find(self->types, &(struct str){ .ptr = name, .length = strlen(name) });
     #line 398 "src/analyzer/Include.pv"

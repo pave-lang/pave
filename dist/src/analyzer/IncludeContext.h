@@ -17,7 +17,7 @@ struct FunctionC;
 #include <stdio.h>
 #include <string.h>
 
-#line 325 "src/analyzer/Include.pv"
+#line 326 "src/analyzer/Include.pv"
 struct IncludeContext {
     struct Include* include;
     struct IncludeContext* parent_context;
@@ -26,34 +26,34 @@ struct IncludeContext {
     struct ParentCpp parent;
 };
 
-#line 339 "src/analyzer/Include.pv"
+#line 340 "src/analyzer/Include.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type);
 
-#line 343 "src/analyzer/Include.pv"
+#line 344 "src/analyzer/Include.pv"
 void IncludeContext__insert_value(struct IncludeContext* self, char const* name, struct Type type);
 
-#line 347 "src/analyzer/Include.pv"
+#line 348 "src/analyzer/Include.pv"
 bool IncludeContext__insert_function(struct IncludeContext* self, char const* name, struct Type* return_type);
 
-#line 355 "src/analyzer/Include.pv"
+#line 356 "src/analyzer/Include.pv"
 void IncludeContext__add_function(struct IncludeContext* self, char const* name, CXCursor cursor);
 
-#line 365 "src/analyzer/Include.pv"
+#line 366 "src/analyzer/Include.pv"
 void IncludeContext__add_basic_function(struct IncludeContext* self, char const* name);
 
-#line 369 "src/analyzer/Include.pv"
+#line 370 "src/analyzer/Include.pv"
 struct StructC* IncludeContext__add_struct(struct IncludeContext* self, char const* name);
 
-#line 375 "src/analyzer/Include.pv"
+#line 376 "src/analyzer/Include.pv"
 struct StructC* IncludeContext__add_union(struct IncludeContext* self, char const* name);
 
-#line 381 "src/analyzer/Include.pv"
+#line 382 "src/analyzer/Include.pv"
 struct EnumC* IncludeContext__add_enum(struct IncludeContext* self, char const* name);
 
-#line 387 "src/analyzer/Include.pv"
+#line 388 "src/analyzer/Include.pv"
 void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name);
 
-#line 392 "src/analyzer/Include.pv"
+#line 393 "src/analyzer/Include.pv"
 struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self, char const* name);
 
 #line 425 "src/analyzer/Include.pv"

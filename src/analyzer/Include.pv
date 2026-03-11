@@ -201,19 +201,19 @@ impl Include {
         if type.kind == CXType_Elaborated {
             let decl = clang_getTypeDeclaration(type);
 
-            let ns_chain = Array<CXCursor>::new(self.root.allocator);
+            let path = Array<CXCursor>::new(self.root.allocator);
             let parent = clang_getCursorSemanticParent(decl);
-            while clang_getCursorKind(parent) == CXCursor_Namespace {
-                ns_chain.append(parent);
+            while clang_getCursorKind(parent) == CXCursor_Namespace || clang_getCursorKind(parent) == CXCursor_ClassDecl || clang_getCursorKind(parent) == CXCursor_StructDecl {
+                path.append(parent);
                 parent = clang_getCursorSemanticParent(parent);
             }
 
-            if ns_chain.length > 0 {
+            if path.length > 0 {
                 let current_types = &self.types;
-                let i = ns_chain.length;
+                let i = path.length;
                 while i > 0 {
                     i -= 1;
-                    let ns_spelling = clang_getCursorSpelling(ns_chain.data[i]);
+                    let ns_spelling = clang_getCursorSpelling(path.data[i]);
                     let ns_name = clang_getCString(ns_spelling);
 
                     let ns_type = current_types.find(ns_name);
@@ -223,6 +223,7 @@ impl Include {
 
                     match ns_type {
                         Type::NamespaceCpp(ns_info) => { current_types = &ns_info.types; },
+                        Type::ClassCpp(class_info) => { current_types = &class_info.types; },
                         _ => { return &self.root.type_void; }
                     }
                 }
@@ -393,7 +394,6 @@ impl IncludeContext {
         let include = self.include;
         let allocator = include.root.allocator;
 
-        // Reuse existing namespace if already registered (namespace can appear in multiple translation units)
         let existing = self.types.find(name);
         if existing != 0 {
             match existing {

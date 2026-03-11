@@ -7,7 +7,7 @@ struct IncludeContext;
 #include <stdio.h>
 #include <string.h>
 
-#line 333 "src/analyzer/Include.pv"
+#line 334 "src/analyzer/Include.pv"
 struct IncludeObjectContext {
     struct IncludeContext* context;
     void* object;

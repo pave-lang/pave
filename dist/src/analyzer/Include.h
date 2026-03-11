@@ -43,16 +43,16 @@ bool Include__process(struct Include* self);
 #line 178 "src/analyzer/Include.pv"
 struct Type* Include__parse_type(struct Include* self, CXType type);
 
-#line 258 "src/analyzer/Include.pv"
+#line 259 "src/analyzer/Include.pv"
 struct EnumC* Include__find_enum(struct Include* self, char const* name);
 
-#line 269 "src/analyzer/Include.pv"
+#line 270 "src/analyzer/Include.pv"
 char* Include__make_string(struct Include* self, CXString s);
 
-#line 276 "src/analyzer/Include.pv"
+#line 277 "src/analyzer/Include.pv"
 struct str Include__make_str(struct Include* self, CXString s);
 
-#line 283 "src/analyzer/Include.pv"
+#line 284 "src/analyzer/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor);
 
 #endif
