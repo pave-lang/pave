@@ -135,7 +135,7 @@ intptr_t str__index_of_start(struct str self, char ch, uintptr_t start) {
 #line 80 "src/std/str.pv"
 bool str__is_whitespace(char ch) {
     #line 81 "src/std/str.pv"
-    return ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t';
+    return (ch == ' ') || (ch == '\r') || (ch == '\n') || (ch == '\t');
 }
 
 #line 84 "src/std/str.pv"
@@ -146,13 +146,13 @@ struct str str__trim(struct str self) {
     uintptr_t end = self.length;
 
     #line 88 "src/std/str.pv"
-    while (start < end && str__is_whitespace(*(self.ptr + start))) {
+    while ((start < end) && str__is_whitespace(*(self.ptr + start))) {
         #line 89 "src/std/str.pv"
         start = start + 1;
     }
 
     #line 92 "src/std/str.pv"
-    while (end > start && str__is_whitespace(*(self.ptr + end - 1))) {
+    while ((end > start) && str__is_whitespace(*(self.ptr + end - 1))) {
         #line 93 "src/std/str.pv"
         end = end - 1;
     }

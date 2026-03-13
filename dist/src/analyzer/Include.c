@@ -183,7 +183,7 @@ bool Include__process(struct Include* self) {
     #line 114 "src/analyzer/Include.pv"
     CXIndex index = clang_createIndex(0, 1);
     #line 115 "src/analyzer/Include.pv"
-    if (index == 0) {
+    if (index == (CXIndex)(0)) {
         #line 116 "src/analyzer/Include.pv"
         Root__error(self->root, self->path, 0, 0, 0, 0, "clang_createIndex failed\n");
         #line 117 "src/analyzer/Include.pv"
@@ -321,7 +321,7 @@ struct Type* Include__parse_type(struct Include* self, CXType type) {
         #line 205 "src/analyzer/Include.pv"
         CXCursor parent = clang_getCursorSemanticParent(decl);
         #line 206 "src/analyzer/Include.pv"
-        while (clang_getCursorKind(parent) == CXCursor_Namespace || clang_getCursorKind(parent) == CXCursor_ClassDecl || clang_getCursorKind(parent) == CXCursor_StructDecl) {
+        while ((clang_getCursorKind(parent) == CXCursor_Namespace) || (clang_getCursorKind(parent) == CXCursor_ClassDecl) || (clang_getCursorKind(parent) == CXCursor_StructDecl)) {
             #line 207 "src/analyzer/Include.pv"
             Array_CXCursor__append(&path, parent);
             #line 208 "src/analyzer/Include.pv"
@@ -528,7 +528,7 @@ bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
         clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
         #line 314 "src/analyzer/Include.pv"
-        if (line1 == line2 && col1 == col2) {
+        if ((line1 == line2) && (col1 == col2)) {
             #line 315 "src/analyzer/Include.pv"
             result = true;
         }

@@ -81,7 +81,7 @@ struct Enum* HashMap_str_Enum__insert(struct HashMap_str_Enum* self, struct str 
     }
 
     #line 77 "src/std/HashMap.pv"
-    if (self->capacity == 0 || (self->length * 100 / self->capacity) > 75) {
+    if ((self->capacity == 0) || ((self->length * 100 / self->capacity) > 75)) {
         #line 78 "src/std/HashMap.pv"
         HashMap_str_Enum__resize(self, self->capacity * 2);
     }

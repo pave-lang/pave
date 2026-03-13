@@ -31,7 +31,7 @@ struct Impl Impl__parse(struct Context* context) {
     };
 
     #line 36 "src/analyzer/Impl.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "impl") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "impl")) {
         #line 36 "src/analyzer/Impl.pv"
         return node;
     }
@@ -145,7 +145,7 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
     struct Array_ImplNode* nodes = &self->nodes;
 
     #line 89 "src/analyzer/Impl.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
         #line 89 "src/analyzer/Impl.pv"
         return false;
     }
@@ -178,7 +178,7 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
     }
 
     #line 106 "src/analyzer/Impl.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 106 "src/analyzer/Impl.pv"
         return false;
     }

@@ -78,18 +78,18 @@ impl str {
     }
 
     fn is_whitespace(ch: char) -> bool {
-        return ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t';
+        return (ch == ' ') || (ch == '\r') || (ch == '\n') || (ch == '\t');
     }
 
     fn trim(self) -> str {
         let start: usize = 0;
         let end: usize = self.length;
 
-        while start < end && str::is_whitespace(*(self.ptr + start)) {
+        while (start < end) && str::is_whitespace(*(self.ptr + start)) {
             start = start + 1;
         }
 
-        while end > start && str::is_whitespace(*(self.ptr + end - 1)) {
+        while (end > start) && str::is_whitespace(*(self.ptr + end - 1)) {
             end = end - 1;
         }
 

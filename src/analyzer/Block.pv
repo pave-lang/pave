@@ -25,7 +25,7 @@ impl Block {
 
     fn parse_let_statement(&self, context: &Context, generics: &Generics) -> bool {
         let first_token = context.current();
-        if context.expect_value(TokenType::Keyword, "let") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "let") { return false; }
 
         let is_static = context.check_next(TokenType::Keyword, "static");
 
@@ -52,12 +52,12 @@ impl Block {
                 type_name.prepend(": ");
                 context.inlay_hint(name, type_name.c_str(), InlayHintKind::Type, false, false);
             } else {
-                expression.validate_type(context, type);
+                expression.validate_type(context, type, true);
             }
         }
 
-        if context.set_value(name, type) == 0 { context.error("set_value"); return false; }
-        if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+        if !context.set_value(name, type) { context.error("set_value"); return false; }
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
         let let_statement = context.allocator.store(LetStatement {
             is_static,
@@ -75,7 +75,7 @@ impl Block {
         let defer_statements: Array<DeferStatement> = context.get_defer_statements();
 
         let first_token = context.current();
-        if context.expect_value(TokenType::Keyword, "return") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "return") { return false; }
 
         if context.check_next(TokenType::Symbol, ";") {
             let statement: StatementData = StatementData::ReturnStatement(0, defer_statements);
@@ -85,9 +85,9 @@ impl Block {
 
         let expression = Expression::parse(context, generics);
         if expression == 0 { return false; }
-        if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
-        expression.validate_type(context, &context.function.return_type);
+        expression.validate_type(context, &context.function.return_type, true);
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::ReturnStatement(expression, defer_statements)));
 
@@ -96,7 +96,7 @@ impl Block {
     
     fn parse_yield_statement(&self, context: &Context, generics: &Generics) -> bool {
         let first_token = context.current();
-        if context.expect_value(TokenType::Keyword, "yield") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "yield") { return false; }
 
         if context.check_next(TokenType::Symbol, ";") {
             let statement: StatementData = StatementData::YieldStatement(0);
@@ -106,9 +106,9 @@ impl Block {
 
         let expression = Expression::parse(context, generics);
         if expression == 0 { return false; }
-        if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
-        expression.validate_type(context, &context.function.return_type);
+        expression.validate_type(context, &context.function.return_type, true);
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::YieldStatement(expression)));
 
@@ -127,21 +127,21 @@ impl Block {
             let value = Expression::parse(context, generics);
             if value == 0 { return false; }
 
-            value.validate_type(context, &expression.return_type);
+            value.validate_type(context, &expression.return_type, true);
 
             self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(expression, operator, value)));
         } else {
             self.statements.append(Statement::new(first_token, context.prev(), StatementData::ExpressionStatement(expression)));
         }
 
-        if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
         return true;
     }
 
     fn parse_if_statement(&self, context: &Context, generics: &Generics) -> bool {
         let first_token = context.current();
-        if context.expect_value(TokenType::Keyword, "if") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "if") { return false; }
 
         let expression = Expression::parse(context, generics);
         if expression == 0 { return false; }
@@ -181,16 +181,16 @@ impl Block {
 
     fn parse_match_statement(&self, context: &Context, generics: &Generics) -> bool {
         let first_token = context.current();
-        if context.expect_value(TokenType::Keyword, "match") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "match") { return false; }
 
         let expression = Expression::parse(context, generics);
         if expression == 0 { return false; }
 
-        if context.expect_value(TokenType::Symbol, "{") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
         
         let cases: Array<MatchCase> = Array<MatchCase>::new(context.allocator);
 
-        while context.check_value(TokenType::Symbol, "}") == 0 {
+        while !context.check_value(TokenType::Symbol, "}") {
             let pattern: MatchPattern = MatchPattern::Default;
             let first_match_token = context.current();
 
@@ -259,7 +259,7 @@ impl Block {
                             if context.check_next(TokenType::Symbol, "(") {
                                 let variable_i: usize = 0;
 
-                                while context.check_value(TokenType::Symbol, ")") == 0 {
+                                while !context.check_value(TokenType::Symbol, ")") {
                                     let ref = context.check_next(TokenType::Symbol, "&");
                                     let variable = context.expect(TokenType::Identifier);
                                     if variable == 0 { context.pop_scope(); return false; }
@@ -278,11 +278,11 @@ impl Block {
                                     variable_type_name.prepend(": ");
                                     context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
 
-                                    if variable.eq(TokenType::Identifier, "_") == 0 {
-                                        if context.set_value(variable, variable_type) == 0 { context.pop_scope(); return false; }
+                                    if !variable.eq(TokenType::Identifier, "_") {
+                                        if !context.set_value(variable, variable_type) { context.pop_scope(); return false; }
                                     }
 
-                                    if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                                    if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                         context.pop_scope();
                                         context.pop_scope();
                                         context.expect_value(TokenType::Symbol, ")");
@@ -292,7 +292,7 @@ impl Block {
                                     variable_i += 1;
                                 }
 
-                                if context.expect_value(TokenType::Symbol, ")") == 0 { context.pop_scope(); return false; }
+                                if !context.expect_value(TokenType::Symbol, ")") { context.pop_scope(); return false; }
 
                                 if parameters.length != enum_variant.types.length {
                                     let message = String::new(context.allocator);
@@ -323,9 +323,9 @@ impl Block {
                 }
             }
 
-            if context.expect_value(TokenType::Symbol, "=>") == 0 { context.pop_scope(); return false; }
+            if !context.expect_value(TokenType::Symbol, "=>") { context.pop_scope(); return false; }
 
-            if block.parse(context, generics, false) == 0 { context.pop_scope(); return false; }
+            if !block.parse(context, generics, false) { context.pop_scope(); return false; }
 
             let match_case: MatchCase = MatchCase {
                 first_token: first_match_token,
@@ -338,14 +338,14 @@ impl Block {
 
             context.pop_scope();
 
-            if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, "}") == 0 {
+            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
                 context.pop_scope();
                 context.expect_value(TokenType::Symbol, "}");
                 return false;
             }
         }
 
-        if context.expect_value(TokenType::Symbol, "}") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "}") { return false; }
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::MatchStatement(expression, cases)));
 
@@ -354,14 +354,14 @@ impl Block {
 
     fn parse_while_statement(&self, context: &Context, generics: &Generics) -> bool {
         let first_token = context.current();
-        if context.expect_value(TokenType::Keyword, "while") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "while") { return false; }
                 
         let expression = Expression::parse(context, generics);
         if expression == 0 { return false; }
 
         let block = Block::new_ptr(context);
         block.is_loop = true;
-        if block.parse(context, generics, true) == 0 { return false; }
+        if !block.parse(context, generics, true) { return false; }
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::WhileStatement(expression, block)));
         
@@ -385,24 +385,24 @@ impl Block {
 
         let for_statement = ForStatement::new(context.allocator);
 
-        if context.expect_value(TokenType::Keyword, "for") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "for") { return false; }
 
         if context.check_next(TokenType::Symbol, "(") {
-            while context.check_value(TokenType::Symbol, ")") == 0 {
-                if self.parse_for_variable(context, &for_statement.variables) == 0 { return false; }
+            while !context.check_value(TokenType::Symbol, ")") {
+                if !self.parse_for_variable(context, &for_statement.variables) { return false; }
 
-                if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, ")") == 0 {
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                     context.expect_value(TokenType::Symbol, ")");
                     return false;
                 }
             }
 
-            if context.expect_value(TokenType::Symbol, ")") == 0 { return false; }
+            if !context.expect_value(TokenType::Symbol, ")") { return false; }
         } else {
-            if self.parse_for_variable(context, &for_statement.variables) == 0 { return false; }
+            if !self.parse_for_variable(context, &for_statement.variables) { return false; }
         }
 
-        if context.expect_value(TokenType::Keyword, "in") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "in") { return false; }
 
         let expression_first_token = context.current();
         for_statement.expression = Expression::parse(context, generics);
@@ -494,12 +494,12 @@ impl Block {
         context.push_scope(self);
 
         for variable2 in for_statement.variables {
-            if context.set_value(variable2.name, variable2.type) == 0 { context.error("set_value"); return false; }
+            if !context.set_value(variable2.name, variable2.type) { context.error("set_value"); return false; }
         }
 
         for_statement.block = Block::new_ptr(context);
         for_statement.block.is_loop = true;
-        if for_statement.block.parse(context, generics, false) == 0 { return false; }
+        if !for_statement.block.parse(context, generics, false) { return false; }
 
         context.pop_scope();
 
@@ -523,27 +523,27 @@ impl Block {
         
         if !top_block_found { context.error("could not find top_block for defer statements"); }
 
-        if context.expect_value(TokenType::Keyword, "defer") == 0 { return false; }
+        if !context.expect_value(TokenType::Keyword, "defer") { return false; }
 
         if context.check_value(TokenType::Symbol, "{") {
             let block = Block::new_ptr(context);
-            if block.parse(context, generics, true) == 0 { return false; }
+            if !block.parse(context, generics, true) { return false; }
             self.defer_statements.append(DeferStatement::Block(block));
         }  else {
             let expression = Expression::parse(context, generics);
             if expression == 0 { return false; }
             self.defer_statements.append(DeferStatement::Expression(expression));
-            if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+            if !context.expect_value(TokenType::Symbol, ";") { return false; }
         }
 
         return true;
     }
 
     fn parse(&self, context: &Context, generics: &Generics, new_scope: bool) -> bool {
-        if context.expect_value(TokenType::Symbol, "{") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
         if new_scope { context.push_scope(self); }
 
-        while context.check_value(TokenType::Symbol, "}") == 0 {
+        while !context.check_value(TokenType::Symbol, "}") {
             let token = &context.tokens[context.pos];
             let result = true;
 
@@ -551,7 +551,7 @@ impl Block {
                 let first_token = context.current();
                 let block = Block::new_ptr(context);
                 result = block.parse(context, generics, true);
-                if result != 0 { self.statements.append(Statement::new(first_token, context.prev(), StatementData::BlockStatement(block))); }
+                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::BlockStatement(block))); }
             } else if token.eq(TokenType::Keyword, "defer") {
                 result = Block::parse_defer_statement(self, context, generics);
             } else if token.eq(TokenType::Keyword, "let") {
@@ -570,11 +570,11 @@ impl Block {
                 result = Block::parse_for_statement(self, context, generics);
             } else if context.check_next(TokenType::Keyword, "continue") {
                 self.statements.append(Statement::new(token, token, StatementData::ContinueStatement(context.get_loop_defer_statements())));
-                if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
                 result = true;
             } else if context.check_next(TokenType::Keyword, "break") {
                 self.statements.append(Statement::new(token, token, StatementData::BreakStatement(context.get_loop_defer_statements())));
-                if context.expect_value(TokenType::Symbol, ";") == 0 { return false; }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
                 result = true;
             } else {
                 result = Block::parse_expression_statement(self, context, generics);
@@ -590,7 +590,7 @@ impl Block {
             context.pop_scope();
         }
 
-        if context.expect_value(TokenType::Symbol, "}") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "}") { return false; }
 
         return true;
     }

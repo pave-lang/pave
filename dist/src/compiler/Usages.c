@@ -275,7 +275,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         HashMap_usize_TypeFunctionUsage__insert(&self->functions, (uintptr_t)(func_info), TypeFunctionUsage__new(self->allocator, func_info));
 
         #line 167 "src/compiler/Usages.pv"
-        if (func_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, func_info->name->value)) {
+        if ((func_info->generics.array.length == 0) && HashSet_str__insert(&self->usage_types, func_info->name->value)) {
             #line 168 "src/compiler/Usages.pv"
             struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap) {});
             #line 169 "src/compiler/Usages.pv"
@@ -321,7 +321,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         } }
 
         #line 186 "src/compiler/Usages.pv"
-        if (enum_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, enum_info->name->value)) {
+        if ((enum_info->generics.array.length == 0) && HashSet_str__insert(&self->usage_types, enum_info->name->value)) {
             #line 187 "src/compiler/Usages.pv"
             struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap) {});
             #line 188 "src/compiler/Usages.pv"
@@ -367,7 +367,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         } }
 
         #line 205 "src/compiler/Usages.pv"
-        if (struct_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, struct_info->name->value)) {
+        if ((struct_info->generics.array.length == 0) && HashSet_str__insert(&self->usage_types, struct_info->name->value)) {
             #line 206 "src/compiler/Usages.pv"
             struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap) {});
             #line 207 "src/compiler/Usages.pv"
@@ -401,7 +401,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         } }
 
         #line 220 "src/compiler/Usages.pv"
-        if (trait_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_traits, trait_info->name->value)) {
+        if ((trait_info->generics.array.length == 0) && HashSet_str__insert(&self->usage_traits, trait_info->name->value)) {
             #line 221 "src/compiler/Usages.pv"
             struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap) {});
             #line 222 "src/compiler/Usages.pv"
@@ -468,7 +468,7 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
             #line 243 "src/compiler/Usages.pv"
             struct ClassCpp* class_info = type_deref->classcpp_value;
             #line 244 "src/compiler/Usages.pv"
-            if (self->usage_mode != USAGE_MODE__BODY && usage_context) {
+            if ((self->usage_mode != USAGE_MODE__BODY) && usage_context) {
                 #line 245 "src/compiler/Usages.pv"
                 HashMap_str_ref_Type__insert(&usage_context->cpp_usages, class_info->name, type);
             }

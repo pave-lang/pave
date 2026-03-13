@@ -37,7 +37,7 @@ impl<T> ArrayIter<T> {
 
     fn next(&self) -> bool {
         self.iter = self.iter + self.step; 
-        return self.start <= self.iter && self.iter < self.end;
+        return (self.start <= self.iter) && (self.iter < self.end);
     }
 
     fn value(&self) -> T {

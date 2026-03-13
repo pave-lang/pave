@@ -67,7 +67,7 @@ int32_t main(int32_t argc, char const** argv) {
     }
 
     #line 37 "src/compiler/main.pv"
-    if (output_folder == 0 || argc < 4) {
+    if (!output_folder || argc < 4) {
         #line 38 "src/compiler/main.pv"
         fprintf(stderr, "Usage: %s ns_name=ns_path -o <output_folder> [--no-line-directives] [--output-new-lines] -- [clang_args]\n", argv[0]);
         #line 39 "src/compiler/main.pv"
@@ -152,7 +152,7 @@ int32_t main(int32_t argc, char const** argv) {
     }
 
     #line 80 "src/compiler/main.pv"
-    if (Generator__generate(&allocator, output_folder, output_line_directives, output_seperator, root) == 0) {
+    if (!Generator__generate(&allocator, output_folder, output_line_directives, output_seperator, root)) {
         #line 82 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(&allocator);

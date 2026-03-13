@@ -13,7 +13,7 @@ bool Token__eq(struct Token* self, enum TokenType type, char const* value) {
     struct str v = self->value;
 
     #line 42 "src/analyzer/Token.pv"
-    return self->type == type && str__eq(v, (struct str){ .ptr = value, .length = strlen(value) });
+    return (self->type == type) && str__eq(v, (struct str){ .ptr = value, .length = strlen(value) });
 }
 
 #line 45 "src/analyzer/Token.pv"

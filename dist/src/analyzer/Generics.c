@@ -62,13 +62,13 @@ struct Generic* Generics__find(struct Generics* self, struct str name) {
 #line 74 "src/analyzer/Generics.pv"
 bool Generics__parse(struct Generics* self, struct Context* context) {
     #line 75 "src/analyzer/Generics.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "<") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "<")) {
         #line 75 "src/analyzer/Generics.pv"
         return false;
     }
 
     #line 77 "src/analyzer/Generics.pv"
-    while (Context__check_next(context, TOKEN_TYPE__SYMBOL, ">") == 0) {
+    while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ">")) {
         #line 78 "src/analyzer/Generics.pv"
         struct Generic generic = Generic__new(self->array.allocator);
         #line 79 "src/analyzer/Generics.pv"
@@ -83,14 +83,14 @@ bool Generics__parse(struct Generics* self, struct Context* context) {
         HashMap_str_usize__insert(&self->map, generic.name->value, index);
 
         #line 84 "src/analyzer/Generics.pv"
-        if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") == 0) {
+        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
             #line 85 "src/analyzer/Generics.pv"
             return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">");
         }
     }
 
     #line 89 "src/analyzer/Generics.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">")) {
         #line 89 "src/analyzer/Generics.pv"
         return false;
     }

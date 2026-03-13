@@ -9,8 +9,8 @@
 #include <analyzer/Root.h>
 #include <stdbool.h>
 #include <analyzer/TokenType.h>
-#include <stdint.h>
 #include <analyzer/Token.h>
+#include <stdint.h>
 #include <analyzer/FunctionParent.h>
 #include <analyzer/Type.h>
 #include <tuple_str_Function.h>
@@ -41,7 +41,7 @@ struct Trait Trait__parse(struct Module* module) {
     struct Generics* generics = &node.generics;
 
     #line 29 "src/analyzer/Trait.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "trait") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "trait")) {
         #line 29 "src/analyzer/Trait.pv"
         return node;
     }

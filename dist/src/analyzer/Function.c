@@ -79,7 +79,7 @@ struct Function Function__parse_inner(struct Context* context, bool body_optiona
     node.declaration_start = context->pos;
 
     #line 80 "src/analyzer/Function.pv"
-    while (context->pos < context->length && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "{") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ";")) {
+    while ((context->pos < context->length) && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "{") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 81 "src/analyzer/Function.pv"
         Context__next_token(context);
     }
@@ -107,7 +107,7 @@ struct Function Function__parse_inner(struct Context* context, bool body_optiona
     #line 94 "src/analyzer/Function.pv"
     node.token_start = context->pos;
     #line 95 "src/analyzer/Function.pv"
-    if (Context__skip_brackets(context, "{", "}") == 0) {
+    if (!Context__skip_brackets(context, "{", "}")) {
         #line 95 "src/analyzer/Function.pv"
         return node;
     }
@@ -124,13 +124,13 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
     #line 102 "src/analyzer/Function.pv"
     struct Context* context = self->context;
     #line 103 "src/analyzer/Function.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
         #line 103 "src/analyzer/Function.pv"
         return false;
     }
 
     #line 105 "src/analyzer/Function.pv"
-    while (context->pos < context->length && Context__check_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+    while ((context->pos < context->length) && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
         #line 106 "src/analyzer/Function.pv"
         if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "&")) {
             #line 107 "src/analyzer/Function.pv"
@@ -208,7 +208,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
     }
 
     #line 157 "src/analyzer/Function.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
         #line 157 "src/analyzer/Function.pv"
         return false;
     }
@@ -293,7 +293,7 @@ bool Function__parse_function(struct Function* self, struct Generics* generics) 
         struct Parameter* param_info = ArrayIter_ref_Parameter__value(&__iter);
 
         #line 198 "src/analyzer/Function.pv"
-        if (Context__set_value(context, param_info->name, &param_info->type) == 0) {
+        if (!Context__set_value(context, param_info->name, &param_info->type)) {
             #line 198 "src/analyzer/Function.pv"
             Context__pop_scope(context);
             #line 198 "src/analyzer/Function.pv"
@@ -303,30 +303,29 @@ bool Function__parse_function(struct Function* self, struct Generics* generics) 
 
     #line 201 "src/analyzer/Function.pv"
     bool block_result = Block__parse(block, context, &self->generics, true);
-
-    #line 203 "src/analyzer/Function.pv"
-    if (block_result == 0) {
-        #line 203 "src/analyzer/Function.pv"
+    #line 202 "src/analyzer/Function.pv"
+    if (!block_result) {
+        #line 202 "src/analyzer/Function.pv"
         Context__pop_scope(context);
-        #line 203 "src/analyzer/Function.pv"
+        #line 202 "src/analyzer/Function.pv"
         return true;
     }
 
-    #line 205 "src/analyzer/Function.pv"
+    #line 204 "src/analyzer/Function.pv"
     self->body = block;
 
-    #line 207 "src/analyzer/Function.pv"
+    #line 206 "src/analyzer/Function.pv"
     if (context->pos != self->token_end) {
-        #line 207 "src/analyzer/Function.pv"
+        #line 206 "src/analyzer/Function.pv"
         Context__pop_scope(context);
-        #line 207 "src/analyzer/Function.pv"
+        #line 206 "src/analyzer/Function.pv"
         return true;
     }
 
-    #line 209 "src/analyzer/Function.pv"
+    #line 208 "src/analyzer/Function.pv"
     context->function = 0;
-    #line 210 "src/analyzer/Function.pv"
+    #line 209 "src/analyzer/Function.pv"
     Context__pop_scope(context);
-    #line 211 "src/analyzer/Function.pv"
+    #line 210 "src/analyzer/Function.pv"
     return false;
 }

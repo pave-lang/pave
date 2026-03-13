@@ -231,7 +231,7 @@ impl Context {
     fn next_token(&self) -> bool {
         self.pos += 1;
 
-        while self.pos < self.length && self.tokens[self.pos].type == TokenType::Comment {
+        while (self.pos < self.length) && (self.tokens[self.pos].type == TokenType::Comment) {
             self.pos += 1;
         }
 
@@ -311,7 +311,7 @@ impl Context {
     }
 
     fn skip_to_symbol(&self, symbol: *const char) -> bool {
-        while self.pos < self.length && !self.check_value(TokenType::Symbol, symbol) {
+        while (self.pos < self.length) && !self.check_value(TokenType::Symbol, symbol) {
             self.next_token();
         }
 
@@ -319,7 +319,7 @@ impl Context {
     }
 
     fn skip_comments(&self) {
-        while self.pos < self.length && self.check(TokenType::Comment) {
+        while (self.pos < self.length) && self.check(TokenType::Comment) {
             self.next_token();
         }
     }
@@ -331,7 +331,7 @@ impl Context {
 
         let brackets: usize = 1;
 
-        while self.pos < self.length && brackets > 0 {
+        while (self.pos < self.length) && (brackets > 0) {
             if self.check_value(TokenType::Symbol, open) {
                 brackets += 1;
             } else if self.check_value(TokenType::Symbol, close) {
@@ -365,7 +365,7 @@ impl Context {
     fn parse_type(&self, type: &Type, generics: &Generics) -> bool {
         if self.check_next(TokenType::Symbol, "&&") {
             let target_type: Type;
-            if self.parse_type(&target_type, generics) == 0 { return false; }
+            if !self.parse_type(&target_type, generics) { return false; }
 
             let indirect_1 = Indirect::new_reference(self.allocator, target_type);
             let indirect_2 = Indirect::new_reference(self.allocator, Type::Indirect(indirect_1));
@@ -393,7 +393,7 @@ impl Context {
 
             let indirect = self.allocator.store(Indirect { type: indirect_type });
 
-            if self.parse_type(&indirect.to, generics) == 0 {
+            if !self.parse_type(&indirect.to, generics) {
                 return false;
             }
 
@@ -422,7 +422,7 @@ impl Context {
             while i < length.value.length {
                 let c = length.value.ptr[i];
 
-                if (c >= '0' && c <= '9') {
+                if ((c >= '0') && (c <= '9')) {
                     result = result * 10 + (c - '0'); 
                 } else {
                     break; 
@@ -445,14 +445,14 @@ impl Context {
             let tuple: &Tuple = self.allocator.alloc(sizeof(Tuple));
             tuple.elements = Array<Type>::new(self.allocator);
 
-            while self.check_next(TokenType::Symbol, ")") == 0 {
+            while !self.check_next(TokenType::Symbol, ")") {
                 let element_type: Type;
 
                 if !self.parse_type(&element_type, generics) { return false; }
 
                 tuple.elements.append(element_type);
 
-                if self.check_next(TokenType::Symbol, ",") == 0 && self.check_value(TokenType::Symbol, ")") == 0 {
+                if !self.check_next(TokenType::Symbol, ",") && !self.check_value(TokenType::Symbol, ")") {
                     self.error("Expected , or )");
                     return false;
                 }
@@ -482,16 +482,16 @@ impl Context {
         let generics_ = Array<Type>::new(self.allocator);
         
         if self.check_next(TokenType::Symbol, "<") {
-            while self.check_next(TokenType::Symbol, ">") == 0 {
+            while !self.check_next(TokenType::Symbol, ">") {
                 let child_type: Type = Type::Primitive(0);
 
-                if self.parse_type(&child_type, generics) == 0 {
+                if !self.parse_type(&child_type, generics) {
                     return false;
                 }
 
                 generics_.append(child_type);
 
-                if self.check_next(TokenType::Symbol, ",") == 0 && self.check_value(TokenType::Symbol, ">") == 0 {
+                if !self.check_next(TokenType::Symbol, ",") && !self.check_value(TokenType::Symbol, ">") {
                     self.error("Expected , or >");
                     return false;
                 }
@@ -600,16 +600,16 @@ impl Context {
         let generics_ = Array<Type>::new(self.allocator);
         
         if self.check_next(TokenType::Symbol, "<") {
-            while self.check_next(TokenType::Symbol, ">") == 0 {
+            while !self.check_next(TokenType::Symbol, ">") {
                 let child_type: Type = Type::Primitive(0);
 
-                if self.parse_type(&child_type, generics) == 0 {
+                if !self.parse_type(&child_type, generics) {
                     return false;
                 }
 
                 generics_.append(child_type);
 
-                if self.check_next(TokenType::Symbol, ",") == 0 && self.check_value(TokenType::Symbol, ">") == 0 {
+                if !self.check_next(TokenType::Symbol, ",") && !self.check_value(TokenType::Symbol, ">") {
                     self.error("Expected , or >");
                     return false;
                 }
@@ -824,16 +824,14 @@ impl Context {
 
         if !self.expect_value(TokenType::Symbol, "<") { return Array<Type> {}; }
 
-        while self.check_next(TokenType::Symbol, ">") == 0 {
+        while !self.check_next(TokenType::Symbol, ">") {
             let child_type: Type = Type::Primitive(0);
 
-            if self.parse_type(&child_type, generics) == 0 {
-                return Array<Type> {};
-            }
+            if !self.parse_type(&child_type, generics) { return Array<Type> {}; }
 
             generic_inputs.append(child_type);
 
-            if self.check_next(TokenType::Symbol, ",") == 0 && self.check_value(TokenType::Symbol, ">") == 0 {
+            if !self.check_next(TokenType::Symbol, ",") && !self.check_value(TokenType::Symbol, ">") {
                 self.error("Expected , or >");
                 return Array<Type> {};
             }

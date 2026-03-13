@@ -43,15 +43,15 @@ impl Enum {
     fn parse(context: &Context) -> Enum {
         let node: Enum = Enum::new(context);
 
-        if context.expect_value(TokenType::Keyword, "enum") == 0 { return node; }
+        if !context.expect_value(TokenType::Keyword, "enum") { return node; }
 
         let name = context.expect(TokenType::Identifier);
         if name == 0 { return node; }
 
         node.token_start = context.pos;
 
-        if context.skip_to_symbol("{") == 0 { return node; }
-        if context.skip_brackets("{", "}") == 0 { return node; }
+        if !context.skip_to_symbol("{") { return node; }
+        if !context.skip_brackets("{", "}") { return node; }
 
         node.token_end = context.pos;
 
@@ -76,10 +76,10 @@ impl Enum {
         if !context.skip_to_symbol("{") { return false; }
         if !context.expect_value(TokenType::Symbol, "{") { return false; }
 
-        while context.check_next(TokenType::Symbol, "}") == 0 {
+        while !context.check_next(TokenType::Symbol, "}") {
             if !self.parse_variant() { return false; }
 
-            if context.check_next(TokenType::Symbol, ",") == 0 && context.check_value(TokenType::Symbol, "}") == 0 {
+            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
                 context.expect_value(TokenType::Symbol, "}");
                 return false;
             }
@@ -96,7 +96,7 @@ impl Enum {
         let types = Array<Type>::new(self.context.allocator);
 
         if context.check_next(TokenType::Symbol, "(") {
-            while context.check_next(TokenType::Symbol, ")") == 0 {
+            while !context.check_next(TokenType::Symbol, ")") {
                 let type: Type = Type::Primitive(0);
 
                 if !context.parse_type(&type, &self.generics) { return false; }

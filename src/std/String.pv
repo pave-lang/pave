@@ -44,9 +44,9 @@ impl String {
         let i: usize = 0;
 
         while i < length {
-            let c: char = ptr[i];
+            let c = ptr[i];
 
-            if c >= 'A' && c <= 'Z' {
+            if (c >= 'A') && (c <= 'Z') {
                 array.data[array.length] = c + 32;
             } else {
                 array.data[array.length] = c;

@@ -51,7 +51,7 @@ bool ArrayIter_ref_HashMap_usize_TypeFunctionUsage__next(struct ArrayIter_ref_Ha
     #line 39 "src/std/Array.pv"
     self->iter = self->iter + self->step;
     #line 40 "src/std/Array.pv"
-    return self->start <= self->iter && self->iter < self->end;
+    return (self->start <= self->iter) && (self->iter < self->end);
 }
 
 #line 43 "src/std/Array.pv"

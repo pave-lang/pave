@@ -39,7 +39,7 @@ impl Token {
     fn eq(&self, type: TokenType, value: *const char) -> bool {
         let v = self.value;
 
-        return self.type == type && v.eq(value);
+        return (self.type == type) && v.eq(value);
     }
 
     fn print(&self, path: *const char, message: *const char) {

@@ -96,7 +96,7 @@ impl Struct {
 
         if !context.expect_value(TokenType::Symbol, "{") { return false; }
 
-        while context.pos < self.token_end && context.check_value(TokenType::Symbol, "}") == 0 {
+        while (context.pos < self.token_end) && !context.check_value(TokenType::Symbol, "}") {
             let name = context.expect(TokenType::Identifier);
             if name == 0 { return false; }
 
@@ -142,7 +142,7 @@ impl Struct {
         if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
         let field_index: usize = 0;
-        while context.pos < self.token_end && context.check_value(TokenType::Symbol, ")") == 0 {
+        while (context.pos < self.token_end) && !context.check_value(TokenType::Symbol, ")") {
             let name = String::new(context.allocator);
             name.append("_");
             name.append_usize(field_index);
@@ -180,6 +180,6 @@ impl Struct {
     }
 
     fn is_newtype(&self) -> bool {
-        return self.type == StructType::Tuple && self.fields.length == 1;
+        return (self.type == StructType::Tuple) && (self.fields.length == 1);
     }
 }

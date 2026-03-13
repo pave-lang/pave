@@ -12,8 +12,8 @@
 #include <analyzer/EnumType.h>
 #include <stdbool.h>
 #include <analyzer/TokenType.h>
-#include <stdint.h>
 #include <analyzer/Token.h>
+#include <stdint.h>
 #include <std/Array_Type.h>
 #include <analyzer/Type.h>
 #include <analyzer/Primitive.h>
@@ -39,7 +39,7 @@ struct Enum Enum__parse(struct Context* context) {
     struct Enum node = Enum__new(context);
 
     #line 46 "src/analyzer/Enum.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "enum") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "enum")) {
         #line 46 "src/analyzer/Enum.pv"
         return node;
     }
@@ -56,12 +56,12 @@ struct Enum Enum__parse(struct Context* context) {
     node.token_start = context->pos;
 
     #line 53 "src/analyzer/Enum.pv"
-    if (Context__skip_to_symbol(context, "{") == 0) {
+    if (!Context__skip_to_symbol(context, "{")) {
         #line 53 "src/analyzer/Enum.pv"
         return node;
     }
     #line 54 "src/analyzer/Enum.pv"
-    if (Context__skip_brackets(context, "{", "}") == 0) {
+    if (!Context__skip_brackets(context, "{", "}")) {
         #line 54 "src/analyzer/Enum.pv"
         return node;
     }
@@ -116,7 +116,7 @@ bool Enum__fill_variants(struct Enum* self) {
     }
 
     #line 79 "src/analyzer/Enum.pv"
-    while (Context__check_next(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 80 "src/analyzer/Enum.pv"
         if (!Enum__parse_variant(self)) {
             #line 80 "src/analyzer/Enum.pv"
@@ -124,7 +124,7 @@ bool Enum__fill_variants(struct Enum* self) {
         }
 
         #line 82 "src/analyzer/Enum.pv"
-        if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
             #line 83 "src/analyzer/Enum.pv"
             Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
             #line 84 "src/analyzer/Enum.pv"
@@ -154,7 +154,7 @@ bool Enum__parse_variant(struct Enum* self) {
     #line 98 "src/analyzer/Enum.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
         #line 99 "src/analyzer/Enum.pv"
-        while (Context__check_next(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+        while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ")")) {
             #line 100 "src/analyzer/Enum.pv"
             struct Type type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
 

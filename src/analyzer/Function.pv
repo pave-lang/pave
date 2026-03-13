@@ -77,7 +77,7 @@ impl Function {
 
         node.declaration_start = context.pos;
 
-        while context.pos < context.length && !context.check_value(TokenType::Symbol, "{") && !context.check_value(TokenType::Symbol, ";") {
+        while (context.pos < context.length) && !context.check_value(TokenType::Symbol, "{") && !context.check_value(TokenType::Symbol, ";") {
             context.next_token();
         }
 
@@ -92,7 +92,7 @@ impl Function {
         if !context.check_value(TokenType::Symbol, "{") && !context.expect_value(TokenType::Symbol, "{") { return node; }
 
         node.token_start = context.pos;
-        if context.skip_brackets("{", "}") == 0 { return node; }
+        if !context.skip_brackets("{", "}") { return node; }
         node.token_end = context.pos;
         node.name = name;
         return node;
@@ -100,9 +100,9 @@ impl Function {
 
     fn parse_parameters(&self, generics: &Generics) -> bool {
         let context = self.context;
-        if context.expect_value(TokenType::Symbol, "(") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
-        while context.pos < context.length && context.check_value(TokenType::Symbol, ")") == 0 {
+        while (context.pos < context.length) && !context.check_value(TokenType::Symbol, ")") {
             if context.check_next(TokenType::Symbol, "&") {
                 let name = &context.tokens[context.pos];
 
@@ -154,7 +154,7 @@ impl Function {
             }
         }
 
-        if context.expect_value(TokenType::Symbol, ")") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, ")") { return false; }
 
         return true;
     }
@@ -195,12 +195,11 @@ impl Function {
         context.function = self;
 
         for param_info in self.parameters {
-            if context.set_value(param_info.name, &param_info.type) == 0 { context.pop_scope(); return true; }
+            if !context.set_value(param_info.name, &param_info.type) { context.pop_scope(); return true; }
         }
 
         let block_result = block.parse(context, &self.generics, true);
-
-        if block_result == 0 { context.pop_scope(); return true; }
+        if !block_result { context.pop_scope(); return true; }
 
         self.body = block;
 

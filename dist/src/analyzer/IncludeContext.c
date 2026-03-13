@@ -352,7 +352,7 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
         clang_visitChildren(cursor, IncludeObjectContext__visitor_enum, &(struct IncludeObjectContext) { .context = self, .object = enum_info });
         #line 535 "src/analyzer/Include.pv"
         return CXChildVisit_Continue;
-    } else if (kind == CXCursor_StructDecl || kind == CXCursor_ClassDecl) {
+    } else if ((kind == CXCursor_StructDecl) || (kind == CXCursor_ClassDecl)) {
         #line 537 "src/analyzer/Include.pv"
         CXType type = clang_getCursorType(cursor);
         #line 538 "src/analyzer/Include.pv"
@@ -451,7 +451,7 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
         enum CXCursorKind canonical_kind = clang_getCursorKind(canonical_decl);
 
         #line 596 "src/analyzer/Include.pv"
-        if (canonical_kind == CXCursor_StructDecl || canonical_kind == CXCursor_ClassDecl) {
+        if ((canonical_kind == CXCursor_StructDecl) || (canonical_kind == CXCursor_ClassDecl)) {
             #line 597 "src/analyzer/Include.pv"
             struct StructC* struct_info = IncludeContext__add_typedef_struct(self, name);
 

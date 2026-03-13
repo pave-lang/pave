@@ -173,7 +173,7 @@ bool Generator__overwrite_if_different(struct Generator* self, char const* file_
         #line 168 "src/compiler/Generator.pv"
         different = false;
         #line 169 "src/compiler/Generator.pv"
-        while (!different && c1 != EOF && c2 != EOF) {
+        while (!different && (c1 != (int32_t)(EOF)) && (c2 != (int32_t)(EOF))) {
             #line 170 "src/compiler/Generator.pv"
             c1 = fgetc(source);
             #line 171 "src/compiler/Generator.pv"
@@ -208,7 +208,7 @@ bool Generator__overwrite_if_different(struct Generator* self, char const* file_
     #line 185 "src/compiler/Generator.pv"
     int32_t c = fgetc(source);
     #line 186 "src/compiler/Generator.pv"
-    while (c != EOF) {
+    while (c != (int32_t)(EOF)) {
         #line 187 "src/compiler/Generator.pv"
         fputc(c, out);
         #line 188 "src/compiler/Generator.pv"
@@ -266,14 +266,14 @@ bool Generator__write_str_title(struct Generator* self, FILE* file, struct str s
         char c = s.ptr[i];
 
         #line 222 "src/compiler/Generator.pv"
-        if (c >= 'a' && c <= 'z') {
+        if ((c >= 'a') && (c <= 'z')) {
             #line 223 "src/compiler/Generator.pv"
             fprintf(file, "%c", c - 32);
             #line 224 "src/compiler/Generator.pv"
             was_lowercase = true;
         } else {
             #line 226 "src/compiler/Generator.pv"
-            if (was_lowercase && c >= 'A' && c <= 'Z') {
+            if (was_lowercase && (c >= 'A') && (c <= 'Z')) {
                 #line 227 "src/compiler/Generator.pv"
                 fprintf(file, "_");
             }
@@ -305,7 +305,7 @@ bool Generator__write_str_lowercase(struct Generator* self, FILE* file, struct s
         char c = s.ptr[i];
 
         #line 247 "src/compiler/Generator.pv"
-        if (c >= 'A' && c <= 'Z') {
+        if ((c >= 'A') && (c <= 'Z')) {
             #line 248 "src/compiler/Generator.pv"
             fprintf(file, "%c", c + 32);
         } else {
@@ -1116,7 +1116,7 @@ bool Generator__write_struct_construction(struct Generator* self, FILE* file, st
         }
     } else {
         #line 673 "src/compiler/Generator.pv"
-        bool compact = fields->length <= 1 || fields->data[0].value->token->start_line == fields->data[fields->length - 1].value->token->start_line;
+        bool compact = (fields->length <= 1) || (fields->data[0].value->token->start_line == fields->data[fields->length - 1].value->token->start_line);
 
         #line 675 "src/compiler/Generator.pv"
         fprintf(file, "(");
@@ -1206,7 +1206,7 @@ bool Generator__write_enum_variant(struct Generator* self, FILE* file, struct En
     struct Enum* parent = variant->parent;
 
     #line 719 "src/compiler/Generator.pv"
-    if (Generator__is_discriminated_union(parent) == 0) {
+    if (!Generator__is_discriminated_union(parent)) {
         #line 720 "src/compiler/Generator.pv"
         Generator__write_enum_variant_name(self, file, type, variant);
         #line 721 "src/compiler/Generator.pv"
@@ -1870,7 +1870,7 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                     #line 1042 "src/compiler/Generator.pv"
                     bool success = Generator__write_type(self, file, type, generics);
                     #line 1043 "src/compiler/Generator.pv"
-                    bool function_mode = arguments->length > 0 && arguments->data[0].name == 0;
+                    bool function_mode = (arguments->length > 0) && (arguments->data[0].name == 0);
 
                     #line 1045 "src/compiler/Generator.pv"
                     if (function_mode) {
@@ -2122,7 +2122,7 @@ bool Generator__write_expression(struct Generator* self, FILE* file, struct Expr
                     #line 1153 "src/compiler/Generator.pv"
                     Generator__write_instance_member_accessor(self, file, &parent->return_type, generics);
                     #line 1154 "src/compiler/Generator.pv"
-                    if (member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9') {
+                    if ((member.length > 0) && (member.ptr[0] >= '0') && (member.ptr[0] <= '9')) {
                         #line 1154 "src/compiler/Generator.pv"
                         fprintf(file, "_");
                     }
@@ -2353,7 +2353,7 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
     }
 
     #line 1269 "src/compiler/Generator.pv"
-    if (no_brackets == 0) {
+    if (!no_brackets) {
         #line 1270 "src/compiler/Generator.pv"
         fprintf(file, "{\n");
         #line 1271 "src/compiler/Generator.pv"
@@ -2602,7 +2602,7 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                 fprintf(file, "switch (");
 
                 #line 1398 "src/compiler/Generator.pv"
-                if (is_discriminated_union == 0) {
+                if (!is_discriminated_union) {
                     #line 1399 "src/compiler/Generator.pv"
                     Generator__write_deref_if_needed(self, file, return_type, generics);
                 }
@@ -3169,7 +3169,7 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
     }
 
     #line 1685 "src/compiler/Generator.pv"
-    if (no_brackets == 0) {
+    if (!no_brackets) {
         #line 1686 "src/compiler/Generator.pv"
         self->indent -= 1;
         #line 1687 "src/compiler/Generator.pv"
@@ -3330,7 +3330,7 @@ bool Generator__add_type_include(struct Generator* self, struct HashMap_str_Gene
             Generator__add_type_include(self, includes, refs, includes_primitives, &func_info->return_type, &resolved_generics);
 
             #line 1768 "src/compiler/Generator.pv"
-            if (func_info->type == FUNCTION_TYPE__BUILTIN || func_info->name == 0) {
+            if ((func_info->type == FUNCTION_TYPE__BUILTIN) || (func_info->name == 0)) {
                 #line 1768 "src/compiler/Generator.pv"
                 return true;
             }
@@ -3499,7 +3499,7 @@ bool Generator__add_function_includes(struct Generator* self, struct HashMap_str
         struct Parameter* parameter_iter = ArrayIter_ref_Parameter__value(&__iter);
 
         #line 1845 "src/compiler/Generator.pv"
-        if (func_info->type == FUNCTION_TYPE__COROUTINE || Type__is_fat_pointer(&parameter_iter->type)) {
+        if ((func_info->type == FUNCTION_TYPE__COROUTINE) || Type__is_fat_pointer(&parameter_iter->type)) {
             #line 1846 "src/compiler/Generator.pv"
             Generator__add_type_include(self, includes, refs, includes, &parameter_iter->type, generics);
         } else if (refs != 0) {
@@ -4079,7 +4079,7 @@ void Generator__write_refs(struct Generator* self, FILE* file, struct HashMap_st
                 #line 2112 "src/compiler/Generator.pv"
                 struct Enum* enum_info = type->enum_value._0;
                 #line 2113 "src/compiler/Generator.pv"
-                if (Generator__is_discriminated_union(enum_info) == 0) {
+                if (!Generator__is_discriminated_union(enum_info)) {
                     #line 2114 "src/compiler/Generator.pv"
                     struct String path = Generator__make_rel_path(self, enum_info->context->module, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
                     #line 2115 "src/compiler/Generator.pv"
@@ -4337,7 +4337,7 @@ bool Generator__write_function_block(struct Generator* self, FILE* file, struct 
         #line 2247 "src/compiler/Generator.pv"
         self->function_context->coroutine.yield_count = 0;
         #line 2248 "src/compiler/Generator.pv"
-        if (Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true) == 0) {
+        if (!Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true)) {
             #line 2249 "src/compiler/Generator.pv"
             uint32_t name_length = name.length;
             #line 2250 "src/compiler/Generator.pv"
@@ -4567,7 +4567,7 @@ bool Generator__generate_function(struct Generator* self, struct Function* func_
     #line 2373 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude includes = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2374 "src/compiler/Generator.pv"
-    if (Generator__add_block_includes(self, &includes, func_info->body, generics) == 0) {
+    if (!Generator__add_block_includes(self, &includes, func_info->body, generics)) {
         #line 2374 "src/compiler/Generator.pv"
         return false;
     }
@@ -4586,7 +4586,7 @@ bool Generator__generate_function(struct Generator* self, struct Function* func_
     fprintf(code_file, ">\n\n");
 
     #line 2383 "src/compiler/Generator.pv"
-    if (Generator__write_function_definition(self, code_file, func_info, generics, 0) == 0) {
+    if (!Generator__write_function_definition(self, code_file, func_info, generics, 0)) {
         #line 2383 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 2383 "src/compiler/Generator.pv"
@@ -4636,7 +4636,7 @@ bool Generator__generate_function(struct Generator* self, struct Function* func_
     #line 2405 "src/compiler/Generator.pv"
     includes = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2406 "src/compiler/Generator.pv"
-    if (Generator__add_function_includes(self, &includes, 0, func_info, generics) == 0) {
+    if (!Generator__add_function_includes(self, &includes, 0, func_info, generics)) {
         #line 2406 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 2406 "src/compiler/Generator.pv"
@@ -4654,7 +4654,7 @@ bool Generator__generate_function(struct Generator* self, struct Function* func_
     }
 
     #line 2414 "src/compiler/Generator.pv"
-    if (Generator__write_function_definition(self, header_file, func_info, generics, 0) == 0) {
+    if (!Generator__write_function_definition(self, header_file, func_info, generics, 0)) {
         #line 2414 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 2414 "src/compiler/Generator.pv"
@@ -5056,14 +5056,14 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
     #line 2614 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2615 "src/compiler/Generator.pv"
-    if (Generator__add_enum_definition_includes(self, &includes_definition, &refs_definition, enum_info, generics) == 0) {
+    if (!Generator__add_enum_definition_includes(self, &includes_definition, &refs_definition, enum_info, generics)) {
         #line 2615 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 2615 "src/compiler/Generator.pv"
         return false;
     }
     #line 2616 "src/compiler/Generator.pv"
-    if (Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &enum_info->impls, 0, generics) == 0) {
+    if (!Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &enum_info->impls, 0, generics)) {
         #line 2616 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 2616 "src/compiler/Generator.pv"
@@ -5077,7 +5077,7 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
     Generator__write_refs(self, header_file, &refs_definition);
 
     #line 2621 "src/compiler/Generator.pv"
-    if (Generator__write_enum_definition(self, header_file, enum_info, generics) == 0) {
+    if (!Generator__write_enum_definition(self, header_file, enum_info, generics)) {
         #line 2621 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 2621 "src/compiler/Generator.pv"
@@ -5120,7 +5120,7 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
     #line 2638 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2639 "src/compiler/Generator.pv"
-    if (Generator__add_impl_includes(self, &includes_code, &enum_info->impls, 0, generics) == 0) {
+    if (!Generator__add_impl_includes(self, &includes_code, &enum_info->impls, 0, generics)) {
         #line 2639 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 2639 "src/compiler/Generator.pv"
@@ -5132,7 +5132,7 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
     Generator__write_includes(self, code_file, &includes_code);
 
     #line 2643 "src/compiler/Generator.pv"
-    if (Generator__write_impls(self, code_file, enum_info->context->module, &enum_info->impls, 0, generics) == 0) {
+    if (!Generator__write_impls(self, code_file, enum_info->context->module, &enum_info->impls, 0, generics)) {
         #line 2643 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 2643 "src/compiler/Generator.pv"
@@ -5187,7 +5187,7 @@ bool Generator__add_impl_definition_includes(struct Generator* self, struct Hash
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
             #line 2664 "src/compiler/Generator.pv"
-            if (func_info->generics.array.length > 0 && impl_functions_for_impl != 0) {
+            if ((func_info->generics.array.length > 0) && (impl_functions_for_impl != 0)) {
                 #line 2665 "src/compiler/Generator.pv"
                 uintptr_t func_ptr = (uintptr_t)(func_info);
                 #line 2666 "src/compiler/Generator.pv"
@@ -5471,7 +5471,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                 #line 2790 "src/compiler/Generator.pv"
                 if (trait_info == 0) {
                     #line 2791 "src/compiler/Generator.pv"
-                    if (func_info->type == FUNCTION_TYPE__COROUTINE && function_usage != 0) {
+                    if ((func_info->type == FUNCTION_TYPE__COROUTINE) && (function_usage != 0)) {
                         #line 2792 "src/compiler/Generator.pv"
                         self->function_context = &function_usage->function_context;
                         #line 2793 "src/compiler/Generator.pv"
@@ -5729,7 +5729,7 @@ bool Generator__write_impl_definition(struct Generator* self, FILE* file, struct
             #line 2912 "src/compiler/Generator.pv"
             if (trait_info == 0) {
                 #line 2913 "src/compiler/Generator.pv"
-                if (Generator__write_function_definition(self, file, func_info, generics, 0) == 0) {
+                if (!Generator__write_function_definition(self, file, func_info, generics, 0)) {
                     #line 2913 "src/compiler/Generator.pv"
                     return false;
                 }
@@ -5879,7 +5879,7 @@ bool Generator__write_trait_definition(struct Generator* self, FILE* file, struc
             #line 2983 "src/compiler/Generator.pv"
             String__append(&func_name, (struct str){ .ptr = ")", .length = strlen(")") });
             #line 2984 "src/compiler/Generator.pv"
-            if (Generator__write_function_definition(self, file, func_info, &void_self_generics, &func_name) == 0) {
+            if (!Generator__write_function_definition(self, file, func_info, &void_self_generics, &func_name)) {
                 #line 2984 "src/compiler/Generator.pv"
                 return false;
             }
@@ -6001,7 +6001,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                     #line 3044 "src/compiler/Generator.pv"
                     struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                     #line 3045 "src/compiler/Generator.pv"
-                    if (Generator__write_function_definition(self, file, func_info, &generics_void, &func_name) == 0) {
+                    if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
                         #line 3046 "src/compiler/Generator.pv"
                         uint32_t func_name_length = func_info->name->value.length;
                         #line 3047 "src/compiler/Generator.pv"
@@ -6023,7 +6023,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                     fprintf(file, "* self = ");
 
                     #line 3058 "src/compiler/Generator.pv"
-                    if (module != 0 && module->mode_cpp) {
+                    if ((module != 0) && module->mode_cpp) {
                         #line 3059 "src/compiler/Generator.pv"
                         fprintf(file, "(");
                         #line 3060 "src/compiler/Generator.pv"
@@ -6048,7 +6048,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                     self->function_context = &func_context;
 
                     #line 3071 "src/compiler/Generator.pv"
-                    if (Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true) == 0) {
+                    if (!Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true)) {
                         #line 3072 "src/compiler/Generator.pv"
                         uint32_t func_name_length = func_info->name->value.length;
                         #line 3073 "src/compiler/Generator.pv"
@@ -6068,7 +6068,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                     self->function_context = 0;
                 } else {
                     #line 3083 "src/compiler/Generator.pv"
-                    if (Generator__write_function_definition(self, file, func_info, generics, 0) == 0) {
+                    if (!Generator__write_function_definition(self, file, func_info, generics, 0)) {
                         #line 3084 "src/compiler/Generator.pv"
                         uint32_t func_name_length = func_info->name->value.length;
                         #line 3085 "src/compiler/Generator.pv"
@@ -6532,7 +6532,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                         #line 3332 "src/compiler/Generator.pv"
                         fprintf(file, "\n");
                         #line 3333 "src/compiler/Generator.pv"
-                        if (Generator__write_function_definition(self, file, func_info, generics3, 0) == 0) {
+                        if (!Generator__write_function_definition(self, file, func_info, generics3, 0)) {
                             #line 3334 "src/compiler/Generator.pv"
                             uint32_t func_name_length = func_info->name->value.length;
                             #line 3335 "src/compiler/Generator.pv"
@@ -6584,7 +6584,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                 #line 3360 "src/compiler/Generator.pv"
                 struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                 #line 3361 "src/compiler/Generator.pv"
-                if (Generator__write_function_definition(self, file, func_info, &generics_void, &func_name) == 0) {
+                if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
                     #line 3362 "src/compiler/Generator.pv"
                     uint32_t func_name_length = func_info->name->value.length;
                     #line 3363 "src/compiler/Generator.pv"
@@ -6832,14 +6832,14 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     #line 3491 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3492 "src/compiler/Generator.pv"
-    if (Generator__add_struct_definition_includes(self, &includes_definition, &refs_definition, struct_info, generics) == 0) {
+    if (!Generator__add_struct_definition_includes(self, &includes_definition, &refs_definition, struct_info, generics)) {
         #line 3492 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3492 "src/compiler/Generator.pv"
         return false;
     }
     #line 3493 "src/compiler/Generator.pv"
-    if (Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &struct_info->impls, &usage->impl_functions, generics) == 0) {
+    if (!Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &struct_info->impls, &usage->impl_functions, generics)) {
         #line 3493 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3493 "src/compiler/Generator.pv"
@@ -6856,7 +6856,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     }
 
     #line 3500 "src/compiler/Generator.pv"
-    if (Generator__write_struct_definition(self, header_file, struct_info, usage, generics) == 0) {
+    if (!Generator__write_struct_definition(self, header_file, struct_info, usage, generics)) {
         #line 3500 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3500 "src/compiler/Generator.pv"
@@ -6884,7 +6884,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     remove(header_tmp);
 
     #line 3514 "src/compiler/Generator.pv"
-    if (struct_info->impls.length == 0 && !usage->impl_dynamic_usage) {
+    if ((struct_info->impls.length == 0) && !usage->impl_dynamic_usage) {
         #line 3515 "src/compiler/Generator.pv"
         return true;
     }
@@ -6920,7 +6920,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     #line 3532 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3533 "src/compiler/Generator.pv"
-    if (Generator__add_impl_includes(self, &includes_code, &struct_info->impls, &usage->impl_functions, generics) == 0) {
+    if (!Generator__add_impl_includes(self, &includes_code, &struct_info->impls, &usage->impl_functions, generics)) {
         #line 3533 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 3533 "src/compiler/Generator.pv"
@@ -6938,7 +6938,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     Generator__write_includes(self, code_file, &includes_code);
 
     #line 3541 "src/compiler/Generator.pv"
-    if (Generator__write_impls(self, code_file, struct_info->module, &struct_info->impls, &usage->impl_functions, generics) == 0) {
+    if (!Generator__write_impls(self, code_file, struct_info->module, &struct_info->impls, &usage->impl_functions, generics)) {
         #line 3541 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 3541 "src/compiler/Generator.pv"
@@ -7297,7 +7297,7 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
     #line 3722 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3723 "src/compiler/Generator.pv"
-    if (Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &primitive_info->impls, &usage->impl_functions, &generics) == 0) {
+    if (!Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &primitive_info->impls, &usage->impl_functions, &generics)) {
         #line 3723 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3723 "src/compiler/Generator.pv"
@@ -7312,7 +7312,7 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
     Generator__write_refs(self, header_file, &refs_definition);
 
     #line 3729 "src/compiler/Generator.pv"
-    if (Generator__write_primitive_definition(self, header_file, primitive_info, &generics) == 0) {
+    if (!Generator__write_primitive_definition(self, header_file, primitive_info, &generics)) {
         #line 3729 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3729 "src/compiler/Generator.pv"
@@ -7355,7 +7355,7 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
     #line 3748 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3749 "src/compiler/Generator.pv"
-    if (Generator__add_impl_includes(self, &includes_code, &primitive_info->impls, &usage->impl_functions, &generics) == 0) {
+    if (!Generator__add_impl_includes(self, &includes_code, &primitive_info->impls, &usage->impl_functions, &generics)) {
         #line 3749 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 3749 "src/compiler/Generator.pv"
@@ -7365,7 +7365,7 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
     Generator__write_includes(self, code_file, &includes_code);
 
     #line 3752 "src/compiler/Generator.pv"
-    if (Generator__write_impls(self, code_file, 0, &primitive_info->impls, &usage->impl_functions, &generics) == 0) {
+    if (!Generator__write_impls(self, code_file, 0, &primitive_info->impls, &usage->impl_functions, &generics)) {
         #line 3752 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 3752 "src/compiler/Generator.pv"
@@ -7564,7 +7564,7 @@ bool Generator__generate_slice(struct Generator* self, struct Type* element_type
     #line 3851 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3852 "src/compiler/Generator.pv"
-    if (Generator__add_impl_includes(self, &includes_code, &impls, &impl_functions, &generics) == 0) {
+    if (!Generator__add_impl_includes(self, &includes_code, &impls, &impl_functions, &generics)) {
         #line 3852 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 3852 "src/compiler/Generator.pv"
@@ -7574,7 +7574,7 @@ bool Generator__generate_slice(struct Generator* self, struct Type* element_type
     Generator__write_includes(self, code_file, &includes_code);
 
     #line 3855 "src/compiler/Generator.pv"
-    if (Generator__write_impls(self, code_file, 0, &impls, &impl_functions, &generics) == 0) {
+    if (!Generator__write_impls(self, code_file, 0, &impls, &impl_functions, &generics)) {
         #line 3855 "src/compiler/Generator.pv"
         fclose(code_file);
         #line 3855 "src/compiler/Generator.pv"
@@ -7778,7 +7778,7 @@ bool Generator__generate_trait(struct Generator* self, struct Trait* trait_info,
     #line 3957 "src/compiler/Generator.pv"
     struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3958 "src/compiler/Generator.pv"
-    if (Generator__add_trait_definition_includes(self, &includes_definition, &refs_definition, trait_info, generics) == 0) {
+    if (!Generator__add_trait_definition_includes(self, &includes_definition, &refs_definition, trait_info, generics)) {
         #line 3958 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3958 "src/compiler/Generator.pv"
@@ -7795,7 +7795,7 @@ bool Generator__generate_trait(struct Generator* self, struct Trait* trait_info,
     }
 
     #line 3965 "src/compiler/Generator.pv"
-    if (Generator__write_trait_definition(self, header_file, trait_info, generics) == 0) {
+    if (!Generator__write_trait_definition(self, header_file, trait_info, generics)) {
         #line 3965 "src/compiler/Generator.pv"
         fclose(header_file);
         #line 3965 "src/compiler/Generator.pv"

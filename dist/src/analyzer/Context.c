@@ -369,7 +369,7 @@ bool Context__next_token(struct Context* self) {
     self->pos += 1;
 
     #line 234 "src/analyzer/Context.pv"
-    while (self->pos < self->length && self->tokens[self->pos].type == TOKEN_TYPE__COMMENT) {
+    while ((self->pos < self->length) && (self->tokens[self->pos].type == TOKEN_TYPE__COMMENT)) {
         #line 235 "src/analyzer/Context.pv"
         self->pos += 1;
     }
@@ -495,7 +495,7 @@ bool Context__expect_value(struct Context* self, enum TokenType type, char const
 #line 313 "src/analyzer/Context.pv"
 bool Context__skip_to_symbol(struct Context* self, char const* symbol) {
     #line 314 "src/analyzer/Context.pv"
-    while (self->pos < self->length && !Context__check_value(self, TOKEN_TYPE__SYMBOL, symbol)) {
+    while ((self->pos < self->length) && !Context__check_value(self, TOKEN_TYPE__SYMBOL, symbol)) {
         #line 315 "src/analyzer/Context.pv"
         Context__next_token(self);
     }
@@ -507,7 +507,7 @@ bool Context__skip_to_symbol(struct Context* self, char const* symbol) {
 #line 321 "src/analyzer/Context.pv"
 void Context__skip_comments(struct Context* self) {
     #line 322 "src/analyzer/Context.pv"
-    while (self->pos < self->length && Context__check(self, TOKEN_TYPE__COMMENT)) {
+    while ((self->pos < self->length) && Context__check(self, TOKEN_TYPE__COMMENT)) {
         #line 323 "src/analyzer/Context.pv"
         Context__next_token(self);
     }
@@ -528,7 +528,7 @@ bool Context__skip_brackets(struct Context* self, char const* open, char const* 
     uintptr_t brackets = 1;
 
     #line 334 "src/analyzer/Context.pv"
-    while (self->pos < self->length && brackets > 0) {
+    while ((self->pos < self->length) && (brackets > 0)) {
         #line 335 "src/analyzer/Context.pv"
         if (Context__check_value(self, TOKEN_TYPE__SYMBOL, open)) {
             #line 336 "src/analyzer/Context.pv"
@@ -581,7 +581,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 367 "src/analyzer/Context.pv"
         struct Type target_type;
         #line 368 "src/analyzer/Context.pv"
-        if (Context__parse_type(self, &target_type, generics) == 0) {
+        if (!Context__parse_type(self, &target_type, generics)) {
             #line 368 "src/analyzer/Context.pv"
             return false;
         }
@@ -639,7 +639,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, (struct Indirect) { .type = indirect_type });
 
         #line 396 "src/analyzer/Context.pv"
-        if (Context__parse_type(self, &indirect->to, generics) == 0) {
+        if (!Context__parse_type(self, &indirect->to, generics)) {
             #line 397 "src/analyzer/Context.pv"
             return false;
         }
@@ -694,7 +694,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
             char c = length->value.ptr[i];
 
             #line 425 "src/analyzer/Context.pv"
-            if ((c >= '0' && c <= '9')) {
+            if (((c >= '0') && (c <= '9'))) {
                 #line 426 "src/analyzer/Context.pv"
                 result = result * 10 + (c - '0');
             } else {
@@ -732,7 +732,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         tuple->elements = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
         #line 448 "src/analyzer/Context.pv"
-        while (Context__check_next(self, TOKEN_TYPE__SYMBOL, ")") == 0) {
+        while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ")")) {
             #line 449 "src/analyzer/Context.pv"
             struct Type element_type;
 
@@ -746,7 +746,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
             Array_Type__append(&tuple->elements, element_type);
 
             #line 455 "src/analyzer/Context.pv"
-            if (Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(self, TOKEN_TYPE__SYMBOL, ")") == 0) {
+            if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ")")) {
                 #line 456 "src/analyzer/Context.pv"
                 Context__error(self, "Expected , or )");
                 #line 457 "src/analyzer/Context.pv"
@@ -799,12 +799,12 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
     #line 484 "src/analyzer/Context.pv"
     if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "<")) {
         #line 485 "src/analyzer/Context.pv"
-        while (Context__check_next(self, TOKEN_TYPE__SYMBOL, ">") == 0) {
+        while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
             #line 486 "src/analyzer/Context.pv"
             struct Type child_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
 
             #line 488 "src/analyzer/Context.pv"
-            if (Context__parse_type(self, &child_type, generics) == 0) {
+            if (!Context__parse_type(self, &child_type, generics)) {
                 #line 489 "src/analyzer/Context.pv"
                 return false;
             }
@@ -813,7 +813,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
             Array_Type__append(&generics_, child_type);
 
             #line 494 "src/analyzer/Context.pv"
-            if (Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(self, TOKEN_TYPE__SYMBOL, ">") == 0) {
+            if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
                 #line 495 "src/analyzer/Context.pv"
                 Context__error(self, "Expected , or >");
                 #line 496 "src/analyzer/Context.pv"
@@ -1012,12 +1012,12 @@ bool Context__parse_type_trait(struct Context* self, struct Type* type, struct G
     #line 602 "src/analyzer/Context.pv"
     if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "<")) {
         #line 603 "src/analyzer/Context.pv"
-        while (Context__check_next(self, TOKEN_TYPE__SYMBOL, ">") == 0) {
+        while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
             #line 604 "src/analyzer/Context.pv"
             struct Type child_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
 
             #line 606 "src/analyzer/Context.pv"
-            if (Context__parse_type(self, &child_type, generics) == 0) {
+            if (!Context__parse_type(self, &child_type, generics)) {
                 #line 607 "src/analyzer/Context.pv"
                 return false;
             }
@@ -1026,7 +1026,7 @@ bool Context__parse_type_trait(struct Context* self, struct Type* type, struct G
             Array_Type__append(&generics_, child_type);
 
             #line 612 "src/analyzer/Context.pv"
-            if (Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(self, TOKEN_TYPE__SYMBOL, ">") == 0) {
+            if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
                 #line 613 "src/analyzer/Context.pv"
                 Context__error(self, "Expected , or >");
                 #line 614 "src/analyzer/Context.pv"
@@ -1446,28 +1446,28 @@ struct Array_Type Context__parse_generics(struct Context* self, struct Generics*
     }
 
     #line 827 "src/analyzer/Context.pv"
-    while (Context__check_next(self, TOKEN_TYPE__SYMBOL, ">") == 0) {
+    while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
         #line 828 "src/analyzer/Context.pv"
         struct Type child_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
 
         #line 830 "src/analyzer/Context.pv"
-        if (Context__parse_type(self, &child_type, generics) == 0) {
-            #line 831 "src/analyzer/Context.pv"
+        if (!Context__parse_type(self, &child_type, generics)) {
+            #line 830 "src/analyzer/Context.pv"
             return (struct Array_Type) {};
         }
 
-        #line 834 "src/analyzer/Context.pv"
+        #line 832 "src/analyzer/Context.pv"
         Array_Type__append(&generic_inputs, child_type);
 
-        #line 836 "src/analyzer/Context.pv"
-        if (Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(self, TOKEN_TYPE__SYMBOL, ">") == 0) {
-            #line 837 "src/analyzer/Context.pv"
+        #line 834 "src/analyzer/Context.pv"
+        if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
+            #line 835 "src/analyzer/Context.pv"
             Context__error(self, "Expected , or >");
-            #line 838 "src/analyzer/Context.pv"
+            #line 836 "src/analyzer/Context.pv"
             return (struct Array_Type) {};
         }
     }
 
-    #line 842 "src/analyzer/Context.pv"
+    #line 840 "src/analyzer/Context.pv"
     return generic_inputs;
 }

@@ -81,7 +81,7 @@ struct Type* HashMap_u32_Type__insert(struct HashMap_u32_Type* self, uint32_t ke
     }
 
     #line 77 "src/std/HashMap.pv"
-    if (self->capacity == 0 || (self->length * 100 / self->capacity) > 75) {
+    if ((self->capacity == 0) || ((self->length * 100 / self->capacity) > 75)) {
         #line 78 "src/std/HashMap.pv"
         HashMap_u32_Type__resize(self, self->capacity * 2);
     }

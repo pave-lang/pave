@@ -111,8 +111,8 @@ impl Include {
             Length: file_content.length(),
         };
 
-        let index: CXIndex = clang_createIndex(0, 1);
-        if index == 0 {
+        let index = clang_createIndex(0, 1);
+        if index == cast<CXIndex>(0) {
             self.root.error(self.path, 0, 0, 0, 0, "clang_createIndex failed\n");
             return false;
         }
@@ -203,7 +203,7 @@ impl Include {
 
             let path = Array<CXCursor>::new(self.root.allocator);
             let parent = clang_getCursorSemanticParent(decl);
-            while clang_getCursorKind(parent) == CXCursor_Namespace || clang_getCursorKind(parent) == CXCursor_ClassDecl || clang_getCursorKind(parent) == CXCursor_StructDecl {
+            while (clang_getCursorKind(parent) == CXCursor_Namespace) || (clang_getCursorKind(parent) == CXCursor_ClassDecl) || (clang_getCursorKind(parent) == CXCursor_StructDecl) {
                 path.append(parent);
                 parent = clang_getCursorSemanticParent(parent);
             }
@@ -311,7 +311,7 @@ impl Include {
             clang_getSpellingLocation(loc_name_end, 0, &line1, &col1, 0);
             clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
-            if line1 == line2 && col1 == col2 {
+            if (line1 == line2) && (col1 == col2) {
                 result = true;
             }
         }
@@ -533,7 +533,7 @@ impl IncludeContext {
             let enum_info = self.add_enum(name);
             clang_visitChildren(cursor, IncludeObjectContext::visitor_enum, &IncludeObjectContext { context: self, object: enum_info });
             return CXChildVisit_Continue;
-        } else if kind == CXCursor_StructDecl || kind == CXCursor_ClassDecl {
+        } else if (kind == CXCursor_StructDecl) || (kind == CXCursor_ClassDecl) {
             let type = clang_getCursorType(cursor);
             let type_spelling = clang_getTypeSpelling(type);
             let type_name = include.make_string(type_spelling);
@@ -593,7 +593,7 @@ impl IncludeContext {
             let canonical_decl = clang_getTypeDeclaration(canonical_type);
             let canonical_kind = clang_getCursorKind(canonical_decl);
 
-            if canonical_kind == CXCursor_StructDecl || canonical_kind == CXCursor_ClassDecl {
+            if (canonical_kind == CXCursor_StructDecl) || (canonical_kind == CXCursor_ClassDecl) {
                 let struct_info = self.add_typedef_struct(name);
 
                 clang_visitChildren(canonical_decl, IncludeObjectContext::visitor_struct, &IncludeObjectContext {

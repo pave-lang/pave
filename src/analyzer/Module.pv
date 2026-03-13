@@ -64,11 +64,11 @@ impl Module {
 
         let result = true;
 
-        while context.pos < context.length && result {
+        while (context.pos < context.length) && result {
             let token = &context.tokens[context.pos];
 
             if token.eq(TokenType::Keyword, "ns") {
-                if context.expect_value(TokenType::Keyword, "ns") == 0 { return false; }
+                if !context.expect_value(TokenType::Keyword, "ns") { return false; }
                 if context.check(TokenType::String) {
                     let name = context.expect(TokenType::String);
 
@@ -89,7 +89,7 @@ impl Module {
                     }
                 }
             } else if token.eq(TokenType::Keyword, "mod") {
-                if context.expect_value(TokenType::Keyword, "mod") == 0 { return false; }
+                if !context.expect_value(TokenType::Keyword, "mod") { return false; }
                 if context.check(TokenType::String) {
                     let name = context.expect(TokenType::String);
 
@@ -117,11 +117,11 @@ impl Module {
                 
                 use_namespaces.append(path);
             } else if token.eq(TokenType::Keyword, "#cpp") {
-                if context.expect_value(TokenType::Keyword, "#cpp") == 0 { return false; }
+                if !context.expect_value(TokenType::Keyword, "#cpp") { return false; }
                 self.mode_cpp = true;
                 self.root.mode_cpp = true;
             } else if token.eq(TokenType::Keyword, "#include") {
-                if context.expect_value(TokenType::Keyword, "#include") == 0 { return false; }
+                if !context.expect_value(TokenType::Keyword, "#include") { return false; }
 
                 let path = context.expect(TokenType::String);
                 if path == 0 { return false; }

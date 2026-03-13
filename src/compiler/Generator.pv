@@ -166,7 +166,7 @@ impl Generator {
             let c1: i32 = 0;
             let c2: i32 = 0;
             different = false;
-            while !different && c1 != EOF && c2 != EOF {
+            while !different && (c1 != cast<i32>(EOF)) && (c2 != cast<i32>(EOF)) {
                 c1 = fgetc(source);
                 c2 = fgetc(orig);
                 different = c1 != c2;
@@ -183,7 +183,7 @@ impl Generator {
         if (!out) { perror("fopen"); return false; }
 
         let c: i32 = fgetc(source);
-        while c != EOF {
+        while c != cast<i32>(EOF) {
             fputc(c, out);
             c = fgetc(source);
         }
@@ -219,11 +219,11 @@ impl Generator {
         while i < length {
             let c: char = s.ptr[i];
             
-            if c >= 'a' && c <= 'z' {
+            if (c >= 'a') && (c <= 'z') {
                 fprintf(file, "%c", c - 32);
                 was_lowercase = true;
             } else {
-                if was_lowercase && c >= 'A' && c <= 'Z' {
+                if was_lowercase && (c >= 'A') && (c <= 'Z') {
                     fprintf(file, "_");
                 }
 
@@ -244,7 +244,7 @@ impl Generator {
         while i < length {
             let c: char = s.ptr[i];
 
-            if c >= 'A' && c <= 'Z' {
+            if (c >= 'A') && (c <= 'Z') {
                 fprintf(file, "%c", c + 32);
             } else {
                 fprintf(file, "%c", c);
@@ -670,7 +670,7 @@ impl Generator {
                 fprintf(file, "0");
             }
         } else {
-            let compact = fields.length <= 1 || fields.data[0].value.token.start_line == fields.data[fields.length - 1].value.token.start_line;
+            let compact = (fields.length <= 1) || (fields.data[0].value.token.start_line == fields.data[fields.length - 1].value.token.start_line);
 
             fprintf(file, "(");
             self.write_type(file, type, generics);
@@ -716,7 +716,7 @@ impl Generator {
     fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
         let parent = variant.parent;
 
-        if Generator::is_discriminated_union(parent) == 0 {
+        if !Generator::is_discriminated_union(parent) {
             self.write_enum_variant_name(file, type, variant);
             return true;
         } 
@@ -1040,7 +1040,7 @@ impl Generator {
                     },
                     Type::ClassCpp(_) => {
                         let success = self.write_type(file, type, generics);
-                        let function_mode = arguments.length > 0 && arguments.data[0].name == 0;
+                        let function_mode = (arguments.length > 0) && (arguments.data[0].name == 0);
 
                         if function_mode {
                             fprintf(file, "(");
@@ -1151,7 +1151,7 @@ impl Generator {
                     _ => {
                         self.write_expression(file, parent, generics);
                         self.write_instance_member_accessor(file, &parent.return_type, generics);
-                        if member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9' { fprintf(file, "_"); }
+                        if (member.length > 0) && (member.ptr[0] >= '0') && (member.ptr[0] <= '9') { fprintf(file, "_"); }
                         self.write_str(file, member);
                     },
                 }
@@ -1266,7 +1266,7 @@ impl Generator {
             return false;
         }
 
-        if no_brackets == 0 {
+        if !no_brackets {
             fprintf(file, "{\n");
             self.indent += 1;
         }
@@ -1395,7 +1395,7 @@ impl Generator {
                     self.write_indent(file);
                     fprintf(file, "switch (");
 
-                    if is_discriminated_union == 0 {
+                    if !is_discriminated_union {
                         self.write_deref_if_needed(file, return_type, generics);
                     }
 
@@ -1682,7 +1682,7 @@ impl Generator {
             self.write_defer_statements(file, return_type, &block.defer_statements, generics);
         }
 
-        if no_brackets == 0 {
+        if !no_brackets {
             self.indent -= 1;
             self.write_indent(file);
 
@@ -1765,7 +1765,7 @@ impl Generator {
 
                 self.add_type_include(includes, refs, includes_primitives, &func_info.return_type, &resolved_generics);
 
-                if func_info.type == FunctionType::Builtin || func_info.name == 0 { return true; }
+                if (func_info.type == FunctionType::Builtin) || (func_info.name == 0) { return true; }
 
                 match func_info.parent {
                     FunctionParent::None => {
@@ -1842,7 +1842,7 @@ impl Generator {
         }
 
         for parameter_iter in func_info.parameters {
-            if func_info.type == FunctionType::Coroutine || parameter_iter.type.is_fat_pointer() {
+            if (func_info.type == FunctionType::Coroutine) || parameter_iter.type.is_fat_pointer() {
                 self.add_type_include(includes, refs, includes, &parameter_iter.type, generics);
             } else if refs != 0 {
                 self.add_type_include(refs, 0, includes, &parameter_iter.type, generics);
@@ -2110,7 +2110,7 @@ impl Generator {
                     }
                 },
                 Type::Enum(enum_info, _) => {
-                    if Generator::is_discriminated_union(enum_info) == 0 {
+                    if !Generator::is_discriminated_union(enum_info) {
                         let path = self.make_rel_path(enum_info.context.module, name, ".h");
                         fprintf(file, "#include <%.*s>\n", cast<i32>(path.array.length), path.array.data);
                     } else {
@@ -2245,7 +2245,7 @@ impl Generator {
             fprintf(file, "}\n\n");
 
             self.function_context.coroutine.yield_count = 0;
-            if self.write_block(file, &func_info.return_type, func_info.body, generics, false, true) == 0 {
+            if !self.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
                 let name_length: u32 = name.length;
                 fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
                 fclose(file);
@@ -2371,7 +2371,7 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         let includes: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_block_includes(&includes, func_info.body, generics) == 0 { return false; }
+        if !self.add_block_includes(&includes, func_info.body, generics) { return false; }
         self.write_includes_raw(code_file, &func_info.context.module.includes);
         self.write_includes(code_file, &includes);
 
@@ -2380,7 +2380,7 @@ impl Generator {
         self.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if self.write_function_definition(code_file, func_info, generics, 0) == 0 { fclose(code_file); return false; }
+        if !self.write_function_definition(code_file, func_info, generics, 0) { fclose(code_file); return false; }
 
         self.write_function_block(code_file, name_str, func_info, generics);
 
@@ -2403,7 +2403,7 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         includes = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_function_includes(&includes, 0, func_info, generics) == 0 { fclose(header_file); return false; }
+        if !self.add_function_includes(&includes, 0, func_info, generics) { fclose(header_file); return false; }
         self.write_includes_raw(header_file, &func_info.context.module.includes);
         self.write_includes(header_file, &includes);
 
@@ -2411,7 +2411,7 @@ impl Generator {
             self.write_function_coroutine(header_file, func_info, generics);
         }
 
-        if self.write_function_definition(header_file, func_info, generics, 0) == 0 { fclose(header_file); return false; }
+        if !self.write_function_definition(header_file, func_info, generics, 0) { fclose(header_file); return false; }
         fprintf(header_file, ";\n");
 
         fprintf(header_file, "\n#endif\n");
@@ -2612,13 +2612,13 @@ impl Generator {
 
         let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
         let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_enum_definition_includes(&includes_definition, &refs_definition, enum_info, generics) == 0 { fclose(header_file); return false; }
-        if self.add_impl_definition_includes(&includes_definition, &refs_definition, &enum_info.impls, 0, generics) == 0 { fclose(header_file); return false; }
+        if !self.add_enum_definition_includes(&includes_definition, &refs_definition, enum_info, generics) { fclose(header_file); return false; }
+        if !self.add_impl_definition_includes(&includes_definition, &refs_definition, &enum_info.impls, 0, generics) { fclose(header_file); return false; }
         self.write_includes_raw(header_file, &enum_info.context.module.includes);
         self.write_includes(header_file, &includes_definition);
         self.write_refs(header_file, &refs_definition);
 
-        if self.write_enum_definition(header_file, enum_info, generics) == 0 { fclose(header_file); return false; }
+        if !self.write_enum_definition(header_file, enum_info, generics) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -2636,11 +2636,11 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_impl_includes(&includes_code, &enum_info.impls, 0, generics) == 0 { fclose(code_file); return false; }
+        if !self.add_impl_includes(&includes_code, &enum_info.impls, 0, generics) { fclose(code_file); return false; }
         self.write_includes_raw(code_file, &enum_info.context.module.includes);
         self.write_includes(code_file, &includes_code);
 
-        if self.write_impls(code_file, enum_info.context.module, &enum_info.impls, 0, generics) == 0 { fclose(code_file); return false; }
+        if !self.write_impls(code_file, enum_info.context.module, &enum_info.impls, 0, generics) { fclose(code_file); return false; }
 
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -2661,7 +2661,7 @@ impl Generator {
             }
 
             for (_, &func_info) in impl_info.functions {
-                if func_info.generics.array.length > 0 && impl_functions_for_impl != 0 {
+                if (func_info.generics.array.length > 0) && (impl_functions_for_impl != 0) {
                     let func_ptr = cast<usize>(func_info);
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
                     if function_usage != 0 {
@@ -2788,7 +2788,7 @@ impl Generator {
 
                 if func_info.generics.array.length == 0 {
                     if trait_info == 0 {
-                        if func_info.type == FunctionType::Coroutine && function_usage != 0 {
+                        if (func_info.type == FunctionType::Coroutine) && (function_usage != 0) {
                             self.function_context = &function_usage.function_context;
                             self.write_function_coroutine(file, func_info, generics);
                             self.function_context = 0;
@@ -2910,7 +2910,7 @@ impl Generator {
         for (_, &func_info) in impl_info.functions {
             if func_info.generics.array.length == 0 {
                 if trait_info == 0 {
-                    if self.write_function_definition(file, func_info, generics, 0) == 0 { return false; }
+                    if !self.write_function_definition(file, func_info, generics, 0) { return false; }
                 } else {
                     let generics_void = *generics;
                     generics_void.self_type = &self.root.type_void;
@@ -2981,7 +2981,7 @@ impl Generator {
                 func_name.append("(*");
                 func_name.append(func_info.name.value);
                 func_name.append(")");
-                if self.write_function_definition(file, func_info, &void_self_generics, &func_name) == 0 { return false; }
+                if !self.write_function_definition(file, func_info, &void_self_generics, &func_name) { return false; }
                 fprintf(file, ";\n");
             } /* else { TODO } */
         }
@@ -3042,7 +3042,7 @@ impl Generator {
                         generics_void.self_type = &self.root.type_void;
 
                         let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
-                        if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 {
+                        if !self.write_function_definition(file, func_info, &generics_void, &func_name) {
                             let func_name_length: u32 = func_info.name.value.length;
                             fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
                             return false;
@@ -3055,7 +3055,7 @@ impl Generator {
                         self.write_type(file, generics.self_type, generics);
                         fprintf(file, "* self = ");
 
-                        if module != 0 && module.mode_cpp {
+                        if (module != 0) && module.mode_cpp {
                             fprintf(file, "(");
                             self.write_type(file, generics.self_type, generics);
                             fprintf(file, "*)");
@@ -3068,7 +3068,7 @@ impl Generator {
                         if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
                         self.function_context = &func_context;
 
-                        if self.write_block(file, &func_info.return_type, func_info.body, generics, false, true) == 0 {
+                        if !self.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
                             let func_name_length: u32 = func_info.name.value.length;
                             fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
                             return false;
@@ -3080,7 +3080,7 @@ impl Generator {
 
                         self.function_context = 0;
                     } else {
-                        if self.write_function_definition(file, func_info, generics, 0) == 0 {
+                        if !self.write_function_definition(file, func_info, generics, 0) {
                             let func_name_length: u32 = func_info.name.value.length;
                             fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
                             return false;
@@ -3330,7 +3330,7 @@ impl Generator {
                             generics3.self_type = generics.self_type;
 
                             fprintf(file, "\n");
-                            if self.write_function_definition(file, func_info, generics3, 0) == 0 {
+                            if !self.write_function_definition(file, func_info, generics3, 0) {
                                 let func_name_length: u32 = func_info.name.value.length;
                                 fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
                                 return false;
@@ -3358,7 +3358,7 @@ impl Generator {
                     generics_void.self_type = &self.root.type_void;
 
                     let func_name = self.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
-                    if self.write_function_definition(file, func_info, &generics_void, &func_name) == 0 {
+                    if !self.write_function_definition(file, func_info, &generics_void, &func_name) {
                         let func_name_length: u32 = func_info.name.value.length;
                         fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
                         return false;
@@ -3489,15 +3489,15 @@ impl Generator {
 
         let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
         let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_struct_definition_includes(&includes_definition, &refs_definition, struct_info, generics) == 0 { fclose(header_file); return false; }
-        if self.add_impl_definition_includes(&includes_definition, &refs_definition, &struct_info.impls, &usage.impl_functions, generics) == 0 { fclose(header_file); return false; }
+        if !self.add_struct_definition_includes(&includes_definition, &refs_definition, struct_info, generics) { fclose(header_file); return false; }
+        if !self.add_impl_definition_includes(&includes_definition, &refs_definition, &struct_info.impls, &usage.impl_functions, generics) { fclose(header_file); return false; }
         self.write_includes(header_file, &includes_definition);
         self.write_refs(header_file, &refs_definition);
         if !struct_info.module.mode_cpp {
             self.write_includes_raw(header_file, &struct_info.module.includes);
         }
 
-        if self.write_struct_definition(header_file, struct_info, usage, generics) == 0 { fclose(header_file); return false; }
+        if !self.write_struct_definition(header_file, struct_info, usage, generics) { fclose(header_file); return false; }
 
         if struct_info.module.mode_cpp || self.root.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");
@@ -3511,7 +3511,7 @@ impl Generator {
         fclose(header_file);
         remove(header_tmp);
 
-        if struct_info.impls.length == 0 && !usage.impl_dynamic_usage {
+        if (struct_info.impls.length == 0) && !usage.impl_dynamic_usage {
             return true;
         }
 
@@ -3530,7 +3530,7 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_impl_includes(&includes_code, &struct_info.impls, &usage.impl_functions, generics) == 0 { fclose(code_file); return false; }
+        if !self.add_impl_includes(&includes_code, &struct_info.impls, &usage.impl_functions, generics) { fclose(code_file); return false; }
         self.write_includes_raw(code_file, &struct_info.module.includes);
 
         let name_str = name.as_str();
@@ -3538,7 +3538,7 @@ impl Generator {
 
         self.write_includes(code_file, &includes_code);
 
-        if self.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics) == 0 { fclose(code_file); return false; }
+        if !self.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics) { fclose(code_file); return false; }
 
         if struct_info.traits.length > 0 {
             fprintf(code_file, "\n");
@@ -3720,13 +3720,13 @@ impl Generator {
 
         let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
         let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_impl_definition_includes(&includes_definition, &refs_definition, &primitive_info.impls, &usage.impl_functions, &generics) == 0 { fclose(header_file); return false; }
+        if !self.add_impl_definition_includes(&includes_definition, &refs_definition, &primitive_info.impls, &usage.impl_functions, &generics) { fclose(header_file); return false; }
 
         self.write_impl_includes_raw(header_file, &primitive_info.impls);
         self.write_includes(header_file, &includes_definition);
         self.write_refs(header_file, &refs_definition);
 
-        if self.write_primitive_definition(header_file, primitive_info, &generics) == 0 { fclose(header_file); return false; }
+        if !self.write_primitive_definition(header_file, primitive_info, &generics) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -3746,10 +3746,10 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_impl_includes(&includes_code, &primitive_info.impls, &usage.impl_functions, &generics) == 0 { fclose(code_file); return false; }
+        if !self.add_impl_includes(&includes_code, &primitive_info.impls, &usage.impl_functions, &generics) { fclose(code_file); return false; }
         self.write_includes(code_file, &includes_code);
 
-        if self.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, &generics) == 0 { fclose(code_file); return false; }
+        if !self.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, &generics) { fclose(code_file); return false; }
 
         for (_, trait_info) in primitive_info.traits {
             fprintf(code_file, "\nstruct ");
@@ -3849,10 +3849,10 @@ impl Generator {
         let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: 0, length: 0 };
 
         let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_impl_includes(&includes_code, &impls, &impl_functions, &generics) == 0 { fclose(code_file); return false; }
+        if !self.add_impl_includes(&includes_code, &impls, &impl_functions, &generics) { fclose(code_file); return false; }
         self.write_includes(code_file, &includes_code);
 
-        if self.write_impls(code_file, 0, &impls, &impl_functions, &generics) == 0 { fclose(code_file); return false; }
+        if !self.write_impls(code_file, 0, &impls, &impl_functions, &generics) { fclose(code_file); return false; }
 
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -3955,14 +3955,14 @@ impl Generator {
 
         let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
         let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if self.add_trait_definition_includes(&includes_definition, &refs_definition, trait_info, generics) == 0 { fclose(header_file); return false; }
+        if !self.add_trait_definition_includes(&includes_definition, &refs_definition, trait_info, generics) { fclose(header_file); return false; }
         self.write_includes(header_file, &includes_definition);
         self.write_refs(header_file, &refs_definition);
         if !trait_info.module.mode_cpp {
             self.write_includes_raw(header_file, &trait_info.module.includes);
         }
 
-        if self.write_trait_definition(header_file, trait_info, generics) == 0 { fclose(header_file); return false; }
+        if !self.write_trait_definition(header_file, trait_info, generics) { fclose(header_file); return false; }
 
         if trait_info.module.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");

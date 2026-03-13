@@ -81,14 +81,14 @@ bool FileWriter__write_str_title(struct FileWriter* self, struct str s) {
         char c = s.ptr[i];
 
         #line 58 "src/compiler/FileWriter.pv"
-        if (c >= 'a' && c <= 'z') {
+        if ((c >= 'a') && (c <= 'z')) {
             #line 59 "src/compiler/FileWriter.pv"
             fprintf(self->file, "%c", c - 32);
             #line 60 "src/compiler/FileWriter.pv"
             was_lowercase = true;
         } else {
             #line 62 "src/compiler/FileWriter.pv"
-            if (was_lowercase && c >= 'A' && c <= 'Z') {
+            if (was_lowercase && (c >= 'A') && (c <= 'Z')) {
                 #line 63 "src/compiler/FileWriter.pv"
                 fprintf(self->file, "_");
             }
@@ -120,7 +120,7 @@ bool FileWriter__write_str_lowercase(struct FileWriter* self, struct str s) {
         char c = s.ptr[i];
 
         #line 83 "src/compiler/FileWriter.pv"
-        if (c >= 'A' && c <= 'Z') {
+        if ((c >= 'A') && (c <= 'Z')) {
             #line 84 "src/compiler/FileWriter.pv"
             fprintf(self->file, "%c", c + 32);
         } else {

@@ -33,7 +33,7 @@ impl Impl {
             functions: HashMap<str, Function>::new(context.allocator),
         };
 
-        if context.expect_value(TokenType::Keyword, "impl") == 0 { return node; }
+        if !context.expect_value(TokenType::Keyword, "impl") { return node; }
 
         node.token_start = context.pos;
         context.skip_to_symbol("{");
@@ -86,7 +86,7 @@ impl Impl {
         context.pos = self.token_start;
         let nodes: &Array<ImplNode> = &self.nodes;
 
-        if context.expect_value(TokenType::Symbol, "{") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
 
         context.skip_comments();
 
@@ -103,7 +103,7 @@ impl Impl {
             context.skip_comments();
         }
 
-        if context.expect_value(TokenType::Symbol, "}") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "}") { return false; }
 
         return true;
     }

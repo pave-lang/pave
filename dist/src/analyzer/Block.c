@@ -72,7 +72,7 @@ bool Block__parse_let_statement(struct Block* self, struct Context* context, str
     #line 27 "src/analyzer/Block.pv"
     struct Token* first_token = Context__current(context);
     #line 28 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "let") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "let")) {
         #line 28 "src/analyzer/Block.pv"
         return false;
     }
@@ -128,19 +128,19 @@ bool Block__parse_let_statement(struct Block* self, struct Context* context, str
             Context__inlay_hint(context, name, String__c_str(&type_name), INLAY_HINT_KIND__TYPE, false, false);
         } else {
             #line 55 "src/analyzer/Block.pv"
-            Expression__validate_type(expression, context, type);
+            Expression__validate_type(expression, context, type, true);
         }
     }
 
     #line 59 "src/analyzer/Block.pv"
-    if (Context__set_value(context, name, type) == 0) {
+    if (!Context__set_value(context, name, type)) {
         #line 59 "src/analyzer/Block.pv"
         Context__error(context, "set_value");
         #line 59 "src/analyzer/Block.pv"
         return false;
     }
     #line 60 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 60 "src/analyzer/Block.pv"
         return false;
     }
@@ -168,7 +168,7 @@ bool Block__parse_return_statement(struct Block* self, struct Context* context, 
     #line 77 "src/analyzer/Block.pv"
     struct Token* first_token = Context__current(context);
     #line 78 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "return") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "return")) {
         #line 78 "src/analyzer/Block.pv"
         return false;
     }
@@ -191,13 +191,13 @@ bool Block__parse_return_statement(struct Block* self, struct Context* context, 
         return false;
     }
     #line 88 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 88 "src/analyzer/Block.pv"
         return false;
     }
 
     #line 90 "src/analyzer/Block.pv"
-    Expression__validate_type(expression, context, &context->function->return_type);
+    Expression__validate_type(expression, context, &context->function->return_type, true);
 
     #line 92 "src/analyzer/Block.pv"
     Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__RETURN_STATEMENT, .returnstatement_value = { ._0 = expression, ._1 = defer_statements} }));
@@ -211,7 +211,7 @@ bool Block__parse_yield_statement(struct Block* self, struct Context* context, s
     #line 98 "src/analyzer/Block.pv"
     struct Token* first_token = Context__current(context);
     #line 99 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "yield") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "yield")) {
         #line 99 "src/analyzer/Block.pv"
         return false;
     }
@@ -234,13 +234,13 @@ bool Block__parse_yield_statement(struct Block* self, struct Context* context, s
         return false;
     }
     #line 109 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 109 "src/analyzer/Block.pv"
         return false;
     }
 
     #line 111 "src/analyzer/Block.pv"
-    Expression__validate_type(expression, context, &context->function->return_type);
+    Expression__validate_type(expression, context, &context->function->return_type, true);
 
     #line 113 "src/analyzer/Block.pv"
     Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__YIELD_STATEMENT, .yieldstatement_value = expression }));
@@ -280,7 +280,7 @@ bool Block__parse_expression_statement(struct Block* self, struct Context* conte
         }
 
         #line 130 "src/analyzer/Block.pv"
-        Expression__validate_type(value, context, &expression->return_type);
+        Expression__validate_type(value, context, &expression->return_type, true);
 
         #line 132 "src/analyzer/Block.pv"
         Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__ASSIGNMENT_STATEMENT, .assignmentstatement_value = { ._0 = expression, ._1 = operator, ._2 = value} }));
@@ -290,7 +290,7 @@ bool Block__parse_expression_statement(struct Block* self, struct Context* conte
     }
 
     #line 137 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 137 "src/analyzer/Block.pv"
         return false;
     }
@@ -304,7 +304,7 @@ bool Block__parse_if_statement(struct Block* self, struct Context* context, stru
     #line 143 "src/analyzer/Block.pv"
     struct Token* first_token = Context__current(context);
     #line 144 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "if") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "if")) {
         #line 144 "src/analyzer/Block.pv"
         return false;
     }
@@ -382,7 +382,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
     #line 183 "src/analyzer/Block.pv"
     struct Token* first_token = Context__current(context);
     #line 184 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "match") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "match")) {
         #line 184 "src/analyzer/Block.pv"
         return false;
     }
@@ -396,7 +396,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
     }
 
     #line 189 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
         #line 189 "src/analyzer/Block.pv"
         return false;
     }
@@ -405,7 +405,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
     struct Array_MatchCase cases = Array_MatchCase__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
     #line 193 "src/analyzer/Block.pv"
-    while (Context__check_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 194 "src/analyzer/Block.pv"
         struct MatchPattern pattern = (struct MatchPattern) { .type = MATCH_PATTERN__DEFAULT };
         #line 195 "src/analyzer/Block.pv"
@@ -525,7 +525,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
                             uintptr_t variable_i = 0;
 
                             #line 262 "src/analyzer/Block.pv"
-                            while (Context__check_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+                            while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
                                 #line 263 "src/analyzer/Block.pv"
                                 bool ref = Context__check_next(context, TOKEN_TYPE__SYMBOL, "&");
                                 #line 264 "src/analyzer/Block.pv"
@@ -565,9 +565,9 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
                                 Context__inlay_hint(context, variable, String__c_str(&variable_type_name), INLAY_HINT_KIND__TYPE, false, false);
 
                                 #line 281 "src/analyzer/Block.pv"
-                                if (Token__eq(variable, TOKEN_TYPE__IDENTIFIER, "_") == 0) {
+                                if (!Token__eq(variable, TOKEN_TYPE__IDENTIFIER, "_")) {
                                     #line 282 "src/analyzer/Block.pv"
-                                    if (Context__set_value(context, variable, variable_type) == 0) {
+                                    if (!Context__set_value(context, variable, variable_type)) {
                                         #line 282 "src/analyzer/Block.pv"
                                         Context__pop_scope(context);
                                         #line 282 "src/analyzer/Block.pv"
@@ -576,7 +576,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
                                 }
 
                                 #line 285 "src/analyzer/Block.pv"
-                                if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+                                if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
                                     #line 286 "src/analyzer/Block.pv"
                                     Context__pop_scope(context);
                                     #line 287 "src/analyzer/Block.pv"
@@ -592,7 +592,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
                             }
 
                             #line 295 "src/analyzer/Block.pv"
-                            if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+                            if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
                                 #line 295 "src/analyzer/Block.pv"
                                 Context__pop_scope(context);
                                 #line 295 "src/analyzer/Block.pv"
@@ -641,7 +641,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
         }
 
         #line 326 "src/analyzer/Block.pv"
-        if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "=>") == 0) {
+        if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "=>")) {
             #line 326 "src/analyzer/Block.pv"
             Context__pop_scope(context);
             #line 326 "src/analyzer/Block.pv"
@@ -649,7 +649,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
         }
 
         #line 328 "src/analyzer/Block.pv"
-        if (Block__parse(block, context, generics, false) == 0) {
+        if (!Block__parse(block, context, generics, false)) {
             #line 328 "src/analyzer/Block.pv"
             Context__pop_scope(context);
             #line 328 "src/analyzer/Block.pv"
@@ -671,7 +671,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
         Context__pop_scope(context);
 
         #line 341 "src/analyzer/Block.pv"
-        if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
             #line 342 "src/analyzer/Block.pv"
             Context__pop_scope(context);
             #line 343 "src/analyzer/Block.pv"
@@ -682,7 +682,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
     }
 
     #line 348 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 348 "src/analyzer/Block.pv"
         return false;
     }
@@ -699,7 +699,7 @@ bool Block__parse_while_statement(struct Block* self, struct Context* context, s
     #line 356 "src/analyzer/Block.pv"
     struct Token* first_token = Context__current(context);
     #line 357 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "while") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "while")) {
         #line 357 "src/analyzer/Block.pv"
         return false;
     }
@@ -717,7 +717,7 @@ bool Block__parse_while_statement(struct Block* self, struct Context* context, s
     #line 363 "src/analyzer/Block.pv"
     block->is_loop = true;
     #line 364 "src/analyzer/Block.pv"
-    if (Block__parse(block, context, generics, true) == 0) {
+    if (!Block__parse(block, context, generics, true)) {
         #line 364 "src/analyzer/Block.pv"
         return false;
     }
@@ -760,7 +760,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
     struct ForStatement for_statement = ForStatement__new(context->allocator);
 
     #line 388 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "for") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "for")) {
         #line 388 "src/analyzer/Block.pv"
         return false;
     }
@@ -768,15 +768,15 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
     #line 390 "src/analyzer/Block.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
         #line 391 "src/analyzer/Block.pv"
-        while (Context__check_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+        while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
             #line 392 "src/analyzer/Block.pv"
-            if (Block__parse_for_variable(self, context, &for_statement.variables) == 0) {
+            if (!Block__parse_for_variable(self, context, &for_statement.variables)) {
                 #line 392 "src/analyzer/Block.pv"
                 return false;
             }
 
             #line 394 "src/analyzer/Block.pv"
-            if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") == 0 && Context__check_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+            if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
                 #line 395 "src/analyzer/Block.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
                 #line 396 "src/analyzer/Block.pv"
@@ -785,20 +785,20 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
         }
 
         #line 400 "src/analyzer/Block.pv"
-        if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
+        if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
             #line 400 "src/analyzer/Block.pv"
             return false;
         }
     } else {
         #line 402 "src/analyzer/Block.pv"
-        if (Block__parse_for_variable(self, context, &for_statement.variables) == 0) {
+        if (!Block__parse_for_variable(self, context, &for_statement.variables)) {
             #line 402 "src/analyzer/Block.pv"
             return false;
         }
     }
 
     #line 405 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "in") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "in")) {
         #line 405 "src/analyzer/Block.pv"
         return false;
     }
@@ -981,7 +981,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
         struct ForVariable* variable2 = ArrayIter_ref_ForVariable__value(&__iter);
 
         #line 497 "src/analyzer/Block.pv"
-        if (Context__set_value(context, variable2->name, variable2->type) == 0) {
+        if (!Context__set_value(context, variable2->name, variable2->type)) {
             #line 497 "src/analyzer/Block.pv"
             Context__error(context, "set_value");
             #line 497 "src/analyzer/Block.pv"
@@ -994,7 +994,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
     #line 501 "src/analyzer/Block.pv"
     for_statement.block->is_loop = true;
     #line 502 "src/analyzer/Block.pv"
-    if (Block__parse(for_statement.block, context, generics, false) == 0) {
+    if (!Block__parse(for_statement.block, context, generics, false)) {
         #line 502 "src/analyzer/Block.pv"
         return false;
     }
@@ -1042,7 +1042,7 @@ bool Block__parse_defer_statement(struct Block* self, struct Context* context, s
     }
 
     #line 526 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "defer") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "defer")) {
         #line 526 "src/analyzer/Block.pv"
         return false;
     }
@@ -1052,7 +1052,7 @@ bool Block__parse_defer_statement(struct Block* self, struct Context* context, s
         #line 529 "src/analyzer/Block.pv"
         struct Block* block = Block__new_ptr(context);
         #line 530 "src/analyzer/Block.pv"
-        if (Block__parse(block, context, generics, true) == 0) {
+        if (!Block__parse(block, context, generics, true)) {
             #line 530 "src/analyzer/Block.pv"
             return false;
         }
@@ -1069,7 +1069,7 @@ bool Block__parse_defer_statement(struct Block* self, struct Context* context, s
         #line 535 "src/analyzer/Block.pv"
         Array_DeferStatement__append(&self->defer_statements, (struct DeferStatement) { .type = DEFER_STATEMENT__EXPRESSION, .expression_value = expression });
         #line 536 "src/analyzer/Block.pv"
-        if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+        if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
             #line 536 "src/analyzer/Block.pv"
             return false;
         }
@@ -1082,7 +1082,7 @@ bool Block__parse_defer_statement(struct Block* self, struct Context* context, s
 #line 542 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope) {
     #line 543 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
         #line 543 "src/analyzer/Block.pv"
         return false;
     }
@@ -1093,7 +1093,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
     }
 
     #line 546 "src/analyzer/Block.pv"
-    while (Context__check_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 547 "src/analyzer/Block.pv"
         struct Token* token = &context->tokens[context->pos];
         #line 548 "src/analyzer/Block.pv"
@@ -1108,7 +1108,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
             #line 553 "src/analyzer/Block.pv"
             result = Block__parse(block, context, generics, true);
             #line 554 "src/analyzer/Block.pv"
-            if (result != 0) {
+            if (result) {
                 #line 554 "src/analyzer/Block.pv"
                 Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__BLOCK_STATEMENT, .blockstatement_value = block }));
             }
@@ -1140,7 +1140,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
             #line 572 "src/analyzer/Block.pv"
             Array_Statement__append(&self->statements, Statement__new(token, token, (struct StatementData) { .type = STATEMENT_DATA__CONTINUE_STATEMENT, .continuestatement_value = Context__get_loop_defer_statements(context) }));
             #line 573 "src/analyzer/Block.pv"
-            if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+            if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
                 #line 573 "src/analyzer/Block.pv"
                 return false;
             }
@@ -1150,7 +1150,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
             #line 576 "src/analyzer/Block.pv"
             Array_Statement__append(&self->statements, Statement__new(token, token, (struct StatementData) { .type = STATEMENT_DATA__BREAK_STATEMENT, .breakstatement_value = Context__get_loop_defer_statements(context) }));
             #line 577 "src/analyzer/Block.pv"
-            if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";") == 0) {
+            if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
                 #line 577 "src/analyzer/Block.pv"
                 return false;
             }
@@ -1180,7 +1180,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
     }
 
     #line 593 "src/analyzer/Block.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 593 "src/analyzer/Block.pv"
         return false;
     }

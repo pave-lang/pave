@@ -133,14 +133,14 @@ bool Module__parse(struct Module* self) {
     bool result = true;
 
     #line 67 "src/analyzer/Module.pv"
-    while (context->pos < context->length && result) {
+    while ((context->pos < context->length) && result) {
         #line 68 "src/analyzer/Module.pv"
         struct Token* token = &context->tokens[context->pos];
 
         #line 70 "src/analyzer/Module.pv"
         if (Token__eq(token, TOKEN_TYPE__KEYWORD, "ns")) {
             #line 71 "src/analyzer/Module.pv"
-            if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "ns") == 0) {
+            if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "ns")) {
                 #line 71 "src/analyzer/Module.pv"
                 return false;
             }
@@ -176,7 +176,7 @@ bool Module__parse(struct Module* self) {
             }
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "mod")) {
             #line 92 "src/analyzer/Module.pv"
-            if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "mod") == 0) {
+            if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "mod")) {
                 #line 92 "src/analyzer/Module.pv"
                 return false;
             }
@@ -229,7 +229,7 @@ bool Module__parse(struct Module* self) {
             Array_NamespacePath__append(use_namespaces, path);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "#cpp")) {
             #line 120 "src/analyzer/Module.pv"
-            if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "#cpp") == 0) {
+            if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "#cpp")) {
                 #line 120 "src/analyzer/Module.pv"
                 return false;
             }
@@ -239,7 +239,7 @@ bool Module__parse(struct Module* self) {
             self->root->mode_cpp = true;
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "#include")) {
             #line 124 "src/analyzer/Module.pv"
-            if (Context__expect_value(context, TOKEN_TYPE__KEYWORD, "#include") == 0) {
+            if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "#include")) {
                 #line 124 "src/analyzer/Module.pv"
                 return false;
             }

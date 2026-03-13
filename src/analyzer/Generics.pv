@@ -72,21 +72,21 @@ impl Generics {
     }
 
     fn parse(&self, context: &Context) -> bool {
-        if context.expect_value(TokenType::Symbol, "<") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, "<") { return false; }
 
-        while context.check_next(TokenType::Symbol, ">") == 0 {
+        while !context.check_next(TokenType::Symbol, ">") {
             let generic = Generic::new(self.array.allocator);
             if !generic.parse(context) || self.has(generic.name.value) { return false; }
 
             let index = self.array.append(generic);
             self.map.insert(generic.name.value, index);
 
-            if context.check_next(TokenType::Symbol, ",") == 0 {
+            if !context.check_next(TokenType::Symbol, ",") {
                 return context.expect_value(TokenType::Symbol, ">");
             }
         }
 
-        if context.expect_value(TokenType::Symbol, ">") == 0 { return false; }
+        if !context.expect_value(TokenType::Symbol, ">") { return false; }
 
         return true;
     }

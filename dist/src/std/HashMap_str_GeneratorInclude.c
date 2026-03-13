@@ -81,7 +81,7 @@ struct GeneratorInclude* HashMap_str_GeneratorInclude__insert(struct HashMap_str
     }
 
     #line 77 "src/std/HashMap.pv"
-    if (self->capacity == 0 || (self->length * 100 / self->capacity) > 75) {
+    if ((self->capacity == 0) || ((self->length * 100 / self->capacity) > 75)) {
         #line 78 "src/std/HashMap.pv"
         HashMap_str_GeneratorInclude__resize(self, self->capacity * 2);
     }

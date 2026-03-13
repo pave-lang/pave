@@ -71,7 +71,7 @@ void String__append_sized_lowercase(struct String* self, char const* ptr, uintpt
         char c = ptr[i];
 
         #line 49 "src/std/String.pv"
-        if (c >= 'A' && c <= 'Z') {
+        if ((c >= 'A') && (c <= 'Z')) {
             #line 50 "src/std/String.pv"
             array->data[array->length] = c + 32;
         } else {
