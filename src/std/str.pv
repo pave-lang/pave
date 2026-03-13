@@ -18,9 +18,7 @@ impl str {
     }
 
     fn eq(self, s: str) -> bool {
-        if self.length != s.length {
-            return 0;
-        }
+        if self.length != s.length { return false; }
 
         return strncmp(self.ptr, s.ptr, self.length) == 0;
     }

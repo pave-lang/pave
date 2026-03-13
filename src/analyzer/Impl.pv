@@ -86,14 +86,14 @@ impl Impl {
         context.pos = self.token_start;
         let nodes: &Array<ImplNode> = &self.nodes;
 
-        if context.expect_value(TokenType::Symbol, "{") == 0 { return 0; }
+        if context.expect_value(TokenType::Symbol, "{") == 0 { return false; }
 
         context.skip_comments();
 
         while context.pos < self.token_end - 1 {
             let func_info: Function = Function::parse(context);
             func_info.parent = parent;
-            if func_info.name == 0 { return 0; }
+            if func_info.name == 0 { return false; }
 
             self.functions.insert(func_info.name.value, func_info);
 
@@ -103,9 +103,9 @@ impl Impl {
             context.skip_comments();
         }
 
-        if context.expect_value(TokenType::Symbol, "}") == 0 { return 0; }
+        if context.expect_value(TokenType::Symbol, "}") == 0 { return false; }
 
-        return 1;
+        return true;
     }
 
     fn parse_functions(&self) -> bool {
@@ -117,6 +117,6 @@ impl Impl {
 
         self.context.type_self = &self.context.root.type_self;
 
-        return 1;
+        return true;
     }
 }

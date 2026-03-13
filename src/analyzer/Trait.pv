@@ -46,20 +46,20 @@ impl Trait {
         let context = &self.module.context;
         context.pos = self.token_start;
 
-        if context.expect_value(TokenType::Symbol, "{") == 0 { return 0; }
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
 
         while context.pos < self.token_end - 1 {
             let func_info: Function = Function::parse_optional_body(context);
-            if func_info.name == 0 { return 0; }
+            if func_info.name == 0 { return false; }
 
             func_info.parent = parent;
 
             self.functions.insert(func_info.name.value, func_info);
         }
 
-        if context.expect_value(TokenType::Symbol, "}") == 0 { return 0; }
+        if !context.expect_value(TokenType::Symbol, "}") { return false; }
 
-        return 1;
+        return true;
     }
 
     fn parse_functions(&self) -> bool {
@@ -75,6 +75,6 @@ impl Trait {
 
         context.type_self = &context.root.type_self;
 
-        return 1;
+        return true;
     }
 }

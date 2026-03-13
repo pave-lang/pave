@@ -82,9 +82,9 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent) {
     context->pos = self->token_start;
 
     #line 49 "src/analyzer/Trait.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
         #line 49 "src/analyzer/Trait.pv"
-        return 0;
+        return false;
     }
 
     #line 51 "src/analyzer/Trait.pv"
@@ -94,7 +94,7 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent) {
         #line 53 "src/analyzer/Trait.pv"
         if (func_info.name == 0) {
             #line 53 "src/analyzer/Trait.pv"
-            return 0;
+            return false;
         }
 
         #line 55 "src/analyzer/Trait.pv"
@@ -105,13 +105,13 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent) {
     }
 
     #line 60 "src/analyzer/Trait.pv"
-    if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 60 "src/analyzer/Trait.pv"
-        return 0;
+        return false;
     }
 
     #line 62 "src/analyzer/Trait.pv"
-    return 1;
+    return true;
 }
 
 #line 65 "src/analyzer/Trait.pv"
@@ -144,5 +144,5 @@ bool Trait__parse_functions(struct Trait* self) {
     context->type_self = &context->root->type_self;
 
     #line 78 "src/analyzer/Trait.pv"
-    return 1;
+    return true;
 }

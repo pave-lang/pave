@@ -5,6 +5,7 @@
 #include <std/Array_ptrc_char.h>
 #include <analyzer/Analysis.h>
 #include <stdint.h>
+#include <analyzer/Position.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/str.h>
 #include <analyzer/Namespace.h>
@@ -20,7 +21,6 @@
 #include <analyzer/Naming.h>
 #include <std/HashMap_str_ref_Include.h>
 #include <analyzer/Include.h>
-#include <analyzer/Position.h>
 #include <analyzer/Indirect.h>
 #include <analyzer/Function.h>
 #include <analyzer/FunctionType.h>
@@ -229,13 +229,13 @@ bool Root__add_namespace(struct Root* self, struct str name, struct str path) {
         fprintf(stderr, "Duplicate namespace %.*s\n", name_length, name.ptr);
 
         #line 133 "src/analyzer/Root.pv"
-        return 0;
+        return false;
     }
 
     #line 136 "src/analyzer/Root.pv"
     HashMap_str_ref_Namespace__insert(&self->children, name, child);
     #line 137 "src/analyzer/Root.pv"
-    return 1;
+    return true;
 }
 
 #line 140 "src/analyzer/Root.pv"
@@ -266,7 +266,7 @@ bool Root__add_use_namespaces(struct Root* self) {
     } }
 
     #line 152 "src/analyzer/Root.pv"
-    return 1;
+    return true;
 }
 
 #line 155 "src/analyzer/Root.pv"
@@ -283,7 +283,7 @@ bool Root__fill_namespace(struct Root* self) {
     } }
 
     #line 160 "src/analyzer/Root.pv"
-    return 1;
+    return true;
 }
 
 #line 163 "src/analyzer/Root.pv"
@@ -300,7 +300,7 @@ bool Root__prefill_types(struct Root* self) {
     } }
 
     #line 168 "src/analyzer/Root.pv"
-    return 1;
+    return true;
 }
 
 #line 171 "src/analyzer/Root.pv"
@@ -351,7 +351,7 @@ bool Root__parse_declarations(struct Root* self) {
     } }
 
     #line 187 "src/analyzer/Root.pv"
-    return 1;
+    return true;
 }
 
 #line 190 "src/analyzer/Root.pv"
@@ -387,7 +387,7 @@ bool Root__parse_functions(struct Root* self) {
     } }
 
     #line 201 "src/analyzer/Root.pv"
-    return 1;
+    return true;
 }
 
 #line 204 "src/analyzer/Root.pv"

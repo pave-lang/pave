@@ -93,7 +93,7 @@ impl Namespace {
             child.add_use_namespaces();
         }
 
-        return 1;
+        return true;
     }
 
     fn fill_namespace(&self) -> bool {
@@ -131,7 +131,7 @@ impl Namespace {
             child.parse_declarations();
         }
 
-        return 1;
+        return true;
     }
 
     fn parse_functions(&self) -> bool {
@@ -143,7 +143,7 @@ impl Namespace {
             child.parse_functions();
         }
 
-        return 1;
+        return true;
     }
 
     fn find_type(&self, name: str) -> &Type {

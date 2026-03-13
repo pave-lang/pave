@@ -6,6 +6,7 @@
 #include <analyzer/Root.h>
 #include <analyzer/Analysis.h>
 #include <stdint.h>
+#include <std/HashMap_str_Primitive.h>
 #include <std/Array_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
 #include <std/Allocator.h>
@@ -29,7 +30,6 @@
 #include <analyzer/Context.h>
 #include <std/Array_Token.h>
 #include <analyzer/Token.h>
-#include <std/HashMap_str_Primitive.h>
 #include <stdbool.h>
 #include <analyzer/Tokenizer.h>
 #include <analyzer/TokenType.h>
@@ -152,7 +152,7 @@ bool Module__parse(struct Module* self) {
                 #line 75 "src/analyzer/Module.pv"
                 if (name == 0) {
                     #line 76 "src/analyzer/Module.pv"
-                    result = 0;
+                    result = false;
                 } else {
                     #line 78 "src/analyzer/Module.pv"
                     struct Namespace* namespace = self->namespace;
@@ -166,7 +166,7 @@ bool Module__parse(struct Module* self) {
                 #line 84 "src/analyzer/Module.pv"
                 if (name == 0) {
                     #line 85 "src/analyzer/Module.pv"
-                    result = 0;
+                    result = false;
                 } else {
                     #line 87 "src/analyzer/Module.pv"
                     struct Namespace* namespace = self->namespace;
@@ -188,7 +188,7 @@ bool Module__parse(struct Module* self) {
                 #line 96 "src/analyzer/Module.pv"
                 if (name == 0) {
                     #line 97 "src/analyzer/Module.pv"
-                    result = 0;
+                    result = false;
                 } else {
                     #line 99 "src/analyzer/Module.pv"
                     struct Namespace* namespace = self->namespace;
@@ -202,7 +202,7 @@ bool Module__parse(struct Module* self) {
                 #line 105 "src/analyzer/Module.pv"
                 if (name == 0) {
                     #line 106 "src/analyzer/Module.pv"
-                    result = 0;
+                    result = false;
                 } else {
                     #line 108 "src/analyzer/Module.pv"
                     struct Namespace* namespace = self->namespace;
@@ -292,7 +292,7 @@ bool Module__parse(struct Module* self) {
             #line 148 "src/analyzer/Module.pv"
             if (node.name == 0) {
                 #line 149 "src/analyzer/Module.pv"
-                result = 0;
+                result = false;
             } else {
                 #line 151 "src/analyzer/Module.pv"
                 HashMap_str_Enum__insert(enums, node.name->value, node);
@@ -304,7 +304,7 @@ bool Module__parse(struct Module* self) {
             #line 156 "src/analyzer/Module.pv"
             if (node.name == 0) {
                 #line 157 "src/analyzer/Module.pv"
-                result = 0;
+                result = false;
             } else {
                 #line 159 "src/analyzer/Module.pv"
                 HashMap_str_Struct__insert(structs, node.name->value, node);
@@ -316,7 +316,7 @@ bool Module__parse(struct Module* self) {
             #line 164 "src/analyzer/Module.pv"
             if (node.token_start == node.token_end) {
                 #line 165 "src/analyzer/Module.pv"
-                result = 0;
+                result = false;
             } else {
                 #line 167 "src/analyzer/Module.pv"
                 Array_Impl__append(impls, node);
@@ -328,7 +328,7 @@ bool Module__parse(struct Module* self) {
             #line 172 "src/analyzer/Module.pv"
             if (node.name == 0) {
                 #line 173 "src/analyzer/Module.pv"
-                result = 0;
+                result = false;
             } else {
                 #line 175 "src/analyzer/Module.pv"
                 HashMap_str_Trait__insert(traits, node.name->value, node);
@@ -340,7 +340,7 @@ bool Module__parse(struct Module* self) {
             #line 180 "src/analyzer/Module.pv"
             if (node.name == 0) {
                 #line 181 "src/analyzer/Module.pv"
-                result = 0;
+                result = false;
             } else {
                 #line 183 "src/analyzer/Module.pv"
                 HashMap_str_Function__insert(functions, node.name->value, node);
@@ -352,7 +352,7 @@ bool Module__parse(struct Module* self) {
             #line 188 "src/analyzer/Module.pv"
             Context__error_token(context, token, "Unexpected token, expected include, fn, co, impl, struct or trait");
             #line 189 "src/analyzer/Module.pv"
-            result = 0;
+            result = false;
         }
     }
 
@@ -497,7 +497,7 @@ bool Module__fill_namespace(struct Module* self) {
     } }
 
     #line 263 "src/analyzer/Module.pv"
-    return 1;
+    return true;
 }
 
 #line 266 "src/analyzer/Module.pv"
@@ -887,7 +887,7 @@ bool Module__parse_declarations(struct Module* self) {
     } }
 
     #line 432 "src/analyzer/Module.pv"
-    return 1;
+    return true;
 }
 
 #line 435 "src/analyzer/Module.pv"
@@ -980,7 +980,7 @@ bool Module__parse_functions(struct Module* self) {
     } }
 
     #line 469 "src/analyzer/Module.pv"
-    return 1;
+    return true;
 }
 
 #line 472 "src/analyzer/Module.pv"

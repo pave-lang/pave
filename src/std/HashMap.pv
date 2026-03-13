@@ -100,7 +100,7 @@ impl<K: Hash, V> HashMap<K: Hash, V> {
     }
 
     fn remove(&self, key: &K) -> bool {
-        if self.capacity == 0 { return 0; }
+        if self.capacity == 0 { return false; }
 
         let hash = (*key).hash();
         let bucket_index: usize = hash._0 % self.capacity;

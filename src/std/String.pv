@@ -150,9 +150,7 @@ impl String {
     fn eq(&self, s: *const char) -> bool {
         let length: usize = strlen(s);
 
-        if self.array.length != length {
-            return 0;
-        }
+        if self.array.length != length { return false; }
 
         return strncmp(self.array.data, s, length) == 0;
     }

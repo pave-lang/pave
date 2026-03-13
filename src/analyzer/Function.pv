@@ -100,7 +100,7 @@ impl Function {
 
     fn parse_parameters(&self, generics: &Generics) -> bool {
         let context = self.context;
-        if context.expect_value(TokenType::Symbol, "(") == 0 { return 0; }
+        if context.expect_value(TokenType::Symbol, "(") == 0 { return false; }
 
         while context.pos < context.length && context.check_value(TokenType::Symbol, ")") == 0 {
             if context.check_next(TokenType::Symbol, "&") {
@@ -126,7 +126,7 @@ impl Function {
                 };
     
                 if parameter.name == 0 {
-                    return 0;
+                    return false;
                 }
 
                 let has_type = false;
@@ -154,7 +154,7 @@ impl Function {
             }
         }
 
-        if context.expect_value(TokenType::Symbol, ")") == 0 { return 0; }
+        if context.expect_value(TokenType::Symbol, ")") == 0 { return false; }
 
         return true;
     }
@@ -198,7 +198,7 @@ impl Function {
             if context.set_value(param_info.name, &param_info.type) == 0 { context.pop_scope(); return true; }
         }
 
-        let block_result = block.parse(context, &self.generics, 1);
+        let block_result = block.parse(context, &self.generics, true);
 
         if block_result == 0 { context.pop_scope(); return true; }
 

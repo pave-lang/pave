@@ -126,7 +126,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
     #line 103 "src/analyzer/Function.pv"
     if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(") == 0) {
         #line 103 "src/analyzer/Function.pv"
-        return 0;
+        return false;
     }
 
     #line 105 "src/analyzer/Function.pv"
@@ -163,7 +163,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
             #line 128 "src/analyzer/Function.pv"
             if (parameter.name == 0) {
                 #line 129 "src/analyzer/Function.pv"
-                return 0;
+                return false;
             }
 
             #line 132 "src/analyzer/Function.pv"
@@ -210,7 +210,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
     #line 157 "src/analyzer/Function.pv"
     if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")") == 0) {
         #line 157 "src/analyzer/Function.pv"
-        return 0;
+        return false;
     }
 
     #line 159 "src/analyzer/Function.pv"
@@ -302,7 +302,7 @@ bool Function__parse_function(struct Function* self, struct Generics* generics) 
     } }
 
     #line 201 "src/analyzer/Function.pv"
-    bool block_result = Block__parse(block, context, &self->generics, 1);
+    bool block_result = Block__parse(block, context, &self->generics, true);
 
     #line 203 "src/analyzer/Function.pv"
     if (block_result == 0) {

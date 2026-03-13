@@ -73,7 +73,7 @@ impl Module {
                     let name = context.expect(TokenType::String);
 
                     if name == 0 {
-                        result = 0;
+                        result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
                         result = namespace.add_namespace_subfolder(name.value.slice(1, name.value.length - 1));
@@ -82,7 +82,7 @@ impl Module {
                     let name = context.expect(TokenType::Identifier);
 
                     if name == 0 {
-                        result = 0;
+                        result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
                         result = namespace.add_namespace_subfolder(name.value);
@@ -94,7 +94,7 @@ impl Module {
                     let name = context.expect(TokenType::String);
 
                     if name == 0 {
-                        result = 0;
+                        result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
                         result = namespace.add_module(name.value.slice(1, name.value.length - 1));
@@ -103,7 +103,7 @@ impl Module {
                     let name = context.expect(TokenType::Identifier);
 
                     if name == 0 {
-                        result = 0;
+                        result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
                         result = namespace.add_module(name.value);
@@ -146,7 +146,7 @@ impl Module {
                 let node: Enum = Enum::parse(context);
 
                 if node.name == 0 {
-                    result = 0;
+                    result = false;
                 } else {
                     enums.insert(node.name.value, node);
                 }
@@ -154,7 +154,7 @@ impl Module {
                 let node: Struct = Struct::parse(self);
 
                 if node.name == 0 {
-                    result = 0;
+                    result = false;
                 } else {
                     structs.insert(node.name.value, node);
                 }
@@ -162,7 +162,7 @@ impl Module {
                 let node: Impl = Impl::parse(context);
 
                 if node.token_start == node.token_end {
-                    result = 0;
+                    result = false;
                 } else {
                     impls.append(node);
                 }
@@ -170,7 +170,7 @@ impl Module {
                 let node: Trait = Trait::parse(self);
 
                 if node.name == 0 {
-                    result = 0;
+                    result = false;
                 } else {
                     traits.insert(node.name.value, node);
                 }
@@ -178,7 +178,7 @@ impl Module {
                 let node: Function = Function::parse(context);
 
                 if node.name == 0 {
-                    result = 0;
+                    result = false;
                 } else {
                     functions.insert(node.name.value, node);
                 }
@@ -186,7 +186,7 @@ impl Module {
                 context.next_token();
             } else {
                 context.error_token(token, "Unexpected token, expected include, fn, co, impl, struct or trait");
-                result = 0;
+                result = false;
             }
         }
 
@@ -260,7 +260,7 @@ impl Module {
             namespace.traits.insert(trait_info.name.value, trait_info);
         }
 
-        return 1;
+        return true;
     }
 
     fn prefill_types(&self) -> bool {
@@ -429,7 +429,7 @@ impl Module {
             }
         }
 
-        return 1;
+        return true;
     }
 
     fn parse_functions(&self) -> bool {
@@ -466,7 +466,7 @@ impl Module {
             type_impl.impl_info.parse_functions();
         }
 
-        return 1;
+        return true;
     }
 
     fn find_type(&self, name: str) -> *Type {

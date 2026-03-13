@@ -51,12 +51,12 @@ impl GenericMap {
     }
 
     fn insert(&self, name: str, type: Type) -> bool {
-        if self.has(name) { return 0; }
+        if self.has(name) { return false; }
 
         let index: usize = self.array.append(type);
         self.map.insert(name, index);
 
-        return 1;
+        return true;
     }
 
     fn get(&self, name: str) -> &Type {

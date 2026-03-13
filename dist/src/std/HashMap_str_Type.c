@@ -118,7 +118,7 @@ bool HashMap_str_Type__remove(struct HashMap_str_Type* self, struct str* key) {
     #line 103 "src/std/HashMap.pv"
     if (self->capacity == 0) {
         #line 103 "src/std/HashMap.pv"
-        return 0;
+        return false;
     }
 
     #line 105 "src/std/HashMap.pv"

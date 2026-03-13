@@ -147,7 +147,7 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
     #line 89 "src/analyzer/Impl.pv"
     if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{") == 0) {
         #line 89 "src/analyzer/Impl.pv"
-        return 0;
+        return false;
     }
 
     #line 91 "src/analyzer/Impl.pv"
@@ -162,7 +162,7 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
         #line 96 "src/analyzer/Impl.pv"
         if (func_info.name == 0) {
             #line 96 "src/analyzer/Impl.pv"
-            return 0;
+            return false;
         }
 
         #line 98 "src/analyzer/Impl.pv"
@@ -180,11 +180,11 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
     #line 106 "src/analyzer/Impl.pv"
     if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}") == 0) {
         #line 106 "src/analyzer/Impl.pv"
-        return 0;
+        return false;
     }
 
     #line 108 "src/analyzer/Impl.pv"
-    return 1;
+    return true;
 }
 
 #line 111 "src/analyzer/Impl.pv"
@@ -207,5 +207,5 @@ bool Impl__parse_functions(struct Impl* self) {
     self->context->type_self = &self->context->root->type_self;
 
     #line 120 "src/analyzer/Impl.pv"
-    return 1;
+    return true;
 }

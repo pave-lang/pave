@@ -320,7 +320,7 @@ bool Block__parse_if_statement(struct Block* self, struct Context* context, stru
     #line 149 "src/analyzer/Block.pv"
     struct Block* block = Block__new_ptr(context);
     #line 150 "src/analyzer/Block.pv"
-    if (Block__parse(block, context, generics, 1) == 0) {
+    if (!Block__parse(block, context, generics, true)) {
         #line 150 "src/analyzer/Block.pv"
         return false;
     }
@@ -349,13 +349,13 @@ bool Block__parse_if_statement(struct Block* self, struct Context* context, stru
             #line 162 "src/analyzer/Block.pv"
             else_expression = 0;
             #line 163 "src/analyzer/Block.pv"
-            else_end = 1;
+            else_end = true;
         }
 
         #line 166 "src/analyzer/Block.pv"
         else_block = Block__new_ptr(context);
         #line 167 "src/analyzer/Block.pv"
-        if (Block__parse(else_block, context, generics, 1) == 0) {
+        if (!Block__parse(else_block, context, generics, true)) {
             #line 167 "src/analyzer/Block.pv"
             return false;
         }
@@ -649,7 +649,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
         }
 
         #line 328 "src/analyzer/Block.pv"
-        if (Block__parse(block, context, generics, 0) == 0) {
+        if (Block__parse(block, context, generics, false) == 0) {
             #line 328 "src/analyzer/Block.pv"
             Context__pop_scope(context);
             #line 328 "src/analyzer/Block.pv"
@@ -717,7 +717,7 @@ bool Block__parse_while_statement(struct Block* self, struct Context* context, s
     #line 363 "src/analyzer/Block.pv"
     block->is_loop = true;
     #line 364 "src/analyzer/Block.pv"
-    if (Block__parse(block, context, generics, 1) == 0) {
+    if (Block__parse(block, context, generics, true) == 0) {
         #line 364 "src/analyzer/Block.pv"
         return false;
     }
@@ -912,7 +912,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
         #line 461 "src/analyzer/Block.pv"
         if (value_member_type == 0) {
             #line 461 "src/analyzer/Block.pv"
-            return 0;
+            return false;
         }
         #line 462 "src/analyzer/Block.pv"
         for_statement.value_type = Expression__get_return_type(context, value_member_type, &value_member, generic_map);
@@ -994,7 +994,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
     #line 501 "src/analyzer/Block.pv"
     for_statement.block->is_loop = true;
     #line 502 "src/analyzer/Block.pv"
-    if (Block__parse(for_statement.block, context, generics, 0) == 0) {
+    if (Block__parse(for_statement.block, context, generics, false) == 0) {
         #line 502 "src/analyzer/Block.pv"
         return false;
     }
@@ -1052,7 +1052,7 @@ bool Block__parse_defer_statement(struct Block* self, struct Context* context, s
         #line 529 "src/analyzer/Block.pv"
         struct Block* block = Block__new_ptr(context);
         #line 530 "src/analyzer/Block.pv"
-        if (Block__parse(block, context, generics, 1) == 0) {
+        if (Block__parse(block, context, generics, true) == 0) {
             #line 530 "src/analyzer/Block.pv"
             return false;
         }
@@ -1106,7 +1106,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
             #line 552 "src/analyzer/Block.pv"
             struct Block* block = Block__new_ptr(context);
             #line 553 "src/analyzer/Block.pv"
-            result = Block__parse(block, context, generics, 1);
+            result = Block__parse(block, context, generics, true);
             #line 554 "src/analyzer/Block.pv"
             if (result != 0) {
                 #line 554 "src/analyzer/Block.pv"

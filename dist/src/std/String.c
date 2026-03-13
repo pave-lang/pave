@@ -234,22 +234,22 @@ bool String__eq(struct String* self, char const* s) {
 
     #line 153 "src/std/String.pv"
     if (self->array.length != length) {
-        #line 154 "src/std/String.pv"
-        return 0;
+        #line 153 "src/std/String.pv"
+        return false;
     }
 
-    #line 157 "src/std/String.pv"
+    #line 155 "src/std/String.pv"
     return strncmp(self->array.data, s, length) == 0;
 }
 
-#line 160 "src/std/String.pv"
+#line 158 "src/std/String.pv"
 uintptr_t String__length(struct String* self) {
-    #line 161 "src/std/String.pv"
+    #line 159 "src/std/String.pv"
     return self->array.length;
 }
 
-#line 164 "src/std/String.pv"
+#line 162 "src/std/String.pv"
 int32_t String__len_i32(struct String* self) {
-    #line 165 "src/std/String.pv"
+    #line 163 "src/std/String.pv"
     return self->array.length;
 }

@@ -64,7 +64,7 @@ bool Generics__parse(struct Generics* self, struct Context* context) {
     #line 75 "src/analyzer/Generics.pv"
     if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, "<") == 0) {
         #line 75 "src/analyzer/Generics.pv"
-        return 0;
+        return false;
     }
 
     #line 77 "src/analyzer/Generics.pv"
@@ -92,9 +92,9 @@ bool Generics__parse(struct Generics* self, struct Context* context) {
     #line 89 "src/analyzer/Generics.pv"
     if (Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">") == 0) {
         #line 89 "src/analyzer/Generics.pv"
-        return 0;
+        return false;
     }
 
     #line 91 "src/analyzer/Generics.pv"
-    return 1;
+    return true;
 }

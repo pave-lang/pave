@@ -94,7 +94,7 @@ bool ArenaBlock__free(struct ArenaBlock* self, void* ptr) {
     #line 75 "src/std/ArenaAllocator.pv"
     if (ptr == 0) {
         #line 75 "src/std/ArenaAllocator.pv"
-        return 0;
+        return false;
     }
 
     #line 77 "src/std/ArenaAllocator.pv"
@@ -114,11 +114,11 @@ bool ArenaBlock__free(struct ArenaBlock* self, void* ptr) {
         #line 85 "src/std/ArenaAllocator.pv"
         memset(header, 0, total_size);
         #line 86 "src/std/ArenaAllocator.pv"
-        return 1;
+        return true;
     }
 
     #line 89 "src/std/ArenaAllocator.pv"
-    return 0;
+    return false;
 }
 
 #line 92 "src/std/ArenaAllocator.pv"

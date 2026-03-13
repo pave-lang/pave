@@ -118,7 +118,7 @@ bool HashMap_u32_Type__remove(struct HashMap_u32_Type* self, uint32_t* key) {
     #line 103 "src/std/HashMap.pv"
     if (self->capacity == 0) {
         #line 103 "src/std/HashMap.pv"
-        return 0;
+        return false;
     }
 
     #line 105 "src/std/HashMap.pv"

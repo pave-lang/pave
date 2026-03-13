@@ -203,7 +203,7 @@ bool Tokenizer__is_in_array(struct Array_ptrc_char* array, char const* s, uintpt
         #line 136 "src/analyzer/Tokenizer.pv"
         if (strlen(array->data[i]) == len && strncmp(array->data[i], s, len) == 0) {
             #line 137 "src/analyzer/Tokenizer.pv"
-            return 1;
+            return true;
         }
 
         #line 140 "src/analyzer/Tokenizer.pv"
@@ -211,7 +211,7 @@ bool Tokenizer__is_in_array(struct Array_ptrc_char* array, char const* s, uintpt
     }
 
     #line 143 "src/analyzer/Tokenizer.pv"
-    return 0;
+    return false;
 }
 
 #line 146 "src/analyzer/Tokenizer.pv"

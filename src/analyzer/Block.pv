@@ -147,7 +147,7 @@ impl Block {
         if expression == 0 { return false; }
 
         let block = Block::new_ptr(context);
-        if block.parse(context, generics, 1) == 0 { return false; }
+        if !block.parse(context, generics, true) { return false; }
 
         let else_statements = Array<ElseStatement>::new(context.allocator);
         let else_expression: &Expression = 0;
@@ -160,11 +160,11 @@ impl Block {
                 if else_expression == 0 { return false; }
             } else {
                 else_expression = 0;
-                else_end = 1;
+                else_end = true;
             }
 
             else_block = Block::new_ptr(context);
-            if else_block.parse(context, generics, 1) == 0 { return false; }
+            if !else_block.parse(context, generics, true) { return false; }
             
             let else_statement: ElseStatement = ElseStatement {
                 expression: else_expression,
@@ -325,7 +325,7 @@ impl Block {
 
             if context.expect_value(TokenType::Symbol, "=>") == 0 { context.pop_scope(); return false; }
 
-            if block.parse(context, generics, 0) == 0 { context.pop_scope(); return false; }
+            if block.parse(context, generics, false) == 0 { context.pop_scope(); return false; }
 
             let match_case: MatchCase = MatchCase {
                 first_token: first_match_token,
@@ -361,7 +361,7 @@ impl Block {
 
         let block = Block::new_ptr(context);
         block.is_loop = true;
-        if block.parse(context, generics, 1) == 0 { return false; }
+        if block.parse(context, generics, true) == 0 { return false; }
 
         self.statements.append(Statement::new(first_token, context.prev(), StatementData::WhileStatement(expression, block)));
         
@@ -458,7 +458,7 @@ impl Block {
             value_member.value = "value";
 
             let value_member_type = Expression::get_member_type(context, for_statement.iter_type, &value_member, true);
-            if value_member_type == 0 { return 0; }
+            if value_member_type == 0 { return false; }
             for_statement.value_type = Expression::get_return_type(context, value_member_type, &value_member, generic_map);
 
             let variable_i: usize = 0;
@@ -499,7 +499,7 @@ impl Block {
 
         for_statement.block = Block::new_ptr(context);
         for_statement.block.is_loop = true;
-        if for_statement.block.parse(context, generics, 0) == 0 { return false; }
+        if for_statement.block.parse(context, generics, false) == 0 { return false; }
 
         context.pop_scope();
 
@@ -527,7 +527,7 @@ impl Block {
 
         if context.check_value(TokenType::Symbol, "{") {
             let block = Block::new_ptr(context);
-            if block.parse(context, generics, 1) == 0 { return false; }
+            if block.parse(context, generics, true) == 0 { return false; }
             self.defer_statements.append(DeferStatement::Block(block));
         }  else {
             let expression = Expression::parse(context, generics);
@@ -550,7 +550,7 @@ impl Block {
             if token.eq(TokenType::Symbol, "{") {
                 let first_token = context.current();
                 let block = Block::new_ptr(context);
-                result = block.parse(context, generics, 1);
+                result = block.parse(context, generics, true);
                 if result != 0 { self.statements.append(Statement::new(first_token, context.prev(), StatementData::BlockStatement(block))); }
             } else if token.eq(TokenType::Keyword, "defer") {
                 result = Block::parse_defer_statement(self, context, generics);

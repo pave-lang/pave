@@ -119,7 +119,7 @@ bool HashMap_usize_TypeUsage_Enum__remove(struct HashMap_usize_TypeUsage_Enum* s
     #line 103 "src/std/HashMap.pv"
     if (self->capacity == 0) {
         #line 103 "src/std/HashMap.pv"
-        return 0;
+        return false;
     }
 
     #line 105 "src/std/HashMap.pv"

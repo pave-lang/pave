@@ -118,7 +118,7 @@ bool HashMap_str_GeneratorInclude__remove(struct HashMap_str_GeneratorInclude* s
     #line 103 "src/std/HashMap.pv"
     if (self->capacity == 0) {
         #line 103 "src/std/HashMap.pv"
-        return 0;
+        return false;
     }
 
     #line 105 "src/std/HashMap.pv"

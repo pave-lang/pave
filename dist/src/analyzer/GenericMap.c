@@ -88,7 +88,7 @@ bool GenericMap__insert(struct GenericMap* self, struct str name, struct Type ty
     #line 54 "src/analyzer/GenericMap.pv"
     if (GenericMap__has(self, name)) {
         #line 54 "src/analyzer/GenericMap.pv"
-        return 0;
+        return false;
     }
 
     #line 56 "src/analyzer/GenericMap.pv"
@@ -97,7 +97,7 @@ bool GenericMap__insert(struct GenericMap* self, struct str name, struct Type ty
     HashMap_str_usize__insert(&self->map, name, index);
 
     #line 59 "src/analyzer/GenericMap.pv"
-    return 1;
+    return true;
 }
 
 #line 62 "src/analyzer/GenericMap.pv"

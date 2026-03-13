@@ -69,10 +69,10 @@ char const* String__c_str(struct String* self);
 #line 150 "src/std/String.pv"
 bool String__eq(struct String* self, char const* s);
 
-#line 160 "src/std/String.pv"
+#line 158 "src/std/String.pv"
 uintptr_t String__length(struct String* self);
 
-#line 164 "src/std/String.pv"
+#line 162 "src/std/String.pv"
 int32_t String__len_i32(struct String* self);
 
 #endif

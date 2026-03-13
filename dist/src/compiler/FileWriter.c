@@ -24,14 +24,14 @@ bool FileWriter__remove_indent(struct FileWriter* self) {
     #line 21 "src/compiler/FileWriter.pv"
     if (self->indent == 0) {
         #line 22 "src/compiler/FileWriter.pv"
-        return 0;
+        return false;
     }
 
     #line 25 "src/compiler/FileWriter.pv"
     self->indent -= 1;
 
     #line 27 "src/compiler/FileWriter.pv"
-    return 1;
+    return true;
 }
 
 #line 30 "src/compiler/FileWriter.pv"
@@ -53,7 +53,7 @@ bool FileWriter__write(struct FileWriter* self, char const* s) {
     #line 40 "src/compiler/FileWriter.pv"
     fprintf(self->file, "%s", s);
     #line 41 "src/compiler/FileWriter.pv"
-    return 1;
+    return true;
 }
 
 #line 44 "src/compiler/FileWriter.pv"
@@ -63,7 +63,7 @@ bool FileWriter__write_str(struct FileWriter* self, struct str s) {
     #line 46 "src/compiler/FileWriter.pv"
     fprintf(self->file, "%.*s", length, s.ptr);
     #line 47 "src/compiler/FileWriter.pv"
-    return 1;
+    return true;
 }
 
 #line 50 "src/compiler/FileWriter.pv"
@@ -85,7 +85,7 @@ bool FileWriter__write_str_title(struct FileWriter* self, struct str s) {
             #line 59 "src/compiler/FileWriter.pv"
             fprintf(self->file, "%c", c - 32);
             #line 60 "src/compiler/FileWriter.pv"
-            was_lowercase = 1;
+            was_lowercase = true;
         } else {
             #line 62 "src/compiler/FileWriter.pv"
             if (was_lowercase && c >= 'A' && c <= 'Z') {
@@ -96,7 +96,7 @@ bool FileWriter__write_str_title(struct FileWriter* self, struct str s) {
             #line 66 "src/compiler/FileWriter.pv"
             fprintf(self->file, "%c", c);
             #line 67 "src/compiler/FileWriter.pv"
-            was_lowercase = 0;
+            was_lowercase = false;
         }
 
         #line 70 "src/compiler/FileWriter.pv"
@@ -104,7 +104,7 @@ bool FileWriter__write_str_title(struct FileWriter* self, struct str s) {
     }
 
     #line 73 "src/compiler/FileWriter.pv"
-    return 1;
+    return true;
 }
 
 #line 76 "src/compiler/FileWriter.pv"
@@ -133,7 +133,7 @@ bool FileWriter__write_str_lowercase(struct FileWriter* self, struct str s) {
     }
 
     #line 92 "src/compiler/FileWriter.pv"
-    return 1;
+    return true;
 }
 
 #line 95 "src/compiler/FileWriter.pv"

@@ -60,9 +60,6 @@ impl Context {
         let param_name = allocator.store(Token { type: TokenType::String, value: "value" });
 
         self.push_scope(0);
-        let params2 = Array<Parameter>::new(allocator);
-        params2.append(Parameter { name: param_name, type: self.root.type_void });
-        self.insert_builtin_function("sizeof", 0, &params2, self.root.type_usize);
 
         let t = Generic::new(allocator);
         t.name = allocator.store(Token { type: TokenType::String, value: "T" });
@@ -80,6 +77,14 @@ impl Context {
         params.append(Parameter { name: param_name, type: Type::Generic(generic_u) });
 
         self.insert_builtin_function("cast", &generics, &params, Type::Generic(generic_t));
+
+        let generics2 = Array<Generic>::new(allocator);
+        generics2.append(t);
+        let generic2_t = generics2.get(0);
+
+        let params2 = Array<Parameter>::new(allocator);
+        params2.append(Parameter { name: param_name, type: Type::Generic(generic2_t) });
+        self.insert_builtin_function("sizeof", &generics2, &params2, self.root.type_usize);
 
         params.release();
         generics.release();
@@ -251,7 +256,7 @@ impl Context {
 
     fn check(&self, type: TokenType) -> bool {
         if self.pos >= self.length {
-            return 0;
+            return false;
         }
 
         return type == self.tokens[self.pos].type;
@@ -259,7 +264,7 @@ impl Context {
 
     fn check_value(&self, type: TokenType, value: *const char) -> bool {
         if self.pos >= self.length {
-            return 0;
+            return false;
         }
 
         let token = &self.tokens[self.pos];
@@ -291,18 +296,18 @@ impl Context {
 
     fn expect_value(&self, type: TokenType, value: *const char) -> bool {
         if self.pos >= self.length {
-            return 0;
+            return false;
         }
 
         let token = &self.tokens[self.pos];
 
         if (token.eq(type, value)) {
             self.next_token();
-            return 1;
+            return true;
         }
 
         self.error_expected_value(type, value);
-        return 0;
+        return false;
     }
 
     fn skip_to_symbol(&self, symbol: *const char) -> bool {

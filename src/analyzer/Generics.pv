@@ -72,7 +72,7 @@ impl Generics {
     }
 
     fn parse(&self, context: &Context) -> bool {
-        if context.expect_value(TokenType::Symbol, "<") == 0 { return 0; }
+        if context.expect_value(TokenType::Symbol, "<") == 0 { return false; }
 
         while context.check_next(TokenType::Symbol, ">") == 0 {
             let generic = Generic::new(self.array.allocator);
@@ -86,8 +86,8 @@ impl Generics {
             }
         }
 
-        if context.expect_value(TokenType::Symbol, ">") == 0 { return 0; }
+        if context.expect_value(TokenType::Symbol, ">") == 0 { return false; }
 
-        return 1;
+        return true;
     }
 }

@@ -72,7 +72,7 @@ impl ArenaBlock {
     }
 
     fn free(&self, ptr: &void) -> bool {
-        if ptr == 0 { return 0; }
+        if ptr == 0 { return false; }
 
         let header: &ArenaAllocation = ptr;
         header -= 1;
@@ -83,10 +83,10 @@ impl ArenaBlock {
             let total_size: usize = sizeof(ArenaAllocation) + header.size;
             self.offset -= total_size;
             memset(header, 0, total_size);
-            return 1;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
     fn destroy(&self, allocator: &dyn Allocator) {

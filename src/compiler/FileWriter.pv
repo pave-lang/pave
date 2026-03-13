@@ -19,12 +19,12 @@ impl FileWriter {
 
     fn remove_indent(&self) -> bool {
         if self.indent == 0 {
-            return 0;
+            return false;
         }
 
         self.indent -= 1;
 
-        return 1;
+        return true;
     }
 
     fn write_indent(&self) {
@@ -38,13 +38,13 @@ impl FileWriter {
 
     fn write(&self, s: *const char) -> bool {
         fprintf(self.file, "%s", s);
-        return 1;
+        return true;
     }
 
     fn write_str(&self, s: str) -> bool {
         let length: i32 = s.length;
         fprintf(self.file, "%.*s", length, s.ptr);
-        return 1;
+        return true;
     }
 
     fn write_str_title(&self, s: str) -> bool {
@@ -57,20 +57,20 @@ impl FileWriter {
             
             if c >= 'a' && c <= 'z' {
                 fprintf(self.file, "%c", c - 32);
-                was_lowercase = 1;
+                was_lowercase = true;
             } else {
                 if was_lowercase && c >= 'A' && c <= 'Z' {
                     fprintf(self.file, "_");
                 }
 
                 fprintf(self.file, "%c", c);
-                was_lowercase = 0;
+                was_lowercase = false;
             }
 
             i += 1;
         }
 
-        return 1;
+        return true;
     }
 
     fn write_str_lowercase(&self, s: str) -> bool {
@@ -89,7 +89,7 @@ impl FileWriter {
             i += 1;
         }
 
-        return 1;
+        return true;
     }
 
     fn write_token(&self, token: &Token) -> bool {

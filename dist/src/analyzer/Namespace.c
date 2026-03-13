@@ -156,7 +156,7 @@ bool Namespace__add_use_namespaces(struct Namespace* self) {
     } }
 
     #line 96 "src/analyzer/Namespace.pv"
-    return 1;
+    return true;
 }
 
 #line 99 "src/analyzer/Namespace.pv"
@@ -243,7 +243,7 @@ bool Namespace__parse_declarations(struct Namespace* self) {
     } }
 
     #line 134 "src/analyzer/Namespace.pv"
-    return 1;
+    return true;
 }
 
 #line 137 "src/analyzer/Namespace.pv"
@@ -271,7 +271,7 @@ bool Namespace__parse_functions(struct Namespace* self) {
     } }
 
     #line 146 "src/analyzer/Namespace.pv"
-    return 1;
+    return true;
 }
 
 #line 149 "src/analyzer/Namespace.pv"

@@ -187,7 +187,7 @@ bool Include__process(struct Include* self) {
         #line 116 "src/analyzer/Include.pv"
         Root__error(self->root, self->path, 0, 0, 0, 0, "clang_createIndex failed\n");
         #line 117 "src/analyzer/Include.pv"
-        return 0;
+        return false;
     }
 
     #line 120 "src/analyzer/Include.pv"
@@ -271,7 +271,7 @@ bool Include__process(struct Include* self) {
     clang_disposeIndex(index);
 
     #line 175 "src/analyzer/Include.pv"
-    return 1;
+    return true;
 }
 
 #line 178 "src/analyzer/Include.pv"
@@ -495,7 +495,7 @@ bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
         #line 293 "src/analyzer/Include.pv"
         clang_disposeTokens(tu, tokens, num_tokens);
         #line 294 "src/analyzer/Include.pv"
-        return 0;
+        return false;
     }
 
     #line 297 "src/analyzer/Include.pv"
@@ -504,7 +504,7 @@ bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
     char const* txt = clang_getCString(spelling);
 
     #line 300 "src/analyzer/Include.pv"
-    bool result = 0;
+    bool result = false;
 
     #line 302 "src/analyzer/Include.pv"
     if (strcmp(txt, "(") == 0) {
@@ -530,7 +530,7 @@ bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
         #line 314 "src/analyzer/Include.pv"
         if (line1 == line2 && col1 == col2) {
             #line 315 "src/analyzer/Include.pv"
-            result = 1;
+            result = true;
         }
     }
 

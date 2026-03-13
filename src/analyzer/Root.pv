@@ -130,11 +130,11 @@ impl Root {
             let name_length: u32 = name.length;
             fprintf(stderr, "Duplicate namespace %.*s\n", name_length, name.ptr);
 
-            return 0;
+            return false;
         }
 
         self.children.insert(name, child);
-        return 1;
+        return true;
     }
 
     fn find_namespace(&self, name: str) -> *Namespace {
@@ -149,7 +149,7 @@ impl Root {
             child.add_use_namespaces();
         }
 
-        return 1;
+        return true;
     }
 
     fn fill_namespace(&self) -> bool {
@@ -157,7 +157,7 @@ impl Root {
             child.fill_namespace();
         }
 
-        return 1;
+        return true;
     }
 
     fn prefill_types(&self) -> bool {
@@ -165,7 +165,7 @@ impl Root {
             child.prefill_types();
         }
 
-        return 1;
+        return true;
     }
 
     fn parse_declarations(&self) -> bool {
@@ -184,7 +184,7 @@ impl Root {
             }
         }
 
-        return 1;
+        return true;
     }
 
     fn parse_functions(&self) -> bool {
@@ -198,7 +198,7 @@ impl Root {
             }
         }
 
-        return 1;
+        return true;
     }
 
     fn find_type(&self, name: str) -> &Type {

@@ -114,7 +114,7 @@ impl Include {
         let index: CXIndex = clang_createIndex(0, 1);
         if index == 0 {
             self.root.error(self.path, 0, 0, 0, 0, "clang_createIndex failed\n");
-            return 0;
+            return false;
         }
 
         let unit: *CXTranslationUnitImpl = 0;
@@ -172,7 +172,7 @@ impl Include {
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
 
-        return 1;
+        return true;
     }
 
     fn parse_type(&self, type: CXType) -> &Type {
@@ -291,13 +291,13 @@ impl Include {
 
         if num_tokens < 2 {
             clang_disposeTokens(tu, tokens, num_tokens);
-            return 0;
+            return false;
         }
 
         let spelling: CXString = clang_getTokenSpelling(tu, tokens[1]);
         let txt: *const char = clang_getCString(spelling);
 
-        let result: bool = 0;
+        let result = false;
 
         if strcmp(txt, "(") == 0 {
             let loc_name_end: CXSourceLocation = clang_getRangeEnd(clang_getTokenExtent(tu, tokens[0]));
@@ -312,7 +312,7 @@ impl Include {
             clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
             if line1 == line2 && col1 == col2 {
-                result = 1;
+                result = true;
             }
         }
 

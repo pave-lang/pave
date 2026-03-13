@@ -208,7 +208,7 @@ impl Type {
 
     fn eq_indirect(&self, other: &Indirect) -> bool {
         match self {
-            Type::Indirect(indirect) => { return indirect.to.eq(&other.to); },
+            Type::Indirect(indirect) => { return indirect.to.is_void() || other.to.is_void() || indirect.to.eq(&other.to); },
             Type::Sequence(seq) => { return seq.element.eq(&other.to); },
             Type::Primitive(_) => { return true; },
             _ => { return false; },
@@ -252,18 +252,18 @@ impl Type {
 
     fn eq_primitive(&self, other: &Primitive) -> bool {
         match self {
-            Type::Primitive(_) => { return true; /* name.eq(other_name); */ },
+            Type::Primitive(primitive_info) => {
+                return primitive_info == 0 || other == 0 || primitive_info.name.eq(other.name) || (primitive_info.is_number() && other.is_number()) || other.is_void();
+            },
             Type::Indirect(_) => { return true; },
-            _ => {},
+            _ => { return other.is_void(); },
         }
-
-        return other == 0 || other.name.eq("void");
     }
 
     fn eq_enum(&self, other_enum: &Enum, generics: Array<Type>) -> bool {
         match self {
             Type::Enum(enum_info, _) => { return enum_info == other_enum; },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
             _ => { return false; },
         }
@@ -278,7 +278,7 @@ impl Type {
                 let trait_name: &Token = trait_info.name;
                 return other_struct.traits.find(&trait_name.value) != 0;
             },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
             _ => { return false; },
         }
@@ -289,7 +289,7 @@ impl Type {
     fn eq_trait(&self, other_trait: &Trait, generics: Array<Type>) -> bool {
         match self {
             Type::Trait(trait_info, _) => { return trait_info == other_trait; },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -299,7 +299,7 @@ impl Type {
     fn eq_generic(&self, other_generic: &Generic) -> bool {
         match self {
             Type::Generic(generic) => { return generic.name.value.eq(other_generic.name.value); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
             _ => { return false; },
         }
@@ -310,7 +310,7 @@ impl Type {
     fn eq_unknown(&self, other_name: str, generics: &Array<Type>) -> bool {
         match self {
             Type::Unknown(name, _) => { return name.eq(other_name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
             Type::Generic(_) => { return true; },
             _ => { return false; },
@@ -352,7 +352,7 @@ impl Type {
     fn eq_typedef_c(&self, other: &TypedefC) -> bool {
         match self {
             Type::TypedefC(info) => { return info.name.eq(other.name) || info.type.resolve_typedef().eq(other.type.resolve_typedef()); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return self.eq(other.type); },
         }
 
@@ -362,7 +362,7 @@ impl Type {
     fn eq_enum_c(&self, other_enum: &EnumC) -> bool {
         match self {
             Type::EnumC(enum_info) => { return enum_info.name.eq(other_enum.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -372,7 +372,7 @@ impl Type {
     fn eq_struct_c(&self, other_struct: &StructC) -> bool {
         match self {
             Type::StructC(struct_info) => { return struct_info.name.eq(other_struct.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -382,7 +382,7 @@ impl Type {
     fn eq_union_c(&self, other_union: &StructC) -> bool {
         match self {
             Type::UnionC(union_info) => { return union_info.name.eq(other_union.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -392,7 +392,7 @@ impl Type {
     fn eq_class_cpp(&self, other_class: &ClassCpp) -> bool {
         match self {
             Type::ClassCpp(class_info) => { return class_info.name.eq(other_class.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -402,7 +402,7 @@ impl Type {
     fn eq_namespace_cpp(&self, other_namespace: &NamespaceCpp) -> bool {
         match self {
             Type::NamespaceCpp(namespace_info) => { return namespace_info.name.eq(other_namespace.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -412,7 +412,7 @@ impl Type {
     fn eq_function_c(&self, other_function: &FunctionC) -> bool {
         match self {
             Type::FunctionC(function) => { return function.name.eq(other_function.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -423,7 +423,7 @@ impl Type {
         if self == 0 { return true; }
 
         match self {
-            Type::Primitive(primitive_info) => { return primitive_info == 0 || primitive_info.name.eq("void"); },
+            Type::Primitive(primitive_info) => { return primitive_info == 0 || primitive_info.is_void(); },
             _ => { return false; },
         }
     }

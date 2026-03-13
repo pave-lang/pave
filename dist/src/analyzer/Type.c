@@ -426,7 +426,7 @@ bool Type__eq_indirect(struct Type* self, struct Indirect* other) {
             #line 211 "src/analyzer/Type.pv"
             struct Indirect* indirect = self->indirect_value;
             #line 211 "src/analyzer/Type.pv"
-            return Type__eq(&indirect->to, &other->to);
+            return Type__is_void(&indirect->to) || Type__is_void(&other->to) || Type__eq(&indirect->to, &other->to);
         } break;
         #line 212 "src/analyzer/Type.pv"
         case TYPE__SEQUENCE: {
@@ -498,20 +498,21 @@ bool Type__eq_primitive(struct Type* self, struct Primitive* other) {
         #line 255 "src/analyzer/Type.pv"
         case TYPE__PRIMITIVE: {
             #line 255 "src/analyzer/Type.pv"
-            return true;
-        } break;
-        #line 256 "src/analyzer/Type.pv"
-        case TYPE__INDIRECT: {
+            struct Primitive* primitive_info = self->primitive_value;
             #line 256 "src/analyzer/Type.pv"
+            return primitive_info == 0 || other == 0 || str__eq(primitive_info->name, other->name) || (Primitive__is_number(primitive_info) && Primitive__is_number(other)) || Primitive__is_void(other);
+        } break;
+        #line 258 "src/analyzer/Type.pv"
+        case TYPE__INDIRECT: {
+            #line 258 "src/analyzer/Type.pv"
             return true;
         } break;
-        #line 257 "src/analyzer/Type.pv"
+        #line 259 "src/analyzer/Type.pv"
         default: {
+            #line 259 "src/analyzer/Type.pv"
+            return Primitive__is_void(other);
         } break;
     }
-
-    #line 260 "src/analyzer/Type.pv"
-    return other == 0 || str__eq(other->name, (struct str){ .ptr = "void", .length = strlen("void") });
 }
 
 #line 263 "src/analyzer/Type.pv"
@@ -530,7 +531,7 @@ bool Type__eq_enum(struct Type* self, struct Enum* other_enum, struct Array_Type
             #line 266 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 266 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 267 "src/analyzer/Type.pv"
         case TYPE__SELF: {
@@ -573,7 +574,7 @@ bool Type__eq_struct(struct Type* self, struct Struct* other_struct, struct Arra
             #line 281 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 281 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 282 "src/analyzer/Type.pv"
         case TYPE__SELF: {
@@ -607,7 +608,7 @@ bool Type__eq_trait(struct Type* self, struct Trait* other_trait, struct Array_T
             #line 292 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 292 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 293 "src/analyzer/Type.pv"
         default: {
@@ -636,7 +637,7 @@ bool Type__eq_generic(struct Type* self, struct Generic* other_generic) {
             #line 302 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 302 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 303 "src/analyzer/Type.pv"
         case TYPE__SELF: {
@@ -670,7 +671,7 @@ bool Type__eq_unknown(struct Type* self, struct str other_name, struct Array_Typ
             #line 313 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 313 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 314 "src/analyzer/Type.pv"
         case TYPE__SELF: {
@@ -755,7 +756,7 @@ bool Type__eq_typedef_c(struct Type* self, struct TypedefC* other) {
             #line 355 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 355 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 356 "src/analyzer/Type.pv"
         default: {
@@ -784,7 +785,7 @@ bool Type__eq_enum_c(struct Type* self, struct EnumC* other_enum) {
             #line 365 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 365 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 366 "src/analyzer/Type.pv"
         default: {
@@ -813,7 +814,7 @@ bool Type__eq_struct_c(struct Type* self, struct StructC* other_struct) {
             #line 375 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 375 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 376 "src/analyzer/Type.pv"
         default: {
@@ -842,7 +843,7 @@ bool Type__eq_union_c(struct Type* self, struct StructC* other_union) {
             #line 385 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 385 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 386 "src/analyzer/Type.pv"
         default: {
@@ -871,7 +872,7 @@ bool Type__eq_class_cpp(struct Type* self, struct ClassCpp* other_class) {
             #line 395 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 395 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 396 "src/analyzer/Type.pv"
         default: {
@@ -900,7 +901,7 @@ bool Type__eq_namespace_cpp(struct Type* self, struct NamespaceCpp* other_namesp
             #line 405 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 405 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 406 "src/analyzer/Type.pv"
         default: {
@@ -929,7 +930,7 @@ bool Type__eq_function_c(struct Type* self, struct FunctionC* other_function) {
             #line 415 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 415 "src/analyzer/Type.pv"
-            return str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return Primitive__is_void(primitive_info);
         } break;
         #line 416 "src/analyzer/Type.pv"
         default: {
@@ -957,7 +958,7 @@ bool Type__is_void(struct Type* self) {
             #line 426 "src/analyzer/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 426 "src/analyzer/Type.pv"
-            return primitive_info == 0 || str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") });
+            return primitive_info == 0 || Primitive__is_void(primitive_info);
         } break;
         #line 427 "src/analyzer/Type.pv"
         default: {
