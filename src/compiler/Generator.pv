@@ -3607,12 +3607,11 @@ impl Generator {
             self.indent += 1;
 
             self.write_indent(code_file);
-            fprintf(code_file, "struct ");
-            self.write_string(code_file, &name);
+            self.write_type(code_file, &Type::Self, generics);
 
             if module.mode_cpp {
-                fprintf(code_file, "* self = (struct ");
-                self.write_string(code_file, &name);
+                fprintf(code_file, "* self = (");
+                self.write_type(code_file, &Type::Self, generics);
                 fprintf(code_file, "*)__self;\n");
             } else {
                 fprintf(code_file, "* self = __self;\n");
@@ -3627,13 +3626,19 @@ impl Generator {
                 self.write_indent(code_file);
                 fprintf(code_file, "case %zu: return ", i);
 
-                if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
-                    fprintf(code_file, "&");
+                if struct_info.is_newtype() {
+                    fprintf(code_file, "self");
+                } else {
+                    if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
+                        fprintf(code_file, "&");
+                    }
+
+                    fprintf(code_file, "self->");
+                    self.write_token(code_file, field.name);
                 }
 
-                fprintf(code_file, "self->");
-                self.write_token(code_file, field.name);
                 fprintf(code_file, ";\n");
+
                 i += 1;
             }
 
@@ -3655,12 +3660,11 @@ impl Generator {
             self.indent += 1;
 
             self.write_indent(code_file);
-            fprintf(code_file, "struct ");
-            self.write_string(code_file, &name);
+            self.write_type(code_file, &Type::Self, generics);
 
             if module.mode_cpp {
-                fprintf(code_file, "* self = (struct ");
-                self.write_string(code_file, &name);
+                fprintf(code_file, "* self = (");
+                self.write_type(code_file, &Type::Self, generics);
                 fprintf(code_file, "*)__self;\n");
             } else {
                 fprintf(code_file, "* self = __self;\n");
@@ -3675,18 +3679,25 @@ impl Generator {
                 if field.type.is_sequence() { continue; }
 
                 self.write_indent(code_file);
-                fprintf(code_file, "case %zu: self->", i);
-                self.write_token(code_file, field.name);
-                fprintf(code_file, " = ");
 
-                if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
-                    fprintf(code_file, "*(");
+                if struct_info.is_newtype() {
+                    fprintf(code_file, "case %zu: *self = *(", i);
                     self.write_type(code_file, &field.type, generics);
                     fprintf(code_file, "*)");
-                } else if module.mode_cpp {
-                    fprintf(code_file, "(");
-                    self.write_type(code_file, &field.type, generics);
-                    fprintf(code_file, ")");
+                } else {
+                    fprintf(code_file, "case %zu: self->", i);
+                    self.write_token(code_file, field.name);
+                    fprintf(code_file, " = ");
+
+                    if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
+                        fprintf(code_file, "*(");
+                        self.write_type(code_file, &field.type, generics);
+                        fprintf(code_file, "*)");
+                    } else if module.mode_cpp {
+                        fprintf(code_file, "(");
+                        self.write_type(code_file, &field.type, generics);
+                        fprintf(code_file, ")");
+                    }
                 }
 
                 fprintf(code_file, "value; return true;\n");
