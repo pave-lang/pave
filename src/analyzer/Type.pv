@@ -435,6 +435,14 @@ impl Type {
             _ => { return false; },
         }
     }
+    
+    fn is_function(&self) -> bool {
+        match self {
+            Type::Function(_, _) => { return true; },
+            Type::FunctionC(_) => { return true; },
+            _ => { return false; },
+        }
+    }
 
     fn is_indirect(&self) -> bool {
         match self {

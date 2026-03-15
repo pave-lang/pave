@@ -948,19 +948,15 @@ impl Expression {
             if value == 0 { return 0; }
 
             result = Expression::make(context.allocator, token, ExpressionData::BinaryExpression(inner, operator.value, value), &inner.return_type);
-        } else if token.eq(TokenType::Symbol, "==") || token.eq(TokenType::Symbol, "!=") || token.eq(TokenType::Symbol, "<=") || token.eq(TokenType::Symbol, ">=") || token.eq(TokenType::Symbol, "<") || token.eq(TokenType::Symbol, ">") || token.eq(TokenType::Symbol, "||") || token.eq(TokenType::Symbol, "&&") {
-            let operator = context.expect(TokenType::Symbol);
-            if operator == 0 { return 0; }
-
-            let value = Expression::parse(context, generics);
-            if value == 0 { return 0; }
-
-            if !token.eq(TokenType::Symbol, "||") && !token.eq(TokenType::Symbol, "&&") && !inner.validate_type(context, &value.return_type, false) { return 0; }
-
-            result = Expression::make(context.allocator, token, ExpressionData::BinaryExpression(inner, operator.value, value), Type::Primitive(context.module.find_primitive("bool")).to_ptr(context.allocator));
-        } else if token.eq(TokenType::Symbol, "(") {
+        } else if inner.return_type.resolve_typedef_function().is_function() && (token.eq(TokenType::Symbol, "<") || token.eq(TokenType::Symbol, "(")) {
             match inner.return_type.resolve_typedef_function() {
                 Type::Function(func_info, _) => {
+                    let parsed_generics = Array<Type> {};
+
+                    if context.check_value(TokenType::Symbol, "<") {
+                        parsed_generics = context.parse_generics(generics);
+                    }
+
                     if !context.expect_value(TokenType::Symbol, "(") { return 0; }
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
@@ -976,6 +972,21 @@ impl Expression {
                     }
                     
                     if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                    if func_info.generics.array.length > 0 {
+                        let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
+                        inner.return_type = *context.module.make_type_usage(&inner.return_type, &func_generics.array);
+
+                        match inner.data {
+                            ExpressionData::Type(&type) => {
+                                *type = &inner.return_type;
+                            },
+                            _ => {},
+                        }
+                    }
+
+                    if !Expression::validate_arguments(context, token, &inner.return_type, &arguments, 0, false) { return 0; }
+
                     result = Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), &func_info.return_type);
                 },
                 Type::FunctionC(func_info) => {
@@ -1007,6 +1018,16 @@ impl Expression {
                     return 0;
                 },
             }
+        } else if token.eq(TokenType::Symbol, "==") || token.eq(TokenType::Symbol, "!=") || token.eq(TokenType::Symbol, "<=") || token.eq(TokenType::Symbol, ">=") || token.eq(TokenType::Symbol, "<") || token.eq(TokenType::Symbol, ">") || token.eq(TokenType::Symbol, "||") || token.eq(TokenType::Symbol, "&&") {
+            let operator = context.expect(TokenType::Symbol);
+            if operator == 0 { return 0; }
+
+            let value = Expression::parse(context, generics);
+            if value == 0 { return 0; }
+
+            if !token.eq(TokenType::Symbol, "||") && !token.eq(TokenType::Symbol, "&&") && !inner.validate_type(context, &value.return_type, false) { return 0; }
+
+            result = Expression::make(context.allocator, token, ExpressionData::BinaryExpression(inner, operator.value, value), Type::Primitive(context.module.find_primitive("bool")).to_ptr(context.allocator));
         } else {
             return inner;
         }
