@@ -1,10 +1,5 @@
-struct DynStructField {
-    name: str,
-    type: TypeId,
-}
-
 trait Struct {
-    fn get_fields(&self) -> &[DynStructField];
+    fn get_fields(&self) -> &[(usize, str, TypeId)];
     fn get_field(&self, index: usize) -> &void;
     fn set_field(&self, index: usize, value: *void) -> bool;
 }
