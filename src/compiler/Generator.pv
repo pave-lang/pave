@@ -3438,6 +3438,7 @@ impl Generator {
         
     fn generate_struct(&self, struct_info: &Struct, usage: &TypeUsage<Struct>, generics: &GenericMap) -> bool {
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let module = struct_info.module;
         let header = self.make_path(struct_info.module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
@@ -3586,7 +3587,7 @@ impl Generator {
                 if first { first = false; } else { fprintf(code_file, ", "); }
                 fprintf(code_file, "(struct DynStructField){ .name = (struct str){ .ptr = \"");
                 self.write_token(code_file, field.name);
-                fprintf(code_file, "\", .length = %zu }, .typeid = ", field.name.value.length);
+                fprintf(code_file, "\", .length = %zu }, .type = ", field.name.value.length);
                 self.write_typeid(code_file, &field.type, generics);
                 fprintf(code_file, " }");
             }
@@ -3607,7 +3608,14 @@ impl Generator {
             self.write_indent(code_file);
             fprintf(code_file, "struct ");
             self.write_string(code_file, &name);
-            fprintf(code_file, "* self = __self;\n");
+
+            if module.mode_cpp {
+                fprintf(code_file, "* self = (struct ");
+                self.write_string(code_file, &name);
+                fprintf(code_file, "*)__self;\n");
+            } else {
+                fprintf(code_file, "* self = __self;\n");
+            }
 
             self.write_indent(code_file);
             fprintf(code_file, "switch (index) {\n");
@@ -3648,7 +3656,14 @@ impl Generator {
             self.write_indent(code_file);
             fprintf(code_file, "struct ");
             self.write_string(code_file, &name);
-            fprintf(code_file, "* self = __self;\n");
+
+            if module.mode_cpp {
+                fprintf(code_file, "* self = (struct ");
+                self.write_string(code_file, &name);
+                fprintf(code_file, "*)__self;\n");
+            } else {
+                fprintf(code_file, "* self = __self;\n");
+            }
 
             self.write_indent(code_file);
             fprintf(code_file, "switch (index) {\n");
@@ -3656,6 +3671,8 @@ impl Generator {
 
             i = 0;
             for (_, &field) in struct_info.fields {
+                if field.type.is_sequence() { continue; }
+
                 self.write_indent(code_file);
                 fprintf(code_file, "case %zu: self->", i);
                 self.write_token(code_file, field.name);
@@ -3665,6 +3682,10 @@ impl Generator {
                     fprintf(code_file, "*(");
                     self.write_type(code_file, &field.type, generics);
                     fprintf(code_file, "*)");
+                } else if module.mode_cpp {
+                    fprintf(code_file, "(");
+                    self.write_type(code_file, &field.type, generics);
+                    fprintf(code_file, ")");
                 }
 
                 fprintf(code_file, "value; return true;\n");

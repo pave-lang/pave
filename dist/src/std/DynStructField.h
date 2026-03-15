@@ -8,7 +8,7 @@
 #line 1 "src/std/Struct.pv"
 struct DynStructField {
     struct str name;
-    TypeId typeid;
+    TypeId type;
 };
 
 #endif

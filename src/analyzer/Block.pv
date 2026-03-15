@@ -210,7 +210,9 @@ impl Block {
                     pattern = MatchPattern::StaticValue(token);
                 } else {
                     type = context.parse_type2(generics);
-                    if !type.is_enum() {
+                    if type == 0 {
+                        return false;
+                    } else if !type.is_enum() {
                         context.error_token(token, "Type is not an enum");
                         return false;
                     }

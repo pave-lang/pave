@@ -1,6 +1,6 @@
 struct DynStructField {
     name: str,
-    typeid: TypeId,
+    type: TypeId,
 }
 
 trait Struct {

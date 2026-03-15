@@ -535,7 +535,8 @@ impl Usages {
             ExpressionData::ImplicitCast(inner) => {
                 self.process_expression(inner, generic_map);
 
-                match inner.return_type.deref() {
+                let return_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, 0).deref();
+                match return_type {
                     Type::Function(func_info, _) => {
                         // let name = func_info.name.value;
                         let func_ptr = cast<usize>(func_info);

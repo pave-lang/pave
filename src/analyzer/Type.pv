@@ -457,6 +457,13 @@ impl Type {
         }
     }
 
+    fn is_sequence(&self) -> bool {
+        match self {
+            Type::Sequence(_) => { return true; },
+            _ => { return false; },
+        }
+    }
+
     fn deref_1(&self) -> &Type {
         match self {
             Type::Indirect(indirect) => { return &indirect.to; },

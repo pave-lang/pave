@@ -105,7 +105,7 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
 #line 488 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 595 "src/compiler/Usages.pv"
+#line 596 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif
