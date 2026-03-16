@@ -4,7 +4,8 @@ enum MatchPattern {
     Default,
     StaticValue(&Token),
     EnumVariant(&EnumVariant, Array<EnumVariantParameter>),
-    EnumCValue2(&EnumCValue),
+    EnumCValue(&EnumCValue),
+    Expression(&Expression),
 }
 
 struct MatchCase {

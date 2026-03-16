@@ -1473,7 +1473,7 @@ impl Generator {
                                     param_i += 1;
                                 }
                             },
-                            MatchPattern::EnumCValue2(enum_variant) => {
+                            MatchPattern::EnumCValue(enum_variant) => {
                                 fprintf(file, "case ");
 
                                 let enum_info = enum_variant.parent;
@@ -1488,6 +1488,12 @@ impl Generator {
                                 self.write_str(file, enum_variant.name);
                                 fprintf(file, ": {\n");
 
+                                self.indent += 1;
+                            },
+                            MatchPattern::Expression(expr) => {
+                                fprintf(file, "case ");
+                                self.write_expression(file, expr, generics);
+                                fprintf(file, ": {\n");
                                 self.indent += 1;
                             },
                             MatchPattern::Default => {

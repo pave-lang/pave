@@ -3,7 +3,7 @@
 
 struct Expression;
 
-#line 27 "src/analyzer/Statement.pv"
+#line 28 "src/analyzer/Statement.pv"
 struct ForStatementType {
     enum {
         FOR_STATEMENT_TYPE__RANGE,

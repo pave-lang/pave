@@ -68,9 +68,8 @@ impl Expression {
             Type::Enum(enum_info, _) => {
                 let variant = enum_info.variants.find(&token.value);
                 if variant == 0 {
-
                     context.error_token(token, "Variant not found in enum");
-
+                    return EnumVariantResult::None;
                 }
 
                 return EnumVariantResult::EnumVariant(variant);

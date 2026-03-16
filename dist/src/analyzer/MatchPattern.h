@@ -7,6 +7,7 @@
 struct Token;
 struct EnumVariant;
 struct EnumCValue;
+struct Expression;
 
 #line 3 "src/analyzer/Statement.pv"
 struct MatchPattern {
@@ -14,13 +15,15 @@ struct MatchPattern {
         MATCH_PATTERN__DEFAULT,
         MATCH_PATTERN__STATIC_VALUE,
         MATCH_PATTERN__ENUM_VARIANT,
-        MATCH_PATTERN__ENUM_CVALUE2,
+        MATCH_PATTERN__ENUM_CVALUE,
+        MATCH_PATTERN__EXPRESSION,
     } type;
 
     union {
         struct Token* staticvalue_value;
         struct { struct EnumVariant* _0; struct Array_EnumVariantParameter _1; } enumvariant_value;
-        struct EnumCValue* enumcvalue2_value;
+        struct EnumCValue* enumcvalue_value;
+        struct Expression* expression_value;
     };
 };
 
