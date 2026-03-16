@@ -35,22 +35,22 @@ struct Array_Diagnostic* HashMap_str_Array_Diagnostic__find(struct HashMap_str_A
 #line 70 "src/std/HashMap.pv"
 struct Array_Diagnostic* HashMap_str_Array_Diagnostic__insert(struct HashMap_str_Array_Diagnostic* self, struct str key, struct Array_Diagnostic value);
 
-#line 102 "src/std/HashMap.pv"
+#line 98 "src/std/HashMap.pv"
 bool HashMap_str_Array_Diagnostic__remove(struct HashMap_str_Array_Diagnostic* self, struct str* key);
 
-#line 126 "src/std/HashMap.pv"
+#line 122 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__release(struct HashMap_str_Array_Diagnostic* self);
 
-#line 135 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__fill_buckets(struct HashMap_str_Array_Diagnostic* self);
 
-#line 153 "src/std/HashMap.pv"
+#line 149 "src/std/HashMap.pv"
 struct HashMap_str_Array_Diagnostic HashMap_str_Array_Diagnostic__clone(struct HashMap_str_Array_Diagnostic* self, struct Allocator allocator);
 
-#line 167 "src/std/HashMap.pv"
+#line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_Diagnostic HashMap_str_Array_Diagnostic__iter(struct HashMap_str_Array_Diagnostic* self);
 
-#line 174 "src/std/HashMap.pv"
+#line 170 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__clear(struct HashMap_str_Array_Diagnostic* self);
 
 #endif

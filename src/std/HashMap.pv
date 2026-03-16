@@ -82,10 +82,6 @@ impl<K: Hash, V> HashMap<K: Hash, V> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets + bucket_index;
 
-        // if *current_bucket_node != 0 {
-        //     fprintf(stderr, "hashmap collision\n");
-        // }
-
         while *current_bucket_node != 0 {
             current_bucket_node = &(*current_bucket_node).next;
         }

@@ -34,22 +34,22 @@ struct EnumVariant* HashMap_str_EnumVariant__find(struct HashMap_str_EnumVariant
 #line 70 "src/std/HashMap.pv"
 struct EnumVariant* HashMap_str_EnumVariant__insert(struct HashMap_str_EnumVariant* self, struct str key, struct EnumVariant value);
 
-#line 102 "src/std/HashMap.pv"
+#line 98 "src/std/HashMap.pv"
 bool HashMap_str_EnumVariant__remove(struct HashMap_str_EnumVariant* self, struct str* key);
 
-#line 126 "src/std/HashMap.pv"
+#line 122 "src/std/HashMap.pv"
 void HashMap_str_EnumVariant__release(struct HashMap_str_EnumVariant* self);
 
-#line 135 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_EnumVariant__fill_buckets(struct HashMap_str_EnumVariant* self);
 
-#line 153 "src/std/HashMap.pv"
+#line 149 "src/std/HashMap.pv"
 struct HashMap_str_EnumVariant HashMap_str_EnumVariant__clone(struct HashMap_str_EnumVariant* self, struct Allocator allocator);
 
-#line 167 "src/std/HashMap.pv"
+#line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_EnumVariant HashMap_str_EnumVariant__iter(struct HashMap_str_EnumVariant* self);
 
-#line 174 "src/std/HashMap.pv"
+#line 170 "src/std/HashMap.pv"
 void HashMap_str_EnumVariant__clear(struct HashMap_str_EnumVariant* self);
 
 #endif

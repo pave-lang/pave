@@ -34,22 +34,22 @@ struct Namespace** HashMap_str_ref_Namespace__find(struct HashMap_str_ref_Namesp
 #line 70 "src/std/HashMap.pv"
 struct Namespace** HashMap_str_ref_Namespace__insert(struct HashMap_str_ref_Namespace* self, struct str key, struct Namespace* value);
 
-#line 102 "src/std/HashMap.pv"
+#line 98 "src/std/HashMap.pv"
 bool HashMap_str_ref_Namespace__remove(struct HashMap_str_ref_Namespace* self, struct str* key);
 
-#line 126 "src/std/HashMap.pv"
+#line 122 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__release(struct HashMap_str_ref_Namespace* self);
 
-#line 135 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__fill_buckets(struct HashMap_str_ref_Namespace* self);
 
-#line 153 "src/std/HashMap.pv"
+#line 149 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__clone(struct HashMap_str_ref_Namespace* self, struct Allocator allocator);
 
-#line 167 "src/std/HashMap.pv"
+#line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_ref_Namespace HashMap_str_ref_Namespace__iter(struct HashMap_str_ref_Namespace* self);
 
-#line 174 "src/std/HashMap.pv"
+#line 170 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__clear(struct HashMap_str_ref_Namespace* self);
 
 #endif

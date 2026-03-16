@@ -33,22 +33,22 @@ struct str* HashMap_str_str__find(struct HashMap_str_str* self, struct str* key)
 #line 70 "src/std/HashMap.pv"
 struct str* HashMap_str_str__insert(struct HashMap_str_str* self, struct str key, struct str value);
 
-#line 102 "src/std/HashMap.pv"
+#line 98 "src/std/HashMap.pv"
 bool HashMap_str_str__remove(struct HashMap_str_str* self, struct str* key);
 
-#line 126 "src/std/HashMap.pv"
+#line 122 "src/std/HashMap.pv"
 void HashMap_str_str__release(struct HashMap_str_str* self);
 
-#line 135 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_str__fill_buckets(struct HashMap_str_str* self);
 
-#line 153 "src/std/HashMap.pv"
+#line 149 "src/std/HashMap.pv"
 struct HashMap_str_str HashMap_str_str__clone(struct HashMap_str_str* self, struct Allocator allocator);
 
-#line 167 "src/std/HashMap.pv"
+#line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_str HashMap_str_str__iter(struct HashMap_str_str* self);
 
-#line 174 "src/std/HashMap.pv"
+#line 170 "src/std/HashMap.pv"
 void HashMap_str_str__clear(struct HashMap_str_str* self);
 
 #endif
