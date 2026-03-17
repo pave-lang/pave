@@ -1,0 +1,10 @@
+use std
+use analyzer
+
+enum MatchPattern {
+    Default,
+    StaticValue(&Token),
+    EnumVariant(&EnumVariant, Array<EnumVariantParameter>),
+    EnumCValue(&EnumCValue),
+    Expression(&Expression),
+}

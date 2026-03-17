@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_ForVariable.h>
-#include <analyzer/ForVariable.h>
+#include <analyzer/statement/ForVariable.h>
 #include <stdint.h>
 #include <tuple_usize_ref_ForVariable.h>
 

@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_DeferStatement.h>
-#include <analyzer/DeferStatement.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_DeferStatement.h>
 

@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_Statement.h>
-#include <analyzer/Statement.h>
+#include <analyzer/statement/Statement.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_Statement.h>
 

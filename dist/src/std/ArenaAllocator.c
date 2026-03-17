@@ -12,9 +12,9 @@
 #include <analyzer/GenericMap.h>
 #include <analyzer/Indirect.h>
 #include <analyzer/Block.h>
-#include <analyzer/LetStatement.h>
+#include <analyzer/statement/LetStatement.h>
 #include <analyzer/Token.h>
-#include <analyzer/ForStatement.h>
+#include <analyzer/statement/ForStatement.h>
 #include <analyzer/Sequence.h>
 #include <analyzer/Tuple.h>
 #include <analyzer/Expression.h>

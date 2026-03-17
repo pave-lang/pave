@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_ForVariable.h>
-#include <analyzer/ForVariable.h>
+#include <analyzer/statement/ForVariable.h>
 #include <stdint.h>
 
 #include <slice_ForVariable.h>

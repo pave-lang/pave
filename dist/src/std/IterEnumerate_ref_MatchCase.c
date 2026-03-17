@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_MatchCase.h>
-#include <analyzer/MatchCase.h>
+#include <analyzer/statement/MatchCase.h>
 #include <stdint.h>
 #include <tuple_usize_ref_MatchCase.h>
 

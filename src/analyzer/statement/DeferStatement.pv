@@ -1,0 +1,6 @@
+use analyzer
+
+enum DeferStatement {
+    Expression(&Expression),
+    Block(&Block),
+}

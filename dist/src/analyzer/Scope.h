@@ -12,13 +12,13 @@ struct ArenaAllocator;
 #include <stdlib.h>
 #include <string.h>
 
-#line 7 "src/analyzer/Context.pv"
+#line 8 "src/analyzer/Context.pv"
 struct Scope {
     struct HashMap_str_Type values;
     struct Block* block;
 };
 
-#line 13 "src/analyzer/Context.pv"
+#line 14 "src/analyzer/Context.pv"
 struct Scope Scope__new(struct ArenaAllocator* allocator, struct Block* block);
 
 #endif

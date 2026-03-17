@@ -7,7 +7,7 @@ struct Token;
 struct Type;
 struct Expression;
 
-#line 48 "src/analyzer/Statement.pv"
+#line 3 "src/analyzer/statement/LetStatement.pv"
 struct LetStatement {
     bool is_static;
     struct Token* name;

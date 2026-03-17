@@ -1,0 +1,8 @@
+use analyzer
+
+struct LetStatement {
+    is_static: bool,
+    name: &Token,
+    type: &Type,
+    value: &Expression,
+}

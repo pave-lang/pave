@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/DeferStatement.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_DeferStatement.h>

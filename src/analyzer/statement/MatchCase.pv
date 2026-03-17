@@ -1,0 +1,8 @@
+use analyzer
+
+struct MatchCase {
+    first_token: &Token,
+    pattern: MatchPattern,
+    type: &Type,
+    body: &Block,
+}

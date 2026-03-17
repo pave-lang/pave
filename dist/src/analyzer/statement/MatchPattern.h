@@ -9,7 +9,7 @@ struct EnumVariant;
 struct EnumCValue;
 struct Expression;
 
-#line 3 "src/analyzer/Statement.pv"
+#line 4 "src/analyzer/statement/MatchPattern.pv"
 struct MatchPattern {
     enum {
         MATCH_PATTERN__DEFAULT,

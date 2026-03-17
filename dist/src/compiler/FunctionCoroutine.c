@@ -10,8 +10,8 @@
 
 #include <compiler/FunctionCoroutine.h>
 
-#line 32 "src/compiler/Generator.pv"
+#line 33 "src/compiler/Generator.pv"
 struct FunctionCoroutine FunctionCoroutine__new(struct ArenaAllocator* allocator) {
-    #line 33 "src/compiler/Generator.pv"
+    #line 34 "src/compiler/Generator.pv"
     return (struct FunctionCoroutine) { .variables = HashMap_str_ref_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }) };
 }

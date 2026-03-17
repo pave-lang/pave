@@ -1,0 +1,13 @@
+use analyzer
+
+struct Statement {
+    first_token: &Token,
+    last_token: &Token,
+    data: StatementData,
+}
+
+impl Statement {
+    fn new(first_token: &Token, last_token: &Token, data: StatementData) -> Self {
+        return Self { first_token, last_token, data };
+    }
+}

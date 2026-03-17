@@ -2,11 +2,11 @@
 #define PAVE_STATEMENT_DATA
 
 #include <std/Array_DeferStatement.h>
-#include <analyzer/DeferStatement.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <std/Array_ElseStatement.h>
-#include <analyzer/ElseStatement.h>
+#include <analyzer/statement/ElseStatement.h>
 #include <std/Array_MatchCase.h>
-#include <analyzer/MatchCase.h>
+#include <analyzer/statement/MatchCase.h>
 
 struct Block;
 struct LetStatement;
@@ -14,7 +14,7 @@ struct Expression;
 struct ForStatement;
 struct Token;
 
-#line 62 "src/analyzer/Statement.pv"
+#line 4 "src/analyzer/statement/StatementData.pv"
 struct StatementData {
     enum {
         STATEMENT_DATA__BLOCK_STATEMENT,

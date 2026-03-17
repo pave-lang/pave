@@ -1,0 +1,17 @@
+use std
+use analyzer
+
+enum StatementData {
+    BlockStatement(&Block),
+    LetStatement(&LetStatement),
+    ReturnStatement(&Expression, Array<DeferStatement>),
+    YieldStatement(&Expression),
+    IfStatement(&Expression, &Block, Array<ElseStatement>),
+    MatchStatement(&Expression, Array<MatchCase>),
+    WhileStatement(&Expression, &Block),
+    ForStatement(&ForStatement),
+    AssignmentStatement(&Expression, &Token, &Expression),
+    ExpressionStatement(&Expression),
+    BreakStatement(Array<DeferStatement>),
+    ContinueStatement(Array<DeferStatement>),
+}

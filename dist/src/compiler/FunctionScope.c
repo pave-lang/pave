@@ -12,9 +12,9 @@
 
 #include <compiler/FunctionScope.h>
 
-#line 16 "src/compiler/Generator.pv"
+#line 17 "src/compiler/Generator.pv"
 struct FunctionScope FunctionScope__new(struct ArenaAllocator* allocator, bool break_target, bool continue_target) {
-    #line 17 "src/compiler/Generator.pv"
+    #line 18 "src/compiler/Generator.pv"
     return (struct FunctionScope) {
         .break_target = break_target,
         .continue_target = continue_target,

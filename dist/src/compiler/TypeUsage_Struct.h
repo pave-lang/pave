@@ -15,7 +15,7 @@ struct ArenaAllocator;
 
 #include <stdio.h>
 
-#line 43 "src/compiler/Usages.pv"
+#line 44 "src/compiler/Usages.pv"
 struct TypeUsage_Struct {
     struct Struct* type;
     struct Array_ref_GenericMap generic_maps;
@@ -24,7 +24,7 @@ struct TypeUsage_Struct {
     struct UsageContext usage_context;
 };
 
-#line 52 "src/compiler/Usages.pv"
+#line 53 "src/compiler/Usages.pv"
 struct TypeUsage_Struct TypeUsage_Struct__new(struct ArenaAllocator* allocator, struct Struct* type, uintptr_t impl_count);
 
 #endif

@@ -14,10 +14,11 @@ mod NamespacePath
 mod Naming
 mod Primitive
 mod Root
-mod Statement
 mod Struct
 mod Token
 mod Tokenizer
 mod Trait
 mod Type
 mod TypeImpl
+
+ns statement

@@ -6,7 +6,7 @@
 struct Token;
 struct Type;
 
-#line 55 "src/analyzer/Statement.pv"
+#line 3 "src/analyzer/statement/ForVariable.pv"
 struct ForVariable {
     bool deref;
     bool ref;

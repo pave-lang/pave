@@ -4,6 +4,7 @@
 
 use std
 use analyzer
+use analyzer::statement
 
 struct FunctionScope {
     break_target: bool,

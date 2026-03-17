@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_DeferStatement.h>
-#include <analyzer/DeferStatement.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <stdint.h>
 #include <tuple_usize_ref_DeferStatement.h>
 

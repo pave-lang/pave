@@ -2,15 +2,15 @@
 #define PAVE_FOR_STATEMENT
 
 #include <std/Array_ForVariable.h>
-#include <analyzer/ForVariable.h>
-#include <analyzer/ForStatementType.h>
+#include <analyzer/statement/ForVariable.h>
+#include <analyzer/statement/ForStatementType.h>
 
 struct Expression;
 struct Type;
 struct Block;
 struct ArenaAllocator;
 
-#line 33 "src/analyzer/Statement.pv"
+#line 4 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement {
     struct Array_ForVariable variables;
     struct Expression* expression;
@@ -20,7 +20,7 @@ struct ForStatement {
     struct Block* block;
 };
 
-#line 43 "src/analyzer/Statement.pv"
+#line 14 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator);
 
 #endif

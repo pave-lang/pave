@@ -1,13 +1,13 @@
 #ifndef PAVE_MATCH_CASE
 #define PAVE_MATCH_CASE
 
-#include <analyzer/MatchPattern.h>
+#include <analyzer/statement/MatchPattern.h>
 
 struct Token;
 struct Type;
 struct Block;
 
-#line 11 "src/analyzer/Statement.pv"
+#line 3 "src/analyzer/statement/MatchCase.pv"
 struct MatchCase {
     struct Token* first_token;
     struct MatchPattern pattern;

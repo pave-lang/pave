@@ -1,0 +1,6 @@
+use analyzer
+
+struct ElseStatement {
+    expression: &Expression,
+    block: &Block, 
+}

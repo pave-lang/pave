@@ -3,6 +3,7 @@
 #include "string.h"
 
 use std
+use statement
 
 struct Scope {
     values: HashMap<str, Type>,

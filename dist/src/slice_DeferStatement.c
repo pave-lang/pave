@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_DeferStatement.h>
-#include <analyzer/DeferStatement.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <stdint.h>
 
 #include <slice_DeferStatement.h>

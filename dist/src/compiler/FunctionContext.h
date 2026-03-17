@@ -15,7 +15,7 @@ struct Type;
 #include <stdlib.h>
 #include <fs.h>
 
-#line 39 "src/compiler/Generator.pv"
+#line 40 "src/compiler/Generator.pv"
 struct FunctionContext {
     struct ArenaAllocator* allocator;
     struct Function* func_info;
@@ -24,19 +24,19 @@ struct FunctionContext {
     struct FunctionCoroutine coroutine;
 };
 
-#line 48 "src/compiler/Generator.pv"
+#line 49 "src/compiler/Generator.pv"
 struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, struct Function* func_info, bool use_scopes);
 
-#line 71 "src/compiler/Generator.pv"
+#line 72 "src/compiler/Generator.pv"
 void FunctionContext__push_scope(struct FunctionContext* self, bool break_target, bool continue_target);
 
-#line 75 "src/compiler/Generator.pv"
+#line 76 "src/compiler/Generator.pv"
 void FunctionContext__pop_scope(struct FunctionContext* self);
 
-#line 79 "src/compiler/Generator.pv"
+#line 80 "src/compiler/Generator.pv"
 struct str FunctionContext__get_variable_replacement(struct FunctionContext* self, struct str name);
 
-#line 90 "src/compiler/Generator.pv"
+#line 91 "src/compiler/Generator.pv"
 void FunctionContext__add_variable(struct FunctionContext* self, struct str name, struct Type* type);
 
 #endif

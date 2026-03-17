@@ -1,0 +1,6 @@
+use analyzer
+
+enum ForStatementType {
+    Range(&Expression, &Expression),
+    Iter(&Expression),
+}

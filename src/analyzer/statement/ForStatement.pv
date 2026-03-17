@@ -1,0 +1,17 @@
+use std
+use analyzer
+
+struct ForStatement {
+    variables: Array<ForVariable>,
+    expression: &Expression,
+    type: ForStatementType,
+    iter_type: &Type,
+    value_type: &Type,
+    block: &Block,
+}
+
+impl ForStatement {
+    fn new(allocator: &ArenaAllocator) -> Self {
+        return Self { variables: Array<ForVariable>::new(allocator) };
+    }
+}

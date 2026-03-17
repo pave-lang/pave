@@ -1,10 +1,10 @@
 #include <analyzer/Token.h>
-#include <analyzer/StatementData.h>
+#include <analyzer/statement/StatementData.h>
 
-#include <analyzer/Statement.h>
+#include <analyzer/statement/Statement.h>
 
-#line 84 "src/analyzer/Statement.pv"
+#line 10 "src/analyzer/statement/Statement.pv"
 struct Statement Statement__new(struct Token* first_token, struct Token* last_token, struct StatementData data) {
-    #line 85 "src/analyzer/Statement.pv"
+    #line 11 "src/analyzer/statement/Statement.pv"
     return (struct Statement) { .first_token = first_token, .last_token = last_token, .data = data };
 }
