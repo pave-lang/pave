@@ -1,5 +1,6 @@
 use std
 use analyzer
+use analyzer::expression
 
 struct ForStatement {
     variables: Array<ForVariable>,

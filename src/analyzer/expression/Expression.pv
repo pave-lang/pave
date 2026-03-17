@@ -1,43 +1,12 @@
 #include "stdlib.h"
 
 use std
-
-struct InvokeArgument {
-    name: &Token,
-    value: &Expression,
-}
-
-enum CppExpression {
-    New(&Expression, &Expression),
-    Delete(&Expression),
-}
-
-enum ExpressionData {
-    EnumVariant(&EnumVariant),
-    Type(&Type),
-    Literal(str),
-    Variable(str),
-    BinaryExpression(&Expression, str, &Expression),
-    UnaryExpression(str, &Expression),
-    MemberStaticExpression(&Expression, str),
-    MemberInstanceExpression(&Expression, str),
-    IndexExpression(&Expression, &Expression),
-    ParenthesizedExpression(&Expression),
-    CppExpression(CppExpression),
-    ImplicitCast(&Expression),
-    Invoke(&Expression, Array<InvokeArgument>),
-}
+use analyzer
 
 struct Expression {
     token: &Token,
     data: ExpressionData,
     return_type: Type,
-}
-
-enum EnumVariantResult {
-    None,
-    EnumVariant(&EnumVariant),
-    EnumCValue(&EnumCValue),
 }
 
 impl Expression {

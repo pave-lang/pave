@@ -14,31 +14,31 @@
 
 #include <compiler/TypeUsage_Struct.h>
 
-#line 53 "src/compiler/Usages.pv"
+#line 54 "src/compiler/Usages.pv"
 struct TypeUsage_Struct TypeUsage_Struct__new(struct ArenaAllocator* allocator, struct Struct* type, uintptr_t impl_count) {
-    #line 54 "src/compiler/Usages.pv"
+    #line 55 "src/compiler/Usages.pv"
     struct TypeUsage_Struct self = (struct TypeUsage_Struct) {
         .type = type,
         .generic_maps = Array_ref_GenericMap__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .usage_context = UsageContext__new(allocator),
     };
 
-    #line 60 "src/compiler/Usages.pv"
+    #line 61 "src/compiler/Usages.pv"
     if (impl_count > 0) {
-        #line 61 "src/compiler/Usages.pv"
-        self.impl_functions = Array_HashMap_usize_TypeFunctionUsage__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
         #line 62 "src/compiler/Usages.pv"
-        Array_HashMap_usize_TypeFunctionUsage__reserve(&self.impl_functions, impl_count);
+        self.impl_functions = Array_HashMap_usize_TypeFunctionUsage__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
         #line 63 "src/compiler/Usages.pv"
+        Array_HashMap_usize_TypeFunctionUsage__reserve(&self.impl_functions, impl_count);
+        #line 64 "src/compiler/Usages.pv"
         self.impl_functions.length = impl_count;
 
-        #line 65 "src/compiler/Usages.pv"
+        #line 66 "src/compiler/Usages.pv"
         for (uintptr_t i = 0; i < impl_count; i++) {
-            #line 66 "src/compiler/Usages.pv"
+            #line 67 "src/compiler/Usages.pv"
             self.impl_functions.data[i] = HashMap_usize_TypeFunctionUsage__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
         }
     }
 
-    #line 70 "src/compiler/Usages.pv"
+    #line 71 "src/compiler/Usages.pv"
     return self;
 }

@@ -4,7 +4,7 @@
 struct Expression;
 struct Block;
 
-#line 3 "src/analyzer/statement/DeferStatement.pv"
+#line 4 "src/analyzer/statement/DeferStatement.pv"
 struct DeferStatement {
     enum {
         DEFER_STATEMENT__EXPRESSION,

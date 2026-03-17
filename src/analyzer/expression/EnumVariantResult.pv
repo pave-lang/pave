@@ -1,0 +1,7 @@
+use analyzer
+
+enum EnumVariantResult {
+    None,
+    EnumVariant(&EnumVariant),
+    EnumCValue(&EnumCValue),
+}

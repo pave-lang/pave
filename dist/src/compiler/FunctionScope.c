@@ -5,16 +5,16 @@
 #include <std/ArenaAllocator.h>
 #include <stdbool.h>
 #include <std/Array_ref_Expression.h>
-#include <analyzer/Expression.h>
+#include <analyzer/expression/Expression.h>
 #include <std/Allocator.h>
 #include <std/HashMap_str_str.h>
 #include <std/str.h>
 
 #include <compiler/FunctionScope.h>
 
-#line 17 "src/compiler/Generator.pv"
+#line 18 "src/compiler/Generator.pv"
 struct FunctionScope FunctionScope__new(struct ArenaAllocator* allocator, bool break_target, bool continue_target) {
-    #line 18 "src/compiler/Generator.pv"
+    #line 19 "src/compiler/Generator.pv"
     return (struct FunctionScope) {
         .break_target = break_target,
         .continue_target = continue_target,

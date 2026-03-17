@@ -3,6 +3,7 @@
 #include "string.h"
 
 use std
+use expression
 
 struct Include {
     root: &Root,

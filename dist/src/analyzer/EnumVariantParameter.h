@@ -5,7 +5,7 @@
 
 struct Token;
 
-#line 3 "src/analyzer/Enum.pv"
+#line 4 "src/analyzer/Enum.pv"
 struct EnumVariantParameter {
     bool ref;
     struct Token* variable;

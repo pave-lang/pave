@@ -2,6 +2,7 @@
 
 use std
 use analyzer
+use analyzer::expression
 use analyzer::statement
 
 struct TypeFunctionUsage {

@@ -8,7 +8,7 @@ struct Token;
 struct Enum;
 struct Expression;
 
-#line 8 "src/analyzer/Enum.pv"
+#line 9 "src/analyzer/Enum.pv"
 struct EnumVariant {
     struct Token* name;
     struct Array_Type types;

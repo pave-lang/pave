@@ -13,7 +13,7 @@ struct ParentCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 990 "src/analyzer/Include.pv"
+#line 991 "src/analyzer/Include.pv"
 struct NamespaceCpp {
     struct Include* include;
     struct str name;
@@ -22,7 +22,7 @@ struct NamespaceCpp {
     struct HashMap_str_Type values;
 };
 
-#line 999 "src/analyzer/Include.pv"
+#line 1000 "src/analyzer/Include.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct ParentCpp parent);
 
 #endif

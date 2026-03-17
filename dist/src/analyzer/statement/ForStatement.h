@@ -10,7 +10,7 @@ struct Type;
 struct Block;
 struct ArenaAllocator;
 
-#line 4 "src/analyzer/statement/ForStatement.pv"
+#line 5 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement {
     struct Array_ForVariable variables;
     struct Expression* expression;
@@ -20,7 +20,7 @@ struct ForStatement {
     struct Block* block;
 };
 
-#line 14 "src/analyzer/statement/ForStatement.pv"
+#line 15 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator);
 
 #endif

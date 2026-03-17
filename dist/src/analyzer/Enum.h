@@ -17,7 +17,7 @@ struct Trait;
 struct Impl;
 struct Enum;
 
-#line 20 "src/analyzer/Enum.pv"
+#line 21 "src/analyzer/Enum.pv"
 struct Enum {
     struct Token* name;
     struct Context* context;
@@ -30,19 +30,19 @@ struct Enum {
     struct Array_ref_Impl impls;
 };
 
-#line 33 "src/analyzer/Enum.pv"
+#line 34 "src/analyzer/Enum.pv"
 struct Enum Enum__new(struct Context* context);
 
-#line 43 "src/analyzer/Enum.pv"
+#line 44 "src/analyzer/Enum.pv"
 struct Enum Enum__parse(struct Context* context);
 
-#line 62 "src/analyzer/Enum.pv"
+#line 63 "src/analyzer/Enum.pv"
 bool Enum__prefill_types(struct Enum* self);
 
-#line 72 "src/analyzer/Enum.pv"
+#line 73 "src/analyzer/Enum.pv"
 bool Enum__fill_variants(struct Enum* self);
 
-#line 91 "src/analyzer/Enum.pv"
+#line 92 "src/analyzer/Enum.pv"
 bool Enum__parse_variant(struct Enum* self);
 
 #endif

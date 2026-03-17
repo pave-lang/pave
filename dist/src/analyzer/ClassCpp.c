@@ -15,12 +15,12 @@
 
 #include <analyzer/ClassCpp.h>
 
-#line 955 "src/analyzer/Include.pv"
+#line 956 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct ParentCpp parent, bool is_struct) {
-    #line 956 "src/analyzer/Include.pv"
+    #line 957 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 958 "src/analyzer/Include.pv"
+    #line 959 "src/analyzer/Include.pv"
     return ArenaAllocator__store_ClassCpp(allocator, (struct ClassCpp) {
         .include = include,
         .is_struct = is_struct,

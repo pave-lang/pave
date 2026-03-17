@@ -1,4 +1,5 @@
 use std
+use expression
 
 struct EnumVariantParameter {
     ref: bool,

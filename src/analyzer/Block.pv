@@ -1,6 +1,7 @@
 #include "stdio.h"
 
 use std
+use expression
 use statement
 
 struct Block {

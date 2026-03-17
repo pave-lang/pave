@@ -2,7 +2,6 @@ mod Block
 mod Context
 mod Analysis
 mod Enum
-mod Expression
 mod Function
 mod GenericMap
 mod Generics
@@ -21,4 +20,5 @@ mod Trait
 mod Type
 mod TypeImpl
 
+ns expression
 ns statement

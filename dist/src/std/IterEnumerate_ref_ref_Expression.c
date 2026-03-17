@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_ref_Expression.h>
-#include <analyzer/Expression.h>
+#include <analyzer/expression/Expression.h>
 #include <stdint.h>
 #include <tuple_usize_ref_ref_Expression.h>
 

@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_ref_Expression.h>
-#include <analyzer/Expression.h>
+#include <analyzer/expression/Expression.h>
 #include <stdint.h>
 
 #include <slice_ref_Expression.h>

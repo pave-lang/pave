@@ -14,7 +14,7 @@ struct Expression;
 struct ForStatement;
 struct Token;
 
-#line 4 "src/analyzer/statement/StatementData.pv"
+#line 5 "src/analyzer/statement/StatementData.pv"
 struct StatementData {
     enum {
         STATEMENT_DATA__BLOCK_STATEMENT,

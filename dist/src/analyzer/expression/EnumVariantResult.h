@@ -1,12 +1,10 @@
 #ifndef PAVE_ENUM_VARIANT_RESULT
 #define PAVE_ENUM_VARIANT_RESULT
 
-#include <stdlib.h>
-
 struct EnumVariant;
 struct EnumCValue;
 
-#line 37 "src/analyzer/Expression.pv"
+#line 3 "src/analyzer/expression/EnumVariantResult.pv"
 struct EnumVariantResult {
     enum {
         ENUM_VARIANT_RESULT__NONE,

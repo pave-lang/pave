@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_InvokeArgument.h>
-#include <analyzer/InvokeArgument.h>
+#include <analyzer/expression/InvokeArgument.h>
 #include <stdint.h>
 #include <tuple_usize_ref_InvokeArgument.h>
 

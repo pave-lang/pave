@@ -13,12 +13,12 @@
 
 #include <analyzer/NamespaceCpp.h>
 
-#line 999 "src/analyzer/Include.pv"
+#line 1000 "src/analyzer/Include.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct ParentCpp parent) {
-    #line 1000 "src/analyzer/Include.pv"
+    #line 1001 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 1002 "src/analyzer/Include.pv"
+    #line 1003 "src/analyzer/Include.pv"
     return ArenaAllocator__store_NamespaceCpp(allocator, (struct NamespaceCpp) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

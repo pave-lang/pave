@@ -1,0 +1,18 @@
+use std
+use analyzer
+
+enum ExpressionData {
+    EnumVariant(&EnumVariant),
+    Type(&Type),
+    Literal(str),
+    Variable(str),
+    BinaryExpression(&Expression, str, &Expression),
+    UnaryExpression(str, &Expression),
+    MemberStaticExpression(&Expression, str),
+    MemberInstanceExpression(&Expression, str),
+    IndexExpression(&Expression, &Expression),
+    ParenthesizedExpression(&Expression),
+    CppExpression(CppExpression),
+    ImplicitCast(&Expression),
+    Invoke(&Expression, Array<InvokeArgument>),
+}

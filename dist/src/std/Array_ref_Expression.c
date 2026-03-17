@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_ref_Expression.h>
-#include <analyzer/Expression.h>
+#include <analyzer/expression/Expression.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_ref_Expression.h>
 

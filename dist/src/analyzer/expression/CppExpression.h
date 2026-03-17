@@ -1,11 +1,9 @@
 #ifndef PAVE_CPP_EXPRESSION
 #define PAVE_CPP_EXPRESSION
 
-#include <stdlib.h>
-
 struct Expression;
 
-#line 10 "src/analyzer/Expression.pv"
+#line 1 "src/analyzer/expression/CppExpression.pv"
 struct CppExpression {
     enum {
         CPP_EXPRESSION__NEW,

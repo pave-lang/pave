@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_InvokeArgument.h>
-#include <analyzer/InvokeArgument.h>
+#include <analyzer/expression/InvokeArgument.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_InvokeArgument.h>
 

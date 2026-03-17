@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/Expression.h>
+#include <analyzer/expression/Expression.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_ref_Expression.h>

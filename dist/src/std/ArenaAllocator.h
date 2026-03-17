@@ -17,7 +17,6 @@ struct Token;
 struct ForStatement;
 struct Sequence;
 struct Tuple;
-struct Expression;
 struct Include;
 struct IncludeContext;
 struct TypedefC;
@@ -27,6 +26,7 @@ struct ClassCpp;
 struct FunctionC;
 struct NamespaceCpp;
 struct Generic;
+struct Expression;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,9 +77,6 @@ struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, str
 struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tuple value);
 
 #line 174 "src/std/ArenaAllocator.pv"
-struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
-
-#line 174 "src/std/ArenaAllocator.pv"
 struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include value);
 
 #line 174 "src/std/ArenaAllocator.pv"
@@ -105,6 +102,9 @@ struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* s
 
 #line 174 "src/std/ArenaAllocator.pv"
 struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struct Generic value);
+
+#line 174 "src/std/ArenaAllocator.pv"
+struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
 
 #line 184 "src/std/ArenaAllocator.pv"
 void* ArenaAllocator__Allocator__alloc(void* __self, uintptr_t size);

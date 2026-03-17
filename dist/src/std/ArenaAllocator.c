@@ -17,7 +17,6 @@
 #include <analyzer/statement/ForStatement.h>
 #include <analyzer/Sequence.h>
 #include <analyzer/Tuple.h>
-#include <analyzer/Expression.h>
 #include <analyzer/Include.h>
 #include <analyzer/IncludeContext.h>
 #include <analyzer/TypedefC.h>
@@ -27,6 +26,7 @@
 #include <analyzer/FunctionC.h>
 #include <analyzer/NamespaceCpp.h>
 #include <analyzer/Generic.h>
+#include <analyzer/expression/Expression.h>
 
 #include <std/ArenaAllocator.h>
 
@@ -238,22 +238,6 @@ struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tu
 }
 
 #line 174 "src/std/ArenaAllocator.pv"
-struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value) {
-    #line 175 "src/std/ArenaAllocator.pv"
-    struct Expression* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Expression));
-    #line 176 "src/std/ArenaAllocator.pv"
-    if (new_memory == 0) {
-        #line 176 "src/std/ArenaAllocator.pv"
-        return 0;
-    }
-
-    #line 178 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Expression));
-    #line 179 "src/std/ArenaAllocator.pv"
-    return new_memory;
-}
-
-#line 174 "src/std/ArenaAllocator.pv"
 struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include value) {
     #line 175 "src/std/ArenaAllocator.pv"
     struct Include* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Include));
@@ -393,6 +377,22 @@ struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struc
 
     #line 178 "src/std/ArenaAllocator.pv"
     memcpy(new_memory, &value, sizeof(struct Generic));
+    #line 179 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 174 "src/std/ArenaAllocator.pv"
+struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value) {
+    #line 175 "src/std/ArenaAllocator.pv"
+    struct Expression* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Expression));
+    #line 176 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 176 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 178 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct Expression));
     #line 179 "src/std/ArenaAllocator.pv"
     return new_memory;
 }

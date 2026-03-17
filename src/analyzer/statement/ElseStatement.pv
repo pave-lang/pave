@@ -1,4 +1,5 @@
 use analyzer
+use analyzer::expression
 
 struct ElseStatement {
     expression: &Expression,

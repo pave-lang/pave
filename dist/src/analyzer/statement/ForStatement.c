@@ -5,8 +5,8 @@
 
 #include <analyzer/statement/ForStatement.h>
 
-#line 14 "src/analyzer/statement/ForStatement.pv"
+#line 15 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator) {
-    #line 15 "src/analyzer/statement/ForStatement.pv"
+    #line 16 "src/analyzer/statement/ForStatement.pv"
     return (struct ForStatement) { .variables = Array_ForVariable__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }) };
 }

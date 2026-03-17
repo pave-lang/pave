@@ -11,14 +11,14 @@ struct Include;
 #include <stdio.h>
 #include <string.h>
 
-#line 920 "src/analyzer/Include.pv"
+#line 921 "src/analyzer/Include.pv"
 struct StructC {
     struct Include* include;
     struct str name;
     struct HashMap_str_StructCField fields;
 };
 
-#line 927 "src/analyzer/Include.pv"
+#line 928 "src/analyzer/Include.pv"
 struct StructC* StructC__new(struct Include* include, char const* name);
 
 #endif

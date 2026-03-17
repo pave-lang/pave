@@ -15,7 +15,7 @@ struct ParentCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 943 "src/analyzer/Include.pv"
+#line 944 "src/analyzer/Include.pv"
 struct ClassCpp {
     struct Include* include;
     bool is_struct;
@@ -27,7 +27,7 @@ struct ClassCpp {
     struct Array_Type bases;
 };
 
-#line 955 "src/analyzer/Include.pv"
+#line 956 "src/analyzer/Include.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct ParentCpp parent, bool is_struct);
 
 #endif

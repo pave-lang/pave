@@ -10,9 +10,9 @@
 
 #include <compiler/TypeFunctionUsage.h>
 
-#line 16 "src/compiler/Usages.pv"
+#line 17 "src/compiler/Usages.pv"
 struct TypeFunctionUsage TypeFunctionUsage__new(struct ArenaAllocator* allocator, struct Function* type) {
-    #line 17 "src/compiler/Usages.pv"
+    #line 18 "src/compiler/Usages.pv"
     return (struct TypeFunctionUsage) {
         .type = type,
         .generic_maps = Array_ref_GenericMap__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
