@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <std/HashMapIter_u32_Type.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 #include <std/HashMapBucket_u32_Type.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

@@ -10,7 +10,7 @@ struct EnumVariant;
 struct Type;
 struct Expression;
 
-#line 4 "src/analyzer/expression/ExpressionData.pv"
+#line 5 "src/analyzer/expression/ExpressionData.pv"
 struct ExpressionData {
     enum {
         EXPRESSION_DATA__ENUM_VARIANT,

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/EnumVariantParameter.h>
+#include <analyzer/types/EnumVariantParameter.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_EnumVariantParameter.h>

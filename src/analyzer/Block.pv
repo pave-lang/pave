@@ -3,6 +3,7 @@
 use std
 use expression
 use statement
+use types
 
 struct Block {
     context: &Context,

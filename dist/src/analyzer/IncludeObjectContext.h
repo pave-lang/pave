@@ -7,22 +7,22 @@ struct IncludeContext;
 #include <stdio.h>
 #include <string.h>
 
-#line 335 "src/analyzer/Include.pv"
+#line 336 "src/analyzer/Include.pv"
 struct IncludeObjectContext {
     struct IncludeContext* context;
     void* object;
 };
 
-#line 671 "src/analyzer/Include.pv"
+#line 672 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_struct(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 691 "src/analyzer/Include.pv"
+#line 692 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 823 "src/analyzer/Include.pv"
+#line 824 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 839 "src/analyzer/Include.pv"
+#line 840 "src/analyzer/Include.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum_into_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

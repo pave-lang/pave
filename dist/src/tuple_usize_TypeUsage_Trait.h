@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <compiler/TypeUsage_Trait.h>
-#include <analyzer/Trait.h>
+#include <analyzer/types/Trait.h>
 
 struct tuple_usize_TypeUsage_Trait {
     uintptr_t _0;

@@ -1,5 +1,6 @@
 use std
 use analyzer
+use types
 
 enum ExpressionData {
     EnumVariant(&EnumVariant),

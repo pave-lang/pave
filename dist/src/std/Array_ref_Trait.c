@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_ref_Trait.h>
-#include <analyzer/Trait.h>
+#include <analyzer/types/Trait.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_ref_Trait.h>
 

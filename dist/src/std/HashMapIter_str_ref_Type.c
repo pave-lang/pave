@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <std/HashMapBucket_str_ref_Type.h>
 #include <std/str.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 #include <tuple_str_ref_Type.h>
 
 #include <std/HashMapIter_str_ref_Type.h>

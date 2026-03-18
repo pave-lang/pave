@@ -5,7 +5,7 @@
 #include <std/HashMapBucket_usize_TypeUsage_Trait.h>
 #include <stdint.h>
 #include <compiler/TypeUsage_Trait.h>
-#include <analyzer/Trait.h>
+#include <analyzer/types/Trait.h>
 #include <tuple_usize_TypeUsage_Trait.h>
 
 #include <std/HashMapIter_usize_TypeUsage_Trait.h>

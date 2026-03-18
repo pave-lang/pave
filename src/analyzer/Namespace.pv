@@ -1,6 +1,7 @@
 #include "fs.h"
 
 use std
+use types
 
 struct Namespace {
     root: &Root,

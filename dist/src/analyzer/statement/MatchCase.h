@@ -7,7 +7,7 @@ struct Token;
 struct Type;
 struct Block;
 
-#line 3 "src/analyzer/statement/MatchCase.pv"
+#line 4 "src/analyzer/statement/MatchCase.pv"
 struct MatchCase {
     struct Token* first_token;
     struct MatchPattern pattern;

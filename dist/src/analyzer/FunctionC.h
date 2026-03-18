@@ -3,7 +3,7 @@
 
 #include <std/str.h>
 #include <std/Array_ref_Expression.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 
 struct Include;
 struct Expression;
@@ -12,7 +12,7 @@ struct Expression;
 #include <stdio.h>
 #include <string.h>
 
-#line 972 "src/analyzer/Include.pv"
+#line 973 "src/analyzer/Include.pv"
 struct FunctionC {
     struct Include* include;
     struct str name;
@@ -20,7 +20,7 @@ struct FunctionC {
     struct Type return_type;
 };
 
-#line 980 "src/analyzer/Include.pv"
+#line 981 "src/analyzer/Include.pv"
 struct FunctionC* FunctionC__new(struct Include* include, char const* name);
 
 #endif

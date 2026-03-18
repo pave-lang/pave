@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <std/HashMapBucket_str_ref_Trait.h>
 #include <std/str.h>
-#include <analyzer/Trait.h>
+#include <analyzer/types/Trait.h>
 #include <tuple_str_ref_Trait.h>
 
 #include <std/HashMapIter_str_ref_Trait.h>

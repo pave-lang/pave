@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_EnumVariantParameter.h>
-#include <analyzer/EnumVariantParameter.h>
+#include <analyzer/types/EnumVariantParameter.h>
 #include <stdint.h>
 
 #include <slice_EnumVariantParameter.h>

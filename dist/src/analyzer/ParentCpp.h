@@ -10,7 +10,7 @@
 struct ClassCpp;
 struct NamespaceCpp;
 
-#line 858 "src/analyzer/Include.pv"
+#line 859 "src/analyzer/Include.pv"
 struct ParentCpp {
     enum {
         PARENT_CPP__NONE,
@@ -24,7 +24,7 @@ struct ParentCpp {
     };
 };
 
-#line 865 "src/analyzer/Include.pv"
+#line 866 "src/analyzer/Include.pv"
 bool ParentCpp__is_none(struct ParentCpp* self);
 
 #endif

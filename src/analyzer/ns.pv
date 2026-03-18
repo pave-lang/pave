@@ -1,24 +1,17 @@
 mod Block
 mod Context
 mod Analysis
-mod Enum
-mod Function
-mod GenericMap
-mod Generics
 mod Impl
 mod Include
 mod Module
 mod Namespace
 mod NamespacePath
 mod Naming
-mod Primitive
 mod Root
-mod Struct
+mod Scope
 mod Token
 mod Tokenizer
-mod Trait
-mod Type
-mod TypeImpl
 
 ns expression
 ns statement
+ns types

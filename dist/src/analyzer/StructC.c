@@ -12,12 +12,12 @@
 
 #include <analyzer/StructC.h>
 
-#line 928 "src/analyzer/Include.pv"
+#line 929 "src/analyzer/Include.pv"
 struct StructC* StructC__new(struct Include* include, char const* name) {
-    #line 929 "src/analyzer/Include.pv"
+    #line 930 "src/analyzer/Include.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 931 "src/analyzer/Include.pv"
+    #line 932 "src/analyzer/Include.pv"
     return ArenaAllocator__store_StructC(allocator, (struct StructC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

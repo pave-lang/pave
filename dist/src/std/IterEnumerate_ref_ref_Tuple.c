@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_ref_Tuple.h>
-#include <analyzer/Tuple.h>
+#include <analyzer/types/Tuple.h>
 #include <stdint.h>
 #include <tuple_usize_ref_ref_Tuple.h>
 

@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_ref_Tuple.h>
-#include <analyzer/Tuple.h>
+#include <analyzer/types/Tuple.h>
 #include <stdint.h>
 
 #include <slice_ref_Tuple.h>

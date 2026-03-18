@@ -1,0 +1,16 @@
+use std
+use analyzer
+
+struct TypeImpl {
+    type: Type,
+    impl_info: &Impl,
+}
+
+impl TypeImpl {
+    fn new(allocator: &ArenaAllocator, type: Type, impl_info: &Impl) -> Self {
+        return Self {
+            type,
+            impl_info,
+        };
+    }
+}

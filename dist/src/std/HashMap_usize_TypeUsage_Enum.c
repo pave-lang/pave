@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_usize_TypeUsage_Enum.h>
 #include <compiler/TypeUsage_Enum.h>
-#include <analyzer/Enum.h>
+#include <analyzer/types/Enum.h>
 #include <std/HashMapBucket_usize_TypeUsage_Enum.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

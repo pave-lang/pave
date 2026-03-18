@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <compiler/TypeUsage_Enum.h>
-#include <analyzer/Enum.h>
+#include <analyzer/types/Enum.h>
 
 struct HashMapBucket_usize_TypeUsage_Enum;
 struct TypeUsage_Enum;

@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_Parameter.h>
-#include <analyzer/Parameter.h>
+#include <analyzer/types/Parameter.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_Parameter.h>
 

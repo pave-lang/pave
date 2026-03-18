@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_Type.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 #include <stdint.h>
 
 #include <slice_Type.h>

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/GenericMap.h>
+#include <analyzer/types/GenericMap.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_ref_GenericMap.h>

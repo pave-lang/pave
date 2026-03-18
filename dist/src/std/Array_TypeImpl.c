@@ -4,7 +4,7 @@
 #include <std/Allocator.h>
 #include <stdint.h>
 #include <slice_TypeImpl.h>
-#include <analyzer/TypeImpl.h>
+#include <analyzer/types/TypeImpl.h>
 #include <stdbool.h>
 #include <std/ArrayIter_ref_TypeImpl.h>
 

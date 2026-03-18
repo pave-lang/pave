@@ -3,22 +3,18 @@
 
 #include <std/HashMap_str_Type.h>
 #include <std/str.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 
 struct Block;
 struct ArenaAllocator;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#line 8 "src/analyzer/Context.pv"
+#line 4 "src/analyzer/Scope.pv"
 struct Scope {
     struct HashMap_str_Type values;
     struct Block* block;
 };
 
-#line 14 "src/analyzer/Context.pv"
+#line 10 "src/analyzer/Scope.pv"
 struct Scope Scope__new(struct ArenaAllocator* allocator, struct Block* block);
 
 #endif

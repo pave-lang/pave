@@ -2,7 +2,7 @@
 #define PAVE_TUPLE_STR_FUNCTION
 
 #include <std/str.h>
-#include <analyzer/Function.h>
+#include <analyzer/types/Function.h>
 
 struct tuple_str_Function {
     struct str _0;

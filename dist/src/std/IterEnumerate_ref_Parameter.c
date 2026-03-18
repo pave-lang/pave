@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_Parameter.h>
-#include <analyzer/Parameter.h>
+#include <analyzer/types/Parameter.h>
 #include <stdint.h>
 #include <tuple_usize_ref_Parameter.h>
 

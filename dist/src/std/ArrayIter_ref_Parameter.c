@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/Parameter.h>
+#include <analyzer/types/Parameter.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_Parameter.h>

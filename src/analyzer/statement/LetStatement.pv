@@ -1,5 +1,6 @@
 use analyzer
-use analyzer::expression
+use expression
+use types
 
 struct LetStatement {
     is_static: bool,

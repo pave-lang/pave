@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/Tuple.h>
+#include <analyzer/types/Tuple.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_ref_Tuple.h>

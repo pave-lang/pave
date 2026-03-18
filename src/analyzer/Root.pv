@@ -2,6 +2,7 @@
 #include "string.h"
 
 use std
+use types
 
 struct Root {
     allocator: &ArenaAllocator,

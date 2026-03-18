@@ -9,7 +9,7 @@ struct Type;
 #include <stdlib.h>
 #include <fs.h>
 
-#line 156 "src/compiler/Generator.pv"
+#line 157 "src/compiler/Generator.pv"
 struct GeneratorInclude {
     struct Type* type;
     struct str name;

@@ -2,6 +2,7 @@
 
 use std
 use analyzer
+use types
 
 struct Expression {
     token: &Token,

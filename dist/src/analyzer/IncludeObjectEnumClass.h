@@ -8,7 +8,7 @@ struct ClassCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 873 "src/analyzer/Include.pv"
+#line 874 "src/analyzer/Include.pv"
 struct IncludeObjectEnumClass {
     struct EnumC* enum_info;
     struct ClassCpp* class_info;

@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/ArrayIter_ref_TypeImpl.h>
-#include <analyzer/TypeImpl.h>
+#include <analyzer/types/TypeImpl.h>
 #include <stdint.h>
 #include <tuple_usize_ref_TypeImpl.h>
 

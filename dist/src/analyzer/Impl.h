@@ -2,13 +2,13 @@
 #define PAVE_IMPL
 
 #include <stdint.h>
-#include <analyzer/Generics.h>
+#include <analyzer/types/Generics.h>
 #include <std/Array_ImplNode.h>
 #include <analyzer/ImplNode.h>
 #include <std/HashMap_str_Function.h>
 #include <std/str.h>
-#include <analyzer/Function.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Function.h>
+#include <analyzer/types/Type.h>
 #include <stdbool.h>
 
 struct Token;
@@ -18,7 +18,7 @@ struct Trait;
 struct Impl;
 struct FunctionParent;
 
-#line 7 "src/analyzer/Impl.pv"
+#line 8 "src/analyzer/Impl.pv"
 struct Impl {
     struct Token* name;
     struct Type* type;
@@ -38,16 +38,16 @@ struct Impl {
     struct Type type_self;
 };
 
-#line 27 "src/analyzer/Impl.pv"
+#line 28 "src/analyzer/Impl.pv"
 struct Impl Impl__parse(struct Context* context);
 
-#line 46 "src/analyzer/Impl.pv"
+#line 47 "src/analyzer/Impl.pv"
 bool Impl__prefill_types(struct Impl* self);
 
-#line 84 "src/analyzer/Impl.pv"
+#line 85 "src/analyzer/Impl.pv"
 bool Impl__fill_types(struct Impl* self, struct FunctionParent parent);
 
-#line 111 "src/analyzer/Impl.pv"
+#line 112 "src/analyzer/Impl.pv"
 bool Impl__parse_functions(struct Impl* self);
 
 #endif

@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_ref_GenericMap.h>
-#include <analyzer/GenericMap.h>
+#include <analyzer/types/GenericMap.h>
 #include <stdint.h>
 
 #include <slice_ref_GenericMap.h>

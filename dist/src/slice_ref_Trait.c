@@ -1,5 +1,5 @@
 #include <std/ArrayIter_ref_ref_Trait.h>
-#include <analyzer/Trait.h>
+#include <analyzer/types/Trait.h>
 #include <stdint.h>
 
 #include <slice_ref_Trait.h>

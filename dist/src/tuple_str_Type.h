@@ -2,7 +2,7 @@
 #define PAVE_TUPLE_STR_TYPE
 
 #include <std/str.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 
 struct tuple_str_Type {
     struct str _0;

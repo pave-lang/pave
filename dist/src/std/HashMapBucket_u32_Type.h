@@ -2,7 +2,7 @@
 #define PAVE_HASH_MAP_BUCKET_U32_TYPE
 
 #include <stdint.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 
 struct HashMapBucket_u32_Type;
 struct Type;

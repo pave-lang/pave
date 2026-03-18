@@ -12,7 +12,7 @@ struct ArenaAllocator;
 
 #include <stdio.h>
 
-#line 8 "src/compiler/Usages.pv"
+#line 9 "src/compiler/Usages.pv"
 struct TypeFunctionUsage {
     struct Function* type;
     struct Array_ref_GenericMap generic_maps;
@@ -21,7 +21,7 @@ struct TypeFunctionUsage {
     struct UsageContext usage_context;
 };
 
-#line 17 "src/compiler/Usages.pv"
+#line 18 "src/compiler/Usages.pv"
 struct TypeFunctionUsage TypeFunctionUsage__new(struct ArenaAllocator* allocator, struct Function* type);
 
 #endif

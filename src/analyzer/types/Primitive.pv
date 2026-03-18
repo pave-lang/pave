@@ -1,0 +1,38 @@
+use std
+use analyzer
+
+struct Primitive {
+    name: str,
+    traits: HashMap<str, &Trait>,
+    impls: Array<&Impl>,
+}
+
+impl Primitive {
+    fn new(allocator: &ArenaAllocator, name: *const char) -> Self {
+        return Self {
+            name: name,
+            traits: HashMap<str, &Trait>::new(allocator),
+            impls: Array<&Impl>::new(allocator),
+        };
+    }
+
+    fn is_number(&self) -> bool {
+        return self.name.eq("char")
+            || self.name.eq("i8")
+            || self.name.eq("i16")
+            || self.name.eq("i32")
+            || self.name.eq("i64")
+            || self.name.eq("isize")
+            || self.name.eq("u8")
+            || self.name.eq("u16")
+            || self.name.eq("u32")
+            || self.name.eq("u64")
+            || self.name.eq("usize")
+            || self.name.eq("f32")
+            || self.name.eq("f64");
+    }
+
+    fn is_void(&self) -> bool {
+        return self == 0 || self.name.eq("void");
+    }
+}

@@ -2,7 +2,7 @@
 #define PAVE_TUPLE_STR_PRIMITIVE
 
 #include <std/str.h>
-#include <analyzer/Primitive.h>
+#include <analyzer/types/Primitive.h>
 
 struct tuple_str_Primitive {
     struct str _0;

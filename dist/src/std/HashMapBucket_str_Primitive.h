@@ -2,7 +2,7 @@
 #define PAVE_HASH_MAP_BUCKET_STR_PRIMITIVE
 
 #include <std/str.h>
-#include <analyzer/Primitive.h>
+#include <analyzer/types/Primitive.h>
 
 struct HashMapBucket_str_Primitive;
 struct str;

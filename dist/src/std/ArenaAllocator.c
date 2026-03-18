@@ -6,17 +6,17 @@
 #include <stdint.h>
 #include <std/ArenaBlock.h>
 #include <stdbool.h>
-#include <analyzer/Function.h>
+#include <analyzer/types/Function.h>
 #include <std/ArenaOversize.h>
-#include <analyzer/Type.h>
-#include <analyzer/GenericMap.h>
-#include <analyzer/Indirect.h>
+#include <analyzer/types/Type.h>
+#include <analyzer/types/GenericMap.h>
+#include <analyzer/types/Indirect.h>
 #include <analyzer/Block.h>
 #include <analyzer/statement/LetStatement.h>
 #include <analyzer/Token.h>
 #include <analyzer/statement/ForStatement.h>
-#include <analyzer/Sequence.h>
-#include <analyzer/Tuple.h>
+#include <analyzer/types/Sequence.h>
+#include <analyzer/types/Tuple.h>
 #include <analyzer/Include.h>
 #include <analyzer/IncludeContext.h>
 #include <analyzer/TypedefC.h>
@@ -25,7 +25,7 @@
 #include <analyzer/ClassCpp.h>
 #include <analyzer/FunctionC.h>
 #include <analyzer/NamespaceCpp.h>
-#include <analyzer/Generic.h>
+#include <analyzer/types/Generic.h>
 #include <analyzer/expression/Expression.h>
 
 #include <std/ArenaAllocator.h>

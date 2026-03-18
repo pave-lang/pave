@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <compiler/TypeUsage_Primitive.h>
-#include <analyzer/Primitive.h>
+#include <analyzer/types/Primitive.h>
 
 struct tuple_usize_TypeUsage_Primitive {
     uintptr_t _0;

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <std/IterEnumerate_ref_Type.h>

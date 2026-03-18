@@ -4,6 +4,7 @@
 
 use std
 use expression
+use types
 
 struct Include {
     root: &Root,

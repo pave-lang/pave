@@ -1,6 +1,7 @@
 #include "stdio.h"
 
 use std
+use types
 
 enum NamingType {
     Ident,

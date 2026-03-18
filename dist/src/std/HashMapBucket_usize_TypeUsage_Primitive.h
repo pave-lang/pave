@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <compiler/TypeUsage_Primitive.h>
-#include <analyzer/Primitive.h>
+#include <analyzer/types/Primitive.h>
 
 struct HashMapBucket_usize_TypeUsage_Primitive;
 struct TypeUsage_Primitive;

@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_str_Primitive.h>
 #include <std/str.h>
-#include <analyzer/Primitive.h>
+#include <analyzer/types/Primitive.h>
 #include <std/HashMapBucket_str_Primitive.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

@@ -3,7 +3,7 @@
 
 #include <std/str.h>
 
-#line 3 "src/analyzer/Impl.pv"
+#line 4 "src/analyzer/Impl.pv"
 struct ImplNode {
     enum {
         IMPL_NODE__FUNCTION,

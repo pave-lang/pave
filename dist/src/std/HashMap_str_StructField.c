@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_str_StructField.h>
 #include <std/str.h>
-#include <analyzer/StructField.h>
+#include <analyzer/types/StructField.h>
 #include <std/HashMapBucket_str_StructField.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

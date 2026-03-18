@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_str_Function.h>
 #include <std/str.h>
-#include <analyzer/Function.h>
+#include <analyzer/types/Function.h>
 #include <std/HashMapBucket_str_Function.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

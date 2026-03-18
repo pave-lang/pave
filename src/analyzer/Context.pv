@@ -4,20 +4,7 @@
 
 use std
 use statement
-
-struct Scope {
-    values: HashMap<str, Type>,
-    block: &Block,
-}
-
-impl Scope {
-    fn new(allocator: &ArenaAllocator, block: &Block) -> Self {
-        return Self {
-            values: HashMap<str, Type>::new(allocator),
-            block,
-        };
-    }
-}
+use types
 
 struct Context {
     allocator: &ArenaAllocator,

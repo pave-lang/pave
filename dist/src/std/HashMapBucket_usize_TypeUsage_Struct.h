@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <compiler/TypeUsage_Struct.h>
-#include <analyzer/Struct.h>
+#include <analyzer/types/Struct.h>
 
 struct HashMapBucket_usize_TypeUsage_Struct;
 struct TypeUsage_Struct;

@@ -1,0 +1,136 @@
+use std
+use analyzer
+use expression
+
+struct EnumVariantParameter {
+    ref: bool,
+    variable: &Token,
+}
+
+struct EnumVariant {
+    name: &Token,
+    types: Array<Type>,
+    parent: &Enum,
+    value: *Expression,
+}
+
+enum EnumType {
+    Standard,
+    DiscriminatedUnion,
+}
+
+struct Enum {
+    name: &Token,
+    context: &Context,
+    token_start: usize,
+    token_end: usize,
+    type: EnumType,
+    generics: Generics,
+    variants: HashMap<str, EnumVariant>,
+    traits: HashMap<str, &Trait>,
+    impls: Array<&Impl>,
+}
+
+impl Enum {
+    fn new(context: &Context) -> Self {
+        return Self {
+            context,
+            generics: Generics::new(context.allocator),
+            variants: HashMap<str, EnumVariant>::new(context.allocator),
+            traits: HashMap<str, &Trait>::new(context.allocator),
+            impls: Array<&Impl>::new(context.allocator),
+        };
+    }
+
+    fn parse(context: &Context) -> Enum {
+        let node: Enum = Enum::new(context);
+
+        if !context.expect_value(TokenType::Keyword, "enum") { return node; }
+
+        let name = context.expect(TokenType::Identifier);
+        if name == 0 { return node; }
+
+        node.token_start = context.pos;
+
+        if !context.skip_to_symbol("{") { return node; }
+        if !context.skip_brackets("{", "}") { return node; }
+
+        node.token_end = context.pos;
+
+        node.name = name;
+        return node;
+    }
+
+    fn prefill_types(&self) -> bool {
+        let context = self.context;
+        context.pos = self.token_start;
+
+        if context.check_value(TokenType::Symbol, "<") && !self.generics.parse(context) { return false; }
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
+
+        return true;
+    }
+
+    fn fill_variants(&self) -> bool {
+        let context = self.context;
+        context.pos = self.token_start;
+
+        if !context.skip_to_symbol("{") { return false; }
+        if !context.expect_value(TokenType::Symbol, "{") { return false; }
+
+        while !context.check_next(TokenType::Symbol, "}") {
+            if !self.parse_variant() { return false; }
+
+            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                context.expect_value(TokenType::Symbol, "}");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    fn parse_variant(&self) -> bool {
+        let context = self.context;
+        let name = context.expect(TokenType::Identifier);
+        if name == 0 { return false; }
+
+        let types = Array<Type>::new(self.context.allocator);
+
+        if context.check_next(TokenType::Symbol, "(") {
+            while !context.check_next(TokenType::Symbol, ")") {
+                let type: Type = Type::Primitive(0);
+
+                if !context.parse_type(&type, &self.generics) { return false; }
+                types.append(type);
+
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                    context.expect_value(TokenType::Symbol, ")");
+                    return false;
+                }
+            }
+        }
+
+        let value: *Expression = 0;
+
+        if context.check_next(TokenType::Symbol, "=") {
+            value = Expression::parse(context, 0);
+            if value == 0 { return false; }
+        }
+
+        if types.length > 0 {
+            self.type = EnumType::DiscriminatedUnion;
+        }
+
+        let variant: EnumVariant = EnumVariant {
+            name,
+            types,
+            parent: self,
+            value,
+        };
+
+        if self.variants.insert(variant.name.value, variant) == 0 { return false; }
+
+        return true;
+    }
+}

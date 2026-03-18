@@ -2,7 +2,7 @@
 #define PAVE_HASH_MAP_BUCKET_STR_TYPE
 
 #include <std/str.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 
 struct HashMapBucket_str_Type;
 struct str;

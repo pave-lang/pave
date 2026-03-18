@@ -2,14 +2,14 @@
 #define PAVE_MATCH_PATTERN
 
 #include <std/Array_EnumVariantParameter.h>
-#include <analyzer/EnumVariantParameter.h>
+#include <analyzer/types/EnumVariantParameter.h>
 
 struct Token;
 struct EnumVariant;
 struct EnumCValue;
 struct Expression;
 
-#line 5 "src/analyzer/statement/MatchPattern.pv"
+#line 6 "src/analyzer/statement/MatchPattern.pv"
 struct MatchPattern {
     enum {
         MATCH_PATTERN__DEFAULT,

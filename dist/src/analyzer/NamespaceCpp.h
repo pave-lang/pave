@@ -4,7 +4,7 @@
 #include <std/str.h>
 #include <analyzer/ParentCpp.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/Type.h>
+#include <analyzer/types/Type.h>
 
 struct Include;
 struct ParentCpp;
@@ -13,7 +13,7 @@ struct ParentCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 991 "src/analyzer/Include.pv"
+#line 992 "src/analyzer/Include.pv"
 struct NamespaceCpp {
     struct Include* include;
     struct str name;
@@ -22,7 +22,7 @@ struct NamespaceCpp {
     struct HashMap_str_Type values;
 };
 
-#line 1000 "src/analyzer/Include.pv"
+#line 1001 "src/analyzer/Include.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct ParentCpp parent);
 
 #endif

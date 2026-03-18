@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_usize_TypeUsage_Primitive.h>
 #include <compiler/TypeUsage_Primitive.h>
-#include <analyzer/Primitive.h>
+#include <analyzer/types/Primitive.h>
 #include <std/HashMapBucket_usize_TypeUsage_Primitive.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

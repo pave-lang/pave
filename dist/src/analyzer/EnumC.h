@@ -13,7 +13,7 @@ struct ParentCpp;
 #include <stdio.h>
 #include <string.h>
 
-#line 896 "src/analyzer/Include.pv"
+#line 897 "src/analyzer/Include.pv"
 struct EnumC {
     struct Include* include;
     struct str name;
@@ -21,7 +21,7 @@ struct EnumC {
     struct HashMap_str_EnumCValue values;
 };
 
-#line 904 "src/analyzer/Include.pv"
+#line 905 "src/analyzer/Include.pv"
 struct EnumC* EnumC__new(struct Include* include, char const* name, struct ParentCpp parent);
 
 #endif

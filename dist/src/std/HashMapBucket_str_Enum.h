@@ -2,7 +2,7 @@
 #define PAVE_HASH_MAP_BUCKET_STR_ENUM
 
 #include <std/str.h>
-#include <analyzer/Enum.h>
+#include <analyzer/types/Enum.h>
 
 struct HashMapBucket_str_Enum;
 struct str;

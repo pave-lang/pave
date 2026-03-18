@@ -1,0 +1,94 @@
+use std
+use analyzer
+
+struct Generic {
+    name: &Token,
+    traits: Array<&Trait>,
+}
+
+impl Generic {
+    fn new(allocator: &dyn Allocator) -> Self {
+        return Self { traits: Array<&Trait>::new(allocator) };
+    }
+
+    fn parse(&self, context: &Context) -> bool {
+        let module: &Module = context.module;
+
+        self.name = context.expect(TokenType::Identifier);
+        if self.name == 0 { return false; }
+
+        if context.check_next(TokenType::Symbol, ":") {
+            let name = context.expect(TokenType::Identifier);
+            if name == 0 { return false; }
+
+            let trait_info = module.find_trait(name.value);
+            if trait_info == 0 { context.error_token(name, "Unable to find trait"); return false; }
+            self.traits.append(trait_info);
+
+            while context.check_next(TokenType::Symbol, "+") {
+                let name = context.expect(TokenType::Identifier);
+                if name == 0 { return false; }
+
+                let trait_info = module.find_trait(name.value);
+                if trait_info == 0 { context.error_token(name, "Unable to find trait"); return false; }
+                self.traits.append(trait_info);
+            }
+        }
+
+        return true;
+    }
+}
+
+struct Generics {
+    parent: *Generics,
+    array: Array<Generic>,
+    map: HashMap<str, usize>,
+}
+
+impl Generics {
+    fn new(allocator: &dyn Allocator) -> Self {
+        return Self {
+            array: Array<Generic>::new(allocator),
+            map: HashMap<str, usize>::new(allocator),
+        };
+    }
+
+    fn has(&self, name: str) -> bool {
+        if self.map.find(&name) { return true; }
+        if self.parent != 0 && self.parent.has(name) { return true; }
+
+        return false;
+    }
+
+    fn find(&self, name: str) -> &Generic {
+        let index_ptr = self.map.find(&name);
+        if index_ptr != 0 {
+            let index = *index_ptr;
+            return self.array.data + index;
+        }
+
+        if self.parent != 0 { return self.parent.find(name); }
+
+        return 0;
+    }
+
+    fn parse(&self, context: &Context) -> bool {
+        if !context.expect_value(TokenType::Symbol, "<") { return false; }
+
+        while !context.check_next(TokenType::Symbol, ">") {
+            let generic = Generic::new(self.array.allocator);
+            if !generic.parse(context) || self.has(generic.name.value) { return false; }
+
+            let index = self.array.append(generic);
+            self.map.insert(generic.name.value, index);
+
+            if !context.check_next(TokenType::Symbol, ",") {
+                return context.expect_value(TokenType::Symbol, ">");
+            }
+        }
+
+        if !context.expect_value(TokenType::Symbol, ">") { return false; }
+
+        return true;
+    }
+}

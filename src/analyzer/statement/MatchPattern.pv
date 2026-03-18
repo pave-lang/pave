@@ -1,6 +1,7 @@
 use std
 use analyzer
-use analyzer::expression
+use expression
+use types
 
 enum MatchPattern {
     Default,
