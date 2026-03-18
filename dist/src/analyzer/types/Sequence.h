@@ -7,17 +7,17 @@
 
 #include <stdio.h>
 
-#line 49 "src/analyzer/types/Type.pv"
+#line 50 "src/analyzer/types/Type.pv"
 struct Sequence {
     struct SequenceType type;
     struct Type element;
     struct Type element_pointer;
 };
 
-#line 56 "src/analyzer/types/Type.pv"
+#line 57 "src/analyzer/types/Type.pv"
 bool Sequence__is_slice(struct Sequence* self);
 
-#line 63 "src/analyzer/types/Type.pv"
+#line 64 "src/analyzer/types/Type.pv"
 bool Sequence__is_fixed_array(struct Sequence* self);
 
 #endif

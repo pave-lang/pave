@@ -1,9 +1,5 @@
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <analyzer/Include.h>
-#include <analyzer/ParentCpp.h>
+#include <analyzer/c/Include.h>
+#include <analyzer/c/ParentCpp.h>
 #include <stdbool.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
@@ -13,14 +9,14 @@
 #include <analyzer/types/Type.h>
 #include <std/Allocator.h>
 
-#include <analyzer/ClassCpp.h>
+#include <analyzer/c/ClassCpp.h>
 
-#line 957 "src/analyzer/Include.pv"
+#line 16 "src/analyzer/c/ClassCpp.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct ParentCpp parent, bool is_struct) {
-    #line 958 "src/analyzer/Include.pv"
+    #line 17 "src/analyzer/c/ClassCpp.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 960 "src/analyzer/Include.pv"
+    #line 19 "src/analyzer/c/ClassCpp.pv"
     return ArenaAllocator__store_ClassCpp(allocator, (struct ClassCpp) {
         .include = include,
         .is_struct = is_struct,

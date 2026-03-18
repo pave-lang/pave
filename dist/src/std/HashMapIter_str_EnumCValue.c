@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <std/HashMapBucket_str_EnumCValue.h>
 #include <std/str.h>
-#include <analyzer/EnumCValue.h>
+#include <analyzer/c/EnumCValue.h>
 #include <tuple_str_EnumCValue.h>
 
 #include <std/HashMapIter_str_EnumCValue.h>

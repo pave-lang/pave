@@ -12,13 +12,13 @@ struct ArenaAllocator;
 #include <stdlib.h>
 #include <fs.h>
 
-#line 29 "src/compiler/Generator.pv"
+#line 30 "src/compiler/Generator.pv"
 struct FunctionCoroutine {
     uintptr_t yield_count;
     struct HashMap_str_ref_Type variables;
 };
 
-#line 35 "src/compiler/Generator.pv"
+#line 36 "src/compiler/Generator.pv"
 struct FunctionCoroutine FunctionCoroutine__new(struct ArenaAllocator* allocator);
 
 #endif

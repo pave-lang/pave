@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#line 6 "src/analyzer/types/Type.pv"
+#line 7 "src/analyzer/types/Type.pv"
 enum IndirectType {
     INDIRECT_TYPE__REFERENCE,
     INDIRECT_TYPE__DYNAMIC_DISPATCH,

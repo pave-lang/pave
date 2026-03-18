@@ -1,0 +1,22 @@
+use std
+use expression
+use types
+
+struct FunctionC {
+    include: &Include,
+    name: str,
+    arguments: Array<&Expression>,
+    return_type: Type,
+}
+
+impl FunctionC {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            arguments: Array<&Expression>::new(allocator),
+        });
+    }
+}

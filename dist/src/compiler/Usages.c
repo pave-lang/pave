@@ -65,7 +65,7 @@
 #include <analyzer/Context.h>
 #include <compiler/UsageContext.h>
 #include <std/HashMap_str_ref_Type.h>
-#include <analyzer/ClassCpp.h>
+#include <analyzer/c/ClassCpp.h>
 #include <std/String.h>
 #include <analyzer/Naming.h>
 #include <analyzer/types/Indirect.h>

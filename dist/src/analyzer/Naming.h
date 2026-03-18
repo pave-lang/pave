@@ -15,7 +15,7 @@ struct ParentCpp;
 
 #include <stdio.h>
 
-#line 12 "src/analyzer/Naming.pv"
+#line 13 "src/analyzer/Naming.pv"
 struct Naming {
     struct ArenaAllocator* allocator;
     enum NamingType type;
@@ -45,25 +45,25 @@ struct Naming {
     struct Naming* naming_ident;
 };
 
-#line 42 "src/analyzer/Naming.pv"
+#line 43 "src/analyzer/Naming.pv"
 struct Naming Naming__new_decl(struct ArenaAllocator* allocator);
 
-#line 59 "src/analyzer/Naming.pv"
+#line 60 "src/analyzer/Naming.pv"
 struct Naming Naming__new_ident(struct ArenaAllocator* allocator);
 
-#line 74 "src/analyzer/Naming.pv"
+#line 75 "src/analyzer/Naming.pv"
 struct Naming Naming__new_c99(struct ArenaAllocator* allocator, struct Naming* naming_ident);
 
-#line 114 "src/analyzer/Naming.pv"
+#line 115 "src/analyzer/Naming.pv"
 struct String Naming__get_type_name(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 358 "src/analyzer/Naming.pv"
+#line 359 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 386 "src/analyzer/Naming.pv"
+#line 387 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 431 "src/analyzer/Naming.pv"
+#line 432 "src/analyzer/Naming.pv"
 void Naming__append_cpp_path(struct Naming* self, struct String* result, struct ParentCpp parent);
 
 #endif

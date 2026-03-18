@@ -6,8 +6,8 @@
 
 #include <analyzer/types/Tuple.h>
 
-#line 76 "src/analyzer/types/Type.pv"
+#line 77 "src/analyzer/types/Type.pv"
 struct Tuple Tuple__clone(struct Tuple* self, struct Allocator allocator) {
-    #line 77 "src/analyzer/types/Type.pv"
+    #line 78 "src/analyzer/types/Type.pv"
     return (struct Tuple) { .elements = Array_Type__clone(&self->elements, allocator) };
 }

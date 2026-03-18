@@ -1,0 +1,30 @@
+use std
+use types
+
+struct ClassCpp {
+    include: &Include,
+    is_struct: bool,
+    name: str,
+    parent: ParentCpp,
+    fields: HashMap<str, Type>,
+    values: HashMap<str, Type>,
+    types: HashMap<str, Type>,
+    bases: Array<Type>,
+}
+
+impl ClassCpp {
+    fn new(include: &Include, name: *const char, parent: ParentCpp, is_struct: bool) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            is_struct,
+            name: name,
+            parent,
+            fields: HashMap<str, Type>::new(allocator),
+            values: HashMap<str, Type>::new(allocator),
+            types: HashMap<str, Type>::new(allocator),
+            bases: Array<Type>::new(allocator),
+        });
+    }
+}

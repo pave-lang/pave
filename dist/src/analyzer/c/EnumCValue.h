@@ -5,11 +5,7 @@
 
 struct EnumC;
 
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#line 917 "src/analyzer/Include.pv"
+#line 3 "src/analyzer/c/EnumCValue.pv"
 struct EnumCValue {
     struct EnumC* parent;
     struct str name;

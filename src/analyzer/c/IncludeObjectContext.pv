@@ -1,0 +1,198 @@
+#include "clang-c/Index.h"
+#include "string.h"
+
+use analyzer
+use types
+
+struct IncludeObjectContext {
+    context: &IncludeContext,
+    object: &void,
+}
+
+impl IncludeObjectContext {
+    fn visitor_struct(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let include = self.context.include;
+        let struct_info: &StructC = self.object;
+        let kind = clang_getCursorKind(cursor);
+
+        if kind == CXCursor_FieldDecl {
+            let field_spelling: CXString = clang_getCursorSpelling(cursor);
+            let field_name: *const char = include.make_string(field_spelling);
+            clang_disposeString(field_spelling);
+
+            let field_cx_type = clang_getCursorType(cursor);
+            let field_type = *include.parse_type(field_cx_type);
+
+            struct_info.fields.insert(field_name, StructCField { name: field_name, type: field_type });
+        }
+
+        return CXChildVisit_Continue;
+    }
+
+    fn visitor_class(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let include = self.context.include;
+        let class_info: &ClassCpp = self.object;
+        let kind = clang_getCursorKind(cursor);
+        let allocator = include.root.allocator;
+
+        match kind {
+            CXCursor_CXXBaseSpecifier => {
+                let base_cx_type = clang_getCursorType(cursor);
+                let base_type = include.parse_type(base_cx_type);
+                if base_type != 0 { class_info.bases.append(*base_type); }
+            },
+            CXCursor_FieldDecl => {
+                let field_spelling: CXString = clang_getCursorSpelling(cursor);
+                let field_name: *const char = include.make_string(field_spelling);
+                clang_disposeString(field_spelling);
+
+                let field_cx_type = clang_getCursorType(cursor);
+                let field_type = *include.parse_type(field_cx_type);
+
+                class_info.fields.insert(field_name, field_type);
+            },
+            CXCursor_VarDecl => {
+                let storage = clang_Cursor_getStorageClass(cursor);
+                if storage == CX_SC_Static {
+                    let spelling = clang_getCursorSpelling(cursor);
+                    let name = include.make_string(spelling);
+                    clang_disposeString(spelling);
+
+                    let cx_type = clang_getCursorType(cursor);
+                    let ty = *include.parse_type(cx_type);
+
+                    class_info.values.insert(name, ty);
+                }
+            },
+            CXCursor_CXXMethod => {
+                let method_spelling: CXString = clang_getCursorSpelling(cursor);
+                let method_name: *const char = include.make_string(method_spelling);
+                clang_disposeString(method_spelling);
+
+                let return_type = clang_getCursorResultType(cursor);
+                let return_type_resolved = include.parse_type(return_type);
+
+                let func_info = Function::new_allocator(include.root.allocator);
+                func_info.name = allocator.store(Token { value: method_name });
+                func_info.return_type = *return_type_resolved;
+                func_info.type = FunctionType::MethodCpp;
+
+                let func_type = Type::Function(allocator.store(func_info), 0);
+                class_info.fields.insert(method_name, func_type);
+            },
+            CXCursor_EnumDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                let enum_info: &EnumC = EnumC::new(include, name, ParentCpp::Class(class_info));
+                class_info.types.insert(name, Type::EnumC(enum_info));
+
+                clang_visitChildren(cursor, IncludeObjectContext::visitor_enum_into_class, &IncludeObjectContext {
+                    context: self.context,
+                    object: &IncludeObjectEnumClass { enum_info, class_info },
+                });
+            },
+            CXCursor_StructDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                if strlen(name) == 0 {
+                    include.root.allocator.free(name);
+                    return CXChildVisit_Continue;
+                }
+
+                let existing = class_info.types.find(name);
+                if existing == 0 {
+                    let nested_class = ClassCpp::new(include, name, ParentCpp::Class(class_info), kind == CXCursor_StructDecl);
+                    class_info.types.insert(name, Type::ClassCpp(nested_class));
+
+                    clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
+                        context: self.context,
+                        object: nested_class,
+                    });
+                }
+            },
+            CXCursor_ClassDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                if strlen(name) == 0 {
+                    include.root.allocator.free(name);
+                    return CXChildVisit_Continue;
+                }
+
+                let existing = class_info.types.find(name);
+                if existing == 0 {
+                    let nested_class = ClassCpp::new(include, name, ParentCpp::Class(class_info), kind == CXCursor_StructDecl);
+                    class_info.types.insert(name, Type::ClassCpp(nested_class));
+
+                    clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
+                        context: self.context,
+                        object: nested_class,
+                    });
+                }
+            },
+            CXCursor_TypedefDecl => {
+                let spelling = clang_getCursorSpelling(cursor);
+                let name = include.make_string(spelling);
+                clang_disposeString(spelling);
+
+                if class_info.types.find(name) == 0 {
+                    let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
+                    let resolved = include.parse_type(underlying_type);
+
+                    if resolved != 0 {
+                        let typedef_ = TypedefC::new(include, name, resolved);
+                        class_info.types.insert(name, Type::TypedefC(typedef_));
+                    } else {
+                        include.root.allocator.free(name);
+                    }
+                } else {
+                    include.root.allocator.free(name);
+                }
+            },
+            _ => {},
+        }
+
+        return CXChildVisit_Continue;
+    }
+
+    fn visitor_enum(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let enum_info: &EnumC = self.object;
+        let kind = clang_getCursorKind(cursor);
+
+        if kind == CXCursor_EnumConstantDecl {
+            let value_spelling = clang_getCursorSpelling(cursor);
+            let value_name = self.context.include.make_string(value_spelling);
+            clang_disposeString(value_spelling);
+
+            self.context.add_enum_value(enum_info, value_name);
+        }
+
+        return CXChildVisit_Continue;
+    }
+
+    fn visitor_enum_into_class(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
+        let self: &IncludeObjectContext = client_data;
+        let payload: &IncludeObjectEnumClass = self.object;
+        let include = self.context.include;
+        let kind = clang_getCursorKind(cursor);
+
+        if kind == CXCursor_EnumConstantDecl {
+            let value_spelling = clang_getCursorSpelling(cursor);
+            let value_name = include.make_str(value_spelling);
+            clang_disposeString(value_spelling);
+
+            payload.enum_info.values.insert(value_name, EnumCValue { parent: payload.enum_info, name: value_name });
+            payload.class_info.values.insert(value_name, Type::EnumC(payload.enum_info));
+        }
+
+        return CXChildVisit_Continue;
+    }
+}

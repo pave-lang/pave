@@ -2,7 +2,7 @@
 #define PAVE_HASH_MAP_BUCKET_STR_STRUCT_CFIELD
 
 #include <std/str.h>
-#include <analyzer/StructCField.h>
+#include <analyzer/c/StructCField.h>
 
 struct HashMapBucket_str_StructCField;
 struct str;

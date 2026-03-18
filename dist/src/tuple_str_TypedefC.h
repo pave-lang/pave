@@ -2,7 +2,7 @@
 #define PAVE_TUPLE_STR_TYPEDEF_C
 
 #include <std/str.h>
-#include <analyzer/TypedefC.h>
+#include <analyzer/c/TypedefC.h>
 
 struct tuple_str_TypedefC {
     struct str _0;

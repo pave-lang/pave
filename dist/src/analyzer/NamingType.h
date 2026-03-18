@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#line 6 "src/analyzer/Naming.pv"
+#line 7 "src/analyzer/Naming.pv"
 enum NamingType {
     NAMING_TYPE__IDENT,
     NAMING_TYPE__DECL,

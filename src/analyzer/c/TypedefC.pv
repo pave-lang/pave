@@ -1,0 +1,20 @@
+use std
+use types
+
+struct TypedefC {
+    include: &Include,
+    name: str,
+    type: &Type,
+}
+
+impl TypedefC {
+    fn new(include: &Include, name: *const char, type: &Type) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            type,
+        });
+    }
+}

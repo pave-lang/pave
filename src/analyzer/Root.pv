@@ -3,6 +3,7 @@
 
 use std
 use types
+use c
 
 struct Root {
     allocator: &ArenaAllocator,

@@ -1,5 +1,6 @@
 use analyzer
 use types
+use c
 
 enum EnumVariantResult {
     None,

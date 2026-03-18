@@ -1,0 +1,24 @@
+use std
+use types
+
+struct NamespaceCpp {
+    include: &Include,
+    name: str,
+    parent: ParentCpp,
+    types: HashMap<str, Type>,
+    values: HashMap<str, Type>,
+}
+
+impl NamespaceCpp {
+    fn new(include: &Include, name: *const char, parent: ParentCpp) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            parent,
+            types: HashMap<str, Type>::new(allocator),
+            values: HashMap<str, Type>::new(allocator),
+        });
+    }
+}

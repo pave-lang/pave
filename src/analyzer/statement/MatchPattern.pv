@@ -2,6 +2,7 @@ use std
 use analyzer
 use expression
 use types
+use c
 
 enum MatchPattern {
     Default,

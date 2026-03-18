@@ -1,0 +1,7 @@
+use std
+use types
+
+struct StructCField {
+    name: str,
+    type: Type,
+}

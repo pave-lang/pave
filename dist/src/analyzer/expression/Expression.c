@@ -14,9 +14,9 @@
 #include <std/HashMap_str_EnumVariant.h>
 #include <analyzer/types/Enum.h>
 #include <stdint.h>
-#include <analyzer/EnumCValue.h>
+#include <analyzer/c/EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>
-#include <analyzer/EnumC.h>
+#include <analyzer/c/EnumC.h>
 #include <analyzer/Impl.h>
 #include <std/ArrayIter_ref_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
@@ -31,12 +31,12 @@
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/Trait.h>
 #include <std/Allocator.h>
-#include <analyzer/TypedefC.h>
-#include <analyzer/StructCField.h>
+#include <analyzer/c/TypedefC.h>
+#include <analyzer/c/StructCField.h>
 #include <std/HashMap_str_StructCField.h>
-#include <analyzer/StructC.h>
+#include <analyzer/c/StructC.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/ClassCpp.h>
+#include <analyzer/c/ClassCpp.h>
 #include <std/ArrayIter_ref_Type.h>
 #include <std/Array_Type.h>
 #include <std/ArrayIter_ref_ref_Trait.h>
@@ -47,7 +47,7 @@
 #include <analyzer/types/Generics.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/types/Tuple.h>
-#include <analyzer/NamespaceCpp.h>
+#include <analyzer/c/NamespaceCpp.h>
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/ArrayIter_ref_Parameter.h>
@@ -57,7 +57,7 @@
 #include <std/HashMap_str_usize.h>
 #include <analyzer/types/FunctionType.h>
 #include <std/String.h>
-#include <analyzer/FunctionC.h>
+#include <analyzer/c/FunctionC.h>
 #include <analyzer/expression/CppExpression.h>
 #include <analyzer/Module.h>
 #include <std/Array_Generic.h>

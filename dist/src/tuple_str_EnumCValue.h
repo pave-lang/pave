@@ -2,7 +2,7 @@
 #define PAVE_TUPLE_STR_ENUM_CVALUE
 
 #include <std/str.h>
-#include <analyzer/EnumCValue.h>
+#include <analyzer/c/EnumCValue.h>
 
 struct tuple_str_EnumCValue {
     struct str _0;

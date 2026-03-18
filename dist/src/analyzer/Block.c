@@ -36,7 +36,7 @@
 #include <analyzer/types/EnumVariant.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/IndirectType.h>
-#include <analyzer/EnumCValue.h>
+#include <analyzer/c/EnumCValue.h>
 #include <std/Array_ForVariable.h>
 #include <analyzer/statement/ForVariable.h>
 #include <analyzer/statement/ForStatement.h>

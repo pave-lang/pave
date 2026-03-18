@@ -1,0 +1,14 @@
+enum ParentCpp {
+    None,
+    Class(&ClassCpp),
+    Namespace(&NamespaceCpp),
+}
+
+impl ParentCpp {
+    fn is_none(&self) -> bool {
+        match self {
+            ParentCpp::None => { return true; },
+            _ => { return false; },
+        }
+    }
+}

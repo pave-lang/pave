@@ -2,6 +2,7 @@
 
 use std
 use analyzer
+use c
 
 enum IndirectType {
     Reference,

@@ -1,9 +1,5 @@
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <analyzer/Include.h>
-#include <analyzer/ParentCpp.h>
+#include <analyzer/c/Include.h>
+#include <analyzer/c/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <std/Allocator.h>
@@ -11,14 +7,14 @@
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Type.h>
 
-#include <analyzer/NamespaceCpp.h>
+#include <analyzer/c/NamespaceCpp.h>
 
-#line 1001 "src/analyzer/Include.pv"
+#line 13 "src/analyzer/c/NamespaceCpp.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct ParentCpp parent) {
-    #line 1002 "src/analyzer/Include.pv"
+    #line 14 "src/analyzer/c/NamespaceCpp.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 1004 "src/analyzer/Include.pv"
+    #line 16 "src/analyzer/c/NamespaceCpp.pv"
     return ArenaAllocator__store_NamespaceCpp(allocator, (struct NamespaceCpp) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

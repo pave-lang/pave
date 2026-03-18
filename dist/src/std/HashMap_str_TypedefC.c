@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_str_TypedefC.h>
 #include <std/str.h>
-#include <analyzer/TypedefC.h>
+#include <analyzer/c/TypedefC.h>
 #include <std/HashMapBucket_str_TypedefC.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

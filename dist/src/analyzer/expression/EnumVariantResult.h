@@ -4,7 +4,7 @@
 struct EnumVariant;
 struct EnumCValue;
 
-#line 4 "src/analyzer/expression/EnumVariantResult.pv"
+#line 5 "src/analyzer/expression/EnumVariantResult.pv"
 struct EnumVariantResult {
     enum {
         ENUM_VARIANT_RESULT__NONE,

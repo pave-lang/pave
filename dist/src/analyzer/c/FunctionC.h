@@ -8,11 +8,7 @@
 struct Include;
 struct Expression;
 
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#line 973 "src/analyzer/Include.pv"
+#line 5 "src/analyzer/c/FunctionC.pv"
 struct FunctionC {
     struct Include* include;
     struct str name;
@@ -20,7 +16,7 @@ struct FunctionC {
     struct Type return_type;
 };
 
-#line 981 "src/analyzer/Include.pv"
+#line 13 "src/analyzer/c/FunctionC.pv"
 struct FunctionC* FunctionC__new(struct Include* include, char const* name);
 
 #endif

@@ -1,16 +1,12 @@
 #ifndef PAVE_PARENT_CPP
 #define PAVE_PARENT_CPP
 
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <stdbool.h>
 
 struct ClassCpp;
 struct NamespaceCpp;
 
-#line 859 "src/analyzer/Include.pv"
+#line 1 "src/analyzer/c/ParentCpp.pv"
 struct ParentCpp {
     enum {
         PARENT_CPP__NONE,
@@ -24,7 +20,7 @@ struct ParentCpp {
     };
 };
 
-#line 866 "src/analyzer/Include.pv"
+#line 8 "src/analyzer/c/ParentCpp.pv"
 bool ParentCpp__is_none(struct ParentCpp* self);
 
 #endif

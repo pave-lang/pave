@@ -2,6 +2,7 @@
 
 use std
 use types
+use c
 
 enum NamingType {
     Ident,

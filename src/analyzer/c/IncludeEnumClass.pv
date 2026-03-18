@@ -1,0 +1,4 @@
+struct IncludeObjectEnumClass {
+    enum_info: &EnumC,
+    class_info: &ClassCpp,
+}

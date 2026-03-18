@@ -37,7 +37,7 @@ struct Primitive;
 
 #include <stdio.h>
 
-#line 6 "src/analyzer/Module.pv"
+#line 7 "src/analyzer/Module.pv"
 struct Module {
     struct Root* root;
     struct Namespace* namespace;
@@ -57,49 +57,49 @@ struct Module {
     struct HashMap_str_ref_Include includes;
 };
 
-#line 26 "src/analyzer/Module.pv"
+#line 27 "src/analyzer/Module.pv"
 struct Module* Module__new(struct Namespace* namespace, struct str path);
 
-#line 52 "src/analyzer/Module.pv"
+#line 53 "src/analyzer/Module.pv"
 bool Module__parse(struct Module* self);
 
-#line 197 "src/analyzer/Module.pv"
+#line 198 "src/analyzer/Module.pv"
 bool Module__add_use_namespaces(struct Module* self);
 
-#line 207 "src/analyzer/Module.pv"
+#line 208 "src/analyzer/Module.pv"
 bool Module__add_use_namespace(struct Module* self, struct NamespacePath* path);
 
-#line 239 "src/analyzer/Module.pv"
+#line 240 "src/analyzer/Module.pv"
 bool Module__fill_namespace(struct Module* self);
 
-#line 267 "src/analyzer/Module.pv"
+#line 268 "src/analyzer/Module.pv"
 bool Module__prefill_types(struct Module* self);
 
-#line 312 "src/analyzer/Module.pv"
+#line 313 "src/analyzer/Module.pv"
 bool Module__parse_declarations(struct Module* self);
 
-#line 436 "src/analyzer/Module.pv"
+#line 437 "src/analyzer/Module.pv"
 bool Module__parse_functions(struct Module* self);
 
-#line 473 "src/analyzer/Module.pv"
+#line 474 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name);
 
-#line 496 "src/analyzer/Module.pv"
+#line 497 "src/analyzer/Module.pv"
 struct Trait* Module__find_trait(struct Module* self, struct str name);
 
-#line 511 "src/analyzer/Module.pv"
+#line 512 "src/analyzer/Module.pv"
 struct Type* Module__find_function(struct Module* self, struct str name);
 
-#line 526 "src/analyzer/Module.pv"
+#line 527 "src/analyzer/Module.pv"
 struct Type* Module__find_value(struct Module* self, struct str name);
 
-#line 535 "src/analyzer/Module.pv"
+#line 536 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
-#line 540 "src/analyzer/Module.pv"
+#line 541 "src/analyzer/Module.pv"
 struct Type* Module__make_type_usage(struct Module* self, struct Type* type, struct Array_Type* usage_types);
 
-#line 577 "src/analyzer/Module.pv"
+#line 578 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, char const* name);
 
 #endif

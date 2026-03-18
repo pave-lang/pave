@@ -4,11 +4,7 @@
 struct EnumC;
 struct ClassCpp;
 
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#line 874 "src/analyzer/Include.pv"
+#line 1 "src/analyzer/c/IncludeEnumClass.pv"
 struct IncludeObjectEnumClass {
     struct EnumC* enum_info;
     struct ClassCpp* class_info;

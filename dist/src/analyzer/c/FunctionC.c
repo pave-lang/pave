@@ -1,8 +1,4 @@
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <analyzer/Include.h>
+#include <analyzer/c/Include.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <std/Allocator.h>
@@ -10,14 +6,14 @@
 #include <std/Array_ref_Expression.h>
 #include <analyzer/expression/Expression.h>
 
-#include <analyzer/FunctionC.h>
+#include <analyzer/c/FunctionC.h>
 
-#line 981 "src/analyzer/Include.pv"
+#line 13 "src/analyzer/c/FunctionC.pv"
 struct FunctionC* FunctionC__new(struct Include* include, char const* name) {
-    #line 982 "src/analyzer/Include.pv"
+    #line 14 "src/analyzer/c/FunctionC.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 984 "src/analyzer/Include.pv"
+    #line 16 "src/analyzer/c/FunctionC.pv"
     return ArenaAllocator__store_FunctionC(allocator, (struct FunctionC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

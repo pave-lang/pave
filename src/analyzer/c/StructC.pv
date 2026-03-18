@@ -1,0 +1,19 @@
+use std
+
+struct StructC {
+    include: &Include,
+    name: str,
+    fields: HashMap<str, StructCField>,
+}
+
+impl StructC {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            fields: HashMap<str, StructCField>::new(allocator),
+        });
+    }
+}

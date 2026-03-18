@@ -17,16 +17,16 @@ struct Token;
 struct ForStatement;
 struct Sequence;
 struct Tuple;
-struct Include;
-struct IncludeContext;
-struct TypedefC;
-struct EnumC;
-struct StructC;
-struct ClassCpp;
-struct FunctionC;
-struct NamespaceCpp;
 struct Generic;
 struct Expression;
+struct ClassCpp;
+struct EnumC;
+struct FunctionC;
+struct Include;
+struct IncludeContext;
+struct NamespaceCpp;
+struct StructC;
+struct TypedefC;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,34 +77,34 @@ struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, str
 struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tuple value);
 
 #line 174 "src/std/ArenaAllocator.pv"
+struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struct Generic value);
+
+#line 174 "src/std/ArenaAllocator.pv"
+struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
+
+#line 174 "src/std/ArenaAllocator.pv"
+struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp value);
+
+#line 174 "src/std/ArenaAllocator.pv"
+struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct EnumC value);
+
+#line 174 "src/std/ArenaAllocator.pv"
+struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, struct FunctionC value);
+
+#line 174 "src/std/ArenaAllocator.pv"
 struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include value);
 
 #line 174 "src/std/ArenaAllocator.pv"
 struct IncludeContext* ArenaAllocator__store_IncludeContext(struct ArenaAllocator* self, struct IncludeContext value);
 
 #line 174 "src/std/ArenaAllocator.pv"
-struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, struct TypedefC value);
-
-#line 174 "src/std/ArenaAllocator.pv"
-struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct EnumC value);
+struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* self, struct NamespaceCpp value);
 
 #line 174 "src/std/ArenaAllocator.pv"
 struct StructC* ArenaAllocator__store_StructC(struct ArenaAllocator* self, struct StructC value);
 
 #line 174 "src/std/ArenaAllocator.pv"
-struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp value);
-
-#line 174 "src/std/ArenaAllocator.pv"
-struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, struct FunctionC value);
-
-#line 174 "src/std/ArenaAllocator.pv"
-struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* self, struct NamespaceCpp value);
-
-#line 174 "src/std/ArenaAllocator.pv"
-struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struct Generic value);
-
-#line 174 "src/std/ArenaAllocator.pv"
-struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
+struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, struct TypedefC value);
 
 #line 184 "src/std/ArenaAllocator.pv"
 void* ArenaAllocator__Allocator__alloc(void* __self, uintptr_t size);

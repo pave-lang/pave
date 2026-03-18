@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <std/HashMapIter_str_ref_Include.h>
 #include <std/str.h>
-#include <analyzer/Include.h>
+#include <analyzer/c/Include.h>
 #include <std/HashMapBucket_str_ref_Include.h>
 #include <stdbool.h>
 #include <std/Hashed.h>

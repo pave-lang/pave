@@ -1,7 +1,7 @@
 #ifndef PAVE_INCLUDE_CONTEXT
 #define PAVE_INCLUDE_CONTEXT
 
-#include <analyzer/ParentCpp.h>
+#include <analyzer/c/ParentCpp.h>
 #include <stdbool.h>
 
 struct Include;
@@ -17,7 +17,7 @@ struct FunctionC;
 #include <stdio.h>
 #include <string.h>
 
-#line 328 "src/analyzer/Include.pv"
+#line 8 "src/analyzer/c/IncludeContext.pv"
 struct IncludeContext {
     struct Include* include;
     struct IncludeContext* parent_context;
@@ -26,55 +26,55 @@ struct IncludeContext {
     struct ParentCpp parent;
 };
 
-#line 342 "src/analyzer/Include.pv"
+#line 17 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type);
 
-#line 346 "src/analyzer/Include.pv"
+#line 21 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__insert_value(struct IncludeContext* self, char const* name, struct Type type);
 
-#line 350 "src/analyzer/Include.pv"
+#line 25 "src/analyzer/c/IncludeContext.pv"
 bool IncludeContext__insert_function(struct IncludeContext* self, char const* name, struct Type* return_type);
 
-#line 358 "src/analyzer/Include.pv"
+#line 33 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_function(struct IncludeContext* self, char const* name, CXCursor cursor);
 
-#line 368 "src/analyzer/Include.pv"
+#line 43 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_basic_function(struct IncludeContext* self, char const* name);
 
-#line 372 "src/analyzer/Include.pv"
+#line 47 "src/analyzer/c/IncludeContext.pv"
 struct StructC* IncludeContext__add_struct(struct IncludeContext* self, char const* name);
 
-#line 378 "src/analyzer/Include.pv"
+#line 53 "src/analyzer/c/IncludeContext.pv"
 struct StructC* IncludeContext__add_union(struct IncludeContext* self, char const* name);
 
-#line 384 "src/analyzer/Include.pv"
+#line 59 "src/analyzer/c/IncludeContext.pv"
 struct EnumC* IncludeContext__add_enum(struct IncludeContext* self, char const* name);
 
-#line 390 "src/analyzer/Include.pv"
+#line 65 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name);
 
-#line 395 "src/analyzer/Include.pv"
+#line 70 "src/analyzer/c/IncludeContext.pv"
 struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self, char const* name);
 
-#line 427 "src/analyzer/Include.pv"
+#line 102 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_typedef(struct IncludeContext* self, char const* name, CXCursor cursor);
 
-#line 450 "src/analyzer/Include.pv"
+#line 125 "src/analyzer/c/IncludeContext.pv"
 struct StructC* IncludeContext__add_typedef_struct(struct IncludeContext* self, char const* name);
 
-#line 463 "src/analyzer/Include.pv"
+#line 138 "src/analyzer/c/IncludeContext.pv"
 struct StructC* IncludeContext__add_typedef_union(struct IncludeContext* self, char const* name);
 
-#line 476 "src/analyzer/Include.pv"
+#line 151 "src/analyzer/c/IncludeContext.pv"
 struct StructC* IncludeContext__add_typedef_struct_pointer(struct IncludeContext* self, char const* name);
 
-#line 490 "src/analyzer/Include.pv"
+#line 165 "src/analyzer/c/IncludeContext.pv"
 struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeContext* self, char const* name);
 
-#line 504 "src/analyzer/Include.pv"
+#line 179 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_typedef_pointer(struct IncludeContext* self, char const* name);
 
-#line 516 "src/analyzer/Include.pv"
+#line 191 "src/analyzer/c/IncludeContext.pv"
 enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

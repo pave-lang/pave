@@ -1,24 +1,20 @@
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <analyzer/Include.h>
-#include <analyzer/ParentCpp.h>
+#include <analyzer/c/Include.h>
+#include <analyzer/c/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <std/Allocator.h>
 #include <std/str.h>
 #include <std/HashMap_str_EnumCValue.h>
-#include <analyzer/EnumCValue.h>
+#include <analyzer/c/EnumCValue.h>
 
-#include <analyzer/EnumC.h>
+#include <analyzer/c/EnumC.h>
 
-#line 905 "src/analyzer/Include.pv"
+#line 11 "src/analyzer/c/EnumC.pv"
 struct EnumC* EnumC__new(struct Include* include, char const* name, struct ParentCpp parent) {
-    #line 906 "src/analyzer/Include.pv"
+    #line 12 "src/analyzer/c/EnumC.pv"
     struct ArenaAllocator* allocator = include->root->allocator;
 
-    #line 908 "src/analyzer/Include.pv"
+    #line 14 "src/analyzer/c/EnumC.pv"
     return ArenaAllocator__store_EnumC(allocator, (struct EnumC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

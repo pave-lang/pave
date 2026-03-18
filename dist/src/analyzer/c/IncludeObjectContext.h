@@ -4,25 +4,24 @@
 struct IncludeContext;
 
 #include <clang-c/Index.h>
-#include <stdio.h>
 #include <string.h>
 
-#line 336 "src/analyzer/Include.pv"
+#line 7 "src/analyzer/c/IncludeObjectContext.pv"
 struct IncludeObjectContext {
     struct IncludeContext* context;
     void* object;
 };
 
-#line 672 "src/analyzer/Include.pv"
+#line 13 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_struct(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 692 "src/analyzer/Include.pv"
+#line 33 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 824 "src/analyzer/Include.pv"
+#line 165 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 840 "src/analyzer/Include.pv"
+#line 181 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum_into_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

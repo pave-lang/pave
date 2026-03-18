@@ -6,18 +6,14 @@
 struct Include;
 struct Type;
 
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
-#line 879 "src/analyzer/Include.pv"
+#line 4 "src/analyzer/c/TypedefC.pv"
 struct TypedefC {
     struct Include* include;
     struct str name;
     struct Type* type;
 };
 
-#line 886 "src/analyzer/Include.pv"
+#line 11 "src/analyzer/c/TypedefC.pv"
 struct TypedefC* TypedefC__new(struct Include* include, char const* name, struct Type* type);
 
 #endif

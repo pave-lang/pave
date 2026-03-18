@@ -1,0 +1,21 @@
+use std
+
+struct EnumC {
+    include: &Include,
+    name: str,
+    parent: ParentCpp,
+    values: HashMap<str, EnumCValue>,
+}
+
+impl EnumC {
+    fn new(include: &Include, name: *const char, parent: ParentCpp) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            parent,
+            values: HashMap<str, EnumCValue>::new(allocator),
+        });
+    }
+}
