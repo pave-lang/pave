@@ -1340,7 +1340,7 @@ impl Expression {
                         return_type: Type::Primitive(context.module.find_primitive("bool")),
                     });
                 } else if token.value.eq("if") {
-                    result = Expression::parse_if(context, generics);
+                    result = Expression::parse_if_expression(context, generics);
                 } else {
                     context.error("Only true + false keywords are valid in expressions");
                 }
@@ -1484,7 +1484,7 @@ impl Expression {
         return result;
     }
 
-    fn parse_if(context: &Context, generics: &Generics) -> &Expression {
+    fn parse_if_expression(context: &Context, generics: &Generics) -> &Expression {
         let token = context.current();
         if !context.expect_value(TokenType::Keyword, "if") { return 0; }
 

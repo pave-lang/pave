@@ -2660,7 +2660,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                 });
             } else if (str__eq(token->value, (struct str){ .ptr = "if", .length = strlen("if") })) {
                 #line 1343 "src/analyzer/expression/Expression.pv"
-                result = Expression__parse_if(context, generics);
+                result = Expression__parse_if_expression(context, generics);
             } else {
                 #line 1345 "src/analyzer/expression/Expression.pv"
                 Context__error(context, "Only true + false keywords are valid in expressions");
@@ -2976,7 +2976,7 @@ struct Expression* Expression__parse_postfix_chain(struct Context* context, stru
 }
 
 #line 1487 "src/analyzer/expression/Expression.pv"
-struct Expression* Expression__parse_if(struct Context* context, struct Generics* generics) {
+struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics) {
     #line 1488 "src/analyzer/expression/Expression.pv"
     struct Token* token = Context__current(context);
     #line 1489 "src/analyzer/expression/Expression.pv"
@@ -3044,7 +3044,7 @@ struct Expression* Expression__parse_if(struct Context* context, struct Generics
     }
 
     #line 1514 "src/analyzer/expression/Expression.pv"
-    if (!Expression__validate_type(a, context, &b->return_type, true)) {
+    if (!Expression__validate_type(a, context, &b->return_type, false)) {
         #line 1514 "src/analyzer/expression/Expression.pv"
         return 0;
     }

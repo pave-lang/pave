@@ -32,34 +32,34 @@ struct Block* Block__new_ptr(struct Context* context);
 #line 29 "src/analyzer/Block.pv"
 bool Block__parse_let_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 77 "src/analyzer/Block.pv"
+#line 81 "src/analyzer/Block.pv"
 bool Block__parse_return_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 100 "src/analyzer/Block.pv"
+#line 104 "src/analyzer/Block.pv"
 bool Block__parse_yield_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 121 "src/analyzer/Block.pv"
+#line 125 "src/analyzer/Block.pv"
 bool Block__parse_expression_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 145 "src/analyzer/Block.pv"
+#line 149 "src/analyzer/Block.pv"
 bool Block__parse_if_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 185 "src/analyzer/Block.pv"
+#line 189 "src/analyzer/Block.pv"
 bool Block__parse_match_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 361 "src/analyzer/Block.pv"
+#line 365 "src/analyzer/Block.pv"
 bool Block__parse_while_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 377 "src/analyzer/Block.pv"
+#line 381 "src/analyzer/Block.pv"
 bool Block__parse_for_variable(struct Block* self, struct Context* context, struct Array_ForVariable* variables);
 
-#line 389 "src/analyzer/Block.pv"
+#line 393 "src/analyzer/Block.pv"
 bool Block__parse_for_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 517 "src/analyzer/Block.pv"
+#line 521 "src/analyzer/Block.pv"
 bool Block__parse_defer_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 548 "src/analyzer/Block.pv"
+#line 552 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif

@@ -62,6 +62,10 @@ impl Block {
         if !context.set_value(name, type) { context.error("set_value"); return false; }
         if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
+        if type.is_void() {
+            context.error_token(first_token, "Let statement is unable to determine it's type, manually specify it");
+        }
+
         let let_statement = context.allocator.store(LetStatement {
             is_static,
             name,

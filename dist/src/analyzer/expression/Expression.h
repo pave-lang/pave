@@ -109,6 +109,6 @@ uintptr_t Expression__get_precedence(struct Token* token);
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 1487 "src/analyzer/expression/Expression.pv"
-struct Expression* Expression__parse_if(struct Context* context, struct Generics* generics);
+struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #endif
