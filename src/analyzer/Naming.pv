@@ -214,7 +214,7 @@ impl Naming {
 
                 result.append(struct_info.name.value);
 
-                if (struct_info.generics.array.length > 0) {
+                if struct_info.generics.array.length > 0 {
                     generics = generics2.array;
                 }
             },

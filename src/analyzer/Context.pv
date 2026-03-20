@@ -290,7 +290,7 @@ impl Context {
 
         let token = &self.tokens[self.pos];
 
-        if (token.eq(type, value)) {
+        if token.eq(type, value) {
             self.next_token();
             return true;
         }
@@ -411,7 +411,7 @@ impl Context {
             while i < length.value.length {
                 let c = length.value.ptr[i];
 
-                if ((c >= '0') && (c <= '9')) {
+                if c >= '0' && c <= '9' {
                     result = result * 10 + (c - '0'); 
                 } else {
                     break; 

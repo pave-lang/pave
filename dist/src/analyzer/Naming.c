@@ -364,7 +364,7 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
             String__append(&result, struct_info->name->value);
 
             #line 217 "src/analyzer/Naming.pv"
-            if ((struct_info->generics.array.length > 0)) {
+            if (struct_info->generics.array.length > 0) {
                 #line 218 "src/analyzer/Naming.pv"
                 generics = generics2->array;
             }

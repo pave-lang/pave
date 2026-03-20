@@ -4,6 +4,7 @@
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/types/Type.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 struct Token;
 struct Expression;
@@ -84,15 +85,27 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 902 "src/analyzer/expression/Expression.pv"
-struct Expression* Expression__parse_inner(struct Context* context, struct Expression* inner, struct Generics* generics);
+struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 1009 "src/analyzer/expression/Expression.pv"
+#line 984 "src/analyzer/expression/Expression.pv"
+struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
+
+#line 1024 "src/analyzer/expression/Expression.pv"
+struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
+
+#line 1357 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1380 "src/analyzer/expression/Expression.pv"
+#line 1404 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 1387 "src/analyzer/expression/Expression.pv"
+#line 1411 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
+
+#line 1457 "src/analyzer/expression/Expression.pv"
+uintptr_t Expression__get_precedence(struct Token* token);
+
+#line 1474 "src/analyzer/expression/Expression.pv"
+struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #endif

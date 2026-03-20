@@ -335,7 +335,7 @@ bool Block__parse_if_statement(struct Block* self, struct Context* context, stru
     bool else_end = false;
 
     #line 160 "src/analyzer/Block.pv"
-    while (else_end == 0 && Context__check_next(context, TOKEN_TYPE__KEYWORD, "else")) {
+    while (!else_end && Context__check_next(context, TOKEN_TYPE__KEYWORD, "else")) {
         #line 161 "src/analyzer/Block.pv"
         if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "if")) {
             #line 162 "src/analyzer/Block.pv"

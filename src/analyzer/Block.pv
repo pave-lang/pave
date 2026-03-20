@@ -157,7 +157,7 @@ impl Block {
         let else_block: &Block = 0;
         let else_end = false;
 
-        while else_end == 0 && context.check_next(TokenType::Keyword, "else") {
+        while !else_end && context.check_next(TokenType::Keyword, "else") {
             if context.check_next(TokenType::Keyword, "if") {
                 else_expression = Expression::parse(context, generics);
                 if else_expression == 0 { return false; }

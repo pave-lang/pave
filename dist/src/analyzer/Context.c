@@ -479,7 +479,7 @@ bool Context__expect_value(struct Context* self, enum TokenType type, char const
     struct Token* token = &self->tokens[self->pos];
 
     #line 293 "src/analyzer/Context.pv"
-    if ((Token__eq(token, type, value))) {
+    if (Token__eq(token, type, value)) {
         #line 294 "src/analyzer/Context.pv"
         Context__next_token(self);
         #line 295 "src/analyzer/Context.pv"
@@ -694,7 +694,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
             char c = length->value.ptr[i];
 
             #line 414 "src/analyzer/Context.pv"
-            if (((c >= '0') && (c <= '9'))) {
+            if (c >= '0' && c <= '9') {
                 #line 415 "src/analyzer/Context.pv"
                 result = result * 10 + (c - '0');
             } else {
