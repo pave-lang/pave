@@ -178,7 +178,7 @@ bool Struct__fill_types_field(struct Struct* self) {
     }
 
     #line 100 "src/analyzer/types/Struct.pv"
-    while ((context->pos < self->token_end) && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+    while (context->pos < self->token_end && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 101 "src/analyzer/types/Struct.pv"
         struct Token* name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
         #line 102 "src/analyzer/types/Struct.pv"
@@ -270,7 +270,7 @@ bool Struct__fill_types_tuple(struct Struct* self) {
     #line 145 "src/analyzer/types/Struct.pv"
     uintptr_t field_index = 0;
     #line 146 "src/analyzer/types/Struct.pv"
-    while ((context->pos < self->token_end) && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+    while (context->pos < self->token_end && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
         #line 147 "src/analyzer/types/Struct.pv"
         struct String name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 148 "src/analyzer/types/Struct.pv"

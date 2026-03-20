@@ -74,7 +74,7 @@ impl<K: Hash, V> HashMap<K: Hash, V> {
             return existing_value;
         }
 
-        if (self.capacity == 0) || ((self.length * 100 / self.capacity) > 75) {
+        if self.capacity == 0 || (self.length * 100 / self.capacity) > 75 {
             self.resize(self.capacity * 2);
         }
 

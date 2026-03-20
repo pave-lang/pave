@@ -27,7 +27,7 @@ struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Gener
     #line 17 "src/analyzer/types/GenericMap.pv"
     uintptr_t i = 0;
     #line 18 "src/analyzer/types/GenericMap.pv"
-    while ((i < generics->array.length) && (i < usage_types->length)) {
+    while (i < generics->array.length && i < usage_types->length) {
         #line 19 "src/analyzer/types/GenericMap.pv"
         struct Generic* generic = generics->array.data + i;
         #line 20 "src/analyzer/types/GenericMap.pv"

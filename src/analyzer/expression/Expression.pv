@@ -341,7 +341,7 @@ impl Expression {
                 let param_iter = function.parameters.iter();
                 let args_iter = arguments.iter();
 
-                if (is_member_call) {
+                if is_member_call {
                     param_iter.next();
                     args_iter.next();
 
@@ -738,7 +738,7 @@ impl Expression {
         let member_name = context.current();
         if member_name == 0 { return 0; }
 
-        if (member_name.type != TokenType::Number) && (member_name.type != TokenType::Identifier) {
+        if member_name.type != TokenType::Number && member_name.type != TokenType::Identifier {
             context.error("Unexpected token, expected Identifier or Number");
         }
 
@@ -771,7 +771,7 @@ impl Expression {
 
             let arguments = Array<InvokeArgument>::new(context.allocator);
 
-            if (func_info != 0) && (func_info.parameters.length > 0) && func_info.parameters.data[0].name.value.eq("self") {
+            if func_info != 0 && func_info.parameters.length > 0 && func_info.parameters.data[0].name.value.eq("self") {
                 arguments.append(InvokeArgument { value: inner });
             }
 
@@ -793,7 +793,7 @@ impl Expression {
                 member_type = context.module.make_type_usage(member_type, &func_generics.array);
             }
 
-            if (func_info != 0) && ((func_info.type == FunctionType::Builtin) || (func_info.type == FunctionType::MethodCpp)) {
+            if func_info != 0 && (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {
                 let member_expression = Expression::make(context.allocator, member_name, ExpressionData::MemberInstanceExpression(inner, member_name.value), member_type);
                 return Expression::make_member_function_call(context, member_expression, member_name, member_type, arguments, generic_map);
             } else {

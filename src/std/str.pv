@@ -85,11 +85,11 @@ impl str {
         let start: usize = 0;
         let end: usize = self.length;
 
-        while (start < end) && str::is_whitespace(*(self.ptr + start)) {
+        while start < end && str::is_whitespace(self.ptr[start]) {
             start = start + 1;
         }
 
-        while (end > start) && str::is_whitespace(*(self.ptr + end - 1)) {
+        while end > start && str::is_whitespace(self.ptr[end - 1]) {
             end = end - 1;
         }
 

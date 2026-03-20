@@ -55,11 +55,11 @@ impl FileWriter {
         while i < length {
             let c = s.ptr[i];
             
-            if (c >= 'a') && (c <= 'z') {
+            if c >= 'a' && c <= 'z' {
                 fprintf(self.file, "%c", c - 32);
                 was_lowercase = true;
             } else {
-                if was_lowercase && (c >= 'A') && (c <= 'Z') {
+                if was_lowercase && c >= 'A' && c <= 'Z' {
                     fprintf(self.file, "_");
                 }
 
@@ -80,7 +80,7 @@ impl FileWriter {
         while i < length {
             let c = s.ptr[i];
 
-            if (c >= 'A') && (c <= 'Z') {
+            if c >= 'A' && c <= 'Z' {
                 fprintf(self.file, "%c", c + 32);
             } else {
                 fprintf(self.file, "%c", c);

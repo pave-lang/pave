@@ -15,7 +15,7 @@ impl GenericMap {
         };
 
         let i: usize = 0;
-        while (i < generics.array.length) && (i < usage_types.length) {
+        while i < generics.array.length && i < usage_types.length {
             let generic: &Generic = generics.array.data + i;
             let generic_name = generic.name;
             let generic_type: Type = usage_types.data[i];

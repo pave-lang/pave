@@ -779,7 +779,7 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
             struct ArrayIter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
 
             #line 344 "src/analyzer/expression/Expression.pv"
-            if ((is_member_call)) {
+            if (is_member_call) {
                 #line 345 "src/analyzer/expression/Expression.pv"
                 ArrayIter_ref_Parameter__next(&param_iter);
                 #line 346 "src/analyzer/expression/Expression.pv"
@@ -1537,7 +1537,7 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
     }
 
     #line 741 "src/analyzer/expression/Expression.pv"
-    if ((member_name->type != TOKEN_TYPE__NUMBER) && (member_name->type != TOKEN_TYPE__IDENTIFIER)) {
+    if (member_name->type != TOKEN_TYPE__NUMBER && member_name->type != TOKEN_TYPE__IDENTIFIER) {
         #line 742 "src/analyzer/expression/Expression.pv"
         Context__error(context, "Unexpected token, expected Identifier or Number");
     }
@@ -1606,7 +1606,7 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 774 "src/analyzer/expression/Expression.pv"
-        if ((func_info != 0) && (func_info->parameters.length > 0) && str__eq(func_info->parameters.data[0].name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
+        if (func_info != 0 && func_info->parameters.length > 0 && str__eq(func_info->parameters.data[0].name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
             #line 775 "src/analyzer/expression/Expression.pv"
             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .value = inner });
         }
@@ -1647,7 +1647,7 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
         }
 
         #line 796 "src/analyzer/expression/Expression.pv"
-        if ((func_info != 0) && ((func_info->type == FUNCTION_TYPE__BUILTIN) || (func_info->type == FUNCTION_TYPE__METHOD_CPP))) {
+        if (func_info != 0 && (func_info->type == FUNCTION_TYPE__BUILTIN || func_info->type == FUNCTION_TYPE__METHOD_CPP)) {
             #line 797 "src/analyzer/expression/Expression.pv"
             struct Expression* member_expression = Expression__make(context->allocator, member_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION, .memberinstanceexpression_value = { ._0 = inner, ._1 = member_name->value} }, member_type);
             #line 798 "src/analyzer/expression/Expression.pv"

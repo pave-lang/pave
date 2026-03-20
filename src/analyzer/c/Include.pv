@@ -205,7 +205,7 @@ impl Include {
 
             let path = Array<CXCursor>::new(self.root.allocator);
             let parent = clang_getCursorSemanticParent(decl);
-            while (clang_getCursorKind(parent) == CXCursor_Namespace) || (clang_getCursorKind(parent) == CXCursor_ClassDecl) || (clang_getCursorKind(parent) == CXCursor_StructDecl) {
+            while clang_getCursorKind(parent) == CXCursor_Namespace || clang_getCursorKind(parent) == CXCursor_ClassDecl || clang_getCursorKind(parent) == CXCursor_StructDecl {
                 path.append(parent);
                 parent = clang_getCursorSemanticParent(parent);
             }
@@ -313,7 +313,7 @@ impl Include {
             clang_getSpellingLocation(loc_name_end, 0, &line1, &col1, 0);
             clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
-            if (line1 == line2) && (col1 == col2) {
+            if line1 == line2 && col1 == col2 {
                 result = true;
             }
         }

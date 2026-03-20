@@ -78,7 +78,7 @@ impl Function {
 
         node.declaration_start = context.pos;
 
-        while (context.pos < context.length) && !context.check_value(TokenType::Symbol, "{") && !context.check_value(TokenType::Symbol, ";") {
+        while context.pos < context.length && !context.check_value(TokenType::Symbol, "{") && !context.check_value(TokenType::Symbol, ";") {
             context.next_token();
         }
 
@@ -103,7 +103,7 @@ impl Function {
         let context = self.context;
         if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
-        while (context.pos < context.length) && !context.check_value(TokenType::Symbol, ")") {
+        while context.pos < context.length && !context.check_value(TokenType::Symbol, ")") {
             if context.check_next(TokenType::Symbol, "&") {
                 let name = &context.tokens[context.pos];
 

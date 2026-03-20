@@ -369,7 +369,7 @@ bool Context__next_token(struct Context* self) {
     self->pos += 1;
 
     #line 223 "src/analyzer/Context.pv"
-    while ((self->pos < self->length) && (self->tokens[self->pos].type == TOKEN_TYPE__COMMENT)) {
+    while (self->pos < self->length && self->tokens[self->pos].type == TOKEN_TYPE__COMMENT) {
         #line 224 "src/analyzer/Context.pv"
         self->pos += 1;
     }
@@ -495,7 +495,7 @@ bool Context__expect_value(struct Context* self, enum TokenType type, char const
 #line 302 "src/analyzer/Context.pv"
 bool Context__skip_to_symbol(struct Context* self, char const* symbol) {
     #line 303 "src/analyzer/Context.pv"
-    while ((self->pos < self->length) && !Context__check_value(self, TOKEN_TYPE__SYMBOL, symbol)) {
+    while (self->pos < self->length && !Context__check_value(self, TOKEN_TYPE__SYMBOL, symbol)) {
         #line 304 "src/analyzer/Context.pv"
         Context__next_token(self);
     }
@@ -507,7 +507,7 @@ bool Context__skip_to_symbol(struct Context* self, char const* symbol) {
 #line 310 "src/analyzer/Context.pv"
 void Context__skip_comments(struct Context* self) {
     #line 311 "src/analyzer/Context.pv"
-    while ((self->pos < self->length) && Context__check(self, TOKEN_TYPE__COMMENT)) {
+    while (self->pos < self->length && Context__check(self, TOKEN_TYPE__COMMENT)) {
         #line 312 "src/analyzer/Context.pv"
         Context__next_token(self);
     }
@@ -528,7 +528,7 @@ bool Context__skip_brackets(struct Context* self, char const* open, char const* 
     uintptr_t brackets = 1;
 
     #line 323 "src/analyzer/Context.pv"
-    while ((self->pos < self->length) && (brackets > 0)) {
+    while (self->pos < self->length && brackets > 0) {
         #line 324 "src/analyzer/Context.pv"
         if (Context__check_value(self, TOKEN_TYPE__SYMBOL, open)) {
             #line 325 "src/analyzer/Context.pv"

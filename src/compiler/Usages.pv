@@ -167,7 +167,7 @@ impl Usages {
         for (_, &func_info) in module.functions {
             self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
             
-            if (func_info.generics.array.length == 0) && self.usage_types.insert(func_info.name.value) {
+            if func_info.generics.array.length == 0 && self.usage_types.insert(func_info.name.value) {
                 let generic_map = self.allocator.store(GenericMap {});
                 let self_type = self.allocator.store(Type::Function(func_info, generic_map));
                 generic_map.self_type = self_type;
@@ -186,7 +186,7 @@ impl Usages {
                 i += 1;
             }
 
-            if (enum_info.generics.array.length == 0) && self.usage_types.insert(enum_info.name.value) {
+            if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
                 let generic_map = self.allocator.store(GenericMap {});
                 let self_type = self.allocator.store(Type::Enum(enum_info, generic_map));
                 generic_map.self_type = self_type;
@@ -205,7 +205,7 @@ impl Usages {
                 i += 1;
             }
 
-            if (struct_info.generics.array.length == 0) && self.usage_types.insert(struct_info.name.value) {
+            if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
                 let generic_map = self.allocator.store(GenericMap {});
                 let self_type = self.allocator.store(Type::Struct(struct_info, generic_map));
                 generic_map.self_type = self_type;
@@ -220,7 +220,7 @@ impl Usages {
                 usage.impl_functions.data[0].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
             }
 
-            if (trait_info.generics.array.length == 0) && self.usage_traits.insert(trait_info.name.value) {
+            if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
                 let generic_map = self.allocator.store(GenericMap {});
                 let self_type = self.allocator.store(Type::Trait(trait_info, generic_map));
                 generic_map.self_type = self_type;
@@ -244,7 +244,7 @@ impl Usages {
             Type::Sequence(sequence) => { is_type = sequence.is_slice(); },
             Type::Tuple(_) => { is_type = true; },
             Type::ClassCpp(class_info) => {
-                if (self.usage_mode != UsageMode::Body) && usage_context {
+                if self.usage_mode != UsageMode::Body && usage_context {
                     usage_context.cpp_usages.insert(class_info.name, type);
                 }
             },

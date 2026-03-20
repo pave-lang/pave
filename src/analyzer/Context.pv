@@ -220,7 +220,7 @@ impl Context {
     fn next_token(&self) -> bool {
         self.pos += 1;
 
-        while (self.pos < self.length) && (self.tokens[self.pos].type == TokenType::Comment) {
+        while self.pos < self.length && self.tokens[self.pos].type == TokenType::Comment {
             self.pos += 1;
         }
 
@@ -300,7 +300,7 @@ impl Context {
     }
 
     fn skip_to_symbol(&self, symbol: *const char) -> bool {
-        while (self.pos < self.length) && !self.check_value(TokenType::Symbol, symbol) {
+        while self.pos < self.length && !self.check_value(TokenType::Symbol, symbol) {
             self.next_token();
         }
 
@@ -308,7 +308,7 @@ impl Context {
     }
 
     fn skip_comments(&self) {
-        while (self.pos < self.length) && self.check(TokenType::Comment) {
+        while self.pos < self.length && self.check(TokenType::Comment) {
             self.next_token();
         }
     }
@@ -320,7 +320,7 @@ impl Context {
 
         let brackets: usize = 1;
 
-        while (self.pos < self.length) && (brackets > 0) {
+        while self.pos < self.length && brackets > 0 {
             if self.check_value(TokenType::Symbol, open) {
                 brackets += 1;
             } else if self.check_value(TokenType::Symbol, close) {

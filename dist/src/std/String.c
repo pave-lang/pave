@@ -22,7 +22,7 @@ void String__ensure_can_hold(struct String* self, uintptr_t length) {
     struct Array_char* array = &self->array;
 
     #line 17 "src/std/String.pv"
-    if ((array->length + length >= array->capacity)) {
+    if (array->length + length >= array->capacity) {
         #line 18 "src/std/String.pv"
         uintptr_t reserve = array->length + length + 1;
 
@@ -71,7 +71,7 @@ void String__append_sized_lowercase(struct String* self, char const* ptr, uintpt
         char c = ptr[i];
 
         #line 49 "src/std/String.pv"
-        if ((c >= 'A') && (c <= 'Z')) {
+        if (c >= 'A' && c <= 'Z') {
             #line 50 "src/std/String.pv"
             array->data[array->length] = c + 32;
         } else {

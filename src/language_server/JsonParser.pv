@@ -90,7 +90,7 @@ impl JsonParser {
     if !self.expect("\"") { return false; }
 
     let start = self.pos;
-    while (self.pos < self.data.length) && (self.data.ptr[self.pos] != '\"') {
+    while self.pos < self.data.length && self.data.ptr[self.pos] != '\"' {
       let c = self.data.ptr[self.pos];
       
       if c == '\\' {

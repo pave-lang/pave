@@ -14,7 +14,7 @@ impl String {
     fn ensure_can_hold(&self, length: usize) {
         let array: &Array<char> = &self.array;
 
-        if (array.length + length >= array.capacity) {
+        if array.length + length >= array.capacity {
             let reserve: usize = array.length + length + 1;
 
             if reserve < array.capacity {
@@ -46,7 +46,7 @@ impl String {
         while i < length {
             let c = ptr[i];
 
-            if (c >= 'A') && (c <= 'Z') {
+            if c >= 'A' && c <= 'Z' {
                 array.data[array.length] = c + 32;
             } else {
                 array.data[array.length] = c;

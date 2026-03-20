@@ -210,7 +210,7 @@ impl IncludeContext {
             let enum_info = self.add_enum(name);
             clang_visitChildren(cursor, IncludeObjectContext::visitor_enum, &IncludeObjectContext { context: self, object: enum_info });
             return CXChildVisit_Continue;
-        } else if (kind == CXCursor_StructDecl) || (kind == CXCursor_ClassDecl) {
+        } else if kind == CXCursor_StructDecl || kind == CXCursor_ClassDecl {
             let type = clang_getCursorType(cursor);
             let type_spelling = clang_getTypeSpelling(type);
             let type_name = include.make_string(type_spelling);
@@ -270,7 +270,7 @@ impl IncludeContext {
             let canonical_decl = clang_getTypeDeclaration(canonical_type);
             let canonical_kind = clang_getCursorKind(canonical_decl);
 
-            if (canonical_kind == CXCursor_StructDecl) || (canonical_kind == CXCursor_ClassDecl) {
+            if canonical_kind == CXCursor_StructDecl || canonical_kind == CXCursor_ClassDecl {
                 let struct_info = self.add_typedef_struct(name);
 
                 clang_visitChildren(canonical_decl, IncludeObjectContext::visitor_struct, &IncludeObjectContext {

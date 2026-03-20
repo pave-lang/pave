@@ -72,7 +72,7 @@ bool HashSet_str__insert(struct HashSet_str* self, struct str value) {
     }
 
     #line 56 "src/std/HashSet.pv"
-    if ((self->length * 100 / self->capacity) > 75) {
+    if (self->length * 100 / self->capacity > 75) {
         #line 57 "src/std/HashSet.pv"
         HashSet_str__resize(self, self->capacity * 2);
     }

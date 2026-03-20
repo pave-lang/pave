@@ -53,7 +53,7 @@ impl<T: Hash> HashSet<T: Hash> {
     fn insert(&self, value: T) -> bool {
         if self.has(&value) { return false; }
 
-        if (self.length * 100 / self.capacity) > 75 {
+        if self.length * 100 / self.capacity > 75 {
             self.resize(self.capacity * 2);
         }
 

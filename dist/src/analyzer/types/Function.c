@@ -79,7 +79,7 @@ struct Function Function__parse_inner(struct Context* context, bool body_optiona
     node.declaration_start = context->pos;
 
     #line 81 "src/analyzer/types/Function.pv"
-    while ((context->pos < context->length) && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "{") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ";")) {
+    while (context->pos < context->length && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "{") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 82 "src/analyzer/types/Function.pv"
         Context__next_token(context);
     }
@@ -130,7 +130,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
     }
 
     #line 106 "src/analyzer/types/Function.pv"
-    while ((context->pos < context->length) && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+    while (context->pos < context->length && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
         #line 107 "src/analyzer/types/Function.pv"
         if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "&")) {
             #line 108 "src/analyzer/types/Function.pv"

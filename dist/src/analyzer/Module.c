@@ -133,7 +133,7 @@ bool Module__parse(struct Module* self) {
     bool result = true;
 
     #line 69 "src/analyzer/Module.pv"
-    while ((context->pos < context->length) && result) {
+    while (context->pos < context->length && result) {
         #line 70 "src/analyzer/Module.pv"
         struct Token* token = &context->tokens[context->pos];
 

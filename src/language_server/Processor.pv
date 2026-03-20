@@ -27,7 +27,7 @@ impl Processor {
         let pos: usize = 0;
         let c: char = 0;
         let newlines: usize = 0;
-        while (pos < MAX_LENGTH - 1) {
+        while pos < MAX_LENGTH - 1 {
             if !read_pipe(pipe, &c, 1) { return false; }
 
             buf[pos] = c;
@@ -35,7 +35,7 @@ impl Processor {
             
             if c == '\n' {
                 newlines += 1;
-                if (newlines == 2) && (pos >= 4) && (buf[pos-4] == '\r') && (buf[pos-3] == '\n') && (buf[pos-2] == '\r') && (buf[pos-1] == '\n') {
+                if newlines == 2 && pos >= 4 && buf[pos-4] == '\r' && buf[pos-3] == '\n' && buf[pos-2] == '\r' && buf[pos-1] == '\n' {
                     buf[pos] = '\0';
                     
                     let cl = strstr(buf, "Content-Length:");
@@ -294,14 +294,14 @@ impl Processor {
 
             if diagnostics != 0 {
                 for diagnostic in diagnostics {
-                    if (start_line == diagnostic.range.start.line) && (start_character <= diagnostic.range.start.character) {
+                    if start_line == diagnostic.range.start.line && start_character <= diagnostic.range.start.character {
                         diagnostic.range.start.character += change_characters;
                         diagnostic.range.start.line += change_lines;
                     } else if start_line < diagnostic.range.start.line {
                         diagnostic.range.start.line += change_lines;
                     }
 
-                    if (start_line == diagnostic.range.end.line) && (start_character <= diagnostic.range.end.character) {
+                    if start_line == diagnostic.range.end.line && start_character <= diagnostic.range.end.character {
                         diagnostic.range.end.character += change_characters;
                         diagnostic.range.end.line += change_lines;
                     } else if start_line < diagnostic.range.end.line {
@@ -312,7 +312,7 @@ impl Processor {
 
             if inlay_hints != 0 {
                 for inlay_hint in inlay_hints {
-                    if (start_line == inlay_hint.position.line) && (start_character <= inlay_hint.position.character) {
+                    if start_line == inlay_hint.position.line && start_character <= inlay_hint.position.character {
                         inlay_hint.position.character += change_characters;
                         inlay_hint.position.line += change_lines;
                     } else if start_line < inlay_hint.position.line {
