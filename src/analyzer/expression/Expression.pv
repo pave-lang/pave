@@ -1511,7 +1511,7 @@ impl Expression {
 
         if !is_else_if && !context.expect_value(TokenType::Symbol, "}") { return 0; }
 
-        if !a.validate_type(context, &b.return_type, true) { return 0; }
+        if !a.validate_type(context, &b.return_type, false) { return 0; }
 
         return Expression::make(context.allocator, token, ExpressionData::IfExpression(condition, a, b), &a.return_type);
     }
