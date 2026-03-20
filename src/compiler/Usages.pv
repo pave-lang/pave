@@ -524,6 +524,11 @@ impl Usages {
             ExpressionData::ParenthesizedExpression(inner) => {
                 self.process_expression(inner, generic_map);
             },
+            ExpressionData::IfExpression(cond, a, b) => {
+                self.process_expression(cond, generic_map);
+                self.process_expression(a, generic_map);
+                self.process_expression(b, generic_map);
+            },
             ExpressionData::CppExpression(cpp_expression) => {
                 match cpp_expression {
                     CppExpression::New(placement, new_expression) => {

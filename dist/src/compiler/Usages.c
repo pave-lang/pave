@@ -1072,154 +1072,169 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
             Usages__process_expression(self, inner, generic_map);
         } break;
         #line 527 "src/compiler/Usages.pv"
-        case EXPRESSION_DATA__CPP_EXPRESSION: {
+        case EXPRESSION_DATA__IF_EXPRESSION: {
             #line 527 "src/compiler/Usages.pv"
-            struct CppExpression cpp_expression = expression->data.cppexpression_value;
+            struct Expression* cond = expression->data.ifexpression_value._0;
+            #line 527 "src/compiler/Usages.pv"
+            struct Expression* a = expression->data.ifexpression_value._1;
+            #line 527 "src/compiler/Usages.pv"
+            struct Expression* b = expression->data.ifexpression_value._2;
             #line 528 "src/compiler/Usages.pv"
+            Usages__process_expression(self, cond, generic_map);
+            #line 529 "src/compiler/Usages.pv"
+            Usages__process_expression(self, a, generic_map);
+            #line 530 "src/compiler/Usages.pv"
+            Usages__process_expression(self, b, generic_map);
+        } break;
+        #line 532 "src/compiler/Usages.pv"
+        case EXPRESSION_DATA__CPP_EXPRESSION: {
+            #line 532 "src/compiler/Usages.pv"
+            struct CppExpression cpp_expression = expression->data.cppexpression_value;
+            #line 533 "src/compiler/Usages.pv"
             switch (cpp_expression.type) {
-                #line 529 "src/compiler/Usages.pv"
+                #line 534 "src/compiler/Usages.pv"
                 case CPP_EXPRESSION__NEW: {
-                    #line 529 "src/compiler/Usages.pv"
+                    #line 534 "src/compiler/Usages.pv"
                     struct Expression* placement = cpp_expression.new_value._0;
-                    #line 529 "src/compiler/Usages.pv"
+                    #line 534 "src/compiler/Usages.pv"
                     struct Expression* new_expression = cpp_expression.new_value._1;
-                    #line 530 "src/compiler/Usages.pv"
+                    #line 535 "src/compiler/Usages.pv"
                     if (placement != 0) {
-                        #line 530 "src/compiler/Usages.pv"
+                        #line 535 "src/compiler/Usages.pv"
                         Usages__process_expression(self, placement, generic_map);
                     }
-                    #line 531 "src/compiler/Usages.pv"
+                    #line 536 "src/compiler/Usages.pv"
                     Usages__process_expression(self, new_expression, generic_map);
                 } break;
-                #line 533 "src/compiler/Usages.pv"
+                #line 538 "src/compiler/Usages.pv"
                 case CPP_EXPRESSION__DELETE: {
-                    #line 533 "src/compiler/Usages.pv"
+                    #line 538 "src/compiler/Usages.pv"
                     struct Expression* delete_expression = cpp_expression.delete_value;
-                    #line 534 "src/compiler/Usages.pv"
+                    #line 539 "src/compiler/Usages.pv"
                     Usages__process_expression(self, delete_expression, generic_map);
                 } break;
             }
         } break;
-        #line 538 "src/compiler/Usages.pv"
+        #line 543 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__IMPLICIT_CAST: {
-            #line 538 "src/compiler/Usages.pv"
+            #line 543 "src/compiler/Usages.pv"
             struct Expression* inner = expression->data.implicitcast_value;
-            #line 539 "src/compiler/Usages.pv"
+            #line 544 "src/compiler/Usages.pv"
             Usages__process_expression(self, inner, generic_map);
 
-            #line 541 "src/compiler/Usages.pv"
+            #line 546 "src/compiler/Usages.pv"
             struct Type* return_type = Type__deref(Context__resolve_type(self->allocator, &inner->return_type, generic_map, 0));
-            #line 542 "src/compiler/Usages.pv"
+            #line 547 "src/compiler/Usages.pv"
             switch (return_type->type) {
-                #line 543 "src/compiler/Usages.pv"
+                #line 548 "src/compiler/Usages.pv"
                 case TYPE__FUNCTION: {
-                    #line 543 "src/compiler/Usages.pv"
+                    #line 548 "src/compiler/Usages.pv"
                     struct Function* func_info = return_type->function_value._0;
-                    #line 545 "src/compiler/Usages.pv"
+                    #line 550 "src/compiler/Usages.pv"
                     uintptr_t func_ptr = (uintptr_t)(func_info);
 
-                    #line 547 "src/compiler/Usages.pv"
+                    #line 552 "src/compiler/Usages.pv"
                     switch (func_info->parent.type) {
-                        #line 548 "src/compiler/Usages.pv"
+                        #line 553 "src/compiler/Usages.pv"
                         case FUNCTION_PARENT__NONE: {
-                            #line 549 "src/compiler/Usages.pv"
+                            #line 554 "src/compiler/Usages.pv"
                             struct TypeFunctionUsage* usage = HashMap_usize_TypeFunctionUsage__find(&self->functions, &func_ptr);
-                            #line 550 "src/compiler/Usages.pv"
+                            #line 555 "src/compiler/Usages.pv"
                             usage->impl_dynamic_function = true;
                         } break;
-                        #line 552 "src/compiler/Usages.pv"
+                        #line 557 "src/compiler/Usages.pv"
                         case FUNCTION_PARENT__PRIMITIVE: {
-                            #line 552 "src/compiler/Usages.pv"
-                            struct Primitive* primitive_info = func_info->parent.primitive_value._0;
-                            #line 552 "src/compiler/Usages.pv"
-                            uintptr_t impl_index = func_info->parent.primitive_value._1;
-                            #line 553 "src/compiler/Usages.pv"
-                            uintptr_t parent_ptr = (uintptr_t)(primitive_info);
-                            #line 554 "src/compiler/Usages.pv"
-                            struct TypeUsage_Primitive* parent_usage = HashMap_usize_TypeUsage_Primitive__find(&self->primitives, &parent_ptr);
-                            #line 555 "src/compiler/Usages.pv"
-                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                            #line 556 "src/compiler/Usages.pv"
-                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
                             #line 557 "src/compiler/Usages.pv"
-                            impl_function->impl_dynamic_function = true;
-                        } break;
-                        #line 559 "src/compiler/Usages.pv"
-                        case FUNCTION_PARENT__STRUCT: {
+                            struct Primitive* primitive_info = func_info->parent.primitive_value._0;
+                            #line 557 "src/compiler/Usages.pv"
+                            uintptr_t impl_index = func_info->parent.primitive_value._1;
+                            #line 558 "src/compiler/Usages.pv"
+                            uintptr_t parent_ptr = (uintptr_t)(primitive_info);
                             #line 559 "src/compiler/Usages.pv"
-                            struct Struct* struct_info = func_info->parent.struct_value._0;
-                            #line 559 "src/compiler/Usages.pv"
-                            uintptr_t impl_index = func_info->parent.struct_value._1;
+                            struct TypeUsage_Primitive* parent_usage = HashMap_usize_TypeUsage_Primitive__find(&self->primitives, &parent_ptr);
                             #line 560 "src/compiler/Usages.pv"
-                            uintptr_t parent_ptr = (uintptr_t)(struct_info);
+                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
                             #line 561 "src/compiler/Usages.pv"
-                            struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
+                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
                             #line 562 "src/compiler/Usages.pv"
-                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                            #line 563 "src/compiler/Usages.pv"
-                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
+                            impl_function->impl_dynamic_function = true;
+                        } break;
+                        #line 564 "src/compiler/Usages.pv"
+                        case FUNCTION_PARENT__STRUCT: {
                             #line 564 "src/compiler/Usages.pv"
-                            impl_function->impl_dynamic_function = true;
-                        } break;
-                        #line 566 "src/compiler/Usages.pv"
-                        case FUNCTION_PARENT__ENUM: {
+                            struct Struct* struct_info = func_info->parent.struct_value._0;
+                            #line 564 "src/compiler/Usages.pv"
+                            uintptr_t impl_index = func_info->parent.struct_value._1;
+                            #line 565 "src/compiler/Usages.pv"
+                            uintptr_t parent_ptr = (uintptr_t)(struct_info);
                             #line 566 "src/compiler/Usages.pv"
-                            struct Enum* enum_info = func_info->parent.enum_value._0;
-                            #line 566 "src/compiler/Usages.pv"
-                            uintptr_t impl_index = func_info->parent.enum_value._1;
+                            struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
                             #line 567 "src/compiler/Usages.pv"
-                            uintptr_t parent_ptr = (uintptr_t)(enum_info);
-                            #line 568 "src/compiler/Usages.pv"
-                            struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
-                            #line 569 "src/compiler/Usages.pv"
                             struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                            #line 570 "src/compiler/Usages.pv"
+                            #line 568 "src/compiler/Usages.pv"
                             struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
-                            #line 571 "src/compiler/Usages.pv"
+                            #line 569 "src/compiler/Usages.pv"
                             impl_function->impl_dynamic_function = true;
                         } break;
-                        #line 573 "src/compiler/Usages.pv"
+                        #line 571 "src/compiler/Usages.pv"
+                        case FUNCTION_PARENT__ENUM: {
+                            #line 571 "src/compiler/Usages.pv"
+                            struct Enum* enum_info = func_info->parent.enum_value._0;
+                            #line 571 "src/compiler/Usages.pv"
+                            uintptr_t impl_index = func_info->parent.enum_value._1;
+                            #line 572 "src/compiler/Usages.pv"
+                            uintptr_t parent_ptr = (uintptr_t)(enum_info);
+                            #line 573 "src/compiler/Usages.pv"
+                            struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
+                            #line 574 "src/compiler/Usages.pv"
+                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
+                            #line 575 "src/compiler/Usages.pv"
+                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
+                            #line 576 "src/compiler/Usages.pv"
+                            impl_function->impl_dynamic_function = true;
+                        } break;
+                        #line 578 "src/compiler/Usages.pv"
                         default: {
                         } break;
                     }
                 } break;
-                #line 576 "src/compiler/Usages.pv"
+                #line 581 "src/compiler/Usages.pv"
                 case TYPE__STRUCT: {
-                    #line 576 "src/compiler/Usages.pv"
+                    #line 581 "src/compiler/Usages.pv"
                     struct Struct* struct_info = return_type->struct_value._0;
-                    #line 577 "src/compiler/Usages.pv"
+                    #line 582 "src/compiler/Usages.pv"
                     switch (expression->return_type.type) {
-                        #line 578 "src/compiler/Usages.pv"
+                        #line 583 "src/compiler/Usages.pv"
                         case TYPE__INDIRECT: {
-                            #line 578 "src/compiler/Usages.pv"
+                            #line 583 "src/compiler/Usages.pv"
                             struct Indirect* indirect = expression->return_type.indirect_value;
-                            #line 579 "src/compiler/Usages.pv"
+                            #line 584 "src/compiler/Usages.pv"
                             switch (indirect->to.type) {
-                                #line 580 "src/compiler/Usages.pv"
+                                #line 585 "src/compiler/Usages.pv"
                                 case TYPE__TRAIT: {
-                                    #line 580 "src/compiler/Usages.pv"
+                                    #line 585 "src/compiler/Usages.pv"
                                     struct Trait* trait_info = indirect->to.trait_value._0;
-                                    #line 581 "src/compiler/Usages.pv"
+                                    #line 586 "src/compiler/Usages.pv"
                                     if (str__eq(trait_info->name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
-                                        #line 582 "src/compiler/Usages.pv"
+                                        #line 587 "src/compiler/Usages.pv"
                                         uintptr_t ptr = (uintptr_t)(struct_info);
-                                        #line 583 "src/compiler/Usages.pv"
+                                        #line 588 "src/compiler/Usages.pv"
                                         struct TypeUsage_Struct* usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &ptr);
-                                        #line 584 "src/compiler/Usages.pv"
+                                        #line 589 "src/compiler/Usages.pv"
                                         usage->impl_dynamic_usage = true;
                                     }
                                 } break;
-                                #line 587 "src/compiler/Usages.pv"
+                                #line 592 "src/compiler/Usages.pv"
                                 default: {
                                 } break;
                             }
                         } break;
-                        #line 590 "src/compiler/Usages.pv"
+                        #line 595 "src/compiler/Usages.pv"
                         default: {
                         } break;
                     }
                 } break;
-                #line 593 "src/compiler/Usages.pv"
+                #line 598 "src/compiler/Usages.pv"
                 default: {
                 } break;
             }
@@ -1227,149 +1242,149 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
     }
 }
 
-#line 599 "src/compiler/Usages.pv"
+#line 604 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self) {
-    #line 600 "src/compiler/Usages.pv"
+    #line 605 "src/compiler/Usages.pv"
     { struct ArrayIter_ref_Type __iter = Array_Type__iter(&self->usages);
-    #line 600 "src/compiler/Usages.pv"
+    #line 605 "src/compiler/Usages.pv"
     while (ArrayIter_ref_Type__next(&__iter)) {
-        #line 600 "src/compiler/Usages.pv"
+        #line 605 "src/compiler/Usages.pv"
         struct Type* usage = ArrayIter_ref_Type__value(&__iter);
 
-        #line 601 "src/compiler/Usages.pv"
+        #line 606 "src/compiler/Usages.pv"
         switch (usage->type) {
-            #line 602 "src/compiler/Usages.pv"
+            #line 607 "src/compiler/Usages.pv"
             case TYPE__STRUCT: {
-                #line 602 "src/compiler/Usages.pv"
+                #line 607 "src/compiler/Usages.pv"
                 struct Struct* struct_info = usage->struct_value._0;
-                #line 602 "src/compiler/Usages.pv"
+                #line 607 "src/compiler/Usages.pv"
                 struct GenericMap* generic_map = usage->struct_value._1;
-                #line 603 "src/compiler/Usages.pv"
+                #line 608 "src/compiler/Usages.pv"
                 uintptr_t parent_ptr = (uintptr_t)(struct_info);
-                #line 604 "src/compiler/Usages.pv"
+                #line 609 "src/compiler/Usages.pv"
                 struct TypeUsage_Struct* usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
-                #line 605 "src/compiler/Usages.pv"
+                #line 610 "src/compiler/Usages.pv"
                 Array_ref_GenericMap__append(&usage->generic_maps, generic_map);
             } break;
-            #line 607 "src/compiler/Usages.pv"
+            #line 612 "src/compiler/Usages.pv"
             case TYPE__ENUM: {
-                #line 607 "src/compiler/Usages.pv"
+                #line 612 "src/compiler/Usages.pv"
                 struct Enum* enum_info = usage->enum_value._0;
-                #line 607 "src/compiler/Usages.pv"
+                #line 612 "src/compiler/Usages.pv"
                 struct GenericMap* generic_map = usage->enum_value._1;
-                #line 608 "src/compiler/Usages.pv"
+                #line 613 "src/compiler/Usages.pv"
                 uintptr_t parent_ptr = (uintptr_t)(enum_info);
-                #line 609 "src/compiler/Usages.pv"
+                #line 614 "src/compiler/Usages.pv"
                 struct TypeUsage_Enum* usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
 
-                #line 611 "src/compiler/Usages.pv"
-                Array_ref_GenericMap__append(&usage->generic_maps, generic_map);
-            } break;
-            #line 613 "src/compiler/Usages.pv"
-            case TYPE__TRAIT: {
-                #line 613 "src/compiler/Usages.pv"
-                struct Trait* trait_info = usage->trait_value._0;
-                #line 613 "src/compiler/Usages.pv"
-                struct GenericMap* generic_map = usage->trait_value._1;
-                #line 614 "src/compiler/Usages.pv"
-                uintptr_t parent_ptr = (uintptr_t)(trait_info);
-                #line 615 "src/compiler/Usages.pv"
-                struct TypeUsage_Trait* usage = HashMap_usize_TypeUsage_Trait__find(&self->traits, &parent_ptr);
                 #line 616 "src/compiler/Usages.pv"
                 Array_ref_GenericMap__append(&usage->generic_maps, generic_map);
             } break;
             #line 618 "src/compiler/Usages.pv"
-            case TYPE__FUNCTION: {
+            case TYPE__TRAIT: {
                 #line 618 "src/compiler/Usages.pv"
-                struct Function* func_info = usage->function_value._0;
+                struct Trait* trait_info = usage->trait_value._0;
                 #line 618 "src/compiler/Usages.pv"
-                struct GenericMap* generic_map = usage->function_value._1;
+                struct GenericMap* generic_map = usage->trait_value._1;
                 #line 619 "src/compiler/Usages.pv"
+                uintptr_t parent_ptr = (uintptr_t)(trait_info);
+                #line 620 "src/compiler/Usages.pv"
+                struct TypeUsage_Trait* usage = HashMap_usize_TypeUsage_Trait__find(&self->traits, &parent_ptr);
+                #line 621 "src/compiler/Usages.pv"
+                Array_ref_GenericMap__append(&usage->generic_maps, generic_map);
+            } break;
+            #line 623 "src/compiler/Usages.pv"
+            case TYPE__FUNCTION: {
+                #line 623 "src/compiler/Usages.pv"
+                struct Function* func_info = usage->function_value._0;
+                #line 623 "src/compiler/Usages.pv"
+                struct GenericMap* generic_map = usage->function_value._1;
+                #line 624 "src/compiler/Usages.pv"
                 if (func_info->type == FUNCTION_TYPE__BUILTIN) {
-                    #line 619 "src/compiler/Usages.pv"
+                    #line 624 "src/compiler/Usages.pv"
                     continue;
                 }
 
-                #line 621 "src/compiler/Usages.pv"
+                #line 626 "src/compiler/Usages.pv"
                 uintptr_t func_ptr = (uintptr_t)(func_info);
 
-                #line 623 "src/compiler/Usages.pv"
+                #line 628 "src/compiler/Usages.pv"
                 switch (func_info->parent.type) {
-                    #line 624 "src/compiler/Usages.pv"
+                    #line 629 "src/compiler/Usages.pv"
                     case FUNCTION_PARENT__NONE: {
-                        #line 625 "src/compiler/Usages.pv"
+                        #line 630 "src/compiler/Usages.pv"
                         struct TypeFunctionUsage* usage = HashMap_usize_TypeFunctionUsage__find(&self->functions, &func_ptr);
-                        #line 626 "src/compiler/Usages.pv"
+                        #line 631 "src/compiler/Usages.pv"
                         Array_ref_GenericMap__append(&usage->generic_maps, generic_map);
                     } break;
-                    #line 628 "src/compiler/Usages.pv"
+                    #line 633 "src/compiler/Usages.pv"
                     case FUNCTION_PARENT__STRUCT: {
-                        #line 628 "src/compiler/Usages.pv"
-                        struct Struct* struct_info = func_info->parent.struct_value._0;
-                        #line 628 "src/compiler/Usages.pv"
-                        uintptr_t impl_index = func_info->parent.struct_value._1;
-                        #line 629 "src/compiler/Usages.pv"
-                        uintptr_t parent_ptr = (uintptr_t)(struct_info);
-                        #line 630 "src/compiler/Usages.pv"
-                        struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
-                        #line 631 "src/compiler/Usages.pv"
-                        if (parent_usage == 0) {
-                            #line 631 "src/compiler/Usages.pv"
-                            fprintf(stderr, "Could not find parent usage\n");
-                        }
-
                         #line 633 "src/compiler/Usages.pv"
-                        struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
+                        struct Struct* struct_info = func_info->parent.struct_value._0;
+                        #line 633 "src/compiler/Usages.pv"
+                        uintptr_t impl_index = func_info->parent.struct_value._1;
                         #line 634 "src/compiler/Usages.pv"
-                        struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
-
+                        uintptr_t parent_ptr = (uintptr_t)(struct_info);
+                        #line 635 "src/compiler/Usages.pv"
+                        struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
                         #line 636 "src/compiler/Usages.pv"
-                        Array_ref_GenericMap__append(&impl_function->generic_maps, generic_map);
-                    } break;
-                    #line 638 "src/compiler/Usages.pv"
-                    case FUNCTION_PARENT__ENUM: {
-                        #line 638 "src/compiler/Usages.pv"
-                        struct Enum* enum_info = func_info->parent.enum_value._0;
-                        #line 638 "src/compiler/Usages.pv"
-                        uintptr_t impl_index = func_info->parent.enum_value._1;
-                        #line 639 "src/compiler/Usages.pv"
-                        uintptr_t parent_ptr = (uintptr_t)(enum_info);
-                        #line 640 "src/compiler/Usages.pv"
-                        struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
-                        #line 641 "src/compiler/Usages.pv"
                         if (parent_usage == 0) {
-                            #line 641 "src/compiler/Usages.pv"
+                            #line 636 "src/compiler/Usages.pv"
                             fprintf(stderr, "Could not find parent usage\n");
                         }
 
-                        #line 643 "src/compiler/Usages.pv"
+                        #line 638 "src/compiler/Usages.pv"
                         struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                        #line 644 "src/compiler/Usages.pv"
+                        #line 639 "src/compiler/Usages.pv"
                         struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
 
-                        #line 646 "src/compiler/Usages.pv"
+                        #line 641 "src/compiler/Usages.pv"
                         Array_ref_GenericMap__append(&impl_function->generic_maps, generic_map);
                     } break;
-                    #line 648 "src/compiler/Usages.pv"
+                    #line 643 "src/compiler/Usages.pv"
+                    case FUNCTION_PARENT__ENUM: {
+                        #line 643 "src/compiler/Usages.pv"
+                        struct Enum* enum_info = func_info->parent.enum_value._0;
+                        #line 643 "src/compiler/Usages.pv"
+                        uintptr_t impl_index = func_info->parent.enum_value._1;
+                        #line 644 "src/compiler/Usages.pv"
+                        uintptr_t parent_ptr = (uintptr_t)(enum_info);
+                        #line 645 "src/compiler/Usages.pv"
+                        struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
+                        #line 646 "src/compiler/Usages.pv"
+                        if (parent_usage == 0) {
+                            #line 646 "src/compiler/Usages.pv"
+                            fprintf(stderr, "Could not find parent usage\n");
+                        }
+
+                        #line 648 "src/compiler/Usages.pv"
+                        struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
+                        #line 649 "src/compiler/Usages.pv"
+                        struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
+
+                        #line 651 "src/compiler/Usages.pv"
+                        Array_ref_GenericMap__append(&impl_function->generic_maps, generic_map);
+                    } break;
+                    #line 653 "src/compiler/Usages.pv"
                     default: {
                     } break;
                 }
             } break;
-            #line 651 "src/compiler/Usages.pv"
+            #line 656 "src/compiler/Usages.pv"
             case TYPE__SEQUENCE: {
-                #line 651 "src/compiler/Usages.pv"
+                #line 656 "src/compiler/Usages.pv"
                 struct Sequence* sequence = usage->sequence_value;
-                #line 652 "src/compiler/Usages.pv"
+                #line 657 "src/compiler/Usages.pv"
                 Array_Type__append(&self->sequences, sequence->element);
             } break;
-            #line 654 "src/compiler/Usages.pv"
+            #line 659 "src/compiler/Usages.pv"
             case TYPE__TUPLE: {
-                #line 654 "src/compiler/Usages.pv"
+                #line 659 "src/compiler/Usages.pv"
                 struct Tuple* tuple = usage->tuple_value;
-                #line 655 "src/compiler/Usages.pv"
+                #line 660 "src/compiler/Usages.pv"
                 Array_ref_Tuple__append(&self->tuples, tuple);
             } break;
-            #line 657 "src/compiler/Usages.pv"
+            #line 662 "src/compiler/Usages.pv"
             default: {
             } break;
         }

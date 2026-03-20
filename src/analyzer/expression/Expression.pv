@@ -1339,6 +1339,8 @@ impl Expression {
                         data: ExpressionData::Literal(token.value),
                         return_type: Type::Primitive(context.module.find_primitive("bool")),
                     });
+                } else if token.value.eq("if") {
+                    result = Expression::parse_if(context, generics);
                 } else {
                     context.error("Only true + false keywords are valid in expressions");
                 }
@@ -1480,5 +1482,37 @@ impl Expression {
             result = next;
         }
         return result;
+    }
+
+    fn parse_if(context: &Context, generics: &Generics) -> &Expression {
+        let token = context.current();
+        if !context.expect_value(TokenType::Keyword, "if") { return 0; }
+
+        let condition = Expression::parse(context, generics);
+        if condition == 0 { return 0; }
+
+        if !context.expect_value(TokenType::Symbol, "{") { return 0; }
+
+        let a = Expression::parse(context, generics);
+        if a == 0 { return 0; }
+
+        if !context.expect_value(TokenType::Symbol, "}") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "else") { return 0; }
+
+        let is_else_if = context.check_value(TokenType::Keyword, "if");
+
+        if !is_else_if && !context.check_next(TokenType::Symbol, "{") {
+            context.error("Expected { or else if");
+            return 0;
+        }
+
+        let b = Expression::parse(context, generics);
+        if b == 0 { return 0; }
+
+        if !is_else_if && !context.expect_value(TokenType::Symbol, "}") { return 0; }
+
+        if !a.validate_type(context, &b.return_type, true) { return 0; }
+
+        return Expression::make(context.allocator, token, ExpressionData::IfExpression(condition, a, b), &a.return_type);
     }
 }

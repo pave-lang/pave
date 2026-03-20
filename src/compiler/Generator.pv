@@ -1117,6 +1117,14 @@ impl Generator {
                 self.write_expression(file, right, generics);
                 return true;
             },
+            ExpressionData::IfExpression(cond, a, b) => {
+                self.write_expression(file, cond, generics);
+                fprintf(file, " ? ");
+                self.write_expression(file, a, generics);
+                fprintf(file, " : ");
+                self.write_expression(file, b, generics);
+                return true;
+            },
             ExpressionData::MemberStaticExpression(parent, member) => {
                 self.write_expression(file, parent, generics);
                 self.write_static_member_accessor(file, generics);
@@ -1997,6 +2005,11 @@ impl Generator {
             ExpressionData::BinaryExpression(left, _, right) => {
                 self.add_expression_includes(includes, left, generics);
                 self.add_expression_includes(includes, right, generics);
+            },
+            ExpressionData::IfExpression(cond, a, b) => {
+                self.add_expression_includes(includes, cond, generics);
+                self.add_expression_includes(includes, a, generics);
+                self.add_expression_includes(includes, b, generics);
             },
             ExpressionData::MemberStaticExpression(inner, _) => {
                 self.add_expression_includes(includes, inner, generics);
