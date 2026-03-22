@@ -1,9 +1,9 @@
+use std
 use analyzer
 use types
 
 struct MatchCase {
     first_token: &Token,
-    pattern: MatchPattern,
-    type: &Type,
+    patterns: Array<MatchPattern>,
     body: &Block,
 }

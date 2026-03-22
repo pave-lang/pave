@@ -6,8 +6,8 @@ use c
 
 enum MatchPattern {
     Default,
-    StaticValue(&Token),
-    EnumVariant(&EnumVariant, Array<EnumVariantParameter>),
+    StaticValue(&Expression),
+    EnumVariant(&Type, &EnumVariant, Array<EnumVariantParameter>),
     EnumCValue(&EnumCValue),
     TypeId(Type),
 }

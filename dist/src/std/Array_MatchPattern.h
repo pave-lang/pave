@@ -1,0 +1,64 @@
+#ifndef PAVE_ARRAY_MATCH_PATTERN
+#define PAVE_ARRAY_MATCH_PATTERN
+
+#include <std/Allocator.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+struct MatchPattern;
+struct ArrayIter_ref_MatchPattern;
+
+#include <stdlib.h>
+#include <string.h>
+
+#line 69 "src/std/Array.pv"
+struct Array_MatchPattern {
+    struct Allocator allocator;
+    struct MatchPattern* data;
+    uintptr_t length;
+    uintptr_t capacity;
+};
+
+#line 77 "src/std/Array.pv"
+struct Array_MatchPattern Array_MatchPattern__new(struct Allocator allocator);
+
+#line 81 "src/std/Array.pv"
+struct Array_MatchPattern Array_MatchPattern__new_with_length(struct Allocator allocator, uintptr_t length);
+
+#line 88 "src/std/Array.pv"
+struct Array_MatchPattern Array_MatchPattern__new_with_capacity(struct Allocator allocator, uintptr_t length);
+
+#line 94 "src/std/Array.pv"
+void Array_MatchPattern__reserve(struct Array_MatchPattern* self, uintptr_t capacity);
+
+#line 103 "src/std/Array.pv"
+struct MatchPattern* Array_MatchPattern__get(struct Array_MatchPattern* self, uintptr_t index);
+
+#line 108 "src/std/Array.pv"
+uintptr_t Array_MatchPattern__append(struct Array_MatchPattern* self, struct MatchPattern value);
+
+#line 125 "src/std/Array.pv"
+uintptr_t Array_MatchPattern__prepend(struct Array_MatchPattern* self, struct MatchPattern value);
+
+#line 143 "src/std/Array.pv"
+bool Array_MatchPattern__remove_back(struct Array_MatchPattern* self);
+
+#line 154 "src/std/Array.pv"
+struct MatchPattern* Array_MatchPattern__back(struct Array_MatchPattern* self);
+
+#line 160 "src/std/Array.pv"
+void Array_MatchPattern__clear(struct Array_MatchPattern* self);
+
+#line 165 "src/std/Array.pv"
+void Array_MatchPattern__release(struct Array_MatchPattern* self);
+
+#line 172 "src/std/Array.pv"
+struct Array_MatchPattern Array_MatchPattern__clone(struct Array_MatchPattern* self, struct Allocator allocator);
+
+#line 184 "src/std/Array.pv"
+struct ArrayIter_ref_MatchPattern Array_MatchPattern__iter(struct Array_MatchPattern* self);
+
+#line 189 "src/std/Array.pv"
+struct slice_MatchPattern Array_MatchPattern__as_slice(struct Array_MatchPattern* self);
+
+#endif

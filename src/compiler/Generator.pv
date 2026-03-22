@@ -1426,92 +1426,102 @@ impl Generator {
 
                         self.write_indent(file);
 
-                        let pattern: &MatchPattern = &case_info.pattern;
+                        let patterns = &case_info.patterns;
+                        for (i, pattern) in patterns.iter().enumerate() {
+                            if i > 0 { fprintf(file, "\n"); }
+
+                            match pattern {
+                                MatchPattern::StaticValue(expr) => {
+                                    fprintf(file, "case ");
+                                    self.write_expression(file, expr, generics);
+                                    fprintf(file, ":");
+                                },
+                                MatchPattern::EnumVariant(type, enum_variant, _) => {
+                                    fprintf(file, "case ");
+                                    self.write_enum_variant_name(file, type, enum_variant);
+                                    fprintf(file, ":");
+                                },
+                                MatchPattern::EnumCValue(enum_variant) => {
+                                    fprintf(file, "case ");
+
+                                    let enum_info = enum_variant.parent;
+                                    if !enum_info.parent.is_none() {
+                                        let type_name = self.naming_decl.get_type_name(&Type::EnumC(enum_info), generics.self_type, generics);
+                                        self.write_str(file, type_name.as_str());
+                                        type_name.release();
+                                        // self.write_type(file, &Type::EnumC(enum_info), generics);
+                                        fprintf(file, "::");
+                                    }
+
+                                    self.write_str(file, enum_variant.name);
+                                    fprintf(file, ":");
+                                },
+                                MatchPattern::TypeId(&type) => {
+                                    fprintf(file, "case ");
+                                    self.write_typeid(file, type, generics);
+                                    fprintf(file, ":");
+                                },
+                                MatchPattern::Default => {
+                                    fprintf(file, "default:");
+                                },
+                            }
+                        }
                         
-                        match pattern {
-                            MatchPattern::StaticValue(name) => {
-                                fprintf(file, "case ");
-                                self.write_token(file, name);
-                                fprintf(file, ": {\n");
-                                self.indent += 1;
-                            },
-                            MatchPattern::EnumVariant(enum_variant, &parameters) => {
-                                fprintf(file, "case ");
-                                self.write_enum_variant_name(file, generics.self_type, enum_variant);
-                                fprintf(file, ": {\n");
-                                self.indent += 1;
+                        fprintf(file, " {\n");
+                        self.indent += 1;
 
-                                let types = &enum_variant.types;
+                        for pattern in patterns {
+                            match pattern {
+                                MatchPattern::StaticValue(_) => {},
+                                MatchPattern::EnumVariant(_, enum_variant, &parameters) => {
+                                    let types = &enum_variant.types;
 
-                                let param_i: usize = 0;
-                                for param_iter in parameters {
-                                    if param_iter.variable.eq(TokenType::Identifier, "_") {
+                                    let param_i: usize = 0;
+                                    for param_iter in parameters {
+                                        if param_iter.variable.eq(TokenType::Identifier, "_") {
+                                            param_i += 1;
+                                            continue;
+                                        }
+
+                                        let param_type = types.data + param_i;
+                                        let variable_expression: &Expression = expression;
+                                        let accessor = String::new(self.allocator);
+
+                                        accessor.append_str_lowercase(enum_variant.name.value);
+                                        accessor.append("_value");
+
+                                        if types.length > 1 {
+                                            accessor.append("._");
+                                            accessor.append_usize(param_i);
+                                        }
+
+                                        variable_expression = Expression::make(self.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
+
+                                        let name = param_iter.variable;
+
+                                        self.write_line_directive(file, block.context, name);
+
+                                        self.write_indent(file);
+                                        self.write_type(file, param_type, generics);
+                                        if param_iter.ref { fprintf(file, "*"); }
+
+                                        fprintf(file, " ");
+
+                                        self.write_token(file, name);
+                                        fprintf(file, " = ");
+
+                                        if param_iter.ref { fprintf(file, "&"); }
+                                        self.write_expression(file, variable_expression, generics);
+
+                                        fprintf(file, ";\n");
+
                                         param_i += 1;
-                                        continue;
                                     }
-
-                                    let param_type = types.data + param_i;
-                                    let variable_expression: &Expression = expression;
-                                    let accessor = String::new(self.allocator);
-
-                                    accessor.append_str_lowercase(enum_variant.name.value);
-                                    accessor.append("_value");
-
-                                    if types.length > 1 {
-                                        accessor.append("._");
-                                        accessor.append_usize(param_i);
-                                    }
-
-                                    variable_expression = Expression::make(self.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
-
-                                    let name = param_iter.variable;
-
-                                    self.write_line_directive(file, block.context, name);
-
-                                    self.write_indent(file);
-                                    self.write_type(file, param_type, generics);
-                                    if param_iter.ref { fprintf(file, "*"); }
-
-                                    fprintf(file, " ");
-
-                                    self.write_token(file, name);
-                                    fprintf(file, " = ");
-
-                                    if param_iter.ref { fprintf(file, "&"); }
-                                    self.write_expression(file, variable_expression, generics);
-
-                                    fprintf(file, ";\n");
-
-                                    param_i += 1;
-                                }
-                            },
-                            MatchPattern::EnumCValue(enum_variant) => {
-                                fprintf(file, "case ");
-
-                                let enum_info = enum_variant.parent;
-                                if !enum_info.parent.is_none() {
-                                    let type_name = self.naming_decl.get_type_name(&Type::EnumC(enum_info), generics.self_type, generics);
-                                    self.write_str(file, type_name.as_str());
-                                    type_name.release();
-                                    // self.write_type(file, &Type::EnumC(enum_info), generics);
-                                    fprintf(file, "::");
-                                }
-
-                                self.write_str(file, enum_variant.name);
-                                fprintf(file, ": {\n");
-
-                                self.indent += 1;
-                            },
-                            MatchPattern::TypeId(&type) => {
-                                fprintf(file, "case ");
-                                self.write_typeid(file, type, generics);
-                                fprintf(file, ": {\n");
-                                self.indent += 1;
-                            },
-                            MatchPattern::Default => {
-                                fprintf(file, "default: {\n");
-                                self.indent += 1;
-                            },
+                                },
+                                MatchPattern::EnumCValue(_) => {},
+                                MatchPattern::TypeId(_) => {},
+                                MatchPattern::Default => {},
+                            }
                         }
 
                         self.function_context.push_scope(true, false);
@@ -1916,8 +1926,14 @@ impl Generator {
                     self.add_expression_includes(includes, condition, generics);
 
                     for case_info in cases {
-                        if case_info.type != 0 && (&condition.return_type) != case_info.type {
-                            self.add_type_include(includes, 0, includes, case_info.type, generics);
+                        for pattern in case_info.patterns {
+                            match pattern {
+                                MatchPattern::Default => {},
+                                MatchPattern::StaticValue(expr) => { self.add_expression_includes(includes, expr, generics); },
+                                MatchPattern::EnumVariant(type, _, _) => { self.add_type_include(includes, 0, includes, type, generics); },
+                                MatchPattern::EnumCValue(enum_value) => { self.add_type_include(includes, 0, includes, &Type::EnumC(enum_value.parent), generics); },
+                                MatchPattern::TypeId(_) => {},
+                            }
                         }
 
                         self.add_block_includes(includes, case_info.body, generics);

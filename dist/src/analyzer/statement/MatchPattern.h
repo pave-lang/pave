@@ -5,7 +5,8 @@
 #include <analyzer/types/EnumVariantParameter.h>
 #include <analyzer/types/Type.h>
 
-struct Token;
+struct Expression;
+struct Type;
 struct EnumVariant;
 struct EnumCValue;
 
@@ -20,8 +21,8 @@ struct MatchPattern {
     } type;
 
     union {
-        struct Token* staticvalue_value;
-        struct { struct EnumVariant* _0; struct Array_EnumVariantParameter _1; } enumvariant_value;
+        struct Expression* staticvalue_value;
+        struct { struct Type* _0; struct EnumVariant* _1; struct Array_EnumVariantParameter _2; } enumvariant_value;
         struct EnumCValue* enumcvalue_value;
         struct Type typeid_value;
     };
