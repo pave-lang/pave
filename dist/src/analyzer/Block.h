@@ -47,19 +47,19 @@ bool Block__parse_if_statement(struct Block* self, struct Context* context, stru
 #line 198 "src/analyzer/Block.pv"
 bool Block__parse_match_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 374 "src/analyzer/Block.pv"
+#line 370 "src/analyzer/Block.pv"
 bool Block__parse_while_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 390 "src/analyzer/Block.pv"
+#line 386 "src/analyzer/Block.pv"
 bool Block__parse_for_variable(struct Block* self, struct Context* context, struct Array_ForVariable* variables);
 
-#line 402 "src/analyzer/Block.pv"
+#line 398 "src/analyzer/Block.pv"
 bool Block__parse_for_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 530 "src/analyzer/Block.pv"
+#line 526 "src/analyzer/Block.pv"
 bool Block__parse_defer_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 561 "src/analyzer/Block.pv"
+#line 557 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif

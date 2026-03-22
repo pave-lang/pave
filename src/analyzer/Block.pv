@@ -215,11 +215,15 @@ impl Block {
 
             let type: &Type = 0;
 
-            if context.check_value(TokenType::Identifier, "typeid") {
-                let expression = Expression::parse(context, generics);
-                if !expression { return false; }
+            if context.check_next(TokenType::Identifier, "typeid") {
+                if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
-                pattern = MatchPattern::Expression(expression);
+                let type: Type;
+                if !context.parse_type(&type, generics) { return false; }
+
+                if !context.expect_value(TokenType::Symbol, ")") { return false; }
+
+                pattern = MatchPattern::TypeId(type);
             } else if !context.check_next(TokenType::Identifier, "_") {
                 let token = context.current();
                 if token == 0 { return false; }
@@ -239,14 +243,6 @@ impl Block {
                     }
 
                     if !context.expect_value(TokenType::Symbol, "::") { return false; }
-
-                    // let type_find = context.module.find_type(token.value);
-                    // if token.value.eq("Self") || (type_find != 0 && type_find.is_enum()) {
-                    //     type = context.parse_type2(generics);
-                    //     if !context.expect_value(TokenType::Symbol, "::") { return false; }
-                    // } else {
-                    //     type = &expression.return_type;
-                    // }
                     
                     let enum_variant_token = context.expect(TokenType::Identifier);
                     if enum_variant_token == 0 { return false; }

@@ -9,5 +9,5 @@ enum MatchPattern {
     StaticValue(&Token),
     EnumVariant(&EnumVariant, Array<EnumVariantParameter>),
     EnumCValue(&EnumCValue),
-    Expression(&Expression),
+    TypeId(Type),
 }

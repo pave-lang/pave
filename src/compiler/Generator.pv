@@ -1502,9 +1502,9 @@ impl Generator {
 
                                 self.indent += 1;
                             },
-                            MatchPattern::Expression(expr) => {
+                            MatchPattern::TypeId(&type) => {
                                 fprintf(file, "case ");
-                                self.write_expression(file, expr, generics);
+                                self.write_typeid(file, type, generics);
                                 fprintf(file, ": {\n");
                                 self.indent += 1;
                             },

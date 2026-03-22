@@ -2803,13 +2803,13 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                             self->indent += 1;
                         } break;
                         #line 1505 "src/compiler/Generator.pv"
-                        case MATCH_PATTERN__EXPRESSION: {
+                        case MATCH_PATTERN__TYPE_ID: {
                             #line 1505 "src/compiler/Generator.pv"
-                            struct Expression* expr = pattern->expression_value;
+                            struct Type* type = &pattern->typeid_value;
                             #line 1506 "src/compiler/Generator.pv"
                             fprintf(file, "case ");
                             #line 1507 "src/compiler/Generator.pv"
-                            Generator__write_expression(self, file, expr, generics);
+                            Generator__write_typeid(self, file, type, generics);
                             #line 1508 "src/compiler/Generator.pv"
                             fprintf(file, ": {\n");
                             #line 1509 "src/compiler/Generator.pv"
