@@ -292,6 +292,13 @@ impl Generator {
         return true;
     }
 
+    fn write_type_name(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
+        let type_name = self.naming_ident.get_type_name(type, generics.self_type, generics);
+        self.write_str(file, type_name.as_str());
+        type_name.release();
+        return true;
+    }
+
     fn write_variable_decl(&self, file: &FILE, name: str, type: &Type, generics: &GenericMap) -> bool {
         let self_type = type;
         if generics != 0 { self_type = generics.self_type; }
@@ -2694,9 +2701,8 @@ impl Generator {
             let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
             if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
 
-            if trait_info != 0 {
-                let type = self.allocator.store(Type::Trait(trait_info, generics));
-                self.add_type_include(includes, refs, includes, type, generics);
+            if impl_info.has_trait {
+                self.add_type_include(includes, refs, includes, &impl_info.trait_type, generics);
             }
 
             for (_, &func_info) in impl_info.functions {
@@ -2920,7 +2926,7 @@ impl Generator {
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
             fprintf(file, "extern struct ");
-            self.write_token(file, trait_info.name);
+            self.write_type_name(file, trait_entry.1, generics);
             fprintf(file, "VTable ");
             self.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__");
@@ -3584,7 +3590,7 @@ impl Generator {
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
             fprintf(code_file, "struct ");
-            self.write_token(code_file, trait_info.name);
+            self.write_type_name(code_file, trait_entry.1, generics);
             fprintf(code_file, "VTable ");
             self.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__");
