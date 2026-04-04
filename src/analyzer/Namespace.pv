@@ -123,6 +123,18 @@ impl Namespace {
         return true;
     }
 
+    fn prefill_types_impl(&self) -> bool {
+        for (_, child) in self.children {
+            child.prefill_types_impl();
+        }
+
+        for (_, module) in self.modules {
+            module.prefill_types_impl();
+        }
+
+        return true;
+    }
+
     fn parse_declarations(&self) -> bool {
         for (_, module) in self.modules {
             module.parse_declarations();

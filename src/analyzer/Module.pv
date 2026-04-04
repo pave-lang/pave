@@ -295,16 +295,22 @@ impl Module {
             }
         }
 
-        for impl_info in self.impls {
-            success = impl_info.prefill_types() && success;
-        }
-
         for (_, &enum_info) in self.enums {
             success = enum_info.prefill_types() && success;
         }
 
         for (_, &struct_info) in self.structs {
             success = struct_info.prefill_types() && success;
+        }
+
+        return success;
+    }
+
+    fn prefill_types_impl(&self) -> bool {
+        let success = true;
+
+        for impl_info in self.impls {
+            success = impl_info.prefill_types() && success;
         }
 
         return success;
@@ -318,66 +324,39 @@ impl Module {
         }
 
         for impl_info in self.impls {
-            if impl_info.trait_name != 0 {
-                impl_info.trait_ = self.find_trait(impl_info.trait_name.value);
-                if impl_info.trait_ == 0 {
-                    self.context.error_token(impl_info.trait_name, "Could not find trait");
-                    return false;
-                }
-            }
-
-            if impl_info.type == 0 { impl_info.type = self.find_type(impl_info.name.value); }
-            if impl_info.type == 0 {
-                self.context.error_token(impl_info.name, "Could not find type");
-                return false;
-            }
-
             match impl_info.type {
                 Type::Enum(enum_parent, _) => {
-                    impl_info.type_self = Type::Enum(enum_parent, allocator.store(GenericMap::from_generics(allocator, &impl_info.struct_generics)));
-
                     if impl_info.trait_ != 0 { enum_parent.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     enum_parent.impls.append(impl_info);
                 },
                 Type::Struct(struct_parent, _) => {
-                    impl_info.type_self = Type::Struct(struct_parent, allocator.store(GenericMap::from_generics(allocator, &impl_info.struct_generics)));
-
-                    if impl_info.trait_ != 0 { struct_parent.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    if impl_info.trait_ != 0 { struct_parent.traits.insert(impl_info.trait_.name.value, (impl_info.trait_, &impl_info.trait_type)); }
                     struct_parent.impls.append(impl_info);
                 },
                 Type::Primitive(primitive_info) => {
-                    impl_info.type_self = *impl_info.type;
-
                     if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     primitive_info.impls.append(impl_info);
                 },
                 Type::StructC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    impl_info.type_self = *impl_info.type;
-
                     if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     ctype.impls.append(impl_info);
                 },
                 Type::EnumC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    impl_info.type_self = *impl_info.type;
-
                     if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     ctype.impls.append(impl_info);
                 },
                 Type::TypedefC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    impl_info.type_self = *impl_info.type;
-
                     if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     ctype.impls.append(impl_info);
                 },
                 Type::Indirect(_) => {
-                    impl_info.type_self = *impl_info.type;
-                    self.type_impls.append(TypeImpl::new(allocator, *impl_info.type, impl_info));
+                    self.type_impls.append(TypeImpl::new(allocator, impl_info.type, impl_info));
                     self.root.hack_type_impl = self.type_impls.back();
                 },
-                _ => { self.context.error_token(impl_info.name, "TODO: Currently unimplemented"); },
+                _ => { self.context.error_token(impl_info.token, "TODO: Currently unimplemented"); },
             }
         }
 
@@ -395,7 +374,7 @@ impl Module {
                 impl_info.fill_types(parent);
 
                 for (_, &func_info) in impl_info.functions {
-                    func_info.fill_types(&impl_info.impl_generics);
+                    func_info.fill_types(&impl_info.generics);
                 }
             }
         }
@@ -408,7 +387,7 @@ impl Module {
                 impl_info.fill_types(parent);
 
                 for (_, &func_info) in impl_info.functions {
-                    func_info.fill_types(&impl_info.impl_generics);
+                    func_info.fill_types(&impl_info.generics);
                 }
             }
         }
@@ -427,7 +406,7 @@ impl Module {
             type_impl.impl_info.fill_types(parent);
 
             for (_, &func_info) in type_impl.impl_info.functions {
-                func_info.fill_types(&type_impl.impl_info.impl_generics);
+                func_info.fill_types(&type_impl.impl_info.generics);
             }
         }
 

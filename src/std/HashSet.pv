@@ -14,7 +14,7 @@ struct HashSet<T: Hash> {
     length: usize,
 }
 
-impl<T: Hash> HashSet<T: Hash> {
+impl<T: Hash> HashSet<T> {
     fn new(allocator: &ArenaAllocator) -> Self {
         let initial_capacity = 16;
         let self = Self {

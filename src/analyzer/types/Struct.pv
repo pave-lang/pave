@@ -20,7 +20,7 @@ struct Struct {
     generics: Generics,
     type: StructType,
     fields: HashMap<str, StructField>,
-    traits: HashMap<str, &Trait>,
+    traits: HashMap<str, (&Trait, &Type)>,
     impls: Array<&Impl>,
 }
 
@@ -32,7 +32,7 @@ impl Struct {
             module,
             generics: Generics::new(context.allocator),
             fields: HashMap<str, StructField>::new(context.allocator),
-            traits: HashMap<str, &Trait>::new(context.allocator),
+            traits: HashMap<str, (&Trait, &Type)>::new(context.allocator),
             impls: Array<&Impl>::new(context.allocator),
         };
     }

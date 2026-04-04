@@ -24,7 +24,8 @@
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/NamespaceCpp.h>
 #include <analyzer/Token.h>
-#include <std/HashMap_str_ref_Trait.h>
+#include <tuple_ref_Trait_ref_Type.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <analyzer/Module.h>
 
 #include <analyzer/types/Type.h>
@@ -567,7 +568,7 @@ bool Type__eq_struct(struct Type* self, struct Struct* other_struct, struct Arra
             #line 280 "src/analyzer/types/Type.pv"
             struct Token* trait_name = trait_info->name;
             #line 281 "src/analyzer/types/Type.pv"
-            return HashMap_str_ref_Trait__find(&other_struct->traits, &trait_name->value) != 0;
+            return HashMap_str_tuple_ref_Trait_ref_Type__find(&other_struct->traits, &trait_name->value) != 0;
         } break;
         #line 283 "src/analyzer/types/Type.pv"
         case TYPE__PRIMITIVE: {

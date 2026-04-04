@@ -83,24 +83,27 @@ bool Root__fill_namespace(struct Root* self);
 bool Root__prefill_types(struct Root* self);
 
 #line 173 "src/analyzer/Root.pv"
+bool Root__prefill_types_impl(struct Root* self);
+
+#line 181 "src/analyzer/Root.pv"
 bool Root__parse_declarations(struct Root* self);
 
-#line 192 "src/analyzer/Root.pv"
+#line 200 "src/analyzer/Root.pv"
 bool Root__parse_functions(struct Root* self);
 
-#line 206 "src/analyzer/Root.pv"
+#line 214 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name);
 
-#line 210 "src/analyzer/Root.pv"
+#line 218 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name);
 
-#line 216 "src/analyzer/Root.pv"
+#line 224 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name);
 
-#line 220 "src/analyzer/Root.pv"
+#line 228 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, char const* name);
 
-#line 224 "src/analyzer/Root.pv"
+#line 232 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
 
 #endif

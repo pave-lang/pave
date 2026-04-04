@@ -59,18 +59,21 @@ bool Namespace__fill_namespace(struct Namespace* self);
 bool Namespace__prefill_types(struct Namespace* self);
 
 #line 126 "src/analyzer/Namespace.pv"
-bool Namespace__parse_declarations(struct Namespace* self);
+bool Namespace__prefill_types_impl(struct Namespace* self);
 
 #line 138 "src/analyzer/Namespace.pv"
-bool Namespace__parse_functions(struct Namespace* self);
+bool Namespace__parse_declarations(struct Namespace* self);
 
 #line 150 "src/analyzer/Namespace.pv"
+bool Namespace__parse_functions(struct Namespace* self);
+
+#line 162 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_type(struct Namespace* self, struct str name);
 
-#line 154 "src/analyzer/Namespace.pv"
+#line 166 "src/analyzer/Namespace.pv"
 struct Trait* Namespace__find_trait(struct Namespace* self, struct str name);
 
-#line 160 "src/analyzer/Namespace.pv"
+#line 172 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_function(struct Namespace* self, struct str name);
 
 #endif

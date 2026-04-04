@@ -7,13 +7,15 @@
 #include <std/HashMap_str_StructField.h>
 #include <std/str.h>
 #include <analyzer/types/StructField.h>
-#include <std/HashMap_str_ref_Trait.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
+#include <tuple_ref_Trait_ref_Type.h>
 #include <std/Array_ref_Impl.h>
 #include <stdbool.h>
 
 struct Token;
 struct Module;
 struct Trait;
+struct Type;
 struct Impl;
 struct Struct;
 
@@ -26,7 +28,7 @@ struct Struct {
     struct Generics generics;
     enum StructType type;
     struct HashMap_str_StructField fields;
-    struct HashMap_str_ref_Trait traits;
+    struct HashMap_str_tuple_ref_Trait_ref_Type traits;
     struct Array_ref_Impl impls;
 };
 

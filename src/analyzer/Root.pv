@@ -170,20 +170,28 @@ impl Root {
         return true;
     }
 
-    fn parse_declarations(&self) -> bool {
+    fn prefill_types_impl(&self) -> bool {
         for (_, child) in self.children {
-            child.parse_declarations();
+            child.prefill_types_impl();
         }
 
+        return true;
+    }
+
+    fn parse_declarations(&self) -> bool {
         for (_, &primitive_info) in self.primitives {
             for (impl_index, *impl_info) in primitive_info.impls.iter().enumerate() {
                 let parent = FunctionParent::Primitive(primitive_info, impl_index, impl_info.trait_);
                 impl_info.fill_types(parent);
 
                 for (_, &func_info) in impl_info.functions {
-                    func_info.fill_types(&impl_info.impl_generics);
+                    func_info.fill_types(&impl_info.generics);
                 }
             }
+        }
+
+        for (_, child) in self.children {
+            child.parse_declarations();
         }
 
         return true;

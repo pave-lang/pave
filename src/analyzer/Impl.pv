@@ -6,30 +6,26 @@ enum ImplNode {
 }
 
 struct Impl {
-    name: &Token,
-    type: &Type,
+    type: Type,
     context: &Context,
-    declaration_start: usize,
-    declaration_end: usize,
+    token: &Token,
     token_start: usize,
     token_end: usize,
-    trait_name: &Token,
-    trait_type: &Type,
-    impl_generics: Generics,
-    trait_generics: Generics,
-    struct_generics: Generics,
+    has_trait: bool,
     trait_: &Trait,
+    trait_name: &Token,
+    trait_type: Type,
+    generics: Generics,
     nodes: Array<ImplNode>,
     functions: HashMap<str, Function>,
-    type_self: Type,
 }
 
 impl Impl {
     fn parse(context: &Context) -> Impl {
         let node: Impl = Impl {
             context,
-            impl_generics: Generics::new(context.allocator),
-            struct_generics: Generics::new(context.allocator),
+            token: context.current(),
+            generics: Generics::new(context.allocator),
             nodes: Array<ImplNode>::new(context.allocator),
             functions: HashMap<str, Function>::new(context.allocator),
         };
@@ -37,45 +33,51 @@ impl Impl {
         if !context.expect_value(TokenType::Keyword, "impl") { return node; }
 
         node.token_start = context.pos;
-        context.skip_to_symbol("{");
+        node.skip_to_open_brace();
         context.skip_brackets("{", "}");
         node.token_end = context.pos;
-    
+
         return node;
+    }
+
+    fn skip_to_open_brace(&self) -> bool {
+        let context = self.context;
+
+        while context.pos < context.length && !context.check_value(TokenType::Symbol, "{") {
+            if context.check_value(TokenType::Keyword, "for") {
+                self.has_trait = true;
+            }
+
+            context.next_token();
+        }
+
+        return context.check_value(TokenType::Symbol, "{");
     }
 
     fn prefill_types(&self) -> bool {
         let context = self.context;
         context.pos = self.token_start;
 
-        if context.check_value(TokenType::Symbol, "<") && !self.impl_generics.parse(context) { return false; }
+        if context.check_value(TokenType::Symbol, "<") && !self.generics.parse(context) { return false; }
 
-        if context.check(TokenType::Identifier) {
-            self.name = context.expect(TokenType::Identifier);
-            if self.name == 0 { return false; }
-            if context.check_value(TokenType::Symbol, "<") && !self.struct_generics.parse(context) { return false; }
-        } else {
-            self.type = context.allocator.alloc(sizeof(Type));
-            if !context.parse_type(self.type, &self.impl_generics) { return false; }
-        }
+        if self.has_trait {
+            if !context.parse_type_trait(&self.trait_type, &self.generics) { return false; }
 
-        if context.check_value(TokenType::Symbol, "<") && !self.struct_generics.parse(context) { return false; }
-
-        if context.check_next(TokenType::Keyword, "for") {
-            self.trait_name = self.name;
-            self.trait_type = self.type;
-            self.trait_generics = self.struct_generics;
-            self.struct_generics = Generics::new(context.allocator);
-
-            if context.check(TokenType::Identifier) {
-                self.name = context.expect(TokenType::Identifier);
-                if self.name == 0 { return false; }
-                if context.check_value(TokenType::Symbol, "<") && !self.struct_generics.parse(context) { return false; }
-            } else {
-                self.type = context.allocator.alloc(sizeof(Type));
-                if !context.parse_type(self.type, &self.impl_generics) { return false; }
+            match self.trait_type {
+                Type::Trait(trait_info, _) => {
+                    self.trait_ = trait_info;
+                    self.trait_name = trait_info.name;
+                },
+                _ => {
+                    context.error("Expected trait type in impl declaration");
+                    return false;
+                },
             }
+
+            if !context.expect_value(TokenType::Keyword, "for") { return false; }
         }
+
+        if !context.parse_type(&self.type, &self.generics) { return false; }
 
         self.token_start = context.pos;
 
@@ -110,10 +112,10 @@ impl Impl {
     }
 
     fn parse_functions(&self) -> bool {
-        self.context.type_self = &self.type_self;
+        self.context.type_self = &self.type;
 
         for (_, &function) in self.functions {
-            function.parse_function(&self.impl_generics);
+            function.parse_function(&self.generics);
         }
 
         self.context.type_self = &self.context.root.type_self;

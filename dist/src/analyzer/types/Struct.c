@@ -6,8 +6,10 @@
 #include <std/HashMap_str_StructField.h>
 #include <std/str.h>
 #include <analyzer/types/StructField.h>
-#include <std/HashMap_str_ref_Trait.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <analyzer/types/Trait.h>
+#include <analyzer/types/Type.h>
+#include <tuple_ref_Trait_ref_Type.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/Impl.h>
 #include <std/String.h>
@@ -16,7 +18,6 @@
 #include <analyzer/Token.h>
 #include <stdint.h>
 #include <analyzer/types/StructType.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/Root.h>
 #include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionType.h>
@@ -34,7 +35,7 @@ struct Struct Struct__new(struct Module* module) {
         .module = module,
         .generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
         .fields = HashMap_str_StructField__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
-        .traits = HashMap_str_ref_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .traits = HashMap_str_tuple_ref_Trait_ref_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
         .impls = Array_ref_Impl__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
     };
 }

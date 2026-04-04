@@ -31,7 +31,7 @@ struct HashMap<K: Hash, V> {
     length: usize,
 }
 
-impl<K: Hash, V> HashMap<K: Hash, V> {
+impl<K: Hash, V> HashMap<K, V> {
     fn new(allocator: &dyn Allocator) -> Self {
         let initial_capacity = 16;
         let self = Self {

@@ -2731,12 +2731,8 @@ impl Generator {
             self.add_type_include(includes, refs, includes, &field.type, generics);
         }
 
-        for (_, trait_info) in struct_info.traits {
-            let trait_generic_map = self.allocator.store(GenericMap {});
-            let trait_type = self.allocator.store(Type::Trait(trait_info, trait_generic_map));
-            trait_generic_map.self_type = trait_type;
-
-            self.add_type_include(includes, refs, includes, trait_type, trait_generic_map);
+        for (_, trait_entry) in struct_info.traits {
+            self.add_type_include(includes, refs, includes, trait_entry.1, generics);
         }
 
         return true;
@@ -2921,7 +2917,8 @@ impl Generator {
 
         if struct_info.traits.length > 0 { fprintf(file, "\n"); }
 
-        for (_, trait_info) in struct_info.traits {
+        for (_, trait_entry) in struct_info.traits {
+            let trait_info = trait_entry.0;
             fprintf(file, "extern struct ");
             self.write_token(file, trait_info.name);
             fprintf(file, "VTable ");
@@ -3584,7 +3581,8 @@ impl Generator {
             fprintf(code_file, "\n");
         }
 
-        for (_, trait_info) in struct_info.traits {
+        for (_, trait_entry) in struct_info.traits {
+            let trait_info = trait_entry.0;
             fprintf(code_file, "struct ");
             self.write_token(code_file, trait_info.name);
             fprintf(code_file, "VTable ");
