@@ -6,11 +6,13 @@ ifeq ($(OS),Windows_NT)
 	CFLAGS := -std=c99 -Wall -D_CRT_SECURE_NO_WARNINGS -I"C:/Program Files/LLVM/include"
 	LDFLAGS := -L"C:/Program Files/LLVM/lib" -llibclang
 	EXE := .exe
+	DIST_COPY := build/2/pavec$(EXE) build/2/pavec.pdb
 else
 	GEN_FLAGS := std=src/std analyzer=src/analyzer -- -I"/lib/llvm-20/include"
 	CFLAGS := -std=c99 -Wall -I"/lib/llvm-20/include" -fsanitize=address -fno-omit-frame-pointer
 	LDFLAGS := -L"/lib/llvm-20/lib" -lclang -fsanitize=address -fno-omit-frame-pointer
 	EXE :=
+	DIST_COPY := build/2/pavec$(EXE)
 endif
 
 .PHONY: all ls ls-release examples clean
@@ -37,7 +39,7 @@ all:
 	@echo ""
 	@echo "=== Copying final build to dist ==="
 	rm -rf dist/src
-	cp -r build/2/pavec build/2/src dist/
+	cp -r $(DIST_COPY) build/2/src dist/
 	@echo ""
 	@echo "Bootstrap complete!"
 
