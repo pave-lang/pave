@@ -322,16 +322,49 @@ impl Module {
         for (_, &func_info) in self.functions {
             func_info.fill_types(0);
         }
+        
+
+        for (_, &enum_info) in self.enums {
+            enum_info.fill_variants();
+        }
+
+        for (_, &struct_info) in self.structs {
+            struct_info.fill_types();
+        }
+
+        for (_, &trait_info) in self.traits {
+            let parent = FunctionParent::Trait(trait_info);
+            trait_info.fill_types(parent);
+
+
+            for (_, &func_info) in trait_info.functions {
+                func_info.fill_types(&trait_info.generics);
+            }
+        }
 
         for impl_info in self.impls {
             match impl_info.type {
-                Type::Enum(enum_parent, _) => {
-                    if impl_info.trait_ != 0 { enum_parent.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
-                    enum_parent.impls.append(impl_info);
+                Type::Enum(enum_info, _) => {
+                    if impl_info.trait_ != 0 { enum_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    let impl_index = enum_info.impls.append(impl_info);
+
+                    let parent = FunctionParent::Enum(enum_info, impl_index, impl_info.trait_);
+                    impl_info.fill_types(parent);
+
+                    for (_, &func_info) in impl_info.functions {
+                        func_info.fill_types(&impl_info.generics);
+                    }
                 },
-                Type::Struct(struct_parent, _) => {
-                    if impl_info.trait_ != 0 { struct_parent.traits.insert(impl_info.trait_.name.value, (impl_info.trait_, &impl_info.trait_type)); }
-                    struct_parent.impls.append(impl_info);
+                Type::Struct(struct_info, _) => {
+                    if impl_info.trait_ != 0 { struct_info.traits.insert(impl_info.trait_.name.value, (impl_info.trait_, &impl_info.trait_type)); }
+                    let impl_index = struct_info.impls.append(impl_info);
+                    let parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
+                    impl_info.fill_types(parent);
+
+                    for (_, &func_info) in impl_info.functions {
+                        func_info.fill_types(&impl_info.generics);
+                    }
+
                 },
                 Type::Primitive(primitive_info) => {
                     if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
@@ -360,47 +393,6 @@ impl Module {
             }
         }
 
-        for (_, &enum_info) in self.enums {
-            let generics = allocator.store(GenericMap {});
-            let self_type: &Type = allocator.alloc(sizeof(Type));
-            generics.self_type = self_type;
-            *self_type = Type::Enum(enum_info, generics);
-            enum_info.context.type_self = self_type;
-
-            enum_info.fill_variants();
-
-            for (impl_index, *impl_info) in enum_info.impls.iter().enumerate() {
-                let parent = FunctionParent::Enum(enum_info, impl_index, impl_info.trait_);
-                impl_info.fill_types(parent);
-
-                for (_, &func_info) in impl_info.functions {
-                    func_info.fill_types(&impl_info.generics);
-                }
-            }
-        }
-
-        for (_, &struct_info) in self.structs {
-            struct_info.fill_types();
-
-            for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
-                let parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
-                impl_info.fill_types(parent);
-
-                for (_, &func_info) in impl_info.functions {
-                    func_info.fill_types(&impl_info.generics);
-                }
-            }
-        }
-
-        for (_, &trait_info) in self.traits {
-            let parent = FunctionParent::Trait(trait_info);
-            trait_info.fill_types(parent);
-
-            for (_, &func_info) in trait_info.functions {
-                func_info.fill_types(&trait_info.generics);
-            }
-        }
-
         for type_impl in self.type_impls {
             let parent = FunctionParent::Type(&type_impl.type, 0, 0);
             type_impl.impl_info.fill_types(parent);
@@ -422,12 +414,6 @@ impl Module {
         }
 
         for (_, &enum_info) in self.enums {
-            let generics = allocator.store(GenericMap {});
-            let self_type: &Type = allocator.alloc(sizeof(Type));
-            generics.self_type = self_type;
-            *self_type = Type::Enum(enum_info, generics);
-            enum_info.context.type_self = self_type;
-
             for *impl_info in enum_info.impls {
                 impl_info.parse_functions();
             }
