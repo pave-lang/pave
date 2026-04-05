@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#line 132 "src/std/ArenaAllocator.pv"
+#line 131 "src/std/ArenaAllocator.pv"
 struct ArenaAllocation {
     uintptr_t size;
 };

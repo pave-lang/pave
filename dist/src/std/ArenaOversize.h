@@ -9,7 +9,7 @@ struct ArenaOversize;
 #include <stdlib.h>
 #include <string.h>
 
-#line 20 "src/std/ArenaAllocator.pv"
+#line 19 "src/std/ArenaAllocator.pv"
 struct ArenaOversize {
     uintptr_t size;
     struct ArenaOversize* prev;

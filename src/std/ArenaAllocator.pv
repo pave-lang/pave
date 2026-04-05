@@ -10,7 +10,6 @@ struct ArenaAllocator {
 }
 
 struct ArenaBlock {
-    allocator: &dyn Allocator,
     buffer: &u8,
     capacity: usize,
     offset: usize,
@@ -145,14 +144,6 @@ impl ArenaAllocator {
         };
     }
 
-    // fn new_ptr(allocator: &dyn Allocator, block_size: usize) -> &ArenaAllocator {
-    //     let self = ArenaAllocator::new(allocator, block_size);
-    //     let self_ptr: &Self = self.alloc(sizeof(Self));
-    //     *self_ptr = self;
-
-    //     return self_ptr;
-    // }
-
     fn destroy(&self) {
         let block = self.last_block;
 
@@ -209,7 +200,6 @@ impl Allocator for ArenaAllocator {
             let prev = oversize.prev;
 
             if ptr == oversize + 1 {
-                // fprintf(stderr, "oversize.realloc: new_size: %zu\n", new_size);
                 let old_size = oversize.size;
 
                 let new_ptr = self.alloc(new_size);
@@ -230,22 +220,15 @@ impl Allocator for ArenaAllocator {
         }
 
         let current_block: &ArenaBlock = 0;
-        if self.last_block.is_in_block(ptr) {
-            // fprintf(stderr, "last_block.realloc: new_size: %zu\n", new_size);
-            let realloc_ptr = self.last_block.realloc(ptr, new_size);
-            if realloc_ptr != 0 { return realloc_ptr; }
-            current_block = self.last_block;
-        }
-
         let block = self.last_block;
         while current_block == 0 && block != 0 {
-            let prev = block.prev;
-            
             if block.is_in_block(ptr) {
+                let realloc_ptr = block.realloc(ptr, new_size);
+                if realloc_ptr != 0 { return realloc_ptr; }
                 current_block = block;
             }
 
-            block = prev;
+            block = block.prev;
         }
 
         if current_block == 0 {
@@ -255,17 +238,10 @@ impl Allocator for ArenaAllocator {
 
         let old_size = current_block.size(ptr);
 
-        // fprintf(stderr, "realloc new allocation and copy, old_size: %zu, new_size: %zu\n", old_size, new_size);
-
         let new_ptr = self.alloc(new_size);
         if new_ptr == 0 { return 0; }
 
-        if new_size < old_size {
-            memcpy(new_ptr, ptr, new_size);
-        } else {
-            memcpy(new_ptr, ptr, old_size);
-        }
-        
+        memcpy(new_ptr, ptr, if new_size < old_size { new_size } else { old_size });
         current_block.free(ptr);
 
         return new_ptr;
