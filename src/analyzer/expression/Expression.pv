@@ -1205,8 +1205,10 @@ impl Expression {
             TokenType::Number => {
                 let primitive = "i32";
 
-                if token.value.ends_with("f") {
+                if token.value.ends_with("f") || token.value.ends_with("F") {
                     primitive = "f32";
+                } else if token.value.ends_with("u") || token.value.ends_with("U") {
+                    primitive = "u32";
                 } else if token.value.contains(".") {
                     primitive = "f64";
                 }

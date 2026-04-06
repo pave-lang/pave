@@ -483,62 +483,65 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
                 if (tokenizer.data.ptr[tokenizer.pos] == 'f' || tokenizer.data.ptr[tokenizer.pos] == 'F') {
                     #line 307 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
+                } else if (tokenizer.data.ptr[tokenizer.pos] == 'u' || tokenizer.data.ptr[tokenizer.pos] == 'U') {
+                    #line 309 "src/analyzer/Tokenizer.pv"
+                    Tokenizer__increase_pos(&tokenizer);
                 }
             }
 
-            #line 311 "src/analyzer/Tokenizer.pv"
+            #line 313 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__NUMBER;
         } else if (Tokenizer__is_quote(&tokenizer)) {
-            #line 313 "src/analyzer/Tokenizer.pv"
+            #line 315 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_string(&tokenizer);
 
-            #line 315 "src/analyzer/Tokenizer.pv"
+            #line 317 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__STRING;
         } else if (Tokenizer__is_comment_line(&tokenizer)) {
-            #line 317 "src/analyzer/Tokenizer.pv"
+            #line 319 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_comment_line(&tokenizer);
 
-            #line 319 "src/analyzer/Tokenizer.pv"
+            #line 321 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__COMMENT;
         } else if (Tokenizer__is_comment_block(&tokenizer)) {
-            #line 321 "src/analyzer/Tokenizer.pv"
+            #line 323 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_comment_block(&tokenizer);
 
-            #line 323 "src/analyzer/Tokenizer.pv"
+            #line 325 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__COMMENT;
         } else if (Tokenizer__is_symbol(&tokenizer)) {
-            #line 325 "src/analyzer/Tokenizer.pv"
+            #line 327 "src/analyzer/Tokenizer.pv"
             if (Tokenizer__is_in_array(&tokenizer.symbols, token.value.ptr, 2)) {
-                #line 326 "src/analyzer/Tokenizer.pv"
+                #line 328 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
             }
 
-            #line 329 "src/analyzer/Tokenizer.pv"
+            #line 331 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
 
-            #line 331 "src/analyzer/Tokenizer.pv"
+            #line 333 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__SYMBOL;
         } else {
-            #line 333 "src/analyzer/Tokenizer.pv"
+            #line 335 "src/analyzer/Tokenizer.pv"
             fprintf(stderr, "Tokenizer: Unknown token type: %.*s\n", 10, tokenizer.data.ptr + tokenizer.pos);
-            #line 334 "src/analyzer/Tokenizer.pv"
+            #line 336 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
         }
 
-        #line 337 "src/analyzer/Tokenizer.pv"
-        token.value.length = tokenizer.pos - start_pos;
-        #line 338 "src/analyzer/Tokenizer.pv"
-        token.end_line = tokenizer.line;
         #line 339 "src/analyzer/Tokenizer.pv"
+        token.value.length = tokenizer.pos - start_pos;
+        #line 340 "src/analyzer/Tokenizer.pv"
+        token.end_line = tokenizer.line;
+        #line 341 "src/analyzer/Tokenizer.pv"
         token.end_column = tokenizer.column;
 
-        #line 341 "src/analyzer/Tokenizer.pv"
+        #line 343 "src/analyzer/Tokenizer.pv"
         Array_Token__append(&tokens, token);
 
-        #line 343 "src/analyzer/Tokenizer.pv"
+        #line 345 "src/analyzer/Tokenizer.pv"
         Tokenizer__skip_whitespace(&tokenizer);
     }
 
-    #line 346 "src/analyzer/Tokenizer.pv"
+    #line 348 "src/analyzer/Tokenizer.pv"
     return tokens;
 }

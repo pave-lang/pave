@@ -305,6 +305,8 @@ impl Tokenizer {
 
                     if tokenizer.data.ptr[tokenizer.pos] == 'f' || tokenizer.data.ptr[tokenizer.pos] == 'F' {
                         tokenizer.increase_pos();
+                    } else if tokenizer.data.ptr[tokenizer.pos] == 'u' || tokenizer.data.ptr[tokenizer.pos] == 'U' {
+                        tokenizer.increase_pos();
                     }
                 }
     
