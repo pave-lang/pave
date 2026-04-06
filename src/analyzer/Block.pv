@@ -461,7 +461,12 @@ impl Block {
             _ => {},
         }
 
-        if !is_range {
+        if is_range {
+            let variable = for_statement.variables.data[0];
+            let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, 0);
+            type_name.prepend(": ");
+            context.inlay_hint(variable.name, type_name.c_str(), InlayHintKind::Type, false, false);
+        } else {
             let iter_member = context.allocator.store(*expression_first_token);
             iter_member.value = "iter";
 

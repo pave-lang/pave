@@ -60,10 +60,10 @@ bool Block__parse_for_variable(struct Block* self, struct Context* context, stru
 #line 415 "src/analyzer/Block.pv"
 bool Block__parse_for_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 543 "src/analyzer/Block.pv"
+#line 548 "src/analyzer/Block.pv"
 bool Block__parse_defer_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 574 "src/analyzer/Block.pv"
+#line 579 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif
