@@ -1744,6 +1744,8 @@ impl Generator {
     }
 
     fn add_type_include_inner(&self, includes: &HashMap<str, GeneratorInclude>, refs: &HashMap<str, GeneratorInclude>, includes_primitives: &HashMap<str, GeneratorInclude>, type: &Type, generics: &GenericMap) -> bool {
+        if type.is_unknown() { return true; }
+
         let name = self.naming_ident.get_type_name(type, generics.array.data, generics);
         let name_str = name.as_str();
 

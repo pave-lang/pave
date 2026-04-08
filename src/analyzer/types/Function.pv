@@ -187,6 +187,10 @@ impl Function {
     }
     
     fn parse_function(&self, generics: &Generics) -> bool {
+        if self.name.value.eq("write_coroutine_invoke") {
+            self.name.value.eq("write_coroutine_invoke");
+        }
+
         self.generics.parent = generics;
 
         let context = self.context;

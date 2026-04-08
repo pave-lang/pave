@@ -50,7 +50,7 @@ impl<K: Hash, V> HashMap<K, V> {
         self.fill_buckets();
     }
 
-    fn find(&self, key: &K) -> &V {
+    fn find(&self, key: &K) -> *V {
         if self.capacity == 0 { return 0; }
 
         let hash = (*key).hash();

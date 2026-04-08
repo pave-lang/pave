@@ -23,7 +23,7 @@ struct Primitive Primitive__new(struct ArenaAllocator* allocator, char const* na
 #line 19 "src/analyzer/types/Primitive.pv"
 bool Primitive__is_number(struct Primitive* self);
 
-#line 35 "src/analyzer/types/Primitive.pv"
+#line 37 "src/analyzer/types/Primitive.pv"
 bool Primitive__is_void(struct Primitive* self);
 
 #endif

@@ -1010,7 +1010,7 @@ impl Expression {
                     if !result.validate_type(context, &rhs_final.return_type, false) { return 0; }
                 }
 
-                return_type = Type::Primitive(context.module.find_primitive("bool")).to_ptr(context.allocator);
+                return_type = &context.root.type_bool;
             } else {
                 return_type = &result.return_type;
             }
@@ -1140,6 +1140,10 @@ impl Expression {
                             result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
                         },
                         Type::Generic(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
+                        Type::Unknown(_, _) => {
                             context.next_token();
                             result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
                         },

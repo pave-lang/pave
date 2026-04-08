@@ -19,6 +19,8 @@ struct Root {
     primitive_usize: &Primitive,
     primitive_void: &Primitive,
     type_void: Type,
+    type_bool: Type,
+    type_unknown: Type,
     type_self: Type,
     type_ref_self: Type,
     type_usize: Type,
@@ -66,6 +68,8 @@ impl Root {
         self.add_primitive("char");
         self.primitive_void = self.add_primitive("void");
         self.type_void = Type::Primitive(self.primitive_void);
+        self.type_bool = Type::Primitive(self.primitive_bool);
+        self.type_unknown = Type::Unknown("unknown", Array<Type> {});
         self.type_self = Type::Self;
         self.type_ref_self = Type::Indirect(Indirect::new_reference(self.allocator, self.type_self));
         self.type_usize = Type::Primitive(self.primitive_usize);

@@ -7,6 +7,7 @@
 
 struct Include;
 struct Expression;
+struct Type;
 
 #line 5 "src/analyzer/c/FunctionC.pv"
 struct FunctionC {
@@ -17,6 +18,6 @@ struct FunctionC {
 };
 
 #line 13 "src/analyzer/c/FunctionC.pv"
-struct FunctionC* FunctionC__new(struct Include* include, char const* name);
+struct FunctionC* FunctionC__new(struct Include* include, char const* name, struct Type* return_type);
 
 #endif

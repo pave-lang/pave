@@ -28,6 +28,8 @@ impl Include {
             values: HashMap<str, Type>::new(root.allocator),
         });
 
+        self.add_cxtype_primitive(CXType_Void, "void");
+
         self.add_cxtype_primitive(CXType_Bool, "bool");
 
         self.add_cxtype_primitive(CXType_Char_S, "char");
@@ -221,12 +223,12 @@ impl Include {
                     let ns_type = current_types.find(ns_name);
                     clang_disposeString(ns_spelling);
 
-                    if ns_type == 0 { return &self.root.type_void; }
+                    if ns_type == 0 { return &self.root.type_unknown; }
 
                     match ns_type {
                         Type::NamespaceCpp(ns_info) => { current_types = &ns_info.types; },
                         Type::ClassCpp(class_info) => { current_types = &class_info.types; },
-                        _ => { return &self.root.type_void; }
+                        _ => { return &self.root.type_unknown; }
                     }
                 }
 
@@ -236,7 +238,7 @@ impl Include {
                 clang_disposeString(name_spelling);
 
                 if lookup != 0 { return lookup; }
-                return &self.root.type_void;
+                return &self.root.type_unknown;
             }
 
             let name_spelling = clang_getCursorSpelling(decl);
@@ -251,11 +253,11 @@ impl Include {
             let lookup = self.types.find(name);
             clang_disposeString(name_spelling);
 
-            if lookup == 0 { return &self.root.type_void; }
+            if lookup == 0 { return &self.root.type_unknown; }
             return lookup;
         }
 
-        return &self.root.type_void;
+        return &self.root.type_unknown;
     }
 
     fn find_enum(&self, name: *const char) -> &EnumC {

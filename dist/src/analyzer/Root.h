@@ -46,6 +46,8 @@ struct Root {
     struct Primitive* primitive_usize;
     struct Primitive* primitive_void;
     struct Type type_void;
+    struct Type type_bool;
+    struct Type type_unknown;
     struct Type type_self;
     struct Type type_ref_self;
     struct Type type_usize;
@@ -58,52 +60,52 @@ struct Root {
     bool mode_cpp;
 };
 
-#line 35 "src/analyzer/Root.pv"
+#line 37 "src/analyzer/Root.pv"
 struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char* args, struct Array_ptrc_char* clang_args, struct Analysis* analysis);
 
-#line 117 "src/analyzer/Root.pv"
+#line 121 "src/analyzer/Root.pv"
 struct Primitive* Root__add_primitive(struct Root* self, char const* name);
 
-#line 121 "src/analyzer/Root.pv"
+#line 125 "src/analyzer/Root.pv"
 struct Primitive* Root__add_ctype(struct Root* self, char const* name);
 
-#line 128 "src/analyzer/Root.pv"
+#line 132 "src/analyzer/Root.pv"
 bool Root__add_namespace(struct Root* self, struct str name, struct str path);
 
-#line 142 "src/analyzer/Root.pv"
+#line 146 "src/analyzer/Root.pv"
 struct Namespace* Root__find_namespace(struct Root* self, struct str name);
 
-#line 149 "src/analyzer/Root.pv"
+#line 153 "src/analyzer/Root.pv"
 bool Root__add_use_namespaces(struct Root* self);
 
-#line 157 "src/analyzer/Root.pv"
+#line 161 "src/analyzer/Root.pv"
 bool Root__fill_namespace(struct Root* self);
 
-#line 165 "src/analyzer/Root.pv"
+#line 169 "src/analyzer/Root.pv"
 bool Root__prefill_types(struct Root* self);
 
-#line 173 "src/analyzer/Root.pv"
+#line 177 "src/analyzer/Root.pv"
 bool Root__prefill_types_impl(struct Root* self);
 
-#line 181 "src/analyzer/Root.pv"
+#line 185 "src/analyzer/Root.pv"
 bool Root__parse_declarations(struct Root* self);
 
-#line 200 "src/analyzer/Root.pv"
+#line 204 "src/analyzer/Root.pv"
 bool Root__parse_functions(struct Root* self);
 
-#line 214 "src/analyzer/Root.pv"
+#line 218 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name);
 
-#line 218 "src/analyzer/Root.pv"
+#line 222 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name);
 
-#line 224 "src/analyzer/Root.pv"
+#line 228 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name);
 
-#line 228 "src/analyzer/Root.pv"
+#line 232 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, char const* name);
 
-#line 232 "src/analyzer/Root.pv"
+#line 236 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
 
 #endif

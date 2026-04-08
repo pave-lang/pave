@@ -186,6 +186,8 @@ impl Type {
     }
 
     fn eq(&self, other: &Type) -> bool {
+        if self.is_unknown() { return true; }
+
         match other {
             Type::Indirect(indirect) => { return self.eq_indirect(indirect); },
             Type::Sequence(seq_info) => { return self.eq_sequence(seq_info); },
@@ -195,7 +197,7 @@ impl Type {
             Type::Struct(struct_info, generics) => { return self.eq_struct(struct_info, generics.array); },
             Type::Trait(trait_info, generics) => { return self.eq_trait(trait_info, generics.array); },
             Type::Generic(generic) => { return self.eq_generic(generic); },
-            Type::Unknown(name, &generics) => { return self.eq_unknown(name, generics); },
+            Type::Unknown(_, _) => { return true; },
             Type::Function(function, _) => { return self.eq_function(function); },
             Type::CoroutineInstance(function, _) => { return self.eq_coroutine_instance(function); },
             Type::Self => { return self.eq_self(); },
@@ -256,10 +258,10 @@ impl Type {
     fn eq_primitive(&self, other: &Primitive) -> bool {
         match self {
             Type::Primitive(primitive_info) => {
-                return primitive_info == 0 || other == 0 || primitive_info.name.eq(other.name) || (primitive_info.is_number() && other.is_number()) || other.is_void();
+                return (primitive_info.is_void() && other.is_void()) || (primitive_info.is_number() && other.is_number()) || (primitive_info && other && primitive_info.name.eq(other.name));
             },
             Type::Indirect(_) => { return true; },
-            _ => { return other.is_void(); },
+            _ => { return false; },
         }
     }
 
@@ -295,7 +297,6 @@ impl Type {
                 let trait_name: &Token = trait_info.name;
                 return other_struct.traits.find(&trait_name.value) != 0;
             },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
             _ => { return false; },
         }
@@ -313,7 +314,6 @@ impl Type {
                 }
                 return true;
             },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -323,20 +323,7 @@ impl Type {
     fn eq_generic(&self, other_generic: &Generic) -> bool {
         match self {
             Type::Generic(generic) => { return generic.name.value.eq(other_generic.name.value); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
-            _ => { return false; },
-        }
-
-        return false;
-    }
-
-    fn eq_unknown(&self, other_name: str, generics: &Array<Type>) -> bool {
-        match self {
-            Type::Unknown(name, _) => { return name.eq(other_name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
-            Type::Self => { return true; },
-            Type::Generic(_) => { return true; },
             _ => { return false; },
         }
 
@@ -376,7 +363,6 @@ impl Type {
     fn eq_typedef_c(&self, other: &TypedefC) -> bool {
         match self {
             Type::TypedefC(info) => { return info.name.eq(other.name) || info.type.resolve_typedef().eq(other.type.resolve_typedef()); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return self.eq(other.type); },
         }
 
@@ -386,7 +372,6 @@ impl Type {
     fn eq_enum_c(&self, other_enum: &EnumC) -> bool {
         match self {
             Type::EnumC(enum_info) => { return enum_info.name.eq(other_enum.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -396,7 +381,6 @@ impl Type {
     fn eq_struct_c(&self, other_struct: &StructC) -> bool {
         match self {
             Type::StructC(struct_info) => { return struct_info.name.eq(other_struct.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -406,7 +390,6 @@ impl Type {
     fn eq_union_c(&self, other_union: &StructC) -> bool {
         match self {
             Type::UnionC(union_info) => { return union_info.name.eq(other_union.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -416,7 +399,6 @@ impl Type {
     fn eq_class_cpp(&self, other_class: &ClassCpp) -> bool {
         match self {
             Type::ClassCpp(class_info) => { return class_info.name.eq(other_class.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -426,7 +408,6 @@ impl Type {
     fn eq_namespace_cpp(&self, other_namespace: &NamespaceCpp) -> bool {
         match self {
             Type::NamespaceCpp(namespace_info) => { return namespace_info.name.eq(other_namespace.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -436,7 +417,6 @@ impl Type {
     fn eq_function_c(&self, other_function: &FunctionC) -> bool {
         match self {
             Type::FunctionC(function) => { return function.name.eq(other_function.name); },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }
 
@@ -454,7 +434,14 @@ impl Type {
         if self == 0 { return true; }
 
         match self {
-            Type::Primitive(primitive_info) => { return primitive_info == 0 || primitive_info.is_void(); },
+            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
+            _ => { return false; },
+        }
+    }
+
+    fn is_unknown(&self) -> bool {
+        match self {
+            Type::Unknown(_, _) => { return true; },
             _ => { return false; },
         }
     }
