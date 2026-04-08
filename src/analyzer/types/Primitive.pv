@@ -17,8 +17,6 @@ impl Primitive {
     }
 
     fn is_number(&self) -> bool {
-        if self == 0 { return false; }
-
         return self.name.eq("char")
             || self.name.eq("i8")
             || self.name.eq("i16")
@@ -35,6 +33,6 @@ impl Primitive {
     }
 
     fn is_void(&self) -> bool {
-        return self == 0 || self.name.eq("void");
+        return self.name.eq("void");
     }
 }

@@ -163,7 +163,10 @@ impl Function {
     fn parse_return_type(&self, generics: &Generics) -> bool {
         let context = self.context;
 
-        if !context.check_next(TokenType::Symbol, "->") { return true; }
+        if !context.check_next(TokenType::Symbol, "->") {
+            self.return_type = self.context.root.type_void;
+            return true;
+        }
 
         return context.parse_type(&self.return_type, &self.generics);
     }
@@ -187,10 +190,6 @@ impl Function {
     }
     
     fn parse_function(&self, generics: &Generics) -> bool {
-        if self.name.value.eq("write_coroutine_invoke") {
-            self.name.value.eq("write_coroutine_invoke");
-        }
-
         self.generics.parent = generics;
 
         let context = self.context;

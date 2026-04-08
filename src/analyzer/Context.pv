@@ -392,6 +392,7 @@ impl Context {
             let sequence: &Sequence = self.allocator.alloc(sizeof(Sequence));
 
             if !self.parse_type(&sequence.element, generics) { return false; }
+            sequence.element_pointer = Type::Indirect(self.allocator.store(Indirect { type: IndirectType::Pointer, to: sequence.element }));
 
             if !self.check_next(TokenType::Symbol, ";") {
                 sequence.type = SequenceType::Slice;

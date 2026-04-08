@@ -180,6 +180,7 @@ impl IncludeContext {
         if self.types.find(name) != 0 { return; }
 
         let indirect: &Indirect = include.root.allocator.alloc(sizeof(Indirect));
+        indirect.to = include.root.type_void;
         let indirect_type = Type::Indirect(indirect);
         let typedef_ = TypedefC::new(include, name, indirect_type.to_ptr(include.root.allocator));
 
@@ -300,11 +301,6 @@ impl IncludeContext {
                     });
                 } else if pointee_type.kind == CXType_FunctionProto {
                     self.add_typedef_function_pointer(name);
-                    // let field_spelling: CXString = clang_getCursorSpelling(canonical_decl);
-                    // let field_name: *const char = include.make_string(field_spelling);
-                    // clang_disposeString(field_spelling);
-
-                    // fprintf(stderr, "Info: %d %s %s\n", pointee_type.kind, name, field_name);
                 }
                 return CXChildVisit_Continue;
             // } else if canonical_type.kind == CXCursor_TypedefDecl {

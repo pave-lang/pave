@@ -224,114 +224,110 @@ bool Function__parse_return_type(struct Function* self, struct Generics* generic
 
     #line 166 "src/analyzer/types/Function.pv"
     if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, "->")) {
-        #line 166 "src/analyzer/types/Function.pv"
+        #line 167 "src/analyzer/types/Function.pv"
+        self->return_type = self->context->root->type_void;
+        #line 168 "src/analyzer/types/Function.pv"
         return true;
     }
 
-    #line 168 "src/analyzer/types/Function.pv"
+    #line 171 "src/analyzer/types/Function.pv"
     return Context__parse_type(context, &self->return_type, &self->generics);
 }
 
-#line 171 "src/analyzer/types/Function.pv"
+#line 174 "src/analyzer/types/Function.pv"
 bool Function__fill_types(struct Function* self, struct Generics* generics) {
-    #line 172 "src/analyzer/types/Function.pv"
+    #line 175 "src/analyzer/types/Function.pv"
     self->generics.parent = generics;
 
-    #line 174 "src/analyzer/types/Function.pv"
+    #line 177 "src/analyzer/types/Function.pv"
     struct Context* context = self->context;
-    #line 175 "src/analyzer/types/Function.pv"
+    #line 178 "src/analyzer/types/Function.pv"
     context->pos = self->declaration_start;
 
-    #line 177 "src/analyzer/types/Function.pv"
-    if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "<") && !Generics__parse(&self->generics, context)) {
-        #line 177 "src/analyzer/types/Function.pv"
-        return false;
-    }
-
-    #line 179 "src/analyzer/types/Function.pv"
-    if (!Function__parse_parameters(self, &self->generics)) {
-        #line 179 "src/analyzer/types/Function.pv"
-        return false;
-    }
     #line 180 "src/analyzer/types/Function.pv"
-    if (!Function__parse_return_type(self, &self->generics)) {
+    if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "<") && !Generics__parse(&self->generics, context)) {
         #line 180 "src/analyzer/types/Function.pv"
         return false;
     }
 
     #line 182 "src/analyzer/types/Function.pv"
-    if (context->pos != self->declaration_end) {
+    if (!Function__parse_parameters(self, &self->generics)) {
+        #line 182 "src/analyzer/types/Function.pv"
+        return false;
+    }
+    #line 183 "src/analyzer/types/Function.pv"
+    if (!Function__parse_return_type(self, &self->generics)) {
         #line 183 "src/analyzer/types/Function.pv"
         return false;
     }
 
-    #line 186 "src/analyzer/types/Function.pv"
+    #line 185 "src/analyzer/types/Function.pv"
+    if (context->pos != self->declaration_end) {
+        #line 186 "src/analyzer/types/Function.pv"
+        return false;
+    }
+
+    #line 189 "src/analyzer/types/Function.pv"
     return true;
 }
 
-#line 189 "src/analyzer/types/Function.pv"
+#line 192 "src/analyzer/types/Function.pv"
 bool Function__parse_function(struct Function* self, struct Generics* generics) {
-    #line 190 "src/analyzer/types/Function.pv"
-    if (str__eq(self->name->value, (struct str){ .ptr = "write_coroutine_invoke", .length = strlen("write_coroutine_invoke") })) {
-        #line 191 "src/analyzer/types/Function.pv"
-        str__eq(self->name->value, (struct str){ .ptr = "write_coroutine_invoke", .length = strlen("write_coroutine_invoke") });
-    }
-
-    #line 194 "src/analyzer/types/Function.pv"
+    #line 193 "src/analyzer/types/Function.pv"
     self->generics.parent = generics;
 
-    #line 196 "src/analyzer/types/Function.pv"
+    #line 195 "src/analyzer/types/Function.pv"
     struct Context* context = self->context;
-    #line 197 "src/analyzer/types/Function.pv"
+    #line 196 "src/analyzer/types/Function.pv"
     context->pos = self->token_start;
-    #line 198 "src/analyzer/types/Function.pv"
+    #line 197 "src/analyzer/types/Function.pv"
     struct Block* block = Block__new_ptr(context);
-    #line 199 "src/analyzer/types/Function.pv"
+    #line 198 "src/analyzer/types/Function.pv"
     Context__push_scope(context, 0);
-    #line 200 "src/analyzer/types/Function.pv"
+    #line 199 "src/analyzer/types/Function.pv"
     context->function = self;
 
-    #line 202 "src/analyzer/types/Function.pv"
+    #line 201 "src/analyzer/types/Function.pv"
     { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&self->parameters);
-    #line 202 "src/analyzer/types/Function.pv"
+    #line 201 "src/analyzer/types/Function.pv"
     while (ArrayIter_ref_Parameter__next(&__iter)) {
-        #line 202 "src/analyzer/types/Function.pv"
+        #line 201 "src/analyzer/types/Function.pv"
         struct Parameter* param_info = ArrayIter_ref_Parameter__value(&__iter);
 
-        #line 203 "src/analyzer/types/Function.pv"
+        #line 202 "src/analyzer/types/Function.pv"
         if (!Context__set_value(context, param_info->name, &param_info->type)) {
-            #line 203 "src/analyzer/types/Function.pv"
+            #line 202 "src/analyzer/types/Function.pv"
             Context__pop_scope(context);
-            #line 203 "src/analyzer/types/Function.pv"
+            #line 202 "src/analyzer/types/Function.pv"
             return true;
         }
     } }
 
-    #line 206 "src/analyzer/types/Function.pv"
+    #line 205 "src/analyzer/types/Function.pv"
     bool block_result = Block__parse(block, context, &self->generics, true);
-    #line 207 "src/analyzer/types/Function.pv"
+    #line 206 "src/analyzer/types/Function.pv"
     if (!block_result) {
-        #line 207 "src/analyzer/types/Function.pv"
+        #line 206 "src/analyzer/types/Function.pv"
         Context__pop_scope(context);
-        #line 207 "src/analyzer/types/Function.pv"
+        #line 206 "src/analyzer/types/Function.pv"
         return true;
     }
 
-    #line 209 "src/analyzer/types/Function.pv"
+    #line 208 "src/analyzer/types/Function.pv"
     self->body = block;
 
-    #line 211 "src/analyzer/types/Function.pv"
+    #line 210 "src/analyzer/types/Function.pv"
     if (context->pos != self->token_end) {
-        #line 211 "src/analyzer/types/Function.pv"
+        #line 210 "src/analyzer/types/Function.pv"
         Context__pop_scope(context);
-        #line 211 "src/analyzer/types/Function.pv"
+        #line 210 "src/analyzer/types/Function.pv"
         return true;
     }
 
-    #line 213 "src/analyzer/types/Function.pv"
+    #line 212 "src/analyzer/types/Function.pv"
     context->function = 0;
-    #line 214 "src/analyzer/types/Function.pv"
+    #line 213 "src/analyzer/types/Function.pv"
     Context__pop_scope(context);
-    #line 215 "src/analyzer/types/Function.pv"
+    #line 214 "src/analyzer/types/Function.pv"
     return false;
 }

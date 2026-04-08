@@ -74,7 +74,7 @@ struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeCon
 #line 177 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_typedef_pointer(struct IncludeContext* self, char const* name);
 
-#line 189 "src/analyzer/c/IncludeContext.pv"
+#line 190 "src/analyzer/c/IncludeContext.pv"
 enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

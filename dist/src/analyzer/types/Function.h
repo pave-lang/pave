@@ -56,10 +56,10 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
 #line 163 "src/analyzer/types/Function.pv"
 bool Function__parse_return_type(struct Function* self, struct Generics* generics);
 
-#line 171 "src/analyzer/types/Function.pv"
+#line 174 "src/analyzer/types/Function.pv"
 bool Function__fill_types(struct Function* self, struct Generics* generics);
 
-#line 189 "src/analyzer/types/Function.pv"
+#line 192 "src/analyzer/types/Function.pv"
 bool Function__parse_function(struct Function* self, struct Generics* generics);
 
 #endif
