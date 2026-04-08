@@ -971,6 +971,25 @@ impl Expression {
                 Type::ClassCpp(_) => {
                     return Expression::parse_class(context, token, inner, generics);
                 },
+                Type::Unknown(_, _) => {
+                    if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                    while !context.check_value(TokenType::Symbol, ")") {
+                        let argument = Expression::parse(context, generics);
+                        arguments.append(InvokeArgument { value: argument });
+
+                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                            context.expect_value(TokenType::Symbol, ")");
+                            return 0;
+                        }
+                    }
+
+                    if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                    return Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), &context.root.type_unknown);
+                },
                 _ => {
                     context.error_token(token, "Unexpected token when parsing open bracket");
                     return 0;

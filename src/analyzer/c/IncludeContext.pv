@@ -202,6 +202,9 @@ impl IncludeContext {
             let ns_context = self.add_namespace(name);
             clang_visitChildren(cursor, IncludeContext::visitor, ns_context);
             return CXChildVisit_Continue;
+        } else if kind == CXCursor_LinkageSpec {
+            clang_visitChildren(cursor, IncludeContext::visitor, self);
+            return CXChildVisit_Continue;
         } else if kind == CXCursor_FunctionDecl {
             self.add_function(name, cursor);
             return CXChildVisit_Continue;

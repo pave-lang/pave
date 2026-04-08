@@ -456,6 +456,7 @@ impl Type {
         match self {
             Type::Function(_, _) => { return true; },
             Type::FunctionC(_) => { return true; },
+            Type::Unknown(_, _) => { return true; },
             _ => { return false; },
         }
     }
