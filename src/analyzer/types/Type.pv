@@ -264,7 +264,14 @@ impl Type {
 
     fn eq_enum(&self, other_enum: &Enum, generics: Array<Type>) -> bool {
         match self {
-            Type::Enum(enum_info, _) => { return enum_info == other_enum; },
+            Type::Enum(enum_info, self_generics) => {
+                if enum_info != other_enum { return false; }
+                if self_generics.array.length != generics.length { return false; }
+                for i in 0..self_generics.array.length {
+                    if !self_generics.array.data[i].eq(&generics.data[i]) { return false; }
+                }
+                return true;
+            },
             Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             Type::Self => { return true; },
             _ => { return false; },
@@ -275,7 +282,14 @@ impl Type {
 
     fn eq_struct(&self, other_struct: &Struct, generics: Array<Type>) -> bool {
         match self {
-            Type::Struct(struct_info, _) => { return struct_info == other_struct; },
+            Type::Struct(struct_info, self_generics) => {
+                if struct_info != other_struct { return false; }
+                if self_generics.array.length != generics.length { return false; }
+                for i in 0..self_generics.array.length {
+                    if !self_generics.array.data[i].eq(&generics.data[i]) { return false; }
+                }
+                return true;
+            },
             Type::Trait(trait_info, _) => {
                 let trait_name: &Token = trait_info.name;
                 return other_struct.traits.find(&trait_name.value) != 0;
@@ -290,7 +304,14 @@ impl Type {
 
     fn eq_trait(&self, other_trait: &Trait, generics: Array<Type>) -> bool {
         match self {
-            Type::Trait(trait_info, _) => { return trait_info == other_trait; },
+            Type::Trait(trait_info, self_generics) => {
+                if trait_info != other_trait { return false; }
+                if self_generics.array.length != generics.length { return false; }
+                for i in 0..self_generics.array.length {
+                    if !self_generics.array.data[i].eq(&generics.data[i]) { return false; }
+                }
+                return true;
+            },
             Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
             _ => { return false; },
         }

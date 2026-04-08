@@ -13,9 +13,6 @@
 #include <std/ArrayIter_ref_Type.h>
 #include <std/ArrayIter_ref_Generic.h>
 #include <analyzer/Context.h>
-#include <analyzer/TokenType.h>
-#include <analyzer/Root.h>
-#include <analyzer/Module.h>
 
 #include <analyzer/types/GenericMap.h>
 
@@ -124,84 +121,31 @@ struct Type* GenericMap__get(struct GenericMap* self, struct str name) {
 }
 
 #line 72 "src/analyzer/types/GenericMap.pv"
-bool GenericMap__parse(struct GenericMap* self, struct Context* context, struct Generics* target_generics, struct Generics* generics) {
-    #line 73 "src/analyzer/types/GenericMap.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "<")) {
-        #line 73 "src/analyzer/types/GenericMap.pv"
-        return false;
-    }
-
-    #line 75 "src/analyzer/types/GenericMap.pv"
-    uintptr_t i = 0;
-    #line 76 "src/analyzer/types/GenericMap.pv"
-    while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ">")) {
-        #line 77 "src/analyzer/types/GenericMap.pv"
-        if (i >= target_generics->array.length) {
-            #line 77 "src/analyzer/types/GenericMap.pv"
-            Context__error(context, "Too many generic arguments");
-            #line 77 "src/analyzer/types/GenericMap.pv"
-            return false;
-        }
-
-        #line 79 "src/analyzer/types/GenericMap.pv"
-        struct Generic* generic = target_generics->array.data + i;
-        #line 80 "src/analyzer/types/GenericMap.pv"
-        struct Type type = context->module->root->type_void;
-        #line 81 "src/analyzer/types/GenericMap.pv"
-        if (!Context__parse_type(context, &type, generics)) {
-            #line 81 "src/analyzer/types/GenericMap.pv"
-            return false;
-        }
-
-        #line 83 "src/analyzer/types/GenericMap.pv"
-        GenericMap__insert(self, generic->name->value, type);
-
-        #line 85 "src/analyzer/types/GenericMap.pv"
-        i += 1;
-
-        #line 87 "src/analyzer/types/GenericMap.pv"
-        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
-            #line 88 "src/analyzer/types/GenericMap.pv"
-            return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">");
-        }
-    }
-
-    #line 92 "src/analyzer/types/GenericMap.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">")) {
-        #line 92 "src/analyzer/types/GenericMap.pv"
-        return false;
-    }
-
-    #line 94 "src/analyzer/types/GenericMap.pv"
-    return true;
-}
-
-#line 97 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__resolve_types(struct GenericMap* self, struct ArenaAllocator* allocator, struct GenericMap* generics) {
-    #line 98 "src/analyzer/types/GenericMap.pv"
+    #line 73 "src/analyzer/types/GenericMap.pv"
     struct GenericMap result = (struct GenericMap) {
         .array = Array_Type__clone(&self->array, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .map = HashMap_str_usize__clone(&self->map, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .self_type = self->self_type,
     };
 
-    #line 104 "src/analyzer/types/GenericMap.pv"
+    #line 79 "src/analyzer/types/GenericMap.pv"
     if (generics != 0) {
-        #line 105 "src/analyzer/types/GenericMap.pv"
+        #line 80 "src/analyzer/types/GenericMap.pv"
         result.self_type = Context__resolve_type(allocator, generics->self_type, generics, 0);
     }
 
-    #line 108 "src/analyzer/types/GenericMap.pv"
+    #line 83 "src/analyzer/types/GenericMap.pv"
     { struct ArrayIter_ref_Type __iter = Array_Type__iter(&result.array);
-    #line 108 "src/analyzer/types/GenericMap.pv"
+    #line 83 "src/analyzer/types/GenericMap.pv"
     while (ArrayIter_ref_Type__next(&__iter)) {
-        #line 108 "src/analyzer/types/GenericMap.pv"
+        #line 83 "src/analyzer/types/GenericMap.pv"
         struct Type* generic = ArrayIter_ref_Type__value(&__iter);
 
-        #line 109 "src/analyzer/types/GenericMap.pv"
+        #line 84 "src/analyzer/types/GenericMap.pv"
         *generic = *Context__resolve_type(allocator, generic, generics, 0);
     } }
 
-    #line 112 "src/analyzer/types/GenericMap.pv"
+    #line 87 "src/analyzer/types/GenericMap.pv"
     return result;
 }

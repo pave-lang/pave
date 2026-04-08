@@ -13,7 +13,6 @@ struct ArenaAllocator;
 struct Generics;
 struct Array_Type;
 struct str;
-struct Context;
 struct GenericMap;
 
 #line 4 "src/analyzer/types/GenericMap.pv"
@@ -42,9 +41,6 @@ bool GenericMap__insert(struct GenericMap* self, struct str name, struct Type ty
 struct Type* GenericMap__get(struct GenericMap* self, struct str name);
 
 #line 72 "src/analyzer/types/GenericMap.pv"
-bool GenericMap__parse(struct GenericMap* self, struct Context* context, struct Generics* target_generics, struct Generics* generics);
-
-#line 97 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__resolve_types(struct GenericMap* self, struct ArenaAllocator* allocator, struct GenericMap* generics);
 
 #endif

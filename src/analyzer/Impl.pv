@@ -118,6 +118,21 @@ impl Impl {
             function.parse_function(&self.generics);
         }
 
+        if self.has_trait && self.trait_ != 0 {
+            for (_, &trait_func) in self.trait_.functions {
+                let has_default = trait_func.token_start < trait_func.token_end;
+                if has_default { continue; }
+
+                if self.functions.find(&trait_func.name.value) == 0 {
+                    let message = String::new(self.context.allocator);
+                    message.append("Implementation is missing trait function '");
+                    message.append(trait_func.name.value);
+                    message.append("'");
+                    self.context.error_token(self.token, message.c_str());
+                }
+            }
+        }
+
         self.context.type_self = &self.context.root.type_self;
 
         return true;

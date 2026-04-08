@@ -69,31 +69,6 @@ impl GenericMap {
         return self.array.data + *index;
     }
 
-    fn parse(&self, context: &Context, target_generics: &Generics, generics: &Generics) -> bool {
-        if !context.expect_value(TokenType::Symbol, "<") { return false; }
-
-        let i: usize = 0;
-        while !context.check_next(TokenType::Symbol, ">") {
-            if i >= target_generics.array.length { context.error("Too many generic arguments"); return false; }
-
-            let generic = target_generics.array.data + i;
-            let type = context.module.root.type_void;
-            if !context.parse_type(&type, generics) { return false; }
-
-            self.insert(generic.name.value, type);
-
-            i += 1;
-
-            if !context.check_next(TokenType::Symbol, ",") {
-                return context.expect_value(TokenType::Symbol, ">");
-            }
-        }
-
-        if !context.expect_value(TokenType::Symbol, ">") { return false; }
-
-        return true;
-    }
-
     fn resolve_types(&self, allocator: &ArenaAllocator, generics: &GenericMap) -> Self {
         let result: Self = Self {
             array: self.array.clone(allocator),

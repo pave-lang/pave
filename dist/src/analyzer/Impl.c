@@ -17,6 +17,7 @@
 #include <analyzer/types/FunctionParent.h>
 #include <tuple_str_Function.h>
 #include <std/HashMapIter_str_Function.h>
+#include <std/String.h>
 
 #include <analyzer/Impl.h>
 
@@ -201,8 +202,41 @@ bool Impl__parse_functions(struct Impl* self) {
     } }
 
     #line 121 "src/analyzer/Impl.pv"
+    if (self->has_trait && self->trait_ != 0) {
+        #line 122 "src/analyzer/Impl.pv"
+        { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->trait_->functions);
+        #line 122 "src/analyzer/Impl.pv"
+        while (HashMapIter_str_Function__next(&__iter)) {
+            #line 122 "src/analyzer/Impl.pv"
+            struct Function* trait_func = &HashMapIter_str_Function__value(&__iter)->_1;
+
+            #line 123 "src/analyzer/Impl.pv"
+            bool has_default = trait_func->token_start < trait_func->token_end;
+            #line 124 "src/analyzer/Impl.pv"
+            if (has_default) {
+                #line 124 "src/analyzer/Impl.pv"
+                continue;
+            }
+
+            #line 126 "src/analyzer/Impl.pv"
+            if (HashMap_str_Function__find(&self->functions, &trait_func->name->value) == 0) {
+                #line 127 "src/analyzer/Impl.pv"
+                struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                #line 128 "src/analyzer/Impl.pv"
+                String__append(&message, (struct str){ .ptr = "Implementation is missing trait function '", .length = strlen("Implementation is missing trait function '") });
+                #line 129 "src/analyzer/Impl.pv"
+                String__append(&message, trait_func->name->value);
+                #line 130 "src/analyzer/Impl.pv"
+                String__append(&message, (struct str){ .ptr = "'", .length = strlen("'") });
+                #line 131 "src/analyzer/Impl.pv"
+                Context__error_token(self->context, self->token, String__c_str(&message));
+            }
+        } }
+    }
+
+    #line 136 "src/analyzer/Impl.pv"
     self->context->type_self = &self->context->root->type_self;
 
-    #line 123 "src/analyzer/Impl.pv"
+    #line 138 "src/analyzer/Impl.pv"
     return true;
 }

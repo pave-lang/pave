@@ -513,6 +513,19 @@ impl Context {
             _ => {},
         }
 
+        match new_type {
+            Type::Struct(struct_info, _) => {
+                if !self.validate_generic_constraints(&struct_info.generics, &generics_) { return false; }
+            },
+            Type::Enum(enum_info, _) => {
+                if !self.validate_generic_constraints(&enum_info.generics, &generics_) { return false; }
+            },
+            Type::Trait(trait_info, _) => {
+                if !self.validate_generic_constraints(&trait_info.generics, &generics_) { return false; }
+            },
+            _ => {},
+        }
+
         *type = *new_type;
         return true;
     }
@@ -827,5 +840,39 @@ impl Context {
         }
 
         return generic_inputs;
+    }
+
+    fn validate_generic_constraints(&self, generics: &Generics, usage_types: &Array<Type>) -> bool {
+        let i: usize = 0;
+        while i < generics.array.length && i < usage_types.length {
+            let generic = generics.array.data + i;
+            let usage_type = usage_types.data + i;
+
+            for *required_trait in generic.traits {
+                let implements = false;
+                match usage_type {
+                    Type::Struct(struct_info, _) => {
+                        implements = struct_info.traits.find(&required_trait.name.value) != 0;
+                    },
+                    Type::Generic(generic_info) => {
+                        for *generic_trait in generic_info.traits {
+                            if generic_trait == required_trait { implements = true; }
+                        }
+                    },
+                    _ => { implements = true; },
+                }
+                if !implements {
+                    let message = String::new(self.allocator);
+                    message.append("Type does not implement required trait '");
+                    message.append(required_trait.name.value);
+                    message.append("'");
+                    self.error(message.c_str());
+                    return false;
+                }
+            }
+
+            i += 1;
+        }
+        return true;
     }
 }
