@@ -176,6 +176,7 @@ impl Type {
         match self {
             Type::Enum(_, generics) => { return generics; },
             Type::Struct(_, generics) => { return generics; },
+            Type::Trait(_, generics) => { return generics; },
             Type::Indirect(indirect) => { return indirect.to.get_generic_map(context); },
             Type::Self => { return context.type_self.get_generic_map(context); },
             _ => {},
@@ -440,6 +441,13 @@ impl Type {
         }
 
         return false;
+    }
+
+    fn is_self(&self) -> bool {
+        match self {
+            Type::Self => { return true; },
+            _ => { return false; },
+        }
     }
 
     fn is_void(&self) -> bool {

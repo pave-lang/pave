@@ -112,7 +112,8 @@ impl Impl {
     }
 
     fn parse_functions(&self) -> bool {
-        self.context.type_self = &self.type;
+        let context = self.context;
+        context.type_self = &self.type;
 
         for (_, &function) in self.functions {
             function.parse_function(&self.generics);
@@ -121,14 +122,67 @@ impl Impl {
         if self.has_trait && self.trait_ != 0 {
             for (_, &trait_func) in self.trait_.functions {
                 let has_default = trait_func.token_start < trait_func.token_end;
-                if has_default { continue; }
 
-                if self.functions.find(&trait_func.name.value) == 0 {
+                let impl_func = self.functions.find(&trait_func.name.value);
+
+                if impl_func == 0 {
+                    if !has_default {
+                        let message = String::new(self.context.allocator);
+                        message.append("Implementation is missing trait function '");
+                        message.append(trait_func.name.value);
+                        message.append("'");
+                        self.context.error_token(self.token, message.c_str());
+                    }
+                    continue;
+                }
+
+                let generic_map = self.trait_type.get_generic_map(context);
+
+                if impl_func.parameters.length != trait_func.parameters.length {
                     let message = String::new(self.context.allocator);
-                    message.append("Implementation is missing trait function '");
+                    message.append("Implementation of trait function '");
                     message.append(trait_func.name.value);
-                    message.append("'");
-                    self.context.error_token(self.token, message.c_str());
+                    message.append("' has wrong number of parameters");
+                    self.context.error_token(impl_func.name, message.c_str());
+                } else {
+                    let i: usize = 0;
+                    while i < impl_func.parameters.length {
+                        let impl_param = impl_func.parameters.get(i);
+                        let trait_param = trait_func.parameters.get(i);
+                        
+                        let trait_param_type = &trait_param.type;
+                        if !trait_param_type.deref().is_self() { trait_param_type = Context::resolve_type(context.allocator, trait_param_type, generic_map, 0); }
+
+                        if !impl_param.type.eq(trait_param_type) {
+                            let message = String::new(self.context.allocator);
+                            message.append("Parameter ");
+                            message.append(impl_param.name.value);
+                            message.append(" has type ");
+                            let impl_type_name = context.root.naming_decl.get_type_decl(&impl_param.type, context.type_self, 0);
+                            message.append(impl_type_name.as_str());
+                            message.append(", expected ");
+                            let trait_type_name = context.root.naming_decl.get_type_decl(trait_param_type, context.type_self, 0);
+                            message.append(trait_type_name.as_str());
+                            self.context.error_token(impl_param.name, message.c_str());
+                        }
+                        i += 1;
+                    }
+                }
+
+                let trait_func_return_type = &trait_func.return_type;
+                if !trait_func_return_type.deref().is_self() { trait_func_return_type = Context::resolve_type(context.allocator, trait_func_return_type, generic_map, 0); }
+
+                if !impl_func.return_type.eq(trait_func_return_type) {
+                    let message = String::new(self.context.allocator);
+                    message.append("Implementation of trait function ");
+                    message.append(trait_func.name.value);
+                    message.append(" has return type ");
+                    let impl_return_name = context.root.naming_decl.get_type_decl(&impl_func.return_type, context.type_self, 0);
+                    message.append(impl_return_name.as_str());
+                    message.append(", expected ");
+                    let trait_return_name = context.root.naming_decl.get_type_decl(trait_func_return_type, context.type_self, 0);
+                    message.append(trait_return_name.as_str());
+                    self.context.error_token(impl_func.name, message.c_str());
                 }
             }
         }

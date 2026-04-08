@@ -89,73 +89,75 @@ struct Type* Type__resolve_typedef_function(struct Type* self);
 struct Type* Type__to_ptr(struct Type* self, struct ArenaAllocator* allocator);
 #line 175 "src/analyzer/types/Type.pv"
 struct GenericMap* Type__get_generic_map(struct Type* self, struct Context* context);
-#line 187 "src/analyzer/types/Type.pv"
+#line 188 "src/analyzer/types/Type.pv"
 bool Type__eq(struct Type* self, struct Type* other);
-#line 211 "src/analyzer/types/Type.pv"
+#line 212 "src/analyzer/types/Type.pv"
 bool Type__eq_indirect(struct Type* self, struct Indirect* other);
-#line 222 "src/analyzer/types/Type.pv"
+#line 223 "src/analyzer/types/Type.pv"
 bool Type__eq_sequence(struct Type* self, struct Sequence* other_seq);
-#line 233 "src/analyzer/types/Type.pv"
+#line 234 "src/analyzer/types/Type.pv"
 bool Type__eq_tuple(struct Type* self, struct Tuple* other_tuple);
-#line 255 "src/analyzer/types/Type.pv"
+#line 256 "src/analyzer/types/Type.pv"
 bool Type__eq_primitive(struct Type* self, struct Primitive* other);
-#line 265 "src/analyzer/types/Type.pv"
+#line 266 "src/analyzer/types/Type.pv"
 bool Type__eq_enum(struct Type* self, struct Enum* other_enum, struct Array_Type generics);
-#line 283 "src/analyzer/types/Type.pv"
+#line 284 "src/analyzer/types/Type.pv"
 bool Type__eq_struct(struct Type* self, struct Struct* other_struct, struct Array_Type generics);
-#line 305 "src/analyzer/types/Type.pv"
+#line 306 "src/analyzer/types/Type.pv"
 bool Type__eq_trait(struct Type* self, struct Trait* other_trait, struct Array_Type generics);
-#line 322 "src/analyzer/types/Type.pv"
+#line 323 "src/analyzer/types/Type.pv"
 bool Type__eq_generic(struct Type* self, struct Generic* other_generic);
-#line 333 "src/analyzer/types/Type.pv"
+#line 334 "src/analyzer/types/Type.pv"
 bool Type__eq_unknown(struct Type* self, struct str other_name, struct Array_Type* generics);
-#line 345 "src/analyzer/types/Type.pv"
+#line 346 "src/analyzer/types/Type.pv"
 bool Type__eq_function(struct Type* self, struct Function* other);
-#line 354 "src/analyzer/types/Type.pv"
+#line 355 "src/analyzer/types/Type.pv"
 bool Type__eq_coroutine_instance(struct Type* self, struct Function* other);
-#line 363 "src/analyzer/types/Type.pv"
+#line 364 "src/analyzer/types/Type.pv"
 bool Type__eq_self(struct Type* self);
-#line 375 "src/analyzer/types/Type.pv"
+#line 376 "src/analyzer/types/Type.pv"
 bool Type__eq_typedef_c(struct Type* self, struct TypedefC* other);
-#line 385 "src/analyzer/types/Type.pv"
+#line 386 "src/analyzer/types/Type.pv"
 bool Type__eq_enum_c(struct Type* self, struct EnumC* other_enum);
-#line 395 "src/analyzer/types/Type.pv"
+#line 396 "src/analyzer/types/Type.pv"
 bool Type__eq_struct_c(struct Type* self, struct StructC* other_struct);
-#line 405 "src/analyzer/types/Type.pv"
+#line 406 "src/analyzer/types/Type.pv"
 bool Type__eq_union_c(struct Type* self, struct StructC* other_union);
-#line 415 "src/analyzer/types/Type.pv"
+#line 416 "src/analyzer/types/Type.pv"
 bool Type__eq_class_cpp(struct Type* self, struct ClassCpp* other_class);
-#line 425 "src/analyzer/types/Type.pv"
+#line 426 "src/analyzer/types/Type.pv"
 bool Type__eq_namespace_cpp(struct Type* self, struct NamespaceCpp* other_namespace);
-#line 435 "src/analyzer/types/Type.pv"
+#line 436 "src/analyzer/types/Type.pv"
 bool Type__eq_function_c(struct Type* self, struct FunctionC* other_function);
-#line 445 "src/analyzer/types/Type.pv"
+#line 446 "src/analyzer/types/Type.pv"
+bool Type__is_self(struct Type* self);
+#line 453 "src/analyzer/types/Type.pv"
 bool Type__is_void(struct Type* self);
-#line 454 "src/analyzer/types/Type.pv"
-bool Type__is_enum(struct Type* self);
 #line 462 "src/analyzer/types/Type.pv"
-bool Type__is_function(struct Type* self);
+bool Type__is_enum(struct Type* self);
 #line 470 "src/analyzer/types/Type.pv"
+bool Type__is_function(struct Type* self);
+#line 478 "src/analyzer/types/Type.pv"
 bool Type__is_indirect(struct Type* self);
-#line 477 "src/analyzer/types/Type.pv"
+#line 485 "src/analyzer/types/Type.pv"
 bool Type__is_trait(struct Type* self);
-#line 484 "src/analyzer/types/Type.pv"
+#line 492 "src/analyzer/types/Type.pv"
 bool Type__is_tuple(struct Type* self);
-#line 491 "src/analyzer/types/Type.pv"
+#line 499 "src/analyzer/types/Type.pv"
 bool Type__is_sequence(struct Type* self);
-#line 498 "src/analyzer/types/Type.pv"
+#line 506 "src/analyzer/types/Type.pv"
 struct Type* Type__deref_1(struct Type* self);
-#line 505 "src/analyzer/types/Type.pv"
+#line 513 "src/analyzer/types/Type.pv"
 bool Type__is_fat_pointer(struct Type* self);
-#line 516 "src/analyzer/types/Type.pv"
+#line 524 "src/analyzer/types/Type.pv"
 bool Type__is_reference_sequence_dynamic(struct Type* self);
-#line 526 "src/analyzer/types/Type.pv"
+#line 534 "src/analyzer/types/Type.pv"
 bool Type__is_iterator(struct Type* self);
-#line 535 "src/analyzer/types/Type.pv"
+#line 543 "src/analyzer/types/Type.pv"
 bool Type__needs_implicit_cast(struct Type* self, struct Type* other);
-#line 586 "src/analyzer/types/Type.pv"
+#line 594 "src/analyzer/types/Type.pv"
 bool Type__is_primitive_or_c_type(struct Type* self);
-#line 601 "src/analyzer/types/Type.pv"
+#line 609 "src/analyzer/types/Type.pv"
 struct Module* Type__get_module(struct Type* self);
 
 #endif
