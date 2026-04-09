@@ -409,11 +409,16 @@ impl Naming {
             _ => {},
         }
 
-        // TODO fix when a sequence is inside a sequence, e.g. [[char; 128]; 1024] should convert to [1024][128]
         let result = self.get_type_name(type, type_self, generics_map);
         result.append(" ");
         result.append(variable_name);
 
+        self.append_decl_suffix(&result, type);
+
+        return result;
+    }
+
+    fn append_decl_suffix(&self, result: &String, type: &Type) {
         match type {
             Type::Sequence(sequence) => {
                 match sequence.type {
@@ -421,14 +426,14 @@ impl Naming {
                         result.append(self.sequence_open);
                         result.append_usize(length);
                         result.append(self.sequence_close);
+
+                        self.append_decl_suffix(result, &sequence.element);
                     },
                     _ => {},
                 }
             },
             _ => {},
         }
-
-        return result;
     }
 
     fn append_cpp_path(&self, result: &String, parent: ParentCpp) {
