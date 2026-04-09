@@ -1079,7 +1079,7 @@ bool Context__parse_type_trait(struct Context* self, struct Type* type, struct G
     }
 
     #line 622 "src/analyzer/Context.pv"
-    *type = *Module__make_type_usage(self->module, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = 0} }, &generics_);
+    *type = *Root__make_type_usage(self->root, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = 0} }, &generics_);
 
     #line 624 "src/analyzer/Context.pv"
     return true;

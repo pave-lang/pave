@@ -59,9 +59,9 @@
 #include <std/String.h>
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/expression/CppExpression.h>
-#include <analyzer/Module.h>
 #include <std/Array_Generic.h>
 #include <analyzer/types/SequenceType.h>
+#include <analyzer/Module.h>
 #include <tuple_usize_ref_InvokeArgument.h>
 #include <std/IterEnumerate_ref_InvokeArgument.h>
 
@@ -1643,7 +1643,7 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
             #line 792 "src/analyzer/expression/Expression.pv"
             struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
             #line 793 "src/analyzer/expression/Expression.pv"
-            member_type = Module__make_type_usage(context->module, member_type, &func_generics->array);
+            member_type = Root__make_type_usage(context->root, member_type, &func_generics->array);
         }
 
         #line 796 "src/analyzer/expression/Expression.pv"
@@ -1899,7 +1899,7 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
                     #line 937 "src/analyzer/expression/Expression.pv"
                     struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                     #line 938 "src/analyzer/expression/Expression.pv"
-                    inner->return_type = *Module__make_type_usage(context->module, &inner->return_type, &func_generics->array);
+                    inner->return_type = *Root__make_type_usage(context->root, &inner->return_type, &func_generics->array);
 
                     #line 940 "src/analyzer/expression/Expression.pv"
                     switch (inner->data.type) {
@@ -2241,7 +2241,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                             #line 1109 "src/analyzer/expression/Expression.pv"
                             struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                             #line 1110 "src/analyzer/expression/Expression.pv"
-                            func_type = Module__make_type_usage(context->module, func_type, &func_generics->array);
+                            func_type = Root__make_type_usage(context->root, func_type, &func_generics->array);
                         }
 
                         #line 1113 "src/analyzer/expression/Expression.pv"

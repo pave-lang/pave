@@ -790,7 +790,7 @@ impl Expression {
 
             if func_info != 0 && func_info.generics.array.length > 0 {
                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                member_type = context.module.make_type_usage(member_type, &func_generics.array);
+                member_type = context.root.make_type_usage(member_type, &func_generics.array);
             }
 
             if func_info != 0 && (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {
@@ -935,7 +935,7 @@ impl Expression {
 
                     if func_info.generics.array.length > 0 {
                         let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                        inner.return_type = *context.module.make_type_usage(&inner.return_type, &func_generics.array);
+                        inner.return_type = *context.root.make_type_usage(&inner.return_type, &func_generics.array);
 
                         match inner.data {
                             ExpressionData::Type(&type) => {
@@ -1107,7 +1107,7 @@ impl Expression {
 
                             if func_info.generics.array.length > 0 {
                                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                                func_type = context.module.make_type_usage(func_type, &func_generics.array);
+                                func_type = context.root.make_type_usage(func_type, &func_generics.array);
                             }
 
                             if !Expression::validate_arguments(context, token, func_type, &arguments, 0, false) { return 0; }

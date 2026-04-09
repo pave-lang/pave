@@ -58,7 +58,7 @@ struct Array_Scope Array_Scope__clone(struct Array_Scope* self, struct Allocator
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Scope Array_Scope__iter(struct Array_Scope* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Scope Array_Scope__as_slice(struct Array_Scope* self);
 
 #endif

@@ -58,7 +58,7 @@ struct Array_ref_GenericMap Array_ref_GenericMap__clone(struct Array_ref_Generic
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ref_GenericMap Array_ref_GenericMap__iter(struct Array_ref_GenericMap* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ref_GenericMap Array_ref_GenericMap__as_slice(struct Array_ref_GenericMap* self);
 
 #endif

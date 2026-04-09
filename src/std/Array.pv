@@ -182,8 +182,7 @@ impl<T> Array<T> {
     }
 
     fn iter(&self) -> ArrayIter<&T> {
-        // Cast hack due to double resolving &T which turns into &&T
-        return ArrayIter<&T>::new(cast<*void>(self.data), cast<*void>(self.data + self.length));
+        return ArrayIter<&T>::new(self.data, self.data + self.length);
     }
 
     fn as_slice(&self) -> &[T] {

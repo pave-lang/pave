@@ -1028,93 +1028,13 @@ struct Type* Module__find_make_type(struct Module* self, struct str name, struct
     #line 488 "src/analyzer/Module.pv"
     struct Type* type = Module__find_type(self, name);
     #line 489 "src/analyzer/Module.pv"
-    return Module__make_type_usage(self, type, usage_types);
+    return Root__make_type_usage(self->root, type, usage_types);
 }
 
 #line 492 "src/analyzer/Module.pv"
-struct Type* Module__make_type_usage(struct Module* self, struct Type* type, struct Array_Type* usage_types) {
-    #line 493 "src/analyzer/Module.pv"
-    if (type == 0) {
-        #line 493 "src/analyzer/Module.pv"
-        return 0;
-    }
-    #line 494 "src/analyzer/Module.pv"
-    struct ArenaAllocator* allocator = self->namespace->root->allocator;
-
-    #line 496 "src/analyzer/Module.pv"
-    switch (type->type) {
-        #line 497 "src/analyzer/Module.pv"
-        case TYPE__ENUM: {
-            #line 497 "src/analyzer/Module.pv"
-            struct Enum* enum_info = type->enum_value._0;
-            #line 498 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &enum_info->generics, usage_types);
-            #line 499 "src/analyzer/Module.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 500 "src/analyzer/Module.pv"
-            generics.self_type = self_type;
-            #line 501 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
-            #line 502 "src/analyzer/Module.pv"
-            return self_type;
-        } break;
-        #line 504 "src/analyzer/Module.pv"
-        case TYPE__STRUCT: {
-            #line 504 "src/analyzer/Module.pv"
-            struct Struct* struct_info = type->struct_value._0;
-            #line 505 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &struct_info->generics, usage_types);
-            #line 506 "src/analyzer/Module.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 507 "src/analyzer/Module.pv"
-            generics.self_type = self_type;
-            #line 508 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
-            #line 509 "src/analyzer/Module.pv"
-            return self_type;
-        } break;
-        #line 511 "src/analyzer/Module.pv"
-        case TYPE__TRAIT: {
-            #line 511 "src/analyzer/Module.pv"
-            struct Trait* trait_info = type->trait_value._0;
-            #line 512 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &trait_info->generics, usage_types);
-            #line 513 "src/analyzer/Module.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 514 "src/analyzer/Module.pv"
-            generics.self_type = self_type;
-            #line 515 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
-            #line 516 "src/analyzer/Module.pv"
-            return self_type;
-        } break;
-        #line 518 "src/analyzer/Module.pv"
-        case TYPE__FUNCTION: {
-            #line 518 "src/analyzer/Module.pv"
-            struct Function* function_info = type->function_value._0;
-            #line 519 "src/analyzer/Module.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &function_info->generics, usage_types);
-            #line 520 "src/analyzer/Module.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 521 "src/analyzer/Module.pv"
-            generics.self_type = self_type;
-            #line 522 "src/analyzer/Module.pv"
-            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
-            #line 523 "src/analyzer/Module.pv"
-            return self_type;
-        } break;
-        #line 525 "src/analyzer/Module.pv"
-        default: {
-            #line 525 "src/analyzer/Module.pv"
-            return type;
-        } break;
-    }
-}
-
-#line 529 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, char const* name) {
-    #line 530 "src/analyzer/Module.pv"
+    #line 493 "src/analyzer/Module.pv"
     struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
-    #line 531 "src/analyzer/Module.pv"
+    #line 494 "src/analyzer/Module.pv"
     return HashMap_str_Primitive__find(primitives, &(struct str){ .ptr = name, .length = strlen(name) });
 }

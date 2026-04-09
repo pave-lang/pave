@@ -58,7 +58,7 @@ struct Array_FunctionScope Array_FunctionScope__clone(struct Array_FunctionScope
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_FunctionScope Array_FunctionScope__iter(struct Array_FunctionScope* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_FunctionScope Array_FunctionScope__as_slice(struct Array_FunctionScope* self);
 
 #endif

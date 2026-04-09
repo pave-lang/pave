@@ -184,12 +184,12 @@ struct Array_InvokeArgument Array_InvokeArgument__clone(struct Array_InvokeArgum
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_InvokeArgument Array_InvokeArgument__iter(struct Array_InvokeArgument* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_InvokeArgument__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_InvokeArgument__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_InvokeArgument Array_InvokeArgument__as_slice(struct Array_InvokeArgument* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_InvokeArgument) { .data = self->data, .length = self->length };
 }

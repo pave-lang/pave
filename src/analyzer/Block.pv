@@ -479,6 +479,17 @@ impl Block {
                     for_statement.iter_type = &for_statement.expression.return_type;
                     for_statement.value_type = &sequence.element;
                 },
+                Type::Indirect(indirect) => {
+                    match indirect.to {
+                        Type::Sequence(sequence) => {
+                            is_sequence = true;
+                            for_statement.type = ForStatementType::Sequence(for_statement.expression);
+                            for_statement.iter_type = &for_statement.expression.return_type;
+                            for_statement.value_type = &sequence.element;
+                        },
+                        _ => {},
+                    }
+                },
                 _ => {},
             }
 

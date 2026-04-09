@@ -184,12 +184,12 @@ struct Array_ImplNode Array_ImplNode__clone(struct Array_ImplNode* self, struct 
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ImplNode Array_ImplNode__iter(struct Array_ImplNode* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_ImplNode__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_ImplNode__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ImplNode Array_ImplNode__as_slice(struct Array_ImplNode* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_ImplNode) { .data = self->data, .length = self->length };
 }

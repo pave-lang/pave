@@ -58,7 +58,7 @@ struct Array_EnumVariantParameter Array_EnumVariantParameter__clone(struct Array
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_EnumVariantParameter Array_EnumVariantParameter__iter(struct Array_EnumVariantParameter* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_EnumVariantParameter Array_EnumVariantParameter__as_slice(struct Array_EnumVariantParameter* self);
 
 #endif

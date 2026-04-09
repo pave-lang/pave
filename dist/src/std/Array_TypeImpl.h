@@ -58,7 +58,7 @@ struct Array_TypeImpl Array_TypeImpl__clone(struct Array_TypeImpl* self, struct 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_TypeImpl Array_TypeImpl__iter(struct Array_TypeImpl* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_TypeImpl Array_TypeImpl__as_slice(struct Array_TypeImpl* self);
 
 #endif

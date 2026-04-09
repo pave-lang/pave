@@ -58,7 +58,7 @@ struct Array_Type Array_Type__clone(struct Array_Type* self, struct Allocator al
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Type Array_Type__iter(struct Array_Type* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Type Array_Type__as_slice(struct Array_Type* self);
 
 #endif

@@ -58,7 +58,7 @@ struct Array_CXCursor Array_CXCursor__clone(struct Array_CXCursor* self, struct 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_CXCursor Array_CXCursor__iter(struct Array_CXCursor* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_CXCursor Array_CXCursor__as_slice(struct Array_CXCursor* self);
 
 #endif

@@ -5,7 +5,7 @@
 #include <std/Array_ptrc_char.h>
 #include <analyzer/Analysis.h>
 #include <stdint.h>
-#include <analyzer/Position.h>
+#include <analyzer/types/Struct.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/str.h>
 #include <analyzer/Namespace.h>
@@ -49,6 +49,9 @@
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <analyzer/Range.h>
+#include <analyzer/Position.h>
+#include <analyzer/types/GenericMap.h>
+#include <analyzer/types/Enum.h>
 
 #include <analyzer/Root.h>
 
@@ -469,4 +472,84 @@ void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintp
             },
         },
     });
+}
+
+#line 256 "src/analyzer/Root.pv"
+struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types) {
+    #line 257 "src/analyzer/Root.pv"
+    if (type == 0) {
+        #line 257 "src/analyzer/Root.pv"
+        return 0;
+    }
+    #line 258 "src/analyzer/Root.pv"
+    struct ArenaAllocator* allocator = self->allocator;
+
+    #line 260 "src/analyzer/Root.pv"
+    switch (type->type) {
+        #line 261 "src/analyzer/Root.pv"
+        case TYPE__ENUM: {
+            #line 261 "src/analyzer/Root.pv"
+            struct Enum* enum_info = type->enum_value._0;
+            #line 262 "src/analyzer/Root.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &enum_info->generics, usage_types);
+            #line 263 "src/analyzer/Root.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 264 "src/analyzer/Root.pv"
+            generics.self_type = self_type;
+            #line 265 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            #line 266 "src/analyzer/Root.pv"
+            return self_type;
+        } break;
+        #line 268 "src/analyzer/Root.pv"
+        case TYPE__STRUCT: {
+            #line 268 "src/analyzer/Root.pv"
+            struct Struct* struct_info = type->struct_value._0;
+            #line 269 "src/analyzer/Root.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &struct_info->generics, usage_types);
+            #line 270 "src/analyzer/Root.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 271 "src/analyzer/Root.pv"
+            generics.self_type = self_type;
+            #line 272 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            #line 273 "src/analyzer/Root.pv"
+            return self_type;
+        } break;
+        #line 275 "src/analyzer/Root.pv"
+        case TYPE__TRAIT: {
+            #line 275 "src/analyzer/Root.pv"
+            struct Trait* trait_info = type->trait_value._0;
+            #line 276 "src/analyzer/Root.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &trait_info->generics, usage_types);
+            #line 277 "src/analyzer/Root.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 278 "src/analyzer/Root.pv"
+            generics.self_type = self_type;
+            #line 279 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            #line 280 "src/analyzer/Root.pv"
+            return self_type;
+        } break;
+        #line 282 "src/analyzer/Root.pv"
+        case TYPE__FUNCTION: {
+            #line 282 "src/analyzer/Root.pv"
+            struct Function* function_info = type->function_value._0;
+            #line 283 "src/analyzer/Root.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &function_info->generics, usage_types);
+            #line 284 "src/analyzer/Root.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 285 "src/analyzer/Root.pv"
+            generics.self_type = self_type;
+            #line 286 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = ArenaAllocator__store_GenericMap(allocator, generics)} };
+            #line 287 "src/analyzer/Root.pv"
+            return self_type;
+        } break;
+        #line 289 "src/analyzer/Root.pv"
+        default: {
+            #line 289 "src/analyzer/Root.pv"
+            return type;
+        } break;
+    }
 }

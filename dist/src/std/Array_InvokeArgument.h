@@ -58,7 +58,7 @@ struct Array_InvokeArgument Array_InvokeArgument__clone(struct Array_InvokeArgum
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_InvokeArgument Array_InvokeArgument__iter(struct Array_InvokeArgument* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_InvokeArgument Array_InvokeArgument__as_slice(struct Array_InvokeArgument* self);
 
 #endif

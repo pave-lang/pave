@@ -58,7 +58,7 @@ struct Array_NamespacePath Array_NamespacePath__clone(struct Array_NamespacePath
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_NamespacePath Array_NamespacePath__iter(struct Array_NamespacePath* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_NamespacePath Array_NamespacePath__as_slice(struct Array_NamespacePath* self);
 
 #endif

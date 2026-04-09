@@ -486,44 +486,7 @@ impl Module {
 
     fn find_make_type(&self, name: str, usage_types: &Array<Type>) -> &Type {
         let type = self.find_type(name);
-        return self.make_type_usage(type, usage_types);
-    }
-
-    fn make_type_usage(&self, type: &Type, usage_types: &Array<Type>) -> &Type {
-        if type == 0 { return 0; }
-        let allocator = self.namespace.root.allocator;
-
-        match type {
-            Type::Enum(enum_info, _) => {
-                let generics = GenericMap::new(allocator, &enum_info.generics, usage_types);
-                let self_type: &Type = allocator.alloc(sizeof(Type));
-                generics.self_type = self_type;
-                *self_type = Type::Enum(enum_info, allocator.store(generics));
-                return self_type;
-            },
-            Type::Struct(struct_info, _) => {
-                let generics = GenericMap::new(allocator, &struct_info.generics, usage_types);
-                let self_type: &Type = allocator.alloc(sizeof(Type));
-                generics.self_type = self_type;
-                *self_type = Type::Struct(struct_info, allocator.store(generics));
-                return self_type;
-            },
-            Type::Trait(trait_info, _) => {
-                let generics = GenericMap::new(allocator, &trait_info.generics, usage_types);
-                let self_type: &Type = allocator.alloc(sizeof(Type));
-                generics.self_type = self_type;
-                *self_type = Type::Trait(trait_info, allocator.store(generics));
-                return self_type;
-            },
-            Type::Function(function_info, _) => {
-                let generics = GenericMap::new(allocator, &function_info.generics, usage_types);
-                let self_type: &Type = allocator.alloc(sizeof(Type));
-                generics.self_type = self_type;
-                *self_type = Type::Function(function_info, allocator.store(generics));
-                return self_type;
-            },
-            _ => { return type; }
-        }
+        return self.root.make_type_usage(type, usage_types);
     }
 
     fn find_primitive(&self, name: *const char) -> *Primitive {

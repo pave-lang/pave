@@ -184,12 +184,12 @@ struct Array_Statement Array_Statement__clone(struct Array_Statement* self, stru
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Statement Array_Statement__iter(struct Array_Statement* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_Statement__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_Statement__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Statement Array_Statement__as_slice(struct Array_Statement* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_Statement) { .data = self->data, .length = self->length };
 }

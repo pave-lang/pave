@@ -184,12 +184,12 @@ struct Array_ref_Token Array_ref_Token__clone(struct Array_ref_Token* self, stru
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ref_Token Array_ref_Token__iter(struct Array_ref_Token* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_ref_Token__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_ref_Token__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ref_Token Array_ref_Token__as_slice(struct Array_ref_Token* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_ref_Token) { .data = self->data, .length = self->length };
 }

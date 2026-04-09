@@ -58,7 +58,7 @@ struct Array_MatchCase Array_MatchCase__clone(struct Array_MatchCase* self, stru
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_MatchCase Array_MatchCase__iter(struct Array_MatchCase* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_MatchCase Array_MatchCase__as_slice(struct Array_MatchCase* self);
 
 #endif

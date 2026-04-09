@@ -58,7 +58,7 @@ struct Array_Impl Array_Impl__clone(struct Array_Impl* self, struct Allocator al
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Impl Array_Impl__iter(struct Array_Impl* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Impl Array_Impl__as_slice(struct Array_Impl* self);
 
 #endif

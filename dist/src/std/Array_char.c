@@ -183,12 +183,12 @@ struct Array_char Array_char__clone(struct Array_char* self, struct Allocator al
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_char Array_char__iter(struct Array_char* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_char__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_char__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_char Array_char__as_slice(struct Array_char* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_char) { .data = self->data, .length = self->length };
 }

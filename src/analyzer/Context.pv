@@ -619,7 +619,7 @@ impl Context {
             }
         }
 
-        *type = *self.module.make_type_usage(&Type::Trait(trait_info, 0), &generics_);
+        *type = *self.root.make_type_usage(&Type::Trait(trait_info, 0), &generics_);
 
         return true;
     }

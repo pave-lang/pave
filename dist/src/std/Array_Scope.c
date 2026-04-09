@@ -184,12 +184,12 @@ struct Array_Scope Array_Scope__clone(struct Array_Scope* self, struct Allocator
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Scope Array_Scope__iter(struct Array_Scope* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_Scope__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_Scope__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Scope Array_Scope__as_slice(struct Array_Scope* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_Scope) { .data = self->data, .length = self->length };
 }

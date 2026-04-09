@@ -183,12 +183,12 @@ struct Array_CXCursor Array_CXCursor__clone(struct Array_CXCursor* self, struct 
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_CXCursor Array_CXCursor__iter(struct Array_CXCursor* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_CXCursor__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_CXCursor__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_CXCursor Array_CXCursor__as_slice(struct Array_CXCursor* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_CXCursor) { .data = self->data, .length = self->length };
 }

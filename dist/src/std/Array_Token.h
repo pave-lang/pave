@@ -58,7 +58,7 @@ struct Array_Token Array_Token__clone(struct Array_Token* self, struct Allocator
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Token Array_Token__iter(struct Array_Token* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Token Array_Token__as_slice(struct Array_Token* self);
 
 #endif

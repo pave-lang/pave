@@ -184,12 +184,12 @@ struct Array_EnumVariantParameter Array_EnumVariantParameter__clone(struct Array
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_EnumVariantParameter Array_EnumVariantParameter__iter(struct Array_EnumVariantParameter* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_EnumVariantParameter__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_EnumVariantParameter__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_EnumVariantParameter Array_EnumVariantParameter__as_slice(struct Array_EnumVariantParameter* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_EnumVariantParameter) { .data = self->data, .length = self->length };
 }

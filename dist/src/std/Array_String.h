@@ -58,7 +58,7 @@ struct Array_String Array_String__clone(struct Array_String* self, struct Alloca
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_String Array_String__iter(struct Array_String* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_String Array_String__as_slice(struct Array_String* self);
 
 #endif

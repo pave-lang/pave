@@ -184,12 +184,12 @@ struct Array_ForVariable Array_ForVariable__clone(struct Array_ForVariable* self
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ForVariable Array_ForVariable__iter(struct Array_ForVariable* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_ForVariable__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_ForVariable__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ForVariable Array_ForVariable__as_slice(struct Array_ForVariable* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_ForVariable) { .data = self->data, .length = self->length };
 }

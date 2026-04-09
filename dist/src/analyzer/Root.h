@@ -27,6 +27,7 @@ struct Include;
 struct Array_ptrc_char;
 struct str;
 struct Type;
+struct Array_Type;
 
 #include <stdio.h>
 #include <string.h>
@@ -107,5 +108,8 @@ struct Primitive* Root__find_primitive(struct Root* self, char const* name);
 
 #line 236 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
+
+#line 256 "src/analyzer/Root.pv"
+struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types);
 
 #endif

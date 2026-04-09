@@ -58,7 +58,7 @@ struct Array_ref_Namespace Array_ref_Namespace__clone(struct Array_ref_Namespace
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ref_Namespace Array_ref_Namespace__iter(struct Array_ref_Namespace* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ref_Namespace Array_ref_Namespace__as_slice(struct Array_ref_Namespace* self);
 
 #endif

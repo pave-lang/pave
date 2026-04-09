@@ -184,12 +184,12 @@ struct Array_FunctionScope Array_FunctionScope__clone(struct Array_FunctionScope
 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_FunctionScope Array_FunctionScope__iter(struct Array_FunctionScope* self) {
-    #line 186 "src/std/Array.pv"
-    return ArrayIter_ref_FunctionScope__new((void*)(self->data), (void*)(self->data + self->length));
+    #line 185 "src/std/Array.pv"
+    return ArrayIter_ref_FunctionScope__new(self->data, self->data + self->length);
 }
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_FunctionScope Array_FunctionScope__as_slice(struct Array_FunctionScope* self) {
-    #line 190 "src/std/Array.pv"
+    #line 189 "src/std/Array.pv"
     return (struct slice_FunctionScope) { .data = self->data, .length = self->length };
 }

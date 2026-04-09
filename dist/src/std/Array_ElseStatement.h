@@ -58,7 +58,7 @@ struct Array_ElseStatement Array_ElseStatement__clone(struct Array_ElseStatement
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ElseStatement Array_ElseStatement__iter(struct Array_ElseStatement* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ElseStatement Array_ElseStatement__as_slice(struct Array_ElseStatement* self);
 
 #endif

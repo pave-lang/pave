@@ -58,7 +58,7 @@ struct Array_Parameter Array_Parameter__clone(struct Array_Parameter* self, stru
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Parameter Array_Parameter__iter(struct Array_Parameter* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Parameter Array_Parameter__as_slice(struct Array_Parameter* self);
 
 #endif

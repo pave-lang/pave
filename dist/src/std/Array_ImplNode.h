@@ -58,7 +58,7 @@ struct Array_ImplNode Array_ImplNode__clone(struct Array_ImplNode* self, struct 
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ImplNode Array_ImplNode__iter(struct Array_ImplNode* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ImplNode Array_ImplNode__as_slice(struct Array_ImplNode* self);
 
 #endif

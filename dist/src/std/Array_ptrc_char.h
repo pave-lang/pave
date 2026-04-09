@@ -57,7 +57,7 @@ struct Array_ptrc_char Array_ptrc_char__clone(struct Array_ptrc_char* self, stru
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ptrc_char Array_ptrc_char__iter(struct Array_ptrc_char* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ptrc_char Array_ptrc_char__as_slice(struct Array_ptrc_char* self);
 
 #endif

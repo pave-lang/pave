@@ -58,7 +58,7 @@ struct Array_Statement Array_Statement__clone(struct Array_Statement* self, stru
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Statement Array_Statement__iter(struct Array_Statement* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Statement Array_Statement__as_slice(struct Array_Statement* self);
 
 #endif

@@ -57,7 +57,7 @@ struct Array_char Array_char__clone(struct Array_char* self, struct Allocator al
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_char Array_char__iter(struct Array_char* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_char Array_char__as_slice(struct Array_char* self);
 
 #endif

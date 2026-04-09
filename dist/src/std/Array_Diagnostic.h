@@ -58,7 +58,7 @@ struct Array_Diagnostic Array_Diagnostic__clone(struct Array_Diagnostic* self, s
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Diagnostic Array_Diagnostic__iter(struct Array_Diagnostic* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Diagnostic Array_Diagnostic__as_slice(struct Array_Diagnostic* self);
 
 #endif

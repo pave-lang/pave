@@ -58,7 +58,7 @@ struct Array_MatchPattern Array_MatchPattern__clone(struct Array_MatchPattern* s
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_MatchPattern Array_MatchPattern__iter(struct Array_MatchPattern* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_MatchPattern Array_MatchPattern__as_slice(struct Array_MatchPattern* self);
 
 #endif

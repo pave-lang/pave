@@ -58,7 +58,7 @@ struct Array_Generic Array_Generic__clone(struct Array_Generic* self, struct All
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_Generic Array_Generic__iter(struct Array_Generic* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_Generic Array_Generic__as_slice(struct Array_Generic* self);
 
 #endif

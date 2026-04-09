@@ -58,7 +58,7 @@ struct Array_ForVariable Array_ForVariable__clone(struct Array_ForVariable* self
 #line 184 "src/std/Array.pv"
 struct ArrayIter_ref_ForVariable Array_ForVariable__iter(struct Array_ForVariable* self);
 
-#line 189 "src/std/Array.pv"
+#line 188 "src/std/Array.pv"
 struct slice_ForVariable Array_ForVariable__as_slice(struct Array_ForVariable* self);
 
 #endif

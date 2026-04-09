@@ -93,6 +93,8 @@ struct Usages {
     usage_mode: UsageMode,
     usage_context: &UsageContext,
     function_context: &FunctionContext,
+
+    std_namespace: *Namespace,
 }
 
 impl Usages {
@@ -115,6 +117,8 @@ impl Usages {
             traits: HashMap<usize, TypeUsage<Trait>>::new(allocator),
             sequences: Array<Type>::new(allocator),
             tuples: Array<&Tuple>::new(allocator),
+
+            std_namespace: generator.root.find_namespace("std"),
         };
 
         for (_, &info) in self.root.primitives {
@@ -281,7 +285,16 @@ impl Usages {
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
         let indirect = self.allocator.store(Indirect { type: IndirectType::Reference, to: sequence_type });
-        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));        
+        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));  
+
+        self.add_type(&sequence.element, &generic_map);
+
+        if self.std_namespace {
+            let array_iter_type = self.std_namespace.find_type("ArrayIter");
+            let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
+            let sequence_iter = self.root.make_type_usage(array_iter_type, &Array<Type> { data: &element_reference, length: 1 });
+            self.add_type(sequence_iter, &generic_map);
+        }
 
         let impl_info = self.root.hack_type_impl.impl_info;
 
@@ -399,6 +412,12 @@ impl Usages {
                 // self.function_context = &func_usage.function_context;
                 return;
             },
+        }
+
+        if self.std_namespace && func_info.type == FunctionType::Coroutine {
+            let iter_trait = self.std_namespace.find_trait("Iter");
+            let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, 0), &Array<Type> { data: &func_info.return_type, length: 1 });
+            self.add_type(sequence_iter, generic_map);
         }
 
         self.usage_mode = UsageMode::Signature;
