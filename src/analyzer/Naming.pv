@@ -54,6 +54,7 @@ impl Naming {
             sequence_fixed_delimiter: "; ",
             sequence_close: "]",
             tuple_open: "(",
+            tuple_close: ")",
         };
     }
 
@@ -68,6 +69,7 @@ impl Naming {
             reference_prefix: "ref_",
             sequence_slice_prefix: "slice_",
             enum_generic_type_suffix: "__Type",
+            trait_prefix: "trait_",
             tuple_prefix: "tuple_",
         };
     }
@@ -104,7 +106,7 @@ impl Naming {
             tuple_prefix: "struct tuple_",
             enum_prefix: "enum ",
             struct_prefix: "struct ",
-            trait_prefix: "struct ",
+            trait_prefix: "struct trait_",
             union_prefix: "union ",
             coroutine_instance_prefix: "struct ",
             primitives,

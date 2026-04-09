@@ -1,6 +1,6 @@
 #include <analyzer/Context.h>
 #include <analyzer/types/Generics.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_EnumVariant.h>
 #include <std/str.h>
@@ -26,10 +26,10 @@ struct Enum Enum__new(struct Context* context) {
     #line 36 "src/analyzer/types/Enum.pv"
     return (struct Enum) {
         .context = context,
-        .generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .variants = HashMap_str_EnumVariant__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .traits = HashMap_str_ref_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .impls = Array_ref_Impl__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .variants = HashMap_str_EnumVariant__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .traits = HashMap_str_ref_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .impls = Array_ref_Impl__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
     };
 }
 
@@ -149,7 +149,7 @@ bool Enum__parse_variant(struct Enum* self) {
     }
 
     #line 98 "src/analyzer/types/Enum.pv"
-    struct Array_Type types = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+    struct Array_Type types = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
 
     #line 100 "src/analyzer/types/Enum.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {

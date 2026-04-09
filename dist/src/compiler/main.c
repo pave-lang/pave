@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <std/ArenaAllocator.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/GeneralPurposeAllocator.h>
 #include <std/Array_ptrc_char.h>
@@ -22,12 +22,12 @@ int32_t main(int32_t argc, char const** argv) {
     int32_t __result;
 
     #line 8 "src/compiler/main.pv"
-    struct ArenaAllocator allocator = ArenaAllocator__new((struct Allocator) { .vtable = &GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR, .instance = GeneralPurposeAllocator__default() }, 5 * 1024 * 1024);
+    struct ArenaAllocator allocator = ArenaAllocator__new((struct trait_Allocator) { .vtable = &GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR, .instance = GeneralPurposeAllocator__default() }, 5 * 1024 * 1024);
 
     #line 11 "src/compiler/main.pv"
-    struct Array_ptrc_char args = Array_ptrc_char__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = &allocator });
+    struct Array_ptrc_char args = Array_ptrc_char__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = &allocator });
     #line 12 "src/compiler/main.pv"
-    struct Array_ptrc_char clang_args = Array_ptrc_char__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = &allocator });
+    struct Array_ptrc_char clang_args = Array_ptrc_char__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = &allocator });
     #line 13 "src/compiler/main.pv"
     char const* output_folder = 0;
     #line 14 "src/compiler/main.pv"

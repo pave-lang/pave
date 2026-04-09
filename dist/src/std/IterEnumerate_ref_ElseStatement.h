@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_ELSE_STATEMENT
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_ElseStatement.h>
+#include <std/Iter_ref_ElseStatement.h>
 #include <stdbool.h>
 
 struct ElseStatement;
@@ -13,7 +13,7 @@ struct ElseStatement;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_ElseStatement {
     uintptr_t index;
-    struct ArrayIter_ref_ElseStatement iter;
+    struct Iter_ref_ElseStatement iter;
 };
 
 #line 58 "src/std/Array.pv"

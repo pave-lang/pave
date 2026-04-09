@@ -1,10 +1,10 @@
-#include <std/ArrayIter_ref_ptrc_char.h>
+#include <std/Iter_ref_ptrc_char.h>
 #include <stdint.h>
 
 #include <slice_ptrc_char.h>
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_ptrc_char slice_ptrc_char__iter(struct slice_ptrc_char self) {
+struct Iter_ref_ptrc_char slice_ptrc_char__iter(struct slice_ptrc_char self) {
     #line 3 "src/std/Slice.pv"
-    return ArrayIter_ref_ptrc_char__new(self.data, self.data + self.length);
+    return Iter_ref_ptrc_char__new(self.data, self.data + self.length);
 }

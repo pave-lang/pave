@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_INLAY_HINT
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_InlayHint.h>
+#include <std/Iter_ref_InlayHint.h>
 #include <stdbool.h>
 
 struct InlayHint;
@@ -13,7 +13,7 @@ struct InlayHint;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_InlayHint {
     uintptr_t index;
-    struct ArrayIter_ref_InlayHint iter;
+    struct Iter_ref_InlayHint iter;
 };
 
 #line 58 "src/std/Array.pv"

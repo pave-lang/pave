@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_PTRC_CHAR
 
 #include <stdint.h>
-#include <std/ArrayIter_ptrc_char.h>
+#include <std/Iter_ptrc_char.h>
 #include <stdbool.h>
 
 
@@ -12,7 +12,7 @@
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ptrc_char {
     uintptr_t index;
-    struct ArrayIter_ptrc_char iter;
+    struct Iter_ptrc_char iter;
 };
 
 #line 58 "src/std/Array.pv"

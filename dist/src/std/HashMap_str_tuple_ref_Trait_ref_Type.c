@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
 #include <std/str.h>
@@ -15,7 +15,7 @@
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type__new(struct Allocator allocator) {
+struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type__new(struct trait_Allocator allocator) {
     #line 36 "src/std/HashMap.pv"
     int32_t initial_capacity = 16;
     #line 37 "src/std/HashMap.pv"
@@ -205,7 +205,7 @@ void HashMap_str_tuple_ref_Trait_ref_Type__fill_buckets(struct HashMap_str_tuple
 }
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type__clone(struct HashMap_str_tuple_ref_Trait_ref_Type* self, struct Allocator allocator) {
+struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type__clone(struct HashMap_str_tuple_ref_Trait_ref_Type* self, struct trait_Allocator allocator) {
     #line 150 "src/std/HashMap.pv"
     struct HashMap_str_tuple_ref_Trait_ref_Type other = (struct HashMap_str_tuple_ref_Trait_ref_Type) {
         .allocator = allocator,

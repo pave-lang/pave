@@ -1,23 +1,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <slice_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <stdbool.h>
-#include <std/ArrayIter_ref_Diagnostic.h>
+#include <std/Iter_ref_Diagnostic.h>
 
 #include <std/Array_Diagnostic.h>
 
 #line 77 "src/std/Array.pv"
-struct Array_Diagnostic Array_Diagnostic__new(struct Allocator allocator) {
+struct Array_Diagnostic Array_Diagnostic__new(struct trait_Allocator allocator) {
     #line 78 "src/std/Array.pv"
     return (struct Array_Diagnostic) { .allocator = allocator };
 }
 
 #line 81 "src/std/Array.pv"
-struct Array_Diagnostic Array_Diagnostic__new_with_length(struct Allocator allocator, uintptr_t length) {
+struct Array_Diagnostic Array_Diagnostic__new_with_length(struct trait_Allocator allocator, uintptr_t length) {
     #line 82 "src/std/Array.pv"
     struct Array_Diagnostic self = (struct Array_Diagnostic) { .allocator = allocator };
     #line 83 "src/std/Array.pv"
@@ -29,7 +29,7 @@ struct Array_Diagnostic Array_Diagnostic__new_with_length(struct Allocator alloc
 }
 
 #line 88 "src/std/Array.pv"
-struct Array_Diagnostic Array_Diagnostic__new_with_capacity(struct Allocator allocator, uintptr_t length) {
+struct Array_Diagnostic Array_Diagnostic__new_with_capacity(struct trait_Allocator allocator, uintptr_t length) {
     #line 89 "src/std/Array.pv"
     struct Array_Diagnostic self = (struct Array_Diagnostic) { .allocator = allocator };
     #line 90 "src/std/Array.pv"
@@ -167,7 +167,7 @@ void Array_Diagnostic__release(struct Array_Diagnostic* self) {
 }
 
 #line 172 "src/std/Array.pv"
-struct Array_Diagnostic Array_Diagnostic__clone(struct Array_Diagnostic* self, struct Allocator allocator) {
+struct Array_Diagnostic Array_Diagnostic__clone(struct Array_Diagnostic* self, struct trait_Allocator allocator) {
     #line 173 "src/std/Array.pv"
     struct Diagnostic* data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct Diagnostic));
     #line 174 "src/std/Array.pv"
@@ -183,9 +183,9 @@ struct Array_Diagnostic Array_Diagnostic__clone(struct Array_Diagnostic* self, s
 }
 
 #line 184 "src/std/Array.pv"
-struct ArrayIter_ref_Diagnostic Array_Diagnostic__iter(struct Array_Diagnostic* self) {
+struct Iter_ref_Diagnostic Array_Diagnostic__iter(struct Array_Diagnostic* self) {
     #line 185 "src/std/Array.pv"
-    return ArrayIter_ref_Diagnostic__new(self->data, self->data + self->length);
+    return Iter_ref_Diagnostic__new(self->data, self->data + self->length);
 }
 
 #line 188 "src/std/Array.pv"

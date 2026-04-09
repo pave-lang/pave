@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_REF_NAMESPACE
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_ref_Namespace.h>
+#include <std/Iter_ref_ref_Namespace.h>
 #include <stdbool.h>
 
 struct Namespace;
@@ -13,7 +13,7 @@ struct Namespace;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_ref_Namespace {
     uintptr_t index;
-    struct ArrayIter_ref_ref_Namespace iter;
+    struct Iter_ref_ref_Namespace iter;
 };
 
 #line 58 "src/std/Array.pv"

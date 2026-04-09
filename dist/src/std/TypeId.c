@@ -10,4 +10,4 @@ Hashed TypeId__Hash__hash(void* __self) {
     return (*self);
 }
 
-struct HashVTable TYPE_ID__VTABLE__HASH = { .hash = &TypeId__Hash__hash };
+struct trait_HashVTable TYPE_ID__VTABLE__HASH = { .hash = &TypeId__Hash__hash };

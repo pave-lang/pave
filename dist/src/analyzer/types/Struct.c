@@ -1,7 +1,7 @@
 #include <analyzer/Module.h>
 #include <analyzer/Context.h>
 #include <analyzer/types/Generics.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_StructField.h>
 #include <std/str.h>
@@ -33,10 +33,10 @@ struct Struct Struct__new(struct Module* module) {
     #line 31 "src/analyzer/types/Struct.pv"
     return (struct Struct) {
         .module = module,
-        .generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
-        .fields = HashMap_str_StructField__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
-        .traits = HashMap_str_tuple_ref_Trait_ref_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
-        .impls = Array_ref_Impl__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .fields = HashMap_str_StructField__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .traits = HashMap_str_tuple_ref_Trait_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .impls = Array_ref_Impl__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
     };
 }
 
@@ -273,7 +273,7 @@ bool Struct__fill_types_tuple(struct Struct* self) {
     #line 146 "src/analyzer/types/Struct.pv"
     while (context->pos < self->token_end && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
         #line 147 "src/analyzer/types/Struct.pv"
-        struct String name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct String name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 148 "src/analyzer/types/Struct.pv"
         String__append(&name, (struct str){ .ptr = "_", .length = strlen("_") });
         #line 149 "src/analyzer/types/Struct.pv"

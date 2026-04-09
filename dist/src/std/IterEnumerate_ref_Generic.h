@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_GENERIC
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_Generic.h>
+#include <std/Iter_ref_Generic.h>
 #include <stdbool.h>
 
 struct Generic;
@@ -13,7 +13,7 @@ struct Generic;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_Generic {
     uintptr_t index;
-    struct ArrayIter_ref_Generic iter;
+    struct Iter_ref_Generic iter;
 };
 
 #line 58 "src/std/Array.pv"

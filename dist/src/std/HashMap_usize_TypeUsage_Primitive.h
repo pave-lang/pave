@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_USIZE_TYPE_USAGE_PRIMITIVE
 #define PAVE_HASH_MAP_USIZE_TYPE_USAGE_PRIMITIVE
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_usize_TypeUsage_Primitive;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Primitive {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_usize_TypeUsage_Primitive** buckets;
     struct HashMapBucket_usize_TypeUsage_Primitive* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_usize_TypeUsage_Primitive {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__new(struct Allocator allocator);
+struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Primitive__resize(struct HashMap_usize_TypeUsage_Primitive* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_usize_TypeUsage_Primitive__release(struct HashMap_usize_TypeUsage_P
 void HashMap_usize_TypeUsage_Primitive__fill_buckets(struct HashMap_usize_TypeUsage_Primitive* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__clone(struct HashMap_usize_TypeUsage_Primitive* self, struct Allocator allocator);
+struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__clone(struct HashMap_usize_TypeUsage_Primitive* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__iter(struct HashMap_usize_TypeUsage_Primitive* self);

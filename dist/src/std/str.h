@@ -2,11 +2,11 @@
 #define PAVE_STR
 
 #include <stdint.h>
-#include <std/Hash.h>
+#include <std/trait_Hash.h>
 #include <stdbool.h>
 
 struct str;
-struct ArrayIter_ptrc_char;
+struct Iter_ptrc_char;
 typedef uint64_t Hashed;
 
 #include <string.h>
@@ -39,7 +39,7 @@ bool str__starts_with(struct str self, char const* prefix);
 bool str__ends_with(struct str self, char const* suffix);
 
 #line 59 "src/std/str.pv"
-struct ArrayIter_ptrc_char str__iter(struct str self);
+struct Iter_ptrc_char str__iter(struct str self);
 
 #line 63 "src/std/str.pv"
 intptr_t str__index_of(struct str self, char ch);
@@ -56,6 +56,6 @@ struct str str__trim(struct str self);
 #line 101 "src/std/str.pv"
 Hashed str__Hash__hash(void* __self);
 
-extern struct HashVTable STR__VTABLE__HASH;
+extern struct trait_HashVTable STR__VTABLE__HASH;
 
 #endif

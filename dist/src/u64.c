@@ -11,4 +11,4 @@ Hashed u64__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(uint64_t));
 }
 
-struct HashVTable U64__VTABLE__HASH = { .hash = &u64__Hash__hash };
+struct trait_HashVTable U64__VTABLE__HASH = { .hash = &u64__Hash__hash };

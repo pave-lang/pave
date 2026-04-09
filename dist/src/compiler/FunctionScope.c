@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <std/Array_ref_Expression.h>
 #include <analyzer/expression/Expression.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashMap_str_str.h>
 #include <std/str.h>
 
@@ -18,7 +18,7 @@ struct FunctionScope FunctionScope__new(struct ArenaAllocator* allocator, bool b
     return (struct FunctionScope) {
         .break_target = break_target,
         .continue_target = continue_target,
-        .defer_statements = Array_ref_Expression__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .variable_replacements = HashMap_str_str__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .defer_statements = Array_ref_Expression__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .variable_replacements = HashMap_str_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 }

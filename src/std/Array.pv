@@ -1,14 +1,14 @@
 #include "stdlib.h"
 #include "string.h"
 
-struct ArrayIter<T> {
+struct Iter<T> {
     step: isize,
     iter: T,
     start: T,
     end: T,
 }
 
-impl<T> ArrayIter<T> {
+impl<T> Iter<T> {
     fn new(start: T, end: T) -> Self {
         return Self {
             step: 1,
@@ -51,7 +51,7 @@ impl<T> ArrayIter<T> {
 
 struct IterEnumerate<T> {
     index: usize,
-    iter: ArrayIter<T>,
+    iter: Iter<T>,
 }
 
 impl<T> IterEnumerate<T> {
@@ -181,8 +181,8 @@ impl<T> Array<T> {
         };
     }
 
-    fn iter(&self) -> ArrayIter<&T> {
-        return ArrayIter<&T>::new(self.data, self.data + self.length);
+    fn iter(&self) -> Iter<&T> {
+        return Iter<&T>::new(self.data, self.data + self.length);
     }
 
     fn as_slice(&self) -> &[T] {

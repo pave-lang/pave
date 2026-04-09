@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/HashMapIter_str_bool.h>
 #include <std/str.h>
@@ -12,7 +12,7 @@
 #include <std/HashMap_str_bool.h>
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_bool HashMap_str_bool__new(struct Allocator allocator) {
+struct HashMap_str_bool HashMap_str_bool__new(struct trait_Allocator allocator) {
     #line 36 "src/std/HashMap.pv"
     int32_t initial_capacity = 16;
     #line 37 "src/std/HashMap.pv"
@@ -202,7 +202,7 @@ void HashMap_str_bool__fill_buckets(struct HashMap_str_bool* self) {
 }
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_bool HashMap_str_bool__clone(struct HashMap_str_bool* self, struct Allocator allocator) {
+struct HashMap_str_bool HashMap_str_bool__clone(struct HashMap_str_bool* self, struct trait_Allocator allocator) {
     #line 150 "src/std/HashMap.pv"
     struct HashMap_str_bool other = (struct HashMap_str_bool) {
         .allocator = allocator,

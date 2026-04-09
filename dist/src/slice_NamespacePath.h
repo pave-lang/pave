@@ -8,6 +8,6 @@ struct NamespacePath;
 struct slice_NamespacePath { struct NamespacePath* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_NamespacePath slice_NamespacePath__iter(struct slice_NamespacePath self);
+struct Iter_ref_NamespacePath slice_NamespacePath__iter(struct slice_NamespacePath self);
 
 #endif

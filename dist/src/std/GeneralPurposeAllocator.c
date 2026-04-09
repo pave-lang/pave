@@ -37,4 +37,4 @@ bool GeneralPurposeAllocator__Allocator__free(void* __self, void* ptr) {
     return true;
 }
 
-struct AllocatorVTable GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR = { .alloc = &GeneralPurposeAllocator__Allocator__alloc, .realloc = &GeneralPurposeAllocator__Allocator__realloc, .free = &GeneralPurposeAllocator__Allocator__free };
+struct trait_AllocatorVTable GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR = { .alloc = &GeneralPurposeAllocator__Allocator__alloc, .realloc = &GeneralPurposeAllocator__Allocator__realloc, .free = &GeneralPurposeAllocator__Allocator__free };

@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_STR_ENUM_VARIANT
 #define PAVE_HASH_MAP_STR_ENUM_VARIANT
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_str_EnumVariant;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_EnumVariant {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_str_EnumVariant** buckets;
     struct HashMapBucket_str_EnumVariant* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_str_EnumVariant {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_EnumVariant HashMap_str_EnumVariant__new(struct Allocator allocator);
+struct HashMap_str_EnumVariant HashMap_str_EnumVariant__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_str_EnumVariant__resize(struct HashMap_str_EnumVariant* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_str_EnumVariant__release(struct HashMap_str_EnumVariant* self);
 void HashMap_str_EnumVariant__fill_buckets(struct HashMap_str_EnumVariant* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_EnumVariant HashMap_str_EnumVariant__clone(struct HashMap_str_EnumVariant* self, struct Allocator allocator);
+struct HashMap_str_EnumVariant HashMap_str_EnumVariant__clone(struct HashMap_str_EnumVariant* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_EnumVariant HashMap_str_EnumVariant__iter(struct HashMap_str_EnumVariant* self);

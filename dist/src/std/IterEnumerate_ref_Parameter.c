@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <stdbool.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <stdint.h>
 #include <tuple_usize_ref_Parameter.h>
@@ -12,7 +12,7 @@
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_Parameter__next(struct IterEnumerate_ref_Parameter* self) {
     #line 59 "src/std/Array.pv"
-    if (!ArrayIter_ref_Parameter__next(&self->iter)) {
+    if (!Iter_ref_Parameter__next(&self->iter)) {
         #line 59 "src/std/Array.pv"
         return false;
     }
@@ -25,5 +25,5 @@ bool IterEnumerate_ref_Parameter__next(struct IterEnumerate_ref_Parameter* self)
 #line 64 "src/std/Array.pv"
 struct tuple_usize_ref_Parameter IterEnumerate_ref_Parameter__value(struct IterEnumerate_ref_Parameter* self) {
     #line 65 "src/std/Array.pv"
-    return (struct tuple_usize_ref_Parameter) { ._0 = self->index - 1, ._1 = ArrayIter_ref_Parameter__value(&self->iter) };
+    return (struct tuple_usize_ref_Parameter) { ._0 = self->index - 1, ._1 = Iter_ref_Parameter__value(&self->iter) };
 }

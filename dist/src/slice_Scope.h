@@ -8,6 +8,6 @@ struct Scope;
 struct slice_Scope { struct Scope* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_Scope slice_Scope__iter(struct slice_Scope self);
+struct Iter_ref_Scope slice_Scope__iter(struct slice_Scope self);
 
 #endif

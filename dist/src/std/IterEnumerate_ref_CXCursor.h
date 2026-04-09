@@ -3,7 +3,7 @@
 
 #include "clang-c/Index.h"
 #include <stdint.h>
-#include <std/ArrayIter_ref_CXCursor.h>
+#include <std/Iter_ref_CXCursor.h>
 #include <stdbool.h>
 
 
@@ -13,7 +13,7 @@
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_CXCursor {
     uintptr_t index;
-    struct ArrayIter_ref_CXCursor iter;
+    struct Iter_ref_CXCursor iter;
 };
 
 #line 58 "src/std/Array.pv"

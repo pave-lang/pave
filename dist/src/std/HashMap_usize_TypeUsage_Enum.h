@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_USIZE_TYPE_USAGE_ENUM
 #define PAVE_HASH_MAP_USIZE_TYPE_USAGE_ENUM
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_usize_TypeUsage_Enum;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_usize_TypeUsage_Enum** buckets;
     struct HashMapBucket_usize_TypeUsage_Enum* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_usize_TypeUsage_Enum {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__new(struct Allocator allocator);
+struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Enum__resize(struct HashMap_usize_TypeUsage_Enum* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_usize_TypeUsage_Enum__release(struct HashMap_usize_TypeUsage_Enum* 
 void HashMap_usize_TypeUsage_Enum__fill_buckets(struct HashMap_usize_TypeUsage_Enum* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__clone(struct HashMap_usize_TypeUsage_Enum* self, struct Allocator allocator);
+struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__clone(struct HashMap_usize_TypeUsage_Enum* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__iter(struct HashMap_usize_TypeUsage_Enum* self);

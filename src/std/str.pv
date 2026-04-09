@@ -56,8 +56,8 @@ impl str {
         return strncmp(self.ptr + self.length - suffix_len, suffix, suffix_len) == 0;
     }
 
-    fn iter(self) -> ArrayIter<*const char> {
-        return ArrayIter<*const char>::new(self.ptr, self.ptr + self.length);
+    fn iter(self) -> Iter<*const char> {
+        return Iter<*const char>::new(self.ptr, self.ptr + self.length);
     }
 
     fn index_of(self, ch: char) -> isize {

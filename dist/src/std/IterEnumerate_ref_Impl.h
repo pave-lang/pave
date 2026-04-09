@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_IMPL
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_Impl.h>
+#include <std/Iter_ref_Impl.h>
 #include <stdbool.h>
 
 struct Impl;
@@ -13,7 +13,7 @@ struct Impl;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_Impl {
     uintptr_t index;
-    struct ArrayIter_ref_Impl iter;
+    struct Iter_ref_Impl iter;
 };
 
 #line 58 "src/std/Array.pv"

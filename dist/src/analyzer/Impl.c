@@ -2,7 +2,7 @@
 #include <analyzer/Context.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/Generics.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_ImplNode.h>
 #include <analyzer/ImplNode.h>
@@ -31,9 +31,9 @@ struct Impl Impl__parse(struct Context* context) {
     struct Impl node = (struct Impl) {
         .context = context,
         .token = Context__current(context),
-        .generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .nodes = Array_ImplNode__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .functions = HashMap_str_Function__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .nodes = Array_ImplNode__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .functions = HashMap_str_Function__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
     };
 
     #line 33 "src/analyzer/Impl.pv"
@@ -227,7 +227,7 @@ bool Impl__parse_functions(struct Impl* self) {
                 #line 129 "src/analyzer/Impl.pv"
                 if (!has_default) {
                     #line 130 "src/analyzer/Impl.pv"
-                    struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                    struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
                     #line 131 "src/analyzer/Impl.pv"
                     String__append(&message, (struct str){ .ptr = "Implementation is missing trait function '", .length = strlen("Implementation is missing trait function '") });
                     #line 132 "src/analyzer/Impl.pv"
@@ -247,7 +247,7 @@ bool Impl__parse_functions(struct Impl* self) {
             #line 141 "src/analyzer/Impl.pv"
             if (impl_func->parameters.length != trait_func->parameters.length) {
                 #line 142 "src/analyzer/Impl.pv"
-                struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
                 #line 143 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = "Implementation of trait function '", .length = strlen("Implementation of trait function '") });
                 #line 144 "src/analyzer/Impl.pv"
@@ -277,7 +277,7 @@ bool Impl__parse_functions(struct Impl* self) {
                     #line 156 "src/analyzer/Impl.pv"
                     if (!Type__eq(&impl_param->type, trait_param_type)) {
                         #line 157 "src/analyzer/Impl.pv"
-                        struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                        struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
                         #line 158 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = "Parameter ", .length = strlen("Parameter ") });
                         #line 159 "src/analyzer/Impl.pv"
@@ -313,7 +313,7 @@ bool Impl__parse_functions(struct Impl* self) {
             #line 175 "src/analyzer/Impl.pv"
             if (!Type__eq(&impl_func->return_type, trait_func_return_type)) {
                 #line 176 "src/analyzer/Impl.pv"
-                struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
                 #line 177 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = "Implementation of trait function ", .length = strlen("Implementation of trait function ") });
                 #line 178 "src/analyzer/Impl.pv"

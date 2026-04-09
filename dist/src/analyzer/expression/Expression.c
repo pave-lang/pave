@@ -18,7 +18,7 @@
 #include <std/HashMap_str_EnumCValue.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/Impl.h>
-#include <std/ArrayIter_ref_ref_Impl.h>
+#include <std/Iter_ref_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/types/Function.h>
@@ -30,16 +30,16 @@
 #include <analyzer/Root.h>
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/Trait.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/StructCField.h>
 #include <std/HashMap_str_StructCField.h>
 #include <analyzer/c/StructC.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/c/ClassCpp.h>
-#include <std/ArrayIter_ref_Type.h>
+#include <std/Iter_ref_Type.h>
 #include <std/Array_Type.h>
-#include <std/ArrayIter_ref_ref_Trait.h>
+#include <std/Iter_ref_ref_Trait.h>
 #include <std/Array_ref_Trait.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/types/Sequence.h>
@@ -50,10 +50,10 @@
 #include <analyzer/c/NamespaceCpp.h>
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/expression/InvokeArgument.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <std/Array_Parameter.h>
-#include <std/ArrayIter_ref_InvokeArgument.h>
+#include <std/Iter_ref_InvokeArgument.h>
 #include <std/HashMap_str_usize.h>
 #include <analyzer/types/FunctionType.h>
 #include <std/String.h>
@@ -169,11 +169,11 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             #line 71 "src/analyzer/expression/Expression.pv"
             struct Primitive* primitive_info = type->primitive_value;
             #line 72 "src/analyzer/expression/Expression.pv"
-            { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
+            { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
             #line 72 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+            while (Iter_ref_ref_Impl__next(&__iter)) {
                 #line 72 "src/analyzer/expression/Expression.pv"
-                struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+                struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
                 #line 73 "src/analyzer/expression/Expression.pv"
                 struct Function* function = HashMap_str_Function__find(&impl_info->functions, &member->value);
@@ -207,11 +207,11 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             }
 
             #line 88 "src/analyzer/expression/Expression.pv"
-            { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
+            { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
             #line 88 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+            while (Iter_ref_ref_Impl__next(&__iter)) {
                 #line 88 "src/analyzer/expression/Expression.pv"
-                struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+                struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
                 #line 89 "src/analyzer/expression/Expression.pv"
                 struct Function* function = HashMap_str_Function__find(&impl_info->functions, &member->value);
@@ -273,11 +273,11 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             #line 117 "src/analyzer/expression/Expression.pv"
             struct GenericMap* generic_map = type->enum_value._1;
             #line 118 "src/analyzer/expression/Expression.pv"
-            { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
+            { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
             #line 118 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+            while (Iter_ref_ref_Impl__next(&__iter)) {
                 #line 118 "src/analyzer/expression/Expression.pv"
-                struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+                struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
                 #line 119 "src/analyzer/expression/Expression.pv"
                 struct Function* function = HashMap_str_Function__find(&impl_info->functions, &member->value);
@@ -305,7 +305,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             #line 129 "src/analyzer/expression/Expression.pv"
             if (str__eq(member->value, (struct str){ .ptr = "instance", .length = strlen("instance") })) {
                 #line 130 "src/analyzer/expression/Expression.pv"
-                return ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_void) });
+                return ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_void) });
             }
 
             #line 133 "src/analyzer/expression/Expression.pv"
@@ -392,11 +392,11 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             }
 
             #line 165 "src/analyzer/expression/Expression.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&class_info->bases);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&class_info->bases);
             #line 165 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 165 "src/analyzer/expression/Expression.pv"
-                struct Type* base = ArrayIter_ref_Type__value(&__iter);
+                struct Type* base = Iter_ref_Type__value(&__iter);
 
                 #line 166 "src/analyzer/expression/Expression.pv"
                 struct Type* base_type = Expression__get_member_type(context, base, member, output_error);
@@ -420,11 +420,11 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             #line 173 "src/analyzer/expression/Expression.pv"
             struct Generic* generic = type->generic_value;
             #line 174 "src/analyzer/expression/Expression.pv"
-            { struct ArrayIter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);
+            { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);
             #line 174 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_ref_Trait__next(&__iter)) {
+            while (Iter_ref_ref_Trait__next(&__iter)) {
                 #line 174 "src/analyzer/expression/Expression.pv"
-                struct Trait* trait_info = *ArrayIter_ref_ref_Trait__value(&__iter);
+                struct Trait* trait_info = *Iter_ref_ref_Trait__value(&__iter);
 
                 #line 175 "src/analyzer/expression/Expression.pv"
                 struct Function* function = HashMap_str_Function__find(&trait_info->functions, &member->value);
@@ -471,7 +471,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 #line 198 "src/analyzer/expression/Expression.pv"
                 GenericMap__insert(&generic_map, (struct str){ .ptr = "T", .length = strlen("T") }, sequence->element);
                 #line 199 "src/analyzer/expression/Expression.pv"
-                generic_map.self_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }) });
+                generic_map.self_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }) });
 
                 #line 201 "src/analyzer/expression/Expression.pv"
                 return ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, generic_map)} });
@@ -563,11 +563,11 @@ struct GenericMap* Expression__resolve_function_generics(struct Context* context
     #line 242 "src/analyzer/expression/Expression.pv"
     uintptr_t i = 0;
     #line 243 "src/analyzer/expression/Expression.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(generics);
+    { struct Iter_ref_Type __iter = Array_Type__iter(generics);
     #line 243 "src/analyzer/expression/Expression.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 243 "src/analyzer/expression/Expression.pv"
-        struct Type* generic = ArrayIter_ref_Type__value(&__iter);
+        struct Type* generic = Iter_ref_Type__value(&__iter);
 
         #line 244 "src/analyzer/expression/Expression.pv"
         struct Type* target = Array_Type__get(&generic_map.array, i);
@@ -587,16 +587,16 @@ struct GenericMap* Expression__resolve_function_generics(struct Context* context
     }
 
     #line 253 "src/analyzer/expression/Expression.pv"
-    struct ArrayIter_ref_Parameter params = Array_Parameter__iter(&func_info->parameters);
+    struct Iter_ref_Parameter params = Array_Parameter__iter(&func_info->parameters);
     #line 254 "src/analyzer/expression/Expression.pv"
-    struct ArrayIter_ref_InvokeArgument args = Array_InvokeArgument__iter(arguments);
+    struct Iter_ref_InvokeArgument args = Array_InvokeArgument__iter(arguments);
 
     #line 256 "src/analyzer/expression/Expression.pv"
-    while (ArrayIter_ref_Parameter__next(&params) && ArrayIter_ref_InvokeArgument__next(&args)) {
+    while (Iter_ref_Parameter__next(&params) && Iter_ref_InvokeArgument__next(&args)) {
         #line 257 "src/analyzer/expression/Expression.pv"
-        struct Type* param_type = &ArrayIter_ref_Parameter__value(&params)->type;
+        struct Type* param_type = &Iter_ref_Parameter__value(&params)->type;
         #line 258 "src/analyzer/expression/Expression.pv"
-        struct Type* arg_type = &ArrayIter_ref_InvokeArgument__value(&args)->value->return_type;
+        struct Type* arg_type = &Iter_ref_InvokeArgument__value(&args)->value->return_type;
 
         #line 260 "src/analyzer/expression/Expression.pv"
         Expression__resolve_generic_type(context, param_type, arg_type, &generic_map);
@@ -695,11 +695,11 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
             #line 297 "src/analyzer/expression/Expression.pv"
             struct GenericMap* generic_map2 = type->struct_value._1;
             #line 298 "src/analyzer/expression/Expression.pv"
-            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
             #line 298 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+            while (Iter_ref_InvokeArgument__next(&__iter)) {
                 #line 298 "src/analyzer/expression/Expression.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                 #line 299 "src/analyzer/expression/Expression.pv"
                 struct StructField* param = HashMap_str_StructField__find(&struct_info->fields, &arg->name->value);
@@ -754,7 +754,7 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
             #line 327 "src/analyzer/expression/Expression.pv"
             if (function->parameters.length != arguments_length) {
                 #line 328 "src/analyzer/expression/Expression.pv"
-                struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                 #line 329 "src/analyzer/expression/Expression.pv"
                 String__append(&message, (struct str){ .ptr = "Number of arguments does not match, expected ", .length = strlen("Number of arguments does not match, expected ") });
 
@@ -774,37 +774,37 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
             }
 
             #line 341 "src/analyzer/expression/Expression.pv"
-            struct ArrayIter_ref_Parameter param_iter = Array_Parameter__iter(&function->parameters);
+            struct Iter_ref_Parameter param_iter = Array_Parameter__iter(&function->parameters);
             #line 342 "src/analyzer/expression/Expression.pv"
-            struct ArrayIter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
+            struct Iter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
 
             #line 344 "src/analyzer/expression/Expression.pv"
             if (is_member_call) {
                 #line 345 "src/analyzer/expression/Expression.pv"
-                ArrayIter_ref_Parameter__next(&param_iter);
+                Iter_ref_Parameter__next(&param_iter);
                 #line 346 "src/analyzer/expression/Expression.pv"
-                ArrayIter_ref_InvokeArgument__next(&args_iter);
+                Iter_ref_InvokeArgument__next(&args_iter);
 
                 #line 348 "src/analyzer/expression/Expression.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&args_iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args_iter);
                 #line 349 "src/analyzer/expression/Expression.pv"
-                struct Type* param_type = &ArrayIter_ref_Parameter__value(&param_iter)->type;
+                struct Type* param_type = &Iter_ref_Parameter__value(&param_iter)->type;
 
                 #line 351 "src/analyzer/expression/Expression.pv"
                 if (Type__is_indirect(param_type) && !Type__is_indirect(&arg->value->return_type)) {
                     #line 352 "src/analyzer/expression/Expression.pv"
-                    struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arg->value->return_type) });
+                    struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arg->value->return_type) });
                     #line 353 "src/analyzer/expression/Expression.pv"
                     arg->value = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = (struct str){ .ptr = "&", .length = strlen("&") }, ._1 = arg->value} }, new_type);
                 }
             }
 
             #line 357 "src/analyzer/expression/Expression.pv"
-            while (ArrayIter_ref_Parameter__next(&param_iter) && ArrayIter_ref_InvokeArgument__next(&args_iter)) {
+            while (Iter_ref_Parameter__next(&param_iter) && Iter_ref_InvokeArgument__next(&args_iter)) {
                 #line 358 "src/analyzer/expression/Expression.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&args_iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args_iter);
                 #line 359 "src/analyzer/expression/Expression.pv"
-                struct Parameter* param = ArrayIter_ref_Parameter__value(&param_iter);
+                struct Parameter* param = Iter_ref_Parameter__value(&param_iter);
                 #line 360 "src/analyzer/expression/Expression.pv"
                 struct Type* param_type = &param->type;
 
@@ -866,7 +866,7 @@ bool Expression__validate_enum_arguments(struct Context* context, struct Token* 
     #line 390 "src/analyzer/expression/Expression.pv"
     if (variant->types.length != arguments_length) {
         #line 391 "src/analyzer/expression/Expression.pv"
-        struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 392 "src/analyzer/expression/Expression.pv"
         String__append(&message, (struct str){ .ptr = "Number of arguments does not match, expected ", .length = strlen("Number of arguments does not match, expected ") });
         #line 393 "src/analyzer/expression/Expression.pv"
@@ -878,16 +878,16 @@ bool Expression__validate_enum_arguments(struct Context* context, struct Token* 
     }
 
     #line 398 "src/analyzer/expression/Expression.pv"
-    struct ArrayIter_ref_Type param_iter = Array_Type__iter(&variant->types);
+    struct Iter_ref_Type param_iter = Array_Type__iter(&variant->types);
     #line 399 "src/analyzer/expression/Expression.pv"
-    struct ArrayIter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
+    struct Iter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
 
     #line 401 "src/analyzer/expression/Expression.pv"
-    while (ArrayIter_ref_Type__next(&param_iter) && ArrayIter_ref_InvokeArgument__next(&args_iter)) {
+    while (Iter_ref_Type__next(&param_iter) && Iter_ref_InvokeArgument__next(&args_iter)) {
         #line 402 "src/analyzer/expression/Expression.pv"
-        struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&args_iter);
+        struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args_iter);
         #line 403 "src/analyzer/expression/Expression.pv"
-        struct Type* param_type = ArrayIter_ref_Type__value(&param_iter);
+        struct Type* param_type = Iter_ref_Type__value(&param_iter);
 
         #line 405 "src/analyzer/expression/Expression.pv"
         if (generic_map != 0) {
@@ -1023,7 +1023,7 @@ struct Expression* Expression__parse_enum(struct Context* context, struct Token*
                 #line 465 "src/analyzer/expression/Expression.pv"
                 struct EnumVariant* variant = variant_result.enumvariant_value;
                 #line 466 "src/analyzer/expression/Expression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                 #line 468 "src/analyzer/expression/Expression.pv"
                 if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "(")) {
@@ -1125,7 +1125,7 @@ struct Expression* Expression__parse_struct(struct Context* context, struct Toke
             }
 
             #line 529 "src/analyzer/expression/Expression.pv"
-            struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+            struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
             #line 531 "src/analyzer/expression/Expression.pv"
             while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -1176,7 +1176,7 @@ struct Expression* Expression__parse_struct(struct Context* context, struct Toke
         }
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
         #line 554 "src/analyzer/expression/Expression.pv"
-        struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 556 "src/analyzer/expression/Expression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
@@ -1247,14 +1247,14 @@ struct Expression* Expression__parse_struct(struct Context* context, struct Toke
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = struct_expression, ._1 = fields} }, struct_type);
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
         #line 591 "src/analyzer/expression/Expression.pv"
-        struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 593 "src/analyzer/expression/Expression.pv"
         uintptr_t field_index = 0;
         #line 594 "src/analyzer/expression/Expression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
             #line 595 "src/analyzer/expression/Expression.pv"
-            struct String name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+            struct String name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
             #line 596 "src/analyzer/expression/Expression.pv"
             String__append(&name, (struct str){ .ptr = "_", .length = strlen("_") });
             #line 597 "src/analyzer/expression/Expression.pv"
@@ -1314,7 +1314,7 @@ struct Expression* Expression__parse_class(struct Context* context, struct Token
     #line 629 "src/analyzer/expression/Expression.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
         #line 630 "src/analyzer/expression/Expression.pv"
-        struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 632 "src/analyzer/expression/Expression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
@@ -1381,7 +1381,7 @@ struct Expression* Expression__parse_class(struct Context* context, struct Token
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = parent, ._1 = fields} }, &parent->return_type);
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
         #line 665 "src/analyzer/expression/Expression.pv"
-        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 667 "src/analyzer/expression/Expression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -1453,7 +1453,7 @@ struct Expression* Expression__parse_cpp(struct Context* context, struct Generic
         }
 
         #line 701 "src/analyzer/expression/Expression.pv"
-        struct Indirect* indirect = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, expression->return_type);
+        struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, expression->return_type);
         #line 702 "src/analyzer/expression/Expression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__NEW, .new_value = { ._0 = placement, ._1 = expression} } }, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
     } else if (Context__check_next(context, TOKEN_TYPE__IDENTIFIER, "delete")) {
@@ -1603,7 +1603,7 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
         }
 
         #line 772 "src/analyzer/expression/Expression.pv"
-        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 774 "src/analyzer/expression/Expression.pv"
         if (func_info != 0 && func_info->parameters.length > 0 && str__eq(func_info->parameters.data[0].name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
@@ -1719,7 +1719,7 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
                         struct Expression* end = args.data[1].value;
 
                         #line 833 "src/analyzer/expression/Expression.pv"
-                        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                         #line 835 "src/analyzer/expression/Expression.pv"
                         struct Token* argument_name_data = ArenaAllocator__store_Token(context->allocator, *index_expr->token);
@@ -1870,7 +1870,7 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
                 }
 
                 #line 922 "src/analyzer/expression/Expression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                 #line 924 "src/analyzer/expression/Expression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -1936,7 +1936,7 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
                 }
 
                 #line 955 "src/analyzer/expression/Expression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                 #line 957 "src/analyzer/expression/Expression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -1977,7 +1977,7 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
                 }
 
                 #line 977 "src/analyzer/expression/Expression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                 #line 979 "src/analyzer/expression/Expression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -2207,7 +2207,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                         }
 
                         #line 1093 "src/analyzer/expression/Expression.pv"
-                        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                         #line 1095 "src/analyzer/expression/Expression.pv"
                         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -2400,7 +2400,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                         }
 
                         #line 1197 "src/analyzer/expression/Expression.pv"
-                        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                         #line 1199 "src/analyzer/expression/Expression.pv"
                         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -2509,14 +2509,14 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                                 #line 1260 "src/analyzer/expression/Expression.pv"
                                 struct Type* type = child->data.type_value;
                                 #line 1261 "src/analyzer/expression/Expression.pv"
-                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type) });
+                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type) });
                                 #line 1262 "src/analyzer/expression/Expression.pv"
                                 result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
                             } break;
                             #line 1264 "src/analyzer/expression/Expression.pv"
                             default: {
                                 #line 1265 "src/analyzer/expression/Expression.pv"
-                                struct Type return_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, child->return_type) };
+                                struct Type return_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, child->return_type) };
                                 #line 1266 "src/analyzer/expression/Expression.pv"
                                 result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &return_type);
                             } break;
@@ -2529,7 +2529,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                                 #line 1271 "src/analyzer/expression/Expression.pv"
                                 struct Type* type = child->data.type_value;
                                 #line 1272 "src/analyzer/expression/Expression.pv"
-                                struct Indirect* new_indirect = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type);
+                                struct Indirect* new_indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type);
                                 #line 1273 "src/analyzer/expression/Expression.pv"
                                 struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = new_indirect });
                                 #line 1274 "src/analyzer/expression/Expression.pv"
@@ -2564,7 +2564,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                 #line 1288 "src/analyzer/expression/Expression.pv"
                 if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
                     #line 1289 "src/analyzer/expression/Expression.pv"
-                    struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                    struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                     #line 1291 "src/analyzer/expression/Expression.pv"
                     struct Token* name = ArenaAllocator__store_Token(context->allocator, *expr->token);
@@ -2577,7 +2577,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                     #line 1296 "src/analyzer/expression/Expression.pv"
                     while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ")")) {
                         #line 1297 "src/analyzer/expression/Expression.pv"
-                        struct String name_string = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                        struct String name_string = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                         #line 1298 "src/analyzer/expression/Expression.pv"
                         String__append(&name_string, (struct str){ .ptr = "_", .length = strlen("_") });
                         #line 1299 "src/analyzer/expression/Expression.pv"
@@ -2611,9 +2611,9 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                     #line 1315 "src/analyzer/expression/Expression.pv"
                     struct Tuple* tuple = ArenaAllocator__store_Tuple(context->allocator, (struct Tuple) {});
                     #line 1316 "src/analyzer/expression/Expression.pv"
-                    tuple->elements = Array_Type__new_with_length((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arguments.length);
+                    tuple->elements = Array_Type__new_with_length((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arguments.length);
                     #line 1317 "src/analyzer/expression/Expression.pv"
-                    { struct IterEnumerate_ref_InvokeArgument __iter = ArrayIter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(&arguments));
+                    { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(&arguments));
                     #line 1317 "src/analyzer/expression/Expression.pv"
                     while (IterEnumerate_ref_InvokeArgument__next(&__iter)) {
                         #line 1317 "src/analyzer/expression/Expression.pv"
@@ -2647,7 +2647,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                 #line 1330 "src/analyzer/expression/Expression.pv"
                 struct Type* element_type = 0;
                 #line 1331 "src/analyzer/expression/Expression.pv"
-                struct Array_InvokeArgument elements = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct Array_InvokeArgument elements = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                 #line 1333 "src/analyzer/expression/Expression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "]")) {
@@ -2805,7 +2805,7 @@ struct Expression* Expression__parse(struct Context* context, struct Generics* g
         }
 
         #line 1419 "src/analyzer/expression/Expression.pv"
-        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 1420 "src/analyzer/expression/Expression.pv"
         Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .value = range_start });
         #line 1421 "src/analyzer/expression/Expression.pv"
@@ -2861,7 +2861,7 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
                     #line 1444 "src/analyzer/expression/Expression.pv"
                     struct Tuple* tuple = type->tuple_value;
                     #line 1445 "src/analyzer/expression/Expression.pv"
-                    { struct IterEnumerate_ref_InvokeArgument __iter = ArrayIter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(arguments));
+                    { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(arguments));
                     #line 1445 "src/analyzer/expression/Expression.pv"
                     while (IterEnumerate_ref_InvokeArgument__next(&__iter)) {
                         #line 1445 "src/analyzer/expression/Expression.pv"
@@ -2908,7 +2908,7 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
     #line 1468 "src/analyzer/expression/Expression.pv"
     if (!Type__eq(type, &self->return_type)) {
         #line 1469 "src/analyzer/expression/Expression.pv"
-        struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 1470 "src/analyzer/expression/Expression.pv"
         String__append(&message, (struct str){ .ptr = "Type ", .length = strlen("Type ") });
         #line 1471 "src/analyzer/expression/Expression.pv"

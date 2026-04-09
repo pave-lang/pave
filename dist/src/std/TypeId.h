@@ -2,7 +2,7 @@
 #define PAVE_TYPE_ID
 
 #include <stdint.h>
-#include <std/Hash.h>
+#include <std/trait_Hash.h>
 
 typedef uint64_t Hashed;
 
@@ -12,6 +12,6 @@ typedef uint64_t TypeId;
 #line 3 "src/std/TypeId.pv"
 Hashed TypeId__Hash__hash(void* __self);
 
-extern struct HashVTable TYPE_ID__VTABLE__HASH;
+extern struct trait_HashVTable TYPE_ID__VTABLE__HASH;
 
 #endif

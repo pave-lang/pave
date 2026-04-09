@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_SCOPE
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_Scope.h>
+#include <std/Iter_ref_Scope.h>
 #include <stdbool.h>
 
 struct Scope;
@@ -13,7 +13,7 @@ struct Scope;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_Scope {
     uintptr_t index;
-    struct ArrayIter_ref_Scope iter;
+    struct Iter_ref_Scope iter;
 };
 
 #line 58 "src/std/Array.pv"

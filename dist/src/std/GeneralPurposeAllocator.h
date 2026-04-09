@@ -1,7 +1,7 @@
 #ifndef PAVE_GENERAL_PURPOSE_ALLOCATOR
 #define PAVE_GENERAL_PURPOSE_ALLOCATOR
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -25,6 +25,6 @@ void* GeneralPurposeAllocator__Allocator__realloc(void* __self, void* ptr, uintp
 #line 21 "src/std/GeneralPurposeAllocator.pv"
 bool GeneralPurposeAllocator__Allocator__free(void* __self, void* ptr);
 
-extern struct AllocatorVTable GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR;
+extern struct trait_AllocatorVTable GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR;
 
 #endif

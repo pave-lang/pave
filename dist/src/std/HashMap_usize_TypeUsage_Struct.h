@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_USIZE_TYPE_USAGE_STRUCT
 #define PAVE_HASH_MAP_USIZE_TYPE_USAGE_STRUCT
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_usize_TypeUsage_Struct;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Struct {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_usize_TypeUsage_Struct** buckets;
     struct HashMapBucket_usize_TypeUsage_Struct* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_usize_TypeUsage_Struct {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__new(struct Allocator allocator);
+struct HashMap_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Struct__resize(struct HashMap_usize_TypeUsage_Struct* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_usize_TypeUsage_Struct__release(struct HashMap_usize_TypeUsage_Stru
 void HashMap_usize_TypeUsage_Struct__fill_buckets(struct HashMap_usize_TypeUsage_Struct* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__clone(struct HashMap_usize_TypeUsage_Struct* self, struct Allocator allocator);
+struct HashMap_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__clone(struct HashMap_usize_TypeUsage_Struct* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__iter(struct HashMap_usize_TypeUsage_Struct* self);

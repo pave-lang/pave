@@ -17,7 +17,7 @@
 #include <std/Array_Type.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Function.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/types/GenericMap.h>
@@ -143,7 +143,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             struct Type* return_type_resolved = Include__parse_type(include, return_type);
 
             #line 77 "src/analyzer/c/IncludeObjectContext.pv"
-            struct Function func_info = Function__new_allocator((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator });
+            struct Function func_info = Function__new_allocator((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator });
             #line 78 "src/analyzer/c/IncludeObjectContext.pv"
             func_info.name = ArenaAllocator__store_Token(allocator, (struct Token) { .value = (struct str){ .ptr = method_name, .length = strlen(method_name) } });
             #line 79 "src/analyzer/c/IncludeObjectContext.pv"

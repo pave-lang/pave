@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_CHAR
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_char.h>
+#include <std/Iter_ref_char.h>
 #include <stdbool.h>
 
 
@@ -12,7 +12,7 @@
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_char {
     uintptr_t index;
-    struct ArrayIter_ref_char iter;
+    struct Iter_ref_char iter;
 };
 
 #line 58 "src/std/Array.pv"

@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_REF_EXPRESSION
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_ref_Expression.h>
+#include <std/Iter_ref_ref_Expression.h>
 #include <stdbool.h>
 
 struct Expression;
@@ -13,7 +13,7 @@ struct Expression;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_ref_Expression {
     uintptr_t index;
-    struct ArrayIter_ref_ref_Expression iter;
+    struct Iter_ref_ref_Expression iter;
 };
 
 #line 58 "src/std/Array.pv"

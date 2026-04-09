@@ -1,4 +1,4 @@
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generic.h>
 #include <std/HashMap_str_usize.h>
@@ -12,7 +12,7 @@
 #include <analyzer/types/Generics.h>
 
 #line 49 "src/analyzer/types/Generics.pv"
-struct Generics Generics__new(struct Allocator allocator) {
+struct Generics Generics__new(struct trait_Allocator allocator) {
     #line 50 "src/analyzer/types/Generics.pv"
     return (struct Generics) {
         .array = Array_Generic__new(allocator),

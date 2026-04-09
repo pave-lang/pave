@@ -7,6 +7,6 @@
 struct slice_CXCursor { CXCursor* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_CXCursor slice_CXCursor__iter(struct slice_CXCursor self);
+struct Iter_ref_CXCursor slice_CXCursor__iter(struct slice_CXCursor self);
 
 #endif

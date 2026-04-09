@@ -22,11 +22,11 @@ impl<T> Range<T> {
     //     } 
     // }
 
-    fn iter(self) -> ArrayIter<T> {
+    fn iter(self) -> Iter<T> {
         match self {
-            Range<T>::End(end) => { return ArrayIter<T>::new(cast<T>(0), end); },
-            Range<T>::StartEnd(start, end) => { return ArrayIter<T>::new(start, end); },
-            _ => { return ArrayIter<T> {}; }
+            Range<T>::End(end) => { return Iter<T>::new(cast<T>(0), end); },
+            Range<T>::StartEnd(start, end) => { return Iter<T>::new(start, end); },
+            _ => { return Iter<T> {}; }
         }
     }
 }

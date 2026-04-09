@@ -1,4 +1,4 @@
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_ref_Trait.h>
 #include <analyzer/types/Trait.h>
 #include <stdbool.h>
@@ -12,7 +12,7 @@
 #include <analyzer/types/Generic.h>
 
 #line 10 "src/analyzer/types/Generics.pv"
-struct Generic Generic__new(struct Allocator allocator) {
+struct Generic Generic__new(struct trait_Allocator allocator) {
     #line 11 "src/analyzer/types/Generics.pv"
     return (struct Generic) { .traits = Array_ref_Trait__new(allocator) };
 }

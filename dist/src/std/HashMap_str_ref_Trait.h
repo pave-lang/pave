@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_STR_REF_TRAIT
 #define PAVE_HASH_MAP_STR_REF_TRAIT
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_str_ref_Trait;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_ref_Trait {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_str_ref_Trait** buckets;
     struct HashMapBucket_str_ref_Trait* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_str_ref_Trait {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_ref_Trait HashMap_str_ref_Trait__new(struct Allocator allocator);
+struct HashMap_str_ref_Trait HashMap_str_ref_Trait__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_str_ref_Trait__resize(struct HashMap_str_ref_Trait* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_str_ref_Trait__release(struct HashMap_str_ref_Trait* self);
 void HashMap_str_ref_Trait__fill_buckets(struct HashMap_str_ref_Trait* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_ref_Trait HashMap_str_ref_Trait__clone(struct HashMap_str_ref_Trait* self, struct Allocator allocator);
+struct HashMap_str_ref_Trait HashMap_str_ref_Trait__clone(struct HashMap_str_ref_Trait* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_ref_Trait HashMap_str_ref_Trait__iter(struct HashMap_str_ref_Trait* self);

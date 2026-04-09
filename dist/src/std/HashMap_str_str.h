@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_STR_STR
 #define PAVE_HASH_MAP_STR_STR
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -14,7 +14,7 @@ struct HashMapIter_str_str;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_str {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_str_str** buckets;
     struct HashMapBucket_str_str* data;
     uintptr_t capacity;
@@ -22,7 +22,7 @@ struct HashMap_str_str {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_str HashMap_str_str__new(struct Allocator allocator);
+struct HashMap_str_str HashMap_str_str__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_str_str__resize(struct HashMap_str_str* self, uintptr_t new_capacity);
@@ -43,7 +43,7 @@ void HashMap_str_str__release(struct HashMap_str_str* self);
 void HashMap_str_str__fill_buckets(struct HashMap_str_str* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_str HashMap_str_str__clone(struct HashMap_str_str* self, struct Allocator allocator);
+struct HashMap_str_str HashMap_str_str__clone(struct HashMap_str_str* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_str HashMap_str_str__iter(struct HashMap_str_str* self);

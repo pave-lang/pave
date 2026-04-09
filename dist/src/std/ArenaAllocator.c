@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/ArenaBlock.h>
 #include <stdbool.h>
@@ -31,7 +31,7 @@
 #include <std/ArenaAllocator.h>
 
 #line 136 "src/std/ArenaAllocator.pv"
-struct ArenaAllocator ArenaAllocator__new(struct Allocator allocator, uintptr_t block_size) {
+struct ArenaAllocator ArenaAllocator__new(struct trait_Allocator allocator, uintptr_t block_size) {
     #line 137 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* block = ArenaBlock__new(allocator, block_size, 0);
     #line 138 "src/std/ArenaAllocator.pv"
@@ -600,4 +600,4 @@ bool ArenaAllocator__Allocator__free(void* __self, void* ptr) {
     return false;
 }
 
-struct AllocatorVTable ARENA_ALLOCATOR__VTABLE__ALLOCATOR = { .alloc = &ArenaAllocator__Allocator__alloc, .realloc = &ArenaAllocator__Allocator__realloc, .free = &ArenaAllocator__Allocator__free };
+struct trait_AllocatorVTable ARENA_ALLOCATOR__VTABLE__ALLOCATOR = { .alloc = &ArenaAllocator__Allocator__alloc, .realloc = &ArenaAllocator__Allocator__realloc, .free = &ArenaAllocator__Allocator__free };

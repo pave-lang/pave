@@ -1,7 +1,7 @@
 #ifndef PAVE_ARENA_ALLOCATOR
 #define PAVE_ARENA_ALLOCATOR
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -34,14 +34,14 @@ struct TypedefC;
 
 #line 5 "src/std/ArenaAllocator.pv"
 struct ArenaAllocator {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     uintptr_t block_size;
     struct ArenaBlock* last_block;
     struct ArenaOversize* last_oversize;
 };
 
 #line 136 "src/std/ArenaAllocator.pv"
-struct ArenaAllocator ArenaAllocator__new(struct Allocator allocator, uintptr_t block_size);
+struct ArenaAllocator ArenaAllocator__new(struct trait_Allocator allocator, uintptr_t block_size);
 
 #line 147 "src/std/ArenaAllocator.pv"
 void ArenaAllocator__destroy(struct ArenaAllocator* self);
@@ -115,6 +115,6 @@ void* ArenaAllocator__Allocator__realloc(void* __self, void* ptr, uintptr_t new_
 #line 250 "src/std/ArenaAllocator.pv"
 bool ArenaAllocator__Allocator__free(void* __self, void* ptr);
 
-extern struct AllocatorVTable ARENA_ALLOCATOR__VTABLE__ALLOCATOR;
+extern struct trait_AllocatorVTable ARENA_ALLOCATOR__VTABLE__ALLOCATOR;
 
 #endif

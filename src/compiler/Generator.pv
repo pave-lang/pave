@@ -555,7 +555,7 @@ impl Generator {
         match inner_expr.return_type.deref() {
             Type::Function(func_info, func_generics) => {
                 if func_info.type == FunctionType::Coroutine {
-                    fprintf(file, "(struct Co_CoroutineStatus) { .vtable = &");
+                    fprintf(file, "(struct trait_Co_CoroutineStatus) { .vtable = &");
 
                     match func_info.parent {
                         FunctionParent::Struct(struct_info, _, _) => {
@@ -572,7 +572,7 @@ impl Generator {
                     
                     fprintf(file, " }");
                 } else {
-                    fprintf(file, "(struct Fn) { .vtable = &");
+                    fprintf(file, "(struct trait_Fn) { .vtable = &");
 
                     match func_info.parent {
                         FunctionParent::Struct(struct_info, _, _) => {
@@ -2376,7 +2376,7 @@ impl Generator {
             self.write_function_name(file, func_info, generics);
             fprintf(file, "*)ctx)->_value; }\n");
 
-            fprintf(file, "struct Iter_");
+            fprintf(file, "struct trait_Iter_");
 
             let name = self.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
             self.write_string(file, &name);
@@ -2438,7 +2438,7 @@ impl Generator {
         self.indent -= 1;
         fprintf(file, "};\n\n");
 
-        fprintf(file, "#include <std/Iter_");
+        fprintf(file, "#include <std/trait_Iter_");
 
         let name = self.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
         self.write_string(file, &name);
@@ -2450,7 +2450,7 @@ impl Generator {
         self.write_function_name(file, func_info, generics);
         fprintf(file, "__value(void* ctx);\n");
 
-        fprintf(file, "extern struct Iter_");
+        fprintf(file, "extern struct trait_Iter_");
         self.write_string(file, &name);
         name.release();
 
@@ -2926,7 +2926,7 @@ impl Generator {
 
                         if function_usage.impl_dynamic_function {
                             if func_info.type == FunctionType::Coroutine {
-                                fprintf(file, "#include <std/Co_CoroutineStatus.h>\n");
+                                fprintf(file, "#include <std/trait_Co_CoroutineStatus.h>\n");
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
                                 fprintf(file, "__Co_CoroutineStatus__Instance { ");
@@ -2940,13 +2940,13 @@ impl Generator {
                                 self.indent -= 1;
                                 fprintf(file, "};\n");
 
-                                fprintf(file, "extern struct Co_CoroutineStatusVTable ");
+                                fprintf(file, "extern struct trait_Co_CoroutineStatusVTable ");
                                 self.write_str_title(file, struct_info.name.value);
                                 fprintf(file, "__");
                                 self.write_str_title(file, func_info.name.value);
                                 fprintf(file, "__VTABLE__CO;\n");
                             } else {
-                                fprintf(file, "#include <std/Fn.h>\n");
+                                fprintf(file, "#include <std/trait_Fn.h>\n");
                                 fprintf(file, "struct ");
                                 self.write_function_name(file, func_info, generics);
                                 fprintf(file, "__Fn__Instance { ");
@@ -2960,7 +2960,7 @@ impl Generator {
                                 self.indent -= 1;
                                 fprintf(file, "};\n");
 
-                                fprintf(file, "extern struct FnVTable ");
+                                fprintf(file, "extern struct trait_FnVTable ");
                                 self.write_str_title(file, struct_info.name.value);
                                 fprintf(file, "__");
                                 self.write_str_title(file, func_info.name.value);
@@ -3000,8 +3000,8 @@ impl Generator {
         }
 
         if usage.impl_dynamic_usage {
-            fprintf(file, "#include <std/Struct.h>\n");
-            fprintf(file, "extern struct StructVTable ");
+            fprintf(file, "#include <std/trait_Struct.h>\n");
+            fprintf(file, "extern struct trait_StructVTable ");
             self.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__STRUCT;\n");
         }
@@ -3058,7 +3058,7 @@ impl Generator {
         if primitive_info.traits.length > 0 { fprintf(file, "\n"); }
 
         for (_, trait_info) in primitive_info.traits {
-            fprintf(file, "extern struct ");
+            fprintf(file, "extern struct trait_");
             self.write_token(file, trait_info.name);
             fprintf(file, "VTable ");
             self.write_str_title(file, name.as_str());
@@ -3209,7 +3209,7 @@ impl Generator {
                         if function_usage != 0 && function_usage.impl_dynamic_function {
                             fprintf(file, "\n");
                             if self.is_coroutine() {
-                                fprintf(file, "#include <std/Allocator.h>\n");
+                                fprintf(file, "#include <std/trait_Allocator.h>\n");
                             }
 
                             fprintf(file, "#include <std/Array_TypeId.h>\n");
@@ -3335,7 +3335,7 @@ impl Generator {
                                 }
 
                                 self.write_indent(file);
-                                fprintf(file, "return (struct Iter_CoroutineStatus) { .vtable = &");
+                                fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
 
                                 match func_info.parent {
                                     FunctionParent::Struct(struct_info, _, _) => {
@@ -3387,9 +3387,9 @@ impl Generator {
                             }
 
                             if self.is_coroutine() {
-                                fprintf(file, "struct Co_CoroutineStatusVTable ");
+                                fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
                             } else {
-                                fprintf(file, "struct FnVTable ");
+                                fprintf(file, "struct trait_FnVTable ");
                             }
 
                             match func_info.parent {
@@ -3822,7 +3822,7 @@ impl Generator {
             self.indent -= 1;
             fprintf(code_file, "}\n");
 
-            fprintf(code_file, "struct StructVTable ");
+            fprintf(code_file, "struct trait_StructVTable ");
             self.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__STRUCT");
             fprintf(code_file, " = { .get_fields = &");
@@ -3893,7 +3893,7 @@ impl Generator {
         if !self.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, &generics) { fclose(code_file); return false; }
 
         for (_, trait_info) in primitive_info.traits {
-            fprintf(code_file, "\nstruct ");
+            fprintf(code_file, "\nstruct trait_");
             self.write_token(code_file, trait_info.name);
             fprintf(code_file, "VTable ");
             self.write_str_title(code_file, name);

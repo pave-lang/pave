@@ -1,7 +1,7 @@
 #include <analyzer/Module.h>
 #include <analyzer/Context.h>
 #include <analyzer/types/Generics.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_Function.h>
 #include <std/str.h>
@@ -26,8 +26,8 @@ struct Trait Trait__new(struct Module* module) {
     #line 18 "src/analyzer/types/Trait.pv"
     return (struct Trait) {
         .module = module,
-        .generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
-        .functions = HashMap_str_Function__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
+        .functions = HashMap_str_Function__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context.allocator }),
     };
 }
 

@@ -9,7 +9,7 @@
 #include <std/HashMap_u32_Type.h>
 #include <stdint.h>
 #include <analyzer/types/Type.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashMap_str_Type.h>
 #include <std/HashMap_str_Primitive.h>
 #include <analyzer/types/Primitive.h>
@@ -31,10 +31,10 @@ struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp) 
         .root = root,
         .mode_cpp = mode_cpp,
         .path = path,
-        .cxtype_to_type = HashMap_u32_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
-        .typedef_to_type = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
-        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
-        .values = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
+        .cxtype_to_type = HashMap_u32_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
+        .typedef_to_type = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
+        .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
+        .values = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
     });
 
     #line 31 "src/analyzer/c/Include.pv"
@@ -148,12 +148,12 @@ bool Include__process(struct Include* self) {
     bool release_clang_args = false;
 
     #line 96 "src/analyzer/c/Include.pv"
-    struct String path = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
+    struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
     #line 97 "src/analyzer/c/Include.pv"
     String__append(&path, str__slice(self->path, 1, self->path.length - 1));
 
     #line 99 "src/analyzer/c/Include.pv"
-    struct String file_content = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
+    struct String file_content = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
     #line 100 "src/analyzer/c/Include.pv"
     String__append(&file_content, (struct str){ .ptr = "#include <", .length = strlen("#include <") });
     #line 101 "src/analyzer/c/Include.pv"
@@ -168,7 +168,7 @@ bool Include__process(struct Include* self) {
         #line 106 "src/analyzer/c/Include.pv"
         filename = "__temp.cpp";
         #line 107 "src/analyzer/c/Include.pv"
-        clang_args = Array_ptrc_char__clone(&clang_args, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
+        clang_args = Array_ptrc_char__clone(&clang_args, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator });
         #line 108 "src/analyzer/c/Include.pv"
         Array_ptrc_char__append(&clang_args, "-std=c++17");
         #line 109 "src/analyzer/c/Include.pv"
@@ -303,10 +303,10 @@ struct Type* Include__parse_type(struct Include* self, CXType type) {
         #line 196 "src/analyzer/c/Include.pv"
         if (is_pointee_const) {
             #line 197 "src/analyzer/c/Include.pv"
-            indirect = Indirect__new_const_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator }, *resolved_pointee_type);
+            indirect = Indirect__new_const_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator }, *resolved_pointee_type);
         } else {
             #line 199 "src/analyzer/c/Include.pv"
-            indirect = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator }, *resolved_pointee_type);
+            indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator }, *resolved_pointee_type);
         }
 
         #line 202 "src/analyzer/c/Include.pv"
@@ -319,7 +319,7 @@ struct Type* Include__parse_type(struct Include* self, CXType type) {
         CXCursor decl = clang_getTypeDeclaration(type);
 
         #line 208 "src/analyzer/c/Include.pv"
-        struct Array_CXCursor path = Array_CXCursor__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
+        struct Array_CXCursor path = Array_CXCursor__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
         #line 209 "src/analyzer/c/Include.pv"
         CXCursor parent = clang_getCursorSemanticParent(decl);
         #line 210 "src/analyzer/c/Include.pv"

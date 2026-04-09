@@ -9,7 +9,7 @@
 #include <std/HashMap_str_Primitive.h>
 #include <std/Array_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_ref_Namespace.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Type.h>
@@ -33,8 +33,8 @@
 #include <stdbool.h>
 #include <analyzer/Tokenizer.h>
 #include <analyzer/TokenType.h>
-#include <std/ArrayIter_ref_NamespacePath.h>
-#include <std/ArrayIter_ref_ref_Token.h>
+#include <std/Iter_ref_NamespacePath.h>
+#include <std/Iter_ref_ref_Token.h>
 #include <std/Array_ref_Token.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <analyzer/types/GenericMap.h>
@@ -48,12 +48,12 @@
 #include <tuple_str_Trait.h>
 #include <std/HashMapIter_str_Trait.h>
 #include <std/HashMap_str_ref_Trait.h>
-#include <std/ArrayIter_ref_ref_Namespace.h>
+#include <std/Iter_ref_ref_Namespace.h>
 #include <analyzer/types/Generic.h>
 #include <std/Array_Generic.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
-#include <std/ArrayIter_ref_Impl.h>
+#include <std/Iter_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/types/FunctionParent.h>
 #include <tuple_ref_Trait_ref_Type.h>
@@ -62,7 +62,7 @@
 #include <analyzer/c/StructC.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/TypedefC.h>
-#include <std/ArrayIter_ref_TypeImpl.h>
+#include <std/Iter_ref_TypeImpl.h>
 #include <tuple_str_ref_Include.h>
 #include <std/HashMapIter_str_ref_Include.h>
 #include <std/Array_Type.h>
@@ -83,16 +83,16 @@ struct Module* Module__new(struct Namespace* namespace, struct str path) {
         .root = namespace->root,
         .namespace = namespace,
         .path = path,
-        .use_namespaces = Array_NamespacePath__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .used_namespaces = Array_ref_Namespace__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .enums = HashMap_str_Enum__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .structs = HashMap_str_Struct__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .traits = HashMap_str_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .impls = Array_Impl__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .functions = HashMap_str_Function__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .type_impls = Array_TypeImpl__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .includes = HashMap_str_ref_Include__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .use_namespaces = Array_NamespacePath__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .used_namespaces = Array_ref_Namespace__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .enums = HashMap_str_Enum__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .structs = HashMap_str_Struct__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .traits = HashMap_str_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .impls = Array_Impl__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .functions = HashMap_str_Function__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .type_impls = Array_TypeImpl__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .includes = HashMap_str_ref_Include__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 
     #line 48 "src/analyzer/Module.pv"
@@ -217,7 +217,7 @@ bool Module__parse(struct Module* self) {
             }
 
             #line 117 "src/analyzer/Module.pv"
-            struct NamespacePath path = NamespacePath__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+            struct NamespacePath path = NamespacePath__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
             #line 118 "src/analyzer/Module.pv"
             if (!NamespacePath__parse(&path, context)) {
                 #line 118 "src/analyzer/Module.pv"
@@ -365,11 +365,11 @@ bool Module__add_use_namespaces(struct Module* self) {
     bool success = true;
 
     #line 201 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_NamespacePath __iter = Array_NamespacePath__iter(&self->use_namespaces);
+    { struct Iter_ref_NamespacePath __iter = Array_NamespacePath__iter(&self->use_namespaces);
     #line 201 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_NamespacePath__next(&__iter)) {
+    while (Iter_ref_NamespacePath__next(&__iter)) {
         #line 201 "src/analyzer/Module.pv"
-        struct NamespacePath* path = ArrayIter_ref_NamespacePath__value(&__iter);
+        struct NamespacePath* path = Iter_ref_NamespacePath__value(&__iter);
 
         #line 202 "src/analyzer/Module.pv"
         success = Module__add_use_namespace(self, path) && success;
@@ -382,11 +382,11 @@ bool Module__add_use_namespaces(struct Module* self) {
 #line 208 "src/analyzer/Module.pv"
 bool Module__add_use_namespace(struct Module* self, struct NamespacePath* path) {
     #line 209 "src/analyzer/Module.pv"
-    struct ArrayIter_ref_ref_Token parts_iter = Array_ref_Token__iter(&path->parts);
+    struct Iter_ref_ref_Token parts_iter = Array_ref_Token__iter(&path->parts);
     #line 210 "src/analyzer/Module.pv"
-    ArrayIter_ref_ref_Token__next(&parts_iter);
+    Iter_ref_ref_Token__next(&parts_iter);
     #line 211 "src/analyzer/Module.pv"
-    struct Token* first_part = *ArrayIter_ref_ref_Token__value(&parts_iter);
+    struct Token* first_part = *Iter_ref_ref_Token__value(&parts_iter);
     #line 212 "src/analyzer/Module.pv"
     struct Namespace* namespace = 0;
 
@@ -408,11 +408,11 @@ bool Module__add_use_namespace(struct Module* self, struct NamespacePath* path) 
     }
 
     #line 225 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Token __iter = parts_iter;
+    { struct Iter_ref_ref_Token __iter = parts_iter;
     #line 225 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Token__next(&__iter)) {
+    while (Iter_ref_ref_Token__next(&__iter)) {
         #line 225 "src/analyzer/Module.pv"
-        struct Token* part = *ArrayIter_ref_ref_Token__value(&__iter);
+        struct Token* part = *Iter_ref_ref_Token__value(&__iter);
 
         #line 226 "src/analyzer/Module.pv"
         struct Namespace** child = HashMap_str_ref_Namespace__find(&namespace->children, &part->value);
@@ -505,16 +505,16 @@ bool Module__prefill_types(struct Module* self) {
     bool success = true;
 
     #line 271 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
     #line 271 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
         #line 271 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
         #line 272 "src/analyzer/Module.pv"
         if (str__eq(namespace->name, (struct str){ .ptr = "std", .length = strlen("std") })) {
             #line 273 "src/analyzer/Module.pv"
-            struct Generic t = Generic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
+            struct Generic t = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
             #line 274 "src/analyzer/Module.pv"
             t.name = ArenaAllocator__store_Token(self->context.allocator, (struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "T", .length = strlen("T") } });
 
@@ -522,14 +522,14 @@ bool Module__prefill_types(struct Module* self) {
             struct Token* param_name = ArenaAllocator__store_Token(self->context.allocator, (struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "type", .length = strlen("type") } });
 
             #line 278 "src/analyzer/Module.pv"
-            struct Array_Generic generics = Array_Generic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
+            struct Array_Generic generics = Array_Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
             #line 279 "src/analyzer/Module.pv"
             Array_Generic__append(&generics, t);
             #line 280 "src/analyzer/Module.pv"
             struct Generic* generic_t = Array_Generic__get(&generics, 0);
 
             #line 282 "src/analyzer/Module.pv"
-            struct Array_Parameter params = Array_Parameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
+            struct Array_Parameter params = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
             #line 283 "src/analyzer/Module.pv"
             Array_Parameter__append(&params, (struct Parameter) { .name = param_name, .type = (struct Type) { .type = TYPE__GENERIC, .generic_value = generic_t } });
 
@@ -585,11 +585,11 @@ bool Module__prefill_types_impl(struct Module* self) {
     struct ArenaAllocator* allocator = self->namespace->root->allocator;
 
     #line 313 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_Impl __iter = Array_Impl__iter(&self->impls);
+    { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
     #line 313 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_Impl__next(&__iter)) {
+    while (Iter_ref_Impl__next(&__iter)) {
         #line 313 "src/analyzer/Module.pv"
-        struct Impl* impl_info = ArrayIter_ref_Impl__value(&__iter);
+        struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
         #line 314 "src/analyzer/Module.pv"
         success = Impl__prefill_types(impl_info) && success;
@@ -762,11 +762,11 @@ bool Module__parse_declarations(struct Module* self) {
     } }
 
     #line 384 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_Impl __iter = Array_Impl__iter(&self->impls);
+    { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
     #line 384 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_Impl__next(&__iter)) {
+    while (Iter_ref_Impl__next(&__iter)) {
         #line 384 "src/analyzer/Module.pv"
-        struct Impl* impl_info = ArrayIter_ref_Impl__value(&__iter);
+        struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
         #line 385 "src/analyzer/Module.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
@@ -781,11 +781,11 @@ bool Module__parse_declarations(struct Module* self) {
     } }
 
     #line 390 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
+    { struct Iter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
     #line 390 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_TypeImpl__next(&__iter)) {
+    while (Iter_ref_TypeImpl__next(&__iter)) {
         #line 390 "src/analyzer/Module.pv"
-        struct TypeImpl* type_impl = ArrayIter_ref_TypeImpl__value(&__iter);
+        struct TypeImpl* type_impl = Iter_ref_TypeImpl__value(&__iter);
 
         #line 391 "src/analyzer/Module.pv"
         struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = &type_impl->type, ._1 = 0, ._2 = 0} };
@@ -821,17 +821,17 @@ bool Module__parse_functions(struct Module* self) {
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
         #line 406 "src/analyzer/Module.pv"
-        struct Generics generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+        struct Generics generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
         #line 407 "src/analyzer/Module.pv"
         Function__parse_function(func_info, &generics);
     } }
 
     #line 410 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_Impl __iter = Array_Impl__iter(&self->impls);
+    { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
     #line 410 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_Impl__next(&__iter)) {
+    while (Iter_ref_Impl__next(&__iter)) {
         #line 410 "src/analyzer/Module.pv"
-        struct Impl* impl_info = ArrayIter_ref_Impl__value(&__iter);
+        struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
         #line 411 "src/analyzer/Module.pv"
         Impl__parse_functions(impl_info);
@@ -849,11 +849,11 @@ bool Module__parse_functions(struct Module* self) {
     } }
 
     #line 418 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
+    { struct Iter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
     #line 418 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_TypeImpl__next(&__iter)) {
+    while (Iter_ref_TypeImpl__next(&__iter)) {
         #line 418 "src/analyzer/Module.pv"
-        struct TypeImpl* type_impl = ArrayIter_ref_TypeImpl__value(&__iter);
+        struct TypeImpl* type_impl = Iter_ref_TypeImpl__value(&__iter);
 
         #line 419 "src/analyzer/Module.pv"
         Impl__parse_functions(type_impl->impl_info);
@@ -882,11 +882,11 @@ struct Type* Module__find_type(struct Module* self, struct str name) {
     }
 
     #line 432 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
     #line 432 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
         #line 432 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
         #line 433 "src/analyzer/Module.pv"
         type = Namespace__find_type(namespace, name);
@@ -944,11 +944,11 @@ struct Trait* Module__find_trait(struct Module* self, struct str name) {
     }
 
     #line 455 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
     #line 455 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
         #line 455 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
         #line 456 "src/analyzer/Module.pv"
         type = Namespace__find_trait(namespace, name);
@@ -982,11 +982,11 @@ struct Type* Module__find_function(struct Module* self, struct str name) {
     }
 
     #line 470 "src/analyzer/Module.pv"
-    { struct ArrayIter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
     #line 470 "src/analyzer/Module.pv"
-    while (ArrayIter_ref_ref_Namespace__next(&__iter)) {
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
         #line 470 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *ArrayIter_ref_ref_Namespace__value(&__iter);
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
         #line 471 "src/analyzer/Module.pv"
         type = Namespace__find_function(namespace, name);

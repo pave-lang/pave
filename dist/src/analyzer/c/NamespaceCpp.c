@@ -2,7 +2,7 @@
 #include <analyzer/c/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/str.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Type.h>
@@ -19,7 +19,7 @@ struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .parent = parent,
-        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .values = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .values = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });
 }

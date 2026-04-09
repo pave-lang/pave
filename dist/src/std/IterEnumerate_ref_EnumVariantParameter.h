@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_ENUM_VARIANT_PARAMETER
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_EnumVariantParameter.h>
+#include <std/Iter_ref_EnumVariantParameter.h>
 #include <stdbool.h>
 
 struct EnumVariantParameter;
@@ -13,7 +13,7 @@ struct EnumVariantParameter;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_EnumVariantParameter {
     uintptr_t index;
-    struct ArrayIter_ref_EnumVariantParameter iter;
+    struct Iter_ref_EnumVariantParameter iter;
 };
 
 #line 58 "src/std/Array.pv"

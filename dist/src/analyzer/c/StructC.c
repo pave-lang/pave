@@ -1,7 +1,7 @@
 #include <analyzer/c/Include.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/str.h>
 #include <std/HashMap_str_StructCField.h>
 #include <analyzer/c/StructCField.h>
@@ -17,6 +17,6 @@ struct StructC* StructC__new(struct Include* include, char const* name) {
     return ArenaAllocator__store_StructC(allocator, (struct StructC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
-        .fields = HashMap_str_StructCField__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .fields = HashMap_str_StructCField__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });
 }

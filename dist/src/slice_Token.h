@@ -8,6 +8,6 @@ struct Token;
 struct slice_Token { struct Token* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_Token slice_Token__iter(struct slice_Token self);
+struct Iter_ref_Token slice_Token__iter(struct slice_Token self);
 
 #endif

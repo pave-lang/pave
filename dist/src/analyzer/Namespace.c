@@ -6,7 +6,7 @@
 #include <std/ArenaAllocator.h>
 #include <stdint.h>
 #include <std/HashMap_str_ref_Namespace.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashMap_str_ref_Module.h>
 #include <analyzer/Module.h>
 #include <std/HashMap_str_Type.h>
@@ -35,11 +35,11 @@ struct Namespace* Namespace__new(struct Root* root, struct Namespace* parent, st
         .parent = parent,
         .name = name,
         .path = path,
-        .children = HashMap_str_ref_Namespace__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .modules = HashMap_str_ref_Module__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .traits = HashMap_str_ref_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .functions = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .children = HashMap_str_ref_Namespace__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .modules = HashMap_str_ref_Module__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .traits = HashMap_str_ref_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .functions = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 
     #line 35 "src/analyzer/Namespace.pv"
@@ -65,7 +65,7 @@ bool Namespace__add_namespace(struct Namespace* self, struct str name, struct st
 #line 48 "src/analyzer/Namespace.pv"
 bool Namespace__add_namespace_subfolder(struct Namespace* self, struct str name) {
     #line 49 "src/analyzer/Namespace.pv"
-    struct String path = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
+    struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
     #line 50 "src/analyzer/Namespace.pv"
     String__append(&path, self->path);
     #line 51 "src/analyzer/Namespace.pv"
@@ -105,7 +105,7 @@ bool Namespace__add_module(struct Namespace* self, struct str name) {
     }
 
     #line 72 "src/analyzer/Namespace.pv"
-    struct String path = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
+    struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
     #line 73 "src/analyzer/Namespace.pv"
     String__append(&path, self->path);
     #line 74 "src/analyzer/Namespace.pv"

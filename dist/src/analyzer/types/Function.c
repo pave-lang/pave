@@ -2,11 +2,11 @@
 
 #include <analyzer/Context.h>
 #include <analyzer/types/Generics.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <stdbool.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/TokenType.h>
@@ -25,13 +25,13 @@ struct Function Function__new(struct Context* context) {
     #line 44 "src/analyzer/types/Function.pv"
     return (struct Function) {
         .context = context,
-        .generics = Generics__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .parameters = Array_Parameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .parameters = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
     };
 }
 
 #line 51 "src/analyzer/types/Function.pv"
-struct Function Function__new_allocator(struct Allocator allocator) {
+struct Function Function__new_allocator(struct trait_Allocator allocator) {
     #line 52 "src/analyzer/types/Function.pv"
     return (struct Function) {
         .generics = Generics__new(allocator),
@@ -144,7 +144,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
 
             #line 114 "src/analyzer/types/Function.pv"
             struct Parameter parameter = (struct Parameter) {
-                .type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_self) },
+                .type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_self) },
                 .name = name,
             };
 
@@ -288,11 +288,11 @@ bool Function__parse_function(struct Function* self, struct Generics* generics) 
     context->function = self;
 
     #line 201 "src/analyzer/types/Function.pv"
-    { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&self->parameters);
+    { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&self->parameters);
     #line 201 "src/analyzer/types/Function.pv"
-    while (ArrayIter_ref_Parameter__next(&__iter)) {
+    while (Iter_ref_Parameter__next(&__iter)) {
         #line 201 "src/analyzer/types/Function.pv"
-        struct Parameter* param_info = ArrayIter_ref_Parameter__value(&__iter);
+        struct Parameter* param_info = Iter_ref_Parameter__value(&__iter);
 
         #line 202 "src/analyzer/types/Function.pv"
         if (!Context__set_value(context, param_info->name, &param_info->type)) {

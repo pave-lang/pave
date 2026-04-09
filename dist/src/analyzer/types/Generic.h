@@ -2,7 +2,7 @@
 #define PAVE_GENERIC
 
 #include <std/Array_ref_Trait.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdbool.h>
 
 struct Token;
@@ -16,7 +16,7 @@ struct Generic {
 };
 
 #line 10 "src/analyzer/types/Generics.pv"
-struct Generic Generic__new(struct Allocator allocator);
+struct Generic Generic__new(struct trait_Allocator allocator);
 
 #line 14 "src/analyzer/types/Generics.pv"
 bool Generic__parse(struct Generic* self, struct Context* context);

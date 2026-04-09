@@ -8,6 +8,6 @@ struct Expression;
 struct slice_ref_Expression { struct Expression** data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_ref_Expression slice_ref_Expression__iter(struct slice_ref_Expression self);
+struct Iter_ref_ref_Expression slice_ref_Expression__iter(struct slice_ref_Expression self);
 
 #endif

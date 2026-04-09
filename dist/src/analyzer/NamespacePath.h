@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <std/Array_ref_Token.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 
 struct Token;
 struct Context;
@@ -15,7 +15,7 @@ struct NamespacePath {
 };
 
 #line 9 "src/analyzer/NamespacePath.pv"
-struct NamespacePath NamespacePath__new(struct Allocator allocator);
+struct NamespacePath NamespacePath__new(struct trait_Allocator allocator);
 
 #line 13 "src/analyzer/NamespacePath.pv"
 bool NamespacePath__parse(struct NamespacePath* self, struct Context* context);

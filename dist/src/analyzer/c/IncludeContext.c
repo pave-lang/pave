@@ -20,7 +20,7 @@
 #include <analyzer/c/NamespaceCpp.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/types/Indirect.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/types/Primitive.h>
@@ -247,7 +247,7 @@ struct StructC* IncludeContext__add_typedef_struct_pointer(struct IncludeContext
     #line 151 "src/analyzer/c/IncludeContext.pv"
     struct StructC* struct_info = StructC__new(include, "");
     #line 152 "src/analyzer/c/IncludeContext.pv"
-    struct Indirect* indirect = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator }, (struct Type) { .type = TYPE__STRUCT_C, .structc_value = struct_info });
+    struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator }, (struct Type) { .type = TYPE__STRUCT_C, .structc_value = struct_info });
 
     #line 154 "src/analyzer/c/IncludeContext.pv"
     if (HashMap_str_Type__find(self->types, &(struct str){ .ptr = name, .length = strlen(name) }) == 0) {
@@ -270,7 +270,7 @@ struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeCon
     #line 165 "src/analyzer/c/IncludeContext.pv"
     struct FunctionC* func_info = FunctionC__new(include, name, &include->root->type_unknown);
     #line 166 "src/analyzer/c/IncludeContext.pv"
-    struct Indirect* indirect = Indirect__new_pointer((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator }, (struct Type) { .type = TYPE__FUNCTION_C, .functionc_value = func_info });
+    struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator }, (struct Type) { .type = TYPE__FUNCTION_C, .functionc_value = func_info });
     #line 167 "src/analyzer/c/IncludeContext.pv"
     struct Type indirect_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect };
 

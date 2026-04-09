@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <stdbool.h>
-#include <std/ArrayIter_ref_DeferStatement.h>
+#include <std/Iter_ref_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
 #include <stdint.h>
 #include <tuple_usize_ref_DeferStatement.h>
@@ -12,7 +12,7 @@
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_DeferStatement__next(struct IterEnumerate_ref_DeferStatement* self) {
     #line 59 "src/std/Array.pv"
-    if (!ArrayIter_ref_DeferStatement__next(&self->iter)) {
+    if (!Iter_ref_DeferStatement__next(&self->iter)) {
         #line 59 "src/std/Array.pv"
         return false;
     }
@@ -25,5 +25,5 @@ bool IterEnumerate_ref_DeferStatement__next(struct IterEnumerate_ref_DeferStatem
 #line 64 "src/std/Array.pv"
 struct tuple_usize_ref_DeferStatement IterEnumerate_ref_DeferStatement__value(struct IterEnumerate_ref_DeferStatement* self) {
     #line 65 "src/std/Array.pv"
-    return (struct tuple_usize_ref_DeferStatement) { ._0 = self->index - 1, ._1 = ArrayIter_ref_DeferStatement__value(&self->iter) };
+    return (struct tuple_usize_ref_DeferStatement) { ._0 = self->index - 1, ._1 = Iter_ref_DeferStatement__value(&self->iter) };
 }

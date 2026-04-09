@@ -8,6 +8,6 @@ struct Trait;
 struct slice_ref_Trait { struct Trait** data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_ref_Trait slice_ref_Trait__iter(struct slice_ref_Trait self);
+struct Iter_ref_ref_Trait slice_ref_Trait__iter(struct slice_ref_Trait self);
 
 #endif

@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_MATCH_CASE
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_MatchCase.h>
+#include <std/Iter_ref_MatchCase.h>
 #include <stdbool.h>
 
 struct MatchCase;
@@ -13,7 +13,7 @@ struct MatchCase;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_MatchCase {
     uintptr_t index;
-    struct ArrayIter_ref_MatchCase iter;
+    struct Iter_ref_MatchCase iter;
 };
 
 #line 58 "src/std/Array.pv"

@@ -8,6 +8,6 @@ struct DeferStatement;
 struct slice_DeferStatement { struct DeferStatement* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_DeferStatement slice_DeferStatement__iter(struct slice_DeferStatement self);
+struct Iter_ref_DeferStatement slice_DeferStatement__iter(struct slice_DeferStatement self);
 
 #endif

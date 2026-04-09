@@ -3,7 +3,7 @@
 
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/Type.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 
 struct Type;
 
@@ -16,15 +16,15 @@ struct Indirect {
 };
 
 #line 20 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_reference(struct Allocator allocator, struct Type to);
+struct Indirect* Indirect__new_reference(struct trait_Allocator allocator, struct Type to);
 
 #line 26 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_dynamic_dispatch(struct Allocator allocator, struct Type to);
+struct Indirect* Indirect__new_dynamic_dispatch(struct trait_Allocator allocator, struct Type to);
 
 #line 32 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_pointer(struct Allocator allocator, struct Type to);
+struct Indirect* Indirect__new_pointer(struct trait_Allocator allocator, struct Type to);
 
 #line 38 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_const_pointer(struct Allocator allocator, struct Type to);
+struct Indirect* Indirect__new_const_pointer(struct trait_Allocator allocator, struct Type to);
 
 #endif

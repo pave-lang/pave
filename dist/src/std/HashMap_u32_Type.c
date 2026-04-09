@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/HashMapIter_u32_Type.h>
 #include <analyzer/types/Type.h>
@@ -13,7 +13,7 @@
 #include <std/HashMap_u32_Type.h>
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_u32_Type HashMap_u32_Type__new(struct Allocator allocator) {
+struct HashMap_u32_Type HashMap_u32_Type__new(struct trait_Allocator allocator) {
     #line 36 "src/std/HashMap.pv"
     int32_t initial_capacity = 16;
     #line 37 "src/std/HashMap.pv"
@@ -203,7 +203,7 @@ void HashMap_u32_Type__fill_buckets(struct HashMap_u32_Type* self) {
 }
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_u32_Type HashMap_u32_Type__clone(struct HashMap_u32_Type* self, struct Allocator allocator) {
+struct HashMap_u32_Type HashMap_u32_Type__clone(struct HashMap_u32_Type* self, struct trait_Allocator allocator) {
     #line 150 "src/std/HashMap.pv"
     struct HashMap_u32_Type other = (struct HashMap_u32_Type) {
         .allocator = allocator,

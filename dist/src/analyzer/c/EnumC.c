@@ -2,7 +2,7 @@
 #include <analyzer/c/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/str.h>
 #include <std/HashMap_str_EnumCValue.h>
 #include <analyzer/c/EnumCValue.h>
@@ -19,6 +19,6 @@ struct EnumC* EnumC__new(struct Include* include, char const* name, struct Paren
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .parent = parent,
-        .values = HashMap_str_EnumCValue__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .values = HashMap_str_EnumCValue__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });
 }

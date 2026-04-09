@@ -2,7 +2,7 @@
 #include <analyzer/types/Type.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/str.h>
 #include <std/Array_ref_Expression.h>
 #include <analyzer/expression/Expression.h>
@@ -19,6 +19,6 @@ struct FunctionC* FunctionC__new(struct Include* include, char const* name, stru
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .return_type = *return_type,
-        .arguments = Array_ref_Expression__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .arguments = Array_ref_Expression__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     });
 }

@@ -8,7 +8,7 @@
 #include <analyzer/TokenType.h>
 #include <std/Array_ptrc_char.h>
 #include <std/ArenaAllocator.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_Token.h>
 #include <analyzer/Token.h>
 
@@ -217,7 +217,7 @@ bool Tokenizer__is_in_array(struct Array_ptrc_char* array, char const* s, uintpt
 #line 146 "src/analyzer/Tokenizer.pv"
 struct Array_ptrc_char Tokenizer__make_keywords(struct ArenaAllocator* allocator) {
     #line 147 "src/analyzer/Tokenizer.pv"
-    struct Array_ptrc_char keywords = Array_ptrc_char__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_ptrc_char keywords = Array_ptrc_char__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
     #line 149 "src/analyzer/Tokenizer.pv"
     Array_ptrc_char__append(&keywords, "struct");
@@ -286,7 +286,7 @@ struct Array_ptrc_char Tokenizer__make_keywords(struct ArenaAllocator* allocator
 #line 184 "src/analyzer/Tokenizer.pv"
 struct Array_ptrc_char Tokenizer__make_symbols(struct ArenaAllocator* allocator) {
     #line 185 "src/analyzer/Tokenizer.pv"
-    struct Array_ptrc_char symbols = Array_ptrc_char__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_ptrc_char symbols = Array_ptrc_char__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
     #line 187 "src/analyzer/Tokenizer.pv"
     Array_ptrc_char__append(&symbols, "::");
@@ -404,7 +404,7 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
     };
 
     #line 257 "src/analyzer/Tokenizer.pv"
-    struct Array_Token tokens = Array_Token__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_Token tokens = Array_Token__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
     #line 259 "src/analyzer/Tokenizer.pv"
     Tokenizer__skip_whitespace(&tokenizer);

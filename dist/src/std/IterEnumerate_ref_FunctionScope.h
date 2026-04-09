@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_FUNCTION_SCOPE
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_FunctionScope.h>
+#include <std/Iter_ref_FunctionScope.h>
 #include <stdbool.h>
 
 struct FunctionScope;
@@ -13,7 +13,7 @@ struct FunctionScope;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_FunctionScope {
     uintptr_t index;
-    struct ArrayIter_ref_FunctionScope iter;
+    struct Iter_ref_FunctionScope iter;
 };
 
 #line 58 "src/std/Array.pv"

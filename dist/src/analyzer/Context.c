@@ -11,7 +11,7 @@
 #include <analyzer/Module.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Type.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_Scope.h>
 #include <analyzer/Scope.h>
 #include <analyzer/Root.h>
@@ -29,10 +29,10 @@
 #include <std/HashMap_str_bool.h>
 #include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionType.h>
-#include <std/ArrayIter_ref_Generic.h>
+#include <std/Iter_ref_Generic.h>
 #include <analyzer/types/Generics.h>
 #include <std/HashMap_str_usize.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <analyzer/types/GenericMap.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <std/Array_Diagnostic.h>
@@ -52,13 +52,13 @@
 #include <analyzer/types/Enum.h>
 #include <analyzer/types/Trait.h>
 #include <analyzer/c/ClassCpp.h>
-#include <std/ArrayIter_ref_Type.h>
+#include <std/Iter_ref_Type.h>
 #include <std/String.h>
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
-#include <std/ArrayIter_ref_Scope.h>
-#include <std/ArrayIter_ref_DeferStatement.h>
-#include <std/ArrayIter_ref_ref_Trait.h>
+#include <std/Iter_ref_Scope.h>
+#include <std/Iter_ref_DeferStatement.h>
+#include <std/Iter_ref_ref_Trait.h>
 #include <std/Array_ref_Trait.h>
 #include <tuple_ref_Trait_ref_Type.h>
 
@@ -73,8 +73,8 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
         .path = path,
         .analysis = analysis,
         .module = module,
-        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .scopes = Array_Scope__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .scopes = Array_Scope__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .root = module->root,
     };
 
@@ -98,17 +98,17 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
     Context__push_scope(&self, 0);
 
     #line 53 "src/analyzer/Context.pv"
-    struct Generic t = Generic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Generic t = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 54 "src/analyzer/Context.pv"
     t.name = ArenaAllocator__store_Token(allocator, (struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "T", .length = strlen("T") } });
 
     #line 56 "src/analyzer/Context.pv"
-    struct Generic u = Generic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Generic u = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 57 "src/analyzer/Context.pv"
     u.name = ArenaAllocator__store_Token(allocator, (struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "U", .length = strlen("U") } });
 
     #line 59 "src/analyzer/Context.pv"
-    struct Array_Generic generics = Array_Generic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_Generic generics = Array_Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 60 "src/analyzer/Context.pv"
     Array_Generic__append(&generics, t);
     #line 61 "src/analyzer/Context.pv"
@@ -119,7 +119,7 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
     struct Generic* generic_u = Array_Generic__get(&generics, 1);
 
     #line 65 "src/analyzer/Context.pv"
-    struct Array_Parameter params = Array_Parameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_Parameter params = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 66 "src/analyzer/Context.pv"
     Array_Parameter__append(&params, (struct Parameter) { .name = param_name, .type = (struct Type) { .type = TYPE__GENERIC, .generic_value = generic_u } });
 
@@ -127,14 +127,14 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
     Context__insert_builtin_function(&self, "cast", &generics, &params, (struct Type) { .type = TYPE__GENERIC, .generic_value = generic_t });
 
     #line 70 "src/analyzer/Context.pv"
-    struct Array_Generic generics2 = Array_Generic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_Generic generics2 = Array_Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 71 "src/analyzer/Context.pv"
     Array_Generic__append(&generics2, t);
     #line 72 "src/analyzer/Context.pv"
     struct Generic* generic2_t = Array_Generic__get(&generics2, 0);
 
     #line 74 "src/analyzer/Context.pv"
-    struct Array_Parameter params2 = Array_Parameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+    struct Array_Parameter params2 = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 75 "src/analyzer/Context.pv"
     Array_Parameter__append(&params2, (struct Parameter) { .name = param_name, .type = (struct Type) { .type = TYPE__GENERIC, .generic_value = generic2_t } });
     #line 76 "src/analyzer/Context.pv"
@@ -177,11 +177,11 @@ bool Context__insert_builtin_function(struct Context* self, char const* name, st
     #line 97 "src/analyzer/Context.pv"
     if (generics != 0) {
         #line 98 "src/analyzer/Context.pv"
-        { struct ArrayIter_ref_Generic __iter = Array_Generic__iter(generics);
+        { struct Iter_ref_Generic __iter = Array_Generic__iter(generics);
         #line 98 "src/analyzer/Context.pv"
-        while (ArrayIter_ref_Generic__next(&__iter)) {
+        while (Iter_ref_Generic__next(&__iter)) {
             #line 98 "src/analyzer/Context.pv"
-            struct Generic generic = *ArrayIter_ref_Generic__value(&__iter);
+            struct Generic generic = *Iter_ref_Generic__value(&__iter);
 
             #line 99 "src/analyzer/Context.pv"
             uintptr_t index = Array_Generic__append(&func_info.generics.array, generic);
@@ -193,11 +193,11 @@ bool Context__insert_builtin_function(struct Context* self, char const* name, st
     #line 104 "src/analyzer/Context.pv"
     if (parameters != 0) {
         #line 105 "src/analyzer/Context.pv"
-        { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(parameters);
+        { struct Iter_ref_Parameter __iter = Array_Parameter__iter(parameters);
         #line 105 "src/analyzer/Context.pv"
-        while (ArrayIter_ref_Parameter__next(&__iter)) {
+        while (Iter_ref_Parameter__next(&__iter)) {
             #line 105 "src/analyzer/Context.pv"
-            struct Parameter param = *ArrayIter_ref_Parameter__value(&__iter);
+            struct Parameter param = *Iter_ref_Parameter__value(&__iter);
 
             #line 106 "src/analyzer/Context.pv"
             Array_Parameter__append(&func_info.parameters, param);
@@ -222,7 +222,7 @@ void Context__error_token(struct Context* self, struct Token* token, char const*
     #line 119 "src/analyzer/Context.pv"
     if (file_diagnostics == 0) {
         #line 119 "src/analyzer/Context.pv"
-        file_diagnostics = HashMap_str_Array_Diagnostic__insert(diagnostics, self->path, Array_Diagnostic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
+        file_diagnostics = HashMap_str_Array_Diagnostic__insert(diagnostics, self->path, Array_Diagnostic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
     }
 
     #line 121 "src/analyzer/Context.pv"
@@ -250,7 +250,7 @@ void Context__error_token_value(struct Context* self, struct Token* token, char 
     #line 139 "src/analyzer/Context.pv"
     if (file_diagnostics == 0) {
         #line 139 "src/analyzer/Context.pv"
-        file_diagnostics = HashMap_str_Array_Diagnostic__insert(diagnostics, self->path, Array_Diagnostic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
+        file_diagnostics = HashMap_str_Array_Diagnostic__insert(diagnostics, self->path, Array_Diagnostic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
     }
 
     #line 141 "src/analyzer/Context.pv"
@@ -351,7 +351,7 @@ void Context__inlay_hint(struct Context* self, struct Token* token, char const* 
     #line 206 "src/analyzer/Context.pv"
     if (file_inlay_hints == 0) {
         #line 206 "src/analyzer/Context.pv"
-        file_inlay_hints = HashMap_str_Array_InlayHint__insert(inlay_hints, self->path, Array_InlayHint__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
+        file_inlay_hints = HashMap_str_Array_InlayHint__insert(inlay_hints, self->path, Array_InlayHint__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
     }
 
     #line 208 "src/analyzer/Context.pv"
@@ -591,9 +591,9 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         }
 
         #line 359 "src/analyzer/Context.pv"
-        struct Indirect* indirect_1 = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, target_type);
+        struct Indirect* indirect_1 = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, target_type);
         #line 360 "src/analyzer/Context.pv"
-        struct Indirect* indirect_2 = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect_1 });
+        struct Indirect* indirect_2 = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect_1 });
 
         #line 362 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect_2 };
@@ -613,7 +613,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
                 return false;
             }
             #line 370 "src/analyzer/Context.pv"
-            struct Indirect* indirect = Indirect__new_dynamic_dispatch((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, target_type);
+            struct Indirect* indirect = Indirect__new_dynamic_dispatch((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, target_type);
             #line 371 "src/analyzer/Context.pv"
             *type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect };
         } else {
@@ -623,7 +623,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
                 return false;
             }
             #line 374 "src/analyzer/Context.pv"
-            struct Indirect* indirect = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, target_type);
+            struct Indirect* indirect = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, target_type);
             #line 375 "src/analyzer/Context.pv"
             *type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect };
         }
@@ -735,7 +735,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 435 "src/analyzer/Context.pv"
         struct Tuple* tuple = ArenaAllocator__Allocator__alloc(self->allocator, sizeof(struct Tuple));
         #line 436 "src/analyzer/Context.pv"
-        tuple->elements = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+        tuple->elements = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
         #line 438 "src/analyzer/Context.pv"
         while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ")")) {
@@ -800,7 +800,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
     }
 
     #line 472 "src/analyzer/Context.pv"
-    struct Array_Type generics_ = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct Array_Type generics_ = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 474 "src/analyzer/Context.pv"
     if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "<")) {
@@ -1050,7 +1050,7 @@ bool Context__parse_type_trait(struct Context* self, struct Type* type, struct G
     }
 
     #line 603 "src/analyzer/Context.pv"
-    struct Array_Type generics_ = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct Array_Type generics_ = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 605 "src/analyzer/Context.pv"
     if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "<")) {
@@ -1139,14 +1139,14 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             #line 657 "src/analyzer/Context.pv"
             struct Tuple* tuple = type->tuple_value;
             #line 658 "src/analyzer/Context.pv"
-            struct Tuple resolved = Tuple__clone(tuple, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+            struct Tuple resolved = Tuple__clone(tuple, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
             #line 660 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&resolved.elements);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved.elements);
             #line 660 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 660 "src/analyzer/Context.pv"
-                struct Type* element = ArrayIter_ref_Type__value(&__iter);
+                struct Type* element = Iter_ref_Type__value(&__iter);
 
                 #line 661 "src/analyzer/Context.pv"
                 *element = *Context__resolve_type(allocator, element, generics_map, fallback_generics_map);
@@ -1170,11 +1170,11 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             struct GenericMap resolved_generics = GenericMap__clone(generics, allocator);
 
             #line 672 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&resolved_generics.array);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics.array);
             #line 672 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 672 "src/analyzer/Context.pv"
-                struct Type* generic = ArrayIter_ref_Type__value(&__iter);
+                struct Type* generic = Iter_ref_Type__value(&__iter);
 
                 #line 673 "src/analyzer/Context.pv"
                 *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
@@ -1200,11 +1200,11 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, GenericMap__clone(generics, allocator));
 
             #line 685 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
             #line 685 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 685 "src/analyzer/Context.pv"
-                struct Type* generic = ArrayIter_ref_Type__value(&__iter);
+                struct Type* generic = Iter_ref_Type__value(&__iter);
 
                 #line 686 "src/analyzer/Context.pv"
                 *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
@@ -1230,11 +1230,11 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, GenericMap__clone(generics, allocator));
 
             #line 698 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
             #line 698 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 698 "src/analyzer/Context.pv"
-                struct Type* generic = ArrayIter_ref_Type__value(&__iter);
+                struct Type* generic = Iter_ref_Type__value(&__iter);
 
                 #line 699 "src/analyzer/Context.pv"
                 *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
@@ -1265,11 +1265,11 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, GenericMap__clone(generics, allocator));
 
             #line 712 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
             #line 712 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 712 "src/analyzer/Context.pv"
-                struct Type* generic = ArrayIter_ref_Type__value(&__iter);
+                struct Type* generic = Iter_ref_Type__value(&__iter);
 
                 #line 713 "src/analyzer/Context.pv"
                 *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
@@ -1352,7 +1352,7 @@ bool Context__set_value(struct Context* self, struct Token* name, struct Type* t
     #line 761 "src/analyzer/Context.pv"
     if (HashMap_str_Type__find(values, &name->value) != 0) {
         #line 762 "src/analyzer/Context.pv"
-        struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+        struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 763 "src/analyzer/Context.pv"
         String__append(&message, (struct str){ .ptr = "Variable name already in use: ", .length = strlen("Variable name already in use: ") });
         #line 764 "src/analyzer/Context.pv"
@@ -1406,14 +1406,14 @@ struct Type* Context__get_value(struct Context* self, struct str name) {
 #line 791 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_defer_statements(struct Context* self) {
     #line 792 "src/analyzer/Context.pv"
-    struct Array_DeferStatement defer_statements = Array_DeferStatement__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct Array_DeferStatement defer_statements = Array_DeferStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 794 "src/analyzer/Context.pv"
-    { struct ArrayIter_ref_Scope __iter = ArrayIter_ref_Scope__reverse(Array_Scope__iter(&self->scopes));
+    { struct Iter_ref_Scope __iter = Iter_ref_Scope__reverse(Array_Scope__iter(&self->scopes));
     #line 794 "src/analyzer/Context.pv"
-    while (ArrayIter_ref_Scope__next(&__iter)) {
+    while (Iter_ref_Scope__next(&__iter)) {
         #line 794 "src/analyzer/Context.pv"
-        struct Scope* scope = ArrayIter_ref_Scope__value(&__iter);
+        struct Scope* scope = Iter_ref_Scope__value(&__iter);
 
         #line 795 "src/analyzer/Context.pv"
         struct Block* block = scope->block;
@@ -1421,11 +1421,11 @@ struct Array_DeferStatement Context__get_defer_statements(struct Context* self) 
         #line 797 "src/analyzer/Context.pv"
         if (block != 0) {
             #line 798 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_DeferStatement __iter = ArrayIter_ref_DeferStatement__reverse(Array_DeferStatement__iter(&block->defer_statements));
+            { struct Iter_ref_DeferStatement __iter = Iter_ref_DeferStatement__reverse(Array_DeferStatement__iter(&block->defer_statements));
             #line 798 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_DeferStatement__next(&__iter)) {
+            while (Iter_ref_DeferStatement__next(&__iter)) {
                 #line 798 "src/analyzer/Context.pv"
-                struct DeferStatement* defer_statement = ArrayIter_ref_DeferStatement__value(&__iter);
+                struct DeferStatement* defer_statement = Iter_ref_DeferStatement__value(&__iter);
 
                 #line 799 "src/analyzer/Context.pv"
                 Array_DeferStatement__append(&defer_statements, *defer_statement);
@@ -1440,14 +1440,14 @@ struct Array_DeferStatement Context__get_defer_statements(struct Context* self) 
 #line 807 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* self) {
     #line 808 "src/analyzer/Context.pv"
-    struct Array_DeferStatement defer_statements = Array_DeferStatement__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct Array_DeferStatement defer_statements = Array_DeferStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 810 "src/analyzer/Context.pv"
-    { struct ArrayIter_ref_Scope __iter = ArrayIter_ref_Scope__reverse(Array_Scope__iter(&self->scopes));
+    { struct Iter_ref_Scope __iter = Iter_ref_Scope__reverse(Array_Scope__iter(&self->scopes));
     #line 810 "src/analyzer/Context.pv"
-    while (ArrayIter_ref_Scope__next(&__iter)) {
+    while (Iter_ref_Scope__next(&__iter)) {
         #line 810 "src/analyzer/Context.pv"
-        struct Scope* scope = ArrayIter_ref_Scope__value(&__iter);
+        struct Scope* scope = Iter_ref_Scope__value(&__iter);
 
         #line 811 "src/analyzer/Context.pv"
         struct Block* block = scope->block;
@@ -1455,11 +1455,11 @@ struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* s
         #line 813 "src/analyzer/Context.pv"
         if (block != 0) {
             #line 814 "src/analyzer/Context.pv"
-            { struct ArrayIter_ref_DeferStatement __iter = ArrayIter_ref_DeferStatement__reverse(Array_DeferStatement__iter(&block->defer_statements));
+            { struct Iter_ref_DeferStatement __iter = Iter_ref_DeferStatement__reverse(Array_DeferStatement__iter(&block->defer_statements));
             #line 814 "src/analyzer/Context.pv"
-            while (ArrayIter_ref_DeferStatement__next(&__iter)) {
+            while (Iter_ref_DeferStatement__next(&__iter)) {
                 #line 814 "src/analyzer/Context.pv"
-                struct DeferStatement* defer_statement = ArrayIter_ref_DeferStatement__value(&__iter);
+                struct DeferStatement* defer_statement = Iter_ref_DeferStatement__value(&__iter);
 
                 #line 815 "src/analyzer/Context.pv"
                 Array_DeferStatement__append(&defer_statements, *defer_statement);
@@ -1480,7 +1480,7 @@ struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* s
 #line 825 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics) {
     #line 826 "src/analyzer/Context.pv"
-    struct Array_Type generic_inputs = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct Array_Type generic_inputs = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 828 "src/analyzer/Context.pv"
     if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "<")) {
@@ -1527,11 +1527,11 @@ bool Context__validate_generic_constraints(struct Context* self, struct Generics
         struct Type* usage_type = usage_types->data + i;
 
         #line 852 "src/analyzer/Context.pv"
-        { struct ArrayIter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);
+        { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);
         #line 852 "src/analyzer/Context.pv"
-        while (ArrayIter_ref_ref_Trait__next(&__iter)) {
+        while (Iter_ref_ref_Trait__next(&__iter)) {
             #line 852 "src/analyzer/Context.pv"
-            struct Trait* required_trait = *ArrayIter_ref_ref_Trait__value(&__iter);
+            struct Trait* required_trait = *Iter_ref_ref_Trait__value(&__iter);
 
             #line 853 "src/analyzer/Context.pv"
             bool implements = false;
@@ -1549,11 +1549,11 @@ bool Context__validate_generic_constraints(struct Context* self, struct Generics
                     #line 858 "src/analyzer/Context.pv"
                     struct Generic* generic_info = usage_type->generic_value;
                     #line 859 "src/analyzer/Context.pv"
-                    { struct ArrayIter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic_info->traits);
+                    { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic_info->traits);
                     #line 859 "src/analyzer/Context.pv"
-                    while (ArrayIter_ref_ref_Trait__next(&__iter)) {
+                    while (Iter_ref_ref_Trait__next(&__iter)) {
                         #line 859 "src/analyzer/Context.pv"
-                        struct Trait* generic_trait = *ArrayIter_ref_ref_Trait__value(&__iter);
+                        struct Trait* generic_trait = *Iter_ref_ref_Trait__value(&__iter);
 
                         #line 860 "src/analyzer/Context.pv"
                         if (generic_trait == required_trait) {
@@ -1571,7 +1571,7 @@ bool Context__validate_generic_constraints(struct Context* self, struct Generics
             #line 865 "src/analyzer/Context.pv"
             if (!implements) {
                 #line 866 "src/analyzer/Context.pv"
-                struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+                struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
                 #line 867 "src/analyzer/Context.pv"
                 String__append(&message, (struct str){ .ptr = "Type does not implement required trait '", .length = strlen("Type does not implement required trait '") });
                 #line 868 "src/analyzer/Context.pv"

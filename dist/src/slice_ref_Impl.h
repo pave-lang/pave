@@ -8,6 +8,6 @@ struct Impl;
 struct slice_ref_Impl { struct Impl** data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_ref_Impl slice_ref_Impl__iter(struct slice_ref_Impl self);
+struct Iter_ref_ref_Impl slice_ref_Impl__iter(struct slice_ref_Impl self);
 
 #endif

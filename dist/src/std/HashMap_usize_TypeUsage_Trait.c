@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/HashMapIter_usize_TypeUsage_Trait.h>
 #include <compiler/TypeUsage_Trait.h>
@@ -14,7 +14,7 @@
 #include <std/HashMap_usize_TypeUsage_Trait.h>
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Trait HashMap_usize_TypeUsage_Trait__new(struct Allocator allocator) {
+struct HashMap_usize_TypeUsage_Trait HashMap_usize_TypeUsage_Trait__new(struct trait_Allocator allocator) {
     #line 36 "src/std/HashMap.pv"
     int32_t initial_capacity = 16;
     #line 37 "src/std/HashMap.pv"
@@ -204,7 +204,7 @@ void HashMap_usize_TypeUsage_Trait__fill_buckets(struct HashMap_usize_TypeUsage_
 }
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_usize_TypeUsage_Trait HashMap_usize_TypeUsage_Trait__clone(struct HashMap_usize_TypeUsage_Trait* self, struct Allocator allocator) {
+struct HashMap_usize_TypeUsage_Trait HashMap_usize_TypeUsage_Trait__clone(struct HashMap_usize_TypeUsage_Trait* self, struct trait_Allocator allocator) {
     #line 150 "src/std/HashMap.pv"
     struct HashMap_usize_TypeUsage_Trait other = (struct HashMap_usize_TypeUsage_Trait) {
         .allocator = allocator,

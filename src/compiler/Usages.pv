@@ -290,9 +290,9 @@ impl Usages {
         self.add_type(&sequence.element, &generic_map);
 
         if self.std_namespace {
-            let array_iter_type = self.std_namespace.find_type("ArrayIter");
+            let iter_type = self.std_namespace.find_type("Iter");
             let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
-            let sequence_iter = self.root.make_type_usage(array_iter_type, &Array<Type> { data: &element_reference, length: 1 });
+            let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1 });
             self.add_type(sequence_iter, &generic_map);
         }
 

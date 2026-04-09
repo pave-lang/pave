@@ -2,7 +2,7 @@
 #include <std/str.h>
 #include <std/HashMap_str_ref_Trait.h>
 #include <analyzer/types/Trait.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/Impl.h>
 #include <stdbool.h>
@@ -14,8 +14,8 @@ struct Primitive Primitive__new(struct ArenaAllocator* allocator, char const* na
     #line 12 "src/analyzer/types/Primitive.pv"
     return (struct Primitive) {
         .name = (struct str){ .ptr = name, .length = strlen(name) },
-        .traits = HashMap_str_ref_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .impls = Array_ref_Impl__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .traits = HashMap_str_ref_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .impls = Array_ref_Impl__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 }
 

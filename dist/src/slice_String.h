@@ -8,6 +8,6 @@ struct String;
 struct slice_String { struct String* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_String slice_String__iter(struct slice_String self);
+struct Iter_ref_String slice_String__iter(struct slice_String self);
 
 #endif

@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <stdbool.h>
-#include <std/ArrayIter_ref_FunctionScope.h>
+#include <std/Iter_ref_FunctionScope.h>
 #include <compiler/FunctionScope.h>
 #include <stdint.h>
 #include <tuple_usize_ref_FunctionScope.h>
@@ -12,7 +12,7 @@
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_FunctionScope__next(struct IterEnumerate_ref_FunctionScope* self) {
     #line 59 "src/std/Array.pv"
-    if (!ArrayIter_ref_FunctionScope__next(&self->iter)) {
+    if (!Iter_ref_FunctionScope__next(&self->iter)) {
         #line 59 "src/std/Array.pv"
         return false;
     }
@@ -25,5 +25,5 @@ bool IterEnumerate_ref_FunctionScope__next(struct IterEnumerate_ref_FunctionScop
 #line 64 "src/std/Array.pv"
 struct tuple_usize_ref_FunctionScope IterEnumerate_ref_FunctionScope__value(struct IterEnumerate_ref_FunctionScope* self) {
     #line 65 "src/std/Array.pv"
-    return (struct tuple_usize_ref_FunctionScope) { ._0 = self->index - 1, ._1 = ArrayIter_ref_FunctionScope__value(&self->iter) };
+    return (struct tuple_usize_ref_FunctionScope) { ._0 = self->index - 1, ._1 = Iter_ref_FunctionScope__value(&self->iter) };
 }

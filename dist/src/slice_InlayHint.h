@@ -8,6 +8,6 @@ struct InlayHint;
 struct slice_InlayHint { struct InlayHint* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_InlayHint slice_InlayHint__iter(struct slice_InlayHint self);
+struct Iter_ref_InlayHint slice_InlayHint__iter(struct slice_InlayHint self);
 
 #endif

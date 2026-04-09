@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <stdbool.h>
-#include <std/ArrayIter_ptrc_char.h>
+#include <std/Iter_ptrc_char.h>
 #include <stdint.h>
 #include <tuple_usize_ptrc_char.h>
 
@@ -11,7 +11,7 @@
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ptrc_char__next(struct IterEnumerate_ptrc_char* self) {
     #line 59 "src/std/Array.pv"
-    if (!ArrayIter_ptrc_char__next(&self->iter)) {
+    if (!Iter_ptrc_char__next(&self->iter)) {
         #line 59 "src/std/Array.pv"
         return false;
     }
@@ -24,5 +24,5 @@ bool IterEnumerate_ptrc_char__next(struct IterEnumerate_ptrc_char* self) {
 #line 64 "src/std/Array.pv"
 struct tuple_usize_ptrc_char IterEnumerate_ptrc_char__value(struct IterEnumerate_ptrc_char* self) {
     #line 65 "src/std/Array.pv"
-    return (struct tuple_usize_ptrc_char) { ._0 = self->index - 1, ._1 = ArrayIter_ptrc_char__value(&self->iter) };
+    return (struct tuple_usize_ptrc_char) { ._0 = self->index - 1, ._1 = Iter_ptrc_char__value(&self->iter) };
 }

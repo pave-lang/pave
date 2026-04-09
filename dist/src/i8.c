@@ -11,4 +11,4 @@ Hashed i8__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(int8_t));
 }
 
-struct HashVTable I8__VTABLE__HASH = { .hash = &i8__Hash__hash };
+struct trait_HashVTable I8__VTABLE__HASH = { .hash = &i8__Hash__hash };

@@ -11,4 +11,4 @@ Hashed i16__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(int16_t));
 }
 
-struct HashVTable I16__VTABLE__HASH = { .hash = &i16__Hash__hash };
+struct trait_HashVTable I16__VTABLE__HASH = { .hash = &i16__Hash__hash };

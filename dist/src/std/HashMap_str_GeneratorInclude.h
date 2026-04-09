@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_STR_GENERATOR_INCLUDE
 #define PAVE_HASH_MAP_STR_GENERATOR_INCLUDE
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_str_GeneratorInclude;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_GeneratorInclude {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_str_GeneratorInclude** buckets;
     struct HashMapBucket_str_GeneratorInclude* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_str_GeneratorInclude {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_GeneratorInclude HashMap_str_GeneratorInclude__new(struct Allocator allocator);
+struct HashMap_str_GeneratorInclude HashMap_str_GeneratorInclude__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_str_GeneratorInclude__resize(struct HashMap_str_GeneratorInclude* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_str_GeneratorInclude__release(struct HashMap_str_GeneratorInclude* 
 void HashMap_str_GeneratorInclude__fill_buckets(struct HashMap_str_GeneratorInclude* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_GeneratorInclude HashMap_str_GeneratorInclude__clone(struct HashMap_str_GeneratorInclude* self, struct Allocator allocator);
+struct HashMap_str_GeneratorInclude HashMap_str_GeneratorInclude__clone(struct HashMap_str_GeneratorInclude* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_GeneratorInclude HashMap_str_GeneratorInclude__iter(struct HashMap_str_GeneratorInclude* self);

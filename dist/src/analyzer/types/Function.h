@@ -8,7 +8,7 @@
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <analyzer/types/Type.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdbool.h>
 
 struct Token;
@@ -39,7 +39,7 @@ struct Function {
 struct Function Function__new(struct Context* context);
 
 #line 51 "src/analyzer/types/Function.pv"
-struct Function Function__new_allocator(struct Allocator allocator);
+struct Function Function__new_allocator(struct trait_Allocator allocator);
 
 #line 58 "src/analyzer/types/Function.pv"
 struct Function Function__parse(struct Context* context);

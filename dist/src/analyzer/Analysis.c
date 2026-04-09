@@ -5,7 +5,7 @@
 #include <std/HashMap_str_bool.h>
 #include <std/str.h>
 #include <stdbool.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
@@ -14,7 +14,7 @@
 #include <analyzer/InlayHint.h>
 #include <tuple_str_Array_Diagnostic.h>
 #include <std/HashMapIter_str_Array_Diagnostic.h>
-#include <std/ArrayIter_ref_Diagnostic.h>
+#include <std/Iter_ref_Diagnostic.h>
 #include <stdint.h>
 #include <analyzer/Position.h>
 
@@ -24,9 +24,9 @@
 struct Analysis Analysis__new(struct ArenaAllocator* allocator) {
     #line 43 "src/analyzer/Analysis.pv"
     return (struct Analysis) {
-        .files = HashMap_str_bool__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .diagnostics = HashMap_str_Array_Diagnostic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .inlay_hints = HashMap_str_Array_InlayHint__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .files = HashMap_str_bool__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .diagnostics = HashMap_str_Array_Diagnostic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .inlay_hints = HashMap_str_Array_InlayHint__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 }
 
@@ -42,11 +42,11 @@ void Analysis__print_diagnostics(struct Analysis* self) {
         struct Array_Diagnostic* diagnostics = &HashMapIter_str_Array_Diagnostic__value(&__iter)->_1;
 
         #line 52 "src/analyzer/Analysis.pv"
-        { struct ArrayIter_ref_Diagnostic __iter = Array_Diagnostic__iter(diagnostics);
+        { struct Iter_ref_Diagnostic __iter = Array_Diagnostic__iter(diagnostics);
         #line 52 "src/analyzer/Analysis.pv"
-        while (ArrayIter_ref_Diagnostic__next(&__iter)) {
+        while (Iter_ref_Diagnostic__next(&__iter)) {
             #line 52 "src/analyzer/Analysis.pv"
-            struct Diagnostic* diagnostic = ArrayIter_ref_Diagnostic__value(&__iter);
+            struct Diagnostic* diagnostic = Iter_ref_Diagnostic__value(&__iter);
 
             #line 53 "src/analyzer/Analysis.pv"
             int32_t filename_length = filename.length;

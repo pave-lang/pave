@@ -8,6 +8,6 @@ struct Tuple;
 struct slice_ref_Tuple { struct Tuple** data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_ref_Tuple slice_ref_Tuple__iter(struct slice_ref_Tuple self);
+struct Iter_ref_ref_Tuple slice_ref_Tuple__iter(struct slice_ref_Tuple self);
 
 #endif

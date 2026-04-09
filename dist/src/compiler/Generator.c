@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <std/str.h>
 #include <std/String.h>
-#include <std/ArrayIter_ref_String.h>
+#include <std/Iter_ref_String.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/Enum.h>
 #include <analyzer/types/EnumVariant.h>
@@ -23,7 +23,7 @@
 #include <analyzer/types/Struct.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/types/Primitive.h>
-#include <std/ArrayIter_ref_ref_Impl.h>
+#include <std/Iter_ref_ref_Impl.h>
 #include <analyzer/Impl.h>
 #include <std/Array_ref_Impl.h>
 #include <std/HashMap_str_Function.h>
@@ -45,51 +45,51 @@
 #include <analyzer/expression/InvokeArgument.h>
 #include <tuple_usize_ref_InvokeArgument.h>
 #include <std/IterEnumerate_ref_InvokeArgument.h>
-#include <std/ArrayIter_ref_InvokeArgument.h>
+#include <std/Iter_ref_InvokeArgument.h>
 #include <analyzer/types/Parameter.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/expression/CppExpression.h>
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
-#include <std/ArrayIter_ref_DeferStatement.h>
+#include <std/Iter_ref_DeferStatement.h>
 #include <compiler/FunctionContext.h>
 #include <analyzer/Block.h>
 #include <analyzer/statement/Statement.h>
-#include <std/ArrayIter_ref_Statement.h>
+#include <std/Iter_ref_Statement.h>
 #include <std/Array_Statement.h>
 #include <analyzer/statement/StatementData.h>
 #include <analyzer/statement/LetStatement.h>
 #include <compiler/FunctionCoroutine.h>
 #include <analyzer/statement/ElseStatement.h>
-#include <std/ArrayIter_ref_ElseStatement.h>
+#include <std/Iter_ref_ElseStatement.h>
 #include <std/Array_ElseStatement.h>
 #include <analyzer/statement/MatchCase.h>
-#include <std/ArrayIter_ref_MatchCase.h>
+#include <std/Iter_ref_MatchCase.h>
 #include <std/Array_MatchCase.h>
 #include <std/Array_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <tuple_usize_ref_MatchPattern.h>
 #include <std/IterEnumerate_ref_MatchPattern.h>
-#include <std/ArrayIter_ref_MatchPattern.h>
+#include <std/Iter_ref_MatchPattern.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/EnumCValue.h>
 #include <analyzer/c/ParentCpp.h>
 #include <analyzer/types/EnumVariantParameter.h>
-#include <std/ArrayIter_ref_EnumVariantParameter.h>
+#include <std/Iter_ref_EnumVariantParameter.h>
 #include <std/Array_EnumVariantParameter.h>
 #include <analyzer/TokenType.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <analyzer/statement/ForStatementType.h>
 #include <analyzer/statement/ForStatement.h>
 #include <analyzer/statement/ForVariable.h>
 #include <std/Array_ForVariable.h>
-#include <std/ArrayIter_ref_ForVariable.h>
+#include <std/Iter_ref_ForVariable.h>
 #include <std/HashMap_str_GeneratorInclude.h>
 #include <compiler/GeneratorInclude.h>
 #include <std/HashMap_str_str.h>
-#include <std/ArrayIter_ref_Type.h>
+#include <std/Iter_ref_Type.h>
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/StructField.h>
 #include <std/HashMapBucket_str_StructField.h>
@@ -106,7 +106,7 @@
 #include <std/HashMap_str_usize.h>
 #include <analyzer/types/Generics.h>
 #include <compiler/TypeFunctionUsage.h>
-#include <std/ArrayIter_ref_ref_GenericMap.h>
+#include <std/Iter_ref_ref_GenericMap.h>
 #include <std/Array_ref_GenericMap.h>
 #include <tuple_str_ref_Type.h>
 #include <std/HashMapIter_str_ref_Type.h>
@@ -158,7 +158,7 @@
 #include <std/HashMap_usize_TypeUsage_Trait.h>
 #include <tuple_usize_TypeFunctionUsage.h>
 #include <std/HashMapIter_usize_TypeFunctionUsage.h>
-#include <std/ArrayIter_ref_ref_Tuple.h>
+#include <std/Iter_ref_ref_Tuple.h>
 #include <std/Array_ref_Tuple.h>
 
 #include <compiler/Generator.h>
@@ -554,11 +554,11 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
             struct Function* func_info = 0;
 
             #line 364 "src/compiler/Generator.pv"
-            struct ArrayIter_ref_ref_Impl impl_iter = Array_ref_Impl__iter(&primitive_info->impls);
+            struct Iter_ref_ref_Impl impl_iter = Array_ref_Impl__iter(&primitive_info->impls);
             #line 365 "src/compiler/Generator.pv"
-            while (func_info == 0 && ArrayIter_ref_ref_Impl__next(&impl_iter)) {
+            while (func_info == 0 && Iter_ref_ref_Impl__next(&impl_iter)) {
                 #line 366 "src/compiler/Generator.pv"
-                struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&impl_iter);
+                struct Impl* impl_info = *Iter_ref_ref_Impl__value(&impl_iter);
                 #line 367 "src/compiler/Generator.pv"
                 func_info = HashMap_str_Function__find(&impl_info->functions, &func_name);
             }
@@ -594,11 +594,11 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
             struct Function* func_info = 0;
 
             #line 387 "src/compiler/Generator.pv"
-            struct ArrayIter_ref_ref_Impl impl_iter = Array_ref_Impl__iter(&enum_info->impls);
+            struct Iter_ref_ref_Impl impl_iter = Array_ref_Impl__iter(&enum_info->impls);
             #line 388 "src/compiler/Generator.pv"
-            while (func_info == 0 && ArrayIter_ref_ref_Impl__next(&impl_iter)) {
+            while (func_info == 0 && Iter_ref_ref_Impl__next(&impl_iter)) {
                 #line 389 "src/compiler/Generator.pv"
-                struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&impl_iter);
+                struct Impl* impl_info = *Iter_ref_ref_Impl__value(&impl_iter);
                 #line 390 "src/compiler/Generator.pv"
                 func_info = HashMap_str_Function__find(&impl_info->functions, &func_name);
             }
@@ -634,7 +634,7 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
             struct Function* func_info = 0;
 
             #line 410 "src/compiler/Generator.pv"
-            { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
+            { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
             #line 410 "src/compiler/Generator.pv"
             while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
                 #line 410 "src/compiler/Generator.pv"
@@ -901,7 +901,7 @@ void Generator__write_trait_cast(struct Generator* self, FILE* file, struct Expr
             #line 557 "src/compiler/Generator.pv"
             if (func_info->type == FUNCTION_TYPE__COROUTINE) {
                 #line 558 "src/compiler/Generator.pv"
-                fprintf(file, "(struct Co_CoroutineStatus) { .vtable = &");
+                fprintf(file, "(struct trait_Co_CoroutineStatus) { .vtable = &");
 
                 #line 560 "src/compiler/Generator.pv"
                 switch (func_info->parent.type) {
@@ -932,7 +932,7 @@ void Generator__write_trait_cast(struct Generator* self, FILE* file, struct Expr
                 fprintf(file, " }");
             } else {
                 #line 575 "src/compiler/Generator.pv"
-                fprintf(file, "(struct Fn) { .vtable = &");
+                fprintf(file, "(struct trait_Fn) { .vtable = &");
 
                 #line 577 "src/compiler/Generator.pv"
                 switch (func_info->parent.type) {
@@ -1160,7 +1160,7 @@ bool Generator__write_struct_construction(struct Generator* self, FILE* file, st
         #line 696 "src/compiler/Generator.pv"
         self->indent += 1;
         #line 697 "src/compiler/Generator.pv"
-        { struct IterEnumerate_ref_InvokeArgument __iter = ArrayIter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(fields));
+        { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(fields));
         #line 697 "src/compiler/Generator.pv"
         while (IterEnumerate_ref_InvokeArgument__next(&__iter)) {
             #line 697 "src/compiler/Generator.pv"
@@ -1273,11 +1273,11 @@ bool Generator__write_enum_variant(struct Generator* self, FILE* file, struct En
         #line 757 "src/compiler/Generator.pv"
         uintptr_t i = 0;
         #line 758 "src/compiler/Generator.pv"
-        { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+        { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
         #line 758 "src/compiler/Generator.pv"
-        while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+        while (Iter_ref_InvokeArgument__next(&__iter)) {
             #line 758 "src/compiler/Generator.pv"
-            struct InvokeArgument arg = *ArrayIter_ref_InvokeArgument__value(&__iter);
+            struct InvokeArgument arg = *Iter_ref_InvokeArgument__value(&__iter);
 
             #line 759 "src/compiler/Generator.pv"
             if (i > 0) {
@@ -1337,11 +1337,11 @@ bool Generator__write_coroutine_invoke(struct Generator* self, FILE* file, struc
                     #line 790 "src/compiler/Generator.pv"
                     uintptr_t i = 0;
                     #line 791 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                    { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                     #line 791 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_Parameter__next(&__iter)) {
+                    while (Iter_ref_Parameter__next(&__iter)) {
                         #line 791 "src/compiler/Generator.pv"
-                        struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                        struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                         #line 792 "src/compiler/Generator.pv"
                         if (i == 0) {
@@ -1456,11 +1456,11 @@ bool Generator__write_builtin_function_invoke(struct Generator* self, FILE* file
     #line 855 "src/compiler/Generator.pv"
     bool first = true;
     #line 856 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+    { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
     #line 856 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+    while (Iter_ref_InvokeArgument__next(&__iter)) {
         #line 856 "src/compiler/Generator.pv"
-        struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+        struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
         #line 857 "src/compiler/Generator.pv"
         if (first) {
@@ -1499,11 +1499,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
             #line 873 "src/compiler/Generator.pv"
             bool first = true;
             #line 874 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
             #line 874 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+            while (Iter_ref_InvokeArgument__next(&__iter)) {
                 #line 874 "src/compiler/Generator.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                 #line 875 "src/compiler/Generator.pv"
                 if (first) {
@@ -1533,11 +1533,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
             #line 887 "src/compiler/Generator.pv"
             bool first = true;
             #line 888 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
             #line 888 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+            while (Iter_ref_InvokeArgument__next(&__iter)) {
                 #line 888 "src/compiler/Generator.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                 #line 889 "src/compiler/Generator.pv"
                 if (first) {
@@ -1567,11 +1567,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
             #line 901 "src/compiler/Generator.pv"
             bool first = true;
             #line 902 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
             #line 902 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+            while (Iter_ref_InvokeArgument__next(&__iter)) {
                 #line 902 "src/compiler/Generator.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                 #line 903 "src/compiler/Generator.pv"
                 if (first) {
@@ -1665,7 +1665,7 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                     struct GenericMap resolved_generics = GenericMap__resolve_types(generic_map, self->allocator, generics);
 
                     #line 947 "src/compiler/Generator.pv"
-                    struct ArrayIter_ref_InvokeArgument args = Array_InvokeArgument__iter(arguments);
+                    struct Iter_ref_InvokeArgument args = Array_InvokeArgument__iter(arguments);
                     #line 948 "src/compiler/Generator.pv"
                     bool success = true;
                     #line 949 "src/compiler/Generator.pv"
@@ -1678,7 +1678,7 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                             #line 952 "src/compiler/Generator.pv"
                             struct Trait* trait_info = func_info->parent.trait_value;
                             #line 953 "src/compiler/Generator.pv"
-                            if (!ArrayIter_ref_InvokeArgument__next(&args)) {
+                            if (!Iter_ref_InvokeArgument__next(&args)) {
                                 #line 954 "src/compiler/Generator.pv"
                                 fprintf(stderr, "Trait function call missing instance argument\n");
                                 #line 955 "src/compiler/Generator.pv"
@@ -1686,7 +1686,7 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                             }
 
                             #line 958 "src/compiler/Generator.pv"
-                            struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&args);
+                            struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args);
 
                             #line 960 "src/compiler/Generator.pv"
                             if (Type__is_trait(Type__deref(&arg->value->return_type))) {
@@ -1740,11 +1740,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                     }
 
                     #line 992 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_InvokeArgument __iter = args;
+                    { struct Iter_ref_InvokeArgument __iter = args;
                     #line 992 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+                    while (Iter_ref_InvokeArgument__next(&__iter)) {
                         #line 992 "src/compiler/Generator.pv"
-                        struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                        struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                         #line 993 "src/compiler/Generator.pv"
                         if (first) {
@@ -1779,11 +1779,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                     #line 1007 "src/compiler/Generator.pv"
                     bool first = true;
                     #line 1008 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+                    { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
                     #line 1008 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+                    while (Iter_ref_InvokeArgument__next(&__iter)) {
                         #line 1008 "src/compiler/Generator.pv"
-                        struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                        struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                         #line 1009 "src/compiler/Generator.pv"
                         if (first) {
@@ -1820,11 +1820,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                             #line 1024 "src/compiler/Generator.pv"
                             bool first = true;
                             #line 1025 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+                            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
                             #line 1025 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+                            while (Iter_ref_InvokeArgument__next(&__iter)) {
                                 #line 1025 "src/compiler/Generator.pv"
-                                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                                 #line 1026 "src/compiler/Generator.pv"
                                 if (first) {
@@ -1853,11 +1853,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                             #line 1037 "src/compiler/Generator.pv"
                             bool first = true;
                             #line 1038 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+                            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
                             #line 1038 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+                            while (Iter_ref_InvokeArgument__next(&__iter)) {
                                 #line 1038 "src/compiler/Generator.pv"
-                                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                                 #line 1039 "src/compiler/Generator.pv"
                                 if (first) {
@@ -1900,11 +1900,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                         #line 1059 "src/compiler/Generator.pv"
                         bool first = true;
                         #line 1060 "src/compiler/Generator.pv"
-                        { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+                        { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
                         #line 1060 "src/compiler/Generator.pv"
-                        while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+                        while (Iter_ref_InvokeArgument__next(&__iter)) {
                             #line 1060 "src/compiler/Generator.pv"
-                            struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                            struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                             #line 1061 "src/compiler/Generator.pv"
                             if (first) {
@@ -1927,11 +1927,11 @@ bool Generator__write_invoke(struct Generator* self, FILE* file, struct Expressi
                         #line 1069 "src/compiler/Generator.pv"
                         bool first = true;
                         #line 1070 "src/compiler/Generator.pv"
-                        { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+                        { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
                         #line 1070 "src/compiler/Generator.pv"
-                        while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+                        while (Iter_ref_InvokeArgument__next(&__iter)) {
                             #line 1070 "src/compiler/Generator.pv"
-                            struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                            struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                             #line 1071 "src/compiler/Generator.pv"
                             if (first) {
@@ -2330,11 +2330,11 @@ bool Generator__write_expression(struct Generator* self, FILE* file, struct Expr
 #line 1253 "src/compiler/Generator.pv"
 bool Generator__write_defer_statements(struct Generator* self, FILE* file, struct Type* return_type, struct Array_DeferStatement* defer_statements, struct GenericMap* generics) {
     #line 1254 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_DeferStatement __iter = Array_DeferStatement__iter(defer_statements);
+    { struct Iter_ref_DeferStatement __iter = Array_DeferStatement__iter(defer_statements);
     #line 1254 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_DeferStatement__next(&__iter)) {
+    while (Iter_ref_DeferStatement__next(&__iter)) {
         #line 1254 "src/compiler/Generator.pv"
-        struct DeferStatement* defer_info = ArrayIter_ref_DeferStatement__value(&__iter);
+        struct DeferStatement* defer_info = Iter_ref_DeferStatement__value(&__iter);
 
         #line 1255 "src/compiler/Generator.pv"
         switch (defer_info->type) {
@@ -2415,11 +2415,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
     bool last_statement_is_return = false;
 
     #line 1301 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Statement __iter = Array_Statement__iter(&block->statements);
+    { struct Iter_ref_Statement __iter = Array_Statement__iter(&block->statements);
     #line 1301 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Statement__next(&__iter)) {
+    while (Iter_ref_Statement__next(&__iter)) {
         #line 1301 "src/compiler/Generator.pv"
-        struct Statement* statement = ArrayIter_ref_Statement__value(&__iter);
+        struct Statement* statement = Iter_ref_Statement__value(&__iter);
 
         #line 1302 "src/compiler/Generator.pv"
         if (statement > block->statements.data) {
@@ -2593,11 +2593,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                 FunctionContext__pop_scope(self->function_context);
 
                 #line 1394 "src/compiler/Generator.pv"
-                { struct ArrayIter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
+                { struct Iter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
                 #line 1394 "src/compiler/Generator.pv"
-                while (ArrayIter_ref_ElseStatement__next(&__iter)) {
+                while (Iter_ref_ElseStatement__next(&__iter)) {
                     #line 1394 "src/compiler/Generator.pv"
-                    struct ElseStatement* else_statement = ArrayIter_ref_ElseStatement__value(&__iter);
+                    struct ElseStatement* else_statement = Iter_ref_ElseStatement__value(&__iter);
 
                     #line 1395 "src/compiler/Generator.pv"
                     fprintf(file, " else ");
@@ -2665,11 +2665,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                 self->indent += 1;
 
                 #line 1431 "src/compiler/Generator.pv"
-                { struct ArrayIter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
+                { struct Iter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
                 #line 1431 "src/compiler/Generator.pv"
-                while (ArrayIter_ref_MatchCase__next(&__iter)) {
+                while (Iter_ref_MatchCase__next(&__iter)) {
                     #line 1431 "src/compiler/Generator.pv"
-                    struct MatchCase* case_info = ArrayIter_ref_MatchCase__value(&__iter);
+                    struct MatchCase* case_info = Iter_ref_MatchCase__value(&__iter);
 
                     #line 1432 "src/compiler/Generator.pv"
                     Generator__write_line_directive(self, file, block->context, case_info->first_token);
@@ -2680,7 +2680,7 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                     #line 1436 "src/compiler/Generator.pv"
                     struct Array_MatchPattern* patterns = &case_info->patterns;
                     #line 1437 "src/compiler/Generator.pv"
-                    { struct IterEnumerate_ref_MatchPattern __iter = ArrayIter_ref_MatchPattern__enumerate(Array_MatchPattern__iter(patterns));
+                    { struct IterEnumerate_ref_MatchPattern __iter = Iter_ref_MatchPattern__enumerate(Array_MatchPattern__iter(patterns));
                     #line 1437 "src/compiler/Generator.pv"
                     while (IterEnumerate_ref_MatchPattern__next(&__iter)) {
                         #line 1437 "src/compiler/Generator.pv"
@@ -2772,11 +2772,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                     self->indent += 1;
 
                     #line 1480 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_MatchPattern __iter = Array_MatchPattern__iter(patterns);
+                    { struct Iter_ref_MatchPattern __iter = Array_MatchPattern__iter(patterns);
                     #line 1480 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_MatchPattern__next(&__iter)) {
+                    while (Iter_ref_MatchPattern__next(&__iter)) {
                         #line 1480 "src/compiler/Generator.pv"
-                        struct MatchPattern* pattern = ArrayIter_ref_MatchPattern__value(&__iter);
+                        struct MatchPattern* pattern = Iter_ref_MatchPattern__value(&__iter);
 
                         #line 1481 "src/compiler/Generator.pv"
                         switch (pattern->type) {
@@ -2795,11 +2795,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                                 #line 1486 "src/compiler/Generator.pv"
                                 uintptr_t param_i = 0;
                                 #line 1487 "src/compiler/Generator.pv"
-                                { struct ArrayIter_ref_EnumVariantParameter __iter = Array_EnumVariantParameter__iter(parameters);
+                                { struct Iter_ref_EnumVariantParameter __iter = Array_EnumVariantParameter__iter(parameters);
                                 #line 1487 "src/compiler/Generator.pv"
-                                while (ArrayIter_ref_EnumVariantParameter__next(&__iter)) {
+                                while (Iter_ref_EnumVariantParameter__next(&__iter)) {
                                     #line 1487 "src/compiler/Generator.pv"
-                                    struct EnumVariantParameter* param_iter = ArrayIter_ref_EnumVariantParameter__value(&__iter);
+                                    struct EnumVariantParameter* param_iter = Iter_ref_EnumVariantParameter__value(&__iter);
 
                                     #line 1488 "src/compiler/Generator.pv"
                                     if (Token__eq(param_iter->variable, TOKEN_TYPE__IDENTIFIER, "_")) {
@@ -2814,7 +2814,7 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                                     #line 1494 "src/compiler/Generator.pv"
                                     struct Expression* variable_expression = expression;
                                     #line 1495 "src/compiler/Generator.pv"
-                                    struct String accessor = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+                                    struct String accessor = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
                                     #line 1497 "src/compiler/Generator.pv"
                                     String__append_str_lowercase(&accessor, enum_variant->name->value);
@@ -3039,11 +3039,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                         #line 1608 "src/compiler/Generator.pv"
                         uintptr_t i = 0;
                         #line 1609 "src/compiler/Generator.pv"
-                        { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
+                        { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
                         #line 1609 "src/compiler/Generator.pv"
-                        while (ArrayIter_ref_ForVariable__next(&__iter)) {
+                        while (Iter_ref_ForVariable__next(&__iter)) {
                             #line 1609 "src/compiler/Generator.pv"
-                            struct ForVariable* variable = ArrayIter_ref_ForVariable__value(&__iter);
+                            struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
                             #line 1610 "src/compiler/Generator.pv"
                             if (!str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
@@ -3144,11 +3144,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                             #line 1659 "src/compiler/Generator.pv"
                             uintptr_t i = 0;
                             #line 1660 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
+                            { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
                             #line 1660 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_ForVariable__next(&__iter)) {
+                            while (Iter_ref_ForVariable__next(&__iter)) {
                                 #line 1660 "src/compiler/Generator.pv"
-                                struct ForVariable* variable = ArrayIter_ref_ForVariable__value(&__iter);
+                                struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
                                 #line 1661 "src/compiler/Generator.pv"
                                 if (!str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
@@ -3230,11 +3230,11 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                             #line 1700 "src/compiler/Generator.pv"
                             uintptr_t i = 0;
                             #line 1701 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
+                            { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
                             #line 1701 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_ForVariable__next(&__iter)) {
+                            while (Iter_ref_ForVariable__next(&__iter)) {
                                 #line 1701 "src/compiler/Generator.pv"
-                                struct ForVariable* variable = ArrayIter_ref_ForVariable__value(&__iter);
+                                struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
                                 #line 1702 "src/compiler/Generator.pv"
                                 if (!str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
@@ -3418,7 +3418,7 @@ bool Generator__add_primitive_type_include(struct Generator* self, struct HashMa
     }
 
     #line 1798 "src/compiler/Generator.pv"
-    struct String include_string = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct String include_string = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 1799 "src/compiler/Generator.pv"
     String__append(&include_string, *include);
 
@@ -3499,11 +3499,11 @@ bool Generator__add_type_include(struct Generator* self, struct HashMap_str_Gene
             #line 1841 "src/compiler/Generator.pv"
             struct Tuple* tuple = type->tuple_value;
             #line 1842 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&tuple->elements);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&tuple->elements);
             #line 1842 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 1842 "src/compiler/Generator.pv"
-                struct Type* element = ArrayIter_ref_Type__value(&__iter);
+                struct Type* element = Iter_ref_Type__value(&__iter);
 
                 #line 1843 "src/compiler/Generator.pv"
                 Generator__add_type_include(self, includes, refs, includes_primitives, element, generics);
@@ -3540,11 +3540,11 @@ bool Generator__add_type_include(struct Generator* self, struct HashMap_str_Gene
             struct GenericMap resolved_generics = GenericMap__resolve_types(child_types, self->allocator, generics);
 
             #line 1859 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+            { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
             #line 1859 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_Parameter__next(&__iter)) {
+            while (Iter_ref_Parameter__next(&__iter)) {
                 #line 1859 "src/compiler/Generator.pv"
-                struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                 #line 1860 "src/compiler/Generator.pv"
                 Generator__add_type_include(self, includes, refs, includes_primitives, &param->type, &resolved_generics);
@@ -3687,11 +3687,11 @@ bool Generator__add_type_include(struct Generator* self, struct HashMap_str_Gene
     }
 
     #line 1925 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(children);
+    { struct Iter_ref_Type __iter = Array_Type__iter(children);
     #line 1925 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 1925 "src/compiler/Generator.pv"
-        struct Type* child = ArrayIter_ref_Type__value(&__iter);
+        struct Type* child = Iter_ref_Type__value(&__iter);
 
         #line 1926 "src/compiler/Generator.pv"
         Generator__add_type_include(self, includes, refs, includes_primitives, child, generics);
@@ -3716,11 +3716,11 @@ bool Generator__add_function_includes(struct Generator* self, struct HashMap_str
     }
 
     #line 1941 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+    { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
     #line 1941 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Parameter__next(&__iter)) {
+    while (Iter_ref_Parameter__next(&__iter)) {
         #line 1941 "src/compiler/Generator.pv"
-        struct Parameter* parameter_iter = ArrayIter_ref_Parameter__value(&__iter);
+        struct Parameter* parameter_iter = Iter_ref_Parameter__value(&__iter);
 
         #line 1942 "src/compiler/Generator.pv"
         if (func_info->type == FUNCTION_TYPE__COROUTINE || Type__is_fat_pointer(&parameter_iter->type)) {
@@ -3748,11 +3748,11 @@ bool Generator__add_block_includes(struct Generator* self, struct HashMap_str_Ge
     }
 
     #line 1957 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Statement __iter = Array_Statement__iter(&block->statements);
+    { struct Iter_ref_Statement __iter = Array_Statement__iter(&block->statements);
     #line 1957 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Statement__next(&__iter)) {
+    while (Iter_ref_Statement__next(&__iter)) {
         #line 1957 "src/compiler/Generator.pv"
-        struct Statement* statement_iter = ArrayIter_ref_Statement__value(&__iter);
+        struct Statement* statement_iter = Iter_ref_Statement__value(&__iter);
 
         #line 1958 "src/compiler/Generator.pv"
         switch (statement_iter->data.type) {
@@ -3821,11 +3821,11 @@ bool Generator__add_block_includes(struct Generator* self, struct HashMap_str_Ge
                 Generator__add_expression_includes(self, includes, condition, generics);
 
                 #line 1990 "src/compiler/Generator.pv"
-                { struct ArrayIter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
+                { struct Iter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
                 #line 1990 "src/compiler/Generator.pv"
-                while (ArrayIter_ref_ElseStatement__next(&__iter)) {
+                while (Iter_ref_ElseStatement__next(&__iter)) {
                     #line 1990 "src/compiler/Generator.pv"
-                    struct ElseStatement* else_statement = ArrayIter_ref_ElseStatement__value(&__iter);
+                    struct ElseStatement* else_statement = Iter_ref_ElseStatement__value(&__iter);
 
                     #line 1991 "src/compiler/Generator.pv"
                     Generator__add_block_includes(self, includes, else_statement->block, generics);
@@ -3841,18 +3841,18 @@ bool Generator__add_block_includes(struct Generator* self, struct HashMap_str_Ge
                 Generator__add_expression_includes(self, includes, condition, generics);
 
                 #line 1997 "src/compiler/Generator.pv"
-                { struct ArrayIter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
+                { struct Iter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
                 #line 1997 "src/compiler/Generator.pv"
-                while (ArrayIter_ref_MatchCase__next(&__iter)) {
+                while (Iter_ref_MatchCase__next(&__iter)) {
                     #line 1997 "src/compiler/Generator.pv"
-                    struct MatchCase* case_info = ArrayIter_ref_MatchCase__value(&__iter);
+                    struct MatchCase* case_info = Iter_ref_MatchCase__value(&__iter);
 
                     #line 1998 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_MatchPattern __iter = Array_MatchPattern__iter(&case_info->patterns);
+                    { struct Iter_ref_MatchPattern __iter = Array_MatchPattern__iter(&case_info->patterns);
                     #line 1998 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_MatchPattern__next(&__iter)) {
+                    while (Iter_ref_MatchPattern__next(&__iter)) {
                         #line 1998 "src/compiler/Generator.pv"
-                        struct MatchPattern* pattern = ArrayIter_ref_MatchPattern__value(&__iter);
+                        struct MatchPattern* pattern = Iter_ref_MatchPattern__value(&__iter);
 
                         #line 1999 "src/compiler/Generator.pv"
                         switch (pattern->type) {
@@ -3987,11 +3987,11 @@ bool Generator__add_expression_includes(struct Generator* self, struct HashMap_s
             #line 2053 "src/compiler/Generator.pv"
             Generator__add_expression_includes(self, includes, target, generics);
             #line 2054 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
+            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
             #line 2054 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+            while (Iter_ref_InvokeArgument__next(&__iter)) {
                 #line 2054 "src/compiler/Generator.pv"
-                struct InvokeArgument* arg = ArrayIter_ref_InvokeArgument__value(&__iter);
+                struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
                 #line 2055 "src/compiler/Generator.pv"
                 Generator__add_expression_includes(self, includes, arg->value, generics);
@@ -4255,11 +4255,11 @@ void Generator__write_impl_includes_raw(struct Generator* self, FILE* file, stru
     struct HashSet_str written = HashSet_str__new(self->allocator);
 
     #line 2179 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(impls);
+    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(impls);
     #line 2179 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+    while (Iter_ref_ref_Impl__next(&__iter)) {
         #line 2179 "src/compiler/Generator.pv"
-        struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
         #line 2180 "src/compiler/Generator.pv"
         { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&impl_info->context->module->includes);
@@ -4509,11 +4509,11 @@ bool Generator__write_function_definition(struct Generator* self, FILE* file, st
     bool first = true;
 
     #line 2303 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+    { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
     #line 2303 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Parameter__next(&__iter)) {
+    while (Iter_ref_Parameter__next(&__iter)) {
         #line 2303 "src/compiler/Generator.pv"
-        struct Parameter* parameter_iter = ArrayIter_ref_Parameter__value(&__iter);
+        struct Parameter* parameter_iter = Iter_ref_Parameter__value(&__iter);
 
         #line 2304 "src/compiler/Generator.pv"
         if (first) {
@@ -4549,11 +4549,11 @@ bool Generator__generate_function_loop(struct Generator* self, struct TypeFuncti
     struct Function* function_info = usage->type;
 
     #line 2322 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
+    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
     #line 2322 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+    while (Iter_ref_ref_GenericMap__next(&__iter)) {
         #line 2322 "src/compiler/Generator.pv"
-        struct GenericMap* generics = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+        struct GenericMap* generics = *Iter_ref_ref_GenericMap__value(&__iter);
 
         #line 2323 "src/compiler/Generator.pv"
         success = Generator__generate_function(self, function_info, generics) && success;
@@ -4651,7 +4651,7 @@ bool Generator__write_function_block(struct Generator* self, FILE* file, struct 
         fprintf(file, "*)ctx)->_value; }\n");
 
         #line 2379 "src/compiler/Generator.pv"
-        fprintf(file, "struct Iter_");
+        fprintf(file, "struct trait_Iter_");
 
         #line 2381 "src/compiler/Generator.pv"
         struct String name = Naming__get_type_name(&self->naming_ident, &func_info->return_type, generics->self_type, generics);
@@ -4765,7 +4765,7 @@ bool Generator__write_function_coroutine(struct Generator* self, FILE* file, str
     fprintf(file, "};\n\n");
 
     #line 2441 "src/compiler/Generator.pv"
-    fprintf(file, "#include <std/Iter_");
+    fprintf(file, "#include <std/trait_Iter_");
 
     #line 2443 "src/compiler/Generator.pv"
     struct String name = Naming__get_type_name(&self->naming_ident, &func_info->return_type, generics->self_type, generics);
@@ -4785,7 +4785,7 @@ bool Generator__write_function_coroutine(struct Generator* self, FILE* file, str
     fprintf(file, "__value(void* ctx);\n");
 
     #line 2453 "src/compiler/Generator.pv"
-    fprintf(file, "extern struct Iter_");
+    fprintf(file, "extern struct trait_Iter_");
     #line 2454 "src/compiler/Generator.pv"
     Generator__write_string(self, file, &name);
     #line 2455 "src/compiler/Generator.pv"
@@ -4844,7 +4844,7 @@ bool Generator__generate_function(struct Generator* self, struct Function* func_
     }
 
     #line 2484 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2485 "src/compiler/Generator.pv"
     if (!Generator__add_block_includes(self, &includes, func_info->body, generics)) {
         #line 2485 "src/compiler/Generator.pv"
@@ -4913,7 +4913,7 @@ bool Generator__generate_function(struct Generator* self, struct Function* func_
     fprintf(header_file, "\n\n");
 
     #line 2516 "src/compiler/Generator.pv"
-    includes = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    includes = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2517 "src/compiler/Generator.pv"
     if (!Generator__add_function_includes(self, &includes, 0, func_info, generics)) {
         #line 2517 "src/compiler/Generator.pv"
@@ -4971,11 +4971,11 @@ bool Generator__add_enum_definition_includes(struct Generator* self, struct Hash
         #line 2541 "src/compiler/Generator.pv"
         if (variant->types.length > 0) {
             #line 2542 "src/compiler/Generator.pv"
-            { struct ArrayIter_ref_Type __iter = Array_Type__iter(&variant->types);
+            { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
             #line 2542 "src/compiler/Generator.pv"
-            while (ArrayIter_ref_Type__next(&__iter)) {
+            while (Iter_ref_Type__next(&__iter)) {
                 #line 2542 "src/compiler/Generator.pv"
-                struct Type* type = ArrayIter_ref_Type__value(&__iter);
+                struct Type* type = Iter_ref_Type__value(&__iter);
 
                 #line 2543 "src/compiler/Generator.pv"
                 Generator__add_type_include(self, includes, refs, includes, type, generics);
@@ -5209,11 +5209,11 @@ bool Generator__write_enum_definition(struct Generator* self, FILE* file, struct
                 fprintf(file, "struct { ");
 
                 #line 2666 "src/compiler/Generator.pv"
-                { struct ArrayIter_ref_Type __iter = Array_Type__iter(&variant->types);
+                { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
                 #line 2666 "src/compiler/Generator.pv"
-                while (ArrayIter_ref_Type__next(&__iter)) {
+                while (Iter_ref_Type__next(&__iter)) {
                     #line 2666 "src/compiler/Generator.pv"
-                    struct Type* type = ArrayIter_ref_Type__value(&__iter);
+                    struct Type* type = Iter_ref_Type__value(&__iter);
 
                     #line 2667 "src/compiler/Generator.pv"
                     Generator__write_type(self, file, type, generics);
@@ -5249,11 +5249,11 @@ bool Generator__write_enum_definition(struct Generator* self, FILE* file, struct
     }
 
     #line 2688 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
+    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
     #line 2688 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+    while (Iter_ref_ref_Impl__next(&__iter)) {
         #line 2688 "src/compiler/Generator.pv"
-        struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
         #line 2689 "src/compiler/Generator.pv"
         fprintf(file, "\n");
@@ -5287,11 +5287,11 @@ bool Generator__generate_enum_loop(struct Generator* self, struct TypeUsage_Enum
     struct Enum* enum_info = usage->type;
 
     #line 2704 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
+    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
     #line 2704 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+    while (Iter_ref_ref_GenericMap__next(&__iter)) {
         #line 2704 "src/compiler/Generator.pv"
-        struct GenericMap* generics = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+        struct GenericMap* generics = *Iter_ref_ref_GenericMap__value(&__iter);
 
         #line 2705 "src/compiler/Generator.pv"
         success = Generator__generate_enum(self, enum_info, generics) && success;
@@ -5331,9 +5331,9 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
     fprintf(header_file, "\n\n");
 
     #line 2724 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2725 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2726 "src/compiler/Generator.pv"
     if (!Generator__add_enum_definition_includes(self, &includes_definition, &refs_definition, enum_info, generics)) {
         #line 2726 "src/compiler/Generator.pv"
@@ -5397,7 +5397,7 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
     }
 
     #line 2749 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2750 "src/compiler/Generator.pv"
     if (!Generator__add_impl_includes(self, &includes_code, &enum_info->impls, 0, generics)) {
         #line 2750 "src/compiler/Generator.pv"
@@ -5432,7 +5432,7 @@ bool Generator__generate_enum(struct Generator* self, struct Enum* enum_info, st
 #line 2763 "src/compiler/Generator.pv"
 bool Generator__add_impl_definition_includes(struct Generator* self, struct HashMap_str_GeneratorInclude* includes, struct HashMap_str_GeneratorInclude* refs, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics) {
     #line 2764 "src/compiler/Generator.pv"
-    { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
+    { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
     #line 2764 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
         #line 2764 "src/compiler/Generator.pv"
@@ -5472,11 +5472,11 @@ bool Generator__add_impl_definition_includes(struct Generator* self, struct Hash
                 #line 2777 "src/compiler/Generator.pv"
                 if (function_usage != 0) {
                     #line 2778 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
+                    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
                     #line 2778 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+                    while (Iter_ref_ref_GenericMap__next(&__iter)) {
                         #line 2778 "src/compiler/Generator.pv"
-                        struct GenericMap* generics_impl = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+                        struct GenericMap* generics_impl = *Iter_ref_ref_GenericMap__value(&__iter);
 
                         #line 2779 "src/compiler/Generator.pv"
                         Generator__add_function_includes(self, includes, refs, func_info, generics_impl);
@@ -5548,7 +5548,7 @@ bool Generator__add_struct_definition_includes(struct Generator* self, struct Ha
 #line 2812 "src/compiler/Generator.pv"
 bool Generator__add_impl_includes(struct Generator* self, struct HashMap_str_GeneratorInclude* includes, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics) {
     #line 2813 "src/compiler/Generator.pv"
-    { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
+    { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
     #line 2813 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
         #line 2813 "src/compiler/Generator.pv"
@@ -5587,11 +5587,11 @@ bool Generator__add_impl_includes(struct Generator* self, struct HashMap_str_Gen
                 #line 2825 "src/compiler/Generator.pv"
                 if (function_usage != 0) {
                     #line 2826 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
+                    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
                     #line 2826 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+                    while (Iter_ref_ref_GenericMap__next(&__iter)) {
                         #line 2826 "src/compiler/Generator.pv"
-                        struct GenericMap* generics3 = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+                        struct GenericMap* generics3 = *Iter_ref_ref_GenericMap__value(&__iter);
 
                         #line 2827 "src/compiler/Generator.pv"
                         Generator__add_function_includes(self, includes, 0, func_info, generics3);
@@ -5701,7 +5701,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
     }
 
     #line 2885 "src/compiler/Generator.pv"
-    { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
+    { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
     #line 2885 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
         #line 2885 "src/compiler/Generator.pv"
@@ -5785,11 +5785,11 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                 #line 2919 "src/compiler/Generator.pv"
                 if (function_usage != 0) {
                     #line 2920 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
+                    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
                     #line 2920 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+                    while (Iter_ref_ref_GenericMap__next(&__iter)) {
                         #line 2920 "src/compiler/Generator.pv"
-                        struct GenericMap* generics3 = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+                        struct GenericMap* generics3 = *Iter_ref_ref_GenericMap__value(&__iter);
 
                         #line 2921 "src/compiler/Generator.pv"
                         generics3->self_type = generics->self_type;
@@ -5809,7 +5809,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                         #line 2928 "src/compiler/Generator.pv"
                         if (func_info->type == FUNCTION_TYPE__COROUTINE) {
                             #line 2929 "src/compiler/Generator.pv"
-                            fprintf(file, "#include <std/Co_CoroutineStatus.h>\n");
+                            fprintf(file, "#include <std/trait_Co_CoroutineStatus.h>\n");
                             #line 2930 "src/compiler/Generator.pv"
                             fprintf(file, "struct ");
                             #line 2931 "src/compiler/Generator.pv"
@@ -5819,11 +5819,11 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                             #line 2933 "src/compiler/Generator.pv"
                             self->indent += 1;
                             #line 2934 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                            { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                             #line 2934 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_Parameter__next(&__iter)) {
+                            while (Iter_ref_Parameter__next(&__iter)) {
                                 #line 2934 "src/compiler/Generator.pv"
-                                struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                                struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                                 #line 2935 "src/compiler/Generator.pv"
                                 Generator__write_type(self, file, &param->type, generics);
@@ -5840,7 +5840,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                             fprintf(file, "};\n");
 
                             #line 2943 "src/compiler/Generator.pv"
-                            fprintf(file, "extern struct Co_CoroutineStatusVTable ");
+                            fprintf(file, "extern struct trait_Co_CoroutineStatusVTable ");
                             #line 2944 "src/compiler/Generator.pv"
                             Generator__write_str_title(self, file, struct_info->name->value);
                             #line 2945 "src/compiler/Generator.pv"
@@ -5851,7 +5851,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                             fprintf(file, "__VTABLE__CO;\n");
                         } else {
                             #line 2949 "src/compiler/Generator.pv"
-                            fprintf(file, "#include <std/Fn.h>\n");
+                            fprintf(file, "#include <std/trait_Fn.h>\n");
                             #line 2950 "src/compiler/Generator.pv"
                             fprintf(file, "struct ");
                             #line 2951 "src/compiler/Generator.pv"
@@ -5861,11 +5861,11 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                             #line 2953 "src/compiler/Generator.pv"
                             self->indent += 1;
                             #line 2954 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                            { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                             #line 2954 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_Parameter__next(&__iter)) {
+                            while (Iter_ref_Parameter__next(&__iter)) {
                                 #line 2954 "src/compiler/Generator.pv"
-                                struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                                struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                                 #line 2955 "src/compiler/Generator.pv"
                                 Generator__write_type(self, file, &param->type, generics);
@@ -5882,7 +5882,7 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
                             fprintf(file, "};\n");
 
                             #line 2963 "src/compiler/Generator.pv"
-                            fprintf(file, "extern struct FnVTable ");
+                            fprintf(file, "extern struct trait_FnVTable ");
                             #line 2964 "src/compiler/Generator.pv"
                             Generator__write_str_title(self, file, struct_info->name->value);
                             #line 2965 "src/compiler/Generator.pv"
@@ -5968,9 +5968,9 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
     #line 3002 "src/compiler/Generator.pv"
     if (usage->impl_dynamic_usage) {
         #line 3003 "src/compiler/Generator.pv"
-        fprintf(file, "#include <std/Struct.h>\n");
+        fprintf(file, "#include <std/trait_Struct.h>\n");
         #line 3004 "src/compiler/Generator.pv"
-        fprintf(file, "extern struct StructVTable ");
+        fprintf(file, "extern struct trait_StructVTable ");
         #line 3005 "src/compiler/Generator.pv"
         Generator__write_str_title(self, file, String__as_str(&name));
         #line 3006 "src/compiler/Generator.pv"
@@ -6070,11 +6070,11 @@ bool Generator__write_primitive_definition(struct Generator* self, FILE* file, s
     struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
 
     #line 3054 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
+    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
     #line 3054 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+    while (Iter_ref_ref_Impl__next(&__iter)) {
         #line 3054 "src/compiler/Generator.pv"
-        struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
         #line 3055 "src/compiler/Generator.pv"
         Generator__write_impl_definition(self, file, String__as_str(&name), impl_info, generics);
@@ -6094,7 +6094,7 @@ bool Generator__write_primitive_definition(struct Generator* self, FILE* file, s
         struct Trait* trait_info = HashMapIter_str_ref_Trait__value(&__iter)->_1;
 
         #line 3061 "src/compiler/Generator.pv"
-        fprintf(file, "extern struct ");
+        fprintf(file, "extern struct trait_");
         #line 3062 "src/compiler/Generator.pv"
         Generator__write_token(self, file, trait_info->name);
         #line 3063 "src/compiler/Generator.pv"
@@ -6143,7 +6143,7 @@ bool Generator__write_trait_definition(struct Generator* self, FILE* file, struc
         #line 3086 "src/compiler/Generator.pv"
         if (func_info->generics.array.length == 0) {
             #line 3087 "src/compiler/Generator.pv"
-            struct String func_name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+            struct String func_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
             #line 3088 "src/compiler/Generator.pv"
             String__append(&func_name, (struct str){ .ptr = "(*", .length = strlen("(*") });
             #line 3089 "src/compiler/Generator.pv"
@@ -6194,7 +6194,7 @@ bool Generator__write_trait_definition(struct Generator* self, FILE* file, struc
 #line 3115 "src/compiler/Generator.pv"
 struct String Generator__get_trait_function_name(struct Generator* self, struct str struct_name, struct Trait* trait_info, struct Function* func_info, struct GenericMap* generics) {
     #line 3116 "src/compiler/Generator.pv"
-    struct String trait_name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct String trait_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 3118 "src/compiler/Generator.pv"
     String__append(&trait_name, struct_name);
@@ -6224,7 +6224,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
     fprintf(file, "#include <%.*s>\n", (int32_t)(path.array.length), path.array.data);
 
     #line 3135 "src/compiler/Generator.pv"
-    { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
+    { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
     #line 3135 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
         #line 3135 "src/compiler/Generator.pv"
@@ -6384,7 +6384,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                         #line 3211 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
                             #line 3212 "src/compiler/Generator.pv"
-                            fprintf(file, "#include <std/Allocator.h>\n");
+                            fprintf(file, "#include <std/trait_Allocator.h>\n");
                         }
 
                         #line 3215 "src/compiler/Generator.pv"
@@ -6413,11 +6413,11 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                         #line 3229 "src/compiler/Generator.pv"
                         bool first = true;
                         #line 3230 "src/compiler/Generator.pv"
-                        { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                        { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                         #line 3230 "src/compiler/Generator.pv"
-                        while (ArrayIter_ref_Parameter__next(&__iter)) {
+                        while (Iter_ref_Parameter__next(&__iter)) {
                             #line 3230 "src/compiler/Generator.pv"
-                            struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                            struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                             #line 3231 "src/compiler/Generator.pv"
                             if (first) {
@@ -6499,11 +6499,11 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                         #line 3275 "src/compiler/Generator.pv"
                         uintptr_t i = 0;
                         #line 3276 "src/compiler/Generator.pv"
-                        { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                        { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                         #line 3276 "src/compiler/Generator.pv"
-                        while (ArrayIter_ref_Parameter__next(&__iter)) {
+                        while (Iter_ref_Parameter__next(&__iter)) {
                             #line 3276 "src/compiler/Generator.pv"
-                            struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                            struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                             #line 3277 "src/compiler/Generator.pv"
                             Generator__write_indent(self, file);
@@ -6592,11 +6592,11 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                             fprintf(file, "));\n");
 
                             #line 3327 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                            { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                             #line 3327 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_Parameter__next(&__iter)) {
+                            while (Iter_ref_Parameter__next(&__iter)) {
                                 #line 3327 "src/compiler/Generator.pv"
-                                struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                                struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                                 #line 3328 "src/compiler/Generator.pv"
                                 Generator__write_indent(self, file);
@@ -6617,7 +6617,7 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                             #line 3337 "src/compiler/Generator.pv"
                             Generator__write_indent(self, file);
                             #line 3338 "src/compiler/Generator.pv"
-                            fprintf(file, "return (struct Iter_CoroutineStatus) { .vtable = &");
+                            fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
 
                             #line 3340 "src/compiler/Generator.pv"
                             switch (func_info->parent.type) {
@@ -6684,11 +6684,11 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                             #line 3376 "src/compiler/Generator.pv"
                             first = true;
                             #line 3377 "src/compiler/Generator.pv"
-                            { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+                            { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
                             #line 3377 "src/compiler/Generator.pv"
-                            while (ArrayIter_ref_Parameter__next(&__iter)) {
+                            while (Iter_ref_Parameter__next(&__iter)) {
                                 #line 3377 "src/compiler/Generator.pv"
-                                struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+                                struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                                 #line 3378 "src/compiler/Generator.pv"
                                 if (first) {
@@ -6716,10 +6716,10 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                         #line 3389 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
                             #line 3390 "src/compiler/Generator.pv"
-                            fprintf(file, "struct Co_CoroutineStatusVTable ");
+                            fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
                         } else {
                             #line 3392 "src/compiler/Generator.pv"
-                            fprintf(file, "struct FnVTable ");
+                            fprintf(file, "struct trait_FnVTable ");
                         }
 
                         #line 3395 "src/compiler/Generator.pv"
@@ -6792,11 +6792,11 @@ bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* m
                     *func2 = *func_info;
 
                     #line 3436 "src/compiler/Generator.pv"
-                    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
+                    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&function_usage->generic_maps);
                     #line 3436 "src/compiler/Generator.pv"
-                    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+                    while (Iter_ref_ref_GenericMap__next(&__iter)) {
                         #line 3436 "src/compiler/Generator.pv"
-                        struct GenericMap* generics3 = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+                        struct GenericMap* generics3 = *Iter_ref_ref_GenericMap__value(&__iter);
 
                         #line 3437 "src/compiler/Generator.pv"
                         generics3->self_type = generics->self_type;
@@ -6931,11 +6931,11 @@ bool Generator__generate_struct_loop(struct Generator* self, struct TypeUsage_St
     struct Struct* struct_info = usage->type;
 
     #line 3515 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
+    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
     #line 3515 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+    while (Iter_ref_ref_GenericMap__next(&__iter)) {
         #line 3515 "src/compiler/Generator.pv"
-        struct GenericMap* generics = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+        struct GenericMap* generics = *Iter_ref_ref_GenericMap__value(&__iter);
 
         #line 3516 "src/compiler/Generator.pv"
         success = Generator__generate_struct(self, struct_info, usage, generics) && success;
@@ -6960,7 +6960,7 @@ struct String Generator__make_path(struct Generator* self, struct Module* module
 #line 3529 "src/compiler/Generator.pv"
 struct String Generator__make_rel_path(struct Generator* self, struct Module* module, struct str name, struct str ext) {
     #line 3530 "src/compiler/Generator.pv"
-    struct String result = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct String result = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3531 "src/compiler/Generator.pv"
     struct Namespace* namespace = 0;
     #line 3532 "src/compiler/Generator.pv"
@@ -7091,20 +7091,20 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     }
 
     #line 3594 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(&generics->array);
+    { struct Iter_ref_Type __iter = Array_Type__iter(&generics->array);
     #line 3594 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 3594 "src/compiler/Generator.pv"
-        struct Type* type = ArrayIter_ref_Type__value(&__iter);
+        struct Type* type = Iter_ref_Type__value(&__iter);
 
         #line 3595 "src/compiler/Generator.pv"
         Generator__write_c_type_include(self, header_file, Type__deref(type));
     } }
 
     #line 3598 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3599 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3600 "src/compiler/Generator.pv"
     if (!Generator__add_struct_definition_includes(self, &includes_definition, &refs_definition, struct_info, generics)) {
         #line 3600 "src/compiler/Generator.pv"
@@ -7192,7 +7192,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
     }
 
     #line 3640 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3641 "src/compiler/Generator.pv"
     if (!Generator__add_impl_includes(self, &includes_code, &struct_info->impls, &usage->impl_functions, generics)) {
         #line 3641 "src/compiler/Generator.pv"
@@ -7548,7 +7548,7 @@ bool Generator__generate_struct(struct Generator* self, struct Struct* struct_in
         fprintf(code_file, "}\n");
 
         #line 3825 "src/compiler/Generator.pv"
-        fprintf(code_file, "struct StructVTable ");
+        fprintf(code_file, "struct trait_StructVTable ");
         #line 3826 "src/compiler/Generator.pv"
         Generator__write_str_title(self, code_file, String__as_str(&name));
         #line 3827 "src/compiler/Generator.pv"
@@ -7618,9 +7618,9 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
     fprintf(header_file, "\n\n");
 
     #line 3862 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3863 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3864 "src/compiler/Generator.pv"
     if (!Generator__add_impl_definition_includes(self, &includes_definition, &refs_definition, &primitive_info->impls, &usage->impl_functions, &generics)) {
         #line 3864 "src/compiler/Generator.pv"
@@ -7678,7 +7678,7 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
     }
 
     #line 3889 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3890 "src/compiler/Generator.pv"
     if (!Generator__add_impl_includes(self, &includes_code, &primitive_info->impls, &usage->impl_functions, &generics)) {
         #line 3890 "src/compiler/Generator.pv"
@@ -7705,7 +7705,7 @@ bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Prim
         struct Trait* trait_info = HashMapIter_str_ref_Trait__value(&__iter)->_1;
 
         #line 3896 "src/compiler/Generator.pv"
-        fprintf(code_file, "\nstruct ");
+        fprintf(code_file, "\nstruct trait_");
         #line 3897 "src/compiler/Generator.pv"
         Generator__write_token(self, code_file, trait_info->name);
         #line 3898 "src/compiler/Generator.pv"
@@ -7815,9 +7815,9 @@ bool Generator__generate_slice(struct Generator* self, struct Type* element_type
     fprintf(header_file, "\n\n");
 
     #line 3952 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3953 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 3955 "src/compiler/Generator.pv"
     Generator__write_c_type_include(self, header_file, element_type);
@@ -7887,7 +7887,7 @@ bool Generator__generate_slice(struct Generator* self, struct Type* element_type
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions = (struct Array_HashMap_usize_TypeFunctionUsage) { .data = 0, .length = 0 };
 
     #line 3992 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_code = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 3993 "src/compiler/Generator.pv"
     if (!Generator__add_impl_includes(self, &includes_code, &impls, &impl_functions, &generics)) {
         #line 3993 "src/compiler/Generator.pv"
@@ -7958,16 +7958,16 @@ bool Generator__generate_tuple(struct Generator* self, struct Tuple* tuple) {
     fprintf(header_file, "\n\n");
 
     #line 4025 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 4026 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
     #line 4028 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(element_types);
+    { struct Iter_ref_Type __iter = Array_Type__iter(element_types);
     #line 4028 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 4028 "src/compiler/Generator.pv"
-        struct Type* type = ArrayIter_ref_Type__value(&__iter);
+        struct Type* type = Iter_ref_Type__value(&__iter);
 
         #line 4029 "src/compiler/Generator.pv"
         Generator__write_c_type_include(self, header_file, type);
@@ -7990,7 +7990,7 @@ bool Generator__generate_tuple(struct Generator* self, struct Tuple* tuple) {
     self->indent += 1;
 
     #line 4041 "src/compiler/Generator.pv"
-    { struct IterEnumerate_ref_Type __iter = ArrayIter_ref_Type__enumerate(Array_Type__iter(element_types));
+    { struct IterEnumerate_ref_Type __iter = Iter_ref_Type__enumerate(Array_Type__iter(element_types));
     #line 4041 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_Type__next(&__iter)) {
         #line 4041 "src/compiler/Generator.pv"
@@ -7999,7 +7999,7 @@ bool Generator__generate_tuple(struct Generator* self, struct Tuple* tuple) {
         struct Type* element = IterEnumerate_ref_Type__value(&__iter)._1;
 
         #line 4042 "src/compiler/Generator.pv"
-        struct String element_name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+        struct String element_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 4043 "src/compiler/Generator.pv"
         String__append(&element_name, (struct str){ .ptr = "_", .length = strlen("_") });
         #line 4044 "src/compiler/Generator.pv"
@@ -8044,11 +8044,11 @@ bool Generator__generate_trait_loop(struct Generator* self, struct TypeUsage_Tra
     struct Trait* trait_info = usage->type;
 
     #line 4070 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
+    { struct Iter_ref_ref_GenericMap __iter = Array_ref_GenericMap__iter(&usage->generic_maps);
     #line 4070 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_GenericMap__next(&__iter)) {
+    while (Iter_ref_ref_GenericMap__next(&__iter)) {
         #line 4070 "src/compiler/Generator.pv"
-        struct GenericMap* generics = *ArrayIter_ref_ref_GenericMap__value(&__iter);
+        struct GenericMap* generics = *Iter_ref_ref_GenericMap__value(&__iter);
 
         #line 4071 "src/compiler/Generator.pv"
         success = Generator__generate_trait(self, trait_info, generics) && success;
@@ -8099,9 +8099,9 @@ bool Generator__generate_trait(struct Generator* self, struct Trait* trait_info,
     }
 
     #line 4097 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude includes_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 4098 "src/compiler/Generator.pv"
-    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct HashMap_str_GeneratorInclude refs_definition = HashMap_str_GeneratorInclude__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 4099 "src/compiler/Generator.pv"
     if (!Generator__add_trait_definition_includes(self, &includes_definition, &refs_definition, trait_info, generics)) {
         #line 4099 "src/compiler/Generator.pv"
@@ -8163,7 +8163,7 @@ void Generator__create_directories(struct Generator* self, struct str base_path,
         struct Namespace* namespace = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
         #line 4125 "src/compiler/Generator.pv"
-        struct String path = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+        struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 4126 "src/compiler/Generator.pv"
         String__append(&path, base_path);
         #line 4127 "src/compiler/Generator.pv"
@@ -8188,9 +8188,9 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
         .allocator = allocator,
         .path = path,
         .root = root,
-        .primitives = HashMap_str_str__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .primitive_includes = HashMap_str_str__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .code_files = Array_String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .primitives = HashMap_str_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .primitive_includes = HashMap_str_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .code_files = Array_String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .error = FileWriter__new(stderr),
         .output_line_directives = output_line_directives,
         .naming_decl = &root->naming_decl,
@@ -8314,21 +8314,21 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
         Generator__generate_function_loop(&self, usage);
     } }
     #line 4191 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(&usages.sequences);
+    { struct Iter_ref_Type __iter = Array_Type__iter(&usages.sequences);
     #line 4191 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 4191 "src/compiler/Generator.pv"
-        struct Type* element = ArrayIter_ref_Type__value(&__iter);
+        struct Type* element = Iter_ref_Type__value(&__iter);
 
         #line 4191 "src/compiler/Generator.pv"
         Generator__generate_slice(&self, element);
     } }
     #line 4192 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_ref_Tuple __iter = Array_ref_Tuple__iter(&usages.tuples);
+    { struct Iter_ref_ref_Tuple __iter = Array_ref_Tuple__iter(&usages.tuples);
     #line 4192 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_ref_Tuple__next(&__iter)) {
+    while (Iter_ref_ref_Tuple__next(&__iter)) {
         #line 4192 "src/compiler/Generator.pv"
-        struct Tuple* tuple = *ArrayIter_ref_ref_Tuple__value(&__iter);
+        struct Tuple* tuple = *Iter_ref_ref_Tuple__value(&__iter);
 
         #line 4192 "src/compiler/Generator.pv"
         Generator__generate_tuple(&self, tuple);
@@ -8337,14 +8337,14 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
     #line 4194 "src/compiler/Generator.pv"
     if (self.code_files.length > 0) {
         #line 4195 "src/compiler/Generator.pv"
-        struct String command = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self.allocator });
+        struct String command = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self.allocator });
 
         #line 4197 "src/compiler/Generator.pv"
-        { struct ArrayIter_ref_String __iter = Array_String__iter(&self.code_files);
+        { struct Iter_ref_String __iter = Array_String__iter(&self.code_files);
         #line 4197 "src/compiler/Generator.pv"
-        while (ArrayIter_ref_String__next(&__iter)) {
+        while (Iter_ref_String__next(&__iter)) {
             #line 4197 "src/compiler/Generator.pv"
-            struct String* code_file = ArrayIter_ref_String__value(&__iter);
+            struct String* code_file = Iter_ref_String__value(&__iter);
 
             #line 4198 "src/compiler/Generator.pv"
             if (command.array.length > 0) {

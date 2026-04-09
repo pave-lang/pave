@@ -2,7 +2,7 @@
 #define PAVE_ARENA_BLOCK
 
 #include <stdint.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdbool.h>
 
 struct ArenaBlock;
@@ -20,7 +20,7 @@ struct ArenaBlock {
 };
 
 #line 25 "src/std/ArenaAllocator.pv"
-struct ArenaBlock* ArenaBlock__new(struct Allocator allocator, uintptr_t capacity, struct ArenaBlock* prev);
+struct ArenaBlock* ArenaBlock__new(struct trait_Allocator allocator, uintptr_t capacity, struct ArenaBlock* prev);
 
 #line 39 "src/std/ArenaAllocator.pv"
 void* ArenaBlock__alloc(struct ArenaBlock* self, uintptr_t size);
@@ -35,7 +35,7 @@ uintptr_t ArenaBlock__size(struct ArenaBlock* self, void* ptr);
 bool ArenaBlock__free(struct ArenaBlock* self, void* ptr);
 
 #line 91 "src/std/ArenaAllocator.pv"
-void ArenaBlock__destroy(struct ArenaBlock* self, struct Allocator allocator);
+void ArenaBlock__destroy(struct ArenaBlock* self, struct trait_Allocator allocator);
 
 #line 95 "src/std/ArenaAllocator.pv"
 void* ArenaBlock__realloc(struct ArenaBlock* self, void* ptr, uintptr_t size);

@@ -8,6 +8,6 @@ struct Statement;
 struct slice_Statement { struct Statement* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_Statement slice_Statement__iter(struct slice_Statement self);
+struct Iter_ref_Statement slice_Statement__iter(struct slice_Statement self);
 
 #endif

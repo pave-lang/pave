@@ -3,7 +3,7 @@
 #include <std/Fnv1a.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <std/ArrayIter_ptrc_char.h>
+#include <std/Iter_ptrc_char.h>
 #include <std/Hashed.h>
 
 #include <std/str.h>
@@ -101,9 +101,9 @@ bool str__ends_with(struct str self, char const* suffix) {
 }
 
 #line 59 "src/std/str.pv"
-struct ArrayIter_ptrc_char str__iter(struct str self) {
+struct Iter_ptrc_char str__iter(struct str self) {
     #line 60 "src/std/str.pv"
-    return ArrayIter_ptrc_char__new(self.ptr, self.ptr + self.length);
+    return Iter_ptrc_char__new(self.ptr, self.ptr + self.length);
 }
 
 #line 63 "src/std/str.pv"
@@ -168,4 +168,4 @@ Hashed str__Hash__hash(void* __self) {
     return Fnv1a__hash(self->ptr, self->length);
 }
 
-struct HashVTable STR__VTABLE__HASH = { .hash = &str__Hash__hash };
+struct trait_HashVTable STR__VTABLE__HASH = { .hash = &str__Hash__hash };

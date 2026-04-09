@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_DIAGNOSTIC
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_Diagnostic.h>
+#include <std/Iter_ref_Diagnostic.h>
 #include <stdbool.h>
 
 struct Diagnostic;
@@ -13,7 +13,7 @@ struct Diagnostic;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_Diagnostic {
     uintptr_t index;
-    struct ArrayIter_ref_Diagnostic iter;
+    struct Iter_ref_Diagnostic iter;
 };
 
 #line 58 "src/std/Array.pv"

@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_REF_TUPLE
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_ref_Tuple.h>
+#include <std/Iter_ref_ref_Tuple.h>
 #include <stdbool.h>
 
 struct Tuple;
@@ -13,7 +13,7 @@ struct Tuple;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_ref_Tuple {
     uintptr_t index;
-    struct ArrayIter_ref_ref_Tuple iter;
+    struct Iter_ref_ref_Tuple iter;
 };
 
 #line 58 "src/std/Array.pv"

@@ -3,7 +3,7 @@
 #include <analyzer/Context.h>
 #include <std/Array_Statement.h>
 #include <analyzer/statement/Statement.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
@@ -47,9 +47,9 @@
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/types/Enum.h>
 #include <analyzer/types/Sequence.h>
-#include <std/ArrayIter_ref_ForVariable.h>
+#include <std/Iter_ref_ForVariable.h>
 #include <analyzer/Scope.h>
-#include <std/ArrayIter_ref_Scope.h>
+#include <std/Iter_ref_Scope.h>
 
 #include <analyzer/Block.h>
 
@@ -58,8 +58,8 @@ struct Block Block__new(struct Context* context) {
     #line 18 "src/analyzer/Block.pv"
     return (struct Block) {
         .context = context,
-        .statements = Array_Statement__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
-        .defer_statements = Array_DeferStatement__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .statements = Array_Statement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .defer_statements = Array_DeferStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
     };
 }
 
@@ -353,7 +353,7 @@ bool Block__parse_if_statement(struct Block* self, struct Context* context, stru
     }
 
     #line 172 "src/analyzer/Block.pv"
-    struct Array_ElseStatement else_statements = Array_ElseStatement__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+    struct Array_ElseStatement else_statements = Array_ElseStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
     #line 173 "src/analyzer/Block.pv"
     struct Expression* else_expression = 0;
     #line 174 "src/analyzer/Block.pv"
@@ -429,7 +429,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
     }
 
     #line 211 "src/analyzer/Block.pv"
-    struct Array_MatchCase cases = Array_MatchCase__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+    struct Array_MatchCase cases = Array_MatchCase__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
     #line 213 "src/analyzer/Block.pv"
     while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
@@ -442,7 +442,7 @@ bool Block__parse_match_statement(struct Block* self, struct Context* context, s
         Context__push_scope(context, block);
 
         #line 219 "src/analyzer/Block.pv"
-        struct Array_MatchPattern patterns = Array_MatchPattern__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        struct Array_MatchPattern patterns = Array_MatchPattern__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
         #line 221 "src/analyzer/Block.pv"
         while (patterns.length == 0 || Context__check_next(context, TOKEN_TYPE__SYMBOL, "|")) {
@@ -653,7 +653,7 @@ bool Block__parse_match_pattern(struct Block* self, struct Context* context, str
             #line 324 "src/analyzer/Block.pv"
             struct EnumVariant* enum_variant = enum_variant_result.enumvariant_value;
             #line 325 "src/analyzer/Block.pv"
-            struct Array_EnumVariantParameter parameters = Array_EnumVariantParameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+            struct Array_EnumVariantParameter parameters = Array_EnumVariantParameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
             #line 327 "src/analyzer/Block.pv"
             if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
@@ -738,7 +738,7 @@ bool Block__parse_match_pattern(struct Block* self, struct Context* context, str
                 #line 365 "src/analyzer/Block.pv"
                 if (parameters.length != enum_variant->types.length) {
                     #line 366 "src/analyzer/Block.pv"
-                    struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                    struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                     #line 367 "src/analyzer/Block.pv"
                     String__append(&message, (struct str){ .ptr = "Number of parameters does not match, expected ", .length = strlen("Number of parameters does not match, expected ") });
                     #line 368 "src/analyzer/Block.pv"
@@ -750,7 +750,7 @@ bool Block__parse_match_pattern(struct Block* self, struct Context* context, str
                 #line 372 "src/analyzer/Block.pv"
                 if (enum_variant->types.length > 0) {
                     #line 373 "src/analyzer/Block.pv"
-                    struct String message = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                    struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                     #line 374 "src/analyzer/Block.pv"
                     String__append(&message, (struct str){ .ptr = "Expected ", .length = strlen("Expected ") });
                     #line 375 "src/analyzer/Block.pv"
@@ -1034,7 +1034,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
                 for_statement.iter_type = &for_statement.expression->return_type;
             } else {
                 #line 514 "src/analyzer/Block.pv"
-                struct Array_InvokeArgument args = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                struct Array_InvokeArgument args = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
                 #line 515 "src/analyzer/Block.pv"
                 Array_InvokeArgument__append(&args, (struct InvokeArgument) { .value = for_statement.expression });
 
@@ -1063,11 +1063,11 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
         #line 529 "src/analyzer/Block.pv"
         uintptr_t variable_i = 0;
         #line 530 "src/analyzer/Block.pv"
-        { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement.variables);
+        { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement.variables);
         #line 530 "src/analyzer/Block.pv"
-        while (ArrayIter_ref_ForVariable__next(&__iter)) {
+        while (Iter_ref_ForVariable__next(&__iter)) {
             #line 530 "src/analyzer/Block.pv"
-            struct ForVariable* variable = ArrayIter_ref_ForVariable__value(&__iter);
+            struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
             #line 531 "src/analyzer/Block.pv"
             if (for_statement.variables.length == 1) {
@@ -1077,7 +1077,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
                 #line 534 "src/analyzer/Block.pv"
                 struct Token value_member = *variable->name;
                 #line 535 "src/analyzer/Block.pv"
-                struct String value_name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                struct String value_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                 #line 536 "src/analyzer/Block.pv"
                 String__append_usize(&value_name, variable_i);
                 #line 537 "src/analyzer/Block.pv"
@@ -1098,7 +1098,7 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
             #line 547 "src/analyzer/Block.pv"
             if (variable->ref) {
                 #line 548 "src/analyzer/Block.pv"
-                variable->type = Type__to_ptr(&(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *variable->type) }, context->allocator);
+                variable->type = Type__to_ptr(&(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *variable->type) }, context->allocator);
             }
 
             #line 551 "src/analyzer/Block.pv"
@@ -1117,11 +1117,11 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
     Context__push_scope(context, self);
 
     #line 561 "src/analyzer/Block.pv"
-    { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement.variables);
+    { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement.variables);
     #line 561 "src/analyzer/Block.pv"
-    while (ArrayIter_ref_ForVariable__next(&__iter)) {
+    while (Iter_ref_ForVariable__next(&__iter)) {
         #line 561 "src/analyzer/Block.pv"
-        struct ForVariable* variable2 = ArrayIter_ref_ForVariable__value(&__iter);
+        struct ForVariable* variable2 = Iter_ref_ForVariable__value(&__iter);
 
         #line 562 "src/analyzer/Block.pv"
         if (!Context__set_value(context, variable2->name, variable2->type)) {
@@ -1157,11 +1157,11 @@ bool Block__parse_defer_statement(struct Block* self, struct Context* context, s
     #line 577 "src/analyzer/Block.pv"
     bool top_block_found = false;
     #line 578 "src/analyzer/Block.pv"
-    { struct ArrayIter_ref_Scope __iter = Array_Scope__iter(&context->scopes);
+    { struct Iter_ref_Scope __iter = Array_Scope__iter(&context->scopes);
     #line 578 "src/analyzer/Block.pv"
-    while (ArrayIter_ref_Scope__next(&__iter)) {
+    while (Iter_ref_Scope__next(&__iter)) {
         #line 578 "src/analyzer/Block.pv"
-        struct Scope* scope = ArrayIter_ref_Scope__value(&__iter);
+        struct Scope* scope = Iter_ref_Scope__value(&__iter);
 
         #line 579 "src/analyzer/Block.pv"
         if (top_block_found) {

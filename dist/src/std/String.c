@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_char.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -11,7 +11,7 @@
 #include <std/String.h>
 
 #line 10 "src/std/String.pv"
-struct String String__new(struct Allocator allocator) {
+struct String String__new(struct trait_Allocator allocator) {
     #line 11 "src/std/String.pv"
     return (struct String) { .array = Array_char__new(allocator) };
 }

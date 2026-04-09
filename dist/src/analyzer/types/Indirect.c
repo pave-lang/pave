@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <analyzer/types/Type.h>
 #include <stdint.h>
 #include <analyzer/types/IndirectType.h>
@@ -8,7 +8,7 @@
 #include <analyzer/types/Indirect.h>
 
 #line 20 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_reference(struct Allocator allocator, struct Type to) {
+struct Indirect* Indirect__new_reference(struct trait_Allocator allocator, struct Type to) {
     #line 21 "src/analyzer/types/Type.pv"
     struct Indirect* result = allocator.vtable->alloc(allocator.instance, sizeof(struct Indirect));
     #line 22 "src/analyzer/types/Type.pv"
@@ -18,7 +18,7 @@ struct Indirect* Indirect__new_reference(struct Allocator allocator, struct Type
 }
 
 #line 26 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_dynamic_dispatch(struct Allocator allocator, struct Type to) {
+struct Indirect* Indirect__new_dynamic_dispatch(struct trait_Allocator allocator, struct Type to) {
     #line 27 "src/analyzer/types/Type.pv"
     struct Indirect* result = allocator.vtable->alloc(allocator.instance, sizeof(struct Indirect));
     #line 28 "src/analyzer/types/Type.pv"
@@ -28,7 +28,7 @@ struct Indirect* Indirect__new_dynamic_dispatch(struct Allocator allocator, stru
 }
 
 #line 32 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_pointer(struct Allocator allocator, struct Type to) {
+struct Indirect* Indirect__new_pointer(struct trait_Allocator allocator, struct Type to) {
     #line 33 "src/analyzer/types/Type.pv"
     struct Indirect* result = allocator.vtable->alloc(allocator.instance, sizeof(struct Indirect));
     #line 34 "src/analyzer/types/Type.pv"
@@ -38,7 +38,7 @@ struct Indirect* Indirect__new_pointer(struct Allocator allocator, struct Type t
 }
 
 #line 38 "src/analyzer/types/Type.pv"
-struct Indirect* Indirect__new_const_pointer(struct Allocator allocator, struct Type to) {
+struct Indirect* Indirect__new_const_pointer(struct trait_Allocator allocator, struct Type to) {
     #line 39 "src/analyzer/types/Type.pv"
     struct Indirect* result = allocator.vtable->alloc(allocator.instance, sizeof(struct Indirect));
     #line 40 "src/analyzer/types/Type.pv"

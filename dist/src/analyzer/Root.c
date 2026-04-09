@@ -9,7 +9,7 @@
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/str.h>
 #include <analyzer/Namespace.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/HashMap_str_Primitive.h>
@@ -31,14 +31,14 @@
 #include <analyzer/types/Generic.h>
 #include <tuple_str_Primitive.h>
 #include <std/HashMapIter_str_Primitive.h>
-#include <std/ArrayIter_ref_ptrc_char.h>
+#include <std/Iter_ref_ptrc_char.h>
 #include <stdbool.h>
 #include <tuple_str_ref_Namespace.h>
 #include <std/HashMapIter_str_ref_Namespace.h>
 #include <analyzer/Impl.h>
 #include <tuple_usize_ref_ref_Impl.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>
-#include <std/ArrayIter_ref_ref_Impl.h>
+#include <std/Iter_ref_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/types/FunctionParent.h>
 #include <tuple_str_Function.h>
@@ -63,17 +63,17 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     #line 40 "src/analyzer/Root.pv"
     *self = (struct Root) {
         .allocator = allocator,
-        .children = HashMap_str_ref_Namespace__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .types = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .primitives = HashMap_str_Primitive__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .ctypes = HashMap_str_TypedefC__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .traits = HashMap_str_ref_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .functions = HashMap_str_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .clang_args = Array_ptrc_char__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .children = HashMap_str_ref_Namespace__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .primitives = HashMap_str_Primitive__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .ctypes = HashMap_str_TypedefC__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .traits = HashMap_str_ref_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .functions = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .clang_args = Array_ptrc_char__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .analysis = analysis,
         .naming_decl = Naming__new_decl(allocator),
-        .includes_c = HashMap_str_ref_Include__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .includes_cpp = HashMap_str_ref_Include__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .includes_c = HashMap_str_ref_Include__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .includes_cpp = HashMap_str_ref_Include__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 
     #line 55 "src/analyzer/Root.pv"
@@ -115,14 +115,14 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     #line 73 "src/analyzer/Root.pv"
     self->type_self = (struct Type) { .type = TYPE__SELF };
     #line 74 "src/analyzer/Root.pv"
-    self->type_ref_self = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, self->type_self) };
+    self->type_ref_self = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, self->type_self) };
     #line 75 "src/analyzer/Root.pv"
     self->type_usize = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = self->primitive_usize };
     #line 76 "src/analyzer/Root.pv"
     self->func_next = (struct Function) {
         .type = FUNCTION_TYPE__STANDARD,
         .name = ArenaAllocator__store_Token(allocator, (struct Token) { .value = (struct str){ .ptr = "next", .length = strlen("next") } }),
-        .parameters = Array_Parameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .parameters = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .return_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = self->primitive_bool },
     };
     #line 82 "src/analyzer/Root.pv"
@@ -132,7 +132,7 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     self->func_value = (struct Function) {
         .type = FUNCTION_TYPE__STANDARD,
         .name = ArenaAllocator__store_Token(allocator, (struct Token) { .value = (struct str){ .ptr = "value", .length = strlen("value") } }),
-        .parameters = Array_Parameter__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .parameters = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .return_type = (struct Type) { .type = TYPE__GENERIC, .generic_value = ArenaAllocator__store_Generic(allocator, (struct Generic) { .name = ArenaAllocator__store_Token(allocator, (struct Token) { .value = (struct str){ .ptr = "T", .length = strlen("T") } }) }) },
     };
     #line 90 "src/analyzer/Root.pv"
@@ -152,11 +152,11 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     } }
 
     #line 96 "src/analyzer/Root.pv"
-    { struct ArrayIter_ref_ptrc_char __iter = Array_ptrc_char__iter(args);
+    { struct Iter_ref_ptrc_char __iter = Array_ptrc_char__iter(args);
     #line 96 "src/analyzer/Root.pv"
-    while (ArrayIter_ref_ptrc_char__next(&__iter)) {
+    while (Iter_ref_ptrc_char__next(&__iter)) {
         #line 96 "src/analyzer/Root.pv"
-        char const* arg = *ArrayIter_ref_ptrc_char__value(&__iter);
+        char const* arg = *Iter_ref_ptrc_char__value(&__iter);
 
         #line 97 "src/analyzer/Root.pv"
         char const* pos = strchr(arg, '=');
@@ -179,11 +179,11 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     } }
 
     #line 110 "src/analyzer/Root.pv"
-    { struct ArrayIter_ref_ptrc_char __iter = Array_ptrc_char__iter(clang_args);
+    { struct Iter_ref_ptrc_char __iter = Array_ptrc_char__iter(clang_args);
     #line 110 "src/analyzer/Root.pv"
-    while (ArrayIter_ref_ptrc_char__next(&__iter)) {
+    while (Iter_ref_ptrc_char__next(&__iter)) {
         #line 110 "src/analyzer/Root.pv"
-        char const* arg = *ArrayIter_ref_ptrc_char__value(&__iter);
+        char const* arg = *Iter_ref_ptrc_char__value(&__iter);
 
         #line 111 "src/analyzer/Root.pv"
         Array_ptrc_char__append(&self->clang_args, arg);
@@ -338,7 +338,7 @@ bool Root__parse_declarations(struct Root* self) {
         struct Primitive* primitive_info = &HashMapIter_str_Primitive__value(&__iter)->_1;
 
         #line 187 "src/analyzer/Root.pv"
-        { struct IterEnumerate_ref_ref_Impl __iter = ArrayIter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&primitive_info->impls));
+        { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&primitive_info->impls));
         #line 187 "src/analyzer/Root.pv"
         while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
             #line 187 "src/analyzer/Root.pv"
@@ -400,11 +400,11 @@ bool Root__parse_functions(struct Root* self) {
         struct Primitive* primitive_info = &HashMapIter_str_Primitive__value(&__iter)->_1;
 
         #line 210 "src/analyzer/Root.pv"
-        { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
+        { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
         #line 210 "src/analyzer/Root.pv"
-        while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+        while (Iter_ref_ref_Impl__next(&__iter)) {
             #line 210 "src/analyzer/Root.pv"
-            struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+            struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
             #line 211 "src/analyzer/Root.pv"
             Impl__parse_functions(impl_info);
@@ -455,7 +455,7 @@ void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintp
     #line 239 "src/analyzer/Root.pv"
     if (file_diagnostics == 0) {
         #line 239 "src/analyzer/Root.pv"
-        file_diagnostics = HashMap_str_Array_Diagnostic__insert(diagnostics, path, Array_Diagnostic__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
+        file_diagnostics = HashMap_str_Array_Diagnostic__insert(diagnostics, path, Array_Diagnostic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }));
     }
 
     #line 241 "src/analyzer/Root.pv"

@@ -8,6 +8,6 @@ struct InvokeArgument;
 struct slice_InvokeArgument { struct InvokeArgument* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_InvokeArgument slice_InvokeArgument__iter(struct slice_InvokeArgument self);
+struct Iter_ref_InvokeArgument slice_InvokeArgument__iter(struct slice_InvokeArgument self);
 
 #endif

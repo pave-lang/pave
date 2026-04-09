@@ -9,6 +9,6 @@ struct TypeFunctionUsage;
 struct slice_HashMap_usize_TypeFunctionUsage { struct HashMap_usize_TypeFunctionUsage* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"
-struct ArrayIter_ref_HashMap_usize_TypeFunctionUsage slice_HashMap_usize_TypeFunctionUsage__iter(struct slice_HashMap_usize_TypeFunctionUsage self);
+struct Iter_ref_HashMap_usize_TypeFunctionUsage slice_HashMap_usize_TypeFunctionUsage__iter(struct slice_HashMap_usize_TypeFunctionUsage self);
 
 #endif

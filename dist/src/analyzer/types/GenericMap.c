@@ -2,7 +2,7 @@
 #include <analyzer/types/Generics.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashMap_str_usize.h>
 #include <std/str.h>
 #include <stdint.h>
@@ -10,8 +10,8 @@
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/Token.h>
-#include <std/ArrayIter_ref_Type.h>
-#include <std/ArrayIter_ref_Generic.h>
+#include <std/Iter_ref_Type.h>
+#include <std/Iter_ref_Generic.h>
 #include <analyzer/Context.h>
 
 #include <analyzer/types/GenericMap.h>
@@ -20,8 +20,8 @@
 struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Generics* generics, struct Array_Type* usage_types) {
     #line 12 "src/analyzer/types/GenericMap.pv"
     struct GenericMap self = (struct GenericMap) {
-        .array = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .map = HashMap_str_usize__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 
     #line 17 "src/analyzer/types/GenericMap.pv"
@@ -48,16 +48,16 @@ struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Gener
 struct GenericMap GenericMap__from_generics(struct ArenaAllocator* allocator, struct Generics* generics) {
     #line 30 "src/analyzer/types/GenericMap.pv"
     struct GenericMap self = (struct GenericMap) {
-        .array = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .map = HashMap_str_usize__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 
     #line 35 "src/analyzer/types/GenericMap.pv"
-    { struct ArrayIter_ref_Generic __iter = Array_Generic__iter(&generics->array);
+    { struct Iter_ref_Generic __iter = Array_Generic__iter(&generics->array);
     #line 35 "src/analyzer/types/GenericMap.pv"
-    while (ArrayIter_ref_Generic__next(&__iter)) {
+    while (Iter_ref_Generic__next(&__iter)) {
         #line 35 "src/analyzer/types/GenericMap.pv"
-        struct Generic* generic = ArrayIter_ref_Generic__value(&__iter);
+        struct Generic* generic = Iter_ref_Generic__value(&__iter);
 
         #line 36 "src/analyzer/types/GenericMap.pv"
         GenericMap__insert(&self, generic->name->value, (struct Type) { .type = TYPE__GENERIC, .generic_value = generic });
@@ -71,8 +71,8 @@ struct GenericMap GenericMap__from_generics(struct ArenaAllocator* allocator, st
 struct GenericMap GenericMap__clone(struct GenericMap* self, struct ArenaAllocator* allocator) {
     #line 43 "src/analyzer/types/GenericMap.pv"
     return (struct GenericMap) {
-        .array = Array_Type__clone(&self->array, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .map = HashMap_str_usize__clone(&self->map, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .array = Array_Type__clone(&self->array, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .map = HashMap_str_usize__clone(&self->map, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .self_type = self->self_type,
     };
 }
@@ -124,8 +124,8 @@ struct Type* GenericMap__get(struct GenericMap* self, struct str name) {
 struct GenericMap GenericMap__resolve_types(struct GenericMap* self, struct ArenaAllocator* allocator, struct GenericMap* generics) {
     #line 73 "src/analyzer/types/GenericMap.pv"
     struct GenericMap result = (struct GenericMap) {
-        .array = Array_Type__clone(&self->array, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .map = HashMap_str_usize__clone(&self->map, (struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .array = Array_Type__clone(&self->array, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .map = HashMap_str_usize__clone(&self->map, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .self_type = self->self_type,
     };
 
@@ -136,11 +136,11 @@ struct GenericMap GenericMap__resolve_types(struct GenericMap* self, struct Aren
     }
 
     #line 83 "src/analyzer/types/GenericMap.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(&result.array);
+    { struct Iter_ref_Type __iter = Array_Type__iter(&result.array);
     #line 83 "src/analyzer/types/GenericMap.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 83 "src/analyzer/types/GenericMap.pv"
-        struct Type* generic = ArrayIter_ref_Type__value(&__iter);
+        struct Type* generic = Iter_ref_Type__value(&__iter);
 
         #line 84 "src/analyzer/types/GenericMap.pv"
         *generic = *Context__resolve_type(allocator, generic, generics, 0);

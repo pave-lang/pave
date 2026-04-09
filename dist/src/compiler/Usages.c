@@ -5,7 +5,7 @@
 #include <analyzer/Root.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/HashSet_str.h>
 #include <std/str.h>
 #include <std/HashMap_usize_TypeUsage_Primitive.h>
@@ -54,7 +54,7 @@
 #include <tuple_str_Enum.h>
 #include <std/HashMapIter_str_Enum.h>
 #include <std/HashMap_str_Enum.h>
-#include <std/ArrayIter_ref_ref_Impl.h>
+#include <std/Iter_ref_ref_Impl.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
 #include <tuple_str_Struct.h>
 #include <std/HashMapIter_str_Struct.h>
@@ -79,32 +79,32 @@
 #include <tuple_str_EnumVariant.h>
 #include <std/HashMapIter_str_EnumVariant.h>
 #include <std/HashMap_str_EnumVariant.h>
-#include <std/ArrayIter_ref_Type.h>
+#include <std/Iter_ref_Type.h>
 #include <analyzer/types/FunctionParent.h>
 #include <compiler/FunctionContext.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/types/Parameter.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/Block.h>
 #include <analyzer/statement/Statement.h>
-#include <std/ArrayIter_ref_Statement.h>
+#include <std/Iter_ref_Statement.h>
 #include <std/Array_Statement.h>
 #include <analyzer/statement/StatementData.h>
 #include <analyzer/statement/LetStatement.h>
 #include <analyzer/expression/Expression.h>
 #include <compiler/FunctionCoroutine.h>
 #include <analyzer/statement/ElseStatement.h>
-#include <std/ArrayIter_ref_ElseStatement.h>
+#include <std/Iter_ref_ElseStatement.h>
 #include <std/Array_ElseStatement.h>
 #include <analyzer/statement/MatchCase.h>
-#include <std/ArrayIter_ref_MatchCase.h>
+#include <std/Iter_ref_MatchCase.h>
 #include <std/Array_MatchCase.h>
 #include <analyzer/statement/ForStatementType.h>
 #include <analyzer/statement/ForStatement.h>
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/expression/InvokeArgument.h>
-#include <std/ArrayIter_ref_InvokeArgument.h>
+#include <std/Iter_ref_InvokeArgument.h>
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/expression/CppExpression.h>
 
@@ -120,16 +120,16 @@ struct Usages Usages__new(struct Generator* generator) {
         .allocator = allocator,
         .generator = generator,
         .root = generator->root,
-        .usages = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .usages = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .usage_types = HashSet_str__new(allocator),
         .usage_traits = HashSet_str__new(allocator),
-        .primitives = HashMap_usize_TypeUsage_Primitive__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .functions = HashMap_usize_TypeFunctionUsage__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .structs = HashMap_usize_TypeUsage_Struct__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .enums = HashMap_usize_TypeUsage_Enum__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .traits = HashMap_usize_TypeUsage_Trait__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .sequences = Array_Type__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .tuples = Array_ref_Tuple__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .primitives = HashMap_usize_TypeUsage_Primitive__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .functions = HashMap_usize_TypeFunctionUsage__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .structs = HashMap_usize_TypeUsage_Struct__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .enums = HashMap_usize_TypeUsage_Enum__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .traits = HashMap_usize_TypeUsage_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .sequences = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .tuples = Array_ref_Tuple__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .std_namespace = Root__find_namespace(generator->root, (struct str){ .ptr = "std", .length = strlen("std") }),
     };
 
@@ -301,11 +301,11 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         #line 185 "src/compiler/Usages.pv"
         uintptr_t i = 0;
         #line 186 "src/compiler/Usages.pv"
-        { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
+        { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
         #line 186 "src/compiler/Usages.pv"
-        while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+        while (Iter_ref_ref_Impl__next(&__iter)) {
             #line 186 "src/compiler/Usages.pv"
-            struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+            struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
             #line 187 "src/compiler/Usages.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
@@ -347,11 +347,11 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         #line 204 "src/compiler/Usages.pv"
         uintptr_t i = 0;
         #line 205 "src/compiler/Usages.pv"
-        { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
+        { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
         #line 205 "src/compiler/Usages.pv"
-        while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+        while (Iter_ref_ref_Impl__next(&__iter)) {
             #line 205 "src/compiler/Usages.pv"
-            struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+            struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
             #line 206 "src/compiler/Usages.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
@@ -510,11 +510,11 @@ void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_
     struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap) { .self_type = self_type });
 
     #line 275 "src/compiler/Usages.pv"
-    { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
+    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
     #line 275 "src/compiler/Usages.pv"
-    while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+    while (Iter_ref_ref_Impl__next(&__iter)) {
         #line 275 "src/compiler/Usages.pv"
-        struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
         #line 276 "src/compiler/Usages.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
@@ -548,11 +548,11 @@ void Usages__process_sequence(struct Usages* self, struct Sequence* sequence) {
     #line 292 "src/compiler/Usages.pv"
     if (self->std_namespace) {
         #line 293 "src/compiler/Usages.pv"
-        struct Type* array_iter_type = Namespace__find_type(self->std_namespace, (struct str){ .ptr = "ArrayIter", .length = strlen("ArrayIter") });
+        struct Type* iter_type = Namespace__find_type(self->std_namespace, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
         #line 294 "src/compiler/Usages.pv"
-        struct Type element_reference = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, sequence->element) };
+        struct Type element_reference = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, sequence->element) };
         #line 295 "src/compiler/Usages.pv"
-        struct Type* sequence_iter = Root__make_type_usage(self->root, array_iter_type, &(struct Array_Type) { .data = &element_reference, .length = 1 });
+        struct Type* sequence_iter = Root__make_type_usage(self->root, iter_type, &(struct Array_Type) { .data = &element_reference, .length = 1 });
         #line 296 "src/compiler/Usages.pv"
         Usages__add_type(self, sequence_iter, &generic_map);
     }
@@ -619,11 +619,11 @@ void Usages__process_struct(struct Usages* self, struct Struct* struct_info, str
     } }
 
     #line 339 "src/compiler/Usages.pv"
-    { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
+    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
     #line 339 "src/compiler/Usages.pv"
-    while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+    while (Iter_ref_ref_Impl__next(&__iter)) {
         #line 339 "src/compiler/Usages.pv"
-        struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
         #line 340 "src/compiler/Usages.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
@@ -651,11 +651,11 @@ void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct Ge
         struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
         #line 350 "src/compiler/Usages.pv"
-        { struct ArrayIter_ref_Type __iter = Array_Type__iter(&variant->types);
+        { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
         #line 350 "src/compiler/Usages.pv"
-        while (ArrayIter_ref_Type__next(&__iter)) {
+        while (Iter_ref_Type__next(&__iter)) {
             #line 350 "src/compiler/Usages.pv"
-            struct Type* type = ArrayIter_ref_Type__value(&__iter);
+            struct Type* type = Iter_ref_Type__value(&__iter);
 
             #line 351 "src/compiler/Usages.pv"
             Usages__add_type(self, type, generic_map);
@@ -663,11 +663,11 @@ void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct Ge
     } }
 
     #line 355 "src/compiler/Usages.pv"
-    { struct ArrayIter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
+    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
     #line 355 "src/compiler/Usages.pv"
-    while (ArrayIter_ref_ref_Impl__next(&__iter)) {
+    while (Iter_ref_ref_Impl__next(&__iter)) {
         #line 355 "src/compiler/Usages.pv"
-        struct Impl* impl_info = *ArrayIter_ref_ref_Impl__value(&__iter);
+        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
         #line 356 "src/compiler/Usages.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
@@ -805,11 +805,11 @@ void Usages__process_function(struct Usages* self, struct Function* func_info, s
     self->usage_mode = USAGE_MODE__SIGNATURE;
 
     #line 425 "src/compiler/Usages.pv"
-    { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+    { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
     #line 425 "src/compiler/Usages.pv"
-    while (ArrayIter_ref_Parameter__next(&__iter)) {
+    while (Iter_ref_Parameter__next(&__iter)) {
         #line 425 "src/compiler/Usages.pv"
-        struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+        struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
         #line 426 "src/compiler/Usages.pv"
         Usages__add_type(self, &param->type, generic_map);
@@ -836,11 +836,11 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
     }
 
     #line 440 "src/compiler/Usages.pv"
-    { struct ArrayIter_ref_Statement __iter = Array_Statement__iter(&block->statements);
+    { struct Iter_ref_Statement __iter = Array_Statement__iter(&block->statements);
     #line 440 "src/compiler/Usages.pv"
-    while (ArrayIter_ref_Statement__next(&__iter)) {
+    while (Iter_ref_Statement__next(&__iter)) {
         #line 440 "src/compiler/Usages.pv"
-        struct Statement* statement_iter = ArrayIter_ref_Statement__value(&__iter);
+        struct Statement* statement_iter = Iter_ref_Statement__value(&__iter);
 
         #line 441 "src/compiler/Usages.pv"
         switch (statement_iter->data.type) {
@@ -903,11 +903,11 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
                 Usages__process_block(self, if_block, generic_map);
 
                 #line 469 "src/compiler/Usages.pv"
-                { struct ArrayIter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
+                { struct Iter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
                 #line 469 "src/compiler/Usages.pv"
-                while (ArrayIter_ref_ElseStatement__next(&__iter)) {
+                while (Iter_ref_ElseStatement__next(&__iter)) {
                     #line 469 "src/compiler/Usages.pv"
-                    struct ElseStatement* else_statement = ArrayIter_ref_ElseStatement__value(&__iter);
+                    struct ElseStatement* else_statement = Iter_ref_ElseStatement__value(&__iter);
 
                     #line 470 "src/compiler/Usages.pv"
                     Usages__process_block(self, else_statement->block, generic_map);
@@ -923,11 +923,11 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
                 Usages__process_expression(self, condition, generic_map);
 
                 #line 476 "src/compiler/Usages.pv"
-                { struct ArrayIter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
+                { struct Iter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
                 #line 476 "src/compiler/Usages.pv"
-                while (ArrayIter_ref_MatchCase__next(&__iter)) {
+                while (Iter_ref_MatchCase__next(&__iter)) {
                     #line 476 "src/compiler/Usages.pv"
-                    struct MatchCase* case_info = ArrayIter_ref_MatchCase__value(&__iter);
+                    struct MatchCase* case_info = Iter_ref_MatchCase__value(&__iter);
 
                     #line 477 "src/compiler/Usages.pv"
                     Usages__process_block(self, case_info->body, generic_map);
@@ -1027,11 +1027,11 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
             #line 519 "src/compiler/Usages.pv"
             Usages__process_expression(self, target, generic_map);
             #line 520 "src/compiler/Usages.pv"
-            { struct ArrayIter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(&arguments);
+            { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(&arguments);
             #line 520 "src/compiler/Usages.pv"
-            while (ArrayIter_ref_InvokeArgument__next(&__iter)) {
+            while (Iter_ref_InvokeArgument__next(&__iter)) {
                 #line 520 "src/compiler/Usages.pv"
-                struct InvokeArgument arg = *ArrayIter_ref_InvokeArgument__value(&__iter);
+                struct InvokeArgument arg = *Iter_ref_InvokeArgument__value(&__iter);
 
                 #line 521 "src/compiler/Usages.pv"
                 Usages__process_expression(self, arg.value, generic_map);
@@ -1278,11 +1278,11 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
 #line 626 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self) {
     #line 627 "src/compiler/Usages.pv"
-    { struct ArrayIter_ref_Type __iter = Array_Type__iter(&self->usages);
+    { struct Iter_ref_Type __iter = Array_Type__iter(&self->usages);
     #line 627 "src/compiler/Usages.pv"
-    while (ArrayIter_ref_Type__next(&__iter)) {
+    while (Iter_ref_Type__next(&__iter)) {
         #line 627 "src/compiler/Usages.pv"
-        struct Type* usage = ArrayIter_ref_Type__value(&__iter);
+        struct Type* usage = Iter_ref_Type__value(&__iter);
 
         #line 628 "src/compiler/Usages.pv"
         switch (usage->type) {

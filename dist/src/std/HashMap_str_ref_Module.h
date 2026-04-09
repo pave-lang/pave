@@ -1,7 +1,7 @@
 #ifndef PAVE_HASH_MAP_STR_REF_MODULE
 #define PAVE_HASH_MAP_STR_REF_MODULE
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,7 +15,7 @@ struct HashMapIter_str_ref_Module;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_ref_Module {
-    struct Allocator allocator;
+    struct trait_Allocator allocator;
     struct HashMapBucket_str_ref_Module** buckets;
     struct HashMapBucket_str_ref_Module* data;
     uintptr_t capacity;
@@ -23,7 +23,7 @@ struct HashMap_str_ref_Module {
 };
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_ref_Module HashMap_str_ref_Module__new(struct Allocator allocator);
+struct HashMap_str_ref_Module HashMap_str_ref_Module__new(struct trait_Allocator allocator);
 
 #line 46 "src/std/HashMap.pv"
 void HashMap_str_ref_Module__resize(struct HashMap_str_ref_Module* self, uintptr_t new_capacity);
@@ -44,7 +44,7 @@ void HashMap_str_ref_Module__release(struct HashMap_str_ref_Module* self);
 void HashMap_str_ref_Module__fill_buckets(struct HashMap_str_ref_Module* self);
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_ref_Module HashMap_str_ref_Module__clone(struct HashMap_str_ref_Module* self, struct Allocator allocator);
+struct HashMap_str_ref_Module HashMap_str_ref_Module__clone(struct HashMap_str_ref_Module* self, struct trait_Allocator allocator);
 
 #line 163 "src/std/HashMap.pv"
 struct HashMapIter_str_ref_Module HashMap_str_ref_Module__iter(struct HashMap_str_ref_Module* self);

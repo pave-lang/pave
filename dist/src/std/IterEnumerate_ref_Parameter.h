@@ -2,7 +2,7 @@
 #define PAVE_ITER_ENUMERATE_REF_PARAMETER
 
 #include <stdint.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <stdbool.h>
 
 struct Parameter;
@@ -13,7 +13,7 @@ struct Parameter;
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_Parameter {
     uintptr_t index;
-    struct ArrayIter_ref_Parameter iter;
+    struct Iter_ref_Parameter iter;
 };
 
 #line 58 "src/std/Array.pv"

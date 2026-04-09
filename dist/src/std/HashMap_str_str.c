@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <std/HashMapIter_str_str.h>
 #include <std/str.h>
@@ -12,7 +12,7 @@
 #include <std/HashMap_str_str.h>
 
 #line 35 "src/std/HashMap.pv"
-struct HashMap_str_str HashMap_str_str__new(struct Allocator allocator) {
+struct HashMap_str_str HashMap_str_str__new(struct trait_Allocator allocator) {
     #line 36 "src/std/HashMap.pv"
     int32_t initial_capacity = 16;
     #line 37 "src/std/HashMap.pv"
@@ -202,7 +202,7 @@ void HashMap_str_str__fill_buckets(struct HashMap_str_str* self) {
 }
 
 #line 149 "src/std/HashMap.pv"
-struct HashMap_str_str HashMap_str_str__clone(struct HashMap_str_str* self, struct Allocator allocator) {
+struct HashMap_str_str HashMap_str_str__clone(struct HashMap_str_str* self, struct trait_Allocator allocator) {
     #line 150 "src/std/HashMap.pv"
     struct HashMap_str_str other = (struct HashMap_str_str) {
         .allocator = allocator,

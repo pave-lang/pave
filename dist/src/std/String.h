@@ -2,7 +2,7 @@
 #define PAVE_STRING
 
 #include <std/Array_char.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -19,7 +19,7 @@ struct String {
 };
 
 #line 10 "src/std/String.pv"
-struct String String__new(struct Allocator allocator);
+struct String String__new(struct trait_Allocator allocator);
 
 #line 14 "src/std/String.pv"
 void String__ensure_can_hold(struct String* self, uintptr_t length);

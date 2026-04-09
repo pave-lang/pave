@@ -7,18 +7,18 @@
 #include <stdbool.h>
 #include <std/Array_FunctionScope.h>
 #include <compiler/FunctionScope.h>
-#include <std/Allocator.h>
+#include <std/trait_Allocator.h>
 #include <std/Array_char.h>
 #include <compiler/FunctionCoroutine.h>
 #include <analyzer/types/Parameter.h>
-#include <std/ArrayIter_ref_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 #include <std/Array_Parameter.h>
 #include <std/str.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/FunctionType.h>
 #include <stdint.h>
-#include <std/ArrayIter_ref_FunctionScope.h>
+#include <std/Iter_ref_FunctionScope.h>
 #include <std/HashMap_str_str.h>
 #include <std/String.h>
 #include <std/HashMap_str_ref_Type.h>
@@ -32,13 +32,13 @@ struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, st
         .allocator = allocator,
         .func_info = func_info,
         .use_scopes = use_scopes,
-        .scopes = Array_FunctionScope__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .scopes = Array_FunctionScope__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 
     #line 60 "src/compiler/Generator.pv"
     if (self.use_scopes) {
         #line 61 "src/compiler/Generator.pv"
-        self.scopes = Array_FunctionScope__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
+        self.scopes = Array_FunctionScope__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
         #line 62 "src/compiler/Generator.pv"
         FunctionContext__push_scope(&self, false, false);
     }
@@ -48,11 +48,11 @@ struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, st
         #line 66 "src/compiler/Generator.pv"
         self.coroutine = FunctionCoroutine__new(allocator);
         #line 67 "src/compiler/Generator.pv"
-        { struct ArrayIter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+        { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
         #line 67 "src/compiler/Generator.pv"
-        while (ArrayIter_ref_Parameter__next(&__iter)) {
+        while (Iter_ref_Parameter__next(&__iter)) {
             #line 67 "src/compiler/Generator.pv"
-            struct Parameter* param = ArrayIter_ref_Parameter__value(&__iter);
+            struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
             #line 68 "src/compiler/Generator.pv"
             FunctionContext__add_variable(&self, param->name->value, &param->type);
@@ -78,11 +78,11 @@ void FunctionContext__pop_scope(struct FunctionContext* self) {
 #line 83 "src/compiler/Generator.pv"
 struct str FunctionContext__get_variable_replacement(struct FunctionContext* self, struct str name) {
     #line 84 "src/compiler/Generator.pv"
-    { struct ArrayIter_ref_FunctionScope __iter = ArrayIter_ref_FunctionScope__reverse(Array_FunctionScope__iter(&self->scopes));
+    { struct Iter_ref_FunctionScope __iter = Iter_ref_FunctionScope__reverse(Array_FunctionScope__iter(&self->scopes));
     #line 84 "src/compiler/Generator.pv"
-    while (ArrayIter_ref_FunctionScope__next(&__iter)) {
+    while (Iter_ref_FunctionScope__next(&__iter)) {
         #line 84 "src/compiler/Generator.pv"
-        struct FunctionScope* scope = ArrayIter_ref_FunctionScope__value(&__iter);
+        struct FunctionScope* scope = Iter_ref_FunctionScope__value(&__iter);
 
         #line 85 "src/compiler/Generator.pv"
         struct str* variable = HashMap_str_str__find(&scope->variable_replacements, &name);
@@ -106,7 +106,7 @@ void FunctionContext__add_variable(struct FunctionContext* self, struct str name
     }
 
     #line 99 "src/compiler/Generator.pv"
-    struct String new_name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+    struct String new_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 100 "src/compiler/Generator.pv"
     String__append(&new_name, name);
 
