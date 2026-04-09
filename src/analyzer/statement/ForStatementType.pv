@@ -4,4 +4,5 @@ use analyzer::expression
 enum ForStatementType {
     Range(&Expression, &Expression),
     Iter(&Expression),
+    Sequence(&Expression),
 }

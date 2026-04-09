@@ -145,18 +145,20 @@ bool Type__is_tuple(struct Type* self);
 #line 485 "src/analyzer/types/Type.pv"
 bool Type__is_sequence(struct Type* self);
 #line 492 "src/analyzer/types/Type.pv"
-struct Type* Type__deref_1(struct Type* self);
+bool Type__is_sequence_fixed_array(struct Type* self);
 #line 499 "src/analyzer/types/Type.pv"
+struct Type* Type__deref_1(struct Type* self);
+#line 506 "src/analyzer/types/Type.pv"
 bool Type__is_fat_pointer(struct Type* self);
-#line 510 "src/analyzer/types/Type.pv"
+#line 517 "src/analyzer/types/Type.pv"
 bool Type__is_reference_sequence_dynamic(struct Type* self);
-#line 520 "src/analyzer/types/Type.pv"
+#line 527 "src/analyzer/types/Type.pv"
 bool Type__is_iterator(struct Type* self);
-#line 529 "src/analyzer/types/Type.pv"
+#line 536 "src/analyzer/types/Type.pv"
 bool Type__needs_implicit_cast(struct Type* self, struct Type* other);
-#line 580 "src/analyzer/types/Type.pv"
+#line 587 "src/analyzer/types/Type.pv"
 bool Type__is_primitive_or_c_type(struct Type* self);
-#line 595 "src/analyzer/types/Type.pv"
+#line 602 "src/analyzer/types/Type.pv"
 struct Module* Type__get_module(struct Type* self);
 
 #endif

@@ -468,6 +468,9 @@ impl Usages {
                             self.process_expression(start, generic_map);
                             self.process_expression(end, generic_map);
                         },
+                        ForStatementType::Sequence(iter_expression) => {
+                            self.process_expression(iter_expression, generic_map);
+                        },
                         ForStatementType::Iter(iter_expression) => {
                             self.process_expression(iter_expression, generic_map);
                         }

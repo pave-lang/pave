@@ -8,11 +8,13 @@ struct ForStatementType {
     enum {
         FOR_STATEMENT_TYPE__RANGE,
         FOR_STATEMENT_TYPE__ITER,
+        FOR_STATEMENT_TYPE__SEQUENCE,
     } type;
 
     union {
         struct { struct Expression* _0; struct Expression* _1; } range_value;
         struct Expression* iter_value;
+        struct Expression* sequence_value;
     };
 };
 

@@ -46,6 +46,7 @@
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/types/Enum.h>
+#include <analyzer/types/Sequence.h>
 #include <std/ArrayIter_ref_ForVariable.h>
 #include <analyzer/Scope.h>
 #include <std/ArrayIter_ref_Scope.h>
@@ -953,331 +954,356 @@ bool Block__parse_for_statement(struct Block* self, struct Context* context, str
         Context__inlay_hint(context, variable.name, String__c_str(&type_name), INLAY_HINT_KIND__TYPE, false, false);
     } else {
         #line 474 "src/analyzer/Block.pv"
-        struct Token* iter_member = ArenaAllocator__store_Token(context->allocator, *expression_first_token);
+        bool is_sequence = false;
         #line 475 "src/analyzer/Block.pv"
-        iter_member->value = (struct str){ .ptr = "iter", .length = strlen("iter") };
-
-        #line 477 "src/analyzer/Block.pv"
-        struct Type* iter_member_type = Expression__get_member_type(context, &for_statement.expression->return_type, iter_member, false);
-        #line 478 "src/analyzer/Block.pv"
-        bool iter_member_is_function = false;
-
-        #line 480 "src/analyzer/Block.pv"
-        if (iter_member_type != 0) {
-            #line 481 "src/analyzer/Block.pv"
-            switch (iter_member_type->type) {
-                #line 482 "src/analyzer/Block.pv"
-                case TYPE__FUNCTION: {
-                    #line 482 "src/analyzer/Block.pv"
-                    iter_member_is_function = true;
-                } break;
-                #line 483 "src/analyzer/Block.pv"
-                default: {
-                } break;
-            }
+        switch (for_statement.expression->return_type.type) {
+            #line 476 "src/analyzer/Block.pv"
+            case TYPE__SEQUENCE: {
+                #line 476 "src/analyzer/Block.pv"
+                struct Sequence* sequence = for_statement.expression->return_type.sequence_value;
+                #line 477 "src/analyzer/Block.pv"
+                is_sequence = true;
+                #line 478 "src/analyzer/Block.pv"
+                for_statement.type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__SEQUENCE, .sequence_value = for_statement.expression };
+                #line 479 "src/analyzer/Block.pv"
+                for_statement.iter_type = &for_statement.expression->return_type;
+                #line 480 "src/analyzer/Block.pv"
+                for_statement.value_type = &sequence->element;
+            } break;
+            #line 482 "src/analyzer/Block.pv"
+            default: {
+            } break;
         }
 
-        #line 487 "src/analyzer/Block.pv"
-        if (!iter_member_is_function) {
-            #line 488 "src/analyzer/Block.pv"
-            for_statement.type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__ITER, .iter_value = for_statement.expression };
+        #line 485 "src/analyzer/Block.pv"
+        if (!is_sequence) {
+            #line 486 "src/analyzer/Block.pv"
+            struct Token* iter_member = ArenaAllocator__store_Token(context->allocator, *expression_first_token);
+            #line 487 "src/analyzer/Block.pv"
+            iter_member->value = (struct str){ .ptr = "iter", .length = strlen("iter") };
+
             #line 489 "src/analyzer/Block.pv"
-            for_statement.iter_type = &for_statement.expression->return_type;
-        } else {
-            #line 491 "src/analyzer/Block.pv"
-            struct Array_InvokeArgument args = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+            struct Type* iter_member_type = Expression__get_member_type(context, &for_statement.expression->return_type, iter_member, false);
+            #line 490 "src/analyzer/Block.pv"
+            bool iter_member_is_function = false;
+
             #line 492 "src/analyzer/Block.pv"
-            Array_InvokeArgument__append(&args, (struct InvokeArgument) { .value = for_statement.expression });
+            if (iter_member_type != 0) {
+                #line 493 "src/analyzer/Block.pv"
+                switch (iter_member_type->type) {
+                    #line 494 "src/analyzer/Block.pv"
+                    case TYPE__FUNCTION: {
+                        #line 494 "src/analyzer/Block.pv"
+                        iter_member_is_function = true;
+                    } break;
+                    #line 495 "src/analyzer/Block.pv"
+                    default: {
+                    } break;
+                }
+            }
 
-            #line 494 "src/analyzer/Block.pv"
-            for_statement.type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__ITER, .iter_value = Expression__make_type_function_call(context, iter_member, iter_member_type, args, generic_map) };
-            #line 495 "src/analyzer/Block.pv"
-            for_statement.iter_type = Expression__get_return_type(context, iter_member_type, iter_member, generic_map);
+            #line 499 "src/analyzer/Block.pv"
+            if (!iter_member_is_function) {
+                #line 500 "src/analyzer/Block.pv"
+                for_statement.type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__ITER, .iter_value = for_statement.expression };
+                #line 501 "src/analyzer/Block.pv"
+                for_statement.iter_type = &for_statement.expression->return_type;
+            } else {
+                #line 503 "src/analyzer/Block.pv"
+                struct Array_InvokeArgument args = Array_InvokeArgument__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
+                #line 504 "src/analyzer/Block.pv"
+                Array_InvokeArgument__append(&args, (struct InvokeArgument) { .value = for_statement.expression });
+
+                #line 506 "src/analyzer/Block.pv"
+                for_statement.type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__ITER, .iter_value = Expression__make_type_function_call(context, iter_member, iter_member_type, args, generic_map) };
+                #line 507 "src/analyzer/Block.pv"
+                for_statement.iter_type = Expression__get_return_type(context, iter_member_type, iter_member, generic_map);
+            }
+
+            #line 510 "src/analyzer/Block.pv"
+            struct Token value_member = *iter_member;
+            #line 511 "src/analyzer/Block.pv"
+            value_member.value = (struct str){ .ptr = "value", .length = strlen("value") };
+
+            #line 513 "src/analyzer/Block.pv"
+            struct Type* value_member_type = Expression__get_member_type(context, for_statement.iter_type, &value_member, true);
+            #line 514 "src/analyzer/Block.pv"
+            if (value_member_type == 0) {
+                #line 514 "src/analyzer/Block.pv"
+                return false;
+            }
+            #line 515 "src/analyzer/Block.pv"
+            for_statement.value_type = Expression__get_return_type(context, value_member_type, &value_member, generic_map);
         }
 
-        #line 498 "src/analyzer/Block.pv"
-        struct Token value_member = *iter_member;
-        #line 499 "src/analyzer/Block.pv"
-        value_member.value = (struct str){ .ptr = "value", .length = strlen("value") };
-
-        #line 501 "src/analyzer/Block.pv"
-        struct Type* value_member_type = Expression__get_member_type(context, for_statement.iter_type, &value_member, true);
-        #line 502 "src/analyzer/Block.pv"
-        if (value_member_type == 0) {
-            #line 502 "src/analyzer/Block.pv"
-            return false;
-        }
-        #line 503 "src/analyzer/Block.pv"
-        for_statement.value_type = Expression__get_return_type(context, value_member_type, &value_member, generic_map);
-
-        #line 505 "src/analyzer/Block.pv"
+        #line 518 "src/analyzer/Block.pv"
         uintptr_t variable_i = 0;
-        #line 506 "src/analyzer/Block.pv"
+        #line 519 "src/analyzer/Block.pv"
         { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement.variables);
-        #line 506 "src/analyzer/Block.pv"
+        #line 519 "src/analyzer/Block.pv"
         while (ArrayIter_ref_ForVariable__next(&__iter)) {
-            #line 506 "src/analyzer/Block.pv"
+            #line 519 "src/analyzer/Block.pv"
             struct ForVariable* variable = ArrayIter_ref_ForVariable__value(&__iter);
 
-            #line 507 "src/analyzer/Block.pv"
+            #line 520 "src/analyzer/Block.pv"
             if (for_statement.variables.length == 1) {
-                #line 508 "src/analyzer/Block.pv"
+                #line 521 "src/analyzer/Block.pv"
                 variable->type = for_statement.value_type;
             } else {
-                #line 510 "src/analyzer/Block.pv"
+                #line 523 "src/analyzer/Block.pv"
                 struct Token value_member = *variable->name;
-                #line 511 "src/analyzer/Block.pv"
+                #line 524 "src/analyzer/Block.pv"
                 struct String value_name = String__new((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 512 "src/analyzer/Block.pv"
+                #line 525 "src/analyzer/Block.pv"
                 String__append_usize(&value_name, variable_i);
-                #line 513 "src/analyzer/Block.pv"
+                #line 526 "src/analyzer/Block.pv"
                 value_member.type = TOKEN_TYPE__NUMBER;
-                #line 514 "src/analyzer/Block.pv"
+                #line 527 "src/analyzer/Block.pv"
                 value_member.value = String__as_str(&value_name);
 
-                #line 516 "src/analyzer/Block.pv"
+                #line 529 "src/analyzer/Block.pv"
                 variable->type = Expression__get_member_type(context, Type__deref(for_statement.value_type), &value_member, true);
             }
 
-            #line 519 "src/analyzer/Block.pv"
+            #line 532 "src/analyzer/Block.pv"
             if (variable->deref) {
-                #line 520 "src/analyzer/Block.pv"
+                #line 533 "src/analyzer/Block.pv"
                 variable->type = Type__deref(variable->type);
             }
 
-            #line 523 "src/analyzer/Block.pv"
+            #line 536 "src/analyzer/Block.pv"
             if (variable->ref) {
-                #line 524 "src/analyzer/Block.pv"
+                #line 537 "src/analyzer/Block.pv"
                 variable->type = Type__to_ptr(&(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *variable->type) }, context->allocator);
             }
 
-            #line 527 "src/analyzer/Block.pv"
+            #line 540 "src/analyzer/Block.pv"
             struct String type_name = Naming__get_type_decl(&context->root->naming_decl, variable->type, context->type_self, 0);
-            #line 528 "src/analyzer/Block.pv"
+            #line 541 "src/analyzer/Block.pv"
             String__prepend(&type_name, (struct str){ .ptr = ": ", .length = strlen(": ") });
-            #line 529 "src/analyzer/Block.pv"
+            #line 542 "src/analyzer/Block.pv"
             Context__inlay_hint(context, variable->name, String__c_str(&type_name), INLAY_HINT_KIND__TYPE, false, false);
 
-            #line 531 "src/analyzer/Block.pv"
+            #line 544 "src/analyzer/Block.pv"
             variable_i += 1;
         } }
     }
 
-    #line 535 "src/analyzer/Block.pv"
+    #line 548 "src/analyzer/Block.pv"
     Context__push_scope(context, self);
 
-    #line 537 "src/analyzer/Block.pv"
+    #line 550 "src/analyzer/Block.pv"
     { struct ArrayIter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement.variables);
-    #line 537 "src/analyzer/Block.pv"
+    #line 550 "src/analyzer/Block.pv"
     while (ArrayIter_ref_ForVariable__next(&__iter)) {
-        #line 537 "src/analyzer/Block.pv"
+        #line 550 "src/analyzer/Block.pv"
         struct ForVariable* variable2 = ArrayIter_ref_ForVariable__value(&__iter);
 
-        #line 538 "src/analyzer/Block.pv"
+        #line 551 "src/analyzer/Block.pv"
         if (!Context__set_value(context, variable2->name, variable2->type)) {
-            #line 538 "src/analyzer/Block.pv"
+            #line 551 "src/analyzer/Block.pv"
             Context__error(context, "set_value");
-            #line 538 "src/analyzer/Block.pv"
+            #line 551 "src/analyzer/Block.pv"
             return false;
         }
     } }
 
-    #line 541 "src/analyzer/Block.pv"
+    #line 554 "src/analyzer/Block.pv"
     for_statement.block = Block__new_ptr(context);
-    #line 542 "src/analyzer/Block.pv"
+    #line 555 "src/analyzer/Block.pv"
     for_statement.block->is_loop = true;
-    #line 543 "src/analyzer/Block.pv"
+    #line 556 "src/analyzer/Block.pv"
     if (!Block__parse(for_statement.block, context, generics, false)) {
-        #line 543 "src/analyzer/Block.pv"
+        #line 556 "src/analyzer/Block.pv"
         return false;
     }
 
-    #line 545 "src/analyzer/Block.pv"
+    #line 558 "src/analyzer/Block.pv"
     Context__pop_scope(context);
 
-    #line 547 "src/analyzer/Block.pv"
+    #line 560 "src/analyzer/Block.pv"
     Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__FOR_STATEMENT, .forstatement_value = ArenaAllocator__store_ForStatement(context->allocator, for_statement) }));
 
-    #line 549 "src/analyzer/Block.pv"
+    #line 562 "src/analyzer/Block.pv"
     return true;
 }
 
-#line 552 "src/analyzer/Block.pv"
+#line 565 "src/analyzer/Block.pv"
 bool Block__parse_defer_statement(struct Block* self, struct Context* context, struct Generics* generics) {
-    #line 553 "src/analyzer/Block.pv"
+    #line 566 "src/analyzer/Block.pv"
     bool top_block_found = false;
-    #line 554 "src/analyzer/Block.pv"
+    #line 567 "src/analyzer/Block.pv"
     { struct ArrayIter_ref_Scope __iter = Array_Scope__iter(&context->scopes);
-    #line 554 "src/analyzer/Block.pv"
+    #line 567 "src/analyzer/Block.pv"
     while (ArrayIter_ref_Scope__next(&__iter)) {
-        #line 554 "src/analyzer/Block.pv"
+        #line 567 "src/analyzer/Block.pv"
         struct Scope* scope = ArrayIter_ref_Scope__value(&__iter);
 
-        #line 555 "src/analyzer/Block.pv"
+        #line 568 "src/analyzer/Block.pv"
         if (top_block_found) {
         } else {
-            #line 557 "src/analyzer/Block.pv"
+            #line 570 "src/analyzer/Block.pv"
             struct Block* top_block = scope->block;
-            #line 558 "src/analyzer/Block.pv"
+            #line 571 "src/analyzer/Block.pv"
             if (top_block != 0) {
-                #line 559 "src/analyzer/Block.pv"
+                #line 572 "src/analyzer/Block.pv"
                 top_block->is_top_level_and_has_defer_statements_inside = true;
-                #line 560 "src/analyzer/Block.pv"
+                #line 573 "src/analyzer/Block.pv"
                 top_block_found = true;
             }
         }
     } }
 
-    #line 565 "src/analyzer/Block.pv"
+    #line 578 "src/analyzer/Block.pv"
     if (!top_block_found) {
-        #line 565 "src/analyzer/Block.pv"
+        #line 578 "src/analyzer/Block.pv"
         Context__error(context, "could not find top_block for defer statements");
     }
 
-    #line 567 "src/analyzer/Block.pv"
+    #line 580 "src/analyzer/Block.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "defer")) {
-        #line 567 "src/analyzer/Block.pv"
+        #line 580 "src/analyzer/Block.pv"
         return false;
     }
 
-    #line 569 "src/analyzer/Block.pv"
+    #line 582 "src/analyzer/Block.pv"
     if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 570 "src/analyzer/Block.pv"
+        #line 583 "src/analyzer/Block.pv"
         struct Block* block = Block__new_ptr(context);
-        #line 571 "src/analyzer/Block.pv"
+        #line 584 "src/analyzer/Block.pv"
         if (!Block__parse(block, context, generics, true)) {
-            #line 571 "src/analyzer/Block.pv"
+            #line 584 "src/analyzer/Block.pv"
             return false;
         }
-        #line 572 "src/analyzer/Block.pv"
+        #line 585 "src/analyzer/Block.pv"
         Array_DeferStatement__append(&self->defer_statements, (struct DeferStatement) { .type = DEFER_STATEMENT__BLOCK, .block_value = block });
     } else {
-        #line 574 "src/analyzer/Block.pv"
+        #line 587 "src/analyzer/Block.pv"
         struct Expression* expression = Expression__parse(context, generics);
-        #line 575 "src/analyzer/Block.pv"
+        #line 588 "src/analyzer/Block.pv"
         if (expression == 0) {
-            #line 575 "src/analyzer/Block.pv"
+            #line 588 "src/analyzer/Block.pv"
             return false;
         }
-        #line 576 "src/analyzer/Block.pv"
+        #line 589 "src/analyzer/Block.pv"
         Array_DeferStatement__append(&self->defer_statements, (struct DeferStatement) { .type = DEFER_STATEMENT__EXPRESSION, .expression_value = expression });
-        #line 577 "src/analyzer/Block.pv"
+        #line 590 "src/analyzer/Block.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-            #line 577 "src/analyzer/Block.pv"
+            #line 590 "src/analyzer/Block.pv"
             return false;
         }
     }
 
-    #line 580 "src/analyzer/Block.pv"
+    #line 593 "src/analyzer/Block.pv"
     return true;
 }
 
-#line 583 "src/analyzer/Block.pv"
+#line 596 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope) {
-    #line 584 "src/analyzer/Block.pv"
+    #line 597 "src/analyzer/Block.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 584 "src/analyzer/Block.pv"
+        #line 597 "src/analyzer/Block.pv"
         return false;
     }
-    #line 585 "src/analyzer/Block.pv"
+    #line 598 "src/analyzer/Block.pv"
     if (new_scope) {
-        #line 585 "src/analyzer/Block.pv"
+        #line 598 "src/analyzer/Block.pv"
         Context__push_scope(context, self);
     }
 
-    #line 587 "src/analyzer/Block.pv"
+    #line 600 "src/analyzer/Block.pv"
     while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 588 "src/analyzer/Block.pv"
+        #line 601 "src/analyzer/Block.pv"
         struct Token* token = &context->tokens[context->pos];
-        #line 589 "src/analyzer/Block.pv"
+        #line 602 "src/analyzer/Block.pv"
         bool result = true;
 
-        #line 591 "src/analyzer/Block.pv"
+        #line 604 "src/analyzer/Block.pv"
         if (Token__eq(token, TOKEN_TYPE__SYMBOL, "{")) {
-            #line 592 "src/analyzer/Block.pv"
+            #line 605 "src/analyzer/Block.pv"
             struct Token* first_token = Context__current(context);
-            #line 593 "src/analyzer/Block.pv"
+            #line 606 "src/analyzer/Block.pv"
             struct Block* block = Block__new_ptr(context);
-            #line 594 "src/analyzer/Block.pv"
+            #line 607 "src/analyzer/Block.pv"
             result = Block__parse(block, context, generics, true);
-            #line 595 "src/analyzer/Block.pv"
+            #line 608 "src/analyzer/Block.pv"
             if (result) {
-                #line 595 "src/analyzer/Block.pv"
+                #line 608 "src/analyzer/Block.pv"
                 Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__BLOCK_STATEMENT, .blockstatement_value = block }));
             }
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "defer")) {
-            #line 597 "src/analyzer/Block.pv"
+            #line 610 "src/analyzer/Block.pv"
             result = Block__parse_defer_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "let")) {
-            #line 599 "src/analyzer/Block.pv"
+            #line 612 "src/analyzer/Block.pv"
             result = Block__parse_let_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "return")) {
-            #line 601 "src/analyzer/Block.pv"
+            #line 614 "src/analyzer/Block.pv"
             result = Block__parse_return_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "yield")) {
-            #line 603 "src/analyzer/Block.pv"
+            #line 616 "src/analyzer/Block.pv"
             result = Block__parse_yield_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "if")) {
-            #line 605 "src/analyzer/Block.pv"
+            #line 618 "src/analyzer/Block.pv"
             result = Block__parse_if_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "match")) {
-            #line 607 "src/analyzer/Block.pv"
+            #line 620 "src/analyzer/Block.pv"
             result = Block__parse_match_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "while")) {
-            #line 609 "src/analyzer/Block.pv"
+            #line 622 "src/analyzer/Block.pv"
             result = Block__parse_while_statement(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "for")) {
-            #line 611 "src/analyzer/Block.pv"
+            #line 624 "src/analyzer/Block.pv"
             result = Block__parse_for_statement(self, context, generics);
         } else if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "continue")) {
-            #line 613 "src/analyzer/Block.pv"
+            #line 626 "src/analyzer/Block.pv"
             Array_Statement__append(&self->statements, Statement__new(token, token, (struct StatementData) { .type = STATEMENT_DATA__CONTINUE_STATEMENT, .continuestatement_value = Context__get_loop_defer_statements(context) }));
-            #line 614 "src/analyzer/Block.pv"
+            #line 627 "src/analyzer/Block.pv"
             if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-                #line 614 "src/analyzer/Block.pv"
+                #line 627 "src/analyzer/Block.pv"
                 return false;
             }
-            #line 615 "src/analyzer/Block.pv"
+            #line 628 "src/analyzer/Block.pv"
             result = true;
         } else if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "break")) {
-            #line 617 "src/analyzer/Block.pv"
+            #line 630 "src/analyzer/Block.pv"
             Array_Statement__append(&self->statements, Statement__new(token, token, (struct StatementData) { .type = STATEMENT_DATA__BREAK_STATEMENT, .breakstatement_value = Context__get_loop_defer_statements(context) }));
-            #line 618 "src/analyzer/Block.pv"
+            #line 631 "src/analyzer/Block.pv"
             if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-                #line 618 "src/analyzer/Block.pv"
+                #line 631 "src/analyzer/Block.pv"
                 return false;
             }
-            #line 619 "src/analyzer/Block.pv"
+            #line 632 "src/analyzer/Block.pv"
             result = true;
         } else {
-            #line 621 "src/analyzer/Block.pv"
+            #line 634 "src/analyzer/Block.pv"
             result = Block__parse_expression_statement(self, context, generics);
         }
 
-        #line 624 "src/analyzer/Block.pv"
+        #line 637 "src/analyzer/Block.pv"
         if (!result) {
-            #line 625 "src/analyzer/Block.pv"
+            #line 638 "src/analyzer/Block.pv"
             if (new_scope) {
-                #line 625 "src/analyzer/Block.pv"
+                #line 638 "src/analyzer/Block.pv"
                 Context__pop_scope(context);
             }
-            #line 626 "src/analyzer/Block.pv"
+            #line 639 "src/analyzer/Block.pv"
             return false;
         }
     }
 
-    #line 630 "src/analyzer/Block.pv"
+    #line 643 "src/analyzer/Block.pv"
     if (new_scope) {
-        #line 631 "src/analyzer/Block.pv"
+        #line 644 "src/analyzer/Block.pv"
         Context__pop_scope(context);
     }
 
-    #line 634 "src/analyzer/Block.pv"
+    #line 647 "src/analyzer/Block.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 634 "src/analyzer/Block.pv"
+        #line 647 "src/analyzer/Block.pv"
         return false;
     }
 
-    #line 636 "src/analyzer/Block.pv"
+    #line 649 "src/analyzer/Block.pv"
     return true;
 }

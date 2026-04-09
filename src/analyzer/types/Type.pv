@@ -489,6 +489,13 @@ impl Type {
         }
     }
 
+    fn is_sequence_fixed_array(&self) -> bool {
+        match self {
+            Type::Sequence(sequence) => { return sequence.is_fixed_array(); },
+            _ => { return false; },
+        }
+    }
+
     fn deref_1(&self) -> &Type {
         match self {
             Type::Indirect(indirect) => { return &indirect.to; },

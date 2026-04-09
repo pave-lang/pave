@@ -471,36 +471,49 @@ impl Block {
             type_name.prepend(": ");
             context.inlay_hint(variable.name, type_name.c_str(), InlayHintKind::Type, false, false);
         } else {
-            let iter_member = context.allocator.store(*expression_first_token);
-            iter_member.value = "iter";
+            let is_sequence = false;
+            match for_statement.expression.return_type {
+                Type::Sequence(sequence) => {
+                    is_sequence = true;
+                    for_statement.type = ForStatementType::Sequence(for_statement.expression);
+                    for_statement.iter_type = &for_statement.expression.return_type;
+                    for_statement.value_type = &sequence.element;
+                },
+                _ => {},
+            }
 
-            let iter_member_type = Expression::get_member_type(context, &for_statement.expression.return_type, iter_member, false);
-            let iter_member_is_function = false;
+            if !is_sequence {
+                let iter_member = context.allocator.store(*expression_first_token);
+                iter_member.value = "iter";
 
-            if iter_member_type != 0 {
-                match iter_member_type {
-                    Type::Function(_, _) => { iter_member_is_function = true; },
-                    _ => {},
+                let iter_member_type = Expression::get_member_type(context, &for_statement.expression.return_type, iter_member, false);
+                let iter_member_is_function = false;
+
+                if iter_member_type != 0 {
+                    match iter_member_type {
+                        Type::Function(_, _) => { iter_member_is_function = true; },
+                        _ => {},
+                    }
                 }
+
+                if !iter_member_is_function {
+                    for_statement.type = ForStatementType::Iter(for_statement.expression);
+                    for_statement.iter_type = &for_statement.expression.return_type;
+                } else {
+                    let args = Array<InvokeArgument>::new(self.context.allocator);
+                    args.append(InvokeArgument { value: for_statement.expression });
+
+                    for_statement.type = ForStatementType::Iter(Expression::make_type_function_call(context, iter_member, iter_member_type, args, generic_map));
+                    for_statement.iter_type = Expression::get_return_type(context, iter_member_type, iter_member, generic_map);
+                }
+
+                let value_member = *iter_member;
+                value_member.value = "value";
+
+                let value_member_type = Expression::get_member_type(context, for_statement.iter_type, &value_member, true);
+                if value_member_type == 0 { return false; }
+                for_statement.value_type = Expression::get_return_type(context, value_member_type, &value_member, generic_map);
             }
-
-            if !iter_member_is_function {
-                for_statement.type = ForStatementType::Iter(for_statement.expression);
-                for_statement.iter_type = &for_statement.expression.return_type;
-            } else {
-                let args = Array<InvokeArgument>::new(self.context.allocator);
-                args.append(InvokeArgument { value: for_statement.expression });
-
-                for_statement.type = ForStatementType::Iter(Expression::make_type_function_call(context, iter_member, iter_member_type, args, generic_map));
-                for_statement.iter_type = Expression::get_return_type(context, iter_member_type, iter_member, generic_map);
-            }
-
-            let value_member = *iter_member;
-            value_member.value = "value";
-
-            let value_member_type = Expression::get_member_type(context, for_statement.iter_type, &value_member, true);
-            if value_member_type == 0 { return false; }
-            for_statement.value_type = Expression::get_return_type(context, value_member_type, &value_member, generic_map);
 
             let variable_i: usize = 0;
             for variable in for_statement.variables {

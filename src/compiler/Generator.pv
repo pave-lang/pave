@@ -1584,6 +1584,66 @@ impl Generator {
                             fprintf(file, "++) {");
                             self.indent += 1;
                         },
+                        ForStatementType::Sequence(iter_expression) => {
+                            is_iterator = true;
+                            self.write_indent(file);
+                            match for_statement.iter_type.deref() {
+                                Type::Sequence(sequence) => {
+                                    match sequence.type {
+                                        SequenceType::FixedArray(size) => {
+                                            fprintf(file, "for (size_t __iter = 0; __iter < %zu; __iter++) {\n", size);
+                                        },
+                                        SequenceType::Slice => {
+                                            fprintf(file, "for (size_t __iter = 0; __iter < ");
+                                            self.write_expression(file, iter_expression, generics);
+                                            fprintf(file, ".length; __iter++) {\n");
+                                        },
+                                    }
+                                },
+                                _ => { fprintf(file, "/* ERROR: Sequence for loop on non-sequence type */"); },
+                            }
+
+                            self.indent += 1;
+
+                            let i: usize = 0;
+                            for variable in for_statement.variables {
+                                if !variable.name.value.eq("_") {
+                                    self.write_line_directive(file, block.context, variable.name);
+
+                                    self.write_indent(file);
+                                    self.write_type(file, variable.type, generics);
+                                    fprintf(file, " ");
+                                    self.write_token(file, variable.name);
+                                    fprintf(file, " = ");
+                                    if variable.ref { fprintf(file, "&"); }
+                                    if variable.deref { fprintf(file, "*"); }
+                                    match for_statement.iter_type.deref() {
+                                        Type::Sequence(sequence) => {
+                                            match sequence.type {
+                                                SequenceType::FixedArray(_) => {
+                                                    self.write_expression(file, iter_expression, generics);
+                                                    fprintf(file, "[__iter]");
+                                                },
+                                                SequenceType::Slice => {
+                                                    self.write_expression(file, iter_expression, generics);
+                                                    fprintf(file, ".data[__iter]");
+                                                },
+                                            }
+                                        },
+                                        _ => { fprintf(file, "/* ERROR */"); },
+                                    }
+
+                                    if for_statement.variables.length > 1 {
+                                        self.write_instance_member_accessor(file, for_statement.value_type, generics);
+                                        fprintf(file, "_%zu", i);
+                                    }
+
+                                    fprintf(file, ";\n");
+                                }
+
+                                i += 1;
+                            }
+                        },
                         ForStatementType::Iter(iter_expression) => {
                             is_iterator = for_statement.iter_type.deref().is_iterator();
                             if is_iterator {
@@ -1959,6 +2019,9 @@ impl Generator {
                         ForStatementType::Range(start, end) => {
                             self.add_expression_includes(includes, start, generics);
                             self.add_expression_includes(includes, end, generics);
+                        },
+                        ForStatementType::Sequence(iter_expression) => {
+                            self.add_expression_includes(includes, iter_expression, generics);
                         },
                         ForStatementType::Iter(iter_expression) => {
                             self.add_expression_includes(includes, iter_expression, generics);
