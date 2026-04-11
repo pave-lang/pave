@@ -10,6 +10,7 @@ enum MatchPattern {
     EnumVariant(&Type, &EnumVariant, Array<EnumVariantParameter>),
     EnumCValue(&EnumCValue),
     TypeId(Type),
+    Hash(&Token),
 }
 
 impl MatchPattern {
@@ -28,6 +29,25 @@ impl MatchPattern {
             if !context.expect_value(TokenType::Symbol, ")") { return false; }
 
             *pattern = MatchPattern::TypeId(type);
+            return true;
+        }
+
+        if context.check_next(TokenType::Identifier, "hash") {
+            if !context.expect_value(TokenType::Symbol, "(") { return false; }
+
+            let token = context.current();
+            if token == 0 { return false; }
+
+            if token.type != TokenType::String && token.type != TokenType::Number {
+                context.error_token(token, "Expected a string or number literal");
+                return false;
+            }
+
+            context.next_token();
+
+            if !context.expect_value(TokenType::Symbol, ")") { return false; }
+
+            *pattern = MatchPattern::Hash(token);
             return true;
         }
 
@@ -144,6 +164,10 @@ impl MatchPattern {
             EnumVariantResult::EnumCValue(enum_variant) => {
                 *pattern = MatchPattern::EnumCValue(enum_variant);
                 return true;
+            },
+            EnumVariantResult::Function(_, _) => {
+                context.error("Expected an enum variant, not a function");
+                return false;
             },
         }
     }
