@@ -26,62 +26,6 @@ impl Block {
         return context.allocator.store(Block::new(context));
     }
 
-    fn parse_let_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "let") { return false; }
-
-        let is_static = context.check_next(TokenType::Keyword, "static");
-
-        let name = context.expect(TokenType::Identifier);
-        if name == 0 { return false; }
-
-        let type: &Type = 0;
-
-        if context.check_next(TokenType::Symbol, ":") {
-            type = context.parse_type2(generics);
-            if type == 0 { /*context.error("type");*/ return false; }
-        }
-        
-        let expression: &Expression = 0;
-
-        if context.check_next(TokenType::Symbol, "=") {
-            expression = Expression::parse(context, generics);
-            if expression == 0 { /* context.error("expression"); */ return false; }
-
-            if type == 0 {
-                type = &expression.return_type;
-
-                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
-                type_name.prepend(": ");
-                context.inlay_hint(name, type_name.c_str(), InlayHintKind::Type, false, false);
-            } else {
-                expression.validate_type(context, type, true);
-            }
-        }
-
-        if !context.set_value(name, type) { context.error("set_value"); return false; }
-        if !context.expect_value(TokenType::Symbol, ";") { return false; }
-
-        if type.is_unknown() {
-            context.error_token(first_token, "Let statement is unable to determine it's type, manually specify it");
-        }
-
-        if type.is_void() {
-            context.error_token(first_token, "Let statement cannot have void type");
-        }
-
-        let let_statement = context.allocator.store(LetStatement {
-            is_static,
-            name,
-            type,
-            value: expression,
-        });
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::LetStatement(let_statement)));
-
-        return true;
-    }
-    
     fn parse_return_statement(&self, context: &Context, generics: &Generics) -> bool {
         let defer_statements: Array<DeferStatement> = context.get_defer_statements();
 
@@ -404,175 +348,6 @@ impl Block {
         return true;
     }
 
-    fn parse_for_variable(&self, context: &Context, variables: &Array<ForVariable>) -> bool {
-        let deref = context.check_next(TokenType::Symbol, "*");
-        let ref = context.check_next(TokenType::Symbol, "&");
-        let name = context.expect(TokenType::Identifier);
-
-        if name == 0 { return false; }
-
-        variables.append(ForVariable { deref, ref, name });
-
-        return true;
-    }
-
-    fn parse_for_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
-
-        let for_statement = ForStatement::new(context.allocator);
-
-        if !context.expect_value(TokenType::Keyword, "for") { return false; }
-
-        if context.check_next(TokenType::Symbol, "(") {
-            while !context.check_value(TokenType::Symbol, ")") {
-                if !self.parse_for_variable(context, &for_statement.variables) { return false; }
-
-                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
-                    context.expect_value(TokenType::Symbol, ")");
-                    return false;
-                }
-            }
-
-            if !context.expect_value(TokenType::Symbol, ")") { return false; }
-        } else {
-            if !self.parse_for_variable(context, &for_statement.variables) { return false; }
-        }
-
-        if !context.expect_value(TokenType::Keyword, "in") { return false; }
-
-        let expression_first_token = context.current();
-        for_statement.expression = Expression::parse(context, generics);
-        if for_statement.expression == 0 { return false; }
-
-        let generic_map = for_statement.expression.return_type.get_generic_map(context);
-
-        let is_range = false;
-
-        match for_statement.expression.data {
-            ExpressionData::Invoke(target, args) => {
-                match target.return_type {
-                    Type::Enum(enum_info, generic_map) => {
-                        if enum_info.name.value.eq("Range") {
-                            is_range = true;
-                            for_statement.type = ForStatementType::Range(args.data[0].value, args.data[1].value);
-                            for_statement.iter_type = &generic_map.array.data[0];
-                            for_statement.variables.data[0].type = &generic_map.array.data[0];
-                        }
-                    },
-                    _ => {},
-                }
-            },
-            _ => {},
-        }
-
-        if is_range {
-            let variable = for_statement.variables.data[0];
-            let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, 0);
-            type_name.prepend(": ");
-            context.inlay_hint(variable.name, type_name.c_str(), InlayHintKind::Type, false, false);
-        } else {
-            let is_sequence = false;
-            match for_statement.expression.return_type {
-                Type::Sequence(sequence) => {
-                    is_sequence = true;
-                    for_statement.type = ForStatementType::Sequence(for_statement.expression);
-                    for_statement.iter_type = &for_statement.expression.return_type;
-                    for_statement.value_type = &sequence.element;
-                },
-                Type::Indirect(indirect) => {
-                    match indirect.to {
-                        Type::Sequence(sequence) => {
-                            is_sequence = true;
-                            for_statement.type = ForStatementType::Sequence(for_statement.expression);
-                            for_statement.iter_type = &for_statement.expression.return_type;
-                            for_statement.value_type = &sequence.element;
-                        },
-                        _ => {},
-                    }
-                },
-                _ => {},
-            }
-
-            if !is_sequence {
-                let iter_member = context.allocator.store(*expression_first_token);
-                iter_member.value = "iter";
-
-                let iter_member_type = Expression::get_member_type(context, &for_statement.expression.return_type, iter_member, false);
-                let iter_member_is_function = false;
-
-                if iter_member_type != 0 {
-                    match iter_member_type {
-                        Type::Function(_, _) => { iter_member_is_function = true; },
-                        _ => {},
-                    }
-                }
-
-                if !iter_member_is_function {
-                    for_statement.type = ForStatementType::Iter(for_statement.expression);
-                    for_statement.iter_type = &for_statement.expression.return_type;
-                } else {
-                    let args = Array<InvokeArgument>::new(self.context.allocator);
-                    args.append(InvokeArgument { value: for_statement.expression });
-
-                    for_statement.type = ForStatementType::Iter(Expression::make_type_function_call(context, iter_member, iter_member_type, args, generic_map));
-                    for_statement.iter_type = Expression::get_return_type(context, iter_member_type, iter_member, generic_map);
-                }
-
-                let value_member = *iter_member;
-                value_member.value = "value";
-
-                let value_member_type = Expression::get_member_type(context, for_statement.iter_type, &value_member, true);
-                if value_member_type == 0 { return false; }
-                for_statement.value_type = Expression::get_return_type(context, value_member_type, &value_member, generic_map);
-            }
-
-            let variable_i: usize = 0;
-            for variable in for_statement.variables {
-                if for_statement.variables.length == 1 {
-                    variable.type = for_statement.value_type;
-                } else {
-                    let value_member = *variable.name;
-                    let value_name = String::new(context.allocator);
-                    value_name.append_usize(variable_i);
-                    value_member.type = TokenType::Number;
-                    value_member.value = value_name.as_str();
-
-                    variable.type = Expression::get_member_type(context, for_statement.value_type.deref(), &value_member, true);
-                }
-
-                if variable.deref {
-                    variable.type = variable.type.deref();
-                }
-
-                if variable.ref {
-                    variable.type = Type::Indirect(Indirect::new_reference(context.allocator, *variable.type)).to_ptr(context.allocator);
-                }
-
-                let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, 0);
-                type_name.prepend(": ");
-                context.inlay_hint(variable.name, type_name.c_str(), InlayHintKind::Type, false, false);
-
-                variable_i += 1;
-            }
-        }
-
-        context.push_scope(self);
-
-        for variable2 in for_statement.variables {
-            if !context.set_value(variable2.name, variable2.type) { context.error("set_value"); return false; }
-        }
-
-        for_statement.block = Block::new_ptr(context);
-        for_statement.block.is_loop = true;
-        if !for_statement.block.parse(context, generics, false) { return false; }
-
-        context.pop_scope();
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::ForStatement(context.allocator.store(for_statement))));
-        
-        return true;
-    }
-
     fn parse_defer_statement(&self, context: &Context, generics: &Generics) -> bool {
         let top_block_found = false;
         for scope in context.scopes {
@@ -620,7 +395,10 @@ impl Block {
             } else if token.eq(TokenType::Keyword, "defer") {
                 result = Block::parse_defer_statement(self, context, generics);
             } else if token.eq(TokenType::Keyword, "let") {
-                result = Block::parse_let_statement(self, context, generics);
+                let first_token = context.current();
+                let let_statement = LetStatement::parse(context, generics);
+                if let_statement { self.statements.append(Statement::new(first_token, context.prev(), StatementData::LetStatement(let_statement))); }
+                result = let_statement != 0;
             } else if token.eq(TokenType::Keyword, "return") {
                 result = Block::parse_return_statement(self, context, generics);
             } else if token.eq(TokenType::Keyword, "yield") {
@@ -632,7 +410,10 @@ impl Block {
             } else if token.eq(TokenType::Keyword, "while") {
                 result = Block::parse_while_statement(self, context, generics);
             } else if token.eq(TokenType::Keyword, "for") {
-                result = Block::parse_for_statement(self, context, generics);
+                let first_token = context.current();
+                let for_statement = ForStatement::parse(self, context, generics);
+                if for_statement { self.statements.append(Statement::new(first_token, context.prev(), StatementData::ForStatement(for_statement))); }
+                result = for_statement != 0;
             } else if context.check_next(TokenType::Keyword, "continue") {
                 self.statements.append(Statement::new(token, token, StatementData::ContinueStatement(context.get_loop_defer_statements())));
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }

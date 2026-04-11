@@ -6,6 +6,9 @@
 struct Token;
 struct Type;
 struct Expression;
+struct LetStatement;
+struct Context;
+struct Generics;
 
 #line 5 "src/analyzer/statement/LetStatement.pv"
 struct LetStatement {
@@ -14,5 +17,8 @@ struct LetStatement {
     struct Type* type;
     struct Expression* value;
 };
+
+#line 13 "src/analyzer/statement/LetStatement.pv"
+struct LetStatement* LetStatement__parse(struct Context* context, struct Generics* generics);
 
 #endif

@@ -12,13 +12,13 @@
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/Block.h>
-#include <analyzer/statement/LetStatement.h>
 #include <analyzer/Token.h>
 #include <analyzer/statement/ForStatement.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/statement/LetStatement.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/FunctionC.h>
@@ -158,22 +158,6 @@ struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Bl
 }
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value) {
-    #line 166 "src/std/ArenaAllocator.pv"
-    struct LetStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct LetStatement));
-    #line 167 "src/std/ArenaAllocator.pv"
-    if (new_memory == 0) {
-        #line 167 "src/std/ArenaAllocator.pv"
-        return 0;
-    }
-
-    #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct LetStatement));
-    #line 170 "src/std/ArenaAllocator.pv"
-    return new_memory;
-}
-
-#line 165 "src/std/ArenaAllocator.pv"
 struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Token* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Token));
@@ -265,6 +249,22 @@ struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self,
 
     #line 169 "src/std/ArenaAllocator.pv"
     memcpy(new_memory, &value, sizeof(struct Expression));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct LetStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct LetStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct LetStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }

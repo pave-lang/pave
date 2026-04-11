@@ -12,13 +12,13 @@ struct Type;
 struct GenericMap;
 struct Indirect;
 struct Block;
-struct LetStatement;
 struct Token;
 struct ForStatement;
 struct Sequence;
 struct Tuple;
 struct Generic;
 struct Expression;
+struct LetStatement;
 struct ClassCpp;
 struct EnumC;
 struct FunctionC;
@@ -62,9 +62,6 @@ struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, str
 struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Block value);
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value);
-
-#line 165 "src/std/ArenaAllocator.pv"
 struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value);
 
 #line 165 "src/std/ArenaAllocator.pv"
@@ -81,6 +78,9 @@ struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struc
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value);
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp value);
