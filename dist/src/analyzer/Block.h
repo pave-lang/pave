@@ -9,6 +9,7 @@
 
 struct Context;
 struct Generics;
+struct StatementData;
 
 #include <stdio.h>
 
@@ -28,12 +29,9 @@ struct Block Block__new(struct Context* context);
 struct Block* Block__new_ptr(struct Context* context);
 
 #line 29 "src/analyzer/Block.pv"
-bool Block__parse_expression_statement(struct Block* self, struct Context* context, struct Generics* generics);
+bool Block__parse_expression_statement(struct Block* self, struct Context* context, struct Generics* generics, struct StatementData* data);
 
-#line 54 "src/analyzer/Block.pv"
-bool Block__parse_defer_statement(struct Block* self, struct Context* context, struct Generics* generics);
-
-#line 85 "src/analyzer/Block.pv"
+#line 53 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif

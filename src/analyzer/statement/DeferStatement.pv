@@ -8,7 +8,7 @@ enum DeferStatement {
 }
 
 impl DeferStatement {
-    fn parse(parent_block: &Block, context: &Context, generics: &Generics) -> bool {
+    fn parse(parent_block: &Block, context: &Context, generics: &Generics) -> *DeferStatement {
         let top_block_found = false;
         for scope in context.scopes {
             if top_block_found {}
@@ -23,19 +23,17 @@ impl DeferStatement {
 
         if !top_block_found { context.error("could not find top_block for defer statements"); }
 
-        if !context.expect_value(TokenType::Keyword, "defer") { return false; }
+        if !context.expect_value(TokenType::Keyword, "defer") { return 0; }
 
         if context.check_value(TokenType::Symbol, "{") {
             let defer_block = Block::new_ptr(context);
-            if !defer_block.parse(context, generics, true) { return false; }
-            parent_block.defer_statements.append(DeferStatement::Block(defer_block));
+            if !defer_block.parse(context, generics, true) { return 0; }
+            return context.allocator.store(DeferStatement::Block(defer_block));
         } else {
             let expression = Expression::parse(context, generics);
-            if expression == 0 { return false; }
-            parent_block.defer_statements.append(DeferStatement::Expression(expression));
-            if !context.expect_value(TokenType::Symbol, ";") { return false; }
+            if expression == 0 { return 0; }
+            if !context.expect_value(TokenType::Symbol, ";") { return 0; }
+            return context.allocator.store(DeferStatement::Expression(expression));
         }
-
-        return true;
     }
 }

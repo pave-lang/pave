@@ -18,6 +18,7 @@ struct Sequence;
 struct Tuple;
 struct Generic;
 struct Expression;
+struct DeferStatement;
 struct ForStatement;
 struct IfStatement;
 struct LetStatement;
@@ -84,6 +85,9 @@ struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struc
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocator* self, struct DeferStatement value);
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value);

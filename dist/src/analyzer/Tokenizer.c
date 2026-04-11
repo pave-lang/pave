@@ -271,7 +271,6 @@ struct Array_ptrc_char Tokenizer__make_keywords(struct ArenaAllocator* allocator
     Array_ptrc_char__append(&keywords, "static");
     #line 174 "src/analyzer/Tokenizer.pv"
     Array_ptrc_char__append(&keywords, "dyn");
-
     #line 177 "src/analyzer/Tokenizer.pv"
     Array_ptrc_char__append(&keywords, "export");
     #line 178 "src/analyzer/Tokenizer.pv"

@@ -1,10 +1,9 @@
 #ifndef PAVE_DEFER_STATEMENT
 #define PAVE_DEFER_STATEMENT
 
-#include <stdbool.h>
-
 struct Expression;
 struct Block;
+struct DeferStatement;
 struct Context;
 struct Generics;
 
@@ -22,6 +21,6 @@ struct DeferStatement {
 };
 
 #line 11 "src/analyzer/statement/DeferStatement.pv"
-bool DeferStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics);
+struct DeferStatement* DeferStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics);
 
 #endif

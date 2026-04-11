@@ -26,8 +26,7 @@ impl Block {
         return context.allocator.store(Block::new(context));
     }
 
-    fn parse_expression_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
+    fn parse_expression_statement(&self, context: &Context, generics: &Generics, data: *StatementData) -> bool {
         let expression = Expression::parse(context, generics);
         if expression == 0 { return false; }
 
@@ -41,9 +40,9 @@ impl Block {
             value.validate_type(context, &expression.return_type, true);
 
             let assignment = context.allocator.store(AssignmentStatement { left: expression, operator, right: value });
-            self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(assignment)));
+            *data = StatementData::AssignmentStatement(assignment);
         } else {
-            self.statements.append(Statement::new(first_token, context.prev(), StatementData::ExpressionStatement(expression)));
+            *data = StatementData::ExpressionStatement(expression);
         }
 
         if !context.expect_value(TokenType::Symbol, ";") { return false; }
@@ -56,67 +55,66 @@ impl Block {
         if new_scope { context.push_scope(self); }
 
         while !context.check_value(TokenType::Symbol, "}") {
-            let token = &context.tokens[context.pos];
+            let first_token = context.current();
+            let data = StatementData::ExpressionStatement(0);
             let result = true;
 
-            if token.eq(TokenType::Symbol, "{") {
-                let first_token = context.current();
+            if first_token.eq(TokenType::Keyword, "defer") {
+                let defer_stmt = DeferStatement::parse(self, context, generics);
+                if defer_stmt == 0 {
+                    if new_scope { context.pop_scope(); }
+                    return false;
+                }
+                self.defer_statements.append(*defer_stmt);
+                continue;
+            } else if first_token.eq(TokenType::Symbol, "{") {
                 let block = Block::new_ptr(context);
                 result = block.parse(context, generics, true);
-                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::BlockStatement(block))); }
-            } else if token.eq(TokenType::Keyword, "defer") {
-                result = DeferStatement::parse(self, context, generics);
-            } else if token.eq(TokenType::Keyword, "let") {
-                let first_token = context.current();
+                data = StatementData::BlockStatement(block);
+            } else if first_token.eq(TokenType::Keyword, "let") {
                 let let_statement = LetStatement::parse(context, generics);
-                if let_statement { self.statements.append(Statement::new(first_token, context.prev(), StatementData::LetStatement(let_statement))); }
                 result = let_statement != 0;
-            } else if token.eq(TokenType::Keyword, "return") {
-                let first_token = context.current();
+                data = StatementData::LetStatement(let_statement);
+            } else if first_token.eq(TokenType::Keyword, "return") {
                 let ret = ReturnStatement::parse(context, generics);
                 result = ret != 0;
-                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::ReturnStatement(ret))); }
-            } else if token.eq(TokenType::Keyword, "yield") {
-                let first_token = context.current();
+                data = StatementData::ReturnStatement(ret);
+            } else if first_token.eq(TokenType::Keyword, "yield") {
                 let yield_stmt = YieldStatement::parse(context, generics);
                 result = yield_stmt != 0;
-                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::YieldStatement(yield_stmt))); }
-            } else if token.eq(TokenType::Keyword, "if") {
-                let first_token = context.current();
+                data = StatementData::YieldStatement(yield_stmt);
+            } else if first_token.eq(TokenType::Keyword, "if") {
                 let if_stmt = IfStatement::parse(context, generics);
                 result = if_stmt != 0;
-                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::IfStatement(if_stmt))); }
-            } else if token.eq(TokenType::Keyword, "match") {
-                let first_token = context.current();
+                data = StatementData::IfStatement(if_stmt);
+            } else if first_token.eq(TokenType::Keyword, "match") {
                 let match_stmt = MatchStatement::parse(context, generics);
                 result = match_stmt != 0;
-                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::MatchStatement(match_stmt))); }
-            } else if token.eq(TokenType::Keyword, "while") {
-                let first_token = context.current();
+                data = StatementData::MatchStatement(match_stmt);
+            } else if first_token.eq(TokenType::Keyword, "while") {
                 let while_stmt = WhileStatement::parse(context, generics);
                 result = while_stmt != 0;
-                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::WhileStatement(while_stmt))); }
-            } else if token.eq(TokenType::Keyword, "for") {
-                let first_token = context.current();
+                data = StatementData::WhileStatement(while_stmt);
+            } else if first_token.eq(TokenType::Keyword, "for") {
                 let for_statement = ForStatement::parse(self, context, generics);
-                if for_statement { self.statements.append(Statement::new(first_token, context.prev(), StatementData::ForStatement(for_statement))); }
                 result = for_statement != 0;
-            } else if context.check_next(TokenType::Keyword, "continue") {
-                self.statements.append(Statement::new(token, token, StatementData::ContinueStatement(context.get_loop_defer_statements())));
+                data = StatementData::ForStatement(for_statement);
+            } else if first_token.eq(TokenType::Keyword, "continue") {
+                data = StatementData::ContinueStatement(context.get_loop_defer_statements());
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
-                result = true;
-            } else if context.check_next(TokenType::Keyword, "break") {
-                self.statements.append(Statement::new(token, token, StatementData::BreakStatement(context.get_loop_defer_statements())));
+            } else if first_token.eq(TokenType::Keyword, "break") {
+                data = StatementData::BreakStatement(context.get_loop_defer_statements());
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
-                result = true;
             } else {
-                result = Block::parse_expression_statement(self, context, generics);
+                result = Block::parse_expression_statement(self, context, generics, &data);
             }
 
             if !result {
                 if new_scope { context.pop_scope(); }
                 return false;
             }
+
+            self.statements.append(Statement::new(first_token, context.prev(), data));
         }
 
         if new_scope {

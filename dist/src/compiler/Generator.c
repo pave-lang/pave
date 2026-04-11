@@ -2743,7 +2743,6 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
                                     Generator__write_str(self, file, String__as_str(&type_name));
                                     #line 1462 "src/compiler/Generator.pv"
                                     String__release(&type_name);
-
                                     #line 1464 "src/compiler/Generator.pv"
                                     fprintf(file, "::");
                                 }

@@ -18,6 +18,7 @@
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <analyzer/statement/ForStatement.h>
 #include <analyzer/statement/IfStatement.h>
 #include <analyzer/statement/LetStatement.h>
@@ -255,6 +256,22 @@ struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self,
 
     #line 169 "src/std/ArenaAllocator.pv"
     memcpy(new_memory, &value, sizeof(struct Expression));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocator* self, struct DeferStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct DeferStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct DeferStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct DeferStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }

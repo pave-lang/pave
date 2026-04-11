@@ -1,20 +1,20 @@
-#include <stdbool.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <analyzer/Block.h>
 #include <analyzer/Context.h>
 #include <analyzer/types/Generics.h>
+#include <stdbool.h>
 #include <analyzer/Scope.h>
 #include <std/Iter_ref_Scope.h>
 #include <std/Array_Scope.h>
 #include <stdint.h>
 #include <analyzer/TokenType.h>
-#include <analyzer/statement/DeferStatement.h>
-#include <std/Array_DeferStatement.h>
+#include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
 
 #include <analyzer/statement/DeferStatement.h>
 
 #line 11 "src/analyzer/statement/DeferStatement.pv"
-bool DeferStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics) {
+struct DeferStatement* DeferStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics) {
     #line 12 "src/analyzer/statement/DeferStatement.pv"
     bool top_block_found = false;
     #line 13 "src/analyzer/statement/DeferStatement.pv"
@@ -48,7 +48,7 @@ bool DeferStatement__parse(struct Block* parent_block, struct Context* context, 
     #line 26 "src/analyzer/statement/DeferStatement.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "defer")) {
         #line 26 "src/analyzer/statement/DeferStatement.pv"
-        return false;
+        return 0;
     }
 
     #line 28 "src/analyzer/statement/DeferStatement.pv"
@@ -58,27 +58,24 @@ bool DeferStatement__parse(struct Block* parent_block, struct Context* context, 
         #line 30 "src/analyzer/statement/DeferStatement.pv"
         if (!Block__parse(defer_block, context, generics, true)) {
             #line 30 "src/analyzer/statement/DeferStatement.pv"
-            return false;
+            return 0;
         }
         #line 31 "src/analyzer/statement/DeferStatement.pv"
-        Array_DeferStatement__append(&parent_block->defer_statements, (struct DeferStatement) { .type = DEFER_STATEMENT__BLOCK, .block_value = defer_block });
+        return ArenaAllocator__store_DeferStatement(context->allocator, (struct DeferStatement) { .type = DEFER_STATEMENT__BLOCK, .block_value = defer_block });
     } else {
         #line 33 "src/analyzer/statement/DeferStatement.pv"
         struct Expression* expression = Expression__parse(context, generics);
         #line 34 "src/analyzer/statement/DeferStatement.pv"
         if (expression == 0) {
             #line 34 "src/analyzer/statement/DeferStatement.pv"
-            return false;
+            return 0;
         }
         #line 35 "src/analyzer/statement/DeferStatement.pv"
-        Array_DeferStatement__append(&parent_block->defer_statements, (struct DeferStatement) { .type = DEFER_STATEMENT__EXPRESSION, .expression_value = expression });
-        #line 36 "src/analyzer/statement/DeferStatement.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-            #line 36 "src/analyzer/statement/DeferStatement.pv"
-            return false;
+            #line 35 "src/analyzer/statement/DeferStatement.pv"
+            return 0;
         }
+        #line 36 "src/analyzer/statement/DeferStatement.pv"
+        return ArenaAllocator__store_DeferStatement(context->allocator, (struct DeferStatement) { .type = DEFER_STATEMENT__EXPRESSION, .expression_value = expression });
     }
-
-    #line 39 "src/analyzer/statement/DeferStatement.pv"
-    return true;
 }
