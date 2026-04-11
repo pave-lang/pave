@@ -50,6 +50,60 @@ impl Block {
         return true;
     }
 
+    fn parse_keyword(&self, context: &Context, generics: &Generics, first_token: &Token, data: *StatementData) -> bool {
+        match first_token.value.hash() {
+            hash("let") => {
+                let let_statement = LetStatement::parse(context, generics);
+                *data = StatementData::LetStatement(let_statement);
+                return let_statement != 0;
+            },
+            hash("return") => {
+                let ret = ReturnStatement::parse(context, generics);
+                *data = StatementData::ReturnStatement(ret);
+                return ret != 0;
+            },
+            hash("yield") => {
+                let yield_stmt = YieldStatement::parse(context, generics);
+                *data = StatementData::YieldStatement(yield_stmt);
+                return yield_stmt != 0;
+            },
+            hash("if") => {
+                let if_stmt = IfStatement::parse(context, generics);
+                *data = StatementData::IfStatement(if_stmt);
+                return if_stmt != 0;
+            },
+            hash("match") => {
+                let match_stmt = MatchStatement::parse(context, generics);
+                *data = StatementData::MatchStatement(match_stmt);
+                return match_stmt != 0;
+            },
+            hash("while") => {
+                let while_stmt = WhileStatement::parse(context, generics);
+                *data = StatementData::WhileStatement(while_stmt);
+                return while_stmt != 0;
+            },
+            hash("for") => {
+                let for_statement = ForStatement::parse(self, context, generics);
+                *data = StatementData::ForStatement(for_statement);
+                return for_statement != 0;
+            },
+            hash("continue") => {
+                context.next_token();
+                *data = StatementData::ContinueStatement(context.get_loop_defer_statements());
+                return context.expect_value(TokenType::Symbol, ";");
+            },
+            hash("break") => {
+                context.next_token();
+                *data = StatementData::BreakStatement(context.get_loop_defer_statements());
+                return context.expect_value(TokenType::Symbol, ";");
+            },
+            _ => {
+                context.error_token(first_token, "Unexpected keyword");
+                return false;
+            },
+        }
+    }
+
     fn parse(&self, context: &Context, generics: &Generics, new_scope: bool) -> bool {
         if !context.expect_value(TokenType::Symbol, "{") { return false; }
         if new_scope { context.push_scope(self); }
@@ -59,7 +113,11 @@ impl Block {
             let data = StatementData::ExpressionStatement(0);
             let result = true;
 
-            if first_token.eq(TokenType::Keyword, "defer") {
+            if first_token.eq(TokenType::Symbol, "{") {
+                let block = Block::new_ptr(context);
+                result = block.parse(context, generics, true);
+                data = StatementData::BlockStatement(block);
+            } else if first_token.eq(TokenType::Keyword, "defer") {
                 let defer_stmt = DeferStatement::parse(self, context, generics);
                 if defer_stmt == 0 {
                     if new_scope { context.pop_scope(); }
@@ -67,46 +125,8 @@ impl Block {
                 }
                 self.defer_statements.append(*defer_stmt);
                 continue;
-            } else if first_token.eq(TokenType::Symbol, "{") {
-                let block = Block::new_ptr(context);
-                result = block.parse(context, generics, true);
-                data = StatementData::BlockStatement(block);
-            } else if first_token.eq(TokenType::Keyword, "let") {
-                let let_statement = LetStatement::parse(context, generics);
-                result = let_statement != 0;
-                data = StatementData::LetStatement(let_statement);
-            } else if first_token.eq(TokenType::Keyword, "return") {
-                let ret = ReturnStatement::parse(context, generics);
-                result = ret != 0;
-                data = StatementData::ReturnStatement(ret);
-            } else if first_token.eq(TokenType::Keyword, "yield") {
-                let yield_stmt = YieldStatement::parse(context, generics);
-                result = yield_stmt != 0;
-                data = StatementData::YieldStatement(yield_stmt);
-            } else if first_token.eq(TokenType::Keyword, "if") {
-                let if_stmt = IfStatement::parse(context, generics);
-                result = if_stmt != 0;
-                data = StatementData::IfStatement(if_stmt);
-            } else if first_token.eq(TokenType::Keyword, "match") {
-                let match_stmt = MatchStatement::parse(context, generics);
-                result = match_stmt != 0;
-                data = StatementData::MatchStatement(match_stmt);
-            } else if first_token.eq(TokenType::Keyword, "while") {
-                let while_stmt = WhileStatement::parse(context, generics);
-                result = while_stmt != 0;
-                data = StatementData::WhileStatement(while_stmt);
-            } else if first_token.eq(TokenType::Keyword, "for") {
-                let for_statement = ForStatement::parse(self, context, generics);
-                result = for_statement != 0;
-                data = StatementData::ForStatement(for_statement);
-            } else if first_token.eq(TokenType::Keyword, "continue") {
-                context.next_token();
-                data = StatementData::ContinueStatement(context.get_loop_defer_statements());
-                if !context.expect_value(TokenType::Symbol, ";") { return false; }
-            } else if first_token.eq(TokenType::Keyword, "break") {
-                context.next_token();
-                data = StatementData::BreakStatement(context.get_loop_defer_statements());
-                if !context.expect_value(TokenType::Symbol, ";") { return false; }
+            } else if first_token.type == TokenType::Keyword {
+                result = Block::parse_keyword(self, context, generics, first_token, &data);
             } else {
                 result = Block::parse_expression_statement(self, context, generics, &data);
             }

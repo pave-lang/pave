@@ -10,6 +10,7 @@
 struct Context;
 struct Generics;
 struct StatementData;
+struct Token;
 
 #include <stdio.h>
 
@@ -32,6 +33,9 @@ struct Block* Block__new_ptr(struct Context* context);
 bool Block__parse_expression_statement(struct Block* self, struct Context* context, struct Generics* generics, struct StatementData* data);
 
 #line 53 "src/analyzer/Block.pv"
+bool Block__parse_keyword(struct Block* self, struct Context* context, struct Generics* generics, struct Token* first_token, struct StatementData* data);
+
+#line 107 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif
