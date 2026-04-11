@@ -4,11 +4,17 @@
 #include <std/Array_ForVariable.h>
 #include <analyzer/statement/ForVariable.h>
 #include <analyzer/statement/ForStatementType.h>
+#include <stdbool.h>
 
 struct Expression;
 struct Type;
 struct Block;
 struct ArenaAllocator;
+struct Context;
+struct Array_ForVariable;
+struct ForVariable;
+struct ForStatement;
+struct Generics;
 
 #line 6 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement {
@@ -22,5 +28,11 @@ struct ForStatement {
 
 #line 16 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator);
+
+#line 20 "src/analyzer/statement/ForStatement.pv"
+bool ForStatement__parse_for_variable(struct Context* context, struct Array_ForVariable* variables);
+
+#line 32 "src/analyzer/statement/ForStatement.pv"
+struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics);
 
 #endif

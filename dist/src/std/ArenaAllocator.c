@@ -12,13 +12,19 @@
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/Block.h>
+#include <analyzer/statement/AssignmentStatement.h>
 #include <analyzer/Token.h>
-#include <analyzer/statement/ForStatement.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/statement/ForStatement.h>
+#include <analyzer/statement/IfStatement.h>
 #include <analyzer/statement/LetStatement.h>
+#include <analyzer/statement/MatchStatement.h>
+#include <analyzer/statement/ReturnStatement.h>
+#include <analyzer/statement/WhileStatement.h>
+#include <analyzer/statement/YieldStatement.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/FunctionC.h>
@@ -158,6 +164,22 @@ struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Bl
 }
 
 #line 165 "src/std/ArenaAllocator.pv"
+struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct ArenaAllocator* self, struct AssignmentStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct AssignmentStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct AssignmentStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct AssignmentStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
 struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Token* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Token));
@@ -169,22 +191,6 @@ struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct To
 
     #line 169 "src/std/ArenaAllocator.pv"
     memcpy(new_memory, &value, sizeof(struct Token));
-    #line 170 "src/std/ArenaAllocator.pv"
-    return new_memory;
-}
-
-#line 165 "src/std/ArenaAllocator.pv"
-struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value) {
-    #line 166 "src/std/ArenaAllocator.pv"
-    struct ForStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ForStatement));
-    #line 167 "src/std/ArenaAllocator.pv"
-    if (new_memory == 0) {
-        #line 167 "src/std/ArenaAllocator.pv"
-        return 0;
-    }
-
-    #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct ForStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
@@ -254,6 +260,38 @@ struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self,
 }
 
 #line 165 "src/std/ArenaAllocator.pv"
+struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct ForStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ForStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct ForStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* self, struct IfStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct IfStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct IfStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct IfStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
 struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct LetStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct LetStatement));
@@ -265,6 +303,70 @@ struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* s
 
     #line 169 "src/std/ArenaAllocator.pv"
     memcpy(new_memory, &value, sizeof(struct LetStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocator* self, struct MatchStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct MatchStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct MatchStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct MatchStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAllocator* self, struct ReturnStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct ReturnStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ReturnStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct ReturnStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocator* self, struct WhileStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct WhileStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct WhileStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct WhileStatement));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocator* self, struct YieldStatement value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct YieldStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct YieldStatement));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct YieldStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }

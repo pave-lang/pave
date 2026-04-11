@@ -93,15 +93,21 @@
 #include <analyzer/statement/StatementData.h>
 #include <analyzer/statement/LetStatement.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/statement/ReturnStatement.h>
 #include <compiler/FunctionCoroutine.h>
+#include <analyzer/statement/YieldStatement.h>
+#include <analyzer/statement/IfStatement.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <std/Iter_ref_ElseStatement.h>
 #include <std/Array_ElseStatement.h>
+#include <analyzer/statement/MatchStatement.h>
 #include <analyzer/statement/MatchCase.h>
 #include <std/Iter_ref_MatchCase.h>
 #include <std/Array_MatchCase.h>
+#include <analyzer/statement/WhileStatement.h>
 #include <analyzer/statement/ForStatementType.h>
 #include <analyzer/statement/ForStatement.h>
+#include <analyzer/statement/AssignmentStatement.h>
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Iter_ref_InvokeArgument.h>
@@ -873,37 +879,33 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
             #line 456 "src/compiler/Usages.pv"
             case STATEMENT_DATA__RETURN_STATEMENT: {
                 #line 456 "src/compiler/Usages.pv"
-                struct Expression* expression = statement_iter->data.returnstatement_value._0;
+                struct ReturnStatement* ret = statement_iter->data.returnstatement_value;
                 #line 457 "src/compiler/Usages.pv"
-                if (expression != 0) {
+                if (ret->expression != 0) {
                     #line 458 "src/compiler/Usages.pv"
-                    Usages__process_expression(self, expression, generic_map);
+                    Usages__process_expression(self, ret->expression, generic_map);
                 }
             } break;
             #line 461 "src/compiler/Usages.pv"
             case STATEMENT_DATA__YIELD_STATEMENT: {
                 #line 461 "src/compiler/Usages.pv"
-                struct Expression* expression = statement_iter->data.yieldstatement_value;
+                struct YieldStatement* yield_stmt = statement_iter->data.yieldstatement_value;
                 #line 462 "src/compiler/Usages.pv"
                 self->function_context->coroutine.yield_count += 1;
                 #line 463 "src/compiler/Usages.pv"
-                Usages__process_expression(self, expression, generic_map);
+                Usages__process_expression(self, yield_stmt->expression, generic_map);
             } break;
             #line 465 "src/compiler/Usages.pv"
             case STATEMENT_DATA__IF_STATEMENT: {
                 #line 465 "src/compiler/Usages.pv"
-                struct Expression* condition = statement_iter->data.ifstatement_value._0;
-                #line 465 "src/compiler/Usages.pv"
-                struct Block* if_block = statement_iter->data.ifstatement_value._1;
-                #line 465 "src/compiler/Usages.pv"
-                struct Array_ElseStatement* else_statements = &statement_iter->data.ifstatement_value._2;
+                struct IfStatement* if_stmt = statement_iter->data.ifstatement_value;
                 #line 466 "src/compiler/Usages.pv"
-                Usages__process_expression(self, condition, generic_map);
+                Usages__process_expression(self, if_stmt->expression, generic_map);
                 #line 467 "src/compiler/Usages.pv"
-                Usages__process_block(self, if_block, generic_map);
+                Usages__process_block(self, if_stmt->block, generic_map);
 
                 #line 469 "src/compiler/Usages.pv"
-                { struct Iter_ref_ElseStatement __iter = Array_ElseStatement__iter(else_statements);
+                { struct Iter_ref_ElseStatement __iter = Array_ElseStatement__iter(&if_stmt->else_statements);
                 #line 469 "src/compiler/Usages.pv"
                 while (Iter_ref_ElseStatement__next(&__iter)) {
                     #line 469 "src/compiler/Usages.pv"
@@ -916,14 +918,12 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
             #line 473 "src/compiler/Usages.pv"
             case STATEMENT_DATA__MATCH_STATEMENT: {
                 #line 473 "src/compiler/Usages.pv"
-                struct Expression* condition = statement_iter->data.matchstatement_value._0;
-                #line 473 "src/compiler/Usages.pv"
-                struct Array_MatchCase* cases = &statement_iter->data.matchstatement_value._1;
+                struct MatchStatement* match_stmt = statement_iter->data.matchstatement_value;
                 #line 474 "src/compiler/Usages.pv"
-                Usages__process_expression(self, condition, generic_map);
+                Usages__process_expression(self, match_stmt->expression, generic_map);
 
                 #line 476 "src/compiler/Usages.pv"
-                { struct Iter_ref_MatchCase __iter = Array_MatchCase__iter(cases);
+                { struct Iter_ref_MatchCase __iter = Array_MatchCase__iter(&match_stmt->cases);
                 #line 476 "src/compiler/Usages.pv"
                 while (Iter_ref_MatchCase__next(&__iter)) {
                     #line 476 "src/compiler/Usages.pv"
@@ -936,13 +936,11 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
             #line 480 "src/compiler/Usages.pv"
             case STATEMENT_DATA__WHILE_STATEMENT: {
                 #line 480 "src/compiler/Usages.pv"
-                struct Expression* condition = statement_iter->data.whilestatement_value._0;
-                #line 480 "src/compiler/Usages.pv"
-                struct Block* while_block = statement_iter->data.whilestatement_value._1;
+                struct WhileStatement* while_stmt = statement_iter->data.whilestatement_value;
                 #line 481 "src/compiler/Usages.pv"
-                Usages__process_expression(self, condition, generic_map);
+                Usages__process_expression(self, while_stmt->expression, generic_map);
                 #line 482 "src/compiler/Usages.pv"
-                Usages__process_block(self, while_block, generic_map);
+                Usages__process_block(self, while_stmt->block, generic_map);
             } break;
             #line 484 "src/compiler/Usages.pv"
             case STATEMENT_DATA__FOR_STATEMENT: {
@@ -983,13 +981,11 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
             #line 500 "src/compiler/Usages.pv"
             case STATEMENT_DATA__ASSIGNMENT_STATEMENT: {
                 #line 500 "src/compiler/Usages.pv"
-                struct Expression* left = statement_iter->data.assignmentstatement_value._0;
-                #line 500 "src/compiler/Usages.pv"
-                struct Expression* right = statement_iter->data.assignmentstatement_value._2;
+                struct AssignmentStatement* assign_stmt = statement_iter->data.assignmentstatement_value;
                 #line 501 "src/compiler/Usages.pv"
-                Usages__process_expression(self, left, generic_map);
+                Usages__process_expression(self, assign_stmt->left, generic_map);
                 #line 502 "src/compiler/Usages.pv"
-                Usages__process_expression(self, right, generic_map);
+                Usages__process_expression(self, assign_stmt->right, generic_map);
             } break;
             #line 504 "src/compiler/Usages.pv"
             case STATEMENT_DATA__EXPRESSION_STATEMENT: {

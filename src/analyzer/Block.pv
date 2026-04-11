@@ -26,59 +26,6 @@ impl Block {
         return context.allocator.store(Block::new(context));
     }
 
-    fn parse_return_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let defer_statements: Array<DeferStatement> = context.get_defer_statements();
-
-        let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "return") { return false; }
-
-        if context.check_next(TokenType::Symbol, ";") {
-            let statement: StatementData = StatementData::ReturnStatement(0, defer_statements);
-            self.statements.append(Statement::new(first_token, context.prev(), statement));
-
-            if !context.function.return_type.is_void() {
-                context.error_token(first_token, "Return statement is blank but function has a return type");
-            }
-
-            return true;
-        }
-
-        let expression = Expression::parse(context, generics);
-        if expression == 0 { return false; }
-        if !context.expect_value(TokenType::Symbol, ";") { return false; }
-
-        expression.validate_type(context, &context.function.return_type, true);
-
-        if context.function.return_type.is_void() {
-            context.error_token(first_token, "Function does not have a return type");
-        }
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::ReturnStatement(expression, defer_statements)));
-
-        return true;
-    }
-    
-    fn parse_yield_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "yield") { return false; }
-
-        if context.check_next(TokenType::Symbol, ";") {
-            let statement: StatementData = StatementData::YieldStatement(0);
-            self.statements.append(Statement::new(first_token, context.prev(), statement));
-            return true;
-        }
-
-        let expression = Expression::parse(context, generics);
-        if expression == 0 { return false; }
-        if !context.expect_value(TokenType::Symbol, ";") { return false; }
-
-        expression.validate_type(context, &context.function.return_type, true);
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::YieldStatement(expression)));
-
-        return true;
-    }
-    
     fn parse_expression_statement(&self, context: &Context, generics: &Generics) -> bool {
         let first_token = context.current();
         let expression = Expression::parse(context, generics);
@@ -93,258 +40,14 @@ impl Block {
 
             value.validate_type(context, &expression.return_type, true);
 
-            self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(expression, operator, value)));
+            let assign_stmt = context.allocator.store(AssignmentStatement { left: expression, operator, right: value });
+            self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(assign_stmt)));
         } else {
             self.statements.append(Statement::new(first_token, context.prev(), StatementData::ExpressionStatement(expression)));
         }
 
         if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
-        return true;
-    }
-
-    fn parse_if_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "if") { return false; }
-
-        let expression = Expression::parse(context, generics);
-        if expression == 0 { return false; }
-
-        let block = Block::new_ptr(context);
-        if !block.parse(context, generics, true) { return false; }
-
-        let else_statements = Array<ElseStatement>::new(context.allocator);
-        let else_expression: &Expression = 0;
-        let else_block: &Block = 0;
-        let else_end = false;
-
-        while !else_end && context.check_next(TokenType::Keyword, "else") {
-            if context.check_next(TokenType::Keyword, "if") {
-                else_expression = Expression::parse(context, generics);
-                if else_expression == 0 { return false; }
-            } else {
-                else_expression = 0;
-                else_end = true;
-            }
-
-            else_block = Block::new_ptr(context);
-            if !else_block.parse(context, generics, true) { return false; }
-            
-            let else_statement: ElseStatement = ElseStatement {
-                expression: else_expression,
-                block: else_block,
-            };
-
-            else_statements.append(else_statement);
-        }
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::IfStatement(expression, block, else_statements)));
-
-        return true;
-    }
-
-    fn parse_match_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "match") { return false; }
-
-        let expression = Expression::parse(context, generics);
-        if expression == 0 { return false; }
-
-        if !context.expect_value(TokenType::Symbol, "{") { return false; }
-        
-        let cases: Array<MatchCase> = Array<MatchCase>::new(context.allocator);
-
-        while !context.check_value(TokenType::Symbol, "}") {
-            let first_match_token = context.current();
-
-            let block = Block::new_ptr(context);
-            context.push_scope(block);
-
-            let patterns = Array<MatchPattern>::new(context.allocator);
-
-            while patterns.length == 0 || context.check_next(TokenType::Symbol, "|") {
-                let pattern: MatchPattern = MatchPattern::Default;
-                if !self.parse_match_pattern(context, generics, &pattern) { return false; }
-
-                patterns.append(pattern);
-            }
-
-            if !context.expect_value(TokenType::Symbol, "=>") { context.pop_scope(); return false; }
-
-            if !block.parse(context, generics, false) { context.pop_scope(); return false; }
-
-            let match_case: MatchCase = MatchCase {
-                first_token: first_match_token,
-                patterns,
-                body: block,
-            };
-
-            cases.append(match_case);
-
-            context.pop_scope();
-
-            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
-                context.pop_scope();
-                context.expect_value(TokenType::Symbol, "}");
-                return false;
-            }
-        }
-
-        if !context.expect_value(TokenType::Symbol, "}") { return false; }
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::MatchStatement(expression, cases)));
-
-        return true;
-    }
-
-    fn parse_match_pattern(&self, context: &Context, generics: &Generics, pattern: &MatchPattern) -> bool {
-        if context.check_next(TokenType::Identifier, "_") {
-            *pattern = MatchPattern::Default;
-            return true;
-        }
-
-        if context.check_next(TokenType::Identifier, "typeid") {
-            if !context.expect_value(TokenType::Symbol, "(") { return false; }
-
-            let type: Type;
-            if !context.parse_type(&type, generics) { return false; }
-
-            if !context.expect_value(TokenType::Symbol, ")") { return false; }
-
-            *pattern = MatchPattern::TypeId(type);
-            return true;
-        }
-
-        let token = context.current();
-        if token == 0 { return false; }
-
-        let type = context.get_value(token.value);
-
-        if type != 0 {
-            context.next_token();
-            let expression = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), type);
-            *pattern = MatchPattern::StaticValue(expression);
-            return true;
-        }
-        
-        type = context.parse_type2(generics);
-        if type == 0 {
-            return false;
-        } else if !type.is_enum() {
-            context.error_token(token, "Type is not an enum");
-            return false;
-        }
-
-        if !context.expect_value(TokenType::Symbol, "::") { return false; }
-        
-        let enum_variant_token = context.expect(TokenType::Identifier);
-        if enum_variant_token == 0 { return false; }
-
-        let generic_map: &GenericMap = 0;
-
-        match type {
-            Type::Self => {
-                type = context.type_self;
-            },
-            _ => {},
-        }
-
-        match type {
-            Type::Enum(_, generics) => { generic_map = generics; },
-            Type::EnumC(_) => {},
-            _ => {
-                context.pop_scope();
-                context.error("Not an enum type");
-                return false;
-            },
-        }
-
-        let enum_variant_result = Expression::get_enum_variant(context, type, enum_variant_token);
-        match enum_variant_result {
-            EnumVariantResult::None => {
-                context.error("Could not find enum variant");
-                return false;
-            },
-            EnumVariantResult::EnumVariant(enum_variant) => {
-                let parameters = Array<EnumVariantParameter>::new(context.allocator);
-
-                if context.check_next(TokenType::Symbol, "(") {
-                    let variable_i: usize = 0;
-
-                    while !context.check_value(TokenType::Symbol, ")") {
-                        let ref = context.check_next(TokenType::Symbol, "&");
-                        let variable = context.expect(TokenType::Identifier);
-                        if variable == 0 { context.pop_scope(); return false; }
-
-                        parameters.append(EnumVariantParameter { ref, variable });
-
-                        let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, 0);
-                        if variable_type == 0 { return false; }
-
-                        if ref {
-                            let indirect = context.allocator.store(Indirect { type: IndirectType::Reference, to: *variable_type });
-                            variable_type = context.allocator.store(Type::Indirect(indirect));
-                        }
-
-                        let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);
-                        variable_type_name.prepend(": ");
-                        context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
-
-                        if !variable.eq(TokenType::Identifier, "_") {
-                            if !context.set_value(variable, variable_type) { context.pop_scope(); return false; }
-                        }
-
-                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
-                            context.pop_scope();
-                            context.pop_scope();
-                            context.expect_value(TokenType::Symbol, ")");
-                            return false;
-                        }
-
-                        variable_i += 1;
-                    }
-
-                    if !context.expect_value(TokenType::Symbol, ")") { context.pop_scope(); return false; }
-
-                    if parameters.length != enum_variant.types.length {
-                        let message = String::new(context.allocator);
-                        message.append("Number of parameters does not match, expected ");
-                        message.append_usize(enum_variant.types.length);
-                        context.error_token(enum_variant_token, message.c_str());
-                    }
-                } else {
-                    if enum_variant.types.length > 0 {
-                        let message = String::new(context.allocator);
-                        message.append("Expected ");
-                        message.append_usize(enum_variant.types.length);
-                        message.append(" parameters");
-                        context.error_token(enum_variant_token, message.c_str());
-                    }  
-                }
-
-                *pattern = MatchPattern::EnumVariant(type, enum_variant, parameters);
-                return true;
-            },
-            EnumVariantResult::EnumCValue(enum_variant) => {
-                *pattern = MatchPattern::EnumCValue(enum_variant);
-                return true;
-            },
-        }
-    }
-
-    fn parse_while_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "while") { return false; }
-                
-        let expression = Expression::parse(context, generics);
-        if expression == 0 { return false; }
-
-        let block = Block::new_ptr(context);
-        block.is_loop = true;
-        if !block.parse(context, generics, true) { return false; }
-
-        self.statements.append(Statement::new(first_token, context.prev(), StatementData::WhileStatement(expression, block)));
-        
         return true;
     }
 
@@ -393,22 +96,37 @@ impl Block {
                 result = block.parse(context, generics, true);
                 if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::BlockStatement(block))); }
             } else if token.eq(TokenType::Keyword, "defer") {
-                result = Block::parse_defer_statement(self, context, generics);
+                result = self.parse_defer_statement(context, generics);
             } else if token.eq(TokenType::Keyword, "let") {
                 let first_token = context.current();
                 let let_statement = LetStatement::parse(context, generics);
                 if let_statement { self.statements.append(Statement::new(first_token, context.prev(), StatementData::LetStatement(let_statement))); }
                 result = let_statement != 0;
             } else if token.eq(TokenType::Keyword, "return") {
-                result = Block::parse_return_statement(self, context, generics);
+                let first_token = context.current();
+                let ret = ReturnStatement::parse(context, generics);
+                result = ret != 0;
+                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::ReturnStatement(ret))); }
             } else if token.eq(TokenType::Keyword, "yield") {
-                result = Block::parse_yield_statement(self, context, generics);
+                let first_token = context.current();
+                let yield_stmt = YieldStatement::parse(context, generics);
+                result = yield_stmt != 0;
+                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::YieldStatement(yield_stmt))); }
             } else if token.eq(TokenType::Keyword, "if") {
-                result = Block::parse_if_statement(self, context, generics);
+                let first_token = context.current();
+                let if_stmt = IfStatement::parse(context, generics);
+                result = if_stmt != 0;
+                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::IfStatement(if_stmt))); }
             } else if token.eq(TokenType::Keyword, "match") {
-                result = Block::parse_match_statement(self, context, generics);
+                let first_token = context.current();
+                let match_stmt = MatchStatement::parse(context, generics);
+                result = match_stmt != 0;
+                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::MatchStatement(match_stmt))); }
             } else if token.eq(TokenType::Keyword, "while") {
-                result = Block::parse_while_statement(self, context, generics);
+                let first_token = context.current();
+                let while_stmt = WhileStatement::parse(context, generics);
+                result = while_stmt != 0;
+                if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::WhileStatement(while_stmt))); }
             } else if token.eq(TokenType::Keyword, "for") {
                 let first_token = context.current();
                 let for_statement = ForStatement::parse(self, context, generics);

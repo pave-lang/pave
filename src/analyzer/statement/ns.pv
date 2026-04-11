@@ -1,10 +1,16 @@
+mod AssignmentStatement
 mod DeferStatement
 mod ElseStatement
 mod ForStatement
 mod ForStatementType
 mod ForVariable
+mod IfStatement
 mod LetStatement
 mod MatchCase
 mod MatchPattern
+mod MatchStatement
+mod ReturnStatement
 mod Statement
 mod StatementData
+mod WhileStatement
+mod YieldStatement

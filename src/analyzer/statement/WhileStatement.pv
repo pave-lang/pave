@@ -1,0 +1,26 @@
+use analyzer
+use expression
+use types
+
+struct WhileStatement {
+    expression: &Expression,
+    block: &Block,
+}
+
+impl WhileStatement {
+    fn parse(context: &Context, generics: &Generics) -> *WhileStatement {
+        if !context.expect_value(TokenType::Keyword, "while") { return 0; }
+
+        let expression = Expression::parse(context, generics);
+        if expression == 0 { return 0; }
+
+        let block = Block::new_ptr(context);
+        block.is_loop = true;
+        if !block.parse(context, generics, true) { return 0; }
+
+        return context.allocator.store(WhileStatement {
+            expression,
+            block,
+        });
+    }
+}

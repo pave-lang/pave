@@ -1,0 +1,8 @@
+use analyzer
+use expression
+
+struct AssignmentStatement {
+    left: &Expression,
+    operator: &Token,
+    right: &Expression,
+}

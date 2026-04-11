@@ -1,0 +1,53 @@
+use std
+use analyzer
+use expression
+use types
+
+struct IfStatement {
+    expression: &Expression,
+    block: &Block,
+    else_statements: Array<ElseStatement>,
+}
+
+impl IfStatement {
+    fn parse(context: &Context, generics: &Generics) -> &IfStatement {
+        if !context.expect_value(TokenType::Keyword, "if") { return 0; }
+
+        let expression = Expression::parse(context, generics);
+        if expression == 0 { return 0; }
+
+        let block = Block::new_ptr(context);
+        if !block.parse(context, generics, true) { return 0; }
+
+        let else_statements = Array<ElseStatement>::new(context.allocator);
+        let else_expression: &Expression = 0;
+        let else_block: &Block = 0;
+        let else_end = false;
+
+        while !else_end && context.check_next(TokenType::Keyword, "else") {
+            if context.check_next(TokenType::Keyword, "if") {
+                else_expression = Expression::parse(context, generics);
+                if else_expression == 0 { return 0; }
+            } else {
+                else_expression = 0;
+                else_end = true;
+            }
+
+            else_block = Block::new_ptr(context);
+            if !else_block.parse(context, generics, true) { return 0; }
+
+            let else_statement: ElseStatement = ElseStatement {
+                expression: else_expression,
+                block: else_block,
+            };
+
+            else_statements.append(else_statement);
+        }
+
+        return context.allocator.store(IfStatement {
+            expression,
+            block,
+            else_statements,
+        });
+    }
+}

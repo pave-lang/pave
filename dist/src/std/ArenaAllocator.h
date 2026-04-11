@@ -12,13 +12,19 @@ struct Type;
 struct GenericMap;
 struct Indirect;
 struct Block;
+struct AssignmentStatement;
 struct Token;
-struct ForStatement;
 struct Sequence;
 struct Tuple;
 struct Generic;
 struct Expression;
+struct ForStatement;
+struct IfStatement;
 struct LetStatement;
+struct MatchStatement;
+struct ReturnStatement;
+struct WhileStatement;
+struct YieldStatement;
 struct ClassCpp;
 struct EnumC;
 struct FunctionC;
@@ -62,10 +68,10 @@ struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, str
 struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Block value);
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value);
+struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct ArenaAllocator* self, struct AssignmentStatement value);
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value);
+struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value);
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, struct Sequence value);
@@ -80,7 +86,25 @@ struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struc
 struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value);
 
 #line 165 "src/std/ArenaAllocator.pv"
+struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* self, struct IfStatement value);
+
+#line 165 "src/std/ArenaAllocator.pv"
 struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocator* self, struct MatchStatement value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAllocator* self, struct ReturnStatement value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocator* self, struct WhileStatement value);
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocator* self, struct YieldStatement value);
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp value);

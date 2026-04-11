@@ -1,0 +1,26 @@
+use analyzer
+use expression
+use types
+
+struct YieldStatement {
+    expression: &Expression,
+}
+
+impl YieldStatement {
+    fn parse(context: &Context, generics: &Generics) -> *YieldStatement {
+        let first_token = context.current();
+        if !context.expect_value(TokenType::Keyword, "yield") { return 0; }
+
+        if context.check_next(TokenType::Symbol, ";") {
+            return context.allocator.store(YieldStatement { expression: 0 });
+        }
+
+        let expression = Expression::parse(context, generics);
+        if expression == 0 { return 0; }
+        if !context.expect_value(TokenType::Symbol, ";") { return 0; }
+
+        expression.validate_type(context, &context.function.return_type, true);
+
+        return context.allocator.store(YieldStatement { expression });
+    }
+}

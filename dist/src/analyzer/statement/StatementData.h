@@ -3,16 +3,17 @@
 
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
-#include <std/Array_ElseStatement.h>
-#include <analyzer/statement/ElseStatement.h>
-#include <std/Array_MatchCase.h>
-#include <analyzer/statement/MatchCase.h>
 
 struct Block;
 struct LetStatement;
-struct Expression;
+struct ReturnStatement;
+struct YieldStatement;
+struct IfStatement;
+struct MatchStatement;
+struct WhileStatement;
 struct ForStatement;
-struct Token;
+struct AssignmentStatement;
+struct Expression;
 
 #line 5 "src/analyzer/statement/StatementData.pv"
 struct StatementData {
@@ -34,13 +35,13 @@ struct StatementData {
     union {
         struct Block* blockstatement_value;
         struct LetStatement* letstatement_value;
-        struct { struct Expression* _0; struct Array_DeferStatement _1; } returnstatement_value;
-        struct Expression* yieldstatement_value;
-        struct { struct Expression* _0; struct Block* _1; struct Array_ElseStatement _2; } ifstatement_value;
-        struct { struct Expression* _0; struct Array_MatchCase _1; } matchstatement_value;
-        struct { struct Expression* _0; struct Block* _1; } whilestatement_value;
+        struct ReturnStatement* returnstatement_value;
+        struct YieldStatement* yieldstatement_value;
+        struct IfStatement* ifstatement_value;
+        struct MatchStatement* matchstatement_value;
+        struct WhileStatement* whilestatement_value;
         struct ForStatement* forstatement_value;
-        struct { struct Expression* _0; struct Token* _1; struct Expression* _2; } assignmentstatement_value;
+        struct AssignmentStatement* assignmentstatement_value;
         struct Expression* expressionstatement_value;
         struct Array_DeferStatement breakstatement_value;
         struct Array_DeferStatement continuestatement_value;

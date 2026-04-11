@@ -453,33 +453,33 @@ impl Usages {
                         self.process_expression(let_statement.value, generic_map);
                     }
                 },
-                StatementData::ReturnStatement(expression, _) => {
-                    if expression != 0 {
-                        self.process_expression(expression, generic_map);
+                StatementData::ReturnStatement(ret) => {
+                    if ret.expression != 0 {
+                        self.process_expression(ret.expression, generic_map);
                     }
                 },
-                StatementData::YieldStatement(expression) => {
+                StatementData::YieldStatement(yield_stmt) => {
                     self.function_context.coroutine.yield_count += 1;
-                    self.process_expression(expression, generic_map);
+                    self.process_expression(yield_stmt.expression, generic_map);
                 },
-                StatementData::IfStatement(condition, if_block, &else_statements) => {
-                    self.process_expression(condition, generic_map);
-                    self.process_block(if_block, generic_map);
+                StatementData::IfStatement(if_stmt) => {
+                    self.process_expression(if_stmt.expression, generic_map);
+                    self.process_block(if_stmt.block, generic_map);
 
-                    for else_statement in else_statements {
+                    for else_statement in if_stmt.else_statements {
                         self.process_block(else_statement.block, generic_map);
                     }
                 },
-                StatementData::MatchStatement(condition, &cases) => {
-                    self.process_expression(condition, generic_map);
+                StatementData::MatchStatement(match_stmt) => {
+                    self.process_expression(match_stmt.expression, generic_map);
 
-                    for case_info in cases {
+                    for case_info in match_stmt.cases {
                         self.process_block(case_info.body, generic_map);
                     }
                 },
-                StatementData::WhileStatement(condition, while_block) => {
-                    self.process_expression(condition, generic_map);
-                    self.process_block(while_block, generic_map);
+                StatementData::WhileStatement(while_stmt) => {
+                    self.process_expression(while_stmt.expression, generic_map);
+                    self.process_block(while_stmt.block, generic_map);
                 },
                 StatementData::ForStatement(for_statement) => {
                     match for_statement.type {
@@ -497,9 +497,9 @@ impl Usages {
 
                     self.process_block(for_statement.block, generic_map);
                 },
-                StatementData::AssignmentStatement(left, _, right) => {
-                    self.process_expression(left, generic_map);
-                    self.process_expression(right, generic_map);
+                StatementData::AssignmentStatement(assign_stmt) => {
+                    self.process_expression(assign_stmt.left, generic_map);
+                    self.process_expression(assign_stmt.right, generic_map);
                 },
                 StatementData::ExpressionStatement(expression) => {
                     self.process_expression(expression, generic_map);

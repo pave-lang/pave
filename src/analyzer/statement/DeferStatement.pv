@@ -1,7 +1,41 @@
 use analyzer
 use analyzer::expression
+use types
 
 enum DeferStatement {
     Expression(&Expression),
     Block(&Block),
+}
+
+impl DeferStatement {
+    fn parse(parent_block: &Block, context: &Context, generics: &Generics) -> bool {
+        let top_block_found = false;
+        for scope in context.scopes {
+            if top_block_found {}
+            else {
+                let top_block = scope.block;
+                if top_block != 0 {
+                    top_block.is_top_level_and_has_defer_statements_inside = true;
+                    top_block_found = true;
+                }
+            }
+        }
+
+        if !top_block_found { context.error("could not find top_block for defer statements"); }
+
+        if !context.expect_value(TokenType::Keyword, "defer") { return false; }
+
+        if context.check_value(TokenType::Symbol, "{") {
+            let defer_block = Block::new_ptr(context);
+            if !defer_block.parse(context, generics, true) { return false; }
+            parent_block.defer_statements.append(DeferStatement::Block(defer_block));
+        } else {
+            let expression = Expression::parse(context, generics);
+            if expression == 0 { return false; }
+            parent_block.defer_statements.append(DeferStatement::Expression(expression));
+            if !context.expect_value(TokenType::Symbol, ";") { return false; }
+        }
+
+        return true;
+    }
 }

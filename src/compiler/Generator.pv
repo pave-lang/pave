@@ -1349,16 +1349,18 @@ impl Generator {
                     fprintf(file, ";\n");
                 },
                 
-                StatementData::YieldStatement(value) => {
+                StatementData::YieldStatement(yield_stmt) => {
                     self.function_context.coroutine.yield_count += 1;
 
                     self.write_indent(file);
                     let yield_number = self.function_context.coroutine.yield_count;
                     fprintf(file, "ctx->_value = ");
-                    self.write_expression(file, value, generics);
+                    self.write_expression(file, yield_stmt.expression, generics);
                     fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:\n", yield_number, yield_number);
                 },
-                StatementData::ReturnStatement(value, &defer_statements) => {
+                StatementData::ReturnStatement(ret) => {
+                    let value = ret.expression;
+                    let defer_statements = &ret.defer_statements;
                     if value == 0 {
                         self.write_defer_statements(file, return_type, defer_statements, generics);
                         self.write_indent(file);
@@ -1382,16 +1384,16 @@ impl Generator {
 
                     last_statement_is_return = true;
                 },
-                StatementData::IfStatement(expression, if_block, &else_statements) => {
+                StatementData::IfStatement(if_stmt) => {
                     self.write_indent(file);
                     fprintf(file, "if (");
-                    self.write_expression(file, expression, generics);
+                    self.write_expression(file, if_stmt.expression, generics);
                     fprintf(file, ") ");
                     self.function_context.push_scope(false, false);
-                    if !self.write_block(file, return_type, if_block, generics, true, false) { return false; }
+                    if !self.write_block(file, return_type, if_stmt.block, generics, true, false) { return false; }
                     self.function_context.pop_scope();
 
-                    for else_statement in else_statements {
+                    for else_statement in if_stmt.else_statements {
                         fprintf(file, " else ");
 
                         if else_statement.expression != 0 {
@@ -1407,7 +1409,9 @@ impl Generator {
 
                     fprintf(file, "\n");
                 },
-                StatementData::MatchStatement(expression, &cases) => {
+                StatementData::MatchStatement(match_stmt) => {
+                    let expression = match_stmt.expression;
+                    let cases = &match_stmt.cases;
                     let return_type = &expression.return_type;
                     let is_discriminated_union = self.type_is_discriminated_union(return_type, generics);
 
@@ -1544,13 +1548,13 @@ impl Generator {
                     self.write_indent(file);
                     fprintf(file, "}\n");
                 },
-                StatementData::WhileStatement(expression, while_block) => {
+                StatementData::WhileStatement(while_stmt) => {
                     self.write_indent(file);
                     fprintf(file, "while (");
-                    self.write_expression(file, expression, generics);
+                    self.write_expression(file, while_stmt.expression, generics);
                     fprintf(file, ") ");
                     self.function_context.push_scope(true, true);
-                    if !self.write_block(file, return_type, while_block, generics, false, false) { return false; }
+                    if !self.write_block(file, return_type, while_stmt.block, generics, false, false) { return false; }
                     self.function_context.pop_scope();
                 },
                 StatementData::ForStatement(for_statement) => {
@@ -1744,20 +1748,18 @@ impl Generator {
                         fprintf(file, "} }\n");
                     }
                 },
-                StatementData::AssignmentStatement(left, operator, right) => {
-                    let op = operator;
-                    
+                StatementData::AssignmentStatement(assign_stmt) => {
                     self.write_indent(file);
-                    self.write_expression(file, left, generics);
+                    self.write_expression(file, assign_stmt.left, generics);
                     fprintf(file, " ");
-                    self.write_str(file, op.value);
+                    self.write_str(file, assign_stmt.operator.value);
                     fprintf(file, " ");
-                    self.write_expression(file, right, generics);
+                    self.write_expression(file, assign_stmt.right, generics);
                     fprintf(file, ";\n");
                 },
-                StatementData::ExpressionStatement(expr) => {
+                StatementData::ExpressionStatement(expression) => {
                     self.write_indent(file);
-                    self.write_expression(file, expr, generics);
+                    self.write_expression(file, expression, generics);
                     fprintf(file, ";\n");
                 },
                 StatementData::ContinueStatement(&defer_statements) => {
@@ -1969,32 +1971,32 @@ impl Generator {
                         self.add_expression_includes(includes, value, generics);
                     }
                 },
-                StatementData::ReturnStatement(expression, _) => {
-                    if expression {
-                        self.add_expression_includes(includes, expression, generics);
+                StatementData::ReturnStatement(ret) => {
+                    if ret.expression {
+                        self.add_expression_includes(includes, ret.expression, generics);
                     }
                 },
-                StatementData::YieldStatement(expression) => {
+                StatementData::YieldStatement(yield_stmt) => {
                     if self.function_context != 0 {
                         self.function_context.coroutine.yield_count += 1;
                     }
 
-                    if expression {
-                        self.add_expression_includes(includes, expression, generics);
+                    if yield_stmt.expression {
+                        self.add_expression_includes(includes, yield_stmt.expression, generics);
                     }
                 },
-                StatementData::IfStatement(condition, if_block, &else_statements) => {
-                    self.add_block_includes(includes, if_block, generics);
-                    self.add_expression_includes(includes, condition, generics);
+                StatementData::IfStatement(if_stmt) => {
+                    self.add_block_includes(includes, if_stmt.block, generics);
+                    self.add_expression_includes(includes, if_stmt.expression, generics);
 
-                    for else_statement in else_statements {
+                    for else_statement in if_stmt.else_statements {
                         self.add_block_includes(includes, else_statement.block, generics);
                     }
                 },
-                StatementData::MatchStatement(condition, &cases) => {
-                    self.add_expression_includes(includes, condition, generics);
+                StatementData::MatchStatement(match_stmt) => {
+                    self.add_expression_includes(includes, match_stmt.expression, generics);
 
-                    for case_info in cases {
+                    for case_info in match_stmt.cases {
                         for pattern in case_info.patterns {
                             match pattern {
                                 MatchPattern::Default => {},
@@ -2008,9 +2010,9 @@ impl Generator {
                         self.add_block_includes(includes, case_info.body, generics);
                     }
                 },
-                StatementData::WhileStatement(condition, while_block) => {
-                    self.add_expression_includes(includes, condition, generics);
-                    self.add_block_includes(includes, while_block, generics);
+                StatementData::WhileStatement(while_stmt) => {
+                    self.add_expression_includes(includes, while_stmt.expression, generics);
+                    self.add_block_includes(includes, while_stmt.block, generics);
                 },
                 StatementData::ForStatement(for_statement) => {
                     self.add_type_include(includes, 0, includes, for_statement.value_type, generics);
@@ -2030,9 +2032,9 @@ impl Generator {
 
                     self.add_block_includes(includes, for_statement.block, generics);
                 },
-                StatementData::AssignmentStatement(left, _, right) => {
-                    self.add_expression_includes(includes, left, generics);
-                    self.add_expression_includes(includes, right, generics);
+                StatementData::AssignmentStatement(assign_stmt) => {
+                    self.add_expression_includes(includes, assign_stmt.left, generics);
+                    self.add_expression_includes(includes, assign_stmt.right, generics);
                 },
                 StatementData::ExpressionStatement(expression) => {
                     self.add_expression_includes(includes, expression, generics);
