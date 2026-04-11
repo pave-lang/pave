@@ -1,9 +1,43 @@
 use std
 use analyzer
+use expression
 use types
+use c
 
 struct MatchCase {
     first_token: &Token,
     patterns: Array<MatchPattern>,
     body: &Block,
+}
+
+impl MatchCase {
+    fn parse(&self, context: &Context, generics: &Generics) -> bool {
+        let first_match_token = context.current();
+
+        let block = Block::new_ptr(context);
+        context.push_scope(block);
+
+        let patterns = Array<MatchPattern>::new(context.allocator);
+
+        while patterns.length == 0 || context.check_next(TokenType::Symbol, "|") {
+            let pattern: MatchPattern = MatchPattern::Default;
+            if !MatchPattern::parse(context, generics, &pattern) { context.pop_scope(); return false; }
+
+            patterns.append(pattern);
+        }
+
+        if !context.expect_value(TokenType::Symbol, "=>") { context.pop_scope(); return false; }
+
+        if !block.parse(context, generics, false) { context.pop_scope(); return false; }
+
+        context.pop_scope();
+
+        *self = MatchCase {
+            first_token: first_match_token,
+            patterns,
+            body: block,
+        };
+
+        return true;
+    }
 }

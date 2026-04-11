@@ -21,33 +21,10 @@ impl MatchStatement {
         let cases: Array<MatchCase> = Array<MatchCase>::new(context.allocator);
 
         while !context.check_value(TokenType::Symbol, "}") {
-            let first_match_token = context.current();
-
-            let block = Block::new_ptr(context);
-            context.push_scope(block);
-
-            let patterns = Array<MatchPattern>::new(context.allocator);
-
-            while patterns.length == 0 || context.check_next(TokenType::Symbol, "|") {
-                let pattern: MatchPattern = MatchPattern::Default;
-                if !MatchPattern::parse(context, generics, &pattern) { return 0; }
-
-                patterns.append(pattern);
-            }
-
-            if !context.expect_value(TokenType::Symbol, "=>") { context.pop_scope(); return 0; }
-
-            if !block.parse(context, generics, false) { context.pop_scope(); return 0; }
-
-            let match_case: MatchCase = MatchCase {
-                first_token: first_match_token,
-                patterns,
-                body: block,
-            };
+            let match_case: MatchCase;
+            if !match_case.parse(context, generics) { return 0; }
 
             cases.append(match_case);
-
-            context.pop_scope();
 
             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
                 context.pop_scope();
