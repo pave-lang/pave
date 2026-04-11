@@ -40,44 +40,13 @@ impl Block {
 
             value.validate_type(context, &expression.return_type, true);
 
-            let assign_stmt = context.allocator.store(AssignmentStatement { left: expression, operator, right: value });
-            self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(assign_stmt)));
+            let assignment = context.allocator.store(AssignmentStatement { left: expression, operator, right: value });
+            self.statements.append(Statement::new(first_token, context.prev(), StatementData::AssignmentStatement(assignment)));
         } else {
             self.statements.append(Statement::new(first_token, context.prev(), StatementData::ExpressionStatement(expression)));
         }
 
         if !context.expect_value(TokenType::Symbol, ";") { return false; }
-
-        return true;
-    }
-
-    fn parse_defer_statement(&self, context: &Context, generics: &Generics) -> bool {
-        let top_block_found = false;
-        for scope in context.scopes {
-            if top_block_found {}
-            else {
-                let top_block = scope.block;
-                if top_block != 0 {
-                    top_block.is_top_level_and_has_defer_statements_inside = true;
-                    top_block_found = true;
-                }
-            }
-        }
-        
-        if !top_block_found { context.error("could not find top_block for defer statements"); }
-
-        if !context.expect_value(TokenType::Keyword, "defer") { return false; }
-
-        if context.check_value(TokenType::Symbol, "{") {
-            let block = Block::new_ptr(context);
-            if !block.parse(context, generics, true) { return false; }
-            self.defer_statements.append(DeferStatement::Block(block));
-        }  else {
-            let expression = Expression::parse(context, generics);
-            if expression == 0 { return false; }
-            self.defer_statements.append(DeferStatement::Expression(expression));
-            if !context.expect_value(TokenType::Symbol, ";") { return false; }
-        }
 
         return true;
     }
@@ -96,7 +65,7 @@ impl Block {
                 result = block.parse(context, generics, true);
                 if result { self.statements.append(Statement::new(first_token, context.prev(), StatementData::BlockStatement(block))); }
             } else if token.eq(TokenType::Keyword, "defer") {
-                result = self.parse_defer_statement(context, generics);
+                result = DeferStatement::parse(self, context, generics);
             } else if token.eq(TokenType::Keyword, "let") {
                 let first_token = context.current();
                 let let_statement = LetStatement::parse(context, generics);

@@ -981,11 +981,11 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
             #line 500 "src/compiler/Usages.pv"
             case STATEMENT_DATA__ASSIGNMENT_STATEMENT: {
                 #line 500 "src/compiler/Usages.pv"
-                struct AssignmentStatement* assign_stmt = statement_iter->data.assignmentstatement_value;
+                struct AssignmentStatement* assignment = statement_iter->data.assignmentstatement_value;
                 #line 501 "src/compiler/Usages.pv"
-                Usages__process_expression(self, assign_stmt->left, generic_map);
+                Usages__process_expression(self, assignment->left, generic_map);
                 #line 502 "src/compiler/Usages.pv"
-                Usages__process_expression(self, assign_stmt->right, generic_map);
+                Usages__process_expression(self, assignment->right, generic_map);
             } break;
             #line 504 "src/compiler/Usages.pv"
             case STATEMENT_DATA__EXPRESSION_STATEMENT: {

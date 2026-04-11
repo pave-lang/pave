@@ -497,9 +497,9 @@ impl Usages {
 
                     self.process_block(for_statement.block, generic_map);
                 },
-                StatementData::AssignmentStatement(assign_stmt) => {
-                    self.process_expression(assign_stmt.left, generic_map);
-                    self.process_expression(assign_stmt.right, generic_map);
+                StatementData::AssignmentStatement(assignment) => {
+                    self.process_expression(assignment.left, generic_map);
+                    self.process_expression(assignment.right, generic_map);
                 },
                 StatementData::ExpressionStatement(expression) => {
                     self.process_expression(expression, generic_map);

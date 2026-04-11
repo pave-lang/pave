@@ -6,4 +6,5 @@ enum EnumVariantResult {
     None,
     EnumVariant(&EnumVariant),
     EnumCValue(&EnumCValue),
+    Function(&Function, &GenericMap),
 }

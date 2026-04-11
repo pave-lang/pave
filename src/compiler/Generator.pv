@@ -1748,13 +1748,13 @@ impl Generator {
                         fprintf(file, "} }\n");
                     }
                 },
-                StatementData::AssignmentStatement(assign_stmt) => {
+                StatementData::AssignmentStatement(assignment) => {
                     self.write_indent(file);
-                    self.write_expression(file, assign_stmt.left, generics);
+                    self.write_expression(file, assignment.left, generics);
                     fprintf(file, " ");
-                    self.write_str(file, assign_stmt.operator.value);
+                    self.write_str(file, assignment.operator.value);
                     fprintf(file, " ");
-                    self.write_expression(file, assign_stmt.right, generics);
+                    self.write_expression(file, assignment.right, generics);
                     fprintf(file, ";\n");
                 },
                 StatementData::ExpressionStatement(expression) => {
@@ -2032,9 +2032,9 @@ impl Generator {
 
                     self.add_block_includes(includes, for_statement.block, generics);
                 },
-                StatementData::AssignmentStatement(assign_stmt) => {
-                    self.add_expression_includes(includes, assign_stmt.left, generics);
-                    self.add_expression_includes(includes, assign_stmt.right, generics);
+                StatementData::AssignmentStatement(assignment) => {
+                    self.add_expression_includes(includes, assignment.left, generics);
+                    self.add_expression_includes(includes, assignment.right, generics);
                 },
                 StatementData::ExpressionStatement(expression) => {
                     self.add_expression_includes(includes, expression, generics);

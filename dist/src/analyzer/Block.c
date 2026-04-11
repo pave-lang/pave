@@ -79,9 +79,9 @@ bool Block__parse_expression_statement(struct Block* self, struct Context* conte
         Expression__validate_type(value, context, &expression->return_type, true);
 
         #line 43 "src/analyzer/Block.pv"
-        struct AssignmentStatement* assign_stmt = ArenaAllocator__store_AssignmentStatement(context->allocator, (struct AssignmentStatement) { .left = expression, .operator = operator, .right = value });
+        struct AssignmentStatement* assignment = ArenaAllocator__store_AssignmentStatement(context->allocator, (struct AssignmentStatement) { .left = expression, .operator = operator, .right = value });
         #line 44 "src/analyzer/Block.pv"
-        Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__ASSIGNMENT_STATEMENT, .assignmentstatement_value = assign_stmt }));
+        Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__ASSIGNMENT_STATEMENT, .assignmentstatement_value = assignment }));
     } else {
         #line 46 "src/analyzer/Block.pv"
         Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), (struct StatementData) { .type = STATEMENT_DATA__EXPRESSION_STATEMENT, .expressionstatement_value = expression }));
@@ -202,7 +202,7 @@ bool Block__parse(struct Block* self, struct Context* context, struct Generics* 
             }
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "defer")) {
             #line 99 "src/analyzer/Block.pv"
-            result = Block__parse_defer_statement(self, context, generics);
+            result = DeferStatement__parse(self, context, generics);
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "let")) {
             #line 101 "src/analyzer/Block.pv"
             struct Token* first_token = Context__current(context);

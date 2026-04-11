@@ -3325,19 +3325,19 @@ bool Generator__write_block(struct Generator* self, FILE* file, struct Type* ret
             #line 1751 "src/compiler/Generator.pv"
             case STATEMENT_DATA__ASSIGNMENT_STATEMENT: {
                 #line 1751 "src/compiler/Generator.pv"
-                struct AssignmentStatement* assign_stmt = statement->data.assignmentstatement_value;
+                struct AssignmentStatement* assignment = statement->data.assignmentstatement_value;
                 #line 1752 "src/compiler/Generator.pv"
                 Generator__write_indent(self, file);
                 #line 1753 "src/compiler/Generator.pv"
-                Generator__write_expression(self, file, assign_stmt->left, generics);
+                Generator__write_expression(self, file, assignment->left, generics);
                 #line 1754 "src/compiler/Generator.pv"
                 fprintf(file, " ");
                 #line 1755 "src/compiler/Generator.pv"
-                Generator__write_str(self, file, assign_stmt->operator->value);
+                Generator__write_str(self, file, assignment->operator->value);
                 #line 1756 "src/compiler/Generator.pv"
                 fprintf(file, " ");
                 #line 1757 "src/compiler/Generator.pv"
-                Generator__write_expression(self, file, assign_stmt->right, generics);
+                Generator__write_expression(self, file, assignment->right, generics);
                 #line 1758 "src/compiler/Generator.pv"
                 fprintf(file, ";\n");
             } break;
@@ -3932,11 +3932,11 @@ bool Generator__add_block_includes(struct Generator* self, struct HashMap_str_Ge
             #line 2035 "src/compiler/Generator.pv"
             case STATEMENT_DATA__ASSIGNMENT_STATEMENT: {
                 #line 2035 "src/compiler/Generator.pv"
-                struct AssignmentStatement* assign_stmt = statement_iter->data.assignmentstatement_value;
+                struct AssignmentStatement* assignment = statement_iter->data.assignmentstatement_value;
                 #line 2036 "src/compiler/Generator.pv"
-                Generator__add_expression_includes(self, includes, assign_stmt->left, generics);
+                Generator__add_expression_includes(self, includes, assignment->left, generics);
                 #line 2037 "src/compiler/Generator.pv"
-                Generator__add_expression_includes(self, includes, assign_stmt->right, generics);
+                Generator__add_expression_includes(self, includes, assignment->right, generics);
             } break;
             #line 2039 "src/compiler/Generator.pv"
             case STATEMENT_DATA__EXPRESSION_STATEMENT: {

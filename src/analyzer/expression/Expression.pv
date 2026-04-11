@@ -35,21 +35,26 @@ impl Expression {
             Type::Self => {
                 return Expression::get_enum_variant(context, context.type_self, token);
             },
-            Type::Enum(enum_info, _) => {
+            Type::Enum(enum_info, generic_map) => {
                 let variant = enum_info.variants.find(&token.value);
-                if variant == 0 {
-                    context.error_token(token, "Variant not found in enum");
-                    return EnumVariantResult::None;
+                if variant != 0 {
+                    return EnumVariantResult::EnumVariant(variant);
                 }
 
-                return EnumVariantResult::EnumVariant(variant);
+                for *impl_info in enum_info.impls {
+                    let function: &Function = impl_info.functions.find(&token.value);
+                    if function != 0 {
+                        return EnumVariantResult::Function(function, generic_map);
+                    }
+                }
+
+                return EnumVariantResult::None;
             },
             Type::EnumC(enum_info) => {
                 let variant = enum_info.values.find(&token.value);
                 if variant == 0 {
-
                     context.error_token(token, "Variant not found in enum");
-                    
+                    return EnumVariantResult::None;
                 }
 
                 return EnumVariantResult::EnumCValue(variant);
@@ -459,8 +464,41 @@ impl Expression {
 
             match variant_result {
                 EnumVariantResult::None => {
-                    context.error_token(variant_name, "Unable to find enum variant");
-                    return false;
+                    context.error_token(variant_name, "Unable to find enum variant or function");
+                    return 0;
+                },
+                EnumVariantResult::Function(function, generic_map) => {
+                    let member_type = context.allocator.store(Type::Function(function, generic_map));
+
+                    if !context.check_value(TokenType::Symbol, "(") {
+                        return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                    }
+
+                    if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                    while !context.check_value(TokenType::Symbol, ")") {
+                        let argument = Expression::parse(context, generics);
+                        if argument == 0 { return 0; }
+
+                        arguments.append(InvokeArgument { value: argument });
+
+                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                            context.expect_value(TokenType::Symbol, ")");
+                            return 0;
+                        }
+                    }
+
+                    if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                    if !Expression::validate_arguments(context, token, member_type, &arguments, generic_map, false) { return 0; }
+
+                    let func_return_type = Expression::get_return_type(context, member_type, token, generic_map);
+                    if func_return_type == 0 { return 0; }
+
+                    let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                    return Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
                 },
                 EnumVariantResult::EnumVariant(variant) => {
                     let arguments = Array<InvokeArgument>::new(context.allocator);
