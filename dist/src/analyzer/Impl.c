@@ -190,155 +190,175 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
 }
 
 #line 114 "src/analyzer/Impl.pv"
-bool Impl__parse_functions(struct Impl* self) {
+struct Function* Impl__find_function(struct Impl* self, struct str name) {
     #line 115 "src/analyzer/Impl.pv"
-    struct Context* context = self->context;
+    struct Function* func = HashMap_str_Function__find(&self->functions, &name);
     #line 116 "src/analyzer/Impl.pv"
+    if (func != 0) {
+        #line 116 "src/analyzer/Impl.pv"
+        return func;
+    }
+
+    #line 118 "src/analyzer/Impl.pv"
+    if (self->has_trait && self->trait_ != 0) {
+        #line 119 "src/analyzer/Impl.pv"
+        return HashMap_str_Function__find(&self->trait_->functions, &name);
+    }
+
+    #line 122 "src/analyzer/Impl.pv"
+    return 0;
+}
+
+#line 125 "src/analyzer/Impl.pv"
+bool Impl__parse_functions(struct Impl* self) {
+    #line 126 "src/analyzer/Impl.pv"
+    struct Context* context = self->context;
+    #line 127 "src/analyzer/Impl.pv"
     context->type_self = &self->type;
 
-    #line 118 "src/analyzer/Impl.pv"
+    #line 129 "src/analyzer/Impl.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 118 "src/analyzer/Impl.pv"
+    #line 129 "src/analyzer/Impl.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 118 "src/analyzer/Impl.pv"
+        #line 129 "src/analyzer/Impl.pv"
         struct Function* function = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 119 "src/analyzer/Impl.pv"
+        #line 130 "src/analyzer/Impl.pv"
         Function__parse_function(function, &self->generics);
     } }
 
-    #line 122 "src/analyzer/Impl.pv"
+    #line 133 "src/analyzer/Impl.pv"
     if (self->has_trait && self->trait_ != 0) {
-        #line 123 "src/analyzer/Impl.pv"
+        #line 134 "src/analyzer/Impl.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->trait_->functions);
-        #line 123 "src/analyzer/Impl.pv"
+        #line 134 "src/analyzer/Impl.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 123 "src/analyzer/Impl.pv"
+            #line 134 "src/analyzer/Impl.pv"
             struct Function* trait_func = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 124 "src/analyzer/Impl.pv"
+            #line 135 "src/analyzer/Impl.pv"
             bool has_default = trait_func->token_start < trait_func->token_end;
 
-            #line 126 "src/analyzer/Impl.pv"
+            #line 137 "src/analyzer/Impl.pv"
             struct Function* impl_func = HashMap_str_Function__find(&self->functions, &trait_func->name->value);
 
-            #line 128 "src/analyzer/Impl.pv"
+            #line 139 "src/analyzer/Impl.pv"
             if (impl_func == 0) {
-                #line 129 "src/analyzer/Impl.pv"
+                #line 140 "src/analyzer/Impl.pv"
                 if (!has_default) {
-                    #line 130 "src/analyzer/Impl.pv"
+                    #line 141 "src/analyzer/Impl.pv"
                     struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-                    #line 131 "src/analyzer/Impl.pv"
+                    #line 142 "src/analyzer/Impl.pv"
                     String__append(&message, (struct str){ .ptr = "Implementation is missing trait function '", .length = strlen("Implementation is missing trait function '") });
-                    #line 132 "src/analyzer/Impl.pv"
+                    #line 143 "src/analyzer/Impl.pv"
                     String__append(&message, trait_func->name->value);
-                    #line 133 "src/analyzer/Impl.pv"
+                    #line 144 "src/analyzer/Impl.pv"
                     String__append(&message, (struct str){ .ptr = "'", .length = strlen("'") });
-                    #line 134 "src/analyzer/Impl.pv"
+                    #line 145 "src/analyzer/Impl.pv"
                     Context__error_token(self->context, self->token, String__c_str(&message));
                 }
-                #line 136 "src/analyzer/Impl.pv"
+                #line 147 "src/analyzer/Impl.pv"
                 continue;
             }
 
-            #line 139 "src/analyzer/Impl.pv"
+            #line 150 "src/analyzer/Impl.pv"
             struct GenericMap* generic_map = Type__get_generic_map(&self->trait_type, context);
 
-            #line 141 "src/analyzer/Impl.pv"
+            #line 152 "src/analyzer/Impl.pv"
             if (impl_func->parameters.length != trait_func->parameters.length) {
-                #line 142 "src/analyzer/Impl.pv"
+                #line 153 "src/analyzer/Impl.pv"
                 struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-                #line 143 "src/analyzer/Impl.pv"
+                #line 154 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = "Implementation of trait function '", .length = strlen("Implementation of trait function '") });
-                #line 144 "src/analyzer/Impl.pv"
+                #line 155 "src/analyzer/Impl.pv"
                 String__append(&message, trait_func->name->value);
-                #line 145 "src/analyzer/Impl.pv"
+                #line 156 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = "' has wrong number of parameters", .length = strlen("' has wrong number of parameters") });
-                #line 146 "src/analyzer/Impl.pv"
+                #line 157 "src/analyzer/Impl.pv"
                 Context__error_token(self->context, impl_func->name, String__c_str(&message));
             } else {
-                #line 148 "src/analyzer/Impl.pv"
+                #line 159 "src/analyzer/Impl.pv"
                 uintptr_t i = 0;
-                #line 149 "src/analyzer/Impl.pv"
+                #line 160 "src/analyzer/Impl.pv"
                 while (i < impl_func->parameters.length) {
-                    #line 150 "src/analyzer/Impl.pv"
+                    #line 161 "src/analyzer/Impl.pv"
                     struct Parameter* impl_param = Array_Parameter__get(&impl_func->parameters, i);
-                    #line 151 "src/analyzer/Impl.pv"
+                    #line 162 "src/analyzer/Impl.pv"
                     struct Parameter* trait_param = Array_Parameter__get(&trait_func->parameters, i);
 
-                    #line 153 "src/analyzer/Impl.pv"
+                    #line 164 "src/analyzer/Impl.pv"
                     struct Type* trait_param_type = &trait_param->type;
-                    #line 154 "src/analyzer/Impl.pv"
+                    #line 165 "src/analyzer/Impl.pv"
                     if (!Type__is_self(Type__deref(trait_param_type))) {
-                        #line 154 "src/analyzer/Impl.pv"
+                        #line 165 "src/analyzer/Impl.pv"
                         trait_param_type = Context__resolve_type(context->allocator, trait_param_type, generic_map, 0);
                     }
 
-                    #line 156 "src/analyzer/Impl.pv"
+                    #line 167 "src/analyzer/Impl.pv"
                     if (!Type__eq(&impl_param->type, trait_param_type)) {
-                        #line 157 "src/analyzer/Impl.pv"
+                        #line 168 "src/analyzer/Impl.pv"
                         struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-                        #line 158 "src/analyzer/Impl.pv"
+                        #line 169 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = "Parameter ", .length = strlen("Parameter ") });
-                        #line 159 "src/analyzer/Impl.pv"
+                        #line 170 "src/analyzer/Impl.pv"
                         String__append(&message, impl_param->name->value);
-                        #line 160 "src/analyzer/Impl.pv"
+                        #line 171 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = " has type ", .length = strlen(" has type ") });
-                        #line 161 "src/analyzer/Impl.pv"
+                        #line 172 "src/analyzer/Impl.pv"
                         struct String impl_type_name = Naming__get_type_decl(&context->root->naming_decl, &impl_param->type, context->type_self, 0);
-                        #line 162 "src/analyzer/Impl.pv"
+                        #line 173 "src/analyzer/Impl.pv"
                         String__append(&message, String__as_str(&impl_type_name));
-                        #line 163 "src/analyzer/Impl.pv"
+                        #line 174 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = ", expected ", .length = strlen(", expected ") });
-                        #line 164 "src/analyzer/Impl.pv"
+                        #line 175 "src/analyzer/Impl.pv"
                         struct String trait_type_name = Naming__get_type_decl(&context->root->naming_decl, trait_param_type, context->type_self, 0);
-                        #line 165 "src/analyzer/Impl.pv"
+                        #line 176 "src/analyzer/Impl.pv"
                         String__append(&message, String__as_str(&trait_type_name));
-                        #line 166 "src/analyzer/Impl.pv"
+                        #line 177 "src/analyzer/Impl.pv"
                         Context__error_token(self->context, impl_param->name, String__c_str(&message));
                     }
-                    #line 168 "src/analyzer/Impl.pv"
+                    #line 179 "src/analyzer/Impl.pv"
                     i += 1;
                 }
             }
 
-            #line 172 "src/analyzer/Impl.pv"
+            #line 183 "src/analyzer/Impl.pv"
             struct Type* trait_func_return_type = &trait_func->return_type;
-            #line 173 "src/analyzer/Impl.pv"
+            #line 184 "src/analyzer/Impl.pv"
             if (!Type__is_self(Type__deref(trait_func_return_type))) {
-                #line 173 "src/analyzer/Impl.pv"
+                #line 184 "src/analyzer/Impl.pv"
                 trait_func_return_type = Context__resolve_type(context->allocator, trait_func_return_type, generic_map, 0);
             }
 
-            #line 175 "src/analyzer/Impl.pv"
+            #line 186 "src/analyzer/Impl.pv"
             if (!Type__eq(&impl_func->return_type, trait_func_return_type)) {
-                #line 176 "src/analyzer/Impl.pv"
+                #line 187 "src/analyzer/Impl.pv"
                 struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-                #line 177 "src/analyzer/Impl.pv"
+                #line 188 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = "Implementation of trait function ", .length = strlen("Implementation of trait function ") });
-                #line 178 "src/analyzer/Impl.pv"
+                #line 189 "src/analyzer/Impl.pv"
                 String__append(&message, trait_func->name->value);
-                #line 179 "src/analyzer/Impl.pv"
+                #line 190 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = " has return type ", .length = strlen(" has return type ") });
-                #line 180 "src/analyzer/Impl.pv"
+                #line 191 "src/analyzer/Impl.pv"
                 struct String impl_return_name = Naming__get_type_decl(&context->root->naming_decl, &impl_func->return_type, context->type_self, 0);
-                #line 181 "src/analyzer/Impl.pv"
+                #line 192 "src/analyzer/Impl.pv"
                 String__append(&message, String__as_str(&impl_return_name));
-                #line 182 "src/analyzer/Impl.pv"
+                #line 193 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = ", expected ", .length = strlen(", expected ") });
-                #line 183 "src/analyzer/Impl.pv"
+                #line 194 "src/analyzer/Impl.pv"
                 struct String trait_return_name = Naming__get_type_decl(&context->root->naming_decl, trait_func_return_type, context->type_self, 0);
-                #line 184 "src/analyzer/Impl.pv"
+                #line 195 "src/analyzer/Impl.pv"
                 String__append(&message, String__as_str(&trait_return_name));
-                #line 185 "src/analyzer/Impl.pv"
+                #line 196 "src/analyzer/Impl.pv"
                 Context__error_token(self->context, impl_func->name, String__c_str(&message));
             }
         } }
     }
 
-    #line 190 "src/analyzer/Impl.pv"
+    #line 201 "src/analyzer/Impl.pv"
     self->context->type_self = &self->context->root->type_self;
 
-    #line 192 "src/analyzer/Impl.pv"
+    #line 203 "src/analyzer/Impl.pv"
     return true;
 }

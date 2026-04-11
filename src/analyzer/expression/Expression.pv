@@ -75,7 +75,7 @@ impl Expression {
             },
             Type::Primitive(primitive_info) => {
                 for *impl_info in primitive_info.impls {
-                    let function: &Function = impl_info.functions.find(&member.value);
+                    let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
                         return context.allocator.store(Type::Function(function, context.allocator.store(GenericMap { self_type: type })));
                     }
@@ -1078,6 +1078,17 @@ impl Expression {
         return result;
     }
 
+    fn number_primitive(value: str) -> str {
+        if value.ends_with("f") || value.ends_with("F") {
+            return "f32";
+        } else if value.ends_with("u") || value.ends_with("U") {
+            return "u32";
+        } else if value.contains(".") {
+            return "f64";
+        }
+        return "i32";
+    }
+
     fn parse_primary(context: &Context, generics: &Generics) -> &Expression {
         let token = context.current();
         let token_type = token.type;
@@ -1264,16 +1275,7 @@ impl Expression {
                 });
             },
             TokenType::Number => {
-                let primitive = "i32";
-
-                if token.value.ends_with("f") || token.value.ends_with("F") {
-                    primitive = "f32";
-                } else if token.value.ends_with("u") || token.value.ends_with("U") {
-                    primitive = "u32";
-                } else if token.value.contains(".") {
-                    primitive = "f64";
-                }
-
+                let primitive = Expression::number_primitive(token.value);
                 result = Expression::make_next(context, Expression {
                     token,
                     data: ExpressionData::Literal(token.value),

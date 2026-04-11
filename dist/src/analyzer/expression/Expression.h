@@ -20,6 +20,7 @@ struct Array_InvokeArgument;
 struct InvokeArgument;
 struct EnumVariant;
 struct Generics;
+struct str;
 
 #include <stdlib.h>
 
@@ -91,24 +92,27 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
 
 #line 1081 "src/analyzer/expression/Expression.pv"
+struct str Expression__number_primitive(struct str value);
+
+#line 1092 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 1422 "src/analyzer/expression/Expression.pv"
+#line 1424 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1469 "src/analyzer/expression/Expression.pv"
+#line 1471 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 1476 "src/analyzer/expression/Expression.pv"
+#line 1478 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 1522 "src/analyzer/expression/Expression.pv"
+#line 1524 "src/analyzer/expression/Expression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
-#line 1539 "src/analyzer/expression/Expression.pv"
+#line 1541 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 1550 "src/analyzer/expression/Expression.pv"
+#line 1552 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #endif

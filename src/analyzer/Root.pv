@@ -229,8 +229,8 @@ impl Root {
         return self.functions.find(&name);
     }
 
-    fn find_primitive(&self, name: *const char) -> *Primitive {
-        return self.primitives.find(name);
+    fn find_primitive(&self, name: str) -> *Primitive {
+        return self.primitives.find(&name);
     }
 
     fn error(&self, path: str, start_line: usize, start_column: usize, end_line: usize, end_column: usize, message: *const char) {

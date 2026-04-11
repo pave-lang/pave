@@ -1481,6 +1481,31 @@ impl Generator {
                                             let value = token.value.slice(1, token.value.length - 1);
                                             hash = value.hash();
                                         },
+                                        TokenType::Number => {
+                                            let primitive = Expression::number_primitive(token.value);
+                                            match primitive.hash() {
+                                                hash("f32") => {
+                                                    let value: f32 = strtof(token.value.ptr, 0);
+                                                    hash = value.hash();
+                                                },
+                                                hash("f64") => {
+                                                    let value: f64 = strtod(token.value.ptr, 0);
+                                                    hash = value.hash();
+                                                },
+                                                hash("u32") => {
+                                                    let value: u32 = strtoul(token.value.ptr, 0, 10);
+                                                    hash = value.hash();
+                                                },
+                                                hash("i32") => {
+                                                    let value: i32 = strtol(token.value.ptr, 0, 10);
+                                                    hash = value.hash();
+                                                },
+                                                _ => {
+                                                    fprintf(stderr, "Hash match pattern on unsupported number literal type\n");
+                                                    hash = Hashed(0);
+                                                }
+                                            }
+                                        },
                                         _ => {
                                             fprintf(stderr, "Hash match pattern on unsupported token type\n");
                                             hash = Hashed(0);

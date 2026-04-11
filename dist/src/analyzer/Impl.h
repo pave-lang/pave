@@ -16,6 +16,8 @@ struct Token;
 struct Trait;
 struct Impl;
 struct FunctionParent;
+struct Function;
+struct str;
 
 #line 8 "src/analyzer/Impl.pv"
 struct Impl {
@@ -46,6 +48,9 @@ bool Impl__prefill_types(struct Impl* self);
 bool Impl__fill_types(struct Impl* self, struct FunctionParent parent);
 
 #line 114 "src/analyzer/Impl.pv"
+struct Function* Impl__find_function(struct Impl* self, struct str name);
+
+#line 125 "src/analyzer/Impl.pv"
 bool Impl__parse_functions(struct Impl* self);
 
 #endif

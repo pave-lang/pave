@@ -111,6 +111,17 @@ impl Impl {
         return true;
     }
 
+    fn find_function(&self, name: str) -> &Function {
+        let func = self.functions.find(&name);
+        if func != 0 { return func; }
+
+        if self.has_trait && self.trait_ != 0 {
+            return self.trait_.functions.find(&name);
+        }
+
+        return 0;
+    }
+
     fn parse_functions(&self) -> bool {
         let context = self.context;
         context.type_self = &self.type;

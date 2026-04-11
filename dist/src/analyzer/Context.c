@@ -89,7 +89,7 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
     #line 46 "src/analyzer/Context.pv"
     self.type_self = &self.root->type_self;
     #line 47 "src/analyzer/Context.pv"
-    self.pointer_const_char = (struct Indirect) { .type = INDIRECT_TYPE__CONST_POINTER, .to = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(module, "char") } };
+    self.pointer_const_char = (struct Indirect) { .type = INDIRECT_TYPE__CONST_POINTER, .to = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(module, (struct str){ .ptr = "char", .length = strlen("char") }) } };
 
     #line 49 "src/analyzer/Context.pv"
     struct Token* param_name = ArenaAllocator__store_Token(allocator, (struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "value", .length = strlen("value") } });

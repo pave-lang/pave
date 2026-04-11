@@ -100,6 +100,6 @@ struct Type* Module__find_value(struct Module* self, struct str name);
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
 #line 492 "src/analyzer/Module.pv"
-struct Primitive* Module__find_primitive(struct Module* self, char const* name);
+struct Primitive* Module__find_primitive(struct Module* self, struct str name);
 
 #endif

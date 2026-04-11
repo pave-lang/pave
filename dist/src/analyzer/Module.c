@@ -1032,9 +1032,9 @@ struct Type* Module__find_make_type(struct Module* self, struct str name, struct
 }
 
 #line 492 "src/analyzer/Module.pv"
-struct Primitive* Module__find_primitive(struct Module* self, char const* name) {
+struct Primitive* Module__find_primitive(struct Module* self, struct str name) {
     #line 493 "src/analyzer/Module.pv"
     struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
     #line 494 "src/analyzer/Module.pv"
-    return HashMap_str_Primitive__find(primitives, &(struct str){ .ptr = name, .length = strlen(name) });
+    return HashMap_str_Primitive__find(primitives, &name);
 }

@@ -441,9 +441,9 @@ struct Type* Root__find_function(struct Root* self, struct str name) {
 }
 
 #line 232 "src/analyzer/Root.pv"
-struct Primitive* Root__find_primitive(struct Root* self, char const* name) {
+struct Primitive* Root__find_primitive(struct Root* self, struct str name) {
     #line 233 "src/analyzer/Root.pv"
-    return HashMap_str_Primitive__find(&self->primitives, &(struct str){ .ptr = name, .length = strlen(name) });
+    return HashMap_str_Primitive__find(&self->primitives, &name);
 }
 
 #line 236 "src/analyzer/Root.pv"

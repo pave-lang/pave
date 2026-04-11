@@ -489,8 +489,8 @@ impl Module {
         return self.root.make_type_usage(type, usage_types);
     }
 
-    fn find_primitive(&self, name: *const char) -> *Primitive {
+    fn find_primitive(&self, name: str) -> *Primitive {
         let primitives = &self.namespace.root.primitives;
-        return primitives.find(name);
+        return primitives.find(&name);
     }
 }

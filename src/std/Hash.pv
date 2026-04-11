@@ -61,3 +61,6 @@ impl Hash for u16 {}
 impl Hash for u32 {}
 impl Hash for u64 {}
 impl Hash for usize {}
+
+impl Hash for f32 {}
+impl Hash for f64 {}
