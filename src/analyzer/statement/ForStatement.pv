@@ -30,8 +30,6 @@ impl ForStatement {
     }
 
     fn parse(parent_block: &Block, context: &Context, generics: &Generics) -> &ForStatement {
-        let first_token = context.current();
-
         let for_statement = ForStatement::new(context.allocator);
 
         if !context.expect_value(TokenType::Keyword, "for") { return 0; }

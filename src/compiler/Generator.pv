@@ -364,7 +364,7 @@ impl Generator {
                 let impl_iter = primitive_info.impls.iter();
                 while func_info == 0 && impl_iter.next() {
                     let impl_info = *impl_iter.value();
-                    func_info = impl_info.functions.find(&func_name);
+                    func_info = impl_info.find_function(func_name);
                 }
 
                 if func_info == 0 {
@@ -387,7 +387,7 @@ impl Generator {
                 let impl_iter = enum_info.impls.iter();
                 while func_info == 0 && impl_iter.next() {
                     let impl_info = *impl_iter.value();
-                    func_info = impl_info.functions.find(&func_name);
+                    func_info = impl_info.find_function(func_name);
                 }
 
                 if func_info == 0 {
@@ -408,7 +408,7 @@ impl Generator {
                 let func_info: &Function = 0;
 
                 for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
-                    func_info = impl_info.functions.find(&func_name);
+                    func_info = impl_info.find_function(func_name);
 
                     if func_info != 0 { break; }
 

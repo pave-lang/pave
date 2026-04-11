@@ -42,7 +42,7 @@ impl Expression {
                 }
 
                 for *impl_info in enum_info.impls {
-                    let function: &Function = impl_info.functions.find(&token.value);
+                    let function: &Function = impl_info.find_function(token.value);
                     if function != 0 {
                         return EnumVariantResult::Function(function, generic_map);
                     }
@@ -91,7 +91,7 @@ impl Expression {
                 }
 
                 for *impl_info in struct_info.impls {
-                    let function: &Function = impl_info.functions.find(&member.value);
+                    let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
                         return context.allocator.store(Type::Function(function, generic_map));
                     }
@@ -121,7 +121,7 @@ impl Expression {
             },
             Type::Enum(enum_info, generic_map) => {
                 for *impl_info in enum_info.impls {
-                    let function: &Function = impl_info.functions.find(&member.value);
+                    let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
                         return context.allocator.store(Type::Function(function, generic_map));
                     }
@@ -197,7 +197,7 @@ impl Expression {
 
                 let impl_info = context.root.hack_type_impl.impl_info;
 
-                let function: &Function = impl_info.functions.find(&member.value);
+                let function: &Function = impl_info.find_function(member.value);
                 if function != 0 {
                     let generic_map = GenericMap::new(context.allocator, &Generics {}, &Array<Type> {});
                     generic_map.insert("T", sequence.element);

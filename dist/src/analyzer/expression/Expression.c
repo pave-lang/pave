@@ -18,7 +18,6 @@
 #include <std/Iter_ref_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/types/Function.h>
-#include <std/HashMap_str_Function.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/c/EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>
@@ -31,6 +30,7 @@
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/Trait.h>
 #include <std/trait_Allocator.h>
+#include <std/HashMap_str_Function.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/StructCField.h>
 #include <std/HashMap_str_StructCField.h>
@@ -127,7 +127,7 @@ struct EnumVariantResult Expression__get_enum_variant(struct Context* context, s
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
                 #line 45 "src/analyzer/expression/Expression.pv"
-                struct Function* function = HashMap_str_Function__find(&impl_info->functions, &token->value);
+                struct Function* function = Impl__find_function(impl_info, token->value);
                 #line 46 "src/analyzer/expression/Expression.pv"
                 if (function != 0) {
                     #line 47 "src/analyzer/expression/Expression.pv"
@@ -232,7 +232,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
                 #line 94 "src/analyzer/expression/Expression.pv"
-                struct Function* function = HashMap_str_Function__find(&impl_info->functions, &member->value);
+                struct Function* function = Impl__find_function(impl_info, member->value);
                 #line 95 "src/analyzer/expression/Expression.pv"
                 if (function != 0) {
                     #line 96 "src/analyzer/expression/Expression.pv"
@@ -298,7 +298,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
                 #line 124 "src/analyzer/expression/Expression.pv"
-                struct Function* function = HashMap_str_Function__find(&impl_info->functions, &member->value);
+                struct Function* function = Impl__find_function(impl_info, member->value);
                 #line 125 "src/analyzer/expression/Expression.pv"
                 if (function != 0) {
                     #line 126 "src/analyzer/expression/Expression.pv"
@@ -481,7 +481,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             struct Impl* impl_info = context->root->hack_type_impl->impl_info;
 
             #line 200 "src/analyzer/expression/Expression.pv"
-            struct Function* function = HashMap_str_Function__find(&impl_info->functions, &member->value);
+            struct Function* function = Impl__find_function(impl_info, member->value);
             #line 201 "src/analyzer/expression/Expression.pv"
             if (function != 0) {
                 #line 202 "src/analyzer/expression/Expression.pv"

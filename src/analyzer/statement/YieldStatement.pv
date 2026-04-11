@@ -8,7 +8,6 @@ struct YieldStatement {
 
 impl YieldStatement {
     fn parse(context: &Context, generics: &Generics) -> *YieldStatement {
-        let first_token = context.current();
         if !context.expect_value(TokenType::Keyword, "yield") { return 0; }
 
         if context.check_next(TokenType::Symbol, ";") {

@@ -26,9 +26,9 @@
 #include <std/Iter_ref_ref_Impl.h>
 #include <analyzer/Impl.h>
 #include <std/Array_ref_Impl.h>
-#include <std/HashMap_str_Function.h>
 #include <tuple_usize_ref_ref_Impl.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>
+#include <std/HashMap_str_Function.h>
 #include <analyzer/types/Trait.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/FunctionParent.h>
@@ -570,7 +570,7 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
                 #line 366 "src/compiler/Generator.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&impl_iter);
                 #line 367 "src/compiler/Generator.pv"
-                func_info = HashMap_str_Function__find(&impl_info->functions, &func_name);
+                func_info = Impl__find_function(impl_info, func_name);
             }
 
             #line 370 "src/compiler/Generator.pv"
@@ -610,7 +610,7 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
                 #line 389 "src/compiler/Generator.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&impl_iter);
                 #line 390 "src/compiler/Generator.pv"
-                func_info = HashMap_str_Function__find(&impl_info->functions, &func_name);
+                func_info = Impl__find_function(impl_info, func_name);
             }
 
             #line 393 "src/compiler/Generator.pv"
@@ -653,7 +653,7 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
                 struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
                 #line 411 "src/compiler/Generator.pv"
-                func_info = HashMap_str_Function__find(&impl_info->functions, &func_name);
+                func_info = Impl__find_function(impl_info, func_name);
 
                 #line 413 "src/compiler/Generator.pv"
                 if (func_info != 0) {
