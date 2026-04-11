@@ -4,11 +4,15 @@
 #include <std/Array_EnumVariantParameter.h>
 #include <analyzer/types/EnumVariantParameter.h>
 #include <analyzer/types/Type.h>
+#include <stdbool.h>
 
 struct Expression;
 struct Type;
 struct EnumVariant;
 struct EnumCValue;
+struct Context;
+struct Generics;
+struct MatchPattern;
 
 #line 7 "src/analyzer/statement/MatchPattern.pv"
 struct MatchPattern {
@@ -27,5 +31,8 @@ struct MatchPattern {
         struct Type typeid_value;
     };
 };
+
+#line 16 "src/analyzer/statement/MatchPattern.pv"
+bool MatchPattern__parse(struct Context* context, struct Generics* generics, struct MatchPattern* pattern);
 
 #endif

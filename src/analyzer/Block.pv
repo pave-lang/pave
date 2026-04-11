@@ -100,9 +100,11 @@ impl Block {
                 result = for_statement != 0;
                 data = StatementData::ForStatement(for_statement);
             } else if first_token.eq(TokenType::Keyword, "continue") {
+                context.next_token();
                 data = StatementData::ContinueStatement(context.get_loop_defer_statements());
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
             } else if first_token.eq(TokenType::Keyword, "break") {
+                context.next_token();
                 data = StatementData::BreakStatement(context.get_loop_defer_statements());
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
             } else {
