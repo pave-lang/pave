@@ -21,6 +21,7 @@ impl TypeFunctionUsage {
             generic_maps: Array<&GenericMap>::new(allocator),
             function_context: FunctionContext::new(allocator, type, false),
             impl_dynamic_function: false,
+            usage_context: UsageContext::new(allocator),
         };
     }
 }
@@ -249,7 +250,15 @@ impl Usages {
         match type_deref {
             Type::Struct(_, _) => { is_type = true; },
             Type::Enum(_, _) => { is_type = true; },
-            Type::Function(func_info, _) => { is_type = func_info.generics.array.length > 0; },
+            Type::Function(func_info, type_generic_map) => {
+                is_type = func_info.generics.array.length > 0;
+
+                match func_info.parent {
+                    FunctionParent::Struct(struct_info, impl_index, _) => {
+                        self.add_type(&Type::Struct(struct_info, type_generic_map), generic_map);
+                    },
+                }
+            },
             Type::Trait(_, _) => { is_trait = true; },
             Type::Sequence(sequence) => { is_type = sequence.is_slice(); },
             Type::Tuple(_) => { is_type = true; },
@@ -263,16 +272,6 @@ impl Usages {
 
         if !is_type && !is_trait { return; }
 
-        let type_name = self.root.naming_decl.get_type_name(type_deref, generic_map.self_type, generic_map);
-        let type_name_str = type_name.as_str();
-
-        if (is_type && !self.usage_types.insert(type_name_str)) || (is_trait && !self.usage_traits.insert(type_name_str)) {
-            type_name.release();
-            return;
-        }
-
-        self.usages.append(*type_deref);
-
         let type_name_generic = self.root.naming_decl.get_type_name(type_deref, generic_map.self_type, 0);
 
         if usage_context {
@@ -282,6 +281,16 @@ impl Usages {
                 UsageMode::Body => { usage_context.body.insert(type_name_generic.as_str(), type_deref); },
             }
         }
+
+        let type_name = self.root.naming_decl.get_type_name(type_deref, generic_map.self_type, generic_map);
+        let type_name_str = type_name.as_str();
+
+        if (is_type && !self.usage_types.insert(type_name_str)) || (is_trait && !self.usage_traits.insert(type_name_str)) {
+            type_name.release();
+            return;
+        }
+
+        self.usages.append(*type_deref);
     }
 
     fn process_primitive(&self, primitive_info: &Primitive) {
@@ -371,12 +380,15 @@ impl Usages {
     }
 
     fn process_function(&self, func_info: &Function, generic_map: &GenericMap) {
+        if func_info.type == FunctionType::Builtin { return; }
+
         let func_ptr = cast<usize>(func_info);
 
         match func_info.parent {
             FunctionParent::None => {
                 let func_usage = self.functions.find(&func_ptr);
                 self.function_context = &func_usage.function_context;
+                self.usage_context = &func_usage.usage_context;
             },
             FunctionParent::Primitive(primitive_info, impl_index, _) => {
                 let parent_ptr = cast<usize>(primitive_info);
@@ -447,47 +459,47 @@ impl Usages {
                 StatementData::BlockStatement(child_block) => {
                     self.process_block(child_block, generic_map);
                 },
-                StatementData::LetStatement(let_statement) => {
-                    if !let_statement.is_static {
-                        self.function_context.add_variable(let_statement.name.value, let_statement.type);
+                StatementData::LetStatement(statement) => {
+                    if !statement.is_static {
+                        self.function_context.add_variable(statement.name.value, statement.type);
                     }
 
-                    self.add_type(let_statement.type, generic_map);
+                    self.add_type(statement.type, generic_map);
 
-                    if let_statement.value != 0 {
-                        self.process_expression(let_statement.value, generic_map);
+                    if statement.value != 0 {
+                        self.process_expression(statement.value, generic_map);
                     }
                 },
-                StatementData::ReturnStatement(ret) => {
-                    if ret.expression != 0 {
-                        self.process_expression(ret.expression, generic_map);
+                StatementData::ReturnStatement(statement) => {
+                    if statement.expression != 0 {
+                        self.process_expression(statement.expression, generic_map);
                     }
                 },
-                StatementData::YieldStatement(yield_stmt) => {
+                StatementData::YieldStatement(statement) => {
                     self.function_context.coroutine.yield_count += 1;
-                    self.process_expression(yield_stmt.expression, generic_map);
+                    self.process_expression(statement.expression, generic_map);
                 },
-                StatementData::IfStatement(if_stmt) => {
-                    self.process_expression(if_stmt.expression, generic_map);
-                    self.process_block(if_stmt.block, generic_map);
+                StatementData::IfStatement(statement) => {
+                    self.process_expression(statement.expression, generic_map);
+                    self.process_block(statement.block, generic_map);
 
-                    for else_statement in if_stmt.else_statements {
+                    for else_statement in statement.else_statements {
                         self.process_block(else_statement.block, generic_map);
                     }
                 },
-                StatementData::MatchStatement(match_stmt) => {
-                    self.process_expression(match_stmt.expression, generic_map);
+                StatementData::MatchStatement(statement) => {
+                    self.process_expression(statement.expression, generic_map);
 
-                    for case_info in match_stmt.cases {
+                    for case_info in statement.cases {
                         self.process_block(case_info.body, generic_map);
                     }
                 },
-                StatementData::WhileStatement(while_stmt) => {
-                    self.process_expression(while_stmt.expression, generic_map);
-                    self.process_block(while_stmt.block, generic_map);
+                StatementData::WhileStatement(statement) => {
+                    self.process_expression(statement.expression, generic_map);
+                    self.process_block(statement.block, generic_map);
                 },
-                StatementData::ForStatement(for_statement) => {
-                    match for_statement.type {
+                StatementData::ForStatement(statement) => {
+                    match statement.type {
                         ForStatementType::Range(start, end) => {
                             self.process_expression(start, generic_map);
                             self.process_expression(end, generic_map);
@@ -500,14 +512,14 @@ impl Usages {
                         }
                     }
 
-                    self.process_block(for_statement.block, generic_map);
+                    self.process_block(statement.block, generic_map);
                 },
-                StatementData::AssignmentStatement(assignment) => {
-                    self.process_expression(assignment.left, generic_map);
-                    self.process_expression(assignment.right, generic_map);
+                StatementData::AssignmentStatement(statement) => {
+                    self.process_expression(statement.left, generic_map);
+                    self.process_expression(statement.right, generic_map);
                 },
-                StatementData::ExpressionStatement(expression) => {
-                    self.process_expression(expression, generic_map);
+                StatementData::ExpressionStatement(statement) => {
+                    self.process_expression(statement, generic_map);
                 },
                 StatementData::ContinueStatement(_) => {},
                 StatementData::BreakStatement(_) => {},

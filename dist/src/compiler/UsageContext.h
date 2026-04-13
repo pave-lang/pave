@@ -9,7 +9,7 @@ struct ArenaAllocator;
 
 #include <stdio.h>
 
-#line 34 "src/compiler/Usages.pv"
+#line 35 "src/compiler/Usages.pv"
 struct UsageContext {
     struct HashMap_str_ref_Type layout;
     struct HashMap_str_ref_Type signature;
@@ -17,7 +17,7 @@ struct UsageContext {
     struct HashMap_str_ref_Type cpp_usages;
 };
 
-#line 42 "src/compiler/Usages.pv"
+#line 43 "src/compiler/Usages.pv"
 struct UsageContext UsageContext__new(struct ArenaAllocator* allocator);
 
 #endif

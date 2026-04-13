@@ -3,16 +3,11 @@
 
 #include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
 #include <std/GeneralPurposeAllocator.h>
 #include <std/Array_ptrc_char.h>
-#include <stdbool.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Root.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
-#include <std/str.h>
-#include <std/Array_Diagnostic.h>
-#include <analyzer/Diagnostic.h>
 #include <compiler/Generator.h>
 
 #include <compiler/main.h>

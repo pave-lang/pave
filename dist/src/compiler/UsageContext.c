@@ -8,9 +8,9 @@
 
 #include <compiler/UsageContext.h>
 
-#line 42 "src/compiler/Usages.pv"
+#line 43 "src/compiler/Usages.pv"
 struct UsageContext UsageContext__new(struct ArenaAllocator* allocator) {
-    #line 43 "src/compiler/Usages.pv"
+    #line 44 "src/compiler/Usages.pv"
     return (struct UsageContext) {
         .layout = HashMap_str_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .signature = HashMap_str_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),

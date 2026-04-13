@@ -7,6 +7,7 @@
 #include <std/trait_Allocator.h>
 #include <compiler/FunctionContext.h>
 #include <stdbool.h>
+#include <compiler/UsageContext.h>
 
 #include <compiler/TypeFunctionUsage.h>
 
@@ -18,5 +19,6 @@ struct TypeFunctionUsage TypeFunctionUsage__new(struct ArenaAllocator* allocator
         .generic_maps = Array_ref_GenericMap__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .function_context = FunctionContext__new(allocator, type, false),
         .impl_dynamic_function = false,
+        .usage_context = UsageContext__new(allocator),
     };
 }

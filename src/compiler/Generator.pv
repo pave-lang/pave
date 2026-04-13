@@ -2232,6 +2232,36 @@ impl Generator {
         }
     }
 
+    fn write_context_includes(&self, file: &FILE, types: &HashMap<str, &Type>, generics: &GenericMap) {
+        for (_, type) in types {
+            let resolved = Context::resolve_type(self.allocator, type.deref(), generics, 0);
+
+            match resolved {
+                Type::Primitive(primitive_info) => {
+                    let include = self.primitive_includes.find(&primitive_info.name);
+                    if include == 0 { continue; }
+
+                    fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
+                },
+                Type::EnumC(_) | Type::StructC(_) | Type::TypedefC(_) => {
+                    self.write_c_type_include(file, resolved);
+                },
+                _ => {
+                    let name = self.naming_ident.get_type_name(resolved, generics.self_type, generics);
+                    let module = resolved.get_module();
+
+                    let path = self.make_rel_path(module, name.as_str(), ".h");
+                    fprintf(file, "#include <%.*s>\n", path.len_i32(), path.array.data);
+                    name.release();
+                },
+            }
+        }
+
+        if types.length > 0 {
+            fprintf(file, "\n");
+        }
+    }
+
     fn write_includes(&self, file: &FILE, includes: &HashMap<str, GeneratorInclude>) {
         for (_, &include) in includes {
             if include.type == 0 {
@@ -2363,10 +2393,9 @@ impl Generator {
 
     fn generate_function_loop(&self, usage: &TypeFunctionUsage) -> bool {
         let success = true;
-        let function_info = usage.type;
 
         for *generics in usage.generic_maps {
-            success = self.generate_function(function_info, generics) && success;
+            success = self.generate_function(usage, generics) && success;
         }
 
         return success;
@@ -2508,7 +2537,8 @@ impl Generator {
         return true;
     }
 
-    fn generate_function(&self, func_info: &Function, generics: &GenericMap) -> bool {
+    fn generate_function(&self, usage: &TypeFunctionUsage, generics: &GenericMap) -> bool {
+        let func_info = usage.type;
         if func_info.type == FunctionType::Builtin { return true; }
 
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
@@ -2519,7 +2549,7 @@ impl Generator {
         let code = self.make_path(func_info.context.module, name_str, ".c");
         let code_file: &FILE = 0;
         let code_tmp: *const char = 0;
-        
+
         code_tmp = tmpnam(0);
         code_file = fopen(code_tmp, "w+");
 
@@ -2527,10 +2557,8 @@ impl Generator {
 
         if code_file == 0 { perror(code.c_str()); return false; }
 
-        let includes: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if !self.add_block_includes(&includes, func_info.body, generics) { return false; }
         self.write_includes_raw(code_file, &func_info.context.module.includes);
-        self.write_includes(code_file, &includes);
+        self.write_context_includes(code_file, &usage.usage_context.body, generics);
 
         let header_rel = self.make_rel_path(func_info.context.module, name_str, ".h");
         fprintf(code_file, "#include <");
@@ -2559,10 +2587,8 @@ impl Generator {
         self.write_str_title(header_file, name_str);
         fprintf(header_file, "\n\n");
 
-        includes = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if !self.add_function_includes(&includes, 0, func_info, generics) { fclose(header_file); return false; }
         self.write_includes_raw(header_file, &func_info.context.module.includes);
-        self.write_includes(header_file, &includes);
+        self.write_context_includes(header_file, &usage.usage_context.signature, generics);
 
         if self.is_coroutine() {
             self.write_function_coroutine(header_file, func_info, generics);
