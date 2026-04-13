@@ -2232,13 +2232,28 @@ impl Generator {
         }
     }
 
-    fn write_context_includes(&self, file: &FILE, types: &HashMap<str, &Type>, generics: &GenericMap) {
+    fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap) {
         let includes = HashSet<str>::new(self.allocator);
 
-        for (_, type) in types {
-            let resolved = Context::resolve_type(self.allocator, type.deref(), generics, 0);
+        for (_, &type) in types {
+            let resolved = Context::resolve_type(self.allocator, type, generics, 0);
 
             match resolved {
+                Type::Indirect(indirect) => {
+                    match indirect.to {
+                        Type::Trait(_, _) => {
+                            let name = self.naming_ident.get_type_name(&indirect.to, generics.self_type, generics);
+                            let module = indirect.to.get_module();
+                            let path = self.make_rel_path(module, name.as_str(), "");
+                            if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
+                        },
+                        Type::Struct(_, _) => {
+                            let name = self.naming_c99.get_type_name(type.deref_all(), generics.self_type, generics);
+                            fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+                        },
+                        _ => {},
+                    }
+                },
                 Type::Primitive(primitive_info) => {
                     let include = self.primitive_includes.find(&primitive_info.name);
                     if include == 0 { continue; }
@@ -2258,15 +2273,15 @@ impl Generator {
                 },
                 Type::EnumC(info) => {
                     let path = info.include.path;
-                    if !includes.insert(path) { continue; }
+                    // if !includes.insert(path) { continue; }
                 },
                 Type::StructC(info) => {
                     let path = info.include.path;
-                    if !includes.insert(path) { continue; }
+                    // if !includes.insert(path) { continue; }
                 },
                 Type::TypedefC(info) => {
                     let path = info.include.path;
-                    if !includes.insert(path) { continue; }
+                    // if !includes.insert(path) { continue; }
                 },
                 _ => {
                     let name = self.naming_ident.get_type_name(resolved, generics.self_type, generics);
