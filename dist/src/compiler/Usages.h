@@ -46,7 +46,7 @@ struct Expression;
 
 #include <stdio.h>
 
-#line 76 "src/compiler/Usages.pv"
+#line 82 "src/compiler/Usages.pv"
 struct Usages {
     struct ArenaAllocator* allocator;
     struct Generator* generator;
@@ -67,46 +67,46 @@ struct Usages {
     struct Namespace* std_namespace;
 };
 
-#line 101 "src/compiler/Usages.pv"
+#line 107 "src/compiler/Usages.pv"
 struct Usages Usages__new(struct Generator* generator);
 
-#line 160 "src/compiler/Usages.pv"
+#line 166 "src/compiler/Usages.pv"
 void Usages__add_namespace(struct Usages* self, struct HashMap_str_ref_Namespace* children);
 
-#line 170 "src/compiler/Usages.pv"
+#line 176 "src/compiler/Usages.pv"
 void Usages__add_module(struct Usages* self, struct Module* module);
 
-#line 236 "src/compiler/Usages.pv"
+#line 242 "src/compiler/Usages.pv"
 void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap* generic_map);
 
-#line 271 "src/compiler/Usages.pv"
+#line 287 "src/compiler/Usages.pv"
 void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_info);
 
-#line 282 "src/compiler/Usages.pv"
+#line 298 "src/compiler/Usages.pv"
 void Usages__process_sequence(struct Usages* self, struct Sequence* sequence);
 
-#line 306 "src/compiler/Usages.pv"
+#line 322 "src/compiler/Usages.pv"
 void Usages__process_tuple(struct Usages* self, struct Tuple* tuple);
 
-#line 330 "src/compiler/Usages.pv"
+#line 335 "src/compiler/Usages.pv"
 void Usages__process_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 348 "src/compiler/Usages.pv"
+#line 353 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 362 "src/compiler/Usages.pv"
+#line 367 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map);
 
-#line 368 "src/compiler/Usages.pv"
+#line 373 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 437 "src/compiler/Usages.pv"
+#line 442 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 513 "src/compiler/Usages.pv"
+#line 518 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 626 "src/compiler/Usages.pv"
+#line 631 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

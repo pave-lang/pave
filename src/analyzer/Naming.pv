@@ -114,7 +114,7 @@ impl Naming {
         };
     }
 
-    fn get_type_name(&self, type: &Type, type_self: &Type, generics_map: &GenericMap) -> String {
+    fn get_type_name(&self, type: &Type, type_self: &Type, generics_map: *GenericMap) -> String {
         let result = String::new(self.allocator);
         let generics = Array<Type> {};
         let generic_start = self.generic_start;

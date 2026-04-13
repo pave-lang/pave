@@ -32,12 +32,18 @@ enum UsageMode {
 }
 
 struct UsageContext {
+    layout: HashMap<str, &Type>,
+    signature: HashMap<str, &Type>,
+    body: HashMap<str, &Type>,
     cpp_usages: HashMap<str, &Type>,
 }
 
 impl UsageContext {
     fn new(allocator: &ArenaAllocator) -> Self {
         return Self {
+            layout: HashMap<str, &Type>::new(allocator),
+            signature: HashMap<str, &Type>::new(allocator),
+            body: HashMap<str, &Type>::new(allocator),
             cpp_usages: HashMap<str, &Type>::new(allocator),
         };
     }
@@ -266,6 +272,16 @@ impl Usages {
         }
 
         self.usages.append(*type_deref);
+
+        let type_name_generic = self.root.naming_decl.get_type_name(type_deref, generic_map.self_type, 0);
+
+        if usage_context {
+            match self.usage_mode {
+                UsageMode::Layout => { usage_context.layout.insert(type_name_generic.as_str(), type_deref); },
+                UsageMode::Signature => { usage_context.signature.insert(type_name_generic.as_str(), type_deref); },
+                UsageMode::Body => { usage_context.body.insert(type_name_generic.as_str(), type_deref); },
+            }
+        }
     }
 
     fn process_primitive(&self, primitive_info: &Primitive) {
@@ -315,17 +331,6 @@ impl Usages {
             self.process_function(func_info, &generic_map);
         }
     }
-
-    // fn process_ctype(&self, info: &TypedefC) {
-    //     let self_type = self.allocator.store(Type::TypedefC(info));
-    //     let generic_map = self.allocator.store(GenericMap { self_type });
-
-    //     for *impl_info in info.impls {
-    //         for (_, &func_info) in impl_info.functions {
-    //             self.process_function(func_info, generic_map);
-    //         }
-    //     }
-    // }
 
     fn process_struct(&self, struct_info: &Struct, generic_map: &GenericMap) {
         let parent_ptr = cast<usize>(struct_info);
