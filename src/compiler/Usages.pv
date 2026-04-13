@@ -254,8 +254,19 @@ impl Usages {
                 is_type = func_info.generics.array.length > 0;
 
                 match func_info.parent {
-                    FunctionParent::Struct(struct_info, impl_index, _) => {
+                    FunctionParent::None => {},
+                    FunctionParent::Primitive(_, _, _) => {},
+                    FunctionParent::Struct(struct_info, _, _) => {
                         self.add_type(&Type::Struct(struct_info, type_generic_map), generic_map);
+                    },
+                    FunctionParent::Enum(enum_info, _, _) => {
+                        self.add_type(&Type::Enum(enum_info, type_generic_map), generic_map);
+                    },
+                    FunctionParent::Trait(trait_info) => {
+                        self.add_type(&Type::Trait(trait_info, type_generic_map), generic_map);
+                    },
+                    FunctionParent::Type(type_info, _, _) => {
+                        self.add_type(type_info, generic_map);
                     },
                 }
             },
