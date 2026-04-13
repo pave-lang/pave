@@ -2233,6 +2233,8 @@ impl Generator {
     }
 
     fn write_context_includes(&self, file: &FILE, types: &HashMap<str, &Type>, generics: &GenericMap) {
+        let includes = HashSet<str>::new(self.allocator);
+
         for (_, type) in types {
             let resolved = Context::resolve_type(self.allocator, type.deref(), generics, 0);
 
@@ -2240,40 +2242,51 @@ impl Generator {
                 Type::Primitive(primitive_info) => {
                     let include = self.primitive_includes.find(&primitive_info.name);
                     if include == 0 { continue; }
-
-                    fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
+                    if !includes.insert(*include) { continue; }
                 },
                 Type::Function(func_info, _) => {
                     match func_info.parent {
                         FunctionParent::None => {
                             let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
                             let module = func_info.context.module;
-
-                            let path = self.make_rel_path(module, name.as_str(), ".h");
-                            fprintf(file, "#include <%.*s>\n", path.len_i32(), path.array.data);
-                            name.release();
+                            let path = self.make_rel_path(module, name.as_str(), "");
+                            if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
                         },
                         _ => {},
                     }
 
                 },
-                Type::EnumC(_) | Type::StructC(_) | Type::TypedefC(_) => {
-                    self.write_c_type_include(file, resolved);
+                Type::EnumC(info) => {
+                    let path = info.include.path;
+                    if !includes.insert(path) { continue; }
+                },
+                Type::StructC(info) => {
+                    let path = info.include.path;
+                    if !includes.insert(path) { continue; }
+                },
+                Type::TypedefC(info) => {
+                    let path = info.include.path;
+                    if !includes.insert(path) { continue; }
                 },
                 _ => {
                     let name = self.naming_ident.get_type_name(resolved, generics.self_type, generics);
                     let module = resolved.get_module();
 
-                    let path = self.make_rel_path(module, name.as_str(), ".h");
-                    fprintf(file, "#include <%.*s>\n", path.len_i32(), path.array.data);
-                    name.release();
+                    let path = self.make_rel_path(module, name.as_str(), "");
+                    if !includes.insert(path.as_str()) { name.release(); continue; }
                 },
             }
+        }
+
+        for *include in includes {
+            fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
         }
 
         if types.length > 0 {
             fprintf(file, "\n");
         }
+
+        defer includes.release();
     }
 
     fn write_includes(&self, file: &FILE, includes: &HashMap<str, GeneratorInclude>) {
