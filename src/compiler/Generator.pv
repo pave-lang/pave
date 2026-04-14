@@ -3079,6 +3079,8 @@ impl Generator {
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
                     if function_usage != 0 {
                         for *generics3 in function_usage.generic_maps {
+                            self.write_context_includes(file, &function_usage.usage_context.signature, generics3);
+
                             generics3.self_type = generics.self_type;
                             fprintf(file, "\n");
                             if !self.write_function_definition(file, func_info, generics3, 0) { return false; }
