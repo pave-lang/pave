@@ -33,6 +33,8 @@ enum UsageMode {
 }
 
 struct UsageContext {
+    primitive_header: HashSet<str>,
+    primitive_code: HashSet<str>,
     layout: HashMap<str, Type>,
     signature: HashMap<str, Type>,
     body: HashMap<str, Type>,
@@ -42,6 +44,8 @@ struct UsageContext {
 impl UsageContext {
     fn new(allocator: &ArenaAllocator) -> Self {
         return Self {
+            primitive_header: HashSet<str>::new(allocator),
+            primitive_code: HashSet<str>::new(allocator),
             layout: HashMap<str, Type>::new(allocator),
             signature: HashMap<str, Type>::new(allocator),
             body: HashMap<str, Type>::new(allocator),
@@ -245,13 +249,28 @@ impl Usages {
         let type_deref = resolved_type.deref();
         let is_type = false;
         let is_indirect = false;
-        let is_primitive = false;
         let is_trait = false;
         let usage_context = self.usage_context;
 
-        match type {
+        match type_deref {
             Type::Indirect(_) => {
                 is_indirect = true;
+
+                match type.deref_all() {
+                    Type::Primitive(primitive_info) => {
+                        if usage_context {
+                            if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {
+                                usage_context.primitive_header.insert(primitive_info.name);
+                            } else {
+                                usage_context.primitive_code.insert(primitive_info.name);
+                            }
+                        }
+
+                        return;
+                    },
+                    _ => {},
+                }
+
                 // match indirect.to {
                 //     Type::Trait(trait_info, _) => {
                 //         if trait_info.name.value.eq("Struct") {
@@ -280,7 +299,15 @@ impl Usages {
                 //     _ => {},
                 // }
             },
-            Type::Primitive(_) => { is_primitive = true; },
+            Type::Primitive(primitive_info) => {
+                if usage_context {
+                    if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {
+                        usage_context.primitive_header.insert(primitive_info.name);
+                    } else {
+                        usage_context.primitive_code.insert(primitive_info.name);
+                    }
+                }
+            },
             Type::Struct(_, _) => { is_type = true; },
             Type::Enum(_, _) => { is_type = true; },
             Type::Function(func_info, type_generic_map) => {
@@ -289,7 +316,7 @@ impl Usages {
                 match func_info.parent {
                     FunctionParent::None => {},
                     FunctionParent::Primitive(primitive_info, _, _) => {
-                        self.add_type(&Type::Primitive(primitive_info), generic_map);
+                        // self.add_type(&Type::Primitive(primitive_info), generic_map);
                     },
                     FunctionParent::Struct(struct_info, _, _) => {
                         self.add_type(&Type::Struct(struct_info, type_generic_map), generic_map);
@@ -316,7 +343,7 @@ impl Usages {
             _ => {},
         }
 
-        if !is_primitive && !is_type && !is_trait && !is_indirect { return; }
+        if !is_type && !is_trait && !is_indirect { return; }
 
         let type_generic = type;
         if self.usage_mode == UsageMode::Body { type_generic = type_generic.deref_all(); }
@@ -356,7 +383,6 @@ impl Usages {
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
-        // let self_type = self.allocator.store(Type::Sequence(sequence));
         let generic_map = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
@@ -564,6 +590,12 @@ impl Usages {
                     self.process_block(statement.block, generic_map);
                 },
                 StatementData::ForStatement(statement) => {
+                    self.process_expression(statement.expression, generic_map);
+                    self.add_type(statement.iter_type, generic_map);
+                    if statement.value_type {
+                        self.add_type(statement.value_type, generic_map);
+                    }
+
                     match statement.type {
                         ForStatementType::Range(start, end) => {
                             self.process_expression(start, generic_map);
@@ -601,6 +633,42 @@ impl Usages {
                 self.process_expression(target, generic_map);
                 for *arg in arguments {
                     self.process_expression(arg.value, generic_map);
+                }
+
+                match target.return_type {
+                    Type::Function(func_info, _) => {
+                        match func_info.parent {
+                            FunctionParent::Trait(_) => {
+                                if arguments.length > 0 {
+                                    let type = arguments.data[0].value.return_type.deref();
+
+                                    match type {
+                                        Type::Generic(generic) => {
+                                            let name = generic.name.value;
+                                            let resolved_type = generic_map.get(name);
+                                            if resolved_type != 0 { type = resolved_type; }
+                                        },
+                                        _ => {},
+                                    }
+                                    
+                                    if type.is_primitive_or_c_type() {
+                                        let usage_context = self.usage_context;
+                                        if usage_context {
+                                            let type_name = self.root.naming_decl.get_type_name(type, generic_map.self_type, 0);
+
+                                            match self.usage_mode {
+                                                UsageMode::Layout => { usage_context.layout.insert(type_name.as_str(), *type); },
+                                                UsageMode::Signature => { usage_context.signature.insert(type_name.as_str(), *type); },
+                                                UsageMode::Body => { usage_context.body.insert(type_name.as_str(), *type); },
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
                 }
             },
             ExpressionData::Type(type) => { self.add_type(type, generic_map); },

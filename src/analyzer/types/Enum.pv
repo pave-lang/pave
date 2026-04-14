@@ -133,4 +133,14 @@ impl Enum {
 
         return true;
     }
+
+    fn is_discriminated_union(&self) -> bool {
+        for (_, &variant_info) in self.variants {
+            if variant_info.types.length > 0 {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

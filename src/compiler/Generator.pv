@@ -264,20 +264,10 @@ impl Generator {
         return self.write_str(file, token.value);
     }
 
-    fn is_discriminated_union(enum_info: &Enum) -> bool {
-        for (_, &variant_info) in enum_info.variants {
-            if variant_info.types.length > 0 {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     fn type_is_discriminated_union(&self, type: &Type, generics: &GenericMap) -> bool {
         match type {
             Type::Indirect(indirect) => { return self.type_is_discriminated_union(&indirect.to, generics); },
-            Type::Enum(enum_info, _) => { return Generator::is_discriminated_union(enum_info); },
+            Type::Enum(enum_info, _) => { return enum_info.is_discriminated_union(); },
             Type::Self => { return self.type_is_discriminated_union(generics.self_type, generics); },
             _ => {},
         }
@@ -727,7 +717,7 @@ impl Generator {
     fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
         let parent = variant.parent;
 
-        if !Generator::is_discriminated_union(parent) {
+        if !parent.is_discriminated_union() {
             self.write_enum_variant_name(file, type, variant);
             return true;
         } 
@@ -2232,6 +2222,25 @@ impl Generator {
         }
     }
 
+    fn write_context_primitives(&self, file: &FILE, primitives: &HashSet<str>, exclude_primitives: *HashSet<str>) {
+        let includes = HashSet<str>::new(self.allocator);
+
+        for primitive in primitives {
+            if exclude_primitives && exclude_primitives.has(primitive) { continue; }
+            let include = self.primitive_includes.find(primitive);
+            if include == 0 { continue; }
+            includes.insert(*include);
+        }
+
+        for *include in includes {
+            fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
+        }
+
+        if includes.length > 0 {
+            fprintf(file, "\n");
+        }
+    }
+
     fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap) {
         let includes = HashSet<str>::new(self.allocator);
 
@@ -2240,24 +2249,32 @@ impl Generator {
 
             match resolved {
                 Type::Indirect(indirect) => {
-                    match indirect.to {
+                    let type_deref = type.deref_all();
+
+                    match type_deref {
                         Type::Trait(_, _) => {
-                            let name = self.naming_ident.get_type_name(&indirect.to, generics.self_type, generics);
-                            let module = indirect.to.get_module();
+                            let name = self.naming_ident.get_type_name(type_deref, generics.self_type, generics);
+                            let module = type_deref.get_module();
                             let path = self.make_rel_path(module, name.as_str(), "");
                             if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
                         },
                         Type::Struct(_, _) => {
-                            let name = self.naming_c99.get_type_name(type.deref_all(), generics.self_type, generics);
+                            let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
                             fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+                        },
+                        Type::Enum(enum_info, _) => {
+                            if enum_info.is_discriminated_union() {
+                                let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
+                                fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+                            } else {
+                                let name = self.naming_ident.get_type_name(type_deref, generics.self_type, generics);
+                                let module = type_deref.get_module();
+                                let path = self.make_rel_path(module, name.as_str(), "");
+                                if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
+                            }
                         },
                         _ => {},
                     }
-                },
-                Type::Primitive(primitive_info) => {
-                    let include = self.primitive_includes.find(&primitive_info.name);
-                    if include == 0 { continue; }
-                    if !includes.insert(*include) { continue; }
                 },
                 Type::Function(func_info, _) => {
                     match func_info.parent {
@@ -2267,20 +2284,46 @@ impl Generator {
                             let path = self.make_rel_path(module, name.as_str(), "");
                             if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
                         },
+                        FunctionParent::Primitive(primitive_info, _, _) => {
+                            let name = primitive_info.name;
+                            let path = self.make_rel_path(0, name, "");
+                            if !includes.insert(path.as_str()) { path.release(); continue; }
+                        },
+                        FunctionParent::Trait(_) => {
+                            // let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+                            // let module = func_info.context.module;
+                            // let path = self.make_rel_path(module, name.as_str(), "");
+                            // if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
+
+                            // let self_type = arguments.data[0].value.return_type.deref();
+
+                            // match self_type {
+                            //     Type::Generic(generic) => {
+                            //         let name = generic.name.value;
+                            //         let resolved_type = generics.get(name);
+                            //         if resolved_type != 0 { type = resolved_type; }
+                            //     },
+                            //     _ => {},
+                            // }
+                            
+                            // if self_type.is_primitive_or_c_type() {
+                            //     self.add_type_include_inner(includes, 0, includes, self_type, generics);
+                            // }
+                        },
                         _ => {},
                     }
 
                 },
-                Type::EnumC(info) => {
-                    let path = info.include.path;
+                Type::EnumC(_) => {
+                    // let path = info.include.path;
                     // if !includes.insert(path) { continue; }
                 },
-                Type::StructC(info) => {
-                    let path = info.include.path;
+                Type::StructC(_) => {
+                    // let path = info.include.path;
                     // if !includes.insert(path) { continue; }
                 },
-                Type::TypedefC(info) => {
-                    let path = info.include.path;
+                Type::TypedefC(_) => {
+                    // let path = info.include.path;
                     // if !includes.insert(path) { continue; }
                 },
                 _ => {
@@ -2339,7 +2382,7 @@ impl Generator {
                     }
                 },
                 Type::Enum(enum_info, _) => {
-                    if !Generator::is_discriminated_union(enum_info) {
+                    if !enum_info.is_discriminated_union() {
                         let path = self.make_rel_path(enum_info.context.module, name, ".h");
                         fprintf(file, "#include <%.*s>\n", cast<i32>(path.array.length), path.array.data);
                     } else {
@@ -2599,6 +2642,7 @@ impl Generator {
 
         if code_file == 0 { perror(code.c_str()); return false; }
 
+        self.write_context_primitives(code_file, &usage.usage_context.primitive_code, &usage.usage_context.primitive_header);
         self.write_includes_raw(code_file, &func_info.context.module.includes);
         self.write_context_includes(code_file, &usage.usage_context.body, generics);
 
@@ -2629,6 +2673,7 @@ impl Generator {
         self.write_str_title(header_file, name_str);
         fprintf(header_file, "\n\n");
 
+        self.write_context_primitives(header_file, &usage.usage_context.primitive_code, 0);
         self.write_includes_raw(header_file, &func_info.context.module.includes);
         self.write_context_includes(header_file, &usage.usage_context.signature, generics);
 
@@ -2666,7 +2711,7 @@ impl Generator {
         let enum_name = enum_info.name;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: u32 = name.array.length;
-        let is_discriminated_union = Generator::is_discriminated_union(enum_info);
+        let is_discriminated_union = enum_info.is_discriminated_union();
 
         self.write_line_directive(file, enum_info.context, enum_info.name);
 
@@ -3711,6 +3756,7 @@ impl Generator {
             self.write_c_type_include(header_file, type.deref());
         }
 
+        self.write_context_primitives(header_file, &usage.usage_context.primitive_header, 0);
         self.write_includes_raw(header_file, &struct_info.module.includes);
         self.write_context_includes(header_file, &usage.usage_context.layout, generics);
 
@@ -3746,6 +3792,7 @@ impl Generator {
         let code_file: &FILE = fopen(code_tmp, "w+");
         if code_file == 0 { perror(code.c_str()); return false; }
 
+        self.write_context_primitives(code_file, &usage.usage_context.primitive_code, &usage.usage_context.primitive_header);
         self.write_includes_raw(code_file, &struct_info.module.includes);
         self.write_context_includes(code_file, &usage.usage_context.body, generics);
 
