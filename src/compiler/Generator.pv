@@ -2249,7 +2249,7 @@ impl Generator {
 
             match resolved {
                 Type::Indirect(indirect) => {
-                    let type_deref = type.deref_all();
+                    let type_deref = resolved.deref_all();
 
                     match type_deref {
                         Type::Trait(_, _) => {
