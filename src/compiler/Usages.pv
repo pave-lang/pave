@@ -263,7 +263,7 @@ impl Usages {
         let usage_context = self.usage_context;
 
         match type_deref {
-            Type::Indirect(indirect) => {
+            Type::Indirect(_) => {
                 is_indirect = true;
 
                 match type.deref_all() {
@@ -278,34 +278,6 @@ impl Usages {
                     },
                     _ => {},
                 }
-
-                // match indirect.to {
-                //     Type::Trait(trait_info, _) => {
-                //         if trait_info.name.value.eq("Struct") {
-                //             match indirect.type {
-                //                 IndirectType::Reference => {
-                //                     match type_deref {
-                //                         Type::Struct(struct_info, _) => struct_info,
-                //                         _ => 0,
-                //                     }
-                //                 },
-                //                 IndirectType::Pointer => {
-                //                     match type_deref {
-                //                         Type::Struct(struct_info, _) => struct_info,
-                //                         _ => 0,
-                //                     }
-                //                 },
-                //             };
-
-                //             if struct_info != 0 {
-                //                 let ptr = cast<usize>(struct_info);
-                //                 let usage = self.structs.find(&ptr);
-                //                 usage.impl_dynamic_usage = true;
-                //             }
-                //         }
-                //     },
-                //     _ => {},
-                // }
             },
             Type::Primitive(primitive_info) => {
                 if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {
@@ -322,7 +294,7 @@ impl Usages {
                 match func_info.parent {
                     FunctionParent::None => {},
                     FunctionParent::Primitive(primitive_info, _, _) => {
-                        // self.add_type(&Type::Primitive(primitive_info), generic_map);
+                        self.add_type(&Type::Primitive(primitive_info), generic_map);
                     },
                     FunctionParent::Struct(struct_info, _, _) => {
                         self.add_type(&Type::Struct(struct_info, type_generic_map), generic_map);
@@ -372,21 +344,16 @@ impl Usages {
         self.usages.append(*type_deref);
     }
 
-    fn process_primitive(&self, primitive_info: &Primitive) {
-        let self_type = self.allocator.store(Type::Primitive(primitive_info));
-        let generic_map = self.allocator.store(GenericMap { self_type });
-
-        let parent_ptr = cast<usize>(primitive_info);
-        let parent_usage = self.primitives.find(&parent_ptr);
-        self.usage_context = parent_usage.add_usage(generic_map);
+    fn process_impls(&self, impls: &Array<&Impl>, generic_map: &GenericMap) {
         self.usage_mode = UsageMode::Signature;
 
-        for *impl_info in primitive_info.impls {
+        for *impl_info in impls {
             if impl_info.has_trait {
                 self.add_type(&impl_info.trait_type, generic_map);
             }
 
             for (_, &func_info) in impl_info.functions {
+                if func_info.generics.array.length > 0 { continue; }
                 self.process_function(func_info, generic_map);
             }
 
@@ -398,6 +365,17 @@ impl Usages {
                 }
             }
         }
+    }
+
+    fn process_primitive(&self, primitive_info: &Primitive) {
+        let self_type = self.allocator.store(Type::Primitive(primitive_info));
+        let generic_map = self.allocator.store(GenericMap { self_type });
+
+        let parent_ptr = cast<usize>(primitive_info);
+        let parent_usage = self.primitives.find(&parent_ptr);
+        self.usage_context = parent_usage.add_usage(generic_map);
+
+        self.process_impls(&primitive_info.impls, generic_map);
 
         self.usage_context = 0;
     }
@@ -468,27 +446,7 @@ impl Usages {
             self.add_type(&field.type, generic_map);
         }
 
-        self.usage_mode = UsageMode::Signature;
-
-        for *impl_info in struct_info.impls {
-            if impl_info.has_trait {
-                self.add_type(&impl_info.trait_type, generic_map);
-            }
-
-            for (_, &func_info) in impl_info.functions {
-                if func_info.generics.array.length == 0 {
-                    self.process_function(func_info, generic_map);
-                }
-            }
-
-            let trait_info = impl_info.trait_;
-            if trait_info != 0 {
-                for (func_base_name, &func_info) in trait_info.functions {
-                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
-                    self.process_function(func_info, generic_map);
-                }
-            }
-        }
+        self.process_impls(&struct_info.impls, generic_map);
 
         self.usage_context = 0;
     }
@@ -497,6 +455,7 @@ impl Usages {
         let parent_ptr = cast<usize>(enum_info);
         let parent_usage = self.enums.find(&parent_ptr);
         self.usage_context = parent_usage.add_usage(generic_map);
+
         self.usage_mode = UsageMode::Layout;
 
         for (_, &variant) in enum_info.variants {
@@ -505,25 +464,7 @@ impl Usages {
             }
         }
 
-        self.usage_mode = UsageMode::Signature;
-
-        for *impl_info in enum_info.impls {
-            if impl_info.has_trait {
-                self.add_type(&impl_info.trait_type, generic_map);
-            }
-
-            for (_, &func_info) in impl_info.functions {
-                self.process_function(func_info, generic_map);
-            }
-
-            let trait_info = impl_info.trait_;
-            if trait_info != 0 {
-                for (func_base_name, &func_info) in trait_info.functions {
-                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
-                    self.process_function(func_info, generic_map);
-                }
-            }
-        }
+        self.process_impls(&enum_info.impls, generic_map);
 
         self.usage_context = 0;
     }
