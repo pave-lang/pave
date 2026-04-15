@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_TYPE_ID
 #define PAVE_SLICE_TYPE_ID
 
-#include <stdint.h>
-
-typedef uint64_t TypeId;
-
+#include <std/TypeId.h>
+#include <std/Iter_ref_TypeId.h>
 struct slice_TypeId { TypeId* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

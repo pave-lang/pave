@@ -3,7 +3,6 @@
 
 struct Trait;
 struct Type;
-
 struct tuple_ref_Trait_ref_Type {
     struct Trait* _0;
     struct Type* _1;

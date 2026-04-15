@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct MatchPattern;
-
 struct tuple_usize_ref_MatchPattern {
     uintptr_t _0;
     struct MatchPattern* _1;

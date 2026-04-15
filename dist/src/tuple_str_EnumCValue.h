@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/c/EnumCValue.h>
-
 struct tuple_str_EnumCValue {
     struct str _0;
     struct EnumCValue _1;

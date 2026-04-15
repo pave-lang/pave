@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct UsageContext;
-
 struct tuple_usize_ref_UsageContext {
     uintptr_t _0;
     struct UsageContext* _1;

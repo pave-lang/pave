@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct ImplNode;
-
 struct tuple_usize_ref_ImplNode {
     uintptr_t _0;
     struct ImplNode* _1;

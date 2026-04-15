@@ -1,11 +1,10 @@
 #ifndef PAVE_U8
 #define PAVE_U8
 
-#include <std/trait_Hash.h>
 #include <stdint.h>
 
-typedef uint64_t Hashed;
-
+#include <std/trait_Hash.h>
+#include <std/Hashed.h>
 
 
 #line 48 "src/std/Hash.pv"

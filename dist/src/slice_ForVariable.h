@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_FOR_VARIABLE
 #define PAVE_SLICE_FOR_VARIABLE
 
-#include <stdint.h>
-
-struct ForVariable;
-
+#include <analyzer/statement/ForVariable.h>
+#include <std/Iter_ref_ForVariable.h>
 struct slice_ForVariable { struct ForVariable* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 typedef uint64_t TypeId;
-
 struct tuple_usize_ref_TypeId {
     uintptr_t _0;
     TypeId* _1;

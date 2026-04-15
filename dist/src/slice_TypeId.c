@@ -1,6 +1,4 @@
-#include <std/Iter_ref_TypeId.h>
-#include <stdint.h>
-#include <std/TypeId.h>
+#include <slice_TypeId.h>
 
 #include <slice_TypeId.h>
 

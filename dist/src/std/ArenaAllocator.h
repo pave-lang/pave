@@ -35,18 +35,18 @@ struct Function;
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, struct Function value);
-struct Type;
-#include <std/ArenaAllocator.h>
-#include <analyzer/types/Type.h>
-
-#line 165 "src/std/ArenaAllocator.pv"
-struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type value);
 struct GenericMap;
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/GenericMap.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self, struct GenericMap value);
+struct Type;
+#include <std/ArenaAllocator.h>
+#include <analyzer/types/Type.h>
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type value);
 struct Indirect;
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Indirect.h>

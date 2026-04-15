@@ -1,6 +1,6 @@
-#include <stdint.h>
 #include <std/Hashed.h>
 #include <std/Fnv1a.h>
+#include <usize.h>
 
 #include <usize.h>
 

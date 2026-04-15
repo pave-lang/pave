@@ -1,6 +1,4 @@
-#include <std/Iter_ref_String.h>
-#include <std/String.h>
-#include <stdint.h>
+#include <slice_String.h>
 
 #include <slice_String.h>
 

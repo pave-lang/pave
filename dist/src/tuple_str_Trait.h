@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/types/Trait.h>
-
 struct tuple_str_Trait {
     struct str _0;
     struct Trait _1;

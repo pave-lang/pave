@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct Statement;
-
 struct tuple_usize_ref_Statement {
     uintptr_t _0;
     struct Statement* _1;

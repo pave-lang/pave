@@ -76,22 +76,6 @@ struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, str
 }
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type value) {
-    #line 166 "src/std/ArenaAllocator.pv"
-    struct Type* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Type));
-    #line 167 "src/std/ArenaAllocator.pv"
-    if (new_memory == 0) {
-        #line 167 "src/std/ArenaAllocator.pv"
-        return 0;
-    }
-
-    #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Type));
-    #line 170 "src/std/ArenaAllocator.pv"
-    return new_memory;
-}
-
-#line 165 "src/std/ArenaAllocator.pv"
 struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self, struct GenericMap value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct GenericMap* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct GenericMap));
@@ -103,6 +87,22 @@ struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self,
 
     #line 169 "src/std/ArenaAllocator.pv"
     memcpy(new_memory, &value, sizeof(struct GenericMap));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct Type* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Type));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct Type));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }

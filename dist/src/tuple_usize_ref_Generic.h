@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct Generic;
-
 struct tuple_usize_ref_Generic {
     uintptr_t _0;
     struct Generic* _1;

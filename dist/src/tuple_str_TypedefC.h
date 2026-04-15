@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/c/TypedefC.h>
-
 struct tuple_str_TypedefC {
     struct str _0;
     struct TypedefC _1;

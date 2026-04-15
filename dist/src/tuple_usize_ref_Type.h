@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct Type;
-
 struct tuple_usize_ref_Type {
     uintptr_t _0;
     struct Type* _1;

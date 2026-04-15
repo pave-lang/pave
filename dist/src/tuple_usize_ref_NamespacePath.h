@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct NamespacePath;
-
 struct tuple_usize_ref_NamespacePath {
     uintptr_t _0;
     struct NamespacePath* _1;

@@ -1,6 +1,4 @@
-#include <std/Iter_ref_EnumVariantParameter.h>
-#include <analyzer/types/EnumVariantParameter.h>
-#include <stdint.h>
+#include <slice_EnumVariantParameter.h>
 
 #include <slice_EnumVariantParameter.h>
 

@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-struct str;
-typedef uint64_t TypeId;
-
 struct tuple_usize_ref_tuple_usize_str_TypeId {
     uintptr_t _0;
     struct tuple_usize_str_TypeId* _1;

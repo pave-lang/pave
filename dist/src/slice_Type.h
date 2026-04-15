@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_TYPE
 #define PAVE_SLICE_TYPE
 
-#include <stdint.h>
-
-struct Type;
-
+#include <analyzer/types/Type.h>
+#include <std/Iter_ref_Type.h>
 struct slice_Type { struct Type* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

@@ -1,6 +1,4 @@
-#include <std/Iter_ref_MatchPattern.h>
-#include <analyzer/statement/MatchPattern.h>
-#include <stdint.h>
+#include <slice_MatchPattern.h>
 
 #include <slice_MatchPattern.h>
 

@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_NAMESPACE_PATH
 #define PAVE_SLICE_NAMESPACE_PATH
 
-#include <stdint.h>
-
-struct NamespacePath;
-
+#include <analyzer/NamespacePath.h>
+#include <std/Iter_ref_NamespacePath.h>
 struct slice_NamespacePath { struct NamespacePath* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/types/StructField.h>
-
 struct tuple_str_StructField {
     struct str _0;
     struct StructField _1;

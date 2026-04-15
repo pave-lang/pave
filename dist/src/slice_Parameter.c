@@ -1,6 +1,4 @@
-#include <std/Iter_ref_Parameter.h>
-#include <analyzer/types/Parameter.h>
-#include <stdint.h>
+#include <slice_Parameter.h>
 
 #include <slice_Parameter.h>
 

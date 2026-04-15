@@ -1,8 +1,4 @@
-#include <std/Iter_ref_tuple_usize_str_TypeId.h>
-#include <stdint.h>
-#include <std/str.h>
-#include <std/TypeId.h>
-#include <tuple_usize_str_TypeId.h>
+#include <slice_tuple_usize_str_TypeId.h>
 
 #include <slice_tuple_usize_str_TypeId.h>
 

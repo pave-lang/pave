@@ -1,8 +1,7 @@
 #ifndef PAVE_SLICE_CHAR
 #define PAVE_SLICE_CHAR
 
-#include <stdint.h>
-
+#include <std/Iter_ref_char.h>
 struct slice_char { char* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct Parameter;
-
 struct tuple_usize_ref_Parameter {
     uintptr_t _0;
     struct Parameter* _1;

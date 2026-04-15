@@ -376,11 +376,30 @@ impl Usages {
         let self_type = self.allocator.store(Type::Primitive(primitive_info));
         let generic_map = self.allocator.store(GenericMap { self_type });
 
+        let parent_ptr = cast<usize>(primitive_info);
+        let parent_usage = self.primitives.find(&parent_ptr);
+        self.usage_context = parent_usage.add_usage(generic_map);
+        self.usage_mode = UsageMode::Signature;
+
         for *impl_info in primitive_info.impls {
+            if impl_info.has_trait {
+                self.add_type(&impl_info.trait_type, generic_map);
+            }
+
             for (_, &func_info) in impl_info.functions {
                 self.process_function(func_info, generic_map);
             }
+
+            let trait_info = impl_info.trait_;
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    self.process_function(func_info, generic_map);
+                }
+            }
         }
+
+        self.usage_context = 0;
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
@@ -426,7 +445,11 @@ impl Usages {
         self.usage_mode = UsageMode::Layout;
 
         let indirect = self.allocator.store(Indirect { type: IndirectType::Reference, to: tuple_type });
-        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));        
+        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));
+
+        for element in tuple.elements {
+            self.add_type(element, generic_map);
+        }
 
         let impl_info = self.root.hack_type_impl.impl_info;
 
@@ -457,6 +480,14 @@ impl Usages {
                     self.process_function(func_info, generic_map);
                 }
             }
+
+            let trait_info = impl_info.trait_;
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    self.process_function(func_info, generic_map);
+                }
+            }
         }
 
         self.usage_context = 0;
@@ -484,15 +515,29 @@ impl Usages {
             for (_, &func_info) in impl_info.functions {
                 self.process_function(func_info, generic_map);
             }
+
+            let trait_info = impl_info.trait_;
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    self.process_function(func_info, generic_map);
+                }
+            }
         }
 
         self.usage_context = 0;
     }
 
     fn process_trait(&self, trait_info: &Trait, generic_map: &GenericMap) {
+        let parent_ptr = cast<usize>(trait_info);
+        let parent_usage = self.traits.find(&parent_ptr);
+        self.usage_context = parent_usage.add_usage(generic_map);
+
         for (_, &func_info) in trait_info.functions {
             self.process_function(func_info, generic_map);
         }
+
+        self.usage_context = 0;
     }
 
     fn process_function(&self, func_info: &Function, generic_map: &GenericMap) {
@@ -514,7 +559,10 @@ impl Usages {
 
                 let func_usage = parent_usage.impl_functions.get(impl_index).find(&func_ptr);
                 self.function_context = &func_usage.function_context;
-                self.usage_context = func_usage.add_usage(generic_map);
+
+                if func_info.generics.array.length > 0 {
+                    self.usage_context = func_usage.add_usage(generic_map);
+                }
             },
             FunctionParent::Struct(struct_info, impl_index, _) => {
                 let parent_ptr = cast<usize>(struct_info);
@@ -541,11 +589,9 @@ impl Usages {
             FunctionParent::Trait(trait_info) => {
                 let parent_ptr = cast<usize>(trait_info);
                 let parent_usage = self.traits.find(&parent_ptr);
-                // self.usage_context = &parent_usage.usage_context;
 
                 let func_usage = parent_usage.impl_functions.get(0).find(&func_ptr);
                 self.function_context = &func_usage.function_context;
-                self.usage_context = parent_usage.add_usage(generic_map);
             },
             FunctionParent::Type(_, _, _) => {
                 // let func_usage = self.functions.find(&func_ptr);
