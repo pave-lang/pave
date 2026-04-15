@@ -1,14 +1,19 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <std/HashMapIter_usize_TypeFunctionUsage.h>
-#include <compiler/TypeFunctionUsage.h>
 #include <std/HashMapBucket_usize_TypeFunctionUsage.h>
-#include <stdbool.h>
+#include <compiler/TypeFunctionUsage.h>
 #include <std/Hashed.h>
+#include <std/trait_Hash.h>
 #include <usize.h>
+#include <std/Range_usize.h>
+#include <std/HashMapIter_usize_TypeFunctionUsage.h>
+
+#include <std/HashMap_usize_TypeFunctionUsage.h>
 
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 

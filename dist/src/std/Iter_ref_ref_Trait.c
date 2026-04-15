@@ -1,10 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_ref_Trait.h>
 #include <analyzer/types/Trait.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_ref_Trait.h>
+
+#include <std/Iter_ref_ref_Trait.h>
 
 #include <std/Iter_ref_ref_Trait.h>
 

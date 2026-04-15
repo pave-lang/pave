@@ -1,19 +1,20 @@
+#include <stdbool.h>
+#include <stdint.h>
+
 #include <clang-c/Index.h>
 #include <string.h>
 
-#include <std/HashMap_str_EnumCValue.h>
+#include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/Include.h>
 #include <analyzer/c/IncludeContext.h>
 #include <analyzer/c/StructC.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/c/StructCField.h>
-#include <std/str.h>
 #include <std/HashMap_str_StructCField.h>
-#include <stdbool.h>
+#include <std/str.h>
 #include <analyzer/c/ClassCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <stdint.h>
 #include <std/Array_Type.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Function.h>
@@ -26,6 +27,9 @@
 #include <analyzer/c/IncludeObjectEnumClass.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/EnumCValue.h>
+#include <std/HashMap_str_EnumCValue.h>
+
+#include <analyzer/c/IncludeObjectContext.h>
 
 #include <analyzer/c/IncludeObjectContext.h>
 

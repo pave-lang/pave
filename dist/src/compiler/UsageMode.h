@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#line 29 "src/compiler/Usages.pv"
+#line 33 "src/compiler/Usages.pv"
 enum UsageMode {
     USAGE_MODE__LAYOUT,
     USAGE_MODE__SIGNATURE,

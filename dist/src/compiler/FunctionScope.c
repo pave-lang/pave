@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <fs.h>
 
-#include <std/ArenaAllocator.h>
-#include <stdbool.h>
+#include <compiler/FunctionScope.h>
 #include <std/Array_ref_Expression.h>
-#include <analyzer/expression/Expression.h>
 #include <std/trait_Allocator.h>
+#include <std/ArenaAllocator.h>
 #include <std/HashMap_str_str.h>
-#include <std/str.h>
+
+#include <compiler/FunctionScope.h>
 
 #include <compiler/FunctionScope.h>
 

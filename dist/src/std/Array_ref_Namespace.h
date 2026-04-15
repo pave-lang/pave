@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_REF_NAMESPACE
 #define PAVE_ARRAY_REF_NAMESPACE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Namespace;
-struct Iter_ref_ref_Namespace;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Namespace;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_ref_Namespace {
@@ -18,6 +17,14 @@ struct Array_ref_Namespace {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_ref_Namespace;
+struct Namespace;
+struct Namespace;
+struct Namespace;
+#include <std/trait_Allocator.h>
+#include <std/Array_ref_Namespace.h>
+#include <std/Iter_ref_ref_Namespace.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_ref_Namespace Array_ref_Namespace__new(struct trait_Allocator allocator);

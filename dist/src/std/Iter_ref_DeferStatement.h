@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct DeferStatement;
-struct IterEnumerate_ref_DeferStatement;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct DeferStatement;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_DeferStatement {
@@ -17,6 +16,11 @@ struct Iter_ref_DeferStatement {
     struct DeferStatement* start;
     struct DeferStatement* end;
 };
+struct DeferStatement;
+struct Iter_ref_DeferStatement;
+#include <std/Iter_ref_DeferStatement.h>
+#include <std/IterEnumerate_ref_DeferStatement.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_DeferStatement Iter_ref_DeferStatement__new(struct DeferStatement* start, struct DeferStatement* end);

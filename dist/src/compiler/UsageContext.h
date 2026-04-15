@@ -1,23 +1,28 @@
 #ifndef PAVE_USAGE_CONTEXT
 #define PAVE_USAGE_CONTEXT
 
-#include <std/HashMap_str_ref_Type.h>
-#include <std/str.h>
-
-struct Type;
-struct ArenaAllocator;
-
 #include <stdio.h>
 
-#line 35 "src/compiler/Usages.pv"
-struct UsageContext {
-    struct HashMap_str_ref_Type layout;
-    struct HashMap_str_ref_Type signature;
-    struct HashMap_str_ref_Type body;
-    struct HashMap_str_ref_Type cpp_usages;
-};
+struct GenericMap;
+#include <std/HashSet_str.h>
+#include <std/HashMap_str_Type.h>
 
-#line 43 "src/compiler/Usages.pv"
-struct UsageContext UsageContext__new(struct ArenaAllocator* allocator);
+#line 39 "src/compiler/Usages.pv"
+struct UsageContext {
+    struct GenericMap* generic_map;
+    struct HashSet_str primitive_header;
+    struct HashSet_str primitive_code;
+    struct HashMap_str_Type layout;
+    struct HashMap_str_Type signature;
+    struct HashMap_str_Type body;
+    struct HashMap_str_Type cpp_usages;
+};
+struct ArenaAllocator;
+struct GenericMap;
+#include <compiler/UsageContext.h>
+
+
+#line 50 "src/compiler/Usages.pv"
+struct UsageContext UsageContext__new(struct ArenaAllocator* allocator, struct GenericMap* generic_map);
 
 #endif

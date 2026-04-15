@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct String;
-struct IterEnumerate_ref_String;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct String;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_String {
@@ -17,6 +16,11 @@ struct Iter_ref_String {
     struct String* start;
     struct String* end;
 };
+struct String;
+struct Iter_ref_String;
+#include <std/Iter_ref_String.h>
+#include <std/IterEnumerate_ref_String.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_String Iter_ref_String__new(struct String* start, struct String* end);

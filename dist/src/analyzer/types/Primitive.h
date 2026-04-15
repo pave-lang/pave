@@ -1,14 +1,11 @@
 #ifndef PAVE_PRIMITIVE
 #define PAVE_PRIMITIVE
 
+#include <stdbool.h>
+
 #include <std/str.h>
 #include <std/HashMap_str_ref_Trait.h>
 #include <std/Array_ref_Impl.h>
-#include <stdbool.h>
-
-struct Trait;
-struct Impl;
-struct ArenaAllocator;
 
 #line 4 "src/analyzer/types/Primitive.pv"
 struct Primitive {
@@ -16,6 +13,10 @@ struct Primitive {
     struct HashMap_str_ref_Trait traits;
     struct Array_ref_Impl impls;
 };
+struct ArenaAllocator;
+struct Primitive;
+#include <analyzer/types/Primitive.h>
+
 
 #line 11 "src/analyzer/types/Primitive.pv"
 struct Primitive Primitive__new(struct ArenaAllocator* allocator, char const* name);

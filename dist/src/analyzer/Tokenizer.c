@@ -1,16 +1,19 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/str.h>
-#include <analyzer/TokenType.h>
+#include <analyzer/Tokenizer.h>
 #include <std/Array_ptrc_char.h>
-#include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>
+#include <std/ArenaAllocator.h>
 #include <std/Array_Token.h>
 #include <analyzer/Token.h>
+#include <analyzer/TokenType.h>
+
+#include <analyzer/Tokenizer.h>
 
 #include <analyzer/Tokenizer.h>
 

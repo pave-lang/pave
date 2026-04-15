@@ -3,18 +3,18 @@
 
 #include <stdbool.h>
 
-struct HashMapBucket_str_TypedefC;
-struct str;
-struct TypedefC;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_TypedefC;
 
 #line 10 "src/std/HashMap.pv"
 struct HashMapIter_str_TypedefC {
     struct HashMapBucket_str_TypedefC* iter;
     struct HashMapBucket_str_TypedefC* end;
 };
+struct HashMapIter_str_TypedefC;
+
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_TypedefC__next(struct HashMapIter_str_TypedefC* self);

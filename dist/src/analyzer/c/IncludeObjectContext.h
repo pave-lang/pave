@@ -1,10 +1,10 @@
 #ifndef PAVE_INCLUDE_OBJECT_CONTEXT
 #define PAVE_INCLUDE_OBJECT_CONTEXT
 
-struct IncludeContext;
-
 #include <clang-c/Index.h>
 #include <string.h>
+
+struct IncludeContext;
 
 #line 7 "src/analyzer/c/IncludeObjectContext.pv"
 struct IncludeObjectContext {

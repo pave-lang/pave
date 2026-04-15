@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_TOKEN
 #define PAVE_ARRAY_TOKEN
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Token;
-struct Iter_ref_Token;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Token;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_Token {
@@ -18,6 +17,14 @@ struct Array_Token {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_Token;
+struct Token;
+struct Token;
+#include <std/trait_Allocator.h>
+#include <std/Array_Token.h>
+#include <analyzer/Token.h>
+#include <std/Iter_ref_Token.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_Token Array_Token__new(struct trait_Allocator allocator);

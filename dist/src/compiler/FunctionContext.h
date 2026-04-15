@@ -2,18 +2,15 @@
 #define PAVE_FUNCTION_CONTEXT
 
 #include <stdbool.h>
-#include <std/Array_FunctionScope.h>
-#include <compiler/FunctionScope.h>
-#include <compiler/FunctionCoroutine.h>
-
-struct ArenaAllocator;
-struct Function;
-struct str;
-struct Type;
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <fs.h>
+
+struct ArenaAllocator;
+struct Function;
+#include <std/Array_FunctionScope.h>
+#include <compiler/FunctionCoroutine.h>
 
 #line 43 "src/compiler/Generator.pv"
 struct FunctionContext {
@@ -23,6 +20,13 @@ struct FunctionContext {
     struct Array_FunctionScope scopes;
     struct FunctionCoroutine coroutine;
 };
+struct ArenaAllocator;
+struct Function;
+struct FunctionContext;
+struct Type;
+#include <compiler/FunctionContext.h>
+#include <std/str.h>
+
 
 #line 52 "src/compiler/Generator.pv"
 struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, struct Function* func_info, bool use_scopes);

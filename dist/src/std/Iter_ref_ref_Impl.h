@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Impl;
-struct IterEnumerate_ref_ref_Impl;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Impl;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ref_Impl {
@@ -17,6 +16,11 @@ struct Iter_ref_ref_Impl {
     struct Impl** start;
     struct Impl** end;
 };
+struct Impl;
+struct Iter_ref_ref_Impl;
+#include <std/Iter_ref_ref_Impl.h>
+#include <std/IterEnumerate_ref_ref_Impl.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_Impl Iter_ref_ref_Impl__new(struct Impl** start, struct Impl** end);

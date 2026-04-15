@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_usize_TypeUsage_Trait.h>
-#include <stdint.h>
-#include <compiler/TypeUsage_Trait.h>
-#include <analyzer/types/Trait.h>
+#include <std/HashMapIter_usize_TypeUsage_Trait.h>
 #include <tuple_usize_TypeUsage_Trait.h>
+
+#include <std/HashMapIter_usize_TypeUsage_Trait.h>
 
 #include <std/HashMapIter_usize_TypeUsage_Trait.h>
 

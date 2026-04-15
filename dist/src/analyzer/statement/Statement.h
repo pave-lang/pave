@@ -1,10 +1,8 @@
 #ifndef PAVE_STATEMENT
 #define PAVE_STATEMENT
 
-#include <analyzer/statement/StatementData.h>
-
 struct Token;
-struct StatementData;
+#include <analyzer/statement/StatementData.h>
 
 #line 3 "src/analyzer/statement/Statement.pv"
 struct Statement {
@@ -12,6 +10,10 @@ struct Statement {
     struct Token* last_token;
     struct StatementData data;
 };
+struct Token;
+#include <analyzer/statement/StatementData.h>
+#include <analyzer/statement/Statement.h>
+
 
 #line 10 "src/analyzer/statement/Statement.pv"
 struct Statement Statement__new(struct Token* first_token, struct Token* last_token, struct StatementData data);

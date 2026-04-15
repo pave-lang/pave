@@ -1,11 +1,10 @@
 #ifndef PAVE_PARAMETER
 #define PAVE_PARAMETER
 
-#include <analyzer/types/Type.h>
+#include <stdio.h>
 
 struct Token;
-
-#include <stdio.h>
+#include <analyzer/types/Type.h>
 
 #line 6 "src/analyzer/types/Function.pv"
 struct Parameter {

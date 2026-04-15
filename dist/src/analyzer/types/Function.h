@@ -2,22 +2,18 @@
 #define PAVE_FUNCTION
 
 #include <stdint.h>
-#include <analyzer/types/FunctionParent.h>
-#include <analyzer/types/FunctionType.h>
-#include <analyzer/types/Generics.h>
-#include <std/Array_Parameter.h>
-#include <analyzer/types/Parameter.h>
-#include <analyzer/types/Type.h>
-#include <std/trait_Allocator.h>
 #include <stdbool.h>
+
+#include <stdio.h>
 
 struct Token;
 struct Context;
 struct Block;
-struct Function;
-struct Generics;
-
-#include <stdio.h>
+#include <analyzer/types/FunctionParent.h>
+#include <analyzer/types/FunctionType.h>
+#include <analyzer/types/Generics.h>
+#include <std/Array_Parameter.h>
+#include <analyzer/types/Type.h>
 
 #line 27 "src/analyzer/types/Function.pv"
 struct Function {
@@ -34,6 +30,12 @@ struct Function {
     struct Type return_type;
     struct Block* body;
 };
+struct Context;
+struct Function;
+struct Generics;
+#include <analyzer/types/Function.h>
+#include <std/trait_Allocator.h>
+
 
 #line 43 "src/analyzer/types/Function.pv"
 struct Function Function__new(struct Context* context);

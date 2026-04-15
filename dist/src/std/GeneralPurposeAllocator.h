@@ -1,17 +1,16 @@
 #ifndef PAVE_GENERAL_PURPOSE_ALLOCATOR
 #define PAVE_GENERAL_PURPOSE_ALLOCATOR
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
-
-struct GeneralPurposeAllocator;
 
 #include <stdlib.h>
 
 #line 3 "src/std/GeneralPurposeAllocator.pv"
 struct GeneralPurposeAllocator {
 };
+struct GeneralPurposeAllocator;
+
 
 #line 6 "src/std/GeneralPurposeAllocator.pv"
 struct GeneralPurposeAllocator* GeneralPurposeAllocator__default();

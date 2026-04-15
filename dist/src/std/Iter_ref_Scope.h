@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Scope;
-struct IterEnumerate_ref_Scope;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Scope;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_Scope {
@@ -17,6 +16,11 @@ struct Iter_ref_Scope {
     struct Scope* start;
     struct Scope* end;
 };
+struct Scope;
+struct Iter_ref_Scope;
+#include <std/Iter_ref_Scope.h>
+#include <std/IterEnumerate_ref_Scope.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Scope Iter_ref_Scope__new(struct Scope* start, struct Scope* end);

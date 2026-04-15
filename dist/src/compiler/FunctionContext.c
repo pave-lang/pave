@@ -1,27 +1,30 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fs.h>
 
+#include <compiler/FunctionContext.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Function.h>
-#include <stdbool.h>
 #include <std/Array_FunctionScope.h>
-#include <compiler/FunctionScope.h>
 #include <std/trait_Allocator.h>
-#include <std/Array_char.h>
-#include <compiler/FunctionCoroutine.h>
-#include <analyzer/types/Parameter.h>
-#include <std/Iter_ref_Parameter.h>
-#include <std/Array_Parameter.h>
-#include <std/str.h>
-#include <analyzer/types/Type.h>
-#include <analyzer/Token.h>
 #include <analyzer/types/FunctionType.h>
-#include <stdint.h>
+#include <compiler/FunctionCoroutine.h>
+#include <std/Array_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
+#include <analyzer/types/Parameter.h>
+#include <std/str.h>
+#include <analyzer/Token.h>
+#include <analyzer/types/Type.h>
+#include <compiler/FunctionScope.h>
 #include <std/Iter_ref_FunctionScope.h>
 #include <std/HashMap_str_str.h>
 #include <std/String.h>
 #include <std/HashMap_str_ref_Type.h>
+#include <std/Array_char.h>
+
+#include <compiler/FunctionContext.h>
 
 #include <compiler/FunctionContext.h>
 

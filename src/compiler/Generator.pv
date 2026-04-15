@@ -2249,7 +2249,7 @@ impl Generator {
             if deref { resolved = resolved.deref_all(); }
 
             match resolved {
-                Type::Indirect(indirect) => {
+                Type::Indirect(_) => {
                     let type_deref = resolved.deref_all();
 
                     match type_deref {
@@ -4101,6 +4101,18 @@ impl Generator {
         return true;
     }
 
+    fn generate_sequence(&self, usage: &TypeUsage<Sequence>) -> bool {
+        let sequence_info = usage.type;
+        let element = sequence_info.element;
+
+        match sequence_info.type {
+            SequenceType::Slice => { self.generate_slice(&element); },
+            SequenceType::FixedArray(_) => { return true; },
+        }
+
+        return true;
+    }
+
     fn generate_slice(&self, element_type: &Type) -> bool {
         let generics = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
         generics.insert("T", *element_type);
@@ -4180,7 +4192,8 @@ impl Generator {
         return true;
     }
 
-    fn generate_tuple(&self, tuple: &Tuple) -> bool {
+    fn generate_tuple(&self, usage: &TypeUsage<Tuple>) -> bool {
+        let tuple = usage.type;
         let element_types = &tuple.elements;
         let generics = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
         let tuple_type = Type::Tuple(tuple);
@@ -4366,8 +4379,8 @@ impl Generator {
         for (_, &usage) in usages.enums { self.generate_enum_loop(usage); }
         for (_, &usage) in usages.traits { self.generate_trait_loop(usage); }
         for (_, &usage) in usages.functions { self.generate_function_loop(usage); }
-        for element in usages.sequences { self.generate_slice(element); }
-        for *tuple in usages.tuples { self.generate_tuple(tuple); }
+        for (_, &usage) in usages.sequences { self.generate_sequence(usage); }
+        for (_, &usage) in usages.tuples { self.generate_tuple(usage); }
 
         if self.code_files.length > 0 {
             let command = String::new(self.allocator);

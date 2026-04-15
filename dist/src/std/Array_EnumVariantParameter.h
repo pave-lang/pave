@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_ENUM_VARIANT_PARAMETER
 #define PAVE_ARRAY_ENUM_VARIANT_PARAMETER
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct EnumVariantParameter;
-struct Iter_ref_EnumVariantParameter;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct EnumVariantParameter;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_EnumVariantParameter {
@@ -18,6 +17,14 @@ struct Array_EnumVariantParameter {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_EnumVariantParameter;
+struct EnumVariantParameter;
+struct EnumVariantParameter;
+#include <std/trait_Allocator.h>
+#include <std/Array_EnumVariantParameter.h>
+#include <analyzer/types/EnumVariantParameter.h>
+#include <std/Iter_ref_EnumVariantParameter.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_EnumVariantParameter Array_EnumVariantParameter__new(struct trait_Allocator allocator);

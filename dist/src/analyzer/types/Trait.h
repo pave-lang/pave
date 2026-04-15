@@ -2,16 +2,13 @@
 #define PAVE_TRAIT
 
 #include <stdint.h>
-#include <analyzer/types/Generics.h>
-#include <std/HashMap_str_Function.h>
-#include <std/str.h>
-#include <analyzer/types/Function.h>
-#include <analyzer/types/Type.h>
 #include <stdbool.h>
 
 struct Token;
 struct Module;
-struct FunctionParent;
+#include <analyzer/types/Generics.h>
+#include <std/HashMap_str_Function.h>
+#include <analyzer/types/Type.h>
 
 #line 4 "src/analyzer/types/Trait.pv"
 struct Trait {
@@ -23,6 +20,11 @@ struct Trait {
     struct HashMap_str_Function functions;
     struct Type type_self;
 };
+struct Module;
+struct Trait;
+#include <analyzer/types/Trait.h>
+#include <analyzer/types/FunctionParent.h>
+
 
 #line 15 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);

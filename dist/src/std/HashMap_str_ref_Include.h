@@ -1,17 +1,15 @@
 #ifndef PAVE_HASH_MAP_STR_REF_INCLUDE
 #define PAVE_HASH_MAP_STR_REF_INCLUDE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_ref_Include;
-struct str;
-struct Include;
-struct HashMapIter_str_ref_Include;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_ref_Include;
+struct HashMapBucket_str_ref_Include;
+#include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_ref_Include {
@@ -21,6 +19,16 @@ struct HashMap_str_ref_Include {
     uintptr_t capacity;
     uintptr_t length;
 };
+struct HashMap_str_ref_Include;
+struct str;
+struct Include;
+struct Include;
+struct Include;
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_ref_Include.h>
+#include <std/str.h>
+#include <std/HashMapIter_str_ref_Include.h>
+
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Include HashMap_str_ref_Include__new(struct trait_Allocator allocator);

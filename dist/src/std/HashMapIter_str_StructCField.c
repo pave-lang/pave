@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_StructCField.h>
-#include <std/str.h>
-#include <analyzer/c/StructCField.h>
+#include <std/HashMapIter_str_StructCField.h>
 #include <tuple_str_StructCField.h>
+
+#include <std/HashMapIter_str_StructCField.h>
 
 #include <std/HashMapIter_str_StructCField.h>
 

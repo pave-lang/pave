@@ -1,17 +1,17 @@
+#include <stdint.h>
+
 #include <clang-c/Index.h>
 #include <string.h>
 
+#include <analyzer/c/Include.h>
+#include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <std/str.h>
-#include <stdbool.h>
-#include <analyzer/c/EnumC.h>
-#include <std/ArenaAllocator.h>
 #include <std/HashMap_u32_Type.h>
-#include <stdint.h>
-#include <analyzer/types/Type.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_Type.h>
 #include <std/HashMap_str_Primitive.h>
+#include <analyzer/types/Type.h>
 #include <analyzer/types/Primitive.h>
 #include <std/Array_ptrc_char.h>
 #include <std/String.h>
@@ -21,6 +21,9 @@
 #include <std/Array_CXCursor.h>
 #include <analyzer/c/NamespaceCpp.h>
 #include <analyzer/c/ClassCpp.h>
+#include <analyzer/c/EnumC.h>
+
+#include <analyzer/c/Include.h>
 
 #include <analyzer/c/Include.h>
 

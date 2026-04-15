@@ -1,23 +1,26 @@
+#include <stdint.h>
+
+#include <analyzer/types/Enum.h>
 #include <analyzer/Context.h>
 #include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_EnumVariant.h>
-#include <std/str.h>
-#include <analyzer/types/EnumVariant.h>
 #include <std/HashMap_str_ref_Trait.h>
-#include <analyzer/types/Trait.h>
 #include <std/Array_ref_Impl.h>
-#include <analyzer/Impl.h>
-#include <analyzer/types/EnumType.h>
-#include <stdbool.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
-#include <stdint.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/types/EnumType.h>
+#include <analyzer/types/EnumVariant.h>
+#include <std/str.h>
+#include <std/HashMapIter_str_EnumVariant.h>
+#include <tuple_str_EnumVariant.h>
+
+#include <analyzer/types/Enum.h>
 
 #include <analyzer/types/Enum.h>
 
@@ -212,4 +215,24 @@ bool Enum__parse_variant(struct Enum* self) {
 
     #line 134 "src/analyzer/types/Enum.pv"
     return true;
+}
+
+#line 137 "src/analyzer/types/Enum.pv"
+bool Enum__is_discriminated_union(struct Enum* self) {
+    #line 138 "src/analyzer/types/Enum.pv"
+    { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&self->variants);
+    #line 138 "src/analyzer/types/Enum.pv"
+    while (HashMapIter_str_EnumVariant__next(&__iter)) {
+        #line 138 "src/analyzer/types/Enum.pv"
+        struct EnumVariant* variant_info = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
+
+        #line 139 "src/analyzer/types/Enum.pv"
+        if (variant_info->types.length > 0) {
+            #line 140 "src/analyzer/types/Enum.pv"
+            return true;
+        }
+    } }
+
+    #line 144 "src/analyzer/types/Enum.pv"
+    return false;
 }

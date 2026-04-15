@@ -1,12 +1,15 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Array_ref_Trait.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <slice_ref_Trait.h>
 #include <analyzer/types/Trait.h>
-#include <stdbool.h>
 #include <std/Iter_ref_ref_Trait.h>
+#include <slice_ref_Trait.h>
+
+#include <std/Array_ref_Trait.h>
 
 #include <std/Array_ref_Trait.h>
 

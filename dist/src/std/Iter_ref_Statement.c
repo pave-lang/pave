@@ -1,10 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_Statement.h>
 #include <analyzer/statement/Statement.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_Statement.h>
+
+#include <std/Iter_ref_Statement.h>
 
 #include <std/Iter_ref_Statement.h>
 

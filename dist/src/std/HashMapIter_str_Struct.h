@@ -3,18 +3,18 @@
 
 #include <stdbool.h>
 
-struct HashMapBucket_str_Struct;
-struct str;
-struct Struct;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_Struct;
 
 #line 10 "src/std/HashMap.pv"
 struct HashMapIter_str_Struct {
     struct HashMapBucket_str_Struct* iter;
     struct HashMapBucket_str_Struct* end;
 };
+struct HashMapIter_str_Struct;
+
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_Struct__next(struct HashMapIter_str_Struct* self);

@@ -1,9 +1,12 @@
+#include <stdint.h>
+
 #include <stdio.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <compiler/FileWriter.h>
 #include <std/str.h>
 #include <analyzer/Token.h>
+
+#include <compiler/FileWriter.h>
 
 #include <compiler/FileWriter.h>
 

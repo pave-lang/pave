@@ -1,11 +1,14 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <std/trait_Allocator.h>
-#include <stdint.h>
+#include <std/ArenaBlock.h>
 #include <std/ArenaAllocation.h>
-#include <stdbool.h>
+
+#include <std/ArenaBlock.h>
 
 #include <std/ArenaBlock.h>
 

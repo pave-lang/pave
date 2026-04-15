@@ -1,18 +1,15 @@
 #ifndef PAVE_HASH_MAP_STR_ARRAY_DIAGNOSTIC
 #define PAVE_HASH_MAP_STR_ARRAY_DIAGNOSTIC
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_Array_Diagnostic;
-struct str;
-struct Array_Diagnostic;
-struct Diagnostic;
-struct HashMapIter_str_Array_Diagnostic;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_Array_Diagnostic;
+struct HashMapBucket_str_Array_Diagnostic;
+#include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_Array_Diagnostic {
@@ -22,6 +19,16 @@ struct HashMap_str_Array_Diagnostic {
     uintptr_t capacity;
     uintptr_t length;
 };
+struct HashMap_str_Array_Diagnostic;
+struct str;
+struct Array_Diagnostic;
+struct Array_Diagnostic;
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_Array_Diagnostic.h>
+#include <std/str.h>
+#include <std/Array_Diagnostic.h>
+#include <std/HashMapIter_str_Array_Diagnostic.h>
+
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Array_Diagnostic HashMap_str_Array_Diagnostic__new(struct trait_Allocator allocator);

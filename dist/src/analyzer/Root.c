@@ -1,26 +1,23 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <analyzer/Root.h>
 #include <std/ArenaAllocator.h>
-#include <std/Array_ptrc_char.h>
-#include <analyzer/Analysis.h>
-#include <stdint.h>
-#include <analyzer/types/Struct.h>
 #include <std/HashMap_str_ref_Namespace.h>
-#include <std/str.h>
-#include <analyzer/Namespace.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
 #include <std/HashMap_str_Primitive.h>
-#include <analyzer/types/Primitive.h>
 #include <std/HashMap_str_TypedefC.h>
-#include <analyzer/c/TypedefC.h>
 #include <std/HashMap_str_ref_Trait.h>
-#include <analyzer/types/Trait.h>
+#include <std/Array_ptrc_char.h>
+#include <analyzer/Analysis.h>
 #include <analyzer/Naming.h>
 #include <std/HashMap_str_ref_Include.h>
-#include <analyzer/c/Include.h>
+#include <analyzer/types/Primitive.h>
+#include <analyzer/types/Type.h>
+#include <std/str.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/Function.h>
@@ -29,21 +26,22 @@
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <analyzer/types/Generic.h>
-#include <tuple_str_Primitive.h>
 #include <std/HashMapIter_str_Primitive.h>
+#include <tuple_str_Primitive.h>
 #include <std/Iter_ref_ptrc_char.h>
-#include <stdbool.h>
-#include <tuple_str_ref_Namespace.h>
 #include <std/HashMapIter_str_ref_Namespace.h>
-#include <analyzer/Impl.h>
-#include <tuple_usize_ref_ref_Impl.h>
+#include <tuple_str_ref_Namespace.h>
+#include <analyzer/Namespace.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>
 #include <std/Iter_ref_ref_Impl.h>
 #include <std/Array_ref_Impl.h>
+#include <tuple_usize_ref_ref_Impl.h>
 #include <analyzer/types/FunctionParent.h>
-#include <tuple_str_Function.h>
-#include <std/HashMapIter_str_Function.h>
+#include <analyzer/types/Trait.h>
+#include <analyzer/Impl.h>
 #include <std/HashMap_str_Function.h>
+#include <std/HashMapIter_str_Function.h>
+#include <tuple_str_Function.h>
 #include <analyzer/types/Generics.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <std/Array_Diagnostic.h>
@@ -52,6 +50,9 @@
 #include <analyzer/Position.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/types/Enum.h>
+#include <analyzer/types/Struct.h>
+
+#include <analyzer/Root.h>
 
 #include <analyzer/Root.h>
 

@@ -1,21 +1,22 @@
+#include <stdbool.h>
+#include <stdint.h>
+
 #include <stdio.h>
 
+#include <analyzer/Naming.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/NamingType.h>
 #include <std/str.h>
-#include <std/IterEnumerate_ref_Parameter.h>
 #include <std/HashMap_str_str.h>
 #include <std/trait_Allocator.h>
 #include <std/String.h>
-#include <analyzer/types/Type.h>
-#include <analyzer/types/GenericMap.h>
 #include <std/Array_Type.h>
+#include <analyzer/types/Type.h>
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/Indirect.h>
-#include <stdbool.h>
+#include <analyzer/types/GenericMap.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/SequenceType.h>
-#include <stdint.h>
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/types/EnumType.h>
@@ -23,9 +24,9 @@
 #include <analyzer/Token.h>
 #include <analyzer/types/Struct.h>
 #include <std/Array_Generic.h>
-#include <analyzer/types/Generic.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/types/Trait.h>
+#include <analyzer/types/Generic.h>
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/Function.h>
 #include <std/HashMap_str_usize.h>
@@ -37,10 +38,13 @@
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/NamespaceCpp.h>
 #include <std/Iter_ref_Type.h>
-#include <analyzer/types/Parameter.h>
-#include <std/Iter_ref_Parameter.h>
 #include <std/Array_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
+#include <analyzer/types/Parameter.h>
+#include <std/IterEnumerate_ref_Parameter.h>
 #include <tuple_usize_ref_Parameter.h>
+
+#include <analyzer/Naming.h>
 
 #include <analyzer/Naming.h>
 

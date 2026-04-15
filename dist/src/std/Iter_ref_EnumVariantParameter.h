@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct EnumVariantParameter;
-struct IterEnumerate_ref_EnumVariantParameter;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct EnumVariantParameter;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_EnumVariantParameter {
@@ -17,6 +16,11 @@ struct Iter_ref_EnumVariantParameter {
     struct EnumVariantParameter* start;
     struct EnumVariantParameter* end;
 };
+struct EnumVariantParameter;
+struct Iter_ref_EnumVariantParameter;
+#include <std/Iter_ref_EnumVariantParameter.h>
+#include <std/IterEnumerate_ref_EnumVariantParameter.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_EnumVariantParameter Iter_ref_EnumVariantParameter__new(struct EnumVariantParameter* start, struct EnumVariantParameter* end);

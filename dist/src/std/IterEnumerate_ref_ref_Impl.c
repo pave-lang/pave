@@ -1,11 +1,14 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/Iter_ref_ref_Impl.h>
-#include <analyzer/Impl.h>
-#include <stdint.h>
+#include <std/IterEnumerate_ref_ref_Impl.h>
 #include <tuple_usize_ref_ref_Impl.h>
+#include <analyzer/Impl.h>
+
+#include <std/IterEnumerate_ref_ref_Impl.h>
 
 #include <std/IterEnumerate_ref_ref_Impl.h>
 

@@ -1,17 +1,15 @@
 #ifndef PAVE_HASH_MAP_STR_ENUM_CVALUE
 #define PAVE_HASH_MAP_STR_ENUM_CVALUE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_EnumCValue;
-struct str;
-struct EnumCValue;
-struct HashMapIter_str_EnumCValue;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_EnumCValue;
+struct HashMapBucket_str_EnumCValue;
+#include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_EnumCValue {
@@ -21,6 +19,16 @@ struct HashMap_str_EnumCValue {
     uintptr_t capacity;
     uintptr_t length;
 };
+struct HashMap_str_EnumCValue;
+struct str;
+struct EnumCValue;
+struct EnumCValue;
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_EnumCValue.h>
+#include <std/str.h>
+#include <analyzer/c/EnumCValue.h>
+#include <std/HashMapIter_str_EnumCValue.h>
+
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_EnumCValue HashMap_str_EnumCValue__new(struct trait_Allocator allocator);

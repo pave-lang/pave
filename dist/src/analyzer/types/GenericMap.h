@@ -1,19 +1,11 @@
 #ifndef PAVE_GENERIC_MAP
 #define PAVE_GENERIC_MAP
 
-#include <std/Array_Type.h>
-#include <analyzer/types/Type.h>
-#include <std/HashMap_str_usize.h>
-#include <std/str.h>
-#include <stdint.h>
 #include <stdbool.h>
 
 struct Type;
-struct ArenaAllocator;
-struct Generics;
-struct Array_Type;
-struct str;
-struct GenericMap;
+#include <std/Array_Type.h>
+#include <std/HashMap_str_usize.h>
 
 #line 4 "src/analyzer/types/GenericMap.pv"
 struct GenericMap {
@@ -21,6 +13,15 @@ struct GenericMap {
     struct Array_Type array;
     struct HashMap_str_usize map;
 };
+struct ArenaAllocator;
+struct Generics;
+struct Array_Type;
+struct GenericMap;
+struct Type;
+#include <analyzer/types/GenericMap.h>
+#include <std/str.h>
+#include <analyzer/types/Type.h>
+
 
 #line 11 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Generics* generics, struct Array_Type* usage_types);

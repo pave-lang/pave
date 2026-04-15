@@ -1,14 +1,12 @@
 #ifndef PAVE_CONTEXT
 #define PAVE_CONTEXT
 
-#include <std/str.h>
 #include <stdint.h>
-#include <analyzer/types/Indirect.h>
-#include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
-#include <std/Array_Scope.h>
-#include <analyzer/Scope.h>
 #include <stdbool.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct ArenaAllocator;
 struct Token;
@@ -17,27 +15,10 @@ struct Type;
 struct Module;
 struct Root;
 struct Function;
-struct Context;
-struct str;
-struct Array_Token;
-struct Array_Generic;
-struct Generic;
-struct Array_Parameter;
-struct Parameter;
-#include <analyzer/TokenType.h>
-#include <analyzer/InlayHintKind.h>
-struct Block;
-struct Generics;
-struct NamespaceCpp;
-struct ClassCpp;
-struct GenericMap;
-struct Array_DeferStatement;
-struct DeferStatement;
-struct Array_Type;
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <std/str.h>
+#include <analyzer/types/Indirect.h>
+#include <std/HashMap_str_Type.h>
+#include <std/Array_Scope.h>
 
 #line 10 "src/analyzer/Context.pv"
 struct Context {
@@ -57,6 +38,30 @@ struct Context {
     struct Root* root;
     struct Function* function;
 };
+struct ArenaAllocator;
+struct Array_Token;
+struct Analysis;
+struct Module;
+struct Context;
+struct Array_Generic;
+struct Array_Parameter;
+struct Token;
+struct Token;
+struct Block;
+struct Type;
+struct Generics;
+struct NamespaceCpp;
+struct ClassCpp;
+struct GenericMap;
+struct Array_Type;
+#include <std/str.h>
+#include <analyzer/Context.h>
+#include <analyzer/types/Type.h>
+#include <analyzer/TokenType.h>
+#include <analyzer/InlayHintKind.h>
+#include <std/Array_DeferStatement.h>
+#include <std/Array_Type.h>
+
 
 #line 29 "src/analyzer/Context.pv"
 struct Context Context__new(struct ArenaAllocator* allocator, struct str base_path, struct str path, struct Array_Token* tokens, struct Analysis* analysis, struct Module* module);

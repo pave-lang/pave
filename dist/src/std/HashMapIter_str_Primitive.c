@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_Primitive.h>
-#include <std/str.h>
-#include <analyzer/types/Primitive.h>
+#include <std/HashMapIter_str_Primitive.h>
 #include <tuple_str_Primitive.h>
+
+#include <std/HashMapIter_str_Primitive.h>
 
 #include <std/HashMapIter_str_Primitive.h>
 

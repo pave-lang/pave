@@ -1,10 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_Generic.h>
 #include <analyzer/types/Generic.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_Generic.h>
+
+#include <std/Iter_ref_Generic.h>
 
 #include <std/Iter_ref_Generic.h>
 

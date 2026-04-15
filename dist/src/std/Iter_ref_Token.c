@@ -1,10 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_Token.h>
 #include <analyzer/Token.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_Token.h>
+
+#include <std/Iter_ref_Token.h>
 
 #include <std/Iter_ref_Token.h>
 

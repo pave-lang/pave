@@ -2,14 +2,13 @@
 #define PAVE_ARRAY_CXCURSOR
 
 #include "clang-c/Index.h"
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Iter_ref_CXCursor;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_CXCursor {
@@ -18,6 +17,11 @@ struct Array_CXCursor {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_CXCursor;
+#include <std/trait_Allocator.h>
+#include <std/Array_CXCursor.h>
+#include <std/Iter_ref_CXCursor.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_CXCursor Array_CXCursor__new(struct trait_Allocator allocator);

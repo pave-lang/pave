@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_Array_InlayHint.h>
-#include <std/str.h>
-#include <std/Array_InlayHint.h>
-#include <analyzer/InlayHint.h>
+#include <std/HashMapIter_str_Array_InlayHint.h>
 #include <tuple_str_Array_InlayHint.h>
+
+#include <std/HashMapIter_str_Array_InlayHint.h>
 
 #include <std/HashMapIter_str_Array_InlayHint.h>
 

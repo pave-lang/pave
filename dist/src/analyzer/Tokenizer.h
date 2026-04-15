@@ -1,20 +1,15 @@
 #ifndef PAVE_TOKENIZER
 #define PAVE_TOKENIZER
 
-#include <std/str.h>
 #include <stdint.h>
-#include <std/Array_ptrc_char.h>
 #include <stdbool.h>
-
-struct Array_ptrc_char;
-struct ArenaAllocator;
-struct str;
-struct Array_Token;
-struct Token;
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/str.h>
+#include <std/Array_ptrc_char.h>
 
 #line 7 "src/analyzer/Tokenizer.pv"
 struct Tokenizer {
@@ -25,6 +20,13 @@ struct Tokenizer {
     struct Array_ptrc_char keywords;
     struct Array_ptrc_char symbols;
 };
+struct Tokenizer;
+struct Array_ptrc_char;
+struct ArenaAllocator;
+#include <std/Array_ptrc_char.h>
+#include <std/str.h>
+#include <std/Array_Token.h>
+
 
 #line 17 "src/analyzer/Tokenizer.pv"
 void Tokenizer__increase_pos(struct Tokenizer* self);

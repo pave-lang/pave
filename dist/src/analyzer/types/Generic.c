@@ -1,13 +1,16 @@
-#include <std/trait_Allocator.h>
+#include <stdint.h>
+
+#include <analyzer/types/Generic.h>
 #include <std/Array_ref_Trait.h>
-#include <analyzer/types/Trait.h>
-#include <stdbool.h>
-#include <analyzer/Context.h>
+#include <std/trait_Allocator.h>
 #include <analyzer/Module.h>
+#include <analyzer/Context.h>
 #include <analyzer/Token.h>
 #include <analyzer/TokenType.h>
-#include <stdint.h>
+#include <analyzer/types/Trait.h>
 #include <std/str.h>
+
+#include <analyzer/types/Generic.h>
 
 #include <analyzer/types/Generic.h>
 

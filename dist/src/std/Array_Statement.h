@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_STATEMENT
 #define PAVE_ARRAY_STATEMENT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Statement;
-struct Iter_ref_Statement;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Statement;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_Statement {
@@ -18,6 +17,14 @@ struct Array_Statement {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_Statement;
+struct Statement;
+struct Statement;
+#include <std/trait_Allocator.h>
+#include <std/Array_Statement.h>
+#include <analyzer/statement/Statement.h>
+#include <std/Iter_ref_Statement.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_Statement Array_Statement__new(struct trait_Allocator allocator);

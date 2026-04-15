@@ -2,19 +2,21 @@
 #define PAVE_ITER_ENUMERATE_REF_FUNCTION_SCOPE
 
 #include <stdint.h>
-#include <std/Iter_ref_FunctionScope.h>
 #include <stdbool.h>
-
-struct FunctionScope;
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/Iter_ref_FunctionScope.h>
 
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_FunctionScope {
     uintptr_t index;
     struct Iter_ref_FunctionScope iter;
 };
+struct IterEnumerate_ref_FunctionScope;
+#include <tuple_usize_ref_FunctionScope.h>
+
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_FunctionScope__next(struct IterEnumerate_ref_FunctionScope* self);

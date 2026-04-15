@@ -2,12 +2,13 @@
 #define PAVE_TYPE_ID
 
 #include <stdint.h>
-#include <std/trait_Hash.h>
-
-typedef uint64_t Hashed;
 
 #line 1 "src/std/TypeId.pv"
 typedef uint64_t TypeId;
+typedef uint64_t TypeId;
+#include <std/trait_Hash.h>
+#include <std/Hashed.h>
+
 
 #line 3 "src/std/TypeId.pv"
 Hashed TypeId__Hash__hash(void* __self);

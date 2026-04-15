@@ -1,12 +1,15 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Array_Generic.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <slice_Generic.h>
 #include <analyzer/types/Generic.h>
-#include <stdbool.h>
 #include <std/Iter_ref_Generic.h>
+#include <slice_Generic.h>
+
+#include <std/Array_Generic.h>
 
 #include <std/Array_Generic.h>
 

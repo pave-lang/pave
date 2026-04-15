@@ -1,11 +1,13 @@
-#include <analyzer/c/Include.h>
-#include <analyzer/types/Type.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/trait_Allocator.h>
+#include <analyzer/c/Include.h>
+#include <analyzer/c/FunctionC.h>
 #include <std/str.h>
+#include <analyzer/types/Type.h>
 #include <std/Array_ref_Expression.h>
-#include <analyzer/expression/Expression.h>
+#include <std/trait_Allocator.h>
+
+#include <analyzer/c/FunctionC.h>
 
 #include <analyzer/c/FunctionC.h>
 

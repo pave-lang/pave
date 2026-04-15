@@ -1,11 +1,14 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/Iter_ref_ForVariable.h>
-#include <analyzer/statement/ForVariable.h>
-#include <stdint.h>
+#include <std/IterEnumerate_ref_ForVariable.h>
 #include <tuple_usize_ref_ForVariable.h>
+#include <analyzer/statement/ForVariable.h>
+
+#include <std/IterEnumerate_ref_ForVariable.h>
 
 #include <std/IterEnumerate_ref_ForVariable.h>
 

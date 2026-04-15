@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_PARAMETER
 #define PAVE_ARRAY_PARAMETER
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Parameter;
-struct Iter_ref_Parameter;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Parameter;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_Parameter {
@@ -18,6 +17,14 @@ struct Array_Parameter {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_Parameter;
+struct Parameter;
+struct Parameter;
+#include <std/trait_Allocator.h>
+#include <std/Array_Parameter.h>
+#include <analyzer/types/Parameter.h>
+#include <std/Iter_ref_Parameter.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_Parameter Array_Parameter__new(struct trait_Allocator allocator);

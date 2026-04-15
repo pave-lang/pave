@@ -1,19 +1,21 @@
 #ifndef PAVE_GENERIC
 #define PAVE_GENERIC
 
-#include <std/Array_ref_Trait.h>
-#include <std/trait_Allocator.h>
 #include <stdbool.h>
 
 struct Token;
-struct Trait;
-struct Context;
+#include <std/Array_ref_Trait.h>
 
 #line 4 "src/analyzer/types/Generics.pv"
 struct Generic {
     struct Token* name;
     struct Array_ref_Trait traits;
 };
+struct Generic;
+struct Context;
+#include <std/trait_Allocator.h>
+#include <analyzer/types/Generic.h>
+
 
 #line 10 "src/analyzer/types/Generics.pv"
 struct Generic Generic__new(struct trait_Allocator allocator);

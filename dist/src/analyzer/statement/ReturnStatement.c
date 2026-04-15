@@ -1,15 +1,18 @@
-#include <stdint.h>
-#include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
-#include <std/Array_DeferStatement.h>
-#include <analyzer/statement/DeferStatement.h>
-#include <analyzer/Token.h>
 #include <stdbool.h>
+#include <stdint.h>
+
+#include <std/Array_DeferStatement.h>
+#include <analyzer/Context.h>
+#include <analyzer/Token.h>
 #include <analyzer/TokenType.h>
+#include <analyzer/statement/ReturnStatement.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Function.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/types/Generics.h>
+
+#include <analyzer/statement/ReturnStatement.h>
 
 #include <analyzer/statement/ReturnStatement.h>
 

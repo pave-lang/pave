@@ -1,17 +1,15 @@
 #ifndef PAVE_HASH_MAP_STR_GENERATOR_INCLUDE
 #define PAVE_HASH_MAP_STR_GENERATOR_INCLUDE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_GeneratorInclude;
-struct str;
-struct GeneratorInclude;
-struct HashMapIter_str_GeneratorInclude;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_GeneratorInclude;
+struct HashMapBucket_str_GeneratorInclude;
+#include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_GeneratorInclude {
@@ -21,6 +19,16 @@ struct HashMap_str_GeneratorInclude {
     uintptr_t capacity;
     uintptr_t length;
 };
+struct HashMap_str_GeneratorInclude;
+struct str;
+struct GeneratorInclude;
+struct GeneratorInclude;
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_GeneratorInclude.h>
+#include <std/str.h>
+#include <compiler/GeneratorInclude.h>
+#include <std/HashMapIter_str_GeneratorInclude.h>
+
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_GeneratorInclude HashMap_str_GeneratorInclude__new(struct trait_Allocator allocator);

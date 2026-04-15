@@ -1,20 +1,26 @@
 #include <stdio.h>
 
+#include <compiler/UsageContext.h>
+#include <analyzer/types/GenericMap.h>
+#include <std/HashSet_str.h>
 #include <std/ArenaAllocator.h>
-#include <std/HashMap_str_ref_Type.h>
-#include <std/str.h>
-#include <analyzer/types/Type.h>
+#include <std/HashMap_str_Type.h>
 #include <std/trait_Allocator.h>
 
 #include <compiler/UsageContext.h>
 
-#line 43 "src/compiler/Usages.pv"
-struct UsageContext UsageContext__new(struct ArenaAllocator* allocator) {
-    #line 44 "src/compiler/Usages.pv"
+#include <compiler/UsageContext.h>
+
+#line 50 "src/compiler/Usages.pv"
+struct UsageContext UsageContext__new(struct ArenaAllocator* allocator, struct GenericMap* generic_map) {
+    #line 51 "src/compiler/Usages.pv"
     return (struct UsageContext) {
-        .layout = HashMap_str_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .signature = HashMap_str_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .body = HashMap_str_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .cpp_usages = HashMap_str_ref_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .generic_map = generic_map,
+        .primitive_header = HashSet_str__new(allocator),
+        .primitive_code = HashSet_str__new(allocator),
+        .layout = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .signature = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .body = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .cpp_usages = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
     };
 }

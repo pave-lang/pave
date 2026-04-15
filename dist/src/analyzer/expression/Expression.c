@@ -1,22 +1,22 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 
-#include <analyzer/Naming.h>
+#include <analyzer/expression/Expression.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Token.h>
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/Context.h>
-#include <stdbool.h>
 #include <analyzer/expression/EnumVariantResult.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/EnumVariant.h>
-#include <std/str.h>
 #include <std/HashMap_str_EnumVariant.h>
 #include <analyzer/types/Enum.h>
-#include <stdint.h>
-#include <analyzer/Impl.h>
-#include <std/Iter_ref_ref_Impl.h>
+#include <std/str.h>
 #include <std/Array_ref_Impl.h>
+#include <std/Iter_ref_ref_Impl.h>
+#include <analyzer/Impl.h>
 #include <analyzer/types/Function.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/c/EnumCValue.h>
@@ -37,23 +37,23 @@
 #include <analyzer/c/StructC.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/c/ClassCpp.h>
-#include <std/Iter_ref_Type.h>
 #include <std/Array_Type.h>
-#include <std/Iter_ref_ref_Trait.h>
+#include <std/Iter_ref_Type.h>
 #include <std/Array_ref_Trait.h>
 #include <analyzer/types/Generic.h>
+#include <std/Iter_ref_ref_Trait.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/TypeImpl.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/types/Tuple.h>
 #include <analyzer/c/NamespaceCpp.h>
-#include <std/Array_InvokeArgument.h>
-#include <analyzer/expression/InvokeArgument.h>
 #include <std/Iter_ref_Parameter.h>
-#include <analyzer/types/Parameter.h>
 #include <std/Array_Parameter.h>
 #include <std/Iter_ref_InvokeArgument.h>
+#include <std/Array_InvokeArgument.h>
+#include <analyzer/types/Parameter.h>
+#include <analyzer/expression/InvokeArgument.h>
 #include <std/HashMap_str_usize.h>
 #include <analyzer/types/FunctionType.h>
 #include <std/String.h>
@@ -62,8 +62,11 @@
 #include <std/Array_Generic.h>
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/Module.h>
-#include <tuple_usize_ref_InvokeArgument.h>
 #include <std/IterEnumerate_ref_InvokeArgument.h>
+#include <tuple_usize_ref_InvokeArgument.h>
+#include <analyzer/Naming.h>
+
+#include <analyzer/expression/Expression.h>
 
 #include <analyzer/expression/Expression.h>
 

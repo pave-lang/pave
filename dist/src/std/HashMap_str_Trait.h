@@ -1,17 +1,15 @@
 #ifndef PAVE_HASH_MAP_STR_TRAIT
 #define PAVE_HASH_MAP_STR_TRAIT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_Trait;
-struct str;
-struct Trait;
-struct HashMapIter_str_Trait;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_Trait;
+struct HashMapBucket_str_Trait;
+#include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_Trait {
@@ -21,6 +19,16 @@ struct HashMap_str_Trait {
     uintptr_t capacity;
     uintptr_t length;
 };
+struct HashMap_str_Trait;
+struct str;
+struct Trait;
+struct Trait;
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_Trait.h>
+#include <std/str.h>
+#include <analyzer/types/Trait.h>
+#include <std/HashMapIter_str_Trait.h>
+
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Trait HashMap_str_Trait__new(struct trait_Allocator allocator);

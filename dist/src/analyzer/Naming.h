@@ -1,19 +1,13 @@
 #ifndef PAVE_NAMING
 #define PAVE_NAMING
 
-#include <analyzer/NamingType.h>
-#include <std/str.h>
-#include <std/HashMap_str_str.h>
+#include <stdio.h>
 
 struct ArenaAllocator;
 struct Naming;
-struct String;
-struct Type;
-struct GenericMap;
-struct str;
-struct ParentCpp;
-
-#include <stdio.h>
+#include <analyzer/NamingType.h>
+#include <std/str.h>
+#include <std/HashMap_str_str.h>
 
 #line 13 "src/analyzer/Naming.pv"
 struct Naming {
@@ -44,6 +38,17 @@ struct Naming {
     struct HashMap_str_str primitives;
     struct Naming* naming_ident;
 };
+struct ArenaAllocator;
+struct Naming;
+struct Type;
+struct GenericMap;
+struct GenericMap;
+struct String;
+#include <analyzer/Naming.h>
+#include <std/String.h>
+#include <std/str.h>
+#include <analyzer/c/ParentCpp.h>
+
 
 #line 43 "src/analyzer/Naming.pv"
 struct Naming Naming__new_decl(struct ArenaAllocator* allocator);

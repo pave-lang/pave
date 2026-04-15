@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_ELSE_STATEMENT
 #define PAVE_ARRAY_ELSE_STATEMENT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct ElseStatement;
-struct Iter_ref_ElseStatement;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct ElseStatement;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_ElseStatement {
@@ -18,6 +17,14 @@ struct Array_ElseStatement {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_ElseStatement;
+struct ElseStatement;
+struct ElseStatement;
+#include <std/trait_Allocator.h>
+#include <std/Array_ElseStatement.h>
+#include <analyzer/statement/ElseStatement.h>
+#include <std/Iter_ref_ElseStatement.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_ElseStatement Array_ElseStatement__new(struct trait_Allocator allocator);

@@ -1,16 +1,16 @@
+#include <stdint.h>
+
 #include <clang-c/Index.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <analyzer/types/Type.h>
-#include <std/str.h>
 #include <std/HashMap_str_Type.h>
-#include <stdbool.h>
+#include <analyzer/c/IncludeContext.h>
+#include <std/str.h>
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/Include.h>
 #include <analyzer/Root.h>
-#include <stdint.h>
-#include <std/HashMap_str_Primitive.h>
 #include <analyzer/c/StructC.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/ParentCpp.h>
@@ -23,7 +23,9 @@
 #include <std/trait_Allocator.h>
 #include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/ClassCpp.h>
-#include <analyzer/types/Primitive.h>
+#include <std/HashMap_str_Primitive.h>
+
+#include <analyzer/c/IncludeContext.h>
 
 #include <analyzer/c/IncludeContext.h>
 

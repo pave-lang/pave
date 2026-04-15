@@ -1,11 +1,13 @@
-#include <analyzer/c/Include.h>
-#include <analyzer/c/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/trait_Allocator.h>
+#include <analyzer/c/Include.h>
+#include <analyzer/c/EnumC.h>
 #include <std/str.h>
+#include <analyzer/c/ParentCpp.h>
 #include <std/HashMap_str_EnumCValue.h>
-#include <analyzer/c/EnumCValue.h>
+#include <std/trait_Allocator.h>
+
+#include <analyzer/c/EnumC.h>
 
 #include <analyzer/c/EnumC.h>
 

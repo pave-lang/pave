@@ -1,22 +1,21 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
+#include <analyzer/Context.h>
 #include <std/ArenaAllocator.h>
 #include <std/str.h>
-#include <std/Array_Token.h>
-#include <analyzer/Token.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Module.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
 #include <std/trait_Allocator.h>
 #include <std/Array_Scope.h>
-#include <analyzer/Scope.h>
 #include <analyzer/Root.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <analyzer/Token.h>
+#include <std/Array_Token.h>
+#include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/Primitive.h>
@@ -27,6 +26,7 @@
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <std/HashMap_str_bool.h>
+#include <analyzer/Scope.h>
 #include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionType.h>
 #include <std/Iter_ref_Generic.h>
@@ -39,10 +39,10 @@
 #include <analyzer/Diagnostic.h>
 #include <analyzer/Range.h>
 #include <analyzer/Position.h>
-#include <analyzer/InlayHintKind.h>
 #include <std/HashMap_str_Array_InlayHint.h>
 #include <std/Array_InlayHint.h>
 #include <analyzer/InlayHint.h>
+#include <analyzer/InlayHintKind.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/types/Tuple.h>
@@ -55,12 +55,14 @@
 #include <std/Iter_ref_Type.h>
 #include <std/String.h>
 #include <std/Array_DeferStatement.h>
-#include <analyzer/statement/DeferStatement.h>
 #include <std/Iter_ref_Scope.h>
 #include <std/Iter_ref_DeferStatement.h>
-#include <std/Iter_ref_ref_Trait.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <std/Array_ref_Trait.h>
-#include <tuple_ref_Trait_ref_Type.h>
+#include <std/Iter_ref_ref_Trait.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
+
+#include <analyzer/Context.h>
 
 #include <analyzer/Context.h>
 

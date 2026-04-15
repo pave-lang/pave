@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_DEFER_STATEMENT
 #define PAVE_ARRAY_DEFER_STATEMENT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct DeferStatement;
-struct Iter_ref_DeferStatement;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct DeferStatement;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_DeferStatement {
@@ -18,6 +17,14 @@ struct Array_DeferStatement {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_DeferStatement;
+struct DeferStatement;
+struct DeferStatement;
+#include <std/trait_Allocator.h>
+#include <std/Array_DeferStatement.h>
+#include <analyzer/statement/DeferStatement.h>
+#include <std/Iter_ref_DeferStatement.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_DeferStatement Array_DeferStatement__new(struct trait_Allocator allocator);

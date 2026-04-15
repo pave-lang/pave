@@ -2,14 +2,13 @@
 #define PAVE_ARENA_BLOCK
 
 #include <stdint.h>
-#include <std/trait_Allocator.h>
 #include <stdbool.h>
-
-struct ArenaBlock;
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+struct ArenaBlock;
 
 #line 12 "src/std/ArenaAllocator.pv"
 struct ArenaBlock {
@@ -18,6 +17,9 @@ struct ArenaBlock {
     uintptr_t offset;
     struct ArenaBlock* prev;
 };
+struct ArenaBlock;
+#include <std/trait_Allocator.h>
+
 
 #line 25 "src/std/ArenaAllocator.pv"
 struct ArenaBlock* ArenaBlock__new(struct trait_Allocator allocator, uintptr_t capacity, struct ArenaBlock* prev);

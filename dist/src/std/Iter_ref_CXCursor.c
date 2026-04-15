@@ -1,9 +1,12 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <std/Iter_ref_CXCursor.h>
 #include <std/IterEnumerate_ref_CXCursor.h>
+
+#include <std/Iter_ref_CXCursor.h>
 
 #include <std/Iter_ref_CXCursor.h>
 

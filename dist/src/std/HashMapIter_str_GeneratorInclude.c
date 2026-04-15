@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_GeneratorInclude.h>
-#include <std/str.h>
-#include <compiler/GeneratorInclude.h>
+#include <std/HashMapIter_str_GeneratorInclude.h>
 #include <tuple_str_GeneratorInclude.h>
+
+#include <std/HashMapIter_str_GeneratorInclude.h>
 
 #include <std/HashMapIter_str_GeneratorInclude.h>
 

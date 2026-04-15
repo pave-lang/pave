@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct TypeImpl;
-struct IterEnumerate_ref_TypeImpl;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct TypeImpl;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_TypeImpl {
@@ -17,6 +16,11 @@ struct Iter_ref_TypeImpl {
     struct TypeImpl* start;
     struct TypeImpl* end;
 };
+struct TypeImpl;
+struct Iter_ref_TypeImpl;
+#include <std/Iter_ref_TypeImpl.h>
+#include <std/IterEnumerate_ref_TypeImpl.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_TypeImpl Iter_ref_TypeImpl__new(struct TypeImpl* start, struct TypeImpl* end);

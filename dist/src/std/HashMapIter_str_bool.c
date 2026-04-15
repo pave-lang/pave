@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_bool.h>
-#include <std/str.h>
+#include <std/HashMapIter_str_bool.h>
 #include <tuple_str_bool.h>
+
+#include <std/HashMapIter_str_bool.h>
 
 #include <std/HashMapIter_str_bool.h>
 

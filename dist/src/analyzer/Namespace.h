@@ -1,22 +1,17 @@
 #ifndef PAVE_NAMESPACE
 #define PAVE_NAMESPACE
 
+#include <stdbool.h>
+
+#include <fs.h>
+
+struct Root;
+struct Namespace;
 #include <std/str.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMap_str_ref_Module.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
 #include <std/HashMap_str_ref_Trait.h>
-#include <stdbool.h>
-
-struct Root;
-struct Namespace;
-struct Module;
-struct Trait;
-struct str;
-struct Type;
-
-#include <fs.h>
 
 #line 6 "src/analyzer/Namespace.pv"
 struct Namespace {
@@ -30,6 +25,13 @@ struct Namespace {
     struct HashMap_str_ref_Trait traits;
     struct HashMap_str_Type functions;
 };
+struct Root;
+struct Namespace;
+struct Namespace;
+struct Type;
+struct Trait;
+#include <std/str.h>
+
 
 #line 19 "src/analyzer/Namespace.pv"
 struct Namespace* Namespace__new(struct Root* root, struct Namespace* parent, struct str name, struct str path);

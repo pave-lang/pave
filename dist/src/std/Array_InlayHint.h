@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_INLAY_HINT
 #define PAVE_ARRAY_INLAY_HINT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct InlayHint;
-struct Iter_ref_InlayHint;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct InlayHint;
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_InlayHint {
@@ -18,6 +17,14 @@ struct Array_InlayHint {
     uintptr_t length;
     uintptr_t capacity;
 };
+struct Array_InlayHint;
+struct InlayHint;
+struct InlayHint;
+#include <std/trait_Allocator.h>
+#include <std/Array_InlayHint.h>
+#include <analyzer/InlayHint.h>
+#include <std/Iter_ref_InlayHint.h>
+
 
 #line 77 "src/std/Array.pv"
 struct Array_InlayHint Array_InlayHint__new(struct trait_Allocator allocator);

@@ -1,22 +1,24 @@
 #ifndef PAVE_STRING
 #define PAVE_STRING
 
-#include <std/Array_char.h>
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
-
-struct str;
-struct String;
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Array_char.h>
+
 #line 5 "src/std/String.pv"
 struct String {
     struct Array_char array;
 };
+struct String;
+#include <std/trait_Allocator.h>
+#include <std/String.h>
+#include <std/str.h>
+
 
 #line 10 "src/std/String.pv"
 struct String String__new(struct trait_Allocator allocator);

@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Diagnostic;
-struct IterEnumerate_ref_Diagnostic;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct Diagnostic;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_Diagnostic {
@@ -17,6 +16,11 @@ struct Iter_ref_Diagnostic {
     struct Diagnostic* start;
     struct Diagnostic* end;
 };
+struct Diagnostic;
+struct Iter_ref_Diagnostic;
+#include <std/Iter_ref_Diagnostic.h>
+#include <std/IterEnumerate_ref_Diagnostic.h>
+
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Diagnostic Iter_ref_Diagnostic__new(struct Diagnostic* start, struct Diagnostic* end);

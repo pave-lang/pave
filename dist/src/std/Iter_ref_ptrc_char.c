@@ -1,9 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <std/Iter_ref_ptrc_char.h>
+#include <char.h>
 #include <std/IterEnumerate_ref_ptrc_char.h>
+
+#include <std/Iter_ref_ptrc_char.h>
 
 #include <std/Iter_ref_ptrc_char.h>
 
