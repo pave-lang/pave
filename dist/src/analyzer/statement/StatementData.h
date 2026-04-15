@@ -1,9 +1,6 @@
 #ifndef PAVE_STATEMENT_DATA
 #define PAVE_STATEMENT_DATA
 
-#include <std/Array_DeferStatement.h>
-#include <analyzer/statement/DeferStatement.h>
-
 struct Block;
 struct LetStatement;
 struct ReturnStatement;
@@ -14,7 +11,7 @@ struct WhileStatement;
 struct ForStatement;
 struct AssignmentStatement;
 struct Expression;
-
+#include <std/Array_DeferStatement.h>
 #line 5 "src/analyzer/statement/StatementData.pv"
 struct StatementData {
     enum {
@@ -47,5 +44,6 @@ struct StatementData {
         struct Array_DeferStatement continuestatement_value;
     };
 };
+
 
 #endif

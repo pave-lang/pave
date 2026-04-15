@@ -27,7 +27,6 @@
 #include <analyzer/types/Indirect.h>
 #include <std/Iter_ref_ForVariable.h>
 #include <analyzer/Block.h>
-
 #include <analyzer/statement/ForStatement.h>
 
 #include <analyzer/statement/ForStatement.h>

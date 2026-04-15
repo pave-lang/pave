@@ -19,13 +19,13 @@ struct TypeUsage_Struct {
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions;
     bool impl_dynamic_usage;
 };
+
 struct ArenaAllocator;
 struct Struct;
 struct TypeUsage_Struct;
 struct GenericMap;
 struct UsageContext;
 #include <compiler/TypeUsage_Struct.h>
-
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Struct TypeUsage_Struct__new(struct ArenaAllocator* allocator, struct Struct* type, uintptr_t impl_count);

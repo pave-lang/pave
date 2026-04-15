@@ -7,7 +7,6 @@
 #include <std/HashMap_str_Type.h>
 #include <std/trait_Allocator.h>
 #include <std/Array_Type.h>
-
 #include <analyzer/c/ClassCpp.h>
 
 #include <analyzer/c/ClassCpp.h>

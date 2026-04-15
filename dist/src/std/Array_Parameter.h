@@ -17,6 +17,7 @@ struct Array_Parameter {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_Parameter;
 struct Parameter;
 struct Parameter;
@@ -24,7 +25,6 @@ struct Parameter;
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <std/Iter_ref_Parameter.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_Parameter Array_Parameter__new(struct trait_Allocator allocator);

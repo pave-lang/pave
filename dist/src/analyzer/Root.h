@@ -50,6 +50,7 @@ struct Root {
     struct HashMap_str_ref_Include includes_cpp;
     bool mode_cpp;
 };
+
 struct ArenaAllocator;
 struct Array_ptrc_char;
 struct Analysis;
@@ -61,7 +62,6 @@ struct Trait;
 struct Primitive;
 struct Array_Type;
 #include <std/str.h>
-
 
 #line 37 "src/analyzer/Root.pv"
 struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char* args, struct Array_ptrc_char* clang_args, struct Analysis* analysis);

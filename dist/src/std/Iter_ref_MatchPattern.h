@@ -16,11 +16,11 @@ struct Iter_ref_MatchPattern {
     struct MatchPattern* start;
     struct MatchPattern* end;
 };
+
 struct MatchPattern;
 struct Iter_ref_MatchPattern;
 #include <std/Iter_ref_MatchPattern.h>
 #include <std/IterEnumerate_ref_MatchPattern.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_MatchPattern Iter_ref_MatchPattern__new(struct MatchPattern* start, struct MatchPattern* end);

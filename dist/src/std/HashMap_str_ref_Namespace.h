@@ -19,6 +19,7 @@ struct HashMap_str_ref_Namespace {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_ref_Namespace;
 struct str;
 struct Namespace;
@@ -28,7 +29,6 @@ struct Namespace;
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Namespace.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__new(struct trait_Allocator allocator);

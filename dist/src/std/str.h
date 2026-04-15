@@ -11,11 +11,11 @@ struct str {
     char const* ptr;
     uintptr_t length;
 };
+
 struct str;
 #include <std/str.h>
 #include <std/Iter_ptrc_char.h>
 #include <std/Hashed.h>
-
 
 #line 9 "src/std/str.pv"
 struct str str__new(char const* ptr);

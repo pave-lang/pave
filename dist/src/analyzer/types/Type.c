@@ -1,11 +1,11 @@
+#include <stdint.h>
+
 #include <stdio.h>
 
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/c/TypedefC.h>
 #include <std/ArenaAllocator.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/Context.h>
 #include <analyzer/types/Sequence.h>
@@ -23,10 +23,11 @@
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/NamespaceCpp.h>
 #include <std/str.h>
+#include <std/Range_usize.h>
 #include <analyzer/Token.h>
-#include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <analyzer/Module.h>
+#include <analyzer/types/Type.h>
 
 #include <analyzer/types/Type.h>
 

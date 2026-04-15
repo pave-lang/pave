@@ -10,7 +10,6 @@
 #include <std/trait_Hash.h>
 #include <std/str.h>
 #include <std/HashSetIter_str.h>
-
 #include <std/HashSet_str.h>
 
 #include <std/HashSet_str.h>

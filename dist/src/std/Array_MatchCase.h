@@ -17,6 +17,7 @@ struct Array_MatchCase {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_MatchCase;
 struct MatchCase;
 struct MatchCase;
@@ -24,7 +25,6 @@ struct MatchCase;
 #include <std/Array_MatchCase.h>
 #include <analyzer/statement/MatchCase.h>
 #include <std/Iter_ref_MatchCase.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_MatchCase Array_MatchCase__new(struct trait_Allocator allocator);

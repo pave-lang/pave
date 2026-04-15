@@ -19,13 +19,13 @@ struct TypeUsage_Tuple {
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions;
     bool impl_dynamic_usage;
 };
+
 struct ArenaAllocator;
 struct Tuple;
 struct TypeUsage_Tuple;
 struct GenericMap;
 struct UsageContext;
 #include <compiler/TypeUsage_Tuple.h>
-
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Tuple TypeUsage_Tuple__new(struct ArenaAllocator* allocator, struct Tuple* type, uintptr_t impl_count);

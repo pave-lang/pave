@@ -8,7 +8,6 @@
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Iter_ref_InvokeArgument.h>
 #include <slice_InvokeArgument.h>
-
 #include <std/Array_InvokeArgument.h>
 
 #include <std/Array_InvokeArgument.h>

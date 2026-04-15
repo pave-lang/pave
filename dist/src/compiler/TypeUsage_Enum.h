@@ -19,13 +19,13 @@ struct TypeUsage_Enum {
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions;
     bool impl_dynamic_usage;
 };
+
 struct ArenaAllocator;
 struct Enum;
 struct TypeUsage_Enum;
 struct GenericMap;
 struct UsageContext;
 #include <compiler/TypeUsage_Enum.h>
-
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Enum TypeUsage_Enum__new(struct ArenaAllocator* allocator, struct Enum* type, uintptr_t impl_count);

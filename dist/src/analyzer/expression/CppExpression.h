@@ -2,7 +2,6 @@
 #define PAVE_CPP_EXPRESSION
 
 struct Expression;
-
 #line 1 "src/analyzer/expression/CppExpression.pv"
 struct CppExpression {
     enum {
@@ -15,5 +14,6 @@ struct CppExpression {
         struct Expression* delete_value;
     };
 };
+
 
 #endif

@@ -38,6 +38,7 @@ struct Context {
     struct Root* root;
     struct Function* function;
 };
+
 struct ArenaAllocator;
 struct Array_Token;
 struct Analysis;
@@ -61,7 +62,6 @@ struct Array_Type;
 #include <analyzer/InlayHintKind.h>
 #include <std/Array_DeferStatement.h>
 #include <std/Array_Type.h>
-
 
 #line 29 "src/analyzer/Context.pv"
 struct Context Context__new(struct ArenaAllocator* allocator, struct str base_path, struct str path, struct Array_Token* tokens, struct Analysis* analysis, struct Module* module);

@@ -1,12 +1,9 @@
 #ifndef PAVE_TYPE
 #define PAVE_TYPE
 
-#include <stdio.h>
-
-#include <std/str.h>
-#include <std/Array_Type.h>
-#include <analyzer/types/Type.h>
 #include <stdbool.h>
+
+#include <stdio.h>
 
 struct Primitive;
 struct Indirect;
@@ -24,12 +21,8 @@ struct StructC;
 struct FunctionC;
 struct ClassCpp;
 struct NamespaceCpp;
-struct Type;
-struct ArenaAllocator;
-struct Context;
-struct Array_Type;
-struct Module;
-
+#include <std/str.h>
+#include <std/Array_Type.h>
 #line 82 "src/analyzer/types/Type.pv"
 struct Type {
     enum {
@@ -75,6 +68,29 @@ struct Type {
         struct NamespaceCpp* namespacecpp_value;
     };
 };
+
+struct Type;
+struct ArenaAllocator;
+struct Type;
+struct Context;
+struct GenericMap;
+struct Indirect;
+struct Sequence;
+struct Tuple;
+struct Primitive;
+struct Enum;
+struct Struct;
+struct Trait;
+struct Generic;
+struct Function;
+struct TypedefC;
+struct EnumC;
+struct StructC;
+struct ClassCpp;
+struct NamespaceCpp;
+struct FunctionC;
+struct Module;
+#include <std/Array_Type.h>
 
 #line 105 "src/analyzer/types/Type.pv"
 char const* Type__name(struct Type* self);

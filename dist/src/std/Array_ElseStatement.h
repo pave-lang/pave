@@ -17,6 +17,7 @@ struct Array_ElseStatement {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_ElseStatement;
 struct ElseStatement;
 struct ElseStatement;
@@ -24,7 +25,6 @@ struct ElseStatement;
 #include <std/Array_ElseStatement.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <std/Iter_ref_ElseStatement.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_ElseStatement Array_ElseStatement__new(struct trait_Allocator allocator);

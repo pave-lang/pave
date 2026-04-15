@@ -16,7 +16,6 @@
 #include <std/HashMapIter_str_Function.h>
 #include <tuple_str_Function.h>
 #include <analyzer/Root.h>
-
 #include <analyzer/types/Trait.h>
 
 #include <analyzer/types/Trait.h>

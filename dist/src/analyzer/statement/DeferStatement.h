@@ -3,10 +3,6 @@
 
 struct Expression;
 struct Block;
-struct DeferStatement;
-struct Context;
-struct Generics;
-
 #line 5 "src/analyzer/statement/DeferStatement.pv"
 struct DeferStatement {
     enum {
@@ -19,6 +15,11 @@ struct DeferStatement {
         struct Block* block_value;
     };
 };
+
+struct Block;
+struct Context;
+struct Generics;
+struct DeferStatement;
 
 #line 11 "src/analyzer/statement/DeferStatement.pv"
 struct DeferStatement* DeferStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics);

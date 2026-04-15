@@ -19,7 +19,6 @@
 #include <std/str.h>
 #include <std/HashMapIter_str_EnumVariant.h>
 #include <tuple_str_EnumVariant.h>
-
 #include <analyzer/types/Enum.h>
 
 #include <analyzer/types/Enum.h>

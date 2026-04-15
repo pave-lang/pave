@@ -13,6 +13,8 @@ enum TokenType {
     TOKEN_TYPE__COMMENT,
 };
 
+#include <analyzer/TokenType.h>
+
 #line 15 "src/analyzer/Token.pv"
 char const* TokenType__get_name(enum TokenType* self);
 

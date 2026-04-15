@@ -13,10 +13,10 @@ struct FunctionC {
     struct Array_ref_Expression arguments;
     struct Type return_type;
 };
+
 struct Include;
 struct Type;
 struct FunctionC;
-
 
 #line 13 "src/analyzer/c/FunctionC.pv"
 struct FunctionC* FunctionC__new(struct Include* include, char const* name, struct Type* return_type);

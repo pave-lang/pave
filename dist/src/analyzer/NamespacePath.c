@@ -6,7 +6,6 @@
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
-
 #include <analyzer/NamespacePath.h>
 
 #include <analyzer/NamespacePath.h>

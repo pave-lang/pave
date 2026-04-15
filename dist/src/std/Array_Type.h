@@ -17,6 +17,7 @@ struct Array_Type {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_Type;
 struct Type;
 struct Type;
@@ -24,7 +25,6 @@ struct Type;
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/Iter_ref_Type.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_Type Array_Type__new(struct trait_Allocator allocator);

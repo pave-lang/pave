@@ -14,10 +14,10 @@ struct LetStatement {
     struct Type* type;
     struct Expression* value;
 };
+
 struct Context;
 struct Generics;
 struct LetStatement;
-
 
 #line 13 "src/analyzer/statement/LetStatement.pv"
 struct LetStatement* LetStatement__parse(struct Context* context, struct Generics* generics);

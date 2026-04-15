@@ -17,6 +17,7 @@ struct Array_UsageContext {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_UsageContext;
 struct UsageContext;
 struct UsageContext;
@@ -24,7 +25,6 @@ struct UsageContext;
 #include <std/Array_UsageContext.h>
 #include <compiler/UsageContext.h>
 #include <std/Iter_ref_UsageContext.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_UsageContext Array_UsageContext__new(struct trait_Allocator allocator);

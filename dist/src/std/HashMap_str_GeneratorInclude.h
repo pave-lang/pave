@@ -19,6 +19,7 @@ struct HashMap_str_GeneratorInclude {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_GeneratorInclude;
 struct str;
 struct GeneratorInclude;
@@ -28,7 +29,6 @@ struct GeneratorInclude;
 #include <std/str.h>
 #include <compiler/GeneratorInclude.h>
 #include <std/HashMapIter_str_GeneratorInclude.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_GeneratorInclude HashMap_str_GeneratorInclude__new(struct trait_Allocator allocator);

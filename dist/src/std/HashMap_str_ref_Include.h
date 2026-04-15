@@ -19,6 +19,7 @@ struct HashMap_str_ref_Include {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_ref_Include;
 struct str;
 struct Include;
@@ -28,7 +29,6 @@ struct Include;
 #include <std/HashMap_str_ref_Include.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Include.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Include HashMap_str_ref_Include__new(struct trait_Allocator allocator);

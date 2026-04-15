@@ -8,7 +8,6 @@
 #include <analyzer/Diagnostic.h>
 #include <std/Iter_ref_Diagnostic.h>
 #include <slice_Diagnostic.h>
-
 #include <std/Array_Diagnostic.h>
 
 #include <std/Array_Diagnostic.h>

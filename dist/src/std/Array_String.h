@@ -17,6 +17,7 @@ struct Array_String {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_String;
 struct String;
 struct String;
@@ -24,7 +25,6 @@ struct String;
 #include <std/Array_String.h>
 #include <std/String.h>
 #include <std/Iter_ref_String.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_String Array_String__new(struct trait_Allocator allocator);

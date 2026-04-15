@@ -10,7 +10,6 @@
 #include <std/trait_Allocator.h>
 #include <compiler/UsageContext.h>
 #include <analyzer/types/GenericMap.h>
-
 #include <compiler/TypeFunctionUsage.h>
 
 #include <compiler/TypeFunctionUsage.h>

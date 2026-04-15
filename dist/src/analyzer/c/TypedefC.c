@@ -4,7 +4,6 @@
 #include <analyzer/c/TypedefC.h>
 #include <std/str.h>
 #include <analyzer/types/Type.h>
-
 #include <analyzer/c/TypedefC.h>
 
 #include <analyzer/c/TypedefC.h>

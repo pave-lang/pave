@@ -10,7 +10,6 @@
 #include <analyzer/statement/MatchPattern.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/statement/MatchCase.h>
-
 #include <analyzer/statement/MatchCase.h>
 
 #include <analyzer/statement/MatchCase.h>

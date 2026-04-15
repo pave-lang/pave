@@ -17,7 +17,6 @@
 #include <std/str.h>
 #include <analyzer/Position.h>
 #include <analyzer/Range.h>
-
 #include <analyzer/Analysis.h>
 
 #include <analyzer/Analysis.h>

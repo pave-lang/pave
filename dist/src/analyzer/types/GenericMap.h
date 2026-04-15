@@ -13,6 +13,7 @@ struct GenericMap {
     struct Array_Type array;
     struct HashMap_str_usize map;
 };
+
 struct ArenaAllocator;
 struct Generics;
 struct Array_Type;
@@ -21,7 +22,6 @@ struct Type;
 #include <analyzer/types/GenericMap.h>
 #include <std/str.h>
 #include <analyzer/types/Type.h>
-
 
 #line 11 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Generics* generics, struct Array_Type* usage_types);

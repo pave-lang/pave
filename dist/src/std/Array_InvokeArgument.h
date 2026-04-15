@@ -17,6 +17,7 @@ struct Array_InvokeArgument {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_InvokeArgument;
 struct InvokeArgument;
 struct InvokeArgument;
@@ -24,7 +25,6 @@ struct InvokeArgument;
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Iter_ref_InvokeArgument.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_InvokeArgument Array_InvokeArgument__new(struct trait_Allocator allocator);

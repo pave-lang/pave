@@ -20,13 +20,13 @@ struct Tokenizer {
     struct Array_ptrc_char keywords;
     struct Array_ptrc_char symbols;
 };
+
 struct Tokenizer;
 struct Array_ptrc_char;
 struct ArenaAllocator;
 #include <std/Array_ptrc_char.h>
 #include <std/str.h>
 #include <std/Array_Token.h>
-
 
 #line 17 "src/analyzer/Tokenizer.pv"
 void Tokenizer__increase_pos(struct Tokenizer* self);

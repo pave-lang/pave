@@ -17,6 +17,7 @@ struct Array_ref_Impl {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_ref_Impl;
 struct Impl;
 struct Impl;
@@ -24,7 +25,6 @@ struct Impl;
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Impl.h>
 #include <std/Iter_ref_ref_Impl.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_ref_Impl Array_ref_Impl__new(struct trait_Allocator allocator);

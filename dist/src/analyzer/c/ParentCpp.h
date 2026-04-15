@@ -5,7 +5,6 @@
 
 struct ClassCpp;
 struct NamespaceCpp;
-
 #line 1 "src/analyzer/c/ParentCpp.pv"
 struct ParentCpp {
     enum {
@@ -19,6 +18,8 @@ struct ParentCpp {
         struct NamespaceCpp* namespace_value;
     };
 };
+
+struct ParentCpp;
 
 #line 8 "src/analyzer/c/ParentCpp.pv"
 bool ParentCpp__is_none(struct ParentCpp* self);

@@ -13,8 +13,8 @@ struct HashMapIter_str_bool {
     struct HashMapBucket_str_bool* iter;
     struct HashMapBucket_str_bool* end;
 };
-struct HashMapIter_str_bool;
 
+struct HashMapIter_str_bool;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_bool__next(struct HashMapIter_str_bool* self);

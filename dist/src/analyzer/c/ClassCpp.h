@@ -20,10 +20,10 @@ struct ClassCpp {
     struct HashMap_str_Type types;
     struct Array_Type bases;
 };
+
 struct Include;
 struct ClassCpp;
 #include <analyzer/c/ParentCpp.h>
-
 
 #line 16 "src/analyzer/c/ClassCpp.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct ParentCpp parent, bool is_struct);

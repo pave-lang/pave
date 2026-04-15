@@ -12,7 +12,6 @@
 #include <std/str.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_TypedefC.h>
-
 #include <std/HashMap_str_TypedefC.h>
 
 #include <std/HashMap_str_TypedefC.h>

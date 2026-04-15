@@ -9,10 +9,10 @@ struct ReturnStatement {
     struct Expression* expression;
     struct Array_DeferStatement defer_statements;
 };
+
 struct Context;
 struct Generics;
 struct ReturnStatement;
-
 
 #line 12 "src/analyzer/statement/ReturnStatement.pv"
 struct ReturnStatement* ReturnStatement__parse(struct Context* context, struct Generics* generics);

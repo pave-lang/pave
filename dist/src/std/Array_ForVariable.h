@@ -17,6 +17,7 @@ struct Array_ForVariable {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_ForVariable;
 struct ForVariable;
 struct ForVariable;
@@ -24,7 +25,6 @@ struct ForVariable;
 #include <std/Array_ForVariable.h>
 #include <analyzer/statement/ForVariable.h>
 #include <std/Iter_ref_ForVariable.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_ForVariable Array_ForVariable__new(struct trait_Allocator allocator);

@@ -14,9 +14,9 @@ struct IterEnumerate_ref_TypeId {
     uintptr_t index;
     struct Iter_ref_TypeId iter;
 };
+
 struct IterEnumerate_ref_TypeId;
 #include <tuple_usize_ref_TypeId.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_TypeId__next(struct IterEnumerate_ref_TypeId* self);

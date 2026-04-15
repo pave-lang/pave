@@ -11,10 +11,10 @@ struct Indirect {
     enum IndirectType type;
     struct Type to;
 };
+
 struct Indirect;
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Type.h>
-
 
 #line 20 "src/analyzer/types/Type.pv"
 struct Indirect* Indirect__new_reference(struct trait_Allocator allocator, struct Type to);

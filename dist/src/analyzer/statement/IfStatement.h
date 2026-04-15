@@ -11,10 +11,10 @@ struct IfStatement {
     struct Block* block;
     struct Array_ElseStatement else_statements;
 };
+
 struct Context;
 struct Generics;
 struct IfStatement;
-
 
 #line 13 "src/analyzer/statement/IfStatement.pv"
 struct IfStatement* IfStatement__parse(struct Context* context, struct Generics* generics);

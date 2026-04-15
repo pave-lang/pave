@@ -20,11 +20,11 @@ struct Trait {
     struct HashMap_str_Function functions;
     struct Type type_self;
 };
+
 struct Module;
 struct Trait;
 #include <analyzer/types/Trait.h>
 #include <analyzer/types/FunctionParent.h>
-
 
 #line 15 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);

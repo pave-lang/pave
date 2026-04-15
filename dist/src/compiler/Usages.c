@@ -117,7 +117,6 @@
 #include <analyzer/expression/InvokeArgument.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/expression/CppExpression.h>
-
 #include <compiler/Usages.h>
 
 #include <compiler/Usages.h>

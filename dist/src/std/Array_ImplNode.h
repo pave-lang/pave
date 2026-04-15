@@ -17,6 +17,7 @@ struct Array_ImplNode {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_ImplNode;
 struct ImplNode;
 struct ImplNode;
@@ -24,7 +25,6 @@ struct ImplNode;
 #include <std/Array_ImplNode.h>
 #include <analyzer/ImplNode.h>
 #include <std/Iter_ref_ImplNode.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_ImplNode Array_ImplNode__new(struct trait_Allocator allocator);

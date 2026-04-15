@@ -20,13 +20,13 @@ struct FunctionContext {
     struct Array_FunctionScope scopes;
     struct FunctionCoroutine coroutine;
 };
+
 struct ArenaAllocator;
 struct Function;
 struct FunctionContext;
 struct Type;
 #include <compiler/FunctionContext.h>
 #include <std/str.h>
-
 
 #line 52 "src/compiler/Generator.pv"
 struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, struct Function* func_info, bool use_scopes);

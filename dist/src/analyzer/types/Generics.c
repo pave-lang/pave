@@ -9,7 +9,6 @@
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
-
 #include <analyzer/types/Generics.h>
 
 #include <analyzer/types/Generics.h>

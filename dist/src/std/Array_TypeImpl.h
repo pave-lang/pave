@@ -17,6 +17,7 @@ struct Array_TypeImpl {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_TypeImpl;
 struct TypeImpl;
 struct TypeImpl;
@@ -24,7 +25,6 @@ struct TypeImpl;
 #include <std/Array_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
 #include <std/Iter_ref_TypeImpl.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_TypeImpl Array_TypeImpl__new(struct trait_Allocator allocator);

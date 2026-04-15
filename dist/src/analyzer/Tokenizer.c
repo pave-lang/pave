@@ -12,7 +12,6 @@
 #include <std/Array_Token.h>
 #include <analyzer/Token.h>
 #include <analyzer/TokenType.h>
-
 #include <analyzer/Tokenizer.h>
 
 #include <analyzer/Tokenizer.h>

@@ -19,6 +19,7 @@ struct HashMap_str_Trait {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_Trait;
 struct str;
 struct Trait;
@@ -28,7 +29,6 @@ struct Trait;
 #include <std/str.h>
 #include <analyzer/types/Trait.h>
 #include <std/HashMapIter_str_Trait.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Trait HashMap_str_Trait__new(struct trait_Allocator allocator);

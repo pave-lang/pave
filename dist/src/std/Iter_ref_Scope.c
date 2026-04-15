@@ -6,7 +6,6 @@
 #include <std/Iter_ref_Scope.h>
 #include <analyzer/Scope.h>
 #include <std/IterEnumerate_ref_Scope.h>
-
 #include <std/Iter_ref_Scope.h>
 
 #include <std/Iter_ref_Scope.h>

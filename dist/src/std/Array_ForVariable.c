@@ -8,7 +8,6 @@
 #include <analyzer/statement/ForVariable.h>
 #include <std/Iter_ref_ForVariable.h>
 #include <slice_ForVariable.h>
-
 #include <std/Array_ForVariable.h>
 
 #include <std/Array_ForVariable.h>

@@ -13,10 +13,10 @@ struct MatchCase {
     struct Array_MatchPattern patterns;
     struct Block* body;
 };
+
 struct MatchCase;
 struct Context;
 struct Generics;
-
 
 #line 14 "src/analyzer/statement/MatchCase.pv"
 bool MatchCase__parse(struct MatchCase* self, struct Context* context, struct Generics* generics);

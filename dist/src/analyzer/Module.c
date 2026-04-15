@@ -67,7 +67,6 @@
 #include <tuple_str_ref_Include.h>
 #include <std/Array_Type.h>
 #include <std/HashMap_str_Primitive.h>
-
 #include <analyzer/Module.h>
 
 #include <analyzer/Module.h>

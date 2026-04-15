@@ -14,9 +14,9 @@ struct IterEnumerate_ref_DeferStatement {
     uintptr_t index;
     struct Iter_ref_DeferStatement iter;
 };
+
 struct IterEnumerate_ref_DeferStatement;
 #include <tuple_usize_ref_DeferStatement.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_DeferStatement__next(struct IterEnumerate_ref_DeferStatement* self);

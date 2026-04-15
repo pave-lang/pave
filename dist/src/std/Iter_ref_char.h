@@ -14,10 +14,10 @@ struct Iter_ref_char {
     char* start;
     char* end;
 };
+
 struct Iter_ref_char;
 #include <std/Iter_ref_char.h>
 #include <std/IterEnumerate_ref_char.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_char Iter_ref_char__new(char* start, char* end);

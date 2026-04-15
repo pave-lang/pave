@@ -19,6 +19,7 @@ struct HashMap_str_TypedefC {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_TypedefC;
 struct str;
 struct TypedefC;
@@ -28,7 +29,6 @@ struct TypedefC;
 #include <std/str.h>
 #include <analyzer/c/TypedefC.h>
 #include <std/HashMapIter_str_TypedefC.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_TypedefC HashMap_str_TypedefC__new(struct trait_Allocator allocator);

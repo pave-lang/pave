@@ -19,6 +19,7 @@ struct HashMap_usize_TypeUsage_Enum {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_usize_TypeUsage_Enum;
 struct TypeUsage_Enum;
 struct TypeUsage_Enum;
@@ -26,7 +27,6 @@ struct TypeUsage_Enum;
 #include <std/HashMap_usize_TypeUsage_Enum.h>
 #include <compiler/TypeUsage_Enum.h>
 #include <std/HashMapIter_usize_TypeUsage_Enum.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__new(struct trait_Allocator allocator);

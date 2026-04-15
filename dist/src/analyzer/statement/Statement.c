@@ -1,7 +1,6 @@
 #include <analyzer/statement/Statement.h>
 #include <analyzer/Token.h>
 #include <analyzer/statement/StatementData.h>
-
 #include <analyzer/statement/Statement.h>
 
 #include <analyzer/statement/Statement.h>

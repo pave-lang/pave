@@ -19,6 +19,7 @@ struct HashMap_str_Array_InlayHint {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_Array_InlayHint;
 struct str;
 struct Array_InlayHint;
@@ -28,7 +29,6 @@ struct Array_InlayHint;
 #include <std/str.h>
 #include <std/Array_InlayHint.h>
 #include <std/HashMapIter_str_Array_InlayHint.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Array_InlayHint HashMap_str_Array_InlayHint__new(struct trait_Allocator allocator);

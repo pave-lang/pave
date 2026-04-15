@@ -14,7 +14,6 @@
 #include <std/Iter_ref_Generic.h>
 #include <analyzer/Context.h>
 #include <std/Iter_ref_Type.h>
-
 #include <analyzer/types/GenericMap.h>
 
 #include <analyzer/types/GenericMap.h>

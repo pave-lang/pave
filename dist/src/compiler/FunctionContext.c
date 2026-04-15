@@ -23,7 +23,6 @@
 #include <std/String.h>
 #include <std/HashMap_str_ref_Type.h>
 #include <std/Array_char.h>
-
 #include <compiler/FunctionContext.h>
 
 #include <compiler/FunctionContext.h>

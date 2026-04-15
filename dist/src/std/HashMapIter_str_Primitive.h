@@ -13,8 +13,8 @@ struct HashMapIter_str_Primitive {
     struct HashMapBucket_str_Primitive* iter;
     struct HashMapBucket_str_Primitive* end;
 };
-struct HashMapIter_str_Primitive;
 
+struct HashMapIter_str_Primitive;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_Primitive__next(struct HashMapIter_str_Primitive* self);

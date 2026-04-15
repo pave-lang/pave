@@ -16,11 +16,11 @@ struct Iter_ref_InlayHint {
     struct InlayHint* start;
     struct InlayHint* end;
 };
+
 struct InlayHint;
 struct Iter_ref_InlayHint;
 #include <std/Iter_ref_InlayHint.h>
 #include <std/IterEnumerate_ref_InlayHint.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_InlayHint Iter_ref_InlayHint__new(struct InlayHint* start, struct InlayHint* end);

@@ -17,6 +17,7 @@ struct Array_EnumVariantParameter {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_EnumVariantParameter;
 struct EnumVariantParameter;
 struct EnumVariantParameter;
@@ -24,7 +25,6 @@ struct EnumVariantParameter;
 #include <std/Array_EnumVariantParameter.h>
 #include <analyzer/types/EnumVariantParameter.h>
 #include <std/Iter_ref_EnumVariantParameter.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_EnumVariantParameter Array_EnumVariantParameter__new(struct trait_Allocator allocator);

@@ -40,6 +40,7 @@ struct Usages {
     struct FunctionContext* function_context;
     struct Namespace* std_namespace;
 };
+
 struct Generator;
 struct Usages;
 struct HashMap_str_ref_Namespace;
@@ -56,7 +57,6 @@ struct Function;
 struct Block;
 struct Expression;
 #include <compiler/Usages.h>
-
 
 #line 124 "src/compiler/Usages.pv"
 struct Usages Usages__new(struct Generator* generator);

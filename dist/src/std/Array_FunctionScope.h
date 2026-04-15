@@ -17,6 +17,7 @@ struct Array_FunctionScope {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_FunctionScope;
 struct FunctionScope;
 struct FunctionScope;
@@ -24,7 +25,6 @@ struct FunctionScope;
 #include <std/Array_FunctionScope.h>
 #include <compiler/FunctionScope.h>
 #include <std/Iter_ref_FunctionScope.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_FunctionScope Array_FunctionScope__new(struct trait_Allocator allocator);

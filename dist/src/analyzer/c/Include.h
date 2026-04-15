@@ -21,12 +21,12 @@ struct Include {
     struct HashMap_str_Type types;
     struct HashMap_str_Type values;
 };
+
 struct Root;
 struct Include;
 struct Type;
 struct EnumC;
 #include <std/str.h>
-
 
 #line 20 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp);

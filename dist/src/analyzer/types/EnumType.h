@@ -7,4 +7,5 @@ enum EnumType {
     ENUM_TYPE__DISCRIMINATED_UNION,
 };
 
+
 #endif

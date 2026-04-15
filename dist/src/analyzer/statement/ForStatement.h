@@ -18,6 +18,7 @@ struct ForStatement {
     struct Type* value_type;
     struct Block* block;
 };
+
 struct ArenaAllocator;
 struct Context;
 struct Array_ForVariable;
@@ -25,7 +26,6 @@ struct Block;
 struct Generics;
 struct ForStatement;
 #include <analyzer/statement/ForStatement.h>
-
 
 #line 16 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator);

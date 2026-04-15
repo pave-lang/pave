@@ -5,7 +5,6 @@
 
 #include <std/Iter_ref_CXCursor.h>
 #include <std/IterEnumerate_ref_CXCursor.h>
-
 #include <std/Iter_ref_CXCursor.h>
 
 #include <std/Iter_ref_CXCursor.h>

@@ -2351,10 +2351,6 @@ impl Generator {
             fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
         }
 
-        if types.length > 0 {
-            fprintf(file, "\n");
-        }
-
         defer includes.release();
     }
 
@@ -2720,7 +2716,8 @@ impl Generator {
         return true;
     }
 
-    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, generics: &GenericMap) -> bool {
+    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage_context: &UsageContext) -> bool {
+        let generics = usage_context.generic_map;
         let enum_name = enum_info.name;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: u32 = name.array.length;
@@ -2857,6 +2854,9 @@ impl Generator {
             fprintf(file, "};\n");
         }
 
+        fprintf(file, "\n");
+        self.write_context_includes(file, &usage_context.signature, generics, false);
+
         for *impl_info in enum_info.impls {
             fprintf(file, "\n");
 
@@ -2871,20 +2871,21 @@ impl Generator {
 
     fn generate_enum_loop(&self, usage: &TypeUsage<Enum>) -> bool {
         let success = true;
-        let enum_info = usage.type;
 
         for usage_context in usage.usage_contexts {
-            success = self.generate_enum(enum_info, usage_context) && success;
+            success = self.generate_enum(usage, usage_context) && success;
         }
 
         return success;
     }
 
-    fn generate_enum(&self, enum_info: &Enum, usage_context: &UsageContext) -> bool {
+    fn generate_enum(&self, usage: &TypeUsage<Enum>, usage_context: &UsageContext) -> bool {
         let generics = usage_context.generic_map;
+        let enum_info = usage.type;
+        let module = enum_info.context.module;
 
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
-        let header = self.make_path(enum_info.context.module, name.as_str(), ".h");
+        let header = self.make_path(module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
         if header_file == 0 { perror(header.c_str()); return false; }
@@ -2895,15 +2896,15 @@ impl Generator {
         self.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        let includes_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        let refs_definition: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if !self.add_enum_definition_includes(&includes_definition, &refs_definition, enum_info, generics) { fclose(header_file); return false; }
-        if !self.add_impl_definition_includes(&includes_definition, &refs_definition, &enum_info.impls, 0, generics) { fclose(header_file); return false; }
-        self.write_includes_raw(header_file, &enum_info.context.module.includes);
-        self.write_includes(header_file, &includes_definition);
-        self.write_refs(header_file, &refs_definition);
+        for type in generics.array {
+            self.write_c_type_include(header_file, type.deref());
+        }
 
-        if !self.write_enum_definition(header_file, enum_info, generics) { fclose(header_file); return false; }
+        self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        self.write_includes_raw(header_file, &module.includes);
+        self.write_context_includes(header_file, &usage_context.layout, generics, false);
+
+        if !self.write_enum_definition(header_file, enum_info, usage_context) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -2913,19 +2914,23 @@ impl Generator {
 
         if enum_info.impls.length == 0 { return true; }
 
-        let code = self.make_path(enum_info.context.module, name.as_str(), ".c");
+        let code = self.make_path(module, name.as_str(), ".c");
         self.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: &FILE = fopen(code_tmp, "w+");
         if code_file == 0 { perror(code.c_str()); return false; }
 
-        let includes_code: HashMap<str, GeneratorInclude> = HashMap<str, GeneratorInclude>::new(self.allocator);
-        if !self.add_impl_includes(&includes_code, &enum_info.impls, 0, generics) { fclose(code_file); return false; }
-        self.write_includes_raw(code_file, &enum_info.context.module.includes);
-        self.write_includes(code_file, &includes_code);
+        self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        self.write_includes_raw(code_file, &module.includes);
+        self.write_context_includes(code_file, &usage_context.body, generics, true);
 
-        if !self.write_impls(code_file, enum_info.context.module, &enum_info.impls, 0, generics) { fclose(code_file); return false; }
+        let header_rel = self.make_rel_path(module, name.as_str(), ".h");
+        fprintf(code_file, "#include <");
+        self.write_str(code_file, header_rel.as_str());
+        fprintf(code_file, ">\n\n");
+
+        if !self.write_impls(code_file, module, &enum_info.impls, &usage.impl_functions, generics) { fclose(code_file); return false; }
 
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -3057,6 +3062,7 @@ impl Generator {
             fprintf(file, "};\n");
         }
 
+        if usage_context.signature.length > 0 { fprintf(file, "\n"); }
         self.write_context_includes(file, &usage_context.signature, generics, false);
 
         for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
@@ -3748,7 +3754,7 @@ impl Generator {
                 match type {
                     Type::ClassCpp(class_info) => {
                         if class_info.is_struct {
-                             fprintf(header_file, "struct %.*s;\n", cast<i32>(name.length), name.ptr);
+                            fprintf(header_file, "struct %.*s;\n", cast<i32>(name.length), name.ptr);
                         } else {
                             fprintf(header_file, "class %.*s;\n", cast<i32>(name.length), name.ptr);
                         }
@@ -3782,6 +3788,7 @@ impl Generator {
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
         self.write_includes_raw(header_file, &struct_info.module.includes);
         self.write_context_includes(header_file, &usage_context.layout, generics, false);
+        if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
 
         if !self.write_struct_definition(header_file, struct_info, usage, usage_context) { fclose(header_file); return false; }
 

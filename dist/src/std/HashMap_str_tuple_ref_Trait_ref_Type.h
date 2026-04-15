@@ -19,6 +19,7 @@ struct HashMap_str_tuple_ref_Trait_ref_Type {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_tuple_ref_Trait_ref_Type;
 struct str;
 #include <std/trait_Allocator.h>
@@ -26,7 +27,6 @@ struct str;
 #include <std/str.h>
 #include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type__new(struct trait_Allocator allocator);

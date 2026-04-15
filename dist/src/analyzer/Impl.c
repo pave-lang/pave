@@ -23,7 +23,6 @@
 #include <analyzer/types/Parameter.h>
 #include <analyzer/Naming.h>
 #include <analyzer/Root.h>
-
 #include <analyzer/Impl.h>
 
 #include <analyzer/Impl.h>

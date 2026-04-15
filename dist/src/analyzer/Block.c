@@ -26,7 +26,6 @@
 #include <analyzer/statement/ForStatement.h>
 #include <analyzer/statement/DeferStatement.h>
 #include <analyzer/statement/Statement.h>
-
 #include <analyzer/Block.h>
 
 #include <analyzer/Block.h>

@@ -19,6 +19,7 @@ struct HashMap_u32_Type {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_u32_Type;
 struct Type;
 struct Type;
@@ -26,7 +27,6 @@ struct Type;
 #include <std/HashMap_u32_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/HashMapIter_u32_Type.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_u32_Type HashMap_u32_Type__new(struct trait_Allocator allocator);

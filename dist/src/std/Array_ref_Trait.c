@@ -8,7 +8,6 @@
 #include <analyzer/types/Trait.h>
 #include <std/Iter_ref_ref_Trait.h>
 #include <slice_ref_Trait.h>
-
 #include <std/Array_ref_Trait.h>
 
 #include <std/Array_ref_Trait.h>

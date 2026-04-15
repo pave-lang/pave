@@ -9,7 +9,6 @@
 #include <analyzer/types/Generics.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Function.h>
-
 #include <analyzer/statement/YieldStatement.h>
 
 #include <analyzer/statement/YieldStatement.h>

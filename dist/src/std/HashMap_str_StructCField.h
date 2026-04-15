@@ -19,6 +19,7 @@ struct HashMap_str_StructCField {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_StructCField;
 struct str;
 struct StructCField;
@@ -28,7 +29,6 @@ struct StructCField;
 #include <std/str.h>
 #include <analyzer/c/StructCField.h>
 #include <std/HashMapIter_str_StructCField.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_StructCField HashMap_str_StructCField__new(struct trait_Allocator allocator);

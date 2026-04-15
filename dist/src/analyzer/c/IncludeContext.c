@@ -24,7 +24,6 @@
 #include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/ClassCpp.h>
 #include <std/HashMap_str_Primitive.h>
-
 #include <analyzer/c/IncludeContext.h>
 
 #include <analyzer/c/IncludeContext.h>

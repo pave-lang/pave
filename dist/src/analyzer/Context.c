@@ -61,7 +61,6 @@
 #include <std/Array_ref_Trait.h>
 #include <std/Iter_ref_ref_Trait.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
-
 #include <analyzer/Context.h>
 
 #include <analyzer/Context.h>

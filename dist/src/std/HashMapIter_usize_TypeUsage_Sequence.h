@@ -13,8 +13,8 @@ struct HashMapIter_usize_TypeUsage_Sequence {
     struct HashMapBucket_usize_TypeUsage_Sequence* iter;
     struct HashMapBucket_usize_TypeUsage_Sequence* end;
 };
-struct HashMapIter_usize_TypeUsage_Sequence;
 
+struct HashMapIter_usize_TypeUsage_Sequence;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_usize_TypeUsage_Sequence__next(struct HashMapIter_usize_TypeUsage_Sequence* self);

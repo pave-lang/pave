@@ -19,6 +19,7 @@ struct HashMap_str_Primitive {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_Primitive;
 struct str;
 struct Primitive;
@@ -28,7 +29,6 @@ struct Primitive;
 #include <std/str.h>
 #include <analyzer/types/Primitive.h>
 #include <std/HashMapIter_str_Primitive.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Primitive HashMap_str_Primitive__new(struct trait_Allocator allocator);

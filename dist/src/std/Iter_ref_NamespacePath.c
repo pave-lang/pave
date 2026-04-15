@@ -6,7 +6,6 @@
 #include <std/Iter_ref_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
 #include <std/IterEnumerate_ref_NamespacePath.h>
-
 #include <std/Iter_ref_NamespacePath.h>
 
 #include <std/Iter_ref_NamespacePath.h>

@@ -13,13 +13,13 @@ struct Generics {
     struct Array_Generic array;
     struct HashMap_str_usize map;
 };
+
 struct Generics;
 struct Generic;
 struct Context;
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Generics.h>
 #include <std/str.h>
-
 
 #line 49 "src/analyzer/types/Generics.pv"
 struct Generics Generics__new(struct trait_Allocator allocator);

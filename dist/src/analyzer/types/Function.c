@@ -18,7 +18,6 @@
 #include <std/str.h>
 #include <analyzer/Block.h>
 #include <std/Iter_ref_Parameter.h>
-
 #include <analyzer/types/Function.h>
 
 #include <analyzer/types/Function.h>

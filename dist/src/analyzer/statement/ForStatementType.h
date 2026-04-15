@@ -2,7 +2,6 @@
 #define PAVE_FOR_STATEMENT_TYPE
 
 struct Expression;
-
 #line 4 "src/analyzer/statement/ForStatementType.pv"
 struct ForStatementType {
     enum {
@@ -17,5 +16,6 @@ struct ForStatementType {
         struct Expression* sequence_value;
     };
 };
+
 
 #endif

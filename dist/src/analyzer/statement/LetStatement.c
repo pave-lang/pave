@@ -14,7 +14,6 @@
 #include <std/str.h>
 #include <analyzer/InlayHintKind.h>
 #include <std/ArenaAllocator.h>
-
 #include <analyzer/statement/LetStatement.h>
 
 #include <analyzer/statement/LetStatement.h>

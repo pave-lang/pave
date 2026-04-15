@@ -9,10 +9,10 @@ struct MatchStatement {
     struct Expression* expression;
     struct Array_MatchCase cases;
 };
+
 struct Context;
 struct Generics;
 struct MatchStatement;
-
 
 #line 13 "src/analyzer/statement/MatchStatement.pv"
 struct MatchStatement* MatchStatement__parse(struct Context* context, struct Generics* generics);

@@ -7,7 +7,6 @@
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_str.h>
-
 #include <compiler/FunctionScope.h>
 
 #include <compiler/FunctionScope.h>

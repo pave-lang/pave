@@ -19,6 +19,7 @@ struct HashMap_usize_TypeUsage_Sequence {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_usize_TypeUsage_Sequence;
 struct TypeUsage_Sequence;
 struct TypeUsage_Sequence;
@@ -26,7 +27,6 @@ struct TypeUsage_Sequence;
 #include <std/HashMap_usize_TypeUsage_Sequence.h>
 #include <compiler/TypeUsage_Sequence.h>
 #include <std/HashMapIter_usize_TypeUsage_Sequence.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Sequence HashMap_usize_TypeUsage_Sequence__new(struct trait_Allocator allocator);

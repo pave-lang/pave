@@ -8,7 +8,6 @@
 #include <analyzer/statement/DeferStatement.h>
 #include <std/Iter_ref_DeferStatement.h>
 #include <slice_DeferStatement.h>
-
 #include <std/Array_DeferStatement.h>
 
 #include <std/Array_DeferStatement.h>

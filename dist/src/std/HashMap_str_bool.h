@@ -19,13 +19,13 @@ struct HashMap_str_bool {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_bool;
 struct str;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_bool.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_bool.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_bool HashMap_str_bool__new(struct trait_Allocator allocator);

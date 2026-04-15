@@ -19,13 +19,13 @@ struct HashMap_str_usize {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_usize;
 struct str;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_usize.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_usize.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_usize HashMap_str_usize__new(struct trait_Allocator allocator);

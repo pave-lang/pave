@@ -13,9 +13,9 @@ struct HashSetIter_str {
     struct HashSetBucket_str* iter;
     struct HashSetBucket_str* end;
 };
+
 struct HashSetIter_str;
 struct str;
-
 
 #line 15 "src/std/HashSet.pv"
 bool HashSetIter_str__next(struct HashSetIter_str* self);

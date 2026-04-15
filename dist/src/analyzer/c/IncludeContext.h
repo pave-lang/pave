@@ -20,13 +20,13 @@ struct IncludeContext {
     struct HashMap_str_Type* values;
     struct ParentCpp parent;
 };
+
 struct IncludeContext;
 struct Type;
 struct StructC;
 struct EnumC;
 struct FunctionC;
 #include <analyzer/types/Type.h>
-
 
 #line 17 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type);

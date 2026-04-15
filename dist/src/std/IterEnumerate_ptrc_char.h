@@ -14,9 +14,9 @@ struct IterEnumerate_ptrc_char {
     uintptr_t index;
     struct Iter_ptrc_char iter;
 };
+
 struct IterEnumerate_ptrc_char;
 #include <tuple_usize_ptrc_char.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ptrc_char__next(struct IterEnumerate_ptrc_char* self);

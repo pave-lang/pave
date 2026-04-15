@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include <analyzer/c/ParentCpp.h>
 #include <analyzer/c/ParentCpp.h>
 
 #include <analyzer/c/ParentCpp.h>

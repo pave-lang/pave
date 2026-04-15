@@ -15,10 +15,10 @@ struct Iter_ref_ptrc_char {
     char const** start;
     char const** end;
 };
+
 struct Iter_ref_ptrc_char;
 #include <std/Iter_ref_ptrc_char.h>
 #include <std/IterEnumerate_ref_ptrc_char.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ptrc_char Iter_ref_ptrc_char__new(char const** start, char const** end);

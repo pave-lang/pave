@@ -16,11 +16,11 @@ struct Iter_ref_MatchCase {
     struct MatchCase* start;
     struct MatchCase* end;
 };
+
 struct MatchCase;
 struct Iter_ref_MatchCase;
 #include <std/Iter_ref_MatchCase.h>
 #include <std/IterEnumerate_ref_MatchCase.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_MatchCase Iter_ref_MatchCase__new(struct MatchCase* start, struct MatchCase* end);

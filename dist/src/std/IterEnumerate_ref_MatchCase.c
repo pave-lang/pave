@@ -7,7 +7,6 @@
 #include <std/IterEnumerate_ref_MatchCase.h>
 #include <tuple_usize_ref_MatchCase.h>
 #include <analyzer/statement/MatchCase.h>
-
 #include <std/IterEnumerate_ref_MatchCase.h>
 
 #include <std/IterEnumerate_ref_MatchCase.h>

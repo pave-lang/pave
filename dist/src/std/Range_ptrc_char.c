@@ -1,6 +1,8 @@
+#include <stdint.h>
+
+#include <std/Range_ptrc_char.h>
 #include <std/Iter_ptrc_char.h>
 #include <std/Range_ptrc_char.h>
-#include <stdint.h>
 
 #include <std/Range_ptrc_char.h>
 

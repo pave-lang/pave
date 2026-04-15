@@ -19,6 +19,7 @@ struct HashMap_str_Enum {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_Enum;
 struct str;
 struct Enum;
@@ -28,7 +29,6 @@ struct Enum;
 #include <std/str.h>
 #include <analyzer/types/Enum.h>
 #include <std/HashMapIter_str_Enum.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Enum HashMap_str_Enum__new(struct trait_Allocator allocator);

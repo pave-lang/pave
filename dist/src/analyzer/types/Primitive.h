@@ -13,10 +13,10 @@ struct Primitive {
     struct HashMap_str_ref_Trait traits;
     struct Array_ref_Impl impls;
 };
+
 struct ArenaAllocator;
 struct Primitive;
 #include <analyzer/types/Primitive.h>
-
 
 #line 11 "src/analyzer/types/Primitive.pv"
 struct Primitive Primitive__new(struct ArenaAllocator* allocator, char const* name);

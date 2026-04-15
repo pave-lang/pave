@@ -8,7 +8,6 @@
 #include <analyzer/Scope.h>
 #include <std/Iter_ref_Scope.h>
 #include <slice_Scope.h>
-
 #include <std/Array_Scope.h>
 
 #include <std/Array_Scope.h>

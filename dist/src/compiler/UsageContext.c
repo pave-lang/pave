@@ -6,7 +6,6 @@
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_Type.h>
 #include <std/trait_Allocator.h>
-
 #include <compiler/UsageContext.h>
 
 #include <compiler/UsageContext.h>

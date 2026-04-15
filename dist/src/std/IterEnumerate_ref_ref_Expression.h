@@ -14,9 +14,9 @@ struct IterEnumerate_ref_ref_Expression {
     uintptr_t index;
     struct Iter_ref_ref_Expression iter;
 };
+
 struct IterEnumerate_ref_ref_Expression;
 #include <tuple_usize_ref_ref_Expression.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_Expression__next(struct IterEnumerate_ref_ref_Expression* self);

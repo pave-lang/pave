@@ -40,6 +40,7 @@ struct Module {
     bool mode_cpp;
     struct HashMap_str_ref_Include includes;
 };
+
 struct Namespace;
 struct Module;
 struct NamespacePath;
@@ -49,7 +50,6 @@ struct Type;
 struct Array_Type;
 struct Primitive;
 #include <std/str.h>
-
 
 #line 27 "src/analyzer/Module.pv"
 struct Module* Module__new(struct Namespace* namespace, struct str path);

@@ -19,13 +19,13 @@ struct TypeUsage_Primitive {
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions;
     bool impl_dynamic_usage;
 };
+
 struct ArenaAllocator;
 struct Primitive;
 struct TypeUsage_Primitive;
 struct GenericMap;
 struct UsageContext;
 #include <compiler/TypeUsage_Primitive.h>
-
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Primitive TypeUsage_Primitive__new(struct ArenaAllocator* allocator, struct Primitive* type, uintptr_t impl_count);

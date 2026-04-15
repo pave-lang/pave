@@ -13,8 +13,8 @@ struct HashMapIter_str_ref_Include {
     struct HashMapBucket_str_ref_Include* iter;
     struct HashMapBucket_str_ref_Include* end;
 };
-struct HashMapIter_str_ref_Include;
 
+struct HashMapIter_str_ref_Include;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_Include__next(struct HashMapIter_str_ref_Include* self);

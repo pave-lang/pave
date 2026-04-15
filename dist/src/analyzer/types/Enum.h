@@ -24,10 +24,10 @@ struct Enum {
     struct HashMap_str_ref_Trait traits;
     struct Array_ref_Impl impls;
 };
+
 struct Context;
 struct Enum;
 #include <analyzer/types/Enum.h>
-
 
 #line 35 "src/analyzer/types/Enum.pv"
 struct Enum Enum__new(struct Context* context);

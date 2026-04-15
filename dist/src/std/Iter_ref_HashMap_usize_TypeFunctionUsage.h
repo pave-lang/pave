@@ -16,11 +16,11 @@ struct Iter_ref_HashMap_usize_TypeFunctionUsage {
     struct HashMap_usize_TypeFunctionUsage* start;
     struct HashMap_usize_TypeFunctionUsage* end;
 };
+
 struct HashMap_usize_TypeFunctionUsage;
 struct Iter_ref_HashMap_usize_TypeFunctionUsage;
 #include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
 #include <std/IterEnumerate_ref_HashMap_usize_TypeFunctionUsage.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_HashMap_usize_TypeFunctionUsage Iter_ref_HashMap_usize_TypeFunctionUsage__new(struct HashMap_usize_TypeFunctionUsage* start, struct HashMap_usize_TypeFunctionUsage* end);

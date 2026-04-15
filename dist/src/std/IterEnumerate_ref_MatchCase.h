@@ -14,9 +14,9 @@ struct IterEnumerate_ref_MatchCase {
     uintptr_t index;
     struct Iter_ref_MatchCase iter;
 };
+
 struct IterEnumerate_ref_MatchCase;
 #include <tuple_usize_ref_MatchCase.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_MatchCase__next(struct IterEnumerate_ref_MatchCase* self);

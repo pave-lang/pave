@@ -13,7 +13,6 @@
 #include <analyzer/Root.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <compiler/Generator.h>
-
 #include <compiler/main.h>
 
 #line 7 "src/compiler/main.pv"

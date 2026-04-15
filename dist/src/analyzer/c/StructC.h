@@ -11,9 +11,9 @@ struct StructC {
     struct str name;
     struct HashMap_str_StructCField fields;
 };
+
 struct Include;
 struct StructC;
-
 
 #line 10 "src/analyzer/c/StructC.pv"
 struct StructC* StructC__new(struct Include* include, char const* name);

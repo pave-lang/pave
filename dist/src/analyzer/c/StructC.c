@@ -5,7 +5,6 @@
 #include <std/str.h>
 #include <std/HashMap_str_StructCField.h>
 #include <std/trait_Allocator.h>
-
 #include <analyzer/c/StructC.h>
 
 #include <analyzer/c/StructC.h>

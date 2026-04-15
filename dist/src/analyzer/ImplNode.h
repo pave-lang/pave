@@ -2,7 +2,6 @@
 #define PAVE_IMPL_NODE
 
 #include <std/str.h>
-
 #line 4 "src/analyzer/Impl.pv"
 struct ImplNode {
     enum {
@@ -11,5 +10,6 @@ struct ImplNode {
 
     struct str function_value;
 };
+
 
 #endif

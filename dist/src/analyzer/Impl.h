@@ -27,13 +27,13 @@ struct Impl {
     struct Array_ImplNode nodes;
     struct HashMap_str_Function functions;
 };
+
 struct Context;
 struct Impl;
 struct Function;
 #include <analyzer/Impl.h>
 #include <analyzer/types/FunctionParent.h>
 #include <std/str.h>
-
 
 #line 24 "src/analyzer/Impl.pv"
 struct Impl Impl__parse(struct Context* context);

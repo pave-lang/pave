@@ -6,7 +6,6 @@
 #include <analyzer/types/Type.h>
 #include <std/Array_ref_Expression.h>
 #include <std/trait_Allocator.h>
-
 #include <analyzer/c/FunctionC.h>
 
 #include <analyzer/c/FunctionC.h>

@@ -11,7 +11,6 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/types/Generics.h>
-
 #include <analyzer/statement/ReturnStatement.h>
 
 #include <analyzer/statement/ReturnStatement.h>

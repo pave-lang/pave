@@ -12,7 +12,6 @@
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <compiler/UsageContext.h>
 #include <analyzer/types/GenericMap.h>
-
 #include <compiler/TypeUsage_Sequence.h>
 
 #include <compiler/TypeUsage_Sequence.h>

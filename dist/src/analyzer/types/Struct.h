@@ -24,10 +24,10 @@ struct Struct {
     struct HashMap_str_tuple_ref_Trait_ref_Type traits;
     struct Array_ref_Impl impls;
 };
+
 struct Module;
 struct Struct;
 #include <analyzer/types/Struct.h>
-
 
 #line 28 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);

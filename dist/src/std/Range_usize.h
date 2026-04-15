@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-struct Iter_usize;
-
 #line 1 "src/std/Range.pv"
 #ifndef PAVE_RANGE__TYPE
 #define PAVE_RANGE__TYPE
@@ -24,6 +22,9 @@ struct Range_usize {
         struct { uintptr_t _0; uintptr_t _1; } startend_value;
     };
 };
+
+#include <std/Range_usize.h>
+#include <std/Iter_usize.h>
 
 #line 25 "src/std/Range.pv"
 struct Iter_usize Range_usize__iter(struct Range_usize self);

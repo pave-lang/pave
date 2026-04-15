@@ -38,6 +38,7 @@ struct Naming {
     struct HashMap_str_str primitives;
     struct Naming* naming_ident;
 };
+
 struct ArenaAllocator;
 struct Naming;
 struct Type;
@@ -48,7 +49,6 @@ struct String;
 #include <std/String.h>
 #include <std/str.h>
 #include <analyzer/c/ParentCpp.h>
-
 
 #line 43 "src/analyzer/Naming.pv"
 struct Naming Naming__new_decl(struct ArenaAllocator* allocator);

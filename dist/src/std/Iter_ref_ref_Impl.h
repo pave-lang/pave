@@ -16,11 +16,11 @@ struct Iter_ref_ref_Impl {
     struct Impl** start;
     struct Impl** end;
 };
+
 struct Impl;
 struct Iter_ref_ref_Impl;
 #include <std/Iter_ref_ref_Impl.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_Impl Iter_ref_ref_Impl__new(struct Impl** start, struct Impl** end);

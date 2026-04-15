@@ -13,8 +13,8 @@ struct HashMapIter_str_Array_InlayHint {
     struct HashMapBucket_str_Array_InlayHint* iter;
     struct HashMapBucket_str_Array_InlayHint* end;
 };
-struct HashMapIter_str_Array_InlayHint;
 
+struct HashMapIter_str_Array_InlayHint;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_InlayHint__next(struct HashMapIter_str_Array_InlayHint* self);

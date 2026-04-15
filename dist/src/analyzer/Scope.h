@@ -9,10 +9,10 @@ struct Scope {
     struct HashMap_str_Type values;
     struct Block* block;
 };
+
 struct ArenaAllocator;
 struct Block;
 #include <analyzer/Scope.h>
-
 
 #line 10 "src/analyzer/Scope.pv"
 struct Scope Scope__new(struct ArenaAllocator* allocator, struct Block* block);

@@ -14,11 +14,11 @@
 struct String {
     struct Array_char array;
 };
+
 struct String;
 #include <std/trait_Allocator.h>
 #include <std/String.h>
 #include <std/str.h>
-
 
 #line 10 "src/std/String.pv"
 struct String String__new(struct trait_Allocator allocator);

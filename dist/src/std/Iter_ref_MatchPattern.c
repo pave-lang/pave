@@ -6,7 +6,6 @@
 #include <std/Iter_ref_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <std/IterEnumerate_ref_MatchPattern.h>
-
 #include <std/Iter_ref_MatchPattern.h>
 
 #include <std/Iter_ref_MatchPattern.h>

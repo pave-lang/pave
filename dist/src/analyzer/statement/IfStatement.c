@@ -11,7 +11,6 @@
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/statement/ElseStatement.h>
-
 #include <analyzer/statement/IfStatement.h>
 
 #include <analyzer/statement/IfStatement.h>

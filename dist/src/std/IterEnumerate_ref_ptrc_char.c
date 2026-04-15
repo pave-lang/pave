@@ -7,7 +7,6 @@
 #include <std/IterEnumerate_ref_ptrc_char.h>
 #include <tuple_usize_ref_ptrc_char.h>
 #include <char.h>
-
 #include <std/IterEnumerate_ref_ptrc_char.h>
 
 #include <std/IterEnumerate_ref_ptrc_char.h>

@@ -15,10 +15,10 @@ struct Iter_ref_tuple_usize_str_TypeId {
     struct tuple_usize_str_TypeId* start;
     struct tuple_usize_str_TypeId* end;
 };
+
 struct Iter_ref_tuple_usize_str_TypeId;
 #include <std/Iter_ref_tuple_usize_str_TypeId.h>
 #include <std/IterEnumerate_ref_tuple_usize_str_TypeId.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_tuple_usize_str_TypeId Iter_ref_tuple_usize_str_TypeId__new(struct tuple_usize_str_TypeId* start, struct tuple_usize_str_TypeId* end);

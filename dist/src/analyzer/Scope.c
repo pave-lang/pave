@@ -3,7 +3,6 @@
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Block.h>
-
 #include <analyzer/Scope.h>
 
 #include <analyzer/Scope.h>

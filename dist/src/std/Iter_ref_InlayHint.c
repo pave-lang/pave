@@ -6,7 +6,6 @@
 #include <std/Iter_ref_InlayHint.h>
 #include <analyzer/InlayHint.h>
 #include <std/IterEnumerate_ref_InlayHint.h>
-
 #include <std/Iter_ref_InlayHint.h>
 
 #include <std/Iter_ref_InlayHint.h>

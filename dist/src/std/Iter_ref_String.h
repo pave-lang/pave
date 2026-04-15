@@ -16,11 +16,11 @@ struct Iter_ref_String {
     struct String* start;
     struct String* end;
 };
+
 struct String;
 struct Iter_ref_String;
 #include <std/Iter_ref_String.h>
 #include <std/IterEnumerate_ref_String.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_String Iter_ref_String__new(struct String* start, struct String* end);

@@ -13,8 +13,8 @@ struct HashMapIter_str_tuple_ref_Trait_ref_Type {
     struct HashMapBucket_str_tuple_ref_Trait_ref_Type* iter;
     struct HashMapBucket_str_tuple_ref_Trait_ref_Type* end;
 };
-struct HashMapIter_str_tuple_ref_Trait_ref_Type;
 
+struct HashMapIter_str_tuple_ref_Trait_ref_Type;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_tuple_ref_Trait_ref_Type__next(struct HashMapIter_str_tuple_ref_Trait_ref_Type* self);

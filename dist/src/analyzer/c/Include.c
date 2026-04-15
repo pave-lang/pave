@@ -22,7 +22,6 @@
 #include <analyzer/c/NamespaceCpp.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/EnumC.h>
-
 #include <analyzer/c/Include.h>
 
 #include <analyzer/c/Include.h>

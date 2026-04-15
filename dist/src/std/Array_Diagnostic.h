@@ -17,6 +17,7 @@ struct Array_Diagnostic {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_Diagnostic;
 struct Diagnostic;
 struct Diagnostic;
@@ -24,7 +25,6 @@ struct Diagnostic;
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <std/Iter_ref_Diagnostic.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_Diagnostic Array_Diagnostic__new(struct trait_Allocator allocator);

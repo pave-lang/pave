@@ -25,13 +25,13 @@ struct Namespace {
     struct HashMap_str_ref_Trait traits;
     struct HashMap_str_Type functions;
 };
+
 struct Root;
 struct Namespace;
 struct Namespace;
 struct Type;
 struct Trait;
 #include <std/str.h>
-
 
 #line 19 "src/analyzer/Namespace.pv"
 struct Namespace* Namespace__new(struct Root* root, struct Namespace* parent, struct str name, struct str path);

@@ -8,7 +8,6 @@
 #include <analyzer/InlayHint.h>
 #include <std/Iter_ref_InlayHint.h>
 #include <slice_InlayHint.h>
-
 #include <std/Array_InlayHint.h>
 
 #include <std/Array_InlayHint.h>

@@ -1,8 +1,6 @@
 #ifndef PAVE_RANGE_PTRC_CHAR
 #define PAVE_RANGE_PTRC_CHAR
 
-struct Iter_ptrc_char;
-
 #line 1 "src/std/Range.pv"
 #ifndef PAVE_RANGE__TYPE
 #define PAVE_RANGE__TYPE
@@ -22,6 +20,9 @@ struct Range_ptrc_char {
         struct { char const* _0; char const* _1; } startend_value;
     };
 };
+
+#include <std/Range_ptrc_char.h>
+#include <std/Iter_ptrc_char.h>
 
 #line 25 "src/std/Range.pv"
 struct Iter_ptrc_char Range_ptrc_char__iter(struct Range_ptrc_char self);

@@ -19,6 +19,7 @@ struct HashMap_str_Array_Diagnostic {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_str_Array_Diagnostic;
 struct str;
 struct Array_Diagnostic;
@@ -28,7 +29,6 @@ struct Array_Diagnostic;
 #include <std/str.h>
 #include <std/Array_Diagnostic.h>
 #include <std/HashMapIter_str_Array_Diagnostic.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Array_Diagnostic HashMap_str_Array_Diagnostic__new(struct trait_Allocator allocator);

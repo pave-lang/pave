@@ -8,7 +8,6 @@
 #include <analyzer/statement/MatchPattern.h>
 #include <std/Iter_ref_MatchPattern.h>
 #include <slice_MatchPattern.h>
-
 #include <std/Array_MatchPattern.h>
 
 #include <std/Array_MatchPattern.h>

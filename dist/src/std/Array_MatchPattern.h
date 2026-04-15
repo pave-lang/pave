@@ -17,6 +17,7 @@ struct Array_MatchPattern {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_MatchPattern;
 struct MatchPattern;
 struct MatchPattern;
@@ -24,7 +25,6 @@ struct MatchPattern;
 #include <std/Array_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <std/Iter_ref_MatchPattern.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_MatchPattern Array_MatchPattern__new(struct trait_Allocator allocator);

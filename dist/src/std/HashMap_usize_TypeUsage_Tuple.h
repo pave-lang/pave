@@ -19,6 +19,7 @@ struct HashMap_usize_TypeUsage_Tuple {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_usize_TypeUsage_Tuple;
 struct TypeUsage_Tuple;
 struct TypeUsage_Tuple;
@@ -26,7 +27,6 @@ struct TypeUsage_Tuple;
 #include <std/HashMap_usize_TypeUsage_Tuple.h>
 #include <compiler/TypeUsage_Tuple.h>
 #include <std/HashMapIter_usize_TypeUsage_Tuple.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Tuple HashMap_usize_TypeUsage_Tuple__new(struct trait_Allocator allocator);

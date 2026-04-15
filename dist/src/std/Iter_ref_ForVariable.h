@@ -16,11 +16,11 @@ struct Iter_ref_ForVariable {
     struct ForVariable* start;
     struct ForVariable* end;
 };
+
 struct ForVariable;
 struct Iter_ref_ForVariable;
 #include <std/Iter_ref_ForVariable.h>
 #include <std/IterEnumerate_ref_ForVariable.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ForVariable Iter_ref_ForVariable__new(struct ForVariable* start, struct ForVariable* end);

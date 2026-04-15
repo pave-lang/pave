@@ -2,7 +2,6 @@
 
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/types/Sequence.h>
-
 #include <analyzer/types/Sequence.h>
 
 #include <analyzer/types/Sequence.h>

@@ -16,11 +16,11 @@ struct Iter_ref_ElseStatement {
     struct ElseStatement* start;
     struct ElseStatement* end;
 };
+
 struct ElseStatement;
 struct Iter_ref_ElseStatement;
 #include <std/Iter_ref_ElseStatement.h>
 #include <std/IterEnumerate_ref_ElseStatement.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ElseStatement Iter_ref_ElseStatement__new(struct ElseStatement* start, struct ElseStatement* end);

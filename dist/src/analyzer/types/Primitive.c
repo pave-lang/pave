@@ -4,7 +4,6 @@
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_ref_Impl.h>
-
 #include <analyzer/types/Primitive.h>
 
 #include <analyzer/types/Primitive.h>

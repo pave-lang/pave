@@ -51,7 +51,6 @@
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/types/Enum.h>
 #include <analyzer/types/Struct.h>
-
 #include <analyzer/Root.h>
 
 #include <analyzer/Root.h>

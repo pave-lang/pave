@@ -7,7 +7,6 @@
 #include <std/IterEnumerate_ref_Diagnostic.h>
 #include <tuple_usize_ref_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
-
 #include <std/IterEnumerate_ref_Diagnostic.h>
 
 #include <std/IterEnumerate_ref_Diagnostic.h>

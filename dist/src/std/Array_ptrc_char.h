@@ -16,11 +16,11 @@ struct Array_ptrc_char {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_ptrc_char;
 #include <std/trait_Allocator.h>
 #include <std/Array_ptrc_char.h>
 #include <std/Iter_ref_ptrc_char.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_ptrc_char Array_ptrc_char__new(struct trait_Allocator allocator);

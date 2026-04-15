@@ -10,4 +10,5 @@ enum InlayHintKind {
     INLAY_HINT_KIND__PARAMETER,
 };
 
+
 #endif

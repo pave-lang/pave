@@ -13,8 +13,8 @@ struct HashMapIter_str_GeneratorInclude {
     struct HashMapBucket_str_GeneratorInclude* iter;
     struct HashMapBucket_str_GeneratorInclude* end;
 };
-struct HashMapIter_str_GeneratorInclude;
 
+struct HashMapIter_str_GeneratorInclude;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_GeneratorInclude__next(struct HashMapIter_str_GeneratorInclude* self);

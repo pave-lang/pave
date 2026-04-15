@@ -13,10 +13,10 @@ struct EnumC {
     struct ParentCpp parent;
     struct HashMap_str_EnumCValue values;
 };
+
 struct Include;
 struct EnumC;
 #include <analyzer/c/ParentCpp.h>
-
 
 #line 11 "src/analyzer/c/EnumC.pv"
 struct EnumC* EnumC__new(struct Include* include, char const* name, struct ParentCpp parent);

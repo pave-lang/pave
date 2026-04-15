@@ -9,11 +9,11 @@ struct TypeImpl {
     struct Type type;
     struct Impl* impl_info;
 };
+
 struct ArenaAllocator;
 struct Impl;
 #include <analyzer/types/Type.h>
 #include <analyzer/types/TypeImpl.h>
-
 
 #line 10 "src/analyzer/types/TypeImpl.pv"
 struct TypeImpl TypeImpl__new(struct ArenaAllocator* allocator, struct Type type, struct Impl* impl_info);

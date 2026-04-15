@@ -16,6 +16,7 @@ struct Expression {
     struct ExpressionData data;
     struct Type return_type;
 };
+
 struct ArenaAllocator;
 struct Token;
 struct Type;
@@ -33,7 +34,6 @@ struct Generics;
 #include <analyzer/expression/EnumVariantResult.h>
 #include <std/Array_InvokeArgument.h>
 #include <std/str.h>
-
 
 #line 14 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make(struct ArenaAllocator* allocator, struct Token* token, struct ExpressionData data, struct Type* return_type);

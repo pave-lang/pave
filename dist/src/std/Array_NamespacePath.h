@@ -17,6 +17,7 @@ struct Array_NamespacePath {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_NamespacePath;
 struct NamespacePath;
 struct NamespacePath;
@@ -24,7 +25,6 @@ struct NamespacePath;
 #include <std/Array_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
 #include <std/Iter_ref_NamespacePath.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_NamespacePath Array_NamespacePath__new(struct trait_Allocator allocator);

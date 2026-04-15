@@ -6,7 +6,6 @@
 #include <std/Iter_ref_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/IterEnumerate_ref_Type.h>
-
 #include <std/Iter_ref_Type.h>
 
 #include <std/Iter_ref_Type.h>

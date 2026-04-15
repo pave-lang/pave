@@ -30,12 +30,12 @@ struct Function {
     struct Type return_type;
     struct Block* body;
 };
+
 struct Context;
 struct Function;
 struct Generics;
 #include <analyzer/types/Function.h>
 #include <std/trait_Allocator.h>
-
 
 #line 43 "src/analyzer/types/Function.pv"
 struct Function Function__new(struct Context* context);

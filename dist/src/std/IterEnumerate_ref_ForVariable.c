@@ -7,7 +7,6 @@
 #include <std/IterEnumerate_ref_ForVariable.h>
 #include <tuple_usize_ref_ForVariable.h>
 #include <analyzer/statement/ForVariable.h>
-
 #include <std/IterEnumerate_ref_ForVariable.h>
 
 #include <std/IterEnumerate_ref_ForVariable.h>

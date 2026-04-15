@@ -17,6 +17,7 @@ struct Array_Scope {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_Scope;
 struct Scope;
 struct Scope;
@@ -24,7 +25,6 @@ struct Scope;
 #include <std/Array_Scope.h>
 #include <analyzer/Scope.h>
 #include <std/Iter_ref_Scope.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_Scope Array_Scope__new(struct trait_Allocator allocator);

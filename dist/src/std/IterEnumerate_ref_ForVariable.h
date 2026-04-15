@@ -14,9 +14,9 @@ struct IterEnumerate_ref_ForVariable {
     uintptr_t index;
     struct Iter_ref_ForVariable iter;
 };
+
 struct IterEnumerate_ref_ForVariable;
 #include <tuple_usize_ref_ForVariable.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ForVariable__next(struct IterEnumerate_ref_ForVariable* self);

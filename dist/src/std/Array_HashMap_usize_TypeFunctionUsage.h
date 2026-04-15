@@ -17,6 +17,7 @@ struct Array_HashMap_usize_TypeFunctionUsage {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_HashMap_usize_TypeFunctionUsage;
 struct HashMap_usize_TypeFunctionUsage;
 struct HashMap_usize_TypeFunctionUsage;
@@ -24,7 +25,6 @@ struct HashMap_usize_TypeFunctionUsage;
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFunctionUsage__new(struct trait_Allocator allocator);

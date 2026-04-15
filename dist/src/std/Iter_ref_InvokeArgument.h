@@ -16,11 +16,11 @@ struct Iter_ref_InvokeArgument {
     struct InvokeArgument* start;
     struct InvokeArgument* end;
 };
+
 struct InvokeArgument;
 struct Iter_ref_InvokeArgument;
 #include <std/Iter_ref_InvokeArgument.h>
 #include <std/IterEnumerate_ref_InvokeArgument.h>
-
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_InvokeArgument Iter_ref_InvokeArgument__new(struct InvokeArgument* start, struct InvokeArgument* end);

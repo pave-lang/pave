@@ -17,6 +17,7 @@ struct Array_TypeId {
     uintptr_t length;
     uintptr_t capacity;
 };
+
 struct Array_TypeId;
 typedef uint64_t TypeId;
 typedef uint64_t TypeId;
@@ -24,7 +25,6 @@ typedef uint64_t TypeId;
 #include <std/Array_TypeId.h>
 #include <std/TypeId.h>
 #include <std/Iter_ref_TypeId.h>
-
 
 #line 77 "src/std/Array.pv"
 struct Array_TypeId Array_TypeId__new(struct trait_Allocator allocator);

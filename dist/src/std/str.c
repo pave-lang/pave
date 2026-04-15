@@ -8,7 +8,6 @@
 #include <std/trait_Hash.h>
 #include <std/Hashed.h>
 #include <std/Fnv1a.h>
-
 #include <std/str.h>
 
 #include <std/str.h>

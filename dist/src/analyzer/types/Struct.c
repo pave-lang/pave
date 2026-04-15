@@ -21,7 +21,6 @@
 #include <analyzer/types/Trait.h>
 #include <std/str.h>
 #include <std/String.h>
-
 #include <analyzer/types/Struct.h>
 
 #include <analyzer/types/Struct.h>

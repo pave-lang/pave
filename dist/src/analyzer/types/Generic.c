@@ -9,7 +9,6 @@
 #include <analyzer/TokenType.h>
 #include <analyzer/types/Trait.h>
 #include <std/str.h>
-
 #include <analyzer/types/Generic.h>
 
 #include <analyzer/types/Generic.h>

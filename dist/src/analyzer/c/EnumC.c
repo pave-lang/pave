@@ -6,7 +6,6 @@
 #include <analyzer/c/ParentCpp.h>
 #include <std/HashMap_str_EnumCValue.h>
 #include <std/trait_Allocator.h>
-
 #include <analyzer/c/EnumC.h>
 
 #include <analyzer/c/EnumC.h>

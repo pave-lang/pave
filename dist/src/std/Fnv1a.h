@@ -5,8 +5,8 @@
 
 #line 3 "src/std/Hash.pv"
 struct Fnv1a;
-#include <std/Hashed.h>
 
+#include <std/Hashed.h>
 
 #line 5 "src/std/Hash.pv"
 Hashed Fnv1a__hash(void const* value, uintptr_t size);

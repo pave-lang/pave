@@ -13,8 +13,8 @@ struct HashMapIter_str_Trait {
     struct HashMapBucket_str_Trait* iter;
     struct HashMapBucket_str_Trait* end;
 };
-struct HashMapIter_str_Trait;
 
+struct HashMapIter_str_Trait;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_Trait__next(struct HashMapIter_str_Trait* self);

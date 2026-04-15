@@ -11,4 +11,5 @@ enum FunctionType {
     FUNCTION_TYPE__METHOD_CPP,
 };
 
+
 #endif

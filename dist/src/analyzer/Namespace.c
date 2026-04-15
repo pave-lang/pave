@@ -20,7 +20,6 @@
 #include <tuple_str_ref_Namespace.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Trait.h>
-
 #include <analyzer/Namespace.h>
 
 #include <analyzer/Namespace.h>

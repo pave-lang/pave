@@ -8,7 +8,6 @@
 #include <analyzer/types/Generics.h>
 #include <analyzer/Block.h>
 #include <std/ArenaAllocator.h>
-
 #include <analyzer/statement/WhileStatement.h>
 
 #include <analyzer/statement/WhileStatement.h>

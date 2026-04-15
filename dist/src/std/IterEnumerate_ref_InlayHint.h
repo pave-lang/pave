@@ -14,9 +14,9 @@ struct IterEnumerate_ref_InlayHint {
     uintptr_t index;
     struct Iter_ref_InlayHint iter;
 };
+
 struct IterEnumerate_ref_InlayHint;
 #include <tuple_usize_ref_InlayHint.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_InlayHint__next(struct IterEnumerate_ref_InlayHint* self);

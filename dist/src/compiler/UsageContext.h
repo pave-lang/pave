@@ -17,10 +17,10 @@ struct UsageContext {
     struct HashMap_str_Type body;
     struct HashMap_str_Type cpp_usages;
 };
+
 struct ArenaAllocator;
 struct GenericMap;
 #include <compiler/UsageContext.h>
-
 
 #line 50 "src/compiler/Usages.pv"
 struct UsageContext UsageContext__new(struct ArenaAllocator* allocator, struct GenericMap* generic_map);

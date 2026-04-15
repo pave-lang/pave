@@ -1,16 +1,15 @@
 #ifndef PAVE_FUNCTION_PARENT
 #define PAVE_FUNCTION_PARENT
 
-#include <stdio.h>
-
 #include <stdint.h>
+
+#include <stdio.h>
 
 struct Primitive;
 struct Trait;
 struct Enum;
 struct Struct;
 struct Type;
-
 #line 11 "src/analyzer/types/Function.pv"
 struct FunctionParent {
     enum {
@@ -30,5 +29,6 @@ struct FunctionParent {
         struct { struct Type* _0; uintptr_t _1; struct Trait* _2; } type_value;
     };
 };
+
 
 #endif

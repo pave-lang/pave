@@ -17,9 +17,9 @@ struct FunctionScope {
     struct Array_ref_Expression defer_statements;
     struct HashMap_str_str variable_replacements;
 };
+
 struct ArenaAllocator;
 #include <compiler/FunctionScope.h>
-
 
 #line 20 "src/compiler/Generator.pv"
 struct FunctionScope FunctionScope__new(struct ArenaAllocator* allocator, bool break_target, bool continue_target);

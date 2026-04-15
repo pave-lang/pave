@@ -14,9 +14,9 @@ struct IterEnumerate_ref_Scope {
     uintptr_t index;
     struct Iter_ref_Scope iter;
 };
+
 struct IterEnumerate_ref_Scope;
 #include <tuple_usize_ref_Scope.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_Scope__next(struct IterEnumerate_ref_Scope* self);

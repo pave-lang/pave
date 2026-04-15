@@ -14,9 +14,9 @@ struct IterEnumerate_ref_ref_Token {
     uintptr_t index;
     struct Iter_ref_ref_Token iter;
 };
+
 struct IterEnumerate_ref_ref_Token;
 #include <tuple_usize_ref_ref_Token.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_Token__next(struct IterEnumerate_ref_ref_Token* self);

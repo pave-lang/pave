@@ -19,6 +19,7 @@ struct HashMap_usize_TypeUsage_Primitive {
     uintptr_t capacity;
     uintptr_t length;
 };
+
 struct HashMap_usize_TypeUsage_Primitive;
 struct TypeUsage_Primitive;
 struct TypeUsage_Primitive;
@@ -26,7 +27,6 @@ struct TypeUsage_Primitive;
 #include <std/HashMap_usize_TypeUsage_Primitive.h>
 #include <compiler/TypeUsage_Primitive.h>
 #include <std/HashMapIter_usize_TypeUsage_Primitive.h>
-
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__new(struct trait_Allocator allocator);

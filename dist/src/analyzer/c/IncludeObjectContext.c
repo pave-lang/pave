@@ -28,7 +28,6 @@
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>
-
 #include <analyzer/c/IncludeObjectContext.h>
 
 #include <analyzer/c/IncludeObjectContext.h>

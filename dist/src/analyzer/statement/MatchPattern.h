@@ -1,9 +1,6 @@
 #ifndef PAVE_MATCH_PATTERN
 #define PAVE_MATCH_PATTERN
 
-#include <std/Array_EnumVariantParameter.h>
-#include <analyzer/types/EnumVariantParameter.h>
-#include <analyzer/types/Type.h>
 #include <stdbool.h>
 
 struct Expression;
@@ -11,10 +8,8 @@ struct Type;
 struct EnumVariant;
 struct EnumCValue;
 struct Token;
-struct Context;
-struct Generics;
-struct MatchPattern;
-
+#include <std/Array_EnumVariantParameter.h>
+#include <analyzer/types/Type.h>
 #line 7 "src/analyzer/statement/MatchPattern.pv"
 struct MatchPattern {
     enum {
@@ -34,6 +29,10 @@ struct MatchPattern {
         struct Token* hash_value;
     };
 };
+
+struct Context;
+struct Generics;
+struct MatchPattern;
 
 #line 17 "src/analyzer/statement/MatchPattern.pv"
 bool MatchPattern__parse(struct Context* context, struct Generics* generics, struct MatchPattern* pattern);

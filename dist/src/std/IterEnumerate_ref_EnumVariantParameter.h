@@ -14,9 +14,9 @@ struct IterEnumerate_ref_EnumVariantParameter {
     uintptr_t index;
     struct Iter_ref_EnumVariantParameter iter;
 };
+
 struct IterEnumerate_ref_EnumVariantParameter;
 #include <tuple_usize_ref_EnumVariantParameter.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_EnumVariantParameter__next(struct IterEnumerate_ref_EnumVariantParameter* self);

@@ -17,13 +17,13 @@ struct Block {
     bool is_top_level_and_has_defer_statements_inside;
     bool is_loop;
 };
+
 struct Context;
 struct Block;
 struct Generics;
 struct StatementData;
 struct Token;
 #include <analyzer/Block.h>
-
 
 #line 17 "src/analyzer/Block.pv"
 struct Block Block__new(struct Context* context);

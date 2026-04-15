@@ -9,8 +9,8 @@
 #line 3 "src/std/GeneralPurposeAllocator.pv"
 struct GeneralPurposeAllocator {
 };
-struct GeneralPurposeAllocator;
 
+struct GeneralPurposeAllocator;
 
 #line 6 "src/std/GeneralPurposeAllocator.pv"
 struct GeneralPurposeAllocator* GeneralPurposeAllocator__default();

@@ -15,9 +15,9 @@ struct IterEnumerate_ref_CXCursor {
     uintptr_t index;
     struct Iter_ref_CXCursor iter;
 };
+
 struct IterEnumerate_ref_CXCursor;
 #include <tuple_usize_ref_CXCursor.h>
-
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_CXCursor__next(struct IterEnumerate_ref_CXCursor* self);
