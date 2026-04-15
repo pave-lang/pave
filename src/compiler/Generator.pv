@@ -2241,11 +2241,12 @@ impl Generator {
         }
     }
 
-    fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap) {
+    fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap, deref: bool) {
         let includes = HashSet<str>::new(self.allocator);
 
         for (_, &type) in types {
             let resolved = Context::resolve_type(self.allocator, type, generics, 0);
+            if deref { resolved = resolved.deref_all(); }
 
             match resolved {
                 Type::Indirect(indirect) => {
@@ -2258,9 +2259,19 @@ impl Generator {
                             let path = self.make_rel_path(module, name.as_str(), "");
                             if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
                         },
-                        Type::Struct(_, _) => {
+                        Type::Struct(struct_info, _) => {
                             let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
-                            fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+
+                            if struct_info.is_newtype() {
+                                let field = &struct_info.fields.data.value;
+
+                                fprintf(file, "typedef ");
+                                self.write_type(file, &field.type, generics);
+                                fprintf(file, " %.*s;\n", cast<i32>(name.length()), name.array.data);
+                            } else {
+                                fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+                            }
+                            
                         },
                         Type::Enum(enum_info, _) => {
                             if enum_info.is_discriminated_union() {
@@ -2479,8 +2490,8 @@ impl Generator {
     fn generate_function_loop(&self, usage: &TypeFunctionUsage) -> bool {
         let success = true;
 
-        for *generics in usage.generic_maps {
-            success = self.generate_function(usage, generics) && success;
+        for usage_context in usage.usage_contexts {
+            success = self.generate_function(usage, usage_context) && success;
         }
 
         return success;
@@ -2622,9 +2633,11 @@ impl Generator {
         return true;
     }
 
-    fn generate_function(&self, usage: &TypeFunctionUsage, generics: &GenericMap) -> bool {
+    fn generate_function(&self, usage: &TypeFunctionUsage, usage_context: &UsageContext) -> bool {
         let func_info = usage.type;
         if func_info.type == FunctionType::Builtin { return true; }
+
+        let generics = usage_context.generic_map;
 
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_str = name.as_str();
@@ -2642,9 +2655,9 @@ impl Generator {
 
         if code_file == 0 { perror(code.c_str()); return false; }
 
-        self.write_context_primitives(code_file, &usage.usage_context.primitive_code, &usage.usage_context.primitive_header);
+        self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
         self.write_includes_raw(code_file, &func_info.context.module.includes);
-        self.write_context_includes(code_file, &usage.usage_context.body, generics);
+        self.write_context_includes(code_file, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(func_info.context.module, name_str, ".h");
         fprintf(code_file, "#include <");
@@ -2673,9 +2686,9 @@ impl Generator {
         self.write_str_title(header_file, name_str);
         fprintf(header_file, "\n\n");
 
-        self.write_context_primitives(header_file, &usage.usage_context.primitive_code, 0);
+        self.write_context_primitives(header_file, &usage_context.primitive_code, 0);
         self.write_includes_raw(header_file, &func_info.context.module.includes);
-        self.write_context_includes(header_file, &usage.usage_context.signature, generics);
+        self.write_context_includes(header_file, &usage_context.signature, generics, false);
 
         if self.is_coroutine() {
             self.write_function_coroutine(header_file, func_info, generics);
@@ -2860,14 +2873,16 @@ impl Generator {
         let success = true;
         let enum_info = usage.type;
 
-        for *generics in usage.generic_maps {
-            success = self.generate_enum(enum_info, generics) && success;
+        for usage_context in usage.usage_contexts {
+            success = self.generate_enum(enum_info, usage_context) && success;
         }
 
         return success;
     }
 
-    fn generate_enum(&self, enum_info: &Enum, generics: &GenericMap) -> bool {
+    fn generate_enum(&self, enum_info: &Enum, usage_context: &UsageContext) -> bool {
+        let generics = usage_context.generic_map;
+
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let header = self.make_path(enum_info.context.module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
@@ -2934,8 +2949,8 @@ impl Generator {
                     let func_ptr = cast<usize>(func_info);
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
                     if function_usage != 0 {
-                        for *generics_impl in function_usage.generic_maps {
-                            self.add_function_includes(includes, refs, func_info, generics_impl);
+                        for usage_context in function_usage.usage_contexts {
+                            self.add_function_includes(includes, refs, func_info, usage_context.generic_map);
                         }
                     }
                     continue;
@@ -2982,9 +2997,9 @@ impl Generator {
                     let func_ptr = cast<usize>(func_info);
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
                     if function_usage != 0 {
-                        for *generics3 in function_usage.generic_maps {
-                            self.add_function_includes(includes, 0, func_info, generics3);
-                            self.add_block_includes(includes, func_info.body, generics3);
+                        for usage_context in function_usage.usage_contexts {
+                            self.add_function_includes(includes, 0, func_info, usage_context.generic_map);
+                            self.add_block_includes(includes, func_info.body, usage_context.generic_map);
                         }
                     }
                 }
@@ -3012,7 +3027,8 @@ impl Generator {
         return true;
     }
 
-    fn write_struct_definition(&self, file: &FILE, struct_info: &Struct, usage: &TypeUsage<Struct>, generics: &GenericMap) -> bool {
+    fn write_struct_definition(&self, file: &FILE, struct_info: &Struct, usage: &TypeUsage<Struct>, usage_context: &UsageContext) -> bool {
+        let generics = usage_context.generic_map;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: i32 = name.array.length;
         let impl_functions = &usage.impl_functions;
@@ -3041,7 +3057,7 @@ impl Generator {
             fprintf(file, "};\n");
         }
 
-        self.write_context_includes(file, &usage.usage_context.signature, generics);
+        self.write_context_includes(file, &usage_context.signature, generics, false);
 
         for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
             let trait_info = impl_info.trait_;
@@ -3078,12 +3094,13 @@ impl Generator {
                 if impl_functions_for_impl != 0 {
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
                     if function_usage != 0 {
-                        for *generics3 in function_usage.generic_maps {
-                            self.write_context_includes(file, &function_usage.usage_context.signature, generics3);
+                        for usage_context in function_usage.usage_contexts {
+                            self.write_context_includes(file, &usage_context.signature, usage_context.generic_map, false);
 
-                            generics3.self_type = generics.self_type;
+                            // TODO: Test if this is actually needed
+                            usage_context.generic_map.self_type = generics.self_type;
                             fprintf(file, "\n");
-                            if !self.write_function_definition(file, func_info, generics3, 0) { return false; }
+                            if !self.write_function_definition(file, func_info, usage_context.generic_map, 0) { return false; }
                             fprintf(file, ";\n");
                         }
 
@@ -3596,7 +3613,10 @@ impl Generator {
                         *func2 = *func_info;
                         // func2.parent_type = generics.self_type;
 
-                        for *generics3 in function_usage.generic_maps {
+                        for usage_context in function_usage.usage_contexts {
+                            let generics3 = usage_context.generic_map;
+                            
+                            // TODO: Is this needed?
                             generics3.self_type = generics.self_type;
 
                             fprintf(file, "\n");
@@ -3674,8 +3694,8 @@ impl Generator {
     fn generate_struct_loop(&self, usage: &TypeUsage<Struct>) -> bool {
         let success = true;
 
-        for *generics in usage.generic_maps {
-            success = self.generate_struct(usage, generics) && success;
+        for usage_context in usage.usage_contexts {
+            success = self.generate_struct(usage, usage_context) && success;
         }
 
         return success;
@@ -3705,7 +3725,8 @@ impl Generator {
         return result;
     }
         
-    fn generate_struct(&self, usage: &TypeUsage<Struct>, generics: &GenericMap) -> bool {
+    fn generate_struct(&self, usage: &TypeUsage<Struct>, usage_context: &UsageContext) -> bool {
+        let generics = usage_context.generic_map;
         let struct_info = usage.type;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let module = struct_info.module;
@@ -3720,10 +3741,10 @@ impl Generator {
         self.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        if struct_info.module.mode_cpp || usage.usage_context.cpp_usages.length > 0 {
+        if struct_info.module.mode_cpp || usage_context.cpp_usages.length > 0 {
             fprintf(header_file, "#ifdef __cplusplus\n");
 
-            for (name, type) in usage.usage_context.cpp_usages {
+            for (name, type) in usage_context.cpp_usages {
                 match type {
                     Type::ClassCpp(class_info) => {
                         if class_info.is_struct {
@@ -3737,13 +3758,13 @@ impl Generator {
             }
 
             if struct_info.module.mode_cpp {
-                if usage.usage_context.cpp_usages.length > 0 { fprintf(header_file, "\n"); }
+                if usage_context.cpp_usages.length > 0 { fprintf(header_file, "\n"); }
                 fprintf(header_file, "extern \"C\" {\n");
             }
 
             fprintf(header_file, "#else\n");
 
-            for (name, _) in usage.usage_context.cpp_usages {
+            for (name, _) in usage_context.cpp_usages {
                 fprintf(header_file, "typedef struct %.*s %.*s;\n", cast<i32>(name.length), name.ptr, cast<i32>(name.length), name.ptr);
             }
 
@@ -3758,11 +3779,11 @@ impl Generator {
             self.write_c_type_include(header_file, type.deref());
         }
 
-        self.write_context_primitives(header_file, &usage.usage_context.primitive_header, 0);
+        self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
         self.write_includes_raw(header_file, &struct_info.module.includes);
-        self.write_context_includes(header_file, &usage.usage_context.layout, generics);
+        self.write_context_includes(header_file, &usage_context.layout, generics, false);
 
-        if !self.write_struct_definition(header_file, struct_info, usage, generics) { fclose(header_file); return false; }
+        if !self.write_struct_definition(header_file, struct_info, usage, usage_context) { fclose(header_file); return false; }
 
         if struct_info.module.mode_cpp || self.root.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");
@@ -3794,9 +3815,9 @@ impl Generator {
         let code_file: &FILE = fopen(code_tmp, "w+");
         if code_file == 0 { perror(code.c_str()); return false; }
 
-        self.write_context_primitives(code_file, &usage.usage_context.primitive_code, &usage.usage_context.primitive_header);
+        self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
         self.write_includes_raw(code_file, &struct_info.module.includes);
-        self.write_context_includes(code_file, &usage.usage_context.body, generics);
+        self.write_context_includes(code_file, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(struct_info.module, name.as_str(), ".h");
         fprintf(code_file, "#include <");
@@ -4224,8 +4245,8 @@ impl Generator {
         let success = true;
         let trait_info = usage.type;
 
-        for *generics in usage.generic_maps {
-            success = self.generate_trait(trait_info, generics) && success;
+        for usage_context in usage.usage_contexts {
+            success = self.generate_trait(trait_info, usage_context.generic_map) && success;
         }
 
         return success;
