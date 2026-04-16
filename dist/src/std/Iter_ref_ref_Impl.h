@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Impl;
-
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ref_Impl {
     intptr_t step;
@@ -17,7 +15,6 @@ struct Iter_ref_ref_Impl {
     struct Impl** end;
 };
 
-struct Impl;
 struct Iter_ref_ref_Impl;
 #include <std/Iter_ref_ref_Impl.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>

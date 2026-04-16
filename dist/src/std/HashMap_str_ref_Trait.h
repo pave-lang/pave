@@ -8,7 +8,6 @@
 #include <string.h>
 
 struct HashMapBucket_str_ref_Trait;
-struct HashMapBucket_str_ref_Trait;
 #include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
@@ -22,8 +21,6 @@ struct HashMap_str_ref_Trait {
 
 struct HashMap_str_ref_Trait;
 struct str;
-struct Trait;
-struct Trait;
 struct Trait;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_ref_Trait.h>

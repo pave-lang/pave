@@ -17,8 +17,8 @@
 #include <std/str.h>
 #include <std/Array_ref_Impl.h>
 #include <std/Iter_ref_ref_Impl.h>
-#include <analyzer/Impl.h>
 #include <analyzer/types/Function.h>
+#include <analyzer/Impl.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/c/EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>

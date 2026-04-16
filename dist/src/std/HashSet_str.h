@@ -9,7 +9,6 @@
 
 struct ArenaAllocator;
 struct HashSetBucket_str;
-struct HashSetBucket_str;
 
 #line 25 "src/std/HashSet.pv"
 struct HashSet_str {

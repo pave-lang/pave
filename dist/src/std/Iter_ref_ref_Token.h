@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Token;
-
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ref_Token {
     intptr_t step;
@@ -17,7 +15,6 @@ struct Iter_ref_ref_Token {
     struct Token** end;
 };
 
-struct Token;
 struct Iter_ref_ref_Token;
 #include <std/Iter_ref_ref_Token.h>
 #include <std/IterEnumerate_ref_ref_Token.h>

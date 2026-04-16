@@ -8,7 +8,6 @@
 #include <string.h>
 
 struct HashMapBucket_str_Enum;
-struct HashMapBucket_str_Enum;
 #include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"

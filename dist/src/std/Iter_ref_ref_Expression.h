@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Expression;
-
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ref_Expression {
     intptr_t step;
@@ -17,7 +15,6 @@ struct Iter_ref_ref_Expression {
     struct Expression** end;
 };
 
-struct Expression;
 struct Iter_ref_ref_Expression;
 #include <std/Iter_ref_ref_Expression.h>
 #include <std/IterEnumerate_ref_ref_Expression.h>

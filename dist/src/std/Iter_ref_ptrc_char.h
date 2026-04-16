@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ptrc_char {
     intptr_t step;

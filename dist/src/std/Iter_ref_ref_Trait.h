@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Trait;
-
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ref_Trait {
     intptr_t step;
@@ -17,7 +15,6 @@ struct Iter_ref_ref_Trait {
     struct Trait** end;
 };
 
-struct Trait;
 struct Iter_ref_ref_Trait;
 #include <std/Iter_ref_ref_Trait.h>
 #include <std/IterEnumerate_ref_ref_Trait.h>

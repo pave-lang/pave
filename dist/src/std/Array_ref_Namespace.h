@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Namespace;
 #include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
@@ -19,8 +18,6 @@ struct Array_ref_Namespace {
 };
 
 struct Array_ref_Namespace;
-struct Namespace;
-struct Namespace;
 struct Namespace;
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Namespace.h>

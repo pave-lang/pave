@@ -8,7 +8,6 @@
 #include <string.h>
 
 struct HashMapBucket_usize_TypeUsage_Sequence;
-struct HashMapBucket_usize_TypeUsage_Sequence;
 #include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"

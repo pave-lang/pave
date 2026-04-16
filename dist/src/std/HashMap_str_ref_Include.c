@@ -7,10 +7,10 @@
 #include <std/HashMap_str_ref_Include.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMapBucket_str_ref_Include.h>
-#include <analyzer/c/Include.h>
 #include <std/Hashed.h>
 #include <std/trait_Hash.h>
 #include <std/str.h>
+#include <analyzer/c/Include.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_ref_Include.h>
 #include <std/HashMap_str_ref_Include.h>

@@ -8,7 +8,6 @@
 #include <string.h>
 
 struct HashMapBucket_usize_TypeUsage_Trait;
-struct HashMapBucket_usize_TypeUsage_Trait;
 #include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"

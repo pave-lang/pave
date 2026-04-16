@@ -8,7 +8,6 @@
 #include <string.h>
 
 struct HashMapBucket_str_Primitive;
-struct HashMapBucket_str_Primitive;
 #include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"

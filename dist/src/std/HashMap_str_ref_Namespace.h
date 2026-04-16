@@ -8,7 +8,6 @@
 #include <string.h>
 
 struct HashMapBucket_str_ref_Namespace;
-struct HashMapBucket_str_ref_Namespace;
 #include <std/trait_Allocator.h>
 
 #line 26 "src/std/HashMap.pv"
@@ -22,8 +21,6 @@ struct HashMap_str_ref_Namespace {
 
 struct HashMap_str_ref_Namespace;
 struct str;
-struct Namespace;
-struct Namespace;
 struct Namespace;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_ref_Namespace.h>

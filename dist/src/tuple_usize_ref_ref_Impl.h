@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-struct Impl;
 struct tuple_usize_ref_ref_Impl {
     uintptr_t _0;
     struct Impl** _1;

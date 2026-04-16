@@ -259,6 +259,7 @@ impl Usages {
     fn add_type(&self, type: &Type, generic_map: &GenericMap) {
         let resolved_type = Context::resolve_type(self.allocator, type, generic_map, 0);
         let type_deref = resolved_type.deref();
+        let type_deref_all = resolved_type.deref_all();
         let is_type = false;
         let is_indirect = false;
         let is_trait = false;
@@ -328,7 +329,7 @@ impl Usages {
             _ => {},
         }
 
-        if !is_type && !is_trait && !is_indirect { return; }
+        if !is_type && !is_trait { return; }
 
         let type_name_generic = self.naming_ident.get_type_name(type, generic_map.self_type, generic_map);
 
@@ -340,7 +341,7 @@ impl Usages {
 
         if !is_type && !is_trait { return; }
 
-        let type_name = self.root.naming_decl.get_type_name(type_deref, generic_map.self_type, generic_map);
+        let type_name = self.root.naming_decl.get_type_name(type_deref_all, generic_map.self_type, generic_map);
         let type_name_str = type_name.as_str();
 
         if (is_type && !self.usage_types.insert(type_name_str)) || (is_trait && !self.usage_traits.insert(type_name_str)) {
@@ -348,7 +349,7 @@ impl Usages {
             return;
         }
 
-        self.usages.append(*type_deref);
+        self.usages.append(*type_deref_all);
     }
 
     fn process_impls(&self, impls: &Array<&Impl>, generic_map: &GenericMap) {

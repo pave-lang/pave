@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-struct Namespace;
 struct tuple_usize_ref_ref_Namespace {
     uintptr_t _0;
     struct Namespace** _1;
