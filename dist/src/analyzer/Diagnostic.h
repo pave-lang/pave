@@ -1,8 +1,6 @@
 #ifndef PAVE_DIAGNOSTIC
 #define PAVE_DIAGNOSTIC
 
-#include <stdio.h>
-
 #include <std/str.h>
 #include <analyzer/Range.h>
 

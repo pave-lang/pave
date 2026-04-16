@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/Array_ptrc_char.h>
-#include <std/trait_Allocator.h>
 #include <std/Iter_ref_ptrc_char.h>
 #include <slice_ptrc_char.h>
 #include <std/Array_ptrc_char.h>

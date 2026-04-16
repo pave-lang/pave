@@ -1,28 +1,16 @@
-#include <stdint.h>
-
-#include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <string.h>
 #include <stdio.h>
 #include <analyzer/Root.h>
 #include <std/ArenaAllocator.h>
-#include <std/HashMap_str_ref_Namespace.h>
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_Type.h>
-#include <std/HashMap_str_Primitive.h>
-#include <std/HashMap_str_TypedefC.h>
-#include <std/HashMap_str_ref_Trait.h>
-#include <std/Array_ptrc_char.h>
 #include <analyzer/Analysis.h>
-#include <analyzer/Naming.h>
-#include <std/HashMap_str_ref_Include.h>
 #include <analyzer/types/Primitive.h>
-#include <analyzer/types/Type.h>
 #include <std/str.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Indirect.h>
-#include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/Token.h>
 #include <std/Array_Parameter.h>

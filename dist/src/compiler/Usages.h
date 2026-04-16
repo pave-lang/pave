@@ -1,8 +1,6 @@
 #ifndef PAVE_USAGES
 #define PAVE_USAGES
 
-#include <stdio.h>
-
 #include <std/Array_Type.h>
 #include <std/HashSet_str.h>
 #include <std/HashMap_usize_TypeUsage_Primitive.h>
@@ -100,10 +98,10 @@ void Usages__process_function(struct Usages* self, struct Function* func_info, s
 #line 567 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 649 "src/compiler/Usages.pv"
+#line 650 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 797 "src/compiler/Usages.pv"
+#line 807 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

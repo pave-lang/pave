@@ -742,7 +742,7 @@ impl Expression {
             let expression = Expression::parse(context, generics);
             if expression == 0 { return 0; }
 
-            return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::Delete(expression)), &Type::Primitive(0));
+            return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::Delete(expression)), &context.root.type_unknown);
         }
 
         context.error("Expected new or delete in cpp expression");

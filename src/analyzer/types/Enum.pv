@@ -99,7 +99,7 @@ impl Enum {
 
         if context.check_next(TokenType::Symbol, "(") {
             while !context.check_next(TokenType::Symbol, ")") {
-                let type: Type = Type::Primitive(0);
+                let type: Type;
 
                 if !context.parse_type(&type, &self.generics) { return false; }
                 types.append(type);

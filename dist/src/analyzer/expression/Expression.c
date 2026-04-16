@@ -1,13 +1,10 @@
 #include <stdint.h>
-
-#include <stdlib.h>
+#include <string.h>
 
 #include <stdlib.h>
 #include <analyzer/expression/Expression.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Token.h>
-#include <analyzer/expression/ExpressionData.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/Context.h>
 #include <analyzer/expression/EnumVariantResult.h>
 #include <analyzer/types/Indirect.h>
@@ -1558,7 +1555,7 @@ struct Expression* Expression__parse_cpp(struct Context* context, struct Generic
         }
 
         #line 745 "src/analyzer/expression/Expression.pv"
-        return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__DELETE, .delete_value = expression } }, &(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 });
+        return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__DELETE, .delete_value = expression } }, &context->root->type_unknown);
     }
 
     #line 748 "src/analyzer/expression/Expression.pv"

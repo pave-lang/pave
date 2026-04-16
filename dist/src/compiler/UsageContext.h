@@ -1,8 +1,6 @@
 #ifndef PAVE_USAGE_CONTEXT
 #define PAVE_USAGE_CONTEXT
 
-#include <stdio.h>
-
 #include <std/HashSet_str.h>
 #include <std/HashMap_str_Type.h>
 struct GenericMap;

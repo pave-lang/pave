@@ -1,9 +1,6 @@
 #ifndef PAVE_HASH_MAP_BUCKET_STR_REF_NAMESPACE
 #define PAVE_HASH_MAP_BUCKET_STR_REF_NAMESPACE
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/str.h>
 struct Namespace;
 struct HashMapBucket_str_ref_Namespace;

@@ -1,8 +1,6 @@
 #ifndef PAVE_RANGE
 #define PAVE_RANGE
 
-#include <stdio.h>
-
 #include <analyzer/Position.h>
 
 #line 10 "src/analyzer/Analysis.pv"

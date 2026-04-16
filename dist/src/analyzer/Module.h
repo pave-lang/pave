@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-
 #include <std/str.h>
 #include <std/Array_NamespacePath.h>
 #include <std/Array_ref_Namespace.h>

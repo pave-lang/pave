@@ -1,8 +1,6 @@
 #include <stdbool.h>
-#include <stdint.h>
-
-#include <clang-c/Index.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <clang-c/Index.h>
 #include <string.h>

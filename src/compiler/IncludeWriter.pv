@@ -1,0 +1,137 @@
+#include "stdio.h"
+
+use std
+use analyzer
+use analyzer::types
+use analyzer::c
+
+struct IncludeWriter {
+    allocator: &ArenaAllocator,
+    c_includes: HashSet<str>,
+    includes: HashSet<str>,
+    type_declarations: HashSet<str>,
+}
+
+impl IncludeWriter {
+    fn new(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            allocator,
+            c_includes: HashSet<str>::new(allocator),
+            includes: HashSet<str>::new(allocator),
+            type_declarations: HashSet<str>::new(allocator),
+        };
+    }
+
+    fn write(&self, file: &FILE, generator: &Generator, types: &HashMap<str, Type>, generics: &GenericMap, deref: bool) {
+        let c_includes = HashSet<str>::new(self.allocator);
+        defer c_includes.release();
+        let includes = HashSet<str>::new(self.allocator);
+        defer includes.release();
+        let type_declarations = HashSet<str>::new(self.allocator);
+        defer type_declarations.release();
+
+        for (_, &type) in types {
+            let resolved = Context::resolve_type(self.allocator, type, generics, 0);
+            if deref { resolved = resolved.deref_all(); }
+
+            match resolved {
+                Type::Indirect(_) => {
+                    let type_deref = resolved.deref_all();
+
+                    match type_deref {
+                        Type::Trait(_, _) => {
+                            let name = generator.naming_ident.get_type_name(type_deref, generics.self_type, generics);
+                            let module = type_deref.get_module();
+                            let path = generator.make_rel_path(module, name.as_str(), "");
+                            if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                        },
+                        Type::Struct(struct_info, _) => {
+                            let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
+
+                            if struct_info.is_newtype() {
+                                let typedef_info = TypedefC { name: name.as_str(), type: &struct_info.fields.data[0].value.type };
+                                let typedef_type = Type::TypedefC(&typedef_info);
+                                let type_declaration = generator.naming_c99.get_type_decl(&typedef_type, generics.self_type, generics);
+                                if self.type_declarations.insert(type_declaration.as_str()) { type_declarations.insert(type_declaration.as_str()); }
+                            } else {
+                                if self.type_declarations.insert(name.as_str()) { type_declarations.insert(name.as_str()); }
+                            }
+
+                        },
+                        Type::Enum(enum_info, _) => {
+                            if enum_info.is_discriminated_union() {
+                                let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
+                                if type_declarations.insert(name.as_str()) { type_declarations.insert(name.as_str()); }
+                            } else {
+                                let name = generator.naming_ident.get_type_name(type_deref, generics.self_type, generics);
+                                let module = type_deref.get_module();
+                                let path = generator.make_rel_path(module, name.as_str(), "");
+                                if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                            }
+                        },
+                        _ => {},
+                    }
+                },
+                Type::Function(func_info, _) => {
+                    match func_info.parent {
+                        FunctionParent::None => {
+                            let name = generator.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+                            let module = func_info.context.module;
+                            let path = generator.make_rel_path(module, name.as_str(), "");
+                            if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                        },
+                        FunctionParent::Primitive(primitive_info, _, _) => {
+                            let name = primitive_info.name;
+                            let path = generator.make_rel_path(0, name, "");
+                            if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                        },
+                        FunctionParent::Trait(_) => {},
+                        _ => {},
+                    }
+
+                },
+                Type::EnumC(info) => {
+                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
+                Type::StructC(info) => {
+                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
+                Type::UnionC(info) => {
+                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
+                Type::TypedefC(info) => {
+                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
+                Type::FunctionC(info) => {
+                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
+                Type::ClassCpp(info) => {
+                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
+                _ => {
+                    let name = generator.naming_ident.get_type_name(resolved, generics.self_type, generics);
+                    let module = resolved.get_module();
+
+                    let path = generator.make_rel_path(module, name.as_str(), "");
+                    if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                },
+            }
+        }
+
+        for *include in c_includes {
+            fprintf(file, "#include <%.*s>\n", cast<i32>(include.length - 2), include.ptr + 1);
+        }
+
+        for *include in includes {
+            fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
+        }
+
+        for *type_declaration in type_declarations {
+            fprintf(file, "%.*s;\n", cast<i32>(type_declaration.length), type_declaration.ptr);
+        }
+    }
+
+    fn release(&self) {
+        self.includes.release();
+    }
+}

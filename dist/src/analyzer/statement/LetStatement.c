@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 
 #include <analyzer/Token.h>
 #include <analyzer/Context.h>

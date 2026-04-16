@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-
 #include <analyzer/Position.h>
 #include <std/str.h>
 #include <analyzer/InlayHintKind.h>

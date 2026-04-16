@@ -3,7 +3,6 @@
 #include <analyzer/Token.h>
 #include <analyzer/Context.h>
 #include <analyzer/Block.h>
-#include <std/Array_MatchPattern.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/TokenType.h>

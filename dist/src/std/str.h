@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <string.h>
-
 #line 3 "src/std/str.pv"
 struct str {
     char const* ptr;

@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-#include <string.h>
-
 struct HashSetBucket_str;
 
 #line 9 "src/std/HashSet.pv"

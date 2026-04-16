@@ -1,14 +1,10 @@
+#include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 #include <stdio.h>
-
-#include <stdio.h>
 #include <analyzer/Naming.h>
 #include <std/ArenaAllocator.h>
-#include <analyzer/NamingType.h>
-#include <std/str.h>
-#include <std/HashMap_str_str.h>
 #include <std/trait_Allocator.h>
 #include <std/String.h>
 #include <std/Array_Type.h>
@@ -436,7 +432,7 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
             #line 249 "src/analyzer/Naming.pv"
             bool has_parent = false;
             #line 250 "src/analyzer/Naming.pv"
-            struct Type parent_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
+            struct Type parent_type;
             #line 251 "src/analyzer/Naming.pv"
             struct Trait* trait_info = 0;
 

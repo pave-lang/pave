@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <stdio.h>
-
 #include <std/Array_UsageContext.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
 struct ArenaAllocator;

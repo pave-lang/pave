@@ -1,8 +1,5 @@
 #include <stdint.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <std/Iter_ref_String.h>
 #include <std/String.h>
 #include <std/IterEnumerate_ref_String.h>

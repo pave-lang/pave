@@ -1,10 +1,8 @@
 #include <stdint.h>
 
 #include <analyzer/types/GenericMap.h>
-#include <std/Array_Type.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/HashMap_str_usize.h>
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/types/Generic.h>

@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-
 #include <std/HashMapBucket_str_Trait.h>
 #include <std/HashMapIter_str_Trait.h>
 #include <tuple_str_Trait.h>

@@ -1,0 +1,101 @@
+use std
+use analyzer::types
+
+struct FunctionContext {
+    allocator: &ArenaAllocator,
+    func_info: &Function,
+    use_scopes: bool,
+    scopes: Array<FunctionScope>,
+    coroutine: FunctionCoroutine,
+}
+
+impl FunctionContext {
+    fn new(allocator: &ArenaAllocator, func_info: &Function, use_scopes: bool) -> Self {
+        let self = Self {
+            allocator,
+            func_info,
+            use_scopes,
+            scopes: Array<FunctionScope>::new(allocator),
+        };
+
+        if self.use_scopes {
+            self.scopes = Array<FunctionScope>::new(allocator);
+            self.push_scope(false, false);
+        }
+
+        if func_info.type == FunctionType::Coroutine {
+            self.coroutine = FunctionCoroutine::new(allocator);
+            for param in func_info.parameters {
+                self.add_variable(param.name.value, &param.type);
+            }
+        }
+
+        return self;
+    }
+
+    fn push_scope(&self, break_target: bool, continue_target: bool) {
+        self.scopes.append(FunctionScope::new(self.allocator, break_target, continue_target));
+    }
+
+    fn pop_scope(&self) {
+        self.scopes.remove_back();
+    }
+
+    fn get_variable_replacement(&self, name: str) -> str {
+        for scope in self.scopes.iter().reverse() {
+            let variable = scope.variable_replacements.find(&name);
+            if variable != 0 {
+                return *variable;
+            }
+        }
+
+        return name;
+    }
+
+    fn add_variable(&self, name: str, type: &Type) {
+        if self.func_info.type != FunctionType::Coroutine {
+            return;
+        }
+
+        let new_name = String::new(self.allocator);
+        new_name.append(name);
+
+        if self.coroutine.variables.find(&name) == 0 {
+            self.coroutine.variables.insert(name, type);
+
+            if self.use_scopes {
+                let scope = self.scopes.back();
+                new_name.prepend("ctx->");
+                scope.variable_replacements.insert(name, new_name.as_str());
+            }
+
+            return;
+        }
+
+        new_name.append("_x");
+        let i = 1;
+        while true {
+            if i == 10 { new_name.append("x"); }
+            if i > 9 {
+                new_name.array.data[new_name.length() - 2] = '0' + (i / 10);
+                new_name.array.data[new_name.length() - 1] = '0' + (i % 10);
+            } else {
+                new_name.array.data[new_name.length() - 1] = '0' + i;
+            }
+
+            let new_name_str = new_name.as_str();
+            if self.coroutine.variables.find(&new_name_str) == 0 {
+                new_name.prepend("ctx->");
+                new_name_str = new_name.as_str();
+                self.coroutine.variables.insert(new_name_str.slice(5, new_name_str.length), type);
+
+                if self.use_scopes {
+                    let scope = self.scopes.back();
+                    scope.variable_replacements.insert(name, new_name.as_str());
+                }
+                return;
+            }
+            i += 1;
+        }
+    }
+}

@@ -2,14 +2,9 @@
 #include <stdbool.h>
 
 #include <stdio.h>
-
-#include <stdio.h>
 #include <analyzer/Analysis.h>
-#include <std/HashMap_str_bool.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/HashMap_str_Array_Diagnostic.h>
-#include <std/HashMap_str_Array_InlayHint.h>
 #include <std/HashMapIter_str_Array_Diagnostic.h>
 #include <tuple_str_Array_Diagnostic.h>
 #include <std/Array_Diagnostic.h>

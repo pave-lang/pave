@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-
 #include <std/Array_Statement.h>
 #include <std/Array_DeferStatement.h>
 struct Context;

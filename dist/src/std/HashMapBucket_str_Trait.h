@@ -1,9 +1,6 @@
 #ifndef PAVE_HASH_MAP_BUCKET_STR_TRAIT
 #define PAVE_HASH_MAP_BUCKET_STR_TRAIT
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/str.h>
 #include <analyzer/types/Trait.h>
 struct HashMapBucket_str_Trait;

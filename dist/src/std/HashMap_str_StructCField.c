@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/HashMap_str_StructCField.h>
-#include <std/trait_Allocator.h>
 #include <std/HashMapBucket_str_StructCField.h>
 #include <analyzer/c/StructCField.h>
 #include <std/Hashed.h>

@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <stdio.h>
-
 #line 5 "src/analyzer/Analysis.pv"
 struct Position {
     uintptr_t line;

@@ -247,7 +247,7 @@ impl Naming {
             },
             Type::Function(func_info, generics2) => {
                 let has_parent = false;
-                let parent_type = Type::Primitive(0);
+                let parent_type: Type;
                 let trait_info: &Trait = 0;
 
                 match func_info.parent {

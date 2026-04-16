@@ -1,8 +1,6 @@
 #ifndef PAVE_USAGE_MODE
 #define PAVE_USAGE_MODE
 
-#include <stdio.h>
-
 #line 33 "src/compiler/Usages.pv"
 enum UsageMode {
     USAGE_MODE__LAYOUT,

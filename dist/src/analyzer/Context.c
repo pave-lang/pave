@@ -1,24 +1,17 @@
 #include <stdint.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <analyzer/Context.h>
 #include <std/ArenaAllocator.h>
-#include <std/str.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Module.h>
-#include <std/HashMap_str_Type.h>
 #include <std/trait_Allocator.h>
-#include <std/Array_Scope.h>
 #include <analyzer/Root.h>
 #include <analyzer/Token.h>
 #include <std/Array_Token.h>
 #include <analyzer/types/Type.h>
-#include <analyzer/types/Indirect.h>
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/TokenType.h>
@@ -810,7 +803,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 475 "src/analyzer/Context.pv"
         while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
             #line 476 "src/analyzer/Context.pv"
-            struct Type child_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
+            struct Type child_type;
 
             #line 478 "src/analyzer/Context.pv"
             if (!Context__parse_type(self, &child_type, generics)) {
@@ -1060,7 +1053,7 @@ bool Context__parse_type_trait(struct Context* self, struct Type* type, struct G
         #line 606 "src/analyzer/Context.pv"
         while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
             #line 607 "src/analyzer/Context.pv"
-            struct Type child_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
+            struct Type child_type;
 
             #line 609 "src/analyzer/Context.pv"
             if (!Context__parse_type(self, &child_type, generics)) {
@@ -1494,7 +1487,7 @@ struct Array_Type Context__parse_generics(struct Context* self, struct Generics*
     #line 830 "src/analyzer/Context.pv"
     while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
         #line 831 "src/analyzer/Context.pv"
-        struct Type child_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
+        struct Type child_type;
 
         #line 833 "src/analyzer/Context.pv"
         if (!Context__parse_type(self, &child_type, generics)) {

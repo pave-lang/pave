@@ -3,10 +3,6 @@
 
 #include <stdbool.h>
 
-#include <clang-c/Index.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <analyzer/c/ParentCpp.h>
 struct Include;
 struct IncludeContext;

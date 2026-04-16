@@ -1,17 +1,11 @@
 #include <stdint.h>
-
-#include <fs.h>
+#include <string.h>
 
 #include <fs.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <analyzer/Namespace.h>
-#include <std/str.h>
-#include <std/HashMap_str_ref_Namespace.h>
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_Module.h>
-#include <std/HashMap_str_Type.h>
-#include <std/HashMap_str_ref_Trait.h>
 #include <std/String.h>
 #include <std/Array_char.h>
 #include <analyzer/Module.h>

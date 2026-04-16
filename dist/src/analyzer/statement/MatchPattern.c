@@ -1,9 +1,9 @@
 #include <stdint.h>
+#include <string.h>
 
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/statement/MatchPattern.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/Token.h>
 #include <std/str.h>
@@ -12,7 +12,6 @@
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/expression/EnumVariantResult.h>
-#include <std/Array_EnumVariantParameter.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/types/EnumVariantParameter.h>
 #include <std/Array_Type.h>

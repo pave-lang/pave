@@ -1,8 +1,6 @@
 #ifndef PAVE_NAMING
 #define PAVE_NAMING
 
-#include <stdio.h>
-
 #include <analyzer/NamingType.h>
 #include <std/str.h>
 #include <std/HashMap_str_str.h>

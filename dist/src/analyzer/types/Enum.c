@@ -2,19 +2,13 @@
 
 #include <analyzer/types/Enum.h>
 #include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/HashMap_str_EnumVariant.h>
-#include <std/HashMap_str_ref_Trait.h>
-#include <std/Array_ref_Impl.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
-#include <analyzer/types/Primitive.h>
 #include <analyzer/expression/Expression.h>
-#include <analyzer/types/EnumType.h>
 #include <analyzer/types/EnumVariant.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_EnumVariant.h>
@@ -158,7 +152,7 @@ bool Enum__parse_variant(struct Enum* self) {
         #line 101 "src/analyzer/types/Enum.pv"
         while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ")")) {
             #line 102 "src/analyzer/types/Enum.pv"
-            struct Type type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 };
+            struct Type type;
 
             #line 104 "src/analyzer/types/Enum.pv"
             if (!Context__parse_type(context, &type, &self->generics)) {

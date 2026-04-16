@@ -1,9 +1,6 @@
 #ifndef PAVE_HASH_MAP_BUCKET_STR_ENUM_VARIANT
 #define PAVE_HASH_MAP_BUCKET_STR_ENUM_VARIANT
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/str.h>
 #include <analyzer/types/EnumVariant.h>
 struct HashMapBucket_str_EnumVariant;

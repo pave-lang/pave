@@ -1,9 +1,5 @@
 #include <stdint.h>
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <std/Iter_i32.h>
 #include <std/IterEnumerate_i32.h>
 #include <tuple_usize_i32.h>
 #include <std/IterEnumerate_i32.h>

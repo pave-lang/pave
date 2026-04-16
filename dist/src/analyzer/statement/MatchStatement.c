@@ -6,7 +6,6 @@
 #include <analyzer/statement/MatchStatement.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/types/Generics.h>
-#include <std/Array_MatchCase.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/statement/MatchCase.h>

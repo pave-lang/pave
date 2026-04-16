@@ -1,13 +1,9 @@
 #include <stdint.h>
 
-#include <stdio.h>
-
 #include <compiler/TypeUsage_Struct.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Struct.h>
-#include <std/Array_UsageContext.h>
 #include <std/trait_Allocator.h>
-#include <std/Array_HashMap_usize_TypeFunctionUsage.h>
 #include <std/Range_usize.h>
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <compiler/UsageContext.h>

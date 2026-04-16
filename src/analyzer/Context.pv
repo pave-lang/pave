@@ -473,7 +473,7 @@ impl Context {
         
         if self.check_next(TokenType::Symbol, "<") {
             while !self.check_next(TokenType::Symbol, ">") {
-                let child_type: Type = Type::Primitive(0);
+                let child_type: Type;
 
                 if !self.parse_type(&child_type, generics) {
                     return false;
@@ -604,7 +604,7 @@ impl Context {
         
         if self.check_next(TokenType::Symbol, "<") {
             while !self.check_next(TokenType::Symbol, ">") {
-                let child_type: Type = Type::Primitive(0);
+                let child_type: Type;
 
                 if !self.parse_type(&child_type, generics) {
                     return false;
@@ -828,7 +828,7 @@ impl Context {
         if !self.expect_value(TokenType::Symbol, "<") { return Array<Type> {}; }
 
         while !self.check_next(TokenType::Symbol, ">") {
-            let child_type: Type = Type::Primitive(0);
+            let child_type: Type;
 
             if !self.parse_type(&child_type, generics) { return Array<Type> {}; }
 

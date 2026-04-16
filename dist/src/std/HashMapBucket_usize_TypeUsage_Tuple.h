@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <compiler/TypeUsage_Tuple.h>
 struct HashMapBucket_usize_TypeUsage_Tuple;
 

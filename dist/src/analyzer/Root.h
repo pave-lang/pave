@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMap_str_Type.h>
 #include <std/HashMap_str_Primitive.h>

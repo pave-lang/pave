@@ -1,17 +1,13 @@
 #include <stdint.h>
+#include <string.h>
 
 #include <analyzer/Context.h>
 #include <analyzer/Module.h>
 #include <analyzer/types/Struct.h>
-#include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/HashMap_str_StructField.h>
-#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
-#include <std/Array_ref_Impl.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
-#include <analyzer/types/StructType.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/Root.h>
 #include <analyzer/types/StructField.h>

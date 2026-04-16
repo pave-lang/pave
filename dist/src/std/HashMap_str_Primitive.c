@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/HashMap_str_Primitive.h>
-#include <std/trait_Allocator.h>
 #include <std/HashMapBucket_str_Primitive.h>
 #include <analyzer/types/Primitive.h>
 #include <std/Hashed.h>

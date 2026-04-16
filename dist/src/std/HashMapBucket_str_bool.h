@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/str.h>
 struct HashMapBucket_str_bool;
 

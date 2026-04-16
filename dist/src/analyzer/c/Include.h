@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-#include <clang-c/Index.h>
-#include <string.h>
-
 #include <std/str.h>
 #include <std/HashMap_u32_Type.h>
 #include <std/HashMap_str_Type.h>

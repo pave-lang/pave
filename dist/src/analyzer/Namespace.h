@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <fs.h>
-
 #include <std/str.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMap_str_ref_Module.h>

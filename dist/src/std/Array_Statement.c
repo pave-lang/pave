@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/Array_Statement.h>
-#include <std/trait_Allocator.h>
 #include <analyzer/statement/Statement.h>
 #include <std/Iter_ref_Statement.h>
 #include <slice_Statement.h>

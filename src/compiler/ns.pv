@@ -1,4 +1,8 @@
 mod main
 mod FileWriter
+mod FunctionScope
+mod FunctionCoroutine
+mod FunctionContext
+mod IncludeWriter
 mod Generator
 mod Usages

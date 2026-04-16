@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-
 #include <std/str.h>
 #include <std/Array_Type.h>
 struct Primitive;
@@ -69,26 +67,9 @@ struct Type {
     };
 };
 
-#include <std/Array_Type.h>
 struct Type;
 struct ArenaAllocator;
 struct Context;
-struct GenericMap;
-struct Indirect;
-struct Sequence;
-struct Tuple;
-struct Primitive;
-struct Enum;
-struct Struct;
-struct Trait;
-struct Generic;
-struct Function;
-struct TypedefC;
-struct EnumC;
-struct StructC;
-struct ClassCpp;
-struct NamespaceCpp;
-struct FunctionC;
 struct Module;
 
 #line 105 "src/analyzer/types/Type.pv"

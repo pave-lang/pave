@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <std/Iter_ref_tuple_usize_str_TypeId.h>
 
 #line 52 "src/std/Array.pv"

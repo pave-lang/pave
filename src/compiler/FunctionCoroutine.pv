@@ -1,0 +1,15 @@
+use std
+use analyzer::types
+
+struct FunctionCoroutine {
+    yield_count: usize,
+    variables: HashMap<str, &Type>,
+}
+
+impl FunctionCoroutine {
+    fn new(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            variables: HashMap<str, &Type>::new(allocator),
+        };
+    }
+}

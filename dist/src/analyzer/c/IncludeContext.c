@@ -1,8 +1,5 @@
-#include <stdint.h>
-
-#include <clang-c/Index.h>
-#include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <clang-c/Index.h>
 #include <stdio.h>
@@ -16,7 +13,6 @@
 #include <analyzer/Root.h>
 #include <analyzer/c/StructC.h>
 #include <analyzer/c/EnumC.h>
-#include <analyzer/c/ParentCpp.h>
 #include <analyzer/c/EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>
 #include <std/ArenaAllocator.h>

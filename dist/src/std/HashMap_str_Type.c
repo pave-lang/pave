@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/HashMap_str_Type.h>
-#include <std/trait_Allocator.h>
 #include <std/HashMapBucket_str_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/Hashed.h>

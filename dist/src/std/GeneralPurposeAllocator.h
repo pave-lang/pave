@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <stdlib.h>
-
 #line 3 "src/std/GeneralPurposeAllocator.pv"
 struct GeneralPurposeAllocator {
 };

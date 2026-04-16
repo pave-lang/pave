@@ -1,18 +1,13 @@
 #include <stdint.h>
-
-#include <stdio.h>
+#include <string.h>
 
 #include <analyzer/types/Function.h>
 #include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/Array_Parameter.h>
 #include <analyzer/TokenType.h>
-#include <analyzer/types/FunctionType.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/Parameter.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/Root.h>
 #include <std/str.h>

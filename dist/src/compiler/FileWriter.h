@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <stdio.h>
-
 
 #line 6 "src/compiler/FileWriter.pv"
 struct FileWriter {

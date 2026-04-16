@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <stdio.h>
-
 struct Primitive;
 struct Trait;
 struct Enum;

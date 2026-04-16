@@ -1,11 +1,8 @@
+#include <string.h>
 #include <stdint.h>
 
 #include <stdio.h>
-
-#include <stdio.h>
-#include <std/str.h>
 #include <analyzer/Token.h>
-#include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
 
 #include <analyzer/Token.h>

@@ -1,6 +1,4 @@
 #include <stdint.h>
-
-#include <clang-c/Index.h>
 #include <string.h>
 
 #include <clang-c/Index.h>
@@ -8,10 +6,7 @@
 #include <analyzer/c/Include.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/str.h>
-#include <std/HashMap_u32_Type.h>
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_Type.h>
 #include <std/HashMap_str_Primitive.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Primitive.h>

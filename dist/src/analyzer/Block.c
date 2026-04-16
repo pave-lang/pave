@@ -1,13 +1,9 @@
 #include <stdint.h>
 
-#include <stdio.h>
-
 #include <analyzer/Block.h>
 #include <analyzer/Context.h>
-#include <std/Array_Statement.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/Array_DeferStatement.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/TokenType.h>

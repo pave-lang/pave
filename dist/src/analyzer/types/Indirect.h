@@ -1,8 +1,6 @@
 #ifndef PAVE_INDIRECT
 #define PAVE_INDIRECT
 
-#include <stdio.h>
-
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/Type.h>
 

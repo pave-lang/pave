@@ -1,8 +1,6 @@
 #ifndef PAVE_PARAMETER
 #define PAVE_PARAMETER
 
-#include <stdio.h>
-
 #include <analyzer/types/Type.h>
 struct Token;
 

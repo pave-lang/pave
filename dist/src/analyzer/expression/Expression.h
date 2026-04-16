@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <stdlib.h>
-
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/types/Type.h>
 struct Token;

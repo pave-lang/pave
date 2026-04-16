@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/Array_MatchPattern.h>
-#include <std/trait_Allocator.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <std/Iter_ref_MatchPattern.h>
 #include <slice_MatchPattern.h>

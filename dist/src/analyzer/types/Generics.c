@@ -1,9 +1,7 @@
 #include <stdint.h>
 
 #include <analyzer/types/Generics.h>
-#include <std/Array_Generic.h>
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_usize.h>
 #include <std/str.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/Context.h>

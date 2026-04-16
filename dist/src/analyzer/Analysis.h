@@ -1,8 +1,6 @@
 #ifndef PAVE_ANALYSIS
 #define PAVE_ANALYSIS
 
-#include <stdio.h>
-
 #include <std/HashMap_str_bool.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <std/HashMap_str_Array_InlayHint.h>

@@ -1,8 +1,6 @@
 #ifndef PAVE_TOKEN_TYPE
 #define PAVE_TOKEN_TYPE
 
-#include <stdio.h>
-
 #line 5 "src/analyzer/Token.pv"
 enum TokenType {
     TOKEN_TYPE__SYMBOL,

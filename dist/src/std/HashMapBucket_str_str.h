@@ -1,9 +1,6 @@
 #ifndef PAVE_HASH_MAP_BUCKET_STR_STR
 #define PAVE_HASH_MAP_BUCKET_STR_STR
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/str.h>
 struct HashMapBucket_str_str;
 

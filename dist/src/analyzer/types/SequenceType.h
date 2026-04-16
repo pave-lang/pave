@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <stdio.h>
-
 #line 45 "src/analyzer/types/Type.pv"
 struct SequenceType {
     enum {

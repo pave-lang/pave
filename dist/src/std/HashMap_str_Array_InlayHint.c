@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <string.h>
 #include <std/HashMap_str_Array_InlayHint.h>
-#include <std/trait_Allocator.h>
 #include <std/HashMapBucket_str_Array_InlayHint.h>
 #include <std/Array_InlayHint.h>
 #include <std/Hashed.h>

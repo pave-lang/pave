@@ -1,12 +1,8 @@
 #include <stdint.h>
 
-#include <stdio.h>
-
 #include <compiler/TypeFunctionUsage.h>
 #include <analyzer/types/Function.h>
-#include <compiler/FunctionContext.h>
 #include <std/ArenaAllocator.h>
-#include <std/Array_UsageContext.h>
 #include <std/trait_Allocator.h>
 #include <compiler/UsageContext.h>
 #include <analyzer/types/GenericMap.h>

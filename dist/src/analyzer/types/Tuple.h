@@ -1,8 +1,6 @@
 #ifndef PAVE_TUPLE
 #define PAVE_TUPLE
 
-#include <stdio.h>
-
 #include <std/Array_Type.h>
 
 #line 72 "src/analyzer/types/Type.pv"

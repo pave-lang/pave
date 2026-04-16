@@ -1,15 +1,12 @@
 #include <stdint.h>
+#include <string.h>
 
 #include <analyzer/Impl.h>
 #include <analyzer/Context.h>
 #include <analyzer/Token.h>
-#include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/Array_ImplNode.h>
-#include <std/HashMap_str_Function.h>
 #include <analyzer/TokenType.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/types/Trait.h>
 #include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionParent.h>

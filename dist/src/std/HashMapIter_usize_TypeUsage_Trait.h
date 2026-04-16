@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-#include <string.h>
-
 struct HashMapBucket_usize_TypeUsage_Trait;
 
 #line 10 "src/std/HashMap.pv"

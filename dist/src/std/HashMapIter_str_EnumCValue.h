@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-#include <string.h>
-
 struct HashMapBucket_str_EnumCValue;
 
 #line 10 "src/std/HashMap.pv"

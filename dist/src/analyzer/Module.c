@@ -1,6 +1,5 @@
 #include <stdint.h>
-
-#include <stdio.h>
+#include <string.h>
 
 #include <stdio.h>
 #include <std/ArenaAllocator.h>
@@ -8,20 +7,7 @@
 #include <analyzer/Namespace.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Module.h>
-#include <std/str.h>
-#include <std/Array_NamespacePath.h>
 #include <std/trait_Allocator.h>
-#include <std/Array_ref_Namespace.h>
-#include <std/HashMap_str_Type.h>
-#include <std/HashMap_str_Enum.h>
-#include <std/HashMap_str_Struct.h>
-#include <std/HashMap_str_Trait.h>
-#include <std/Array_Impl.h>
-#include <std/HashMap_str_Function.h>
-#include <std/Array_TypeImpl.h>
-#include <std/HashMap_str_ref_Include.h>
-#include <analyzer/Context.h>
-#include <std/Array_Token.h>
 #include <analyzer/Tokenizer.h>
 #include <analyzer/Token.h>
 #include <analyzer/TokenType.h>

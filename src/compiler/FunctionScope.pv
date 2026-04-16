@@ -1,0 +1,20 @@
+use std
+use analyzer::expression
+
+struct FunctionScope {
+    break_target: bool,
+    continue_target: bool,
+    defer_statements: Array<&Expression>,
+    variable_replacements: HashMap<str, str>,
+}
+
+impl FunctionScope {
+    fn new(allocator: &ArenaAllocator, break_target: bool, continue_target: bool) -> Self {
+        return Self {
+            break_target,
+            continue_target,
+            defer_statements: Array<&Expression>::new(allocator),
+            variable_replacements: HashMap<str, str>::new(allocator),
+        };
+    }
+}

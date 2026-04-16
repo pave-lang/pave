@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <analyzer/types/Type.h>
 struct HashMapBucket_u32_Type;
 

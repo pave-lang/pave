@@ -1,5 +1,4 @@
 #include <analyzer/Scope.h>
-#include <std/HashMap_str_Type.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Block.h>

@@ -16,7 +16,6 @@ struct DeferStatement {
     };
 };
 
-struct Block;
 struct Context;
 struct Generics;
 struct DeferStatement;

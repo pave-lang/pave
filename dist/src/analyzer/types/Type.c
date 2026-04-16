@@ -1,6 +1,5 @@
 #include <stdint.h>
-
-#include <stdio.h>
+#include <string.h>
 
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
@@ -12,7 +11,6 @@
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/types/Enum.h>
-#include <std/Array_Type.h>
 #include <analyzer/types/Struct.h>
 #include <analyzer/types/Trait.h>
 #include <analyzer/types/Generic.h>
@@ -22,7 +20,6 @@
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/NamespaceCpp.h>
-#include <std/str.h>
 #include <std/Range_usize.h>
 #include <analyzer/Token.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>

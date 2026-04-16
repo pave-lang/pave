@@ -1,8 +1,6 @@
 #ifndef PAVE_NAMING_TYPE
 #define PAVE_NAMING_TYPE
 
-#include <stdio.h>
-
 #line 7 "src/analyzer/Naming.pv"
 enum NamingType {
     NAMING_TYPE__IDENT,

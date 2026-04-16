@@ -306,18 +306,18 @@ impl Usages {
                         self.add_type(&Type::Trait(trait_info, type_generic_map), generic_map);
                     },
                     FunctionParent::Type(type_info, _, _) => {
-                        self.add_type(type_info, generic_map);
+                        self.add_type(type_info, type_generic_map);
                     },
                 }
             },
             Type::Trait(_, _) => { is_trait = true; },
             Type::Sequence(sequence) => { is_type = sequence.is_slice(); },
             Type::Tuple(_) => { is_type = true; },
-            Type::StructC(_) => { is_type = true; },
-            Type::UnionC(_) => { is_type = true; },
-            Type::EnumC(_) => { is_type = true; },
-            Type::FunctionC(_) => { is_type = true; },
-            Type::TypedefC(_) => { is_type = true; },
+            Type::StructC(struct_c) => { is_type = !struct_c.include.mode_cpp; },
+            Type::UnionC(union_c) => { is_type = !union_c.include.mode_cpp; },
+            Type::EnumC(enum_c) => { is_type = !enum_c.include.mode_cpp; },
+            Type::FunctionC(function_c) => { is_type = !function_c.include.mode_cpp; },
+            Type::TypedefC(typedef_c) => { is_type = !typedef_c.include.mode_cpp; },
             Type::ClassCpp(class_info) => {
                 if self.usage_mode != UsageMode::Body && usage_context {
                     usage_context.cpp_usages.insert(class_info.name, *type);
@@ -597,6 +597,7 @@ impl Usages {
                     self.process_block(statement.block, generic_map);
 
                     for else_statement in statement.else_statements {
+                        if else_statement.expression { self.process_expression(else_statement.expression, generic_map); }
                         self.process_block(else_statement.block, generic_map);
                     }
                 },
@@ -736,6 +737,15 @@ impl Usages {
             },
             ExpressionData::ImplicitCast(inner) => {
                 self.process_expression(inner, generic_map);
+
+                match expression.return_type {
+                    Type::Struct(struct_info, _) => {
+                        if struct_info.name.value.eq("str") {
+                            self.usage_context.primitive_code.insert("str");
+                        }
+                    },
+                    _ => {},
+                }
 
                 let return_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, 0).deref();
                 match return_type {

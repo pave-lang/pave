@@ -9,136 +9,6 @@ use analyzer::statement
 use analyzer::types
 use analyzer::c
 
-struct FunctionScope {
-    break_target: bool,
-    continue_target: bool,
-    defer_statements: Array<&Expression>,
-    variable_replacements: HashMap<str, str>,
-}
-
-impl FunctionScope {
-    fn new(allocator: &ArenaAllocator, break_target: bool, continue_target: bool) -> Self {
-        return Self {
-            break_target,
-            continue_target,
-            defer_statements: Array<&Expression>::new(allocator),
-            variable_replacements: HashMap<str, str>::new(allocator),
-        };
-    }
-}
-
-struct FunctionCoroutine {
-    yield_count: usize,
-    variables: HashMap<str, &Type>,
-}
-
-impl FunctionCoroutine {
-    fn new(allocator: &ArenaAllocator) -> Self {
-        return Self {
-            variables: HashMap<str, &Type>::new(allocator),
-        };
-    }
-}
-
-struct FunctionContext {
-    allocator: &ArenaAllocator,
-    func_info: &Function,
-    use_scopes: bool,
-    scopes: Array<FunctionScope>, 
-    coroutine: FunctionCoroutine,   
-}
-
-impl FunctionContext {
-    fn new(allocator: &ArenaAllocator, func_info: &Function, use_scopes: bool) -> Self {
-        let self = Self {
-            allocator,
-            func_info,
-            use_scopes,
-            scopes: Array<FunctionScope>::new(allocator),
-        };
-        
-        if self.use_scopes {
-            self.scopes = Array<FunctionScope>::new(allocator);
-            self.push_scope(false, false);
-        }
-
-        if func_info.type == FunctionType::Coroutine {
-            self.coroutine = FunctionCoroutine::new(allocator);
-            for param in func_info.parameters {
-                self.add_variable(param.name.value, &param.type);
-            }
-        }
-
-        return self;
-    }
-
-    fn push_scope(&self, break_target: bool, continue_target: bool) {
-        self.scopes.append(FunctionScope::new(self.allocator, break_target, continue_target));
-    }
-
-    fn pop_scope(&self) {
-        self.scopes.remove_back();
-    }
-
-    fn get_variable_replacement(&self, name: str) -> str {
-        for scope in self.scopes.iter().reverse() {
-            let variable = scope.variable_replacements.find(&name);
-            if variable != 0 {
-                return *variable;
-            }
-        }
-
-        return name;
-    }
-
-    fn add_variable(&self, name: str, type: &Type) {
-        if self.func_info.type != FunctionType::Coroutine {
-            return;
-        }
-
-        let new_name = String::new(self.allocator);
-        new_name.append(name);
-
-        if self.coroutine.variables.find(&name) == 0 {
-            self.coroutine.variables.insert(name, type);
-
-            if self.use_scopes {
-                let scope = self.scopes.back();
-                new_name.prepend("ctx->");
-                scope.variable_replacements.insert(name, new_name.as_str());
-            }
-
-            return;
-        }
-
-        new_name.append("_x");
-        let i = 1;
-        while true {
-            if i == 10 { new_name.append("x"); }
-            if i > 9 {
-                new_name.array.data[new_name.length() - 2] = '0' + (i / 10);
-                new_name.array.data[new_name.length() - 1] = '0' + (i % 10);
-            } else {
-                new_name.array.data[new_name.length() - 1] = '0' + i;
-            }
-
-            let new_name_str = new_name.as_str();
-            if self.coroutine.variables.find(&new_name_str) == 0 {
-                new_name.prepend("ctx->");
-                new_name_str = new_name.as_str();
-                self.coroutine.variables.insert(new_name_str.slice(5, new_name_str.length), type);
-
-                if self.use_scopes {
-                    let scope = self.scopes.back();
-                    scope.variable_replacements.insert(name, new_name.as_str());
-                }
-                return;
-            }
-            i += 1;
-        }
-    }
-}
-
 struct Generator {
     allocator: &ArenaAllocator,
     path: *const char,
@@ -153,11 +23,6 @@ struct Generator {
     naming_ident: Naming,
     naming_c99: Naming,
     function_context: &FunctionContext,
-}
-
-struct GeneratorInclude {
-    type: &Type,
-    name: str,
 }
 
 impl Generator {
@@ -1871,114 +1736,6 @@ impl Generator {
         }
     }
 
-    fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap, deref: bool) {
-        let c_includes = HashSet<str>::new(self.allocator);
-        let type_declarations = HashSet<str>::new(self.allocator);
-        let includes = HashSet<str>::new(self.allocator);
-
-        for (_, &type) in types {
-            let resolved = Context::resolve_type(self.allocator, type, generics, 0);
-            if deref { resolved = resolved.deref_all(); }
-
-            match resolved {
-                Type::Indirect(_) => {
-                    let type_deref = resolved.deref_all();
-
-                    match type_deref {
-                        Type::Trait(_, _) => {
-                            let name = self.naming_ident.get_type_name(type_deref, generics.self_type, generics);
-                            let module = type_deref.get_module();
-                            let path = self.make_rel_path(module, name.as_str(), "");
-                            if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
-                        },
-                        Type::Struct(struct_info, _) => {
-                            let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
-
-                            if struct_info.is_newtype() {
-                                let typedef_info = TypedefC { name: name.as_str(), type: &struct_info.fields.data[0].value.type };
-                                let typedef_type = Type::TypedefC(&typedef_info);
-                                let type_declaration = self.naming_c99.get_type_decl(&typedef_type, generics.self_type, generics);
-                                type_declarations.insert(type_declaration.as_str());
-                            } else {
-                                type_declarations.insert(name.as_str());
-                            }
-                            
-                        },
-                        Type::Enum(enum_info, _) => {
-                            if enum_info.is_discriminated_union() {
-                                let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
-                                type_declarations.insert(name.as_str());
-                            } else {
-                                let name = self.naming_ident.get_type_name(type_deref, generics.self_type, generics);
-                                let module = type_deref.get_module();
-                                let path = self.make_rel_path(module, name.as_str(), "");
-                                if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
-                            }
-                        },
-                        _ => {},
-                    }
-                },
-                Type::Function(func_info, _) => {
-                    match func_info.parent {
-                        FunctionParent::None => {
-                            let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
-                            let module = func_info.context.module;
-                            let path = self.make_rel_path(module, name.as_str(), "");
-                            if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
-                        },
-                        FunctionParent::Primitive(primitive_info, _, _) => {
-                            let name = primitive_info.name;
-                            let path = self.make_rel_path(0, name, "");
-                            if !includes.insert(path.as_str()) { path.release(); continue; }
-                        },
-                        FunctionParent::Trait(_) => {},
-                        _ => {},
-                    }
-
-                },
-                Type::EnumC(info) => {
-                    c_includes.insert(info.include.path);
-                },
-                Type::StructC(info) => {
-                    c_includes.insert(info.include.path);
-                },
-                Type::UnionC(info) => {
-                    c_includes.insert(info.include.path);
-                },
-                Type::TypedefC(info) => {
-                    c_includes.insert(info.include.path);
-                },
-                Type::FunctionC(info) => {
-                    c_includes.insert(info.include.path);
-                },
-                Type::ClassCpp(info) => {
-                    c_includes.insert(info.include.path);
-                },
-                _ => {
-                    let name = self.naming_ident.get_type_name(resolved, generics.self_type, generics);
-                    let module = resolved.get_module();
-
-                    let path = self.make_rel_path(module, name.as_str(), "");
-                    if !includes.insert(path.as_str()) { name.release(); continue; }
-                },
-            }
-        }
-
-        for *include in c_includes {
-            fprintf(file, "#include <%.*s>\n", cast<i32>(include.length - 2), include.ptr + 1);
-        }
-
-        for *include in includes {
-            fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
-        }
-
-        for *type_declarations in type_declarations {
-            fprintf(file, "%.*s;\n", cast<i32>(type_declarations.length), type_declarations.ptr);
-        }
-
-        defer includes.release();
-    }
-
     fn has_void_self_replacement(parameter: &Parameter, generics: &GenericMap) -> bool {
         if generics == 0 || generics.self_type == 0 { return false; }
 
@@ -2205,6 +1962,7 @@ impl Generator {
         if func_info.type == FunctionType::Builtin { return true; }
 
         let generics = usage_context.generic_map;
+        let include_writer = IncludeWriter::new(self.allocator);
 
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_str = name.as_str();
@@ -2223,8 +1981,8 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        self.write_includes_raw(code_file, &func_info.context.module.includes);
-        self.write_context_includes(code_file, &usage_context.body, generics, true);
+        // self.write_includes_raw(code_file, &func_info.context.module.includes);
+        include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(func_info.context.module, name_str, ".h");
         fprintf(code_file, "#include <");
@@ -2238,6 +1996,8 @@ impl Generator {
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
+
+        include_writer = IncludeWriter::new(self.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
         let header = self.make_path(func_info.context.module, name_str, ".h");
         let header_file: &FILE = 0;
@@ -2254,8 +2014,8 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         self.write_context_primitives(header_file, &usage_context.primitive_code, 0);
-        self.write_includes_raw(header_file, &func_info.context.module.includes);
-        self.write_context_includes(header_file, &usage_context.signature, generics, false);
+        // self.write_includes_raw(header_file, &func_info.context.module.includes);
+        include_writer.write(header_file, self, &usage_context.signature, generics, false);
 
         if self.is_coroutine() {
             self.write_function_coroutine(header_file, func_info, generics);
@@ -2275,7 +2035,7 @@ impl Generator {
         return true;
     }
 
-    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage_context: &UsageContext) -> bool {
+    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage_context: &UsageContext, include_writer: &IncludeWriter) -> bool {
         let generics = usage_context.generic_map;
         let enum_name = enum_info.name;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
@@ -2414,7 +2174,7 @@ impl Generator {
         }
 
         fprintf(file, "\n");
-        self.write_context_includes(file, &usage_context.signature, generics, false);
+        include_writer.write(file, self, &usage_context.signature, generics, false);
 
         for *impl_info in enum_info.impls {
             fprintf(file, "\n");
@@ -2442,6 +2202,7 @@ impl Generator {
         let generics = usage_context.generic_map;
         let enum_info = usage.type;
         let module = enum_info.context.module;
+        let include_writer = IncludeWriter::new(self.allocator);
 
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let header = self.make_path(module, name.as_str(), ".h");
@@ -2456,10 +2217,10 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        self.write_includes_raw(header_file, &module.includes);
-        self.write_context_includes(header_file, &usage_context.layout, generics, false);
+        // self.write_includes_raw(header_file, &module.includes);
+        include_writer.write(header_file, self, &usage_context.layout, generics, false);
 
-        if !self.write_enum_definition(header_file, enum_info, usage_context) { fclose(header_file); return false; }
+        if !self.write_enum_definition(header_file, enum_info, usage_context, &include_writer) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -2477,8 +2238,8 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        self.write_includes_raw(code_file, &module.includes);
-        self.write_context_includes(code_file, &usage_context.body, generics, true);
+        // self.write_includes_raw(code_file, &module.includes);
+        include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(module, name.as_str(), ".h");
         fprintf(code_file, "#include <");
@@ -2499,6 +2260,7 @@ impl Generator {
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: i32 = name.array.length;
         let impl_functions = &usage.impl_functions;
+        let include_writer = IncludeWriter::new(self.allocator);
 
         self.write_line_directive(file, &struct_info.module.context, struct_info.name);
 
@@ -2525,7 +2287,7 @@ impl Generator {
         }
 
         if usage_context.signature.length > 0 { fprintf(file, "\n"); }
-        self.write_context_includes(file, &usage_context.signature, generics, false);
+        include_writer.write(file, self, &usage_context.signature, generics, false);
 
         for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
             let trait_info = impl_info.trait_;
@@ -2563,7 +2325,7 @@ impl Generator {
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
                     if function_usage != 0 {
                         for usage_context in function_usage.usage_contexts {
-                            self.write_context_includes(file, &usage_context.signature, usage_context.generic_map, false);
+                            include_writer.write(file, self, &usage_context.signature, usage_context.generic_map, false);
 
                             // TODO: Test if this is actually needed
                             usage_context.generic_map.self_type = generics.self_type;
@@ -3197,6 +2959,8 @@ impl Generator {
         let struct_info = usage.type;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let module = struct_info.module;
+        let include_writer = IncludeWriter::new(self.allocator);
+
         let header = self.make_path(struct_info.module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
@@ -3243,8 +3007,8 @@ impl Generator {
         }
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        self.write_includes_raw(header_file, &struct_info.module.includes);
-        self.write_context_includes(header_file, &usage_context.layout, generics, false);
+        // self.write_includes_raw(header_file, &struct_info.module.includes);
+        include_writer.write(header_file, self, &usage_context.layout, generics, false);
         if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
 
         if !self.write_struct_definition(header_file, struct_info, usage, usage_context) { fclose(header_file); return false; }
@@ -3280,8 +3044,8 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        self.write_includes_raw(code_file, &struct_info.module.includes);
-        self.write_context_includes(code_file, &usage_context.body, generics, true);
+        // self.write_includes_raw(code_file, &struct_info.module.includes);
+        include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(struct_info.module, name.as_str(), ".h");
         fprintf(code_file, "#include <");
@@ -3498,6 +3262,7 @@ impl Generator {
         let primitive_info = usage.type;
         let generics = usage_context.generic_map;
         let name = primitive_info.name;
+        let include_writer = IncludeWriter::new(self.allocator);
 
         let header = self.make_path(0, name, ".h");
         let header_tmp: *const char = tmpnam(0);
@@ -3512,7 +3277,7 @@ impl Generator {
 
         self.write_impl_includes_raw(header_file, &primitive_info.impls);
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        self.write_context_includes(header_file, &usage_context.signature, generics, false);
+        include_writer.write(header_file, self, &usage_context.signature, generics, false);
 
         if !self.write_primitive_definition(header_file, primitive_info, generics) { fclose(header_file); return false; }
 
@@ -3535,7 +3300,7 @@ impl Generator {
 
         self.write_impl_includes_raw(code_file, &primitive_info.impls);
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        self.write_context_includes(code_file, &usage_context.body, generics, true);
+        include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(0, name, ".h");
         fprintf(code_file, "#include <");
@@ -3600,6 +3365,8 @@ impl Generator {
         let sequence_type = Type::Sequence(usage.type);
         let name = self.naming_ident.get_type_name(&sequence_type, &sequence_type, generics);
 
+        let include_writer = IncludeWriter::new(self.allocator);
+
         let header = self.make_path(0, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
@@ -3612,7 +3379,7 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        self.write_context_includes(header_file, &usage_context.layout, generics, false);
+        include_writer.write(header_file, self, &usage_context.layout, generics, false);
 
         fprintf(header_file, "struct ");
         self.write_string(header_file, &name);
@@ -3674,6 +3441,7 @@ impl Generator {
         let tuple_type = Type::Tuple(tuple);
 
         let name = self.naming_ident.get_type_name(&tuple_type, &tuple_type, generics);
+        let include_writer = IncludeWriter::new(self.allocator);
 
         let header = self.make_path(0, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
@@ -3687,7 +3455,7 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        self.write_context_includes(header_file, &usage_context.layout, generics, false);
+        include_writer.write(header_file, self, &usage_context.layout, generics, false);
 
         fprintf(header_file, "struct ");
         self.write_string(header_file, &name);
@@ -3735,6 +3503,7 @@ impl Generator {
 
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let header = self.make_path(trait_info.module, name.as_str(), ".h");
+        let include_writer = IncludeWriter::new(self.allocator);
 
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
@@ -3755,10 +3524,10 @@ impl Generator {
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
 
         if !trait_info.module.mode_cpp {
-            self.write_includes_raw(header_file, &trait_info.module.includes);
+            // self.write_includes_raw(header_file, &trait_info.module.includes);
         }
 
-        self.write_context_includes(header_file, &usage_context.signature, generics, false);
+        include_writer.write(header_file, self, &usage_context.signature, generics, false);
 
         if !self.write_trait_definition(header_file, trait_info, generics) { fclose(header_file); return false; }
 
@@ -3836,6 +3605,7 @@ impl Generator {
         primitive_includes.insert("isize", "stdint");
         primitive_includes.insert("usize", "stdint");
         primitive_includes.insert("bool", "stdbool");
+        primitive_includes.insert("str", "string");
 
         self.create_directories(path, &root.children);
 

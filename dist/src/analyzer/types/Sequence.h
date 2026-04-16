@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/types/Type.h>
 

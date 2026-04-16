@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#include <stdio.h>
-
 #include <analyzer/types/Indirect.h>
 #include <std/trait_Allocator.h>
-#include <analyzer/types/IndirectType.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
 
 #include <analyzer/types/Indirect.h>

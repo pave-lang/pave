@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <std/trait_Allocator.h>
 struct HashMapBucket_str_Struct;
 

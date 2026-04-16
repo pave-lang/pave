@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-
 #include <std/Array_UsageContext.h>
 #include <compiler/FunctionContext.h>
 struct Function;

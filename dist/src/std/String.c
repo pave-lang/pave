@@ -1,11 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <string.h>
 #include <stdio.h>
 #include <std/String.h>
-#include <std/Array_char.h>
 #include <std/trait_Allocator.h>
 #include <std/str.h>
 #include <std/String.h>

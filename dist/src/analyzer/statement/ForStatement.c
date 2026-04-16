@@ -1,7 +1,7 @@
 #include <stdint.h>
+#include <string.h>
 
 #include <analyzer/statement/ForStatement.h>
-#include <std/Array_ForVariable.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Context.h>
@@ -15,7 +15,6 @@
 #include <analyzer/expression/ExpressionData.h>
 #include <std/str.h>
 #include <analyzer/types/Enum.h>
-#include <analyzer/statement/ForStatementType.h>
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Array_InvokeArgument.h>
 #include <std/Array_Type.h>

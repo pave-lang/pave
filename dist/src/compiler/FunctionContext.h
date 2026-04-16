@@ -3,16 +3,12 @@
 
 #include <stdbool.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <fs.h>
-
 #include <std/Array_FunctionScope.h>
 #include <compiler/FunctionCoroutine.h>
 struct ArenaAllocator;
 struct Function;
 
-#line 43 "src/compiler/Generator.pv"
+#line 4 "src/compiler/FunctionContext.pv"
 struct FunctionContext {
     struct ArenaAllocator* allocator;
     struct Function* func_info;
@@ -28,19 +24,19 @@ struct Function;
 struct FunctionContext;
 struct Type;
 
-#line 52 "src/compiler/Generator.pv"
+#line 13 "src/compiler/FunctionContext.pv"
 struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, struct Function* func_info, bool use_scopes);
 
-#line 75 "src/compiler/Generator.pv"
+#line 36 "src/compiler/FunctionContext.pv"
 void FunctionContext__push_scope(struct FunctionContext* self, bool break_target, bool continue_target);
 
-#line 79 "src/compiler/Generator.pv"
+#line 40 "src/compiler/FunctionContext.pv"
 void FunctionContext__pop_scope(struct FunctionContext* self);
 
-#line 83 "src/compiler/Generator.pv"
+#line 44 "src/compiler/FunctionContext.pv"
 struct str FunctionContext__get_variable_replacement(struct FunctionContext* self, struct str name);
 
-#line 94 "src/compiler/Generator.pv"
+#line 55 "src/compiler/FunctionContext.pv"
 void FunctionContext__add_variable(struct FunctionContext* self, struct str name, struct Type* type);
 
 #endif

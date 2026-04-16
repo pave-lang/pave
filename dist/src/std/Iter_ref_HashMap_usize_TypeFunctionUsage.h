@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 struct HashMap_usize_TypeFunctionUsage;
 
 #line 4 "src/std/Array.pv"
