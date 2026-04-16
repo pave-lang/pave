@@ -100,6 +100,7 @@ struct Usages {
     allocator: &ArenaAllocator,
     generator: &Generator,
     root: &Root,
+    naming_ident: &Naming,
 
     usages: Array<Type>,
     usage_types: HashSet<str>,
@@ -128,6 +129,7 @@ impl Usages {
             allocator,
             generator,
             root: generator.root,
+            naming_ident: &generator.naming_ident,
 
             usages: Array<Type>::new(allocator),
             usage_types: HashSet<str>::new(allocator),
@@ -328,7 +330,7 @@ impl Usages {
 
         if !is_type && !is_trait && !is_indirect { return; }
 
-        let type_name_generic = self.root.naming_decl.get_type_name(type, generic_map.self_type, generic_map);
+        let type_name_generic = self.naming_ident.get_type_name(type, generic_map.self_type, generic_map);
 
         match self.usage_mode {
             UsageMode::Layout => { usage_context.layout.insert(type_name_generic.as_str(), *type); },
