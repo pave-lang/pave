@@ -1,13 +1,18 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/HashMap_str_str.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <std/HashMapIter_str_str.h>
-#include <std/str.h>
 #include <std/HashMapBucket_str_str.h>
-#include <stdbool.h>
+#include <std/str.h>
 #include <std/Hashed.h>
+#include <std/trait_Hash.h>
+#include <std/Range_usize.h>
+#include <std/HashMapIter_str_str.h>
+#include <std/HashMap_str_str.h>
 
 #include <std/HashMap_str_str.h>
 

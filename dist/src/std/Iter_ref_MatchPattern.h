@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct MatchPattern;
-struct IterEnumerate_ref_MatchPattern;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct MatchPattern;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_MatchPattern {
@@ -17,6 +16,11 @@ struct Iter_ref_MatchPattern {
     struct MatchPattern* start;
     struct MatchPattern* end;
 };
+
+#include <std/Iter_ref_MatchPattern.h>
+#include <std/IterEnumerate_ref_MatchPattern.h>
+struct MatchPattern;
+struct Iter_ref_MatchPattern;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_MatchPattern Iter_ref_MatchPattern__new(struct MatchPattern* start, struct MatchPattern* end);

@@ -1,11 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/Iter_ref_MatchCase.h>
-#include <analyzer/statement/MatchCase.h>
-#include <stdint.h>
+#include <std/IterEnumerate_ref_MatchCase.h>
 #include <tuple_usize_ref_MatchCase.h>
+#include <analyzer/statement/MatchCase.h>
+#include <std/IterEnumerate_ref_MatchCase.h>
 
 #include <std/IterEnumerate_ref_MatchCase.h>
 

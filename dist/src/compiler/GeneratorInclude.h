@@ -1,13 +1,12 @@
 #ifndef PAVE_GENERATOR_INCLUDE
 #define PAVE_GENERATOR_INCLUDE
 
-#include <std/str.h>
-
-struct Type;
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <fs.h>
+
+#include <std/str.h>
+struct Type;
 
 #line 158 "src/compiler/Generator.pv"
 struct GeneratorInclude {

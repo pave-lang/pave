@@ -1,22 +1,20 @@
+#include <stdint.h>
+
 #include <stdio.h>
 
+#include <analyzer/Block.h>
 #include <analyzer/Context.h>
 #include <std/Array_Statement.h>
-#include <analyzer/statement/Statement.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_DeferStatement.h>
-#include <analyzer/statement/DeferStatement.h>
-#include <analyzer/statement/ForStatement.h>
-#include <stdbool.h>
-#include <analyzer/types/Generics.h>
-#include <analyzer/statement/StatementData.h>
 #include <analyzer/expression/Expression.h>
-#include <stdint.h>
-#include <analyzer/Token.h>
+#include <analyzer/types/Generics.h>
 #include <analyzer/TokenType.h>
+#include <analyzer/Token.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/statement/AssignmentStatement.h>
+#include <analyzer/statement/StatementData.h>
 #include <std/Hashed.h>
 #include <std/str.h>
 #include <analyzer/statement/LetStatement.h>
@@ -25,6 +23,10 @@
 #include <analyzer/statement/IfStatement.h>
 #include <analyzer/statement/MatchStatement.h>
 #include <analyzer/statement/WhileStatement.h>
+#include <analyzer/statement/ForStatement.h>
+#include <analyzer/statement/DeferStatement.h>
+#include <analyzer/statement/Statement.h>
+#include <analyzer/Block.h>
 
 #include <analyzer/Block.h>
 

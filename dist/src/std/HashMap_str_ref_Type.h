@@ -1,17 +1,14 @@
 #ifndef PAVE_HASH_MAP_STR_REF_TYPE
 #define PAVE_HASH_MAP_STR_REF_TYPE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_ref_Type;
-struct str;
-struct Type;
-struct HashMapIter_str_ref_Type;
-
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_str_ref_Type;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_ref_Type {
@@ -21,6 +18,14 @@ struct HashMap_str_ref_Type {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_ref_Type.h>
+#include <std/str.h>
+#include <std/HashMapIter_str_ref_Type.h>
+struct HashMap_str_ref_Type;
+struct str;
+struct Type;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Type HashMap_str_ref_Type__new(struct trait_Allocator allocator);

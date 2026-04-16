@@ -1,6 +1,4 @@
-#include <std/Iter_ref_DeferStatement.h>
-#include <analyzer/statement/DeferStatement.h>
-#include <stdint.h>
+#include <slice_DeferStatement.h>
 
 #include <slice_DeferStatement.h>
 

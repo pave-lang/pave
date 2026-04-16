@@ -1,6 +1,4 @@
-#include <std/Iter_ref_NamespacePath.h>
-#include <analyzer/NamespacePath.h>
-#include <stdint.h>
+#include <slice_NamespacePath.h>
 
 #include <slice_NamespacePath.h>
 

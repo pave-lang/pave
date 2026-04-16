@@ -1,17 +1,14 @@
 #ifndef PAVE_HASH_MAP_USIZE_TYPE_USAGE_TRAIT
 #define PAVE_HASH_MAP_USIZE_TYPE_USAGE_TRAIT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_usize_TypeUsage_Trait;
-struct TypeUsage_Trait;
-struct Trait;
-struct HashMapIter_usize_TypeUsage_Trait;
-
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_usize_TypeUsage_Trait;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Trait {
@@ -21,6 +18,13 @@ struct HashMap_usize_TypeUsage_Trait {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_usize_TypeUsage_Trait.h>
+#include <compiler/TypeUsage_Trait.h>
+#include <std/HashMapIter_usize_TypeUsage_Trait.h>
+struct HashMap_usize_TypeUsage_Trait;
+struct TypeUsage_Trait;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Trait HashMap_usize_TypeUsage_Trait__new(struct trait_Allocator allocator);

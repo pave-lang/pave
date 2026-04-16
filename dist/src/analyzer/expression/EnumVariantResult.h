@@ -5,7 +5,6 @@ struct EnumVariant;
 struct EnumCValue;
 struct Function;
 struct GenericMap;
-
 #line 5 "src/analyzer/expression/EnumVariantResult.pv"
 struct EnumVariantResult {
     enum {
@@ -21,5 +20,6 @@ struct EnumVariantResult {
         struct { struct Function* _0; struct GenericMap* _1; } function_value;
     };
 };
+
 
 #endif

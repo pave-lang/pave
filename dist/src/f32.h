@@ -2,10 +2,7 @@
 #define PAVE_F32
 
 #include <std/trait_Hash.h>
-#include <stdint.h>
-
-typedef uint64_t Hashed;
-
+#include <std/Hashed.h>
 
 
 #line 48 "src/std/Hash.pv"

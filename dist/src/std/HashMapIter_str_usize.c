@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_usize.h>
-#include <std/str.h>
-#include <stdint.h>
+#include <std/HashMapIter_str_usize.h>
 #include <tuple_str_usize.h>
+#include <std/HashMapIter_str_usize.h>
 
 #include <std/HashMapIter_str_usize.h>
 

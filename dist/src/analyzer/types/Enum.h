@@ -2,20 +2,15 @@
 #define PAVE_ENUM
 
 #include <stdint.h>
+#include <stdbool.h>
+
 #include <analyzer/types/EnumType.h>
 #include <analyzer/types/Generics.h>
 #include <std/HashMap_str_EnumVariant.h>
-#include <std/str.h>
-#include <analyzer/types/EnumVariant.h>
 #include <std/HashMap_str_ref_Trait.h>
 #include <std/Array_ref_Impl.h>
-#include <stdbool.h>
-
 struct Token;
 struct Context;
-struct Trait;
-struct Impl;
-struct Enum;
 
 #line 22 "src/analyzer/types/Enum.pv"
 struct Enum {
@@ -29,6 +24,10 @@ struct Enum {
     struct HashMap_str_ref_Trait traits;
     struct Array_ref_Impl impls;
 };
+
+#include <analyzer/types/Enum.h>
+struct Context;
+struct Enum;
 
 #line 35 "src/analyzer/types/Enum.pv"
 struct Enum Enum__new(struct Context* context);
@@ -44,5 +43,8 @@ bool Enum__fill_variants(struct Enum* self);
 
 #line 93 "src/analyzer/types/Enum.pv"
 bool Enum__parse_variant(struct Enum* self);
+
+#line 137 "src/analyzer/types/Enum.pv"
+bool Enum__is_discriminated_union(struct Enum* self);
 
 #endif

@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_str_Enum.h>
-#include <std/str.h>
-#include <analyzer/types/Enum.h>
+#include <std/HashMapIter_str_Enum.h>
 #include <tuple_str_Enum.h>
+#include <std/HashMapIter_str_Enum.h>
 
 #include <std/HashMapIter_str_Enum.h>
 

@@ -8,4 +8,5 @@ enum StructType {
     STRUCT_TYPE__TUPLE,
 };
 
+
 #endif

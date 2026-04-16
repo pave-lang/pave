@@ -2,8 +2,6 @@
 #define PAVE_ENUM_VARIANT
 
 #include <std/Array_Type.h>
-#include <analyzer/types/Type.h>
-
 struct Token;
 struct Enum;
 struct Expression;

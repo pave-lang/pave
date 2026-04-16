@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct FunctionScope;
-
 struct tuple_usize_ref_FunctionScope {
     uintptr_t _0;
     struct FunctionScope* _1;

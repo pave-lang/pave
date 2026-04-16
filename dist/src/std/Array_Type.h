@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_TYPE
 #define PAVE_ARRAY_TYPE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Type;
-struct Iter_ref_Type;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct Type;
 
 #line 69 "src/std/Array.pv"
 struct Array_Type {
@@ -18,6 +17,13 @@ struct Array_Type {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_Type.h>
+#include <analyzer/types/Type.h>
+#include <std/Iter_ref_Type.h>
+struct Array_Type;
+struct Type;
 
 #line 77 "src/std/Array.pv"
 struct Array_Type Array_Type__new(struct trait_Allocator allocator);

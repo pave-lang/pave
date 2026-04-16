@@ -2,19 +2,21 @@
 #define PAVE_ITER_ENUMERATE_REF_MATCH_CASE
 
 #include <stdint.h>
-#include <std/Iter_ref_MatchCase.h>
 #include <stdbool.h>
-
-struct MatchCase;
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/Iter_ref_MatchCase.h>
 
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_MatchCase {
     uintptr_t index;
     struct Iter_ref_MatchCase iter;
 };
+
+#include <tuple_usize_ref_MatchCase.h>
+struct IterEnumerate_ref_MatchCase;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_MatchCase__next(struct IterEnumerate_ref_MatchCase* self);

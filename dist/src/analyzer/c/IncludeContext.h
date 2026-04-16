@@ -1,21 +1,16 @@
 #ifndef PAVE_INCLUDE_CONTEXT
 #define PAVE_INCLUDE_CONTEXT
 
-#include <analyzer/c/ParentCpp.h>
 #include <stdbool.h>
-
-struct Include;
-struct IncludeContext;
-struct HashMap_str_Type;
-struct str;
-struct Type;
-struct StructC;
-struct EnumC;
-struct FunctionC;
 
 #include <clang-c/Index.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <analyzer/c/ParentCpp.h>
+struct Include;
+struct IncludeContext;
+struct HashMap_str_Type;
 
 #line 8 "src/analyzer/c/IncludeContext.pv"
 struct IncludeContext {
@@ -25,6 +20,14 @@ struct IncludeContext {
     struct HashMap_str_Type* values;
     struct ParentCpp parent;
 };
+
+#include <clang-c/Index.h>
+#include <analyzer/types/Type.h>
+struct IncludeContext;
+struct Type;
+struct StructC;
+struct EnumC;
+struct FunctionC;
 
 #line 17 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type);

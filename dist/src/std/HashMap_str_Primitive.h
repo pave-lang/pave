@@ -1,17 +1,14 @@
 #ifndef PAVE_HASH_MAP_STR_PRIMITIVE
 #define PAVE_HASH_MAP_STR_PRIMITIVE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_Primitive;
-struct str;
-struct Primitive;
-struct HashMapIter_str_Primitive;
-
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_str_Primitive;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_Primitive {
@@ -21,6 +18,15 @@ struct HashMap_str_Primitive {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_Primitive.h>
+#include <std/str.h>
+#include <analyzer/types/Primitive.h>
+#include <std/HashMapIter_str_Primitive.h>
+struct HashMap_str_Primitive;
+struct str;
+struct Primitive;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Primitive HashMap_str_Primitive__new(struct trait_Allocator allocator);

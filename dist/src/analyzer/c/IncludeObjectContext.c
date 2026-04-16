@@ -1,19 +1,22 @@
+#include <stdbool.h>
+#include <stdint.h>
+
 #include <clang-c/Index.h>
 #include <string.h>
 
-#include <std/HashMap_str_EnumCValue.h>
+#include <clang-c/Index.h>
+#include <string.h>
+#include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/Include.h>
 #include <analyzer/c/IncludeContext.h>
 #include <analyzer/c/StructC.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/c/StructCField.h>
-#include <std/str.h>
 #include <std/HashMap_str_StructCField.h>
-#include <stdbool.h>
+#include <std/str.h>
 #include <analyzer/c/ClassCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <stdint.h>
 #include <std/Array_Type.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/Function.h>
@@ -26,6 +29,8 @@
 #include <analyzer/c/IncludeObjectEnumClass.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/EnumCValue.h>
+#include <std/HashMap_str_EnumCValue.h>
+#include <analyzer/c/IncludeObjectContext.h>
 
 #include <analyzer/c/IncludeObjectContext.h>
 
@@ -261,7 +266,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
                 #line 149 "src/analyzer/c/IncludeObjectContext.pv"
                 if (resolved != 0) {
                     #line 150 "src/analyzer/c/IncludeObjectContext.pv"
-                    struct TypedefC* typedef_ = TypedefC__new(include, name, resolved);
+                    struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, resolved);
                     #line 151 "src/analyzer/c/IncludeObjectContext.pv"
                     HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
                 } else {

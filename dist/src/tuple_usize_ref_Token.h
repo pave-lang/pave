@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct Token;
-
 struct tuple_usize_ref_Token {
     uintptr_t _0;
     struct Token* _1;

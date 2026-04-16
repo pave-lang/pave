@@ -1,10 +1,12 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_TypeImpl.h>
+#include <std/Iter_ref_TypeImpl.h>
 
 #include <std/Iter_ref_TypeImpl.h>
 

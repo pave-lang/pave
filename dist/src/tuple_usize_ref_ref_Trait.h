@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-struct Trait;
-
 struct tuple_usize_ref_ref_Trait {
     uintptr_t _0;
     struct Trait** _1;

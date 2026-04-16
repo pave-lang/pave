@@ -1,28 +1,14 @@
 #ifndef PAVE_EXPRESSION
 #define PAVE_EXPRESSION
 
-#include <analyzer/expression/ExpressionData.h>
-#include <analyzer/types/Type.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-struct Token;
-struct Expression;
-struct ArenaAllocator;
-struct ExpressionData;
-struct Type;
-struct Context;
-struct EnumVariantResult;
-struct GenericMap;
-struct Function;
-struct Array_Type;
-struct Array_InvokeArgument;
-struct InvokeArgument;
-struct EnumVariant;
-struct Generics;
-struct str;
-
 #include <stdlib.h>
+
+#include <analyzer/expression/ExpressionData.h>
+#include <analyzer/types/Type.h>
+struct Token;
 
 #line 7 "src/analyzer/expression/Expression.pv"
 struct Expression {
@@ -30,6 +16,23 @@ struct Expression {
     struct ExpressionData data;
     struct Type return_type;
 };
+
+#include <analyzer/expression/ExpressionData.h>
+#include <analyzer/expression/Expression.h>
+#include <analyzer/expression/EnumVariantResult.h>
+#include <std/Array_InvokeArgument.h>
+#include <std/str.h>
+struct ArenaAllocator;
+struct Token;
+struct Type;
+struct Expression;
+struct Context;
+struct Function;
+struct Array_Type;
+struct Array_InvokeArgument;
+struct GenericMap;
+struct EnumVariant;
+struct Generics;
 
 #line 14 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make(struct ArenaAllocator* allocator, struct Token* token, struct ExpressionData data, struct Type* return_type);

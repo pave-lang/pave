@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-struct ArenaOversize;
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+struct ArenaOversize;
 
 #line 19 "src/std/ArenaAllocator.pv"
 struct ArenaOversize {

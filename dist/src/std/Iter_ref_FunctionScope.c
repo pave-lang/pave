@@ -1,10 +1,12 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_FunctionScope.h>
 #include <compiler/FunctionScope.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_FunctionScope.h>
+#include <std/Iter_ref_FunctionScope.h>
 
 #include <std/Iter_ref_FunctionScope.h>
 

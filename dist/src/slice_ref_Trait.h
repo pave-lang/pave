@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_REF_TRAIT
 #define PAVE_SLICE_REF_TRAIT
 
-#include <stdint.h>
-
+#include <std/Iter_ref_ref_Trait.h>
 struct Trait;
-
 struct slice_ref_Trait { struct Trait** data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

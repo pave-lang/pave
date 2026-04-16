@@ -1,14 +1,19 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/HashMap_str_ref_Trait.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <std/HashMapIter_str_ref_Trait.h>
+#include <std/HashMapBucket_str_ref_Trait.h>
+#include <std/Hashed.h>
+#include <std/trait_Hash.h>
 #include <std/str.h>
 #include <analyzer/types/Trait.h>
-#include <std/HashMapBucket_str_ref_Trait.h>
-#include <stdbool.h>
-#include <std/Hashed.h>
+#include <std/Range_usize.h>
+#include <std/HashMapIter_str_ref_Trait.h>
+#include <std/HashMap_str_ref_Trait.h>
 
 #include <std/HashMap_str_ref_Trait.h>
 

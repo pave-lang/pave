@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_IMPL_NODE
 #define PAVE_SLICE_IMPL_NODE
 
-#include <stdint.h>
-
-struct ImplNode;
-
+#include <analyzer/ImplNode.h>
+#include <std/Iter_ref_ImplNode.h>
 struct slice_ImplNode { struct ImplNode* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

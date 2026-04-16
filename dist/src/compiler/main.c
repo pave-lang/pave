@@ -1,15 +1,19 @@
+#include <stdint.h>
+#include <stdbool.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <stdio.h>
 #include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>
 #include <std/GeneralPurposeAllocator.h>
 #include <std/Array_ptrc_char.h>
+#include <std/Range_i32.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Root.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <compiler/Generator.h>
-
 #include <compiler/main.h>
 
 #line 7 "src/compiler/main.pv"

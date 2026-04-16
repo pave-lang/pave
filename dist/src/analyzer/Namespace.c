@@ -1,24 +1,27 @@
+#include <stdint.h>
+
 #include <fs.h>
 
-#include <analyzer/Root.h>
-#include <std/HashMapIter_str_ref_Namespace.h>
-#include <std/str.h>
+#include <fs.h>
 #include <std/ArenaAllocator.h>
-#include <stdint.h>
+#include <analyzer/Root.h>
+#include <analyzer/Namespace.h>
+#include <std/str.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_ref_Module.h>
-#include <analyzer/Module.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
 #include <std/HashMap_str_ref_Trait.h>
-#include <analyzer/types/Trait.h>
-#include <stdbool.h>
 #include <std/String.h>
 #include <std/Array_char.h>
-#include <tuple_str_ref_Module.h>
+#include <analyzer/Module.h>
 #include <std/HashMapIter_str_ref_Module.h>
+#include <tuple_str_ref_Module.h>
+#include <std/HashMapIter_str_ref_Namespace.h>
 #include <tuple_str_ref_Namespace.h>
+#include <analyzer/types/Type.h>
+#include <analyzer/types/Trait.h>
+#include <analyzer/Namespace.h>
 
 #include <analyzer/Namespace.h>
 

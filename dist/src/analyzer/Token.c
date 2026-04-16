@@ -1,9 +1,12 @@
+#include <stdint.h>
+
 #include <stdio.h>
 
-#include <stdbool.h>
-#include <analyzer/TokenType.h>
+#include <stdio.h>
 #include <std/str.h>
-#include <stdint.h>
+#include <analyzer/Token.h>
+#include <analyzer/TokenType.h>
+#include <analyzer/Token.h>
 
 #include <analyzer/Token.h>
 

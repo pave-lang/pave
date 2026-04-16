@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 
+#include <std/trait_Iterator.h>
 #line 1 "src/std/Iterator.pv"
 struct trait_IteratorVTable {
     #line 2 "src/std/Iterator.pv"

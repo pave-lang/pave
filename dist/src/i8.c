@@ -1,6 +1,8 @@
 #include <stdint.h>
+
 #include <std/Hashed.h>
 #include <std/Fnv1a.h>
+#include <i8.h>
 
 #include <i8.h>
 

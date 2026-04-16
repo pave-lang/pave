@@ -1,14 +1,12 @@
 #ifndef PAVE_ITER_REF_CXCURSOR
 #define PAVE_ITER_REF_CXCURSOR
 
-#include "clang-c/Index.h"
 #include <stdint.h>
 #include <stdbool.h>
 
-struct IterEnumerate_ref_CXCursor;
-
 #include <stdlib.h>
 #include <string.h>
+
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_CXCursor {
@@ -17,6 +15,10 @@ struct Iter_ref_CXCursor {
     CXCursor* start;
     CXCursor* end;
 };
+
+#include <std/Iter_ref_CXCursor.h>
+#include <std/IterEnumerate_ref_CXCursor.h>
+struct Iter_ref_CXCursor;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_CXCursor Iter_ref_CXCursor__new(CXCursor* start, CXCursor* end);

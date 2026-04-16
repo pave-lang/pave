@@ -1,11 +1,14 @@
-#include <std/ArenaAllocator.h>
-#include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
 #include <stdbool.h>
-#include <analyzer/TokenType.h>
-#include <analyzer/expression/Expression.h>
 #include <stdint.h>
+
+#include <analyzer/Context.h>
+#include <analyzer/TokenType.h>
+#include <analyzer/statement/WhileStatement.h>
+#include <analyzer/expression/Expression.h>
+#include <analyzer/types/Generics.h>
 #include <analyzer/Block.h>
+#include <std/ArenaAllocator.h>
+#include <analyzer/statement/WhileStatement.h>
 
 #include <analyzer/statement/WhileStatement.h>
 

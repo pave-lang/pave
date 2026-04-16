@@ -2,19 +2,21 @@
 #define PAVE_ITER_ENUMERATE_REF_REF_TOKEN
 
 #include <stdint.h>
-#include <std/Iter_ref_ref_Token.h>
 #include <stdbool.h>
-
-struct Token;
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/Iter_ref_ref_Token.h>
 
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_ref_Token {
     uintptr_t index;
     struct Iter_ref_ref_Token iter;
 };
+
+#include <tuple_usize_ref_ref_Token.h>
+struct IterEnumerate_ref_ref_Token;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_Token__next(struct IterEnumerate_ref_ref_Token* self);

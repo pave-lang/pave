@@ -1,10 +1,12 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <std/Iter_ref_InlayHint.h>
 #include <analyzer/InlayHint.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <std/IterEnumerate_ref_InlayHint.h>
+#include <std/Iter_ref_InlayHint.h>
 
 #include <std/Iter_ref_InlayHint.h>
 

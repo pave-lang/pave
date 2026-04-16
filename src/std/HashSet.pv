@@ -6,6 +6,22 @@ struct HashSetBucket<T> {
     next: &HashSetBucket<T>,
 }
 
+struct HashSetIter<T> {
+    iter: &HashSetBucket<T>,
+    end: &HashSetBucket<T>,
+}
+
+impl<T> HashSetIter<T> {
+    fn next(&self) -> bool {
+        self.iter += 1; 
+        return self.iter < self.end;
+    }
+
+    fn value(&self) -> &T {
+        return cast<&T>(self.iter);
+    }
+}
+
 struct HashSet<T: Hash> {
     allocator: &ArenaAllocator,
     buckets: &&HashSetBucket<T>,
@@ -116,5 +132,12 @@ impl<T: Hash> HashSet<T> {
         other.fill_buckets();
 
         return other;
+    }
+
+    fn iter(&self) -> HashSetIter<T> {
+        return HashSetIter<T> {
+            iter: self.data - 1,
+            end: self.data + self.length,
+        };
     }
 }

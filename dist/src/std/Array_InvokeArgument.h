@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_INVOKE_ARGUMENT
 #define PAVE_ARRAY_INVOKE_ARGUMENT
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct InvokeArgument;
-struct Iter_ref_InvokeArgument;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct InvokeArgument;
 
 #line 69 "src/std/Array.pv"
 struct Array_InvokeArgument {
@@ -18,6 +17,13 @@ struct Array_InvokeArgument {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_InvokeArgument.h>
+#include <analyzer/expression/InvokeArgument.h>
+#include <std/Iter_ref_InvokeArgument.h>
+struct Array_InvokeArgument;
+struct InvokeArgument;
 
 #line 77 "src/std/Array.pv"
 struct Array_InvokeArgument Array_InvokeArgument__new(struct trait_Allocator allocator);

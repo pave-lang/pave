@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct DeferStatement;
-
 struct tuple_usize_ref_DeferStatement {
     uintptr_t _0;
     struct DeferStatement* _1;

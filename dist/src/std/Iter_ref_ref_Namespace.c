@@ -1,10 +1,11 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <analyzer/Namespace.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <std/Iter_ref_ref_Namespace.h>
 #include <std/IterEnumerate_ref_ref_Namespace.h>
+#include <std/Iter_ref_ref_Namespace.h>
 
 #include <std/Iter_ref_ref_Namespace.h>
 

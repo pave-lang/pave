@@ -1,16 +1,14 @@
 #ifndef PAVE_ARRAY_HASH_MAP_USIZE_TYPE_FUNCTION_USAGE
 #define PAVE_ARRAY_HASH_MAP_USIZE_TYPE_FUNCTION_USAGE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMap_usize_TypeFunctionUsage;
-struct TypeFunctionUsage;
-struct Iter_ref_HashMap_usize_TypeFunctionUsage;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMap_usize_TypeFunctionUsage;
 
 #line 69 "src/std/Array.pv"
 struct Array_HashMap_usize_TypeFunctionUsage {
@@ -19,6 +17,13 @@ struct Array_HashMap_usize_TypeFunctionUsage {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_HashMap_usize_TypeFunctionUsage.h>
+#include <std/HashMap_usize_TypeFunctionUsage.h>
+#include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
+struct Array_HashMap_usize_TypeFunctionUsage;
+struct HashMap_usize_TypeFunctionUsage;
 
 #line 77 "src/std/Array.pv"
 struct Array_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFunctionUsage__new(struct trait_Allocator allocator);

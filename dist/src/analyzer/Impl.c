@@ -1,27 +1,29 @@
-#include <analyzer/Root.h>
+#include <stdint.h>
+
+#include <analyzer/Impl.h>
 #include <analyzer/Context.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_ImplNode.h>
-#include <analyzer/ImplNode.h>
 #include <std/HashMap_str_Function.h>
-#include <std/str.h>
-#include <analyzer/types/Function.h>
-#include <stdbool.h>
 #include <analyzer/TokenType.h>
-#include <stdint.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Trait.h>
+#include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionParent.h>
-#include <tuple_str_Function.h>
+#include <std/str.h>
+#include <analyzer/ImplNode.h>
 #include <std/HashMapIter_str_Function.h>
+#include <tuple_str_Function.h>
 #include <std/String.h>
 #include <analyzer/types/GenericMap.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <analyzer/Naming.h>
+#include <analyzer/Root.h>
+#include <analyzer/Impl.h>
 
 #include <analyzer/Impl.h>
 

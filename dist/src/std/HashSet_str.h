@@ -4,14 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct ArenaAllocator;
-struct HashSetBucket_str;
-struct str;
-
 #include <stdio.h>
 #include <string.h>
 
-#line 9 "src/std/HashSet.pv"
+struct ArenaAllocator;
+struct HashSetBucket_str;
+
+#line 25 "src/std/HashSet.pv"
 struct HashSet_str {
     struct ArenaAllocator* allocator;
     struct HashSetBucket_str** buckets;
@@ -20,25 +19,35 @@ struct HashSet_str {
     uintptr_t length;
 };
 
-#line 18 "src/std/HashSet.pv"
+#include <std/HashSet_str.h>
+#include <std/str.h>
+#include <std/HashSetIter_str.h>
+struct ArenaAllocator;
+struct HashSet_str;
+struct str;
+
+#line 34 "src/std/HashSet.pv"
 struct HashSet_str HashSet_str__new(struct ArenaAllocator* allocator);
 
-#line 29 "src/std/HashSet.pv"
+#line 45 "src/std/HashSet.pv"
 void HashSet_str__resize(struct HashSet_str* self, uintptr_t new_capacity);
 
-#line 38 "src/std/HashSet.pv"
+#line 54 "src/std/HashSet.pv"
 bool HashSet_str__has(struct HashSet_str* self, struct str* value);
 
-#line 53 "src/std/HashSet.pv"
+#line 69 "src/std/HashSet.pv"
 bool HashSet_str__insert(struct HashSet_str* self, struct str value);
 
-#line 77 "src/std/HashSet.pv"
+#line 93 "src/std/HashSet.pv"
 void HashSet_str__release(struct HashSet_str* self);
 
-#line 86 "src/std/HashSet.pv"
+#line 102 "src/std/HashSet.pv"
 void HashSet_str__fill_buckets(struct HashSet_str* self);
 
-#line 105 "src/std/HashSet.pv"
+#line 121 "src/std/HashSet.pv"
 struct HashSet_str HashSet_str__clone(struct HashSet_str* self, struct ArenaAllocator* allocator);
+
+#line 137 "src/std/HashSet.pv"
+struct HashSetIter_str HashSet_str__iter(struct HashSet_str* self);
 
 #endif

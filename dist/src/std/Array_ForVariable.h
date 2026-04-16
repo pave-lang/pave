@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_FOR_VARIABLE
 #define PAVE_ARRAY_FOR_VARIABLE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct ForVariable;
-struct Iter_ref_ForVariable;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct ForVariable;
 
 #line 69 "src/std/Array.pv"
 struct Array_ForVariable {
@@ -18,6 +17,13 @@ struct Array_ForVariable {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_ForVariable.h>
+#include <analyzer/statement/ForVariable.h>
+#include <std/Iter_ref_ForVariable.h>
+struct Array_ForVariable;
+struct ForVariable;
 
 #line 77 "src/std/Array.pv"
 struct Array_ForVariable Array_ForVariable__new(struct trait_Allocator allocator);

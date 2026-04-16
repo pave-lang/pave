@@ -1,15 +1,19 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/HashMap_usize_TypeUsage_Primitive.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <std/HashMapIter_usize_TypeUsage_Primitive.h>
-#include <compiler/TypeUsage_Primitive.h>
-#include <analyzer/types/Primitive.h>
 #include <std/HashMapBucket_usize_TypeUsage_Primitive.h>
-#include <stdbool.h>
+#include <compiler/TypeUsage_Primitive.h>
 #include <std/Hashed.h>
+#include <std/trait_Hash.h>
 #include <usize.h>
+#include <std/Range_usize.h>
+#include <std/HashMapIter_usize_TypeUsage_Primitive.h>
+#include <std/HashMap_usize_TypeUsage_Primitive.h>
 
 #include <std/HashMap_usize_TypeUsage_Primitive.h>
 

@@ -1,17 +1,14 @@
 #ifndef PAVE_HASH_MAP_USIZE_TYPE_USAGE_ENUM
 #define PAVE_HASH_MAP_USIZE_TYPE_USAGE_ENUM
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_usize_TypeUsage_Enum;
-struct TypeUsage_Enum;
-struct Enum;
-struct HashMapIter_usize_TypeUsage_Enum;
-
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_usize_TypeUsage_Enum;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum {
@@ -21,6 +18,13 @@ struct HashMap_usize_TypeUsage_Enum {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_usize_TypeUsage_Enum.h>
+#include <compiler/TypeUsage_Enum.h>
+#include <std/HashMapIter_usize_TypeUsage_Enum.h>
+struct HashMap_usize_TypeUsage_Enum;
+struct TypeUsage_Enum;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__new(struct trait_Allocator allocator);

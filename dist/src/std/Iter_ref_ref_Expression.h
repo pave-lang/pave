@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Expression;
-struct IterEnumerate_ref_ref_Expression;
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,6 +14,10 @@ struct Iter_ref_ref_Expression {
     struct Expression** start;
     struct Expression** end;
 };
+
+#include <std/Iter_ref_ref_Expression.h>
+#include <std/IterEnumerate_ref_ref_Expression.h>
+struct Iter_ref_ref_Expression;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_Expression Iter_ref_ref_Expression__new(struct Expression** start, struct Expression** end);

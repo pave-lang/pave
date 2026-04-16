@@ -1,18 +1,20 @@
-#include <std/ArenaAllocator.h>
-#include <analyzer/types/Generics.h>
-#include <std/Array_Type.h>
-#include <analyzer/types/Type.h>
-#include <std/trait_Allocator.h>
-#include <std/HashMap_str_usize.h>
-#include <std/str.h>
 #include <stdint.h>
-#include <stdbool.h>
+
+#include <analyzer/types/GenericMap.h>
+#include <std/Array_Type.h>
+#include <std/trait_Allocator.h>
+#include <std/ArenaAllocator.h>
+#include <std/HashMap_str_usize.h>
 #include <std/Array_Generic.h>
+#include <analyzer/types/Generics.h>
 #include <analyzer/types/Generic.h>
 #include <analyzer/Token.h>
-#include <std/Iter_ref_Type.h>
+#include <analyzer/types/Type.h>
+#include <std/str.h>
 #include <std/Iter_ref_Generic.h>
 #include <analyzer/Context.h>
+#include <std/Iter_ref_Type.h>
+#include <analyzer/types/GenericMap.h>
 
 #include <analyzer/types/GenericMap.h>
 

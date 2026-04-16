@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct EnumVariantParameter;
-
 struct tuple_usize_ref_EnumVariantParameter {
     uintptr_t _0;
     struct EnumVariantParameter* _1;

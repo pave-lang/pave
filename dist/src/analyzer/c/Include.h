@@ -2,19 +2,14 @@
 #define PAVE_INCLUDE
 
 #include <stdbool.h>
-#include <std/str.h>
-#include <std/HashMap_u32_Type.h>
-#include <stdint.h>
-#include <analyzer/types/Type.h>
-#include <std/HashMap_str_Type.h>
-
-struct Root;
-struct str;
-struct Type;
-struct EnumC;
 
 #include <clang-c/Index.h>
 #include <string.h>
+
+#include <std/str.h>
+#include <std/HashMap_u32_Type.h>
+#include <std/HashMap_str_Type.h>
+struct Root;
 
 #line 9 "src/analyzer/c/Include.pv"
 struct Include {
@@ -26,6 +21,13 @@ struct Include {
     struct HashMap_str_Type types;
     struct HashMap_str_Type values;
 };
+
+#include <clang-c/Index.h>
+#include <std/str.h>
+struct Root;
+struct Include;
+struct Type;
+struct EnumC;
 
 #line 20 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp);

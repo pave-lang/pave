@@ -4,9 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <std/trait_Fn.h>
 struct Array_TypeId;
-typedef uint64_t TypeId;
-
 #line 1 "src/std/Fn.pv"
 struct trait_FnVTable {
     #line 2 "src/std/Fn.pv"

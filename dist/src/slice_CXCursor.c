@@ -1,5 +1,4 @@
-#include <std/Iter_ref_CXCursor.h>
-#include <stdint.h>
+#include <slice_CXCursor.h>
 
 #include <slice_CXCursor.h>
 

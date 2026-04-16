@@ -1,11 +1,8 @@
 #ifndef PAVE_SLICE_HASH_MAP_USIZE_TYPE_FUNCTION_USAGE
 #define PAVE_SLICE_HASH_MAP_USIZE_TYPE_FUNCTION_USAGE
 
-#include <stdint.h>
-
-struct HashMap_usize_TypeFunctionUsage;
-struct TypeFunctionUsage;
-
+#include <std/HashMap_usize_TypeFunctionUsage.h>
+#include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
 struct slice_HashMap_usize_TypeFunctionUsage { struct HashMap_usize_TypeFunctionUsage* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

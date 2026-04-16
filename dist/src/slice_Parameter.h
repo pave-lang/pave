@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_PARAMETER
 #define PAVE_SLICE_PARAMETER
 
-#include <stdint.h>
-
-struct Parameter;
-
+#include <analyzer/types/Parameter.h>
+#include <std/Iter_ref_Parameter.h>
 struct slice_Parameter { struct Parameter* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

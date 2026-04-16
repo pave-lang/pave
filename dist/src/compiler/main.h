@@ -1,6 +1,9 @@
 #ifndef PAVE_MAIN
 #define PAVE_MAIN
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #include <stdio.h>
 #include <string.h>
 

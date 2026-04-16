@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_STATEMENT
 #define PAVE_SLICE_STATEMENT
 
-#include <stdint.h>
-
-struct Statement;
-
+#include <analyzer/statement/Statement.h>
+#include <std/Iter_ref_Statement.h>
 struct slice_Statement { struct Statement* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

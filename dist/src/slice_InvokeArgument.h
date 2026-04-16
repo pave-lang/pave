@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_INVOKE_ARGUMENT
 #define PAVE_SLICE_INVOKE_ARGUMENT
 
-#include <stdint.h>
-
-struct InvokeArgument;
-
+#include <analyzer/expression/InvokeArgument.h>
+#include <std/Iter_ref_InvokeArgument.h>
 struct slice_InvokeArgument { struct InvokeArgument* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

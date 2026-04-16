@@ -2,19 +2,21 @@
 #define PAVE_ITER_ENUMERATE_REF_MATCH_PATTERN
 
 #include <stdint.h>
-#include <std/Iter_ref_MatchPattern.h>
 #include <stdbool.h>
-
-struct MatchPattern;
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/Iter_ref_MatchPattern.h>
 
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_MatchPattern {
     uintptr_t index;
     struct Iter_ref_MatchPattern iter;
 };
+
+#include <tuple_usize_ref_MatchPattern.h>
+struct IterEnumerate_ref_MatchPattern;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_MatchPattern__next(struct IterEnumerate_ref_MatchPattern* self);

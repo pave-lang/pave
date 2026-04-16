@@ -1,16 +1,14 @@
 #ifndef PAVE_HASH_MAP_STR_BOOL
 #define PAVE_HASH_MAP_STR_BOOL
 
-#include <std/trait_Allocator.h>
-#include <stdbool.h>
 #include <stdint.h>
-
-struct HashMapBucket_str_bool;
-struct str;
-struct HashMapIter_str_bool;
+#include <stdbool.h>
 
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_str_bool;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_bool {
@@ -20,6 +18,13 @@ struct HashMap_str_bool {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_bool.h>
+#include <std/str.h>
+#include <std/HashMapIter_str_bool.h>
+struct HashMap_str_bool;
+struct str;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_bool HashMap_str_bool__new(struct trait_Allocator allocator);

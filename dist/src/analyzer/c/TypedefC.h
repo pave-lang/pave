@@ -2,7 +2,6 @@
 #define PAVE_TYPEDEF_C
 
 #include <std/str.h>
-
 struct Include;
 struct Type;
 
@@ -13,7 +12,12 @@ struct TypedefC {
     struct Type* type;
 };
 
+#include <std/str.h>
+struct Include;
+struct Type;
+struct TypedefC;
+
 #line 11 "src/analyzer/c/TypedefC.pv"
-struct TypedefC* TypedefC__new(struct Include* include, char const* name, struct Type* type);
+struct TypedefC* TypedefC__new(struct Include* include, struct str name, struct Type* type);
 
 #endif

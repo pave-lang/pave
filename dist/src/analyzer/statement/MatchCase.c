@@ -1,14 +1,16 @@
-#include <stdbool.h>
-#include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
+#include <stdint.h>
+
 #include <analyzer/Token.h>
+#include <analyzer/Context.h>
 #include <analyzer/Block.h>
 #include <std/Array_MatchPattern.h>
-#include <analyzer/statement/MatchPattern.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <stdint.h>
 #include <analyzer/TokenType.h>
+#include <analyzer/statement/MatchPattern.h>
+#include <analyzer/types/Generics.h>
+#include <analyzer/statement/MatchCase.h>
+#include <analyzer/statement/MatchCase.h>
 
 #include <analyzer/statement/MatchCase.h>
 

@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_FUNCTION_SCOPE
 #define PAVE_ARRAY_FUNCTION_SCOPE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct FunctionScope;
-struct Iter_ref_FunctionScope;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct FunctionScope;
 
 #line 69 "src/std/Array.pv"
 struct Array_FunctionScope {
@@ -18,6 +17,13 @@ struct Array_FunctionScope {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_FunctionScope.h>
+#include <compiler/FunctionScope.h>
+#include <std/Iter_ref_FunctionScope.h>
+struct Array_FunctionScope;
+struct FunctionScope;
 
 #line 77 "src/std/Array.pv"
 struct Array_FunctionScope Array_FunctionScope__new(struct trait_Allocator allocator);

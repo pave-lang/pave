@@ -1,14 +1,13 @@
 #ifndef PAVE_ARRAY_CHAR
 #define PAVE_ARRAY_CHAR
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Iter_ref_char;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"
 struct Array_char {
@@ -17,6 +16,11 @@ struct Array_char {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_char.h>
+#include <std/Iter_ref_char.h>
+struct Array_char;
 
 #line 77 "src/std/Array.pv"
 struct Array_char Array_char__new(struct trait_Allocator allocator);

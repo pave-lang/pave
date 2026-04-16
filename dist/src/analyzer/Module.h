@@ -1,41 +1,25 @@
 #ifndef PAVE_MODULE
 #define PAVE_MODULE
 
-#include <std/str.h>
-#include <std/Array_NamespacePath.h>
-#include <analyzer/NamespacePath.h>
-#include <std/Array_ref_Namespace.h>
-#include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
-#include <std/HashMap_str_Enum.h>
-#include <analyzer/types/Enum.h>
-#include <std/HashMap_str_Struct.h>
-#include <analyzer/types/Struct.h>
-#include <std/HashMap_str_Trait.h>
-#include <analyzer/types/Trait.h>
-#include <std/Array_Impl.h>
-#include <analyzer/Impl.h>
-#include <std/HashMap_str_Function.h>
-#include <analyzer/types/Function.h>
-#include <std/Array_TypeImpl.h>
-#include <analyzer/types/TypeImpl.h>
-#include <analyzer/Context.h>
-#include <std/Array_Token.h>
-#include <analyzer/Token.h>
 #include <stdbool.h>
-#include <std/HashMap_str_ref_Include.h>
-
-struct Root;
-struct Namespace;
-struct Include;
-struct str;
-struct NamespacePath;
-struct Type;
-struct Trait;
-struct Array_Type;
-struct Primitive;
 
 #include <stdio.h>
+
+#include <std/str.h>
+#include <std/Array_NamespacePath.h>
+#include <std/Array_ref_Namespace.h>
+#include <std/HashMap_str_Type.h>
+#include <std/HashMap_str_Enum.h>
+#include <std/HashMap_str_Struct.h>
+#include <std/HashMap_str_Trait.h>
+#include <std/Array_Impl.h>
+#include <std/HashMap_str_Function.h>
+#include <std/Array_TypeImpl.h>
+#include <analyzer/Context.h>
+#include <std/Array_Token.h>
+#include <std/HashMap_str_ref_Include.h>
+struct Root;
+struct Namespace;
 
 #line 7 "src/analyzer/Module.pv"
 struct Module {
@@ -56,6 +40,15 @@ struct Module {
     bool mode_cpp;
     struct HashMap_str_ref_Include includes;
 };
+
+#include <std/str.h>
+struct Namespace;
+struct Module;
+struct NamespacePath;
+struct Type;
+struct Trait;
+struct Array_Type;
+struct Primitive;
 
 #line 27 "src/analyzer/Module.pv"
 struct Module* Module__new(struct Namespace* namespace, struct str path);

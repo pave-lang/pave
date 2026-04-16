@@ -4,8 +4,6 @@
 #include <stdint.h>
 
 struct HashMap_usize_TypeFunctionUsage;
-struct TypeFunctionUsage;
-
 struct tuple_usize_ref_HashMap_usize_TypeFunctionUsage {
     uintptr_t _0;
     struct HashMap_usize_TypeFunctionUsage* _1;

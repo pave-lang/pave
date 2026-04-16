@@ -1,18 +1,11 @@
 #ifndef PAVE_GENERICS
 #define PAVE_GENERICS
 
-#include <std/Array_Generic.h>
-#include <analyzer/types/Generic.h>
-#include <std/HashMap_str_usize.h>
-#include <std/str.h>
-#include <stdint.h>
-#include <std/trait_Allocator.h>
 #include <stdbool.h>
 
+#include <std/Array_Generic.h>
+#include <std/HashMap_str_usize.h>
 struct Generics;
-struct str;
-struct Generic;
-struct Context;
 
 #line 42 "src/analyzer/types/Generics.pv"
 struct Generics {
@@ -20,6 +13,13 @@ struct Generics {
     struct Array_Generic array;
     struct HashMap_str_usize map;
 };
+
+#include <std/trait_Allocator.h>
+#include <analyzer/types/Generics.h>
+#include <std/str.h>
+struct Generics;
+struct Generic;
+struct Context;
 
 #line 49 "src/analyzer/types/Generics.pv"
 struct Generics Generics__new(struct trait_Allocator allocator);

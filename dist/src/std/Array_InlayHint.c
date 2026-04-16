@@ -1,12 +1,15 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/Array_InlayHint.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <slice_InlayHint.h>
 #include <analyzer/InlayHint.h>
-#include <stdbool.h>
 #include <std/Iter_ref_InlayHint.h>
+#include <slice_InlayHint.h>
+#include <std/Array_InlayHint.h>
 
 #include <std/Array_InlayHint.h>
 

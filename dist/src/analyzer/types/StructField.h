@@ -2,7 +2,6 @@
 #define PAVE_STRUCT_FIELD
 
 #include <analyzer/types/Type.h>
-
 struct Token;
 
 #line 4 "src/analyzer/types/Struct.pv"

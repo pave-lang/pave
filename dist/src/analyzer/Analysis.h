@@ -1,20 +1,11 @@
 #ifndef PAVE_ANALYSIS
 #define PAVE_ANALYSIS
 
-#include <std/HashMap_str_bool.h>
-#include <std/str.h>
-#include <stdbool.h>
-#include <std/HashMap_str_Array_Diagnostic.h>
-#include <std/Array_Diagnostic.h>
-#include <analyzer/Diagnostic.h>
-#include <std/HashMap_str_Array_InlayHint.h>
-#include <std/Array_InlayHint.h>
-#include <analyzer/InlayHint.h>
-
-struct Analysis;
-struct ArenaAllocator;
-
 #include <stdio.h>
+
+#include <std/HashMap_str_bool.h>
+#include <std/HashMap_str_Array_Diagnostic.h>
+#include <std/HashMap_str_Array_InlayHint.h>
 
 #line 35 "src/analyzer/Analysis.pv"
 struct Analysis {
@@ -22,6 +13,10 @@ struct Analysis {
     struct HashMap_str_Array_Diagnostic diagnostics;
     struct HashMap_str_Array_InlayHint inlay_hints;
 };
+
+#include <analyzer/Analysis.h>
+struct ArenaAllocator;
+struct Analysis;
 
 #line 42 "src/analyzer/Analysis.pv"
 struct Analysis Analysis__new(struct ArenaAllocator* allocator);

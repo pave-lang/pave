@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
+#include <std/trait_Struct.h>
 #line 1 "src/std/Struct.pv"
 struct trait_StructVTable {
     #line 2 "src/std/Struct.pv"

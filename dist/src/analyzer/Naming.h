@@ -1,19 +1,13 @@
 #ifndef PAVE_NAMING
 #define PAVE_NAMING
 
+#include <stdio.h>
+
 #include <analyzer/NamingType.h>
 #include <std/str.h>
 #include <std/HashMap_str_str.h>
-
 struct ArenaAllocator;
 struct Naming;
-struct String;
-struct Type;
-struct GenericMap;
-struct str;
-struct ParentCpp;
-
-#include <stdio.h>
 
 #line 13 "src/analyzer/Naming.pv"
 struct Naming {
@@ -45,6 +39,16 @@ struct Naming {
     struct Naming* naming_ident;
 };
 
+#include <analyzer/Naming.h>
+#include <std/String.h>
+#include <std/str.h>
+#include <analyzer/c/ParentCpp.h>
+struct ArenaAllocator;
+struct Naming;
+struct Type;
+struct GenericMap;
+struct String;
+
 #line 43 "src/analyzer/Naming.pv"
 struct Naming Naming__new_decl(struct ArenaAllocator* allocator);
 
@@ -60,13 +64,13 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
 #line 361 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 389 "src/analyzer/Naming.pv"
+#line 394 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 421 "src/analyzer/Naming.pv"
+#line 426 "src/analyzer/Naming.pv"
 void Naming__append_decl_suffix(struct Naming* self, struct String* result, struct Type* type);
 
-#line 439 "src/analyzer/Naming.pv"
+#line 444 "src/analyzer/Naming.pv"
 void Naming__append_cpp_path(struct Naming* self, struct String* result, struct ParentCpp parent);
 
 #endif

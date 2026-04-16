@@ -10,4 +10,5 @@ enum NamingType {
     NAMING_TYPE__C99,
 };
 
+
 #endif

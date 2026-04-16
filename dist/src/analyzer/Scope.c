@@ -1,9 +1,9 @@
+#include <analyzer/Scope.h>
+#include <std/HashMap_str_Type.h>
+#include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Block.h>
-#include <std/HashMap_str_Type.h>
-#include <std/str.h>
-#include <analyzer/types/Type.h>
-#include <std/trait_Allocator.h>
+#include <analyzer/Scope.h>
 
 #include <analyzer/Scope.h>
 

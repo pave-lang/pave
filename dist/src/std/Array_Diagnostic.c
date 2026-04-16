@@ -1,12 +1,15 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/Array_Diagnostic.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <slice_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
-#include <stdbool.h>
 #include <std/Iter_ref_Diagnostic.h>
+#include <slice_Diagnostic.h>
+#include <std/Array_Diagnostic.h>
 
 #include <std/Array_Diagnostic.h>
 

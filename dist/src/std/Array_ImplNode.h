@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_IMPL_NODE
 #define PAVE_ARRAY_IMPL_NODE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct ImplNode;
-struct Iter_ref_ImplNode;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct ImplNode;
 
 #line 69 "src/std/Array.pv"
 struct Array_ImplNode {
@@ -18,6 +17,13 @@ struct Array_ImplNode {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_ImplNode.h>
+#include <analyzer/ImplNode.h>
+#include <std/Iter_ref_ImplNode.h>
+struct Array_ImplNode;
+struct ImplNode;
 
 #line 77 "src/std/Array.pv"
 struct Array_ImplNode Array_ImplNode__new(struct trait_Allocator allocator);

@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/HashMapBucket_usize_TypeUsage_Struct.h>
-#include <stdint.h>
-#include <compiler/TypeUsage_Struct.h>
-#include <analyzer/types/Struct.h>
+#include <std/HashMapIter_usize_TypeUsage_Struct.h>
 #include <tuple_usize_TypeUsage_Struct.h>
+#include <std/HashMapIter_usize_TypeUsage_Struct.h>
 
 #include <std/HashMapIter_usize_TypeUsage_Struct.h>
 

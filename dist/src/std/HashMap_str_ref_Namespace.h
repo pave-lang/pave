@@ -1,17 +1,14 @@
 #ifndef PAVE_HASH_MAP_STR_REF_NAMESPACE
 #define PAVE_HASH_MAP_STR_REF_NAMESPACE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_ref_Namespace;
-struct str;
-struct Namespace;
-struct HashMapIter_str_ref_Namespace;
-
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_str_ref_Namespace;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace {
@@ -21,6 +18,14 @@ struct HashMap_str_ref_Namespace {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_ref_Namespace.h>
+#include <std/str.h>
+#include <std/HashMapIter_str_ref_Namespace.h>
+struct HashMap_str_ref_Namespace;
+struct str;
+struct Namespace;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__new(struct trait_Allocator allocator);

@@ -1,16 +1,19 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
-#include <std/str.h>
-#include <analyzer/types/Trait.h>
-#include <analyzer/types/Type.h>
-#include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMapBucket_str_tuple_ref_Trait_ref_Type.h>
-#include <stdbool.h>
+#include <tuple_ref_Trait_ref_Type.h>
 #include <std/Hashed.h>
+#include <std/trait_Hash.h>
+#include <std/str.h>
+#include <std/Range_usize.h>
+#include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 

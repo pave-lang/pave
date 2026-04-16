@@ -1,8 +1,9 @@
 #include <stdio.h>
 
-#include <std/trait_Allocator.h>
+#include <analyzer/types/Tuple.h>
 #include <std/Array_Type.h>
-#include <analyzer/types/Type.h>
+#include <std/trait_Allocator.h>
+#include <analyzer/types/Tuple.h>
 
 #include <analyzer/types/Tuple.h>
 

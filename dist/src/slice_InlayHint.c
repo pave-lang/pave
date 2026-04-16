@@ -1,6 +1,4 @@
-#include <std/Iter_ref_InlayHint.h>
-#include <analyzer/InlayHint.h>
-#include <stdint.h>
+#include <slice_InlayHint.h>
 
 #include <slice_InlayHint.h>
 

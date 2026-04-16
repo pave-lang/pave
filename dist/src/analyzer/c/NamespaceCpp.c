@@ -1,11 +1,12 @@
-#include <analyzer/c/Include.h>
-#include <analyzer/c/ParentCpp.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <std/trait_Allocator.h>
+#include <analyzer/c/Include.h>
+#include <analyzer/c/NamespaceCpp.h>
 #include <std/str.h>
+#include <analyzer/c/ParentCpp.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/types/Type.h>
+#include <std/trait_Allocator.h>
+#include <analyzer/c/NamespaceCpp.h>
 
 #include <analyzer/c/NamespaceCpp.h>
 

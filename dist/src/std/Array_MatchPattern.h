@@ -1,15 +1,14 @@
 #ifndef PAVE_ARRAY_MATCH_PATTERN
 #define PAVE_ARRAY_MATCH_PATTERN
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct MatchPattern;
-struct Iter_ref_MatchPattern;
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct MatchPattern;
 
 #line 69 "src/std/Array.pv"
 struct Array_MatchPattern {
@@ -18,6 +17,13 @@ struct Array_MatchPattern {
     uintptr_t length;
     uintptr_t capacity;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/Array_MatchPattern.h>
+#include <analyzer/statement/MatchPattern.h>
+#include <std/Iter_ref_MatchPattern.h>
+struct Array_MatchPattern;
+struct MatchPattern;
 
 #line 77 "src/std/Array.pv"
 struct Array_MatchPattern Array_MatchPattern__new(struct trait_Allocator allocator);

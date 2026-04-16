@@ -4,16 +4,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct str;
-struct Token;
-
 #include <stdio.h>
+
 
 #line 6 "src/compiler/FileWriter.pv"
 struct FileWriter {
     FILE* file;
     uintptr_t indent;
 };
+
+#include <compiler/FileWriter.h>
+#include <std/str.h>
+struct FileWriter;
+struct Token;
 
 #line 12 "src/compiler/FileWriter.pv"
 struct FileWriter FileWriter__new(FILE* file);

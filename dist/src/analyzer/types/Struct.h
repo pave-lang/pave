@@ -2,22 +2,15 @@
 #define PAVE_STRUCT
 
 #include <stdint.h>
+#include <stdbool.h>
+
 #include <analyzer/types/Generics.h>
 #include <analyzer/types/StructType.h>
 #include <std/HashMap_str_StructField.h>
-#include <std/str.h>
-#include <analyzer/types/StructField.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
-#include <tuple_ref_Trait_ref_Type.h>
 #include <std/Array_ref_Impl.h>
-#include <stdbool.h>
-
 struct Token;
 struct Module;
-struct Trait;
-struct Type;
-struct Impl;
-struct Struct;
 
 #line 15 "src/analyzer/types/Struct.pv"
 struct Struct {
@@ -31,6 +24,10 @@ struct Struct {
     struct HashMap_str_tuple_ref_Trait_ref_Type traits;
     struct Array_ref_Impl impls;
 };
+
+#include <analyzer/types/Struct.h>
+struct Module;
+struct Struct;
 
 #line 28 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);

@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct InvokeArgument;
-struct IterEnumerate_ref_InvokeArgument;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct InvokeArgument;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_InvokeArgument {
@@ -17,6 +16,11 @@ struct Iter_ref_InvokeArgument {
     struct InvokeArgument* start;
     struct InvokeArgument* end;
 };
+
+#include <std/Iter_ref_InvokeArgument.h>
+#include <std/IterEnumerate_ref_InvokeArgument.h>
+struct InvokeArgument;
+struct Iter_ref_InvokeArgument;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_InvokeArgument Iter_ref_InvokeArgument__new(struct InvokeArgument* start, struct InvokeArgument* end);

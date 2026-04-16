@@ -1,10 +1,15 @@
+#include <stdint.h>
+
 #include <string.h>
 
-#include <std/Fnv1a.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <string.h>
+#include <std/str.h>
 #include <std/Iter_ptrc_char.h>
+#include <std/Range_ptrc_char.h>
+#include <std/trait_Hash.h>
 #include <std/Hashed.h>
+#include <std/Fnv1a.h>
+#include <std/str.h>
 
 #include <std/str.h>
 

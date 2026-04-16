@@ -1,6 +1,4 @@
-#include <std/Iter_ref_MatchCase.h>
-#include <analyzer/statement/MatchCase.h>
-#include <stdint.h>
+#include <slice_MatchCase.h>
 
 #include <slice_MatchCase.h>
 

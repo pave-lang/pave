@@ -1,6 +1,4 @@
-#include <std/Iter_ref_Diagnostic.h>
-#include <analyzer/Diagnostic.h>
-#include <stdint.h>
+#include <slice_Diagnostic.h>
 
 #include <slice_Diagnostic.h>
 

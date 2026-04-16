@@ -1,12 +1,15 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/Array_ImplNode.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <slice_ImplNode.h>
 #include <analyzer/ImplNode.h>
-#include <stdbool.h>
 #include <std/Iter_ref_ImplNode.h>
+#include <slice_ImplNode.h>
+#include <std/Array_ImplNode.h>
 
 #include <std/Array_ImplNode.h>
 

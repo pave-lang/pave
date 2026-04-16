@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <std/trait_Allocator.h>
 #line 1 "src/std/Allocator.pv"
 struct trait_AllocatorVTable {
     #line 2 "src/std/Allocator.pv"

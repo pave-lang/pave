@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/types/Type.h>
-
 struct tuple_str_Type {
     struct str _0;
     struct Type _1;

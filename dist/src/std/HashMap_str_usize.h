@@ -1,16 +1,14 @@
 #ifndef PAVE_HASH_MAP_STR_USIZE
 #define PAVE_HASH_MAP_STR_USIZE
 
-#include <std/trait_Allocator.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-struct HashMapBucket_str_usize;
-struct str;
-struct HashMapIter_str_usize;
-
 #include <stdio.h>
 #include <string.h>
+
+#include <std/trait_Allocator.h>
+struct HashMapBucket_str_usize;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_usize {
@@ -20,6 +18,13 @@ struct HashMap_str_usize {
     uintptr_t capacity;
     uintptr_t length;
 };
+
+#include <std/trait_Allocator.h>
+#include <std/HashMap_str_usize.h>
+#include <std/str.h>
+#include <std/HashMapIter_str_usize.h>
+struct HashMap_str_usize;
+struct str;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_usize HashMap_str_usize__new(struct trait_Allocator allocator);

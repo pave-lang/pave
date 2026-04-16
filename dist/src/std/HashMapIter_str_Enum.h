@@ -3,18 +3,18 @@
 
 #include <stdbool.h>
 
-struct HashMapBucket_str_Enum;
-struct str;
-struct Enum;
-
 #include <stdio.h>
 #include <string.h>
+
+struct HashMapBucket_str_Enum;
 
 #line 10 "src/std/HashMap.pv"
 struct HashMapIter_str_Enum {
     struct HashMapBucket_str_Enum* iter;
     struct HashMapBucket_str_Enum* end;
 };
+
+struct HashMapIter_str_Enum;
 
 #line 16 "src/std/HashMap.pv"
 bool HashMapIter_str_Enum__next(struct HashMapIter_str_Enum* self);

@@ -1,12 +1,15 @@
-#include <analyzer/types/Function.h>
-#include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
 #include <stdbool.h>
+#include <stdint.h>
+
+#include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
+#include <analyzer/statement/YieldStatement.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
-#include <stdint.h>
+#include <analyzer/types/Generics.h>
 #include <analyzer/types/Type.h>
+#include <analyzer/types/Function.h>
+#include <analyzer/statement/YieldStatement.h>
 
 #include <analyzer/statement/YieldStatement.h>
 

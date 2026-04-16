@@ -1,14 +1,13 @@
 #ifndef PAVE_TOKEN
 #define PAVE_TOKEN
 
-#include <analyzer/TokenType.h>
-#include <std/str.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <analyzer/TokenType.h>
-
 #include <stdio.h>
+
+#include <analyzer/TokenType.h>
+#include <std/str.h>
 
 #line 29 "src/analyzer/Token.pv"
 struct Token {
@@ -19,6 +18,9 @@ struct Token {
     uintptr_t end_line;
     uintptr_t end_column;
 };
+
+#include <analyzer/TokenType.h>
+struct Token;
 
 #line 39 "src/analyzer/Token.pv"
 bool Token__eq(struct Token* self, enum TokenType type, char const* value);

@@ -1,18 +1,13 @@
 #ifndef PAVE_BLOCK
 #define PAVE_BLOCK
 
-#include <std/Array_Statement.h>
-#include <analyzer/statement/Statement.h>
-#include <std/Array_DeferStatement.h>
-#include <analyzer/statement/DeferStatement.h>
 #include <stdbool.h>
 
-struct Context;
-struct Generics;
-struct StatementData;
-struct Token;
-
 #include <stdio.h>
+
+#include <std/Array_Statement.h>
+#include <std/Array_DeferStatement.h>
+struct Context;
 
 #line 8 "src/analyzer/Block.pv"
 struct Block {
@@ -22,6 +17,13 @@ struct Block {
     bool is_top_level_and_has_defer_statements_inside;
     bool is_loop;
 };
+
+#include <analyzer/Block.h>
+struct Context;
+struct Block;
+struct Generics;
+struct StatementData;
+struct Token;
 
 #line 17 "src/analyzer/Block.pv"
 struct Block Block__new(struct Context* context);

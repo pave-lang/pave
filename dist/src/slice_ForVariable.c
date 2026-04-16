@@ -1,6 +1,4 @@
-#include <std/Iter_ref_ForVariable.h>
-#include <analyzer/statement/ForVariable.h>
-#include <stdint.h>
+#include <slice_ForVariable.h>
 
 #include <slice_ForVariable.h>
 

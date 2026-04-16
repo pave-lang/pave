@@ -1,15 +1,17 @@
-#include <analyzer/statement/DeferStatement.h>
-#include <analyzer/Block.h>
-#include <analyzer/Context.h>
-#include <analyzer/types/Generics.h>
 #include <stdbool.h>
-#include <analyzer/Scope.h>
-#include <std/Iter_ref_Scope.h>
-#include <std/Array_Scope.h>
 #include <stdint.h>
+
+#include <std/Array_Scope.h>
+#include <analyzer/Context.h>
+#include <std/Iter_ref_Scope.h>
+#include <analyzer/Scope.h>
+#include <analyzer/Block.h>
 #include <analyzer/TokenType.h>
+#include <analyzer/statement/DeferStatement.h>
+#include <analyzer/types/Generics.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/statement/DeferStatement.h>
 
 #include <analyzer/statement/DeferStatement.h>
 

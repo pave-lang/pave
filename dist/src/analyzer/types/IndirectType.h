@@ -11,4 +11,5 @@ enum IndirectType {
     INDIRECT_TYPE__CONST_POINTER,
 };
 
+
 #endif

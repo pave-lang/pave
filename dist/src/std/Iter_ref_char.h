@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct IterEnumerate_ref_char;
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -16,6 +14,10 @@ struct Iter_ref_char {
     char* start;
     char* end;
 };
+
+#include <std/Iter_ref_char.h>
+#include <std/IterEnumerate_ref_char.h>
+struct Iter_ref_char;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_char Iter_ref_char__new(char* start, char* end);

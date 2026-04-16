@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <fs.h>
 
-#include <std/ArenaAllocator.h>
+#include <compiler/FunctionCoroutine.h>
 #include <std/HashMap_str_ref_Type.h>
-#include <std/str.h>
-#include <analyzer/types/Type.h>
 #include <std/trait_Allocator.h>
+#include <std/ArenaAllocator.h>
+#include <compiler/FunctionCoroutine.h>
 
 #include <compiler/FunctionCoroutine.h>
 

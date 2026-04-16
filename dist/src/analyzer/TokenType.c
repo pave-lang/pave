@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <analyzer/TokenType.h>
+#include <analyzer/TokenType.h>
 
 #include <analyzer/TokenType.h>
 

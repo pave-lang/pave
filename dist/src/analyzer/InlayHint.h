@@ -1,12 +1,13 @@
 #ifndef PAVE_INLAY_HINT
 #define PAVE_INLAY_HINT
 
-#include <analyzer/Position.h>
-#include <std/str.h>
-#include <analyzer/InlayHintKind.h>
 #include <stdbool.h>
 
 #include <stdio.h>
+
+#include <analyzer/Position.h>
+#include <std/str.h>
+#include <analyzer/InlayHintKind.h>
 
 #line 27 "src/analyzer/Analysis.pv"
 struct InlayHint {

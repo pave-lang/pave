@@ -1,7 +1,4 @@
-#include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
-#include <std/HashMap_usize_TypeFunctionUsage.h>
-#include <stdint.h>
-#include <compiler/TypeFunctionUsage.h>
+#include <slice_HashMap_usize_TypeFunctionUsage.h>
 
 #include <slice_HashMap_usize_TypeFunctionUsage.h>
 

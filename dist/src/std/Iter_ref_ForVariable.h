@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct ForVariable;
-struct IterEnumerate_ref_ForVariable;
-
 #include <stdlib.h>
 #include <string.h>
+
+struct ForVariable;
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_ForVariable {
@@ -17,6 +16,11 @@ struct Iter_ref_ForVariable {
     struct ForVariable* start;
     struct ForVariable* end;
 };
+
+#include <std/Iter_ref_ForVariable.h>
+#include <std/IterEnumerate_ref_ForVariable.h>
+struct ForVariable;
+struct Iter_ref_ForVariable;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ForVariable Iter_ref_ForVariable__new(struct ForVariable* start, struct ForVariable* end);

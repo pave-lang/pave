@@ -1,22 +1,24 @@
+#include <stdint.h>
+#include <stdbool.h>
+
 #include <stdio.h>
 
-#include <analyzer/Range.h>
-#include <std/ArenaAllocator.h>
+#include <stdio.h>
+#include <analyzer/Analysis.h>
 #include <std/HashMap_str_bool.h>
-#include <std/str.h>
-#include <stdbool.h>
 #include <std/trait_Allocator.h>
+#include <std/ArenaAllocator.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
-#include <std/Array_Diagnostic.h>
-#include <analyzer/Diagnostic.h>
 #include <std/HashMap_str_Array_InlayHint.h>
-#include <std/Array_InlayHint.h>
-#include <analyzer/InlayHint.h>
-#include <tuple_str_Array_Diagnostic.h>
 #include <std/HashMapIter_str_Array_Diagnostic.h>
+#include <tuple_str_Array_Diagnostic.h>
+#include <std/Array_Diagnostic.h>
 #include <std/Iter_ref_Diagnostic.h>
-#include <stdint.h>
+#include <analyzer/Diagnostic.h>
+#include <std/str.h>
 #include <analyzer/Position.h>
+#include <analyzer/Range.h>
+#include <analyzer/Analysis.h>
 
 #include <analyzer/Analysis.h>
 

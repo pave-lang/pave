@@ -1,14 +1,19 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
+#include <std/HashMap_str_EnumCValue.h>
 #include <std/trait_Allocator.h>
-#include <stdint.h>
-#include <std/HashMapIter_str_EnumCValue.h>
-#include <std/str.h>
-#include <analyzer/c/EnumCValue.h>
 #include <std/HashMapBucket_str_EnumCValue.h>
-#include <stdbool.h>
+#include <analyzer/c/EnumCValue.h>
 #include <std/Hashed.h>
+#include <std/trait_Hash.h>
+#include <std/str.h>
+#include <std/Range_usize.h>
+#include <std/HashMapIter_str_EnumCValue.h>
+#include <std/HashMap_str_EnumCValue.h>
 
 #include <std/HashMap_str_EnumCValue.h>
 

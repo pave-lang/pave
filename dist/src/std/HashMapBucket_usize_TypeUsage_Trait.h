@@ -2,15 +2,12 @@
 #define PAVE_HASH_MAP_BUCKET_USIZE_TYPE_USAGE_TRAIT
 
 #include <stdint.h>
-#include <compiler/TypeUsage_Trait.h>
-#include <analyzer/types/Trait.h>
-
-struct HashMapBucket_usize_TypeUsage_Trait;
-struct TypeUsage_Trait;
-struct Trait;
 
 #include <stdio.h>
 #include <string.h>
+
+#include <compiler/TypeUsage_Trait.h>
+struct HashMapBucket_usize_TypeUsage_Trait;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Trait {

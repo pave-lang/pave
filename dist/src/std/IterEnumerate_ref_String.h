@@ -2,19 +2,21 @@
 #define PAVE_ITER_ENUMERATE_REF_STRING
 
 #include <stdint.h>
-#include <std/Iter_ref_String.h>
 #include <stdbool.h>
-
-struct String;
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <std/Iter_ref_String.h>
 
 #line 52 "src/std/Array.pv"
 struct IterEnumerate_ref_String {
     uintptr_t index;
     struct Iter_ref_String iter;
 };
+
+#include <tuple_usize_ref_String.h>
+struct IterEnumerate_ref_String;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_String__next(struct IterEnumerate_ref_String* self);

@@ -1,31 +1,33 @@
-#include <std/ArenaAllocator.h>
+#include <stdint.h>
+
+#include <analyzer/statement/ForStatement.h>
 #include <std/Array_ForVariable.h>
-#include <analyzer/statement/ForVariable.h>
 #include <std/trait_Allocator.h>
-#include <stdbool.h>
+#include <std/ArenaAllocator.h>
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
-#include <stdint.h>
-#include <std/Iter_ref_ForVariable.h>
-#include <analyzer/Block.h>
-#include <analyzer/types/Generics.h>
+#include <analyzer/statement/ForVariable.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/types/Generics.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/expression/ExpressionData.h>
+#include <std/str.h>
+#include <analyzer/types/Enum.h>
 #include <analyzer/statement/ForStatementType.h>
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Array_InvokeArgument.h>
 #include <std/Array_Type.h>
-#include <std/str.h>
-#include <analyzer/types/Enum.h>
 #include <std/String.h>
 #include <analyzer/Naming.h>
 #include <analyzer/Root.h>
 #include <analyzer/InlayHintKind.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/Indirect.h>
+#include <std/Iter_ref_ForVariable.h>
+#include <analyzer/Block.h>
+#include <analyzer/statement/ForStatement.h>
 
 #include <analyzer/statement/ForStatement.h>
 

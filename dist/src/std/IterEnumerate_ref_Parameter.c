@@ -1,11 +1,13 @@
+#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <std/Iter_ref_Parameter.h>
-#include <analyzer/types/Parameter.h>
-#include <stdint.h>
+#include <std/IterEnumerate_ref_Parameter.h>
 #include <tuple_usize_ref_Parameter.h>
+#include <analyzer/types/Parameter.h>
+#include <std/IterEnumerate_ref_Parameter.h>
 
 #include <std/IterEnumerate_ref_Parameter.h>
 

@@ -1,10 +1,8 @@
 #ifndef PAVE_SLICE_MATCH_CASE
 #define PAVE_SLICE_MATCH_CASE
 
-#include <stdint.h>
-
-struct MatchCase;
-
+#include <analyzer/statement/MatchCase.h>
+#include <std/Iter_ref_MatchCase.h>
 struct slice_MatchCase { struct MatchCase* data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

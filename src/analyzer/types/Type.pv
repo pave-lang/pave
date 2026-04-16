@@ -135,6 +135,15 @@ impl Type {
         return self;
     }
 
+    fn deref_all(&self) -> &Self {
+        match self {
+            Type::Indirect(indirect) => { return indirect.to.deref_all(); },
+            _ => {},
+        }
+
+        return self;
+    }
+
     fn resolve_typedef(&self) -> &Self {
         match self {
             Type::TypedefC(info) => { return info.type.resolve_typedef(); },

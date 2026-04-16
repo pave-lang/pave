@@ -1,6 +1,8 @@
 #include <stdint.h>
+
 #include <std/Hashed.h>
 #include <std/Fnv1a.h>
+#include <char.h>
 
 #include <char.h>
 
