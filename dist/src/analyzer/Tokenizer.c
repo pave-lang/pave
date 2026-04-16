@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
+#include <stdio.h>
 #include <std/str.h>
 #include <analyzer/Tokenizer.h>
 #include <std/Array_ptrc_char.h>

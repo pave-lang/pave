@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
 #include <std/Array_FunctionScope.h>
 #include <std/trait_Allocator.h>
 #include <compiler/FunctionScope.h>

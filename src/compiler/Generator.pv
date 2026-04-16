@@ -1450,7 +1450,6 @@ impl Generator {
                                         let type_name = self.naming_decl.get_type_name(&Type::EnumC(enum_info), generics.self_type, generics);
                                         self.write_str(file, type_name.as_str());
                                         type_name.release();
-                                        // self.write_type(file, &Type::EnumC(enum_info), generics);
                                         fprintf(file, "::");
                                     }
 
@@ -1825,33 +1824,6 @@ impl Generator {
 
         return true;
     }
-
-    fn write_c_type_include(&self, file: &FILE, type: &Type) {
-        match type {
-            Type::EnumC(info) => {
-                let path = info.include.path;
-
-                fprintf(file, "#include ");
-                self.write_str(file, path);
-                fprintf(file, "\n");
-            },
-            Type::StructC(info) => {
-                let path = info.include.path;
-
-                fprintf(file, "#include ");
-                self.write_str(file, path);
-                fprintf(file, "\n");
-            },
-            Type::TypedefC(info) => {
-                let path = info.include.path;
-
-                fprintf(file, "#include ");
-                self.write_str(file, path);
-                fprintf(file, "\n");
-            },
-            _ => {},
-        }
-    }
     
     fn write_includes_raw(&self, file: &FILE, includes: &HashMap<str, &Include>) {
         for (_, include) in includes {
@@ -1900,6 +1872,7 @@ impl Generator {
     }
 
     fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap, deref: bool) {
+        let c_includes = HashSet<str>::new(self.allocator);
         let includes = HashSet<str>::new(self.allocator);
 
         for (_, &type) in types {
@@ -1958,42 +1931,28 @@ impl Generator {
                             let path = self.make_rel_path(0, name, "");
                             if !includes.insert(path.as_str()) { path.release(); continue; }
                         },
-                        FunctionParent::Trait(_) => {
-                            // let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
-                            // let module = func_info.context.module;
-                            // let path = self.make_rel_path(module, name.as_str(), "");
-                            // if !includes.insert(path.as_str()) { path.release(); name.release(); continue; }
-
-                            // let self_type = arguments.data[0].value.return_type.deref();
-
-                            // match self_type {
-                            //     Type::Generic(generic) => {
-                            //         let name = generic.name.value;
-                            //         let resolved_type = generics.get(name);
-                            //         if resolved_type != 0 { type = resolved_type; }
-                            //     },
-                            //     _ => {},
-                            // }
-                            
-                            // if self_type.is_primitive_or_c_type() {
-                            //     self.add_type_include_inner(includes, 0, includes, self_type, generics);
-                            // }
-                        },
+                        FunctionParent::Trait(_) => {},
                         _ => {},
                     }
 
                 },
-                Type::EnumC(_) => {
-                    // let path = info.include.path;
-                    // if !includes.insert(path) { continue; }
+                Type::EnumC(info) => {
+                    c_includes.insert(info.include.path);
                 },
-                Type::StructC(_) => {
-                    // let path = info.include.path;
-                    // if !includes.insert(path) { continue; }
+                Type::StructC(info) => {
+                    c_includes.insert(info.include.path);
                 },
-                Type::TypedefC(_) => {
-                    // let path = info.include.path;
-                    // if !includes.insert(path) { continue; }
+                Type::UnionC(info) => {
+                    c_includes.insert(info.include.path);
+                },
+                Type::TypedefC(info) => {
+                    c_includes.insert(info.include.path);
+                },
+                Type::FunctionC(info) => {
+                    c_includes.insert(info.include.path);
+                },
+                Type::ClassCpp(info) => {
+                    c_includes.insert(info.include.path);
                 },
                 _ => {
                     let name = self.naming_ident.get_type_name(resolved, generics.self_type, generics);
@@ -2003,6 +1962,10 @@ impl Generator {
                     if !includes.insert(path.as_str()) { name.release(); continue; }
                 },
             }
+        }
+
+        for *include in c_includes {
+            fprintf(file, "#include <%.*s>\n", cast<i32>(include.length - 2), include.ptr + 1);
         }
 
         for *include in includes {
@@ -2487,10 +2450,6 @@ impl Generator {
         fprintf(header_file, "\n#define PAVE_");
         self.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
-
-        for type in generics.array {
-            self.write_c_type_include(header_file, type.deref());
-        }
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
         self.write_includes_raw(header_file, &module.includes);
@@ -3116,7 +3075,6 @@ impl Generator {
                     if function_usage != 0 {
                         let func2: &Function = self.allocator.alloc(sizeof(Function));
                         *func2 = *func_info;
-                        // func2.parent_type = generics.self_type;
 
                         for usage_context in function_usage.usage_contexts {
                             let generics3 = usage_context.generic_map;
@@ -3278,10 +3236,6 @@ impl Generator {
             fprintf(header_file, "#ifdef __cplusplus\n");
             fprintf(header_file, "extern \"C\" {\n");
             fprintf(header_file, "#endif\n\n");
-        }
-
-        for type in generics.array {
-            self.write_c_type_include(header_file, type.deref());
         }
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
@@ -3653,7 +3607,6 @@ impl Generator {
         self.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        self.write_c_type_include(header_file, element_type);
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
         self.write_context_includes(header_file, &usage_context.layout, generics, false);
 
@@ -3729,10 +3682,6 @@ impl Generator {
         self.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        for type in element_types {
-            self.write_c_type_include(header_file, type);
-        }
-
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
         self.write_context_includes(header_file, &usage_context.layout, generics, false);
 
@@ -3797,10 +3746,6 @@ impl Generator {
             fprintf(header_file, "#ifdef __cplusplus\n");
             fprintf(header_file, "extern \"C\" {\n");
             fprintf(header_file, "#endif\n\n");
-        }
-
-        for type in generics.array {
-            self.write_c_type_include(header_file, type.deref());
         }
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);

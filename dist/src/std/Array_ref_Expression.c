@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
 #include <std/Array_ref_Expression.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/expression/Expression.h>

@@ -313,6 +313,11 @@ impl Usages {
             Type::Trait(_, _) => { is_trait = true; },
             Type::Sequence(sequence) => { is_type = sequence.is_slice(); },
             Type::Tuple(_) => { is_type = true; },
+            Type::StructC(_) => { is_type = true; },
+            Type::UnionC(_) => { is_type = true; },
+            Type::EnumC(_) => { is_type = true; },
+            Type::FunctionC(_) => { is_type = true; },
+            Type::TypedefC(_) => { is_type = true; },
             Type::ClassCpp(class_info) => {
                 if self.usage_mode != UsageMode::Body && usage_context {
                     usage_context.cpp_usages.insert(class_info.name, *type);
@@ -508,7 +513,6 @@ impl Usages {
             FunctionParent::Struct(struct_info, impl_index, _) => {
                 let parent_ptr = cast<usize>(struct_info);
                 let parent_usage = self.structs.find(&parent_ptr);
-                // self.usage_context = &parent_usage.usage_context;
 
                 let impl_functions = parent_usage.impl_functions.get(impl_index);
                 let func_usage = impl_functions.find(&func_ptr);
@@ -521,7 +525,6 @@ impl Usages {
             FunctionParent::Enum(enum_info, impl_index, _) => {
                 let parent_ptr = cast<usize>(enum_info);
                 let parent_usage = self.enums.find(&parent_ptr);
-                // self.usage_context = &parent_usage.usage_context;
 
                 let impl_functions = parent_usage.impl_functions.get(impl_index);
                 let func_usage = impl_functions.find(&func_ptr);
@@ -535,8 +538,6 @@ impl Usages {
                 self.function_context = &func_usage.function_context;
             },
             FunctionParent::Type(_, _, _) => {
-                // let func_usage = self.functions.find(&func_ptr);
-                // self.function_context = &func_usage.function_context;
                 return;
             },
         }
@@ -739,7 +740,6 @@ impl Usages {
                 let return_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, 0).deref();
                 match return_type {
                     Type::Function(func_info, _) => {
-                        // let name = func_info.name.value;
                         let func_ptr = cast<usize>(func_info);
 
                         match func_info.parent {

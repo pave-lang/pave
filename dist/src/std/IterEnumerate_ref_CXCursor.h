@@ -1,7 +1,6 @@
 #ifndef PAVE_ITER_ENUMERATE_REF_CXCURSOR
 #define PAVE_ITER_ENUMERATE_REF_CXCURSOR
 
-#include "clang-c/Index.h"
 #include <stdint.h>
 #include <stdbool.h>
 

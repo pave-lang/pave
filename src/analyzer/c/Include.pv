@@ -121,7 +121,7 @@ impl Include {
             return false;
         }
 
-        let unit: *CXTranslationUnitImpl = 0;
+        let unit: CXTranslationUnit;
         
         let result: CXErrorCode = clang_parseTranslationUnit2(
             index,

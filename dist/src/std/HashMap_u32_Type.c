@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
 #include <std/HashMap_u32_Type.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMapBucket_u32_Type.h>

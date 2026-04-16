@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#include <stdio.h>
 #include <analyzer/Naming.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/NamingType.h>

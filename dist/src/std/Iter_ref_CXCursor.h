@@ -1,12 +1,12 @@
 #ifndef PAVE_ITER_REF_CXCURSOR
 #define PAVE_ITER_REF_CXCURSOR
 
-#include "clang-c/Index.h"
 #include <stdint.h>
 #include <stdbool.h>
 
 #include <stdlib.h>
 #include <string.h>
+
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_CXCursor {

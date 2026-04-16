@@ -26,6 +26,7 @@ struct Root;
 struct Include;
 struct Type;
 struct EnumC;
+#include <clang-c/Index.h>
 #include <std/str.h>
 
 #line 20 "src/analyzer/c/Include.pv"

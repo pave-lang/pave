@@ -26,6 +26,7 @@ struct Type;
 struct StructC;
 struct EnumC;
 struct FunctionC;
+#include <clang-c/Index.h>
 #include <analyzer/types/Type.h>
 
 #line 17 "src/analyzer/c/IncludeContext.pv"

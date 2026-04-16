@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMapBucket_str_tuple_ref_Trait_ref_Type.h>

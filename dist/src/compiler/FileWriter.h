@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 
+
 #line 6 "src/compiler/FileWriter.pv"
 struct FileWriter {
     FILE* file;

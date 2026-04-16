@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <string.h>
 #include <std/Array_Diagnostic.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/Diagnostic.h>

@@ -12,6 +12,8 @@ struct IncludeObjectContext {
     void* object;
 };
 
+#include <clang-c/Index.h>
+
 #line 13 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_struct(CXCursor cursor, CXCursor parent, CXClientData client_data);
 

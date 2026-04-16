@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdio.h>
+#include <string.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaBlock.h>
 #include <std/ArenaAllocation.h>

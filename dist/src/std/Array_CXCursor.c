@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <clang-c/Index.h>
+#include <string.h>
 #include <std/Array_CXCursor.h>
 #include <std/trait_Allocator.h>
 #include <std/Iter_ref_CXCursor.h>

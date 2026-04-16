@@ -2,6 +2,7 @@
 
 #include <fs.h>
 
+#include <fs.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <analyzer/Namespace.h>

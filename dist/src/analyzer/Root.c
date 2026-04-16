@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <string.h>
+#include <stdio.h>
 #include <analyzer/Root.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_ref_Namespace.h>

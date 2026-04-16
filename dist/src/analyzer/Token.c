@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include <stdio.h>
 #include <std/str.h>
 #include <analyzer/Token.h>
 #include <analyzer/TokenType.h>

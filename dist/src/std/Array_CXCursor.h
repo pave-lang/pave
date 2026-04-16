@@ -1,7 +1,6 @@
 #ifndef PAVE_ARRAY_CXCURSOR
 #define PAVE_ARRAY_CXCURSOR
 
-#include "clang-c/Index.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -19,6 +18,7 @@ struct Array_CXCursor {
 };
 
 struct Array_CXCursor;
+#include <clang-c/Index.h>
 #include <std/trait_Allocator.h>
 #include <std/Array_CXCursor.h>
 #include <std/Iter_ref_CXCursor.h>

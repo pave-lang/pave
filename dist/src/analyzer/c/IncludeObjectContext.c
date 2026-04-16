@@ -4,6 +4,8 @@
 #include <clang-c/Index.h>
 #include <string.h>
 
+#include <clang-c/Index.h>
+#include <string.h>
 #include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/Include.h>
 #include <analyzer/c/IncludeContext.h>

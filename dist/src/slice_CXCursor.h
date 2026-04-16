@@ -1,7 +1,7 @@
 #ifndef PAVE_SLICE_CXCURSOR
 #define PAVE_SLICE_CXCURSOR
 
-#include "clang-c/Index.h"
+#include <clang-c/Index.h>
 #include <std/Iter_ref_CXCursor.h>
 struct slice_CXCursor { CXCursor* data; uintptr_t length; };
 

@@ -3,6 +3,8 @@
 #include <clang-c/Index.h>
 #include <string.h>
 
+#include <clang-c/Index.h>
+#include <string.h>
 #include <analyzer/c/Include.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
@@ -195,7 +197,7 @@ bool Include__process(struct Include* self) {
     }
 
     #line 124 "src/analyzer/c/Include.pv"
-    struct CXTranslationUnitImpl* unit = 0;
+    CXTranslationUnit unit;
 
     #line 126 "src/analyzer/c/Include.pv"
     enum CXErrorCode result = clang_parseTranslationUnit2(index, filename, clang_args.data, clang_args.length, &unsaved, 1, CXTranslationUnit_None | CXTranslationUnit_DetailedPreprocessingRecord | CXTranslationUnit_Incomplete | CXTranslationUnit_SkipFunctionBodies, &unit);
