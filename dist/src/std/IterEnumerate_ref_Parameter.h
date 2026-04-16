@@ -15,8 +15,8 @@ struct IterEnumerate_ref_Parameter {
     struct Iter_ref_Parameter iter;
 };
 
-struct IterEnumerate_ref_Parameter;
 #include <tuple_usize_ref_Parameter.h>
+struct IterEnumerate_ref_Parameter;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_Parameter__next(struct IterEnumerate_ref_Parameter* self);

@@ -17,10 +17,10 @@ struct Iter_ref_Statement {
     struct Statement* end;
 };
 
-struct Statement;
-struct Iter_ref_Statement;
 #include <std/Iter_ref_Statement.h>
 #include <std/IterEnumerate_ref_Statement.h>
+struct Statement;
+struct Iter_ref_Statement;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Statement Iter_ref_Statement__new(struct Statement* start, struct Statement* end);

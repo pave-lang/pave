@@ -11,10 +11,10 @@ struct NamespacePath {
     struct Array_ref_Token parts;
 };
 
-struct NamespacePath;
-struct Context;
 #include <std/trait_Allocator.h>
 #include <analyzer/NamespacePath.h>
+struct NamespacePath;
+struct Context;
 
 #line 9 "src/analyzer/NamespacePath.pv"
 struct NamespacePath NamespacePath__new(struct trait_Allocator allocator);

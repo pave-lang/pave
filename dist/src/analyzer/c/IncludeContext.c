@@ -199,7 +199,7 @@ void IncludeContext__add_typedef(struct IncludeContext* self, char const* name, 
     }
 
     #line 120 "src/analyzer/c/IncludeContext.pv"
-    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = TypedefC__new(include, name, type) });
+    IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, type) });
 }
 
 #line 123 "src/analyzer/c/IncludeContext.pv"
@@ -214,7 +214,7 @@ struct StructC* IncludeContext__add_typedef_struct(struct IncludeContext* self, 
     #line 128 "src/analyzer/c/IncludeContext.pv"
     if (HashMap_str_Type__find(self->types, &(struct str){ .ptr = name, .length = strlen(name) }) == 0) {
         #line 129 "src/analyzer/c/IncludeContext.pv"
-        struct TypedefC* typedef_ = TypedefC__new(include, name, Type__to_ptr(&struct_type, include->root->allocator));
+        struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, Type__to_ptr(&struct_type, include->root->allocator));
         #line 130 "src/analyzer/c/IncludeContext.pv"
         IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
     }
@@ -235,7 +235,7 @@ struct StructC* IncludeContext__add_typedef_union(struct IncludeContext* self, c
     #line 141 "src/analyzer/c/IncludeContext.pv"
     if (HashMap_str_Type__find(self->types, &(struct str){ .ptr = name, .length = strlen(name) }) == 0) {
         #line 142 "src/analyzer/c/IncludeContext.pv"
-        struct TypedefC* typedef_ = TypedefC__new(include, name, Type__to_ptr(&struct_type, include->root->allocator));
+        struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, Type__to_ptr(&struct_type, include->root->allocator));
         #line 143 "src/analyzer/c/IncludeContext.pv"
         IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
     }
@@ -258,7 +258,7 @@ struct StructC* IncludeContext__add_typedef_struct_pointer(struct IncludeContext
         #line 155 "src/analyzer/c/IncludeContext.pv"
         struct Type indirect_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect };
         #line 156 "src/analyzer/c/IncludeContext.pv"
-        struct TypedefC* typedef_ = TypedefC__new(include, name, Type__to_ptr(&indirect_type, include->root->allocator));
+        struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, Type__to_ptr(&indirect_type, include->root->allocator));
         #line 157 "src/analyzer/c/IncludeContext.pv"
         IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
     }
@@ -281,7 +281,7 @@ struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeCon
     #line 169 "src/analyzer/c/IncludeContext.pv"
     if (HashMap_str_Type__find(self->types, &(struct str){ .ptr = name, .length = strlen(name) }) == 0) {
         #line 170 "src/analyzer/c/IncludeContext.pv"
-        struct TypedefC* typedef_ = TypedefC__new(include, name, Type__to_ptr(&indirect_type, include->root->allocator));
+        struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, Type__to_ptr(&indirect_type, include->root->allocator));
         #line 171 "src/analyzer/c/IncludeContext.pv"
         IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
     }
@@ -308,7 +308,7 @@ void IncludeContext__add_typedef_pointer(struct IncludeContext* self, char const
     #line 184 "src/analyzer/c/IncludeContext.pv"
     struct Type indirect_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect };
     #line 185 "src/analyzer/c/IncludeContext.pv"
-    struct TypedefC* typedef_ = TypedefC__new(include, name, Type__to_ptr(&indirect_type, include->root->allocator));
+    struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, Type__to_ptr(&indirect_type, include->root->allocator));
 
     #line 187 "src/analyzer/c/IncludeContext.pv"
     IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });

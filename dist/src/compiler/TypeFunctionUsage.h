@@ -5,9 +5,9 @@
 
 #include <stdio.h>
 
-struct Function;
 #include <std/Array_UsageContext.h>
 #include <compiler/FunctionContext.h>
+struct Function;
 
 #line 9 "src/compiler/Usages.pv"
 struct TypeFunctionUsage {
@@ -17,12 +17,12 @@ struct TypeFunctionUsage {
     bool impl_dynamic_function;
 };
 
+#include <compiler/TypeFunctionUsage.h>
 struct ArenaAllocator;
 struct Function;
 struct TypeFunctionUsage;
 struct GenericMap;
 struct UsageContext;
-#include <compiler/TypeFunctionUsage.h>
 
 #line 17 "src/compiler/Usages.pv"
 struct TypeFunctionUsage TypeFunctionUsage__new(struct ArenaAllocator* allocator, struct Function* type);

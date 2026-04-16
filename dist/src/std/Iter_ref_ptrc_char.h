@@ -15,9 +15,9 @@ struct Iter_ref_ptrc_char {
     char const** end;
 };
 
-struct Iter_ref_ptrc_char;
 #include <std/Iter_ref_ptrc_char.h>
 #include <std/IterEnumerate_ref_ptrc_char.h>
+struct Iter_ref_ptrc_char;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ptrc_char Iter_ref_ptrc_char__new(char const** start, char const** end);

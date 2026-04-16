@@ -17,11 +17,11 @@ struct Array_ref_Namespace {
     uintptr_t capacity;
 };
 
-struct Array_ref_Namespace;
-struct Namespace;
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Namespace.h>
 #include <std/Iter_ref_ref_Namespace.h>
+struct Array_ref_Namespace;
+struct Namespace;
 
 #line 77 "src/std/Array.pv"
 struct Array_ref_Namespace Array_ref_Namespace__new(struct trait_Allocator allocator);

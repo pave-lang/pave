@@ -1,10 +1,10 @@
 #ifndef PAVE_ENUM_VARIANT
 #define PAVE_ENUM_VARIANT
 
+#include <std/Array_Type.h>
 struct Token;
 struct Enum;
 struct Expression;
-#include <std/Array_Type.h>
 
 #line 10 "src/analyzer/types/Enum.pv"
 struct EnumVariant {

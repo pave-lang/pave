@@ -18,8 +18,8 @@ struct FunctionScope {
     struct HashMap_str_str variable_replacements;
 };
 
-struct ArenaAllocator;
 #include <compiler/FunctionScope.h>
+struct ArenaAllocator;
 
 #line 20 "src/compiler/Generator.pv"
 struct FunctionScope FunctionScope__new(struct ArenaAllocator* allocator, bool break_target, bool continue_target);

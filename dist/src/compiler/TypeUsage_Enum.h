@@ -6,10 +6,10 @@
 
 #include <stdio.h>
 
-struct ArenaAllocator;
-struct Enum;
 #include <std/Array_UsageContext.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
+struct ArenaAllocator;
+struct Enum;
 
 #line 63 "src/compiler/Usages.pv"
 struct TypeUsage_Enum {
@@ -20,12 +20,12 @@ struct TypeUsage_Enum {
     bool impl_dynamic_usage;
 };
 
+#include <compiler/TypeUsage_Enum.h>
 struct ArenaAllocator;
 struct Enum;
 struct TypeUsage_Enum;
 struct GenericMap;
 struct UsageContext;
-#include <compiler/TypeUsage_Enum.h>
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Enum TypeUsage_Enum__new(struct ArenaAllocator* allocator, struct Enum* type, uintptr_t impl_count);

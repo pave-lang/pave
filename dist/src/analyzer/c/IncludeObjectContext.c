@@ -266,7 +266,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
                 #line 149 "src/analyzer/c/IncludeObjectContext.pv"
                 if (resolved != 0) {
                     #line 150 "src/analyzer/c/IncludeObjectContext.pv"
-                    struct TypedefC* typedef_ = TypedefC__new(include, name, resolved);
+                    struct TypedefC* typedef_ = TypedefC__new(include, (struct str){ .ptr = name, .length = strlen(name) }, resolved);
                     #line 151 "src/analyzer/c/IncludeObjectContext.pv"
                     HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = typedef_ });
                 } else {

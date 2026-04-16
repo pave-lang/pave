@@ -17,10 +17,10 @@ struct Iter_ref_UsageContext {
     struct UsageContext* end;
 };
 
-struct UsageContext;
-struct Iter_ref_UsageContext;
 #include <std/Iter_ref_UsageContext.h>
 #include <std/IterEnumerate_ref_UsageContext.h>
+struct UsageContext;
+struct Iter_ref_UsageContext;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_UsageContext Iter_ref_UsageContext__new(struct UsageContext* start, struct UsageContext* end);

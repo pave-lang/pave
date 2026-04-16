@@ -17,10 +17,10 @@ struct Iter_ref_FunctionScope {
     struct FunctionScope* end;
 };
 
-struct FunctionScope;
-struct Iter_ref_FunctionScope;
 #include <std/Iter_ref_FunctionScope.h>
 #include <std/IterEnumerate_ref_FunctionScope.h>
+struct FunctionScope;
+struct Iter_ref_FunctionScope;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_FunctionScope Iter_ref_FunctionScope__new(struct FunctionScope* start, struct FunctionScope* end);

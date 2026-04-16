@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_usize_TypeUsage_Enum;
 #include <compiler/TypeUsage_Enum.h>
+struct HashMapBucket_usize_TypeUsage_Enum;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Enum {

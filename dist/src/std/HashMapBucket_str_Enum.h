@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_Enum;
 #include <std/str.h>
 #include <analyzer/types/Enum.h>
+struct HashMapBucket_str_Enum;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_str_Enum {

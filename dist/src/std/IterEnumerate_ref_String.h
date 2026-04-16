@@ -15,8 +15,8 @@ struct IterEnumerate_ref_String {
     struct Iter_ref_String iter;
 };
 
-struct IterEnumerate_ref_String;
 #include <tuple_usize_ref_String.h>
+struct IterEnumerate_ref_String;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_String__next(struct IterEnumerate_ref_String* self);

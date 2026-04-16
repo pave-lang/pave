@@ -15,9 +15,9 @@ struct Iter_usize {
     uintptr_t end;
 };
 
-struct Iter_usize;
 #include <std/Iter_usize.h>
 #include <std/IterEnumerate_usize.h>
+struct Iter_usize;
 
 #line 12 "src/std/Array.pv"
 struct Iter_usize Iter_usize__new(uintptr_t start, uintptr_t end);

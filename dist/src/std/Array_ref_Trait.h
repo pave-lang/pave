@@ -17,11 +17,11 @@ struct Array_ref_Trait {
     uintptr_t capacity;
 };
 
-struct Array_ref_Trait;
-struct Trait;
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Trait.h>
 #include <std/Iter_ref_ref_Trait.h>
+struct Array_ref_Trait;
+struct Trait;
 
 #line 77 "src/std/Array.pv"
 struct Array_ref_Trait Array_ref_Trait__new(struct trait_Allocator allocator);

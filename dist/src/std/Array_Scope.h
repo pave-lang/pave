@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Scope;
 #include <std/trait_Allocator.h>
+struct Scope;
 
 #line 69 "src/std/Array.pv"
 struct Array_Scope {
@@ -18,13 +18,12 @@ struct Array_Scope {
     uintptr_t capacity;
 };
 
-struct Array_Scope;
-struct Scope;
-struct Scope;
 #include <std/trait_Allocator.h>
 #include <std/Array_Scope.h>
 #include <analyzer/Scope.h>
 #include <std/Iter_ref_Scope.h>
+struct Array_Scope;
+struct Scope;
 
 #line 77 "src/std/Array.pv"
 struct Array_Scope Array_Scope__new(struct trait_Allocator allocator);

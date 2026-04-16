@@ -21,12 +21,12 @@ struct Tokenizer {
     struct Array_ptrc_char symbols;
 };
 
-struct Tokenizer;
-struct Array_ptrc_char;
-struct ArenaAllocator;
 #include <std/Array_ptrc_char.h>
 #include <std/str.h>
 #include <std/Array_Token.h>
+struct Tokenizer;
+struct Array_ptrc_char;
+struct ArenaAllocator;
 
 #line 17 "src/analyzer/Tokenizer.pv"
 void Tokenizer__increase_pos(struct Tokenizer* self);

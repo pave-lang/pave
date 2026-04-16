@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct ImplNode;
 #include <std/trait_Allocator.h>
+struct ImplNode;
 
 #line 69 "src/std/Array.pv"
 struct Array_ImplNode {
@@ -18,13 +18,12 @@ struct Array_ImplNode {
     uintptr_t capacity;
 };
 
-struct Array_ImplNode;
-struct ImplNode;
-struct ImplNode;
 #include <std/trait_Allocator.h>
 #include <std/Array_ImplNode.h>
 #include <analyzer/ImplNode.h>
 #include <std/Iter_ref_ImplNode.h>
+struct Array_ImplNode;
+struct ImplNode;
 
 #line 77 "src/std/Array.pv"
 struct Array_ImplNode Array_ImplNode__new(struct trait_Allocator allocator);

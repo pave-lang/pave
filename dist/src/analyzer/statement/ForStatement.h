@@ -3,11 +3,11 @@
 
 #include <stdbool.h>
 
+#include <std/Array_ForVariable.h>
+#include <analyzer/statement/ForStatementType.h>
 struct Expression;
 struct Type;
 struct Block;
-#include <std/Array_ForVariable.h>
-#include <analyzer/statement/ForStatementType.h>
 
 #line 6 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement {
@@ -19,13 +19,13 @@ struct ForStatement {
     struct Block* block;
 };
 
+#include <analyzer/statement/ForStatement.h>
 struct ArenaAllocator;
 struct Context;
 struct Array_ForVariable;
 struct Block;
 struct Generics;
 struct ForStatement;
-#include <analyzer/statement/ForStatement.h>
 
 #line 16 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator);

@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Token;
-struct Module;
 #include <analyzer/types/Generics.h>
 #include <std/HashMap_str_Function.h>
 #include <analyzer/types/Type.h>
+struct Token;
+struct Module;
 
 #line 4 "src/analyzer/types/Trait.pv"
 struct Trait {
@@ -21,10 +21,10 @@ struct Trait {
     struct Type type_self;
 };
 
-struct Module;
-struct Trait;
 #include <analyzer/types/Trait.h>
 #include <analyzer/types/FunctionParent.h>
+struct Module;
+struct Trait;
 
 #line 15 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);

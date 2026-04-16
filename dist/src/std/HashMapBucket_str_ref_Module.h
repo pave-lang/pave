@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <std/str.h>
 struct Module;
 struct HashMapBucket_str_ref_Module;
-#include <std/str.h>
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Module {

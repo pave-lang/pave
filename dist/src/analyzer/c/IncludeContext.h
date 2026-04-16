@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <analyzer/c/ParentCpp.h>
 struct Include;
 struct IncludeContext;
 struct HashMap_str_Type;
-#include <analyzer/c/ParentCpp.h>
 
 #line 8 "src/analyzer/c/IncludeContext.pv"
 struct IncludeContext {
@@ -21,13 +21,13 @@ struct IncludeContext {
     struct ParentCpp parent;
 };
 
+#include <clang-c/Index.h>
+#include <analyzer/types/Type.h>
 struct IncludeContext;
 struct Type;
 struct StructC;
 struct EnumC;
 struct FunctionC;
-#include <clang-c/Index.h>
-#include <analyzer/types/Type.h>
 
 #line 17 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type);

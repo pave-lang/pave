@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-struct Token;
 #include <std/Array_ref_Trait.h>
+struct Token;
 
 #line 4 "src/analyzer/types/Generics.pv"
 struct Generic {
@@ -12,10 +12,10 @@ struct Generic {
     struct Array_ref_Trait traits;
 };
 
-struct Generic;
-struct Context;
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Generic.h>
+struct Generic;
+struct Context;
 
 #line 10 "src/analyzer/types/Generics.pv"
 struct Generic Generic__new(struct trait_Allocator allocator);

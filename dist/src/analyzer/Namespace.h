@@ -5,13 +5,13 @@
 
 #include <fs.h>
 
-struct Root;
-struct Namespace;
 #include <std/str.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMap_str_ref_Module.h>
 #include <std/HashMap_str_Type.h>
 #include <std/HashMap_str_ref_Trait.h>
+struct Root;
+struct Namespace;
 
 #line 6 "src/analyzer/Namespace.pv"
 struct Namespace {
@@ -26,12 +26,11 @@ struct Namespace {
     struct HashMap_str_Type functions;
 };
 
+#include <std/str.h>
 struct Root;
-struct Namespace;
 struct Namespace;
 struct Type;
 struct Trait;
-#include <std/str.h>
 
 #line 19 "src/analyzer/Namespace.pv"
 struct Namespace* Namespace__new(struct Root* root, struct Namespace* parent, struct str name, struct str path);

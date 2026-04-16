@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct TypeImpl;
 #include <std/trait_Allocator.h>
+struct TypeImpl;
 
 #line 69 "src/std/Array.pv"
 struct Array_TypeImpl {
@@ -18,13 +18,12 @@ struct Array_TypeImpl {
     uintptr_t capacity;
 };
 
-struct Array_TypeImpl;
-struct TypeImpl;
-struct TypeImpl;
 #include <std/trait_Allocator.h>
 #include <std/Array_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
 #include <std/Iter_ref_TypeImpl.h>
+struct Array_TypeImpl;
+struct TypeImpl;
 
 #line 77 "src/std/Array.pv"
 struct Array_TypeImpl Array_TypeImpl__new(struct trait_Allocator allocator);

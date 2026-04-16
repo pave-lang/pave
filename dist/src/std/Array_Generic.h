@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Generic;
 #include <std/trait_Allocator.h>
+struct Generic;
 
 #line 69 "src/std/Array.pv"
 struct Array_Generic {
@@ -18,13 +18,12 @@ struct Array_Generic {
     uintptr_t capacity;
 };
 
-struct Array_Generic;
-struct Generic;
-struct Generic;
 #include <std/trait_Allocator.h>
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generic.h>
 #include <std/Iter_ref_Generic.h>
+struct Array_Generic;
+struct Generic;
 
 #line 77 "src/std/Array.pv"
 struct Array_Generic Array_Generic__new(struct trait_Allocator allocator);

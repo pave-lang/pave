@@ -15,8 +15,8 @@ struct IterEnumerate_usize {
     struct Iter_usize iter;
 };
 
-struct IterEnumerate_usize;
 #include <tuple_usize_usize.h>
+struct IterEnumerate_usize;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_usize__next(struct IterEnumerate_usize* self);

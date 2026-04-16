@@ -15,8 +15,8 @@ struct FunctionCoroutine {
     struct HashMap_str_ref_Type variables;
 };
 
-struct ArenaAllocator;
 #include <compiler/FunctionCoroutine.h>
+struct ArenaAllocator;
 
 #line 36 "src/compiler/Generator.pv"
 struct FunctionCoroutine FunctionCoroutine__new(struct ArenaAllocator* allocator);

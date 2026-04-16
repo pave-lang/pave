@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Diagnostic;
 #include <std/trait_Allocator.h>
+struct Diagnostic;
 
 #line 69 "src/std/Array.pv"
 struct Array_Diagnostic {
@@ -18,13 +18,12 @@ struct Array_Diagnostic {
     uintptr_t capacity;
 };
 
-struct Array_Diagnostic;
-struct Diagnostic;
-struct Diagnostic;
 #include <std/trait_Allocator.h>
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <std/Iter_ref_Diagnostic.h>
+struct Array_Diagnostic;
+struct Diagnostic;
 
 #line 77 "src/std/Array.pv"
 struct Array_Diagnostic Array_Diagnostic__new(struct trait_Allocator allocator);

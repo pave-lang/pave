@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_usize_TypeUsage_Sequence;
 #include <compiler/TypeUsage_Sequence.h>
+struct HashMapBucket_usize_TypeUsage_Sequence;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Sequence {

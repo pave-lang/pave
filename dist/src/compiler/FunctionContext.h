@@ -7,10 +7,10 @@
 #include <stdlib.h>
 #include <fs.h>
 
-struct ArenaAllocator;
-struct Function;
 #include <std/Array_FunctionScope.h>
 #include <compiler/FunctionCoroutine.h>
+struct ArenaAllocator;
+struct Function;
 
 #line 43 "src/compiler/Generator.pv"
 struct FunctionContext {
@@ -21,12 +21,12 @@ struct FunctionContext {
     struct FunctionCoroutine coroutine;
 };
 
+#include <compiler/FunctionContext.h>
+#include <std/str.h>
 struct ArenaAllocator;
 struct Function;
 struct FunctionContext;
 struct Type;
-#include <compiler/FunctionContext.h>
-#include <std/str.h>
 
 #line 52 "src/compiler/Generator.pv"
 struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, struct Function* func_info, bool use_scopes);

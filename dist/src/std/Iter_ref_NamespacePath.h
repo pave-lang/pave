@@ -17,10 +17,10 @@ struct Iter_ref_NamespacePath {
     struct NamespacePath* end;
 };
 
-struct NamespacePath;
-struct Iter_ref_NamespacePath;
 #include <std/Iter_ref_NamespacePath.h>
 #include <std/IterEnumerate_ref_NamespacePath.h>
+struct NamespacePath;
+struct Iter_ref_NamespacePath;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_NamespacePath Iter_ref_NamespacePath__new(struct NamespacePath* start, struct NamespacePath* end);

@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct UsageContext;
 #include <std/trait_Allocator.h>
+struct UsageContext;
 
 #line 69 "src/std/Array.pv"
 struct Array_UsageContext {
@@ -18,13 +18,12 @@ struct Array_UsageContext {
     uintptr_t capacity;
 };
 
-struct Array_UsageContext;
-struct UsageContext;
-struct UsageContext;
 #include <std/trait_Allocator.h>
 #include <std/Array_UsageContext.h>
 #include <compiler/UsageContext.h>
 #include <std/Iter_ref_UsageContext.h>
+struct Array_UsageContext;
+struct UsageContext;
 
 #line 77 "src/std/Array.pv"
 struct Array_UsageContext Array_UsageContext__new(struct trait_Allocator allocator);

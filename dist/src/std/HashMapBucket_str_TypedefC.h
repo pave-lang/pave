@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_TypedefC;
 #include <std/str.h>
 #include <analyzer/c/TypedefC.h>
+struct HashMapBucket_str_TypedefC;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_str_TypedefC {

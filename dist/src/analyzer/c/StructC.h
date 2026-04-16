@@ -1,9 +1,9 @@
 #ifndef PAVE_STRUCT_C
 #define PAVE_STRUCT_C
 
-struct Include;
 #include <std/str.h>
 #include <std/HashMap_str_StructCField.h>
+struct Include;
 
 #line 3 "src/analyzer/c/StructC.pv"
 struct StructC {

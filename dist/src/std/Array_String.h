@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct String;
 #include <std/trait_Allocator.h>
+struct String;
 
 #line 69 "src/std/Array.pv"
 struct Array_String {
@@ -18,13 +18,12 @@ struct Array_String {
     uintptr_t capacity;
 };
 
-struct Array_String;
-struct String;
-struct String;
 #include <std/trait_Allocator.h>
 #include <std/Array_String.h>
 #include <std/String.h>
 #include <std/Iter_ref_String.h>
+struct Array_String;
+struct String;
 
 #line 77 "src/std/Array.pv"
 struct Array_String Array_String__new(struct trait_Allocator allocator);

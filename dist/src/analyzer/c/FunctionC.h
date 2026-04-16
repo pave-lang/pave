@@ -1,10 +1,10 @@
 #ifndef PAVE_FUNCTION_C
 #define PAVE_FUNCTION_C
 
-struct Include;
 #include <std/str.h>
 #include <std/Array_ref_Expression.h>
 #include <analyzer/types/Type.h>
+struct Include;
 
 #line 5 "src/analyzer/c/FunctionC.pv"
 struct FunctionC {

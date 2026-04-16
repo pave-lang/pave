@@ -4,13 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Token;
-struct Module;
 #include <analyzer/types/Generics.h>
 #include <analyzer/types/StructType.h>
 #include <std/HashMap_str_StructField.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <std/Array_ref_Impl.h>
+struct Token;
+struct Module;
 
 #line 15 "src/analyzer/types/Struct.pv"
 struct Struct {
@@ -25,9 +25,9 @@ struct Struct {
     struct Array_ref_Impl impls;
 };
 
+#include <analyzer/types/Struct.h>
 struct Module;
 struct Struct;
-#include <analyzer/types/Struct.h>
 
 #line 28 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);

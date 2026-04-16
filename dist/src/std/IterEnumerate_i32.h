@@ -15,8 +15,8 @@ struct IterEnumerate_i32 {
     struct Iter_i32 iter;
 };
 
-struct IterEnumerate_i32;
 #include <tuple_usize_i32.h>
+struct IterEnumerate_i32;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_i32__next(struct IterEnumerate_i32* self);

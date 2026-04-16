@@ -5,9 +5,9 @@
 
 #include <stdio.h>
 
-struct Context;
 #include <std/Array_Statement.h>
 #include <std/Array_DeferStatement.h>
+struct Context;
 
 #line 8 "src/analyzer/Block.pv"
 struct Block {
@@ -18,12 +18,12 @@ struct Block {
     bool is_loop;
 };
 
+#include <analyzer/Block.h>
 struct Context;
 struct Block;
 struct Generics;
 struct StatementData;
 struct Token;
-#include <analyzer/Block.h>
 
 #line 17 "src/analyzer/Block.pv"
 struct Block Block__new(struct Context* context);

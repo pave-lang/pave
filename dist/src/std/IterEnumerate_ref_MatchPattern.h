@@ -15,8 +15,8 @@ struct IterEnumerate_ref_MatchPattern {
     struct Iter_ref_MatchPattern iter;
 };
 
-struct IterEnumerate_ref_MatchPattern;
 #include <tuple_usize_ref_MatchPattern.h>
+struct IterEnumerate_ref_MatchPattern;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_MatchPattern__next(struct IterEnumerate_ref_MatchPattern* self);

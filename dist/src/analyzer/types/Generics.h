@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
-struct Generics;
 #include <std/Array_Generic.h>
 #include <std/HashMap_str_usize.h>
+struct Generics;
 
 #line 42 "src/analyzer/types/Generics.pv"
 struct Generics {
@@ -14,12 +14,12 @@ struct Generics {
     struct HashMap_str_usize map;
 };
 
-struct Generics;
-struct Generic;
-struct Context;
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Generics.h>
 #include <std/str.h>
+struct Generics;
+struct Generic;
+struct Context;
 
 #line 49 "src/analyzer/types/Generics.pv"
 struct Generics Generics__new(struct trait_Allocator allocator);

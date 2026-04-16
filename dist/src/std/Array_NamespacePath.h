@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct NamespacePath;
 #include <std/trait_Allocator.h>
+struct NamespacePath;
 
 #line 69 "src/std/Array.pv"
 struct Array_NamespacePath {
@@ -18,13 +18,12 @@ struct Array_NamespacePath {
     uintptr_t capacity;
 };
 
-struct Array_NamespacePath;
-struct NamespacePath;
-struct NamespacePath;
 #include <std/trait_Allocator.h>
 #include <std/Array_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
 #include <std/Iter_ref_NamespacePath.h>
+struct Array_NamespacePath;
+struct NamespacePath;
 
 #line 77 "src/std/Array.pv"
 struct Array_NamespacePath Array_NamespacePath__new(struct trait_Allocator allocator);

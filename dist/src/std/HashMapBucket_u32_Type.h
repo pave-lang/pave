@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_u32_Type;
 #include <analyzer/types/Type.h>
+struct HashMapBucket_u32_Type;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_u32_Type {

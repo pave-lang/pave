@@ -13,10 +13,10 @@ struct FileWriter {
     uintptr_t indent;
 };
 
-struct FileWriter;
-struct Token;
 #include <compiler/FileWriter.h>
 #include <std/str.h>
+struct FileWriter;
+struct Token;
 
 #line 12 "src/compiler/FileWriter.pv"
 struct FileWriter FileWriter__new(FILE* file);

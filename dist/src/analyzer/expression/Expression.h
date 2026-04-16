@@ -6,9 +6,9 @@
 
 #include <stdlib.h>
 
-struct Token;
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/types/Type.h>
+struct Token;
 
 #line 7 "src/analyzer/expression/Expression.pv"
 struct Expression {
@@ -17,6 +17,11 @@ struct Expression {
     struct Type return_type;
 };
 
+#include <analyzer/expression/ExpressionData.h>
+#include <analyzer/expression/Expression.h>
+#include <analyzer/expression/EnumVariantResult.h>
+#include <std/Array_InvokeArgument.h>
+#include <std/str.h>
 struct ArenaAllocator;
 struct Token;
 struct Type;
@@ -26,14 +31,8 @@ struct Function;
 struct Array_Type;
 struct Array_InvokeArgument;
 struct GenericMap;
-struct GenericMap;
 struct EnumVariant;
 struct Generics;
-#include <analyzer/expression/ExpressionData.h>
-#include <analyzer/expression/Expression.h>
-#include <analyzer/expression/EnumVariantResult.h>
-#include <std/Array_InvokeArgument.h>
-#include <std/str.h>
 
 #line 14 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make(struct ArenaAllocator* allocator, struct Token* token, struct ExpressionData data, struct Type* return_type);

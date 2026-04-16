@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <fs.h>
 
-struct Type;
 #include <std/str.h>
+struct Type;
 
 #line 158 "src/compiler/Generator.pv"
 struct GeneratorInclude {

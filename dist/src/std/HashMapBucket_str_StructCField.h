@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_StructCField;
 #include <std/str.h>
 #include <analyzer/c/StructCField.h>
+struct HashMapBucket_str_StructCField;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_str_StructCField {

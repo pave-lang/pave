@@ -15,8 +15,8 @@ struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage {
     struct Iter_ref_HashMap_usize_TypeFunctionUsage iter;
 };
 
-struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage;
 #include <tuple_usize_ref_HashMap_usize_TypeFunctionUsage.h>
+struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_HashMap_usize_TypeFunctionUsage__next(struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage* self);

@@ -1873,6 +1873,7 @@ impl Generator {
 
     fn write_context_includes(&self, file: &FILE, types: &HashMap<str, Type>, generics: &GenericMap, deref: bool) {
         let c_includes = HashSet<str>::new(self.allocator);
+        let type_declarations = HashSet<str>::new(self.allocator);
         let includes = HashSet<str>::new(self.allocator);
 
         for (_, &type) in types {
@@ -1894,20 +1895,19 @@ impl Generator {
                             let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
 
                             if struct_info.is_newtype() {
-                                let field = &struct_info.fields.data.value;
-
-                                fprintf(file, "typedef ");
-                                self.write_type(file, &field.type, generics);
-                                fprintf(file, " %.*s;\n", cast<i32>(name.length()), name.array.data);
+                                let typedef_info = TypedefC { name: name.as_str(), type: &struct_info.fields.data[0].value.type };
+                                let typedef_type = Type::TypedefC(&typedef_info);
+                                let type_declaration = self.naming_c99.get_type_decl(&typedef_type, generics.self_type, generics);
+                                type_declarations.insert(type_declaration.as_str());
                             } else {
-                                fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+                                type_declarations.insert(name.as_str());
                             }
                             
                         },
                         Type::Enum(enum_info, _) => {
                             if enum_info.is_discriminated_union() {
                                 let name = self.naming_c99.get_type_name(type_deref, generics.self_type, generics);
-                                fprintf(file, "%.*s;\n", cast<i32>(name.length()), name.array.data);
+                                type_declarations.insert(name.as_str());
                             } else {
                                 let name = self.naming_ident.get_type_name(type_deref, generics.self_type, generics);
                                 let module = type_deref.get_module();
@@ -1970,6 +1970,10 @@ impl Generator {
 
         for *include in includes {
             fprintf(file, "#include <%.*s.h>\n", cast<i32>(include.length), include.ptr);
+        }
+
+        for *type_declarations in type_declarations {
+            fprintf(file, "%.*s;\n", cast<i32>(type_declarations.length), type_declarations.ptr);
         }
 
         defer includes.release();

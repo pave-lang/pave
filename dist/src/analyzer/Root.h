@@ -7,10 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 
-struct ArenaAllocator;
-struct Analysis;
-struct Primitive;
-struct TypeImpl;
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMap_str_Type.h>
 #include <std/HashMap_str_Primitive.h>
@@ -21,6 +17,10 @@ struct TypeImpl;
 #include <analyzer/types/Function.h>
 #include <analyzer/Naming.h>
 #include <std/HashMap_str_ref_Include.h>
+struct ArenaAllocator;
+struct Analysis;
+struct Primitive;
+struct TypeImpl;
 
 #line 8 "src/analyzer/Root.pv"
 struct Root {
@@ -51,6 +51,7 @@ struct Root {
     bool mode_cpp;
 };
 
+#include <std/str.h>
 struct ArenaAllocator;
 struct Array_ptrc_char;
 struct Analysis;
@@ -59,9 +60,7 @@ struct Primitive;
 struct Namespace;
 struct Type;
 struct Trait;
-struct Primitive;
 struct Array_Type;
-#include <std/str.h>
 
 #line 37 "src/analyzer/Root.pv"
 struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char* args, struct Array_ptrc_char* clang_args, struct Analysis* analysis);

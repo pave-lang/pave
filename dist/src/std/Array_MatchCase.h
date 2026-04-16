@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct MatchCase;
 #include <std/trait_Allocator.h>
+struct MatchCase;
 
 #line 69 "src/std/Array.pv"
 struct Array_MatchCase {
@@ -18,13 +18,12 @@ struct Array_MatchCase {
     uintptr_t capacity;
 };
 
-struct Array_MatchCase;
-struct MatchCase;
-struct MatchCase;
 #include <std/trait_Allocator.h>
 #include <std/Array_MatchCase.h>
 #include <analyzer/statement/MatchCase.h>
 #include <std/Iter_ref_MatchCase.h>
+struct Array_MatchCase;
+struct MatchCase;
 
 #line 77 "src/std/Array.pv"
 struct Array_MatchCase Array_MatchCase__new(struct trait_Allocator allocator);

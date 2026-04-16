@@ -1,10 +1,10 @@
 #ifndef PAVE_NAMESPACE_CPP
 #define PAVE_NAMESPACE_CPP
 
-struct Include;
 #include <std/str.h>
 #include <analyzer/c/ParentCpp.h>
 #include <std/HashMap_str_Type.h>
+struct Include;
 
 #line 4 "src/analyzer/c/NamespaceCpp.pv"
 struct NamespaceCpp {
@@ -15,9 +15,9 @@ struct NamespaceCpp {
     struct HashMap_str_Type values;
 };
 
+#include <analyzer/c/ParentCpp.h>
 struct Include;
 struct NamespaceCpp;
-#include <analyzer/c/ParentCpp.h>
 
 #line 13 "src/analyzer/c/NamespaceCpp.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct ParentCpp parent);

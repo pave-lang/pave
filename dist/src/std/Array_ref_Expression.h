@@ -17,11 +17,11 @@ struct Array_ref_Expression {
     uintptr_t capacity;
 };
 
-struct Array_ref_Expression;
-struct Expression;
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Expression.h>
 #include <std/Iter_ref_ref_Expression.h>
+struct Array_ref_Expression;
+struct Expression;
 
 #line 77 "src/std/Array.pv"
 struct Array_ref_Expression Array_ref_Expression__new(struct trait_Allocator allocator);

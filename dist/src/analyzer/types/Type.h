@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#include <std/str.h>
+#include <std/Array_Type.h>
 struct Primitive;
 struct Indirect;
 struct Sequence;
@@ -21,8 +23,6 @@ struct StructC;
 struct FunctionC;
 struct ClassCpp;
 struct NamespaceCpp;
-#include <std/str.h>
-#include <std/Array_Type.h>
 #line 82 "src/analyzer/types/Type.pv"
 struct Type {
     enum {
@@ -69,9 +69,9 @@ struct Type {
     };
 };
 
+#include <std/Array_Type.h>
 struct Type;
 struct ArenaAllocator;
-struct Type;
 struct Context;
 struct GenericMap;
 struct Indirect;
@@ -90,7 +90,6 @@ struct ClassCpp;
 struct NamespaceCpp;
 struct FunctionC;
 struct Module;
-#include <std/Array_Type.h>
 
 #line 105 "src/analyzer/types/Type.pv"
 char const* Type__name(struct Type* self);

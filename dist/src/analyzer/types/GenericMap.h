@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
-struct Type;
 #include <std/Array_Type.h>
 #include <std/HashMap_str_usize.h>
+struct Type;
 
 #line 4 "src/analyzer/types/GenericMap.pv"
 struct GenericMap {
@@ -14,14 +14,14 @@ struct GenericMap {
     struct HashMap_str_usize map;
 };
 
+#include <analyzer/types/GenericMap.h>
+#include <std/str.h>
+#include <analyzer/types/Type.h>
 struct ArenaAllocator;
 struct Generics;
 struct Array_Type;
 struct GenericMap;
 struct Type;
-#include <analyzer/types/GenericMap.h>
-#include <std/str.h>
-#include <analyzer/types/Type.h>
 
 #line 11 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Generics* generics, struct Array_Type* usage_types);

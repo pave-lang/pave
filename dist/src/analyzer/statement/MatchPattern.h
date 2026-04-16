@@ -3,13 +3,13 @@
 
 #include <stdbool.h>
 
+#include <std/Array_EnumVariantParameter.h>
+#include <analyzer/types/Type.h>
 struct Expression;
 struct Type;
 struct EnumVariant;
 struct EnumCValue;
 struct Token;
-#include <std/Array_EnumVariantParameter.h>
-#include <analyzer/types/Type.h>
 #line 7 "src/analyzer/statement/MatchPattern.pv"
 struct MatchPattern {
     enum {

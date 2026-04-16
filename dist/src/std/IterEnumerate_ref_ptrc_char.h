@@ -15,8 +15,8 @@ struct IterEnumerate_ref_ptrc_char {
     struct Iter_ref_ptrc_char iter;
 };
 
-struct IterEnumerate_ref_ptrc_char;
 #include <tuple_usize_ref_ptrc_char.h>
+struct IterEnumerate_ref_ptrc_char;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ptrc_char__next(struct IterEnumerate_ref_ptrc_char* self);

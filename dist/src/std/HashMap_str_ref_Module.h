@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_ref_Module;
 #include <std/trait_Allocator.h>
+struct HashMapBucket_str_ref_Module;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_ref_Module {
@@ -19,13 +19,13 @@ struct HashMap_str_ref_Module {
     uintptr_t length;
 };
 
-struct HashMap_str_ref_Module;
-struct str;
-struct Module;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_ref_Module.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Module.h>
+struct HashMap_str_ref_Module;
+struct str;
+struct Module;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Module HashMap_str_ref_Module__new(struct trait_Allocator allocator);

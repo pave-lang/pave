@@ -380,6 +380,11 @@ impl Naming {
 
                 return result;
             },
+            Type::TypedefC(typedef_info) => {
+                let result = self.get_variable_decl(typedef_info.name, typedef_info.type, type_self, generics_map);
+                result.prepend("typedef ");
+                return result;
+            },
             _ => {},
         }
 

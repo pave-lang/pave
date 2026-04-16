@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
+#include <std/Array_MatchPattern.h>
 struct Token;
 struct Block;
-#include <std/Array_MatchPattern.h>
 
 #line 7 "src/analyzer/statement/MatchCase.pv"
 struct MatchCase {

@@ -15,8 +15,8 @@ struct IterEnumerate_ref_ref_Namespace {
     struct Iter_ref_ref_Namespace iter;
 };
 
-struct IterEnumerate_ref_ref_Namespace;
 #include <tuple_usize_ref_ref_Namespace.h>
+struct IterEnumerate_ref_ref_Namespace;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_Namespace__next(struct IterEnumerate_ref_ref_Namespace* self);

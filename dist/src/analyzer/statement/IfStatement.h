@@ -1,9 +1,9 @@
 #ifndef PAVE_IF_STATEMENT
 #define PAVE_IF_STATEMENT
 
+#include <std/Array_ElseStatement.h>
 struct Expression;
 struct Block;
-#include <std/Array_ElseStatement.h>
 
 #line 6 "src/analyzer/statement/IfStatement.pv"
 struct IfStatement {

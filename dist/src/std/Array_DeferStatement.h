@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct DeferStatement;
 #include <std/trait_Allocator.h>
+struct DeferStatement;
 
 #line 69 "src/std/Array.pv"
 struct Array_DeferStatement {
@@ -18,13 +18,12 @@ struct Array_DeferStatement {
     uintptr_t capacity;
 };
 
-struct Array_DeferStatement;
-struct DeferStatement;
-struct DeferStatement;
 #include <std/trait_Allocator.h>
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
 #include <std/Iter_ref_DeferStatement.h>
+struct Array_DeferStatement;
+struct DeferStatement;
 
 #line 77 "src/std/Array.pv"
 struct Array_DeferStatement Array_DeferStatement__new(struct trait_Allocator allocator);

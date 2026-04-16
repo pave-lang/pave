@@ -17,10 +17,10 @@ struct Iter_ref_Parameter {
     struct Parameter* end;
 };
 
-struct Parameter;
-struct Iter_ref_Parameter;
 #include <std/Iter_ref_Parameter.h>
 #include <std/IterEnumerate_ref_Parameter.h>
+struct Parameter;
+struct Iter_ref_Parameter;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Parameter Iter_ref_Parameter__new(struct Parameter* start, struct Parameter* end);

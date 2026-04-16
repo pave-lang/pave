@@ -261,14 +261,11 @@ impl Usages {
         let type_deref = resolved_type.deref();
         let type_deref_all = resolved_type.deref_all();
         let is_type = false;
-        let is_indirect = false;
         let is_trait = false;
         let usage_context = self.usage_context;
 
         match type_deref {
             Type::Indirect(_) => {
-                is_indirect = true;
-
                 match type.deref_all() {
                     Type::Primitive(primitive_info) => {
                         if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {

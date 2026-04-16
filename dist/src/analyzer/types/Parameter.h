@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-struct Token;
 #include <analyzer/types/Type.h>
+struct Token;
 
 #line 6 "src/analyzer/types/Function.pv"
 struct Parameter {

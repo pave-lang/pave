@@ -1,8 +1,8 @@
 #ifndef PAVE_SLICE_REF_TOKEN
 #define PAVE_SLICE_REF_TOKEN
 
-struct Token;
 #include <std/Iter_ref_ref_Token.h>
+struct Token;
 struct slice_ref_Token { struct Token** data; uintptr_t length; };
 
 #line 2 "src/std/Slice.pv"

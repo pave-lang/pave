@@ -10,9 +10,9 @@ struct Tuple {
     struct Array_Type elements;
 };
 
-struct Tuple;
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Tuple.h>
+struct Tuple;
 
 #line 77 "src/analyzer/types/Type.pv"
 struct Tuple Tuple__clone(struct Tuple* self, struct trait_Allocator allocator);

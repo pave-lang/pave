@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct FunctionScope;
 #include <std/trait_Allocator.h>
+struct FunctionScope;
 
 #line 69 "src/std/Array.pv"
 struct Array_FunctionScope {
@@ -18,13 +18,12 @@ struct Array_FunctionScope {
     uintptr_t capacity;
 };
 
-struct Array_FunctionScope;
-struct FunctionScope;
-struct FunctionScope;
 #include <std/trait_Allocator.h>
 #include <std/Array_FunctionScope.h>
 #include <compiler/FunctionScope.h>
 #include <std/Iter_ref_FunctionScope.h>
+struct Array_FunctionScope;
+struct FunctionScope;
 
 #line 77 "src/std/Array.pv"
 struct Array_FunctionScope Array_FunctionScope__new(struct trait_Allocator allocator);

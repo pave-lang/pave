@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef uint64_t TypeId;
 #include <std/trait_Allocator.h>
+typedef uint64_t TypeId;
 
 #line 69 "src/std/Array.pv"
 struct Array_TypeId {
@@ -18,13 +18,12 @@ struct Array_TypeId {
     uintptr_t capacity;
 };
 
-struct Array_TypeId;
-typedef uint64_t TypeId;
-typedef uint64_t TypeId;
 #include <std/trait_Allocator.h>
 #include <std/Array_TypeId.h>
 #include <std/TypeId.h>
 #include <std/Iter_ref_TypeId.h>
+struct Array_TypeId;
+typedef uint64_t TypeId;
 
 #line 77 "src/std/Array.pv"
 struct Array_TypeId Array_TypeId__new(struct trait_Allocator allocator);

@@ -15,8 +15,8 @@ struct IterEnumerate_ref_ref_Trait {
     struct Iter_ref_ref_Trait iter;
 };
 
-struct IterEnumerate_ref_ref_Trait;
 #include <tuple_usize_ref_ref_Trait.h>
+struct IterEnumerate_ref_ref_Trait;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_Trait__next(struct IterEnumerate_ref_ref_Trait* self);

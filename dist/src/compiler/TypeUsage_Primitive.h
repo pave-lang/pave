@@ -6,10 +6,10 @@
 
 #include <stdio.h>
 
-struct ArenaAllocator;
-struct Primitive;
 #include <std/Array_UsageContext.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
+struct ArenaAllocator;
+struct Primitive;
 
 #line 63 "src/compiler/Usages.pv"
 struct TypeUsage_Primitive {
@@ -20,12 +20,12 @@ struct TypeUsage_Primitive {
     bool impl_dynamic_usage;
 };
 
+#include <compiler/TypeUsage_Primitive.h>
 struct ArenaAllocator;
 struct Primitive;
 struct TypeUsage_Primitive;
 struct GenericMap;
 struct UsageContext;
-#include <compiler/TypeUsage_Primitive.h>
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Primitive TypeUsage_Primitive__new(struct ArenaAllocator* allocator, struct Primitive* type, uintptr_t impl_count);

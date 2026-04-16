@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_Enum;
 #include <std/trait_Allocator.h>
+struct HashMapBucket_str_Enum;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_Enum {
@@ -19,15 +19,14 @@ struct HashMap_str_Enum {
     uintptr_t length;
 };
 
-struct HashMap_str_Enum;
-struct str;
-struct Enum;
-struct Enum;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_Enum.h>
 #include <std/str.h>
 #include <analyzer/types/Enum.h>
 #include <std/HashMapIter_str_Enum.h>
+struct HashMap_str_Enum;
+struct str;
+struct Enum;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Enum HashMap_str_Enum__new(struct trait_Allocator allocator);

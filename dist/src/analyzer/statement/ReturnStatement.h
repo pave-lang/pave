@@ -1,8 +1,8 @@
 #ifndef PAVE_RETURN_STATEMENT
 #define PAVE_RETURN_STATEMENT
 
-struct Expression;
 #include <std/Array_DeferStatement.h>
+struct Expression;
 
 #line 6 "src/analyzer/statement/ReturnStatement.pv"
 struct ReturnStatement {

@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_usize_TypeUsage_Sequence;
 #include <std/trait_Allocator.h>
+struct HashMapBucket_usize_TypeUsage_Sequence;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Sequence {
@@ -19,13 +19,12 @@ struct HashMap_usize_TypeUsage_Sequence {
     uintptr_t length;
 };
 
-struct HashMap_usize_TypeUsage_Sequence;
-struct TypeUsage_Sequence;
-struct TypeUsage_Sequence;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_usize_TypeUsage_Sequence.h>
 #include <compiler/TypeUsage_Sequence.h>
 #include <std/HashMapIter_usize_TypeUsage_Sequence.h>
+struct HashMap_usize_TypeUsage_Sequence;
+struct TypeUsage_Sequence;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Sequence HashMap_usize_TypeUsage_Sequence__new(struct trait_Allocator allocator);

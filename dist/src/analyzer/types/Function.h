@@ -6,14 +6,14 @@
 
 #include <stdio.h>
 
-struct Token;
-struct Context;
-struct Block;
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/types/Generics.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Type.h>
+struct Token;
+struct Context;
+struct Block;
 
 #line 27 "src/analyzer/types/Function.pv"
 struct Function {
@@ -31,11 +31,11 @@ struct Function {
     struct Block* body;
 };
 
+#include <analyzer/types/Function.h>
+#include <std/trait_Allocator.h>
 struct Context;
 struct Function;
 struct Generics;
-#include <analyzer/types/Function.h>
-#include <std/trait_Allocator.h>
 
 #line 43 "src/analyzer/types/Function.pv"
 struct Function Function__new(struct Context* context);

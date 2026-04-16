@@ -15,9 +15,9 @@ struct Iter_ref_ref_Trait {
     struct Trait** end;
 };
 
-struct Iter_ref_ref_Trait;
 #include <std/Iter_ref_ref_Trait.h>
 #include <std/IterEnumerate_ref_ref_Trait.h>
+struct Iter_ref_ref_Trait;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_Trait Iter_ref_ref_Trait__new(struct Trait** start, struct Trait** end);

@@ -5,8 +5,6 @@
 
 #include <stdio.h>
 
-struct Root;
-struct Namespace;
 #include <std/str.h>
 #include <std/Array_NamespacePath.h>
 #include <std/Array_ref_Namespace.h>
@@ -20,6 +18,8 @@ struct Namespace;
 #include <analyzer/Context.h>
 #include <std/Array_Token.h>
 #include <std/HashMap_str_ref_Include.h>
+struct Root;
+struct Namespace;
 
 #line 7 "src/analyzer/Module.pv"
 struct Module {
@@ -41,15 +41,14 @@ struct Module {
     struct HashMap_str_ref_Include includes;
 };
 
+#include <std/str.h>
 struct Namespace;
 struct Module;
 struct NamespacePath;
 struct Type;
 struct Trait;
-struct Type;
 struct Array_Type;
 struct Primitive;
-#include <std/str.h>
 
 #line 27 "src/analyzer/Module.pv"
 struct Module* Module__new(struct Namespace* namespace, struct str path);

@@ -15,9 +15,9 @@ struct Iter_ref_ref_Namespace {
     struct Namespace** end;
 };
 
-struct Iter_ref_ref_Namespace;
 #include <std/Iter_ref_ref_Namespace.h>
 #include <std/IterEnumerate_ref_ref_Namespace.h>
+struct Iter_ref_ref_Namespace;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_Namespace Iter_ref_ref_Namespace__new(struct Namespace** start, struct Namespace** end);

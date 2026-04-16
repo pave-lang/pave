@@ -1,12 +1,12 @@
 #ifndef PAVE_EXPRESSION_DATA
 #define PAVE_EXPRESSION_DATA
 
-struct EnumVariant;
-struct Type;
-struct Expression;
 #include <std/str.h>
 #include <analyzer/expression/CppExpression.h>
 #include <std/Array_InvokeArgument.h>
+struct EnumVariant;
+struct Type;
+struct Expression;
 #line 5 "src/analyzer/expression/ExpressionData.pv"
 struct ExpressionData {
     enum {

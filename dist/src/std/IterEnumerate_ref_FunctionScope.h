@@ -15,8 +15,8 @@ struct IterEnumerate_ref_FunctionScope {
     struct Iter_ref_FunctionScope iter;
 };
 
-struct IterEnumerate_ref_FunctionScope;
 #include <tuple_usize_ref_FunctionScope.h>
+struct IterEnumerate_ref_FunctionScope;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_FunctionScope__next(struct IterEnumerate_ref_FunctionScope* self);

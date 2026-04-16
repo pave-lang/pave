@@ -15,8 +15,8 @@ struct IterEnumerate_ref_tuple_usize_str_TypeId {
     struct Iter_ref_tuple_usize_str_TypeId iter;
 };
 
-struct IterEnumerate_ref_tuple_usize_str_TypeId;
 #include <tuple_usize_ref_tuple_usize_str_TypeId.h>
+struct IterEnumerate_ref_tuple_usize_str_TypeId;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_tuple_usize_str_TypeId__next(struct IterEnumerate_ref_tuple_usize_str_TypeId* self);

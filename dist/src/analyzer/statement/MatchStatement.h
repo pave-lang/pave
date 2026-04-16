@@ -1,8 +1,8 @@
 #ifndef PAVE_MATCH_STATEMENT
 #define PAVE_MATCH_STATEMENT
 
-struct Expression;
 #include <std/Array_MatchCase.h>
+struct Expression;
 
 #line 7 "src/analyzer/statement/MatchStatement.pv"
 struct MatchStatement {

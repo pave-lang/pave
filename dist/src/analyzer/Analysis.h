@@ -14,9 +14,9 @@ struct Analysis {
     struct HashMap_str_Array_InlayHint inlay_hints;
 };
 
+#include <analyzer/Analysis.h>
 struct ArenaAllocator;
 struct Analysis;
-#include <analyzer/Analysis.h>
 
 #line 42 "src/analyzer/Analysis.pv"
 struct Analysis Analysis__new(struct ArenaAllocator* allocator);

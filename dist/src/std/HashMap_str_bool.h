@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_bool;
 #include <std/trait_Allocator.h>
+struct HashMapBucket_str_bool;
 
 #line 26 "src/std/HashMap.pv"
 struct HashMap_str_bool {
@@ -19,12 +19,12 @@ struct HashMap_str_bool {
     uintptr_t length;
 };
 
-struct HashMap_str_bool;
-struct str;
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_bool.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_bool.h>
+struct HashMap_str_bool;
+struct str;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_bool HashMap_str_bool__new(struct trait_Allocator allocator);

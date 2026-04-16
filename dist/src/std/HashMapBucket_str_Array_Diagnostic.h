@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-struct HashMapBucket_str_Array_Diagnostic;
 #include <std/str.h>
 #include <std/Array_Diagnostic.h>
+struct HashMapBucket_str_Array_Diagnostic;
 
 #line 4 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_Diagnostic {

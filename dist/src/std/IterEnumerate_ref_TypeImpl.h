@@ -15,8 +15,8 @@ struct IterEnumerate_ref_TypeImpl {
     struct Iter_ref_TypeImpl iter;
 };
 
-struct IterEnumerate_ref_TypeImpl;
 #include <tuple_usize_ref_TypeImpl.h>
+struct IterEnumerate_ref_TypeImpl;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_TypeImpl__next(struct IterEnumerate_ref_TypeImpl* self);

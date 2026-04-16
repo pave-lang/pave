@@ -15,9 +15,9 @@ struct Iter_i32 {
     int32_t end;
 };
 
-struct Iter_i32;
 #include <std/Iter_i32.h>
 #include <std/IterEnumerate_i32.h>
+struct Iter_i32;
 
 #line 12 "src/std/Array.pv"
 struct Iter_i32 Iter_i32__new(int32_t start, int32_t end);

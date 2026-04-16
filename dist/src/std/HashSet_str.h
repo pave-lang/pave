@@ -19,12 +19,12 @@ struct HashSet_str {
     uintptr_t length;
 };
 
-struct ArenaAllocator;
-struct HashSet_str;
-struct str;
 #include <std/HashSet_str.h>
 #include <std/str.h>
 #include <std/HashSetIter_str.h>
+struct ArenaAllocator;
+struct HashSet_str;
+struct str;
 
 #line 34 "src/std/HashSet.pv"
 struct HashSet_str HashSet_str__new(struct ArenaAllocator* allocator);

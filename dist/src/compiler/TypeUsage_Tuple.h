@@ -6,10 +6,10 @@
 
 #include <stdio.h>
 
-struct ArenaAllocator;
-struct Tuple;
 #include <std/Array_UsageContext.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
+struct ArenaAllocator;
+struct Tuple;
 
 #line 63 "src/compiler/Usages.pv"
 struct TypeUsage_Tuple {
@@ -20,12 +20,12 @@ struct TypeUsage_Tuple {
     bool impl_dynamic_usage;
 };
 
+#include <compiler/TypeUsage_Tuple.h>
 struct ArenaAllocator;
 struct Tuple;
 struct TypeUsage_Tuple;
 struct GenericMap;
 struct UsageContext;
-#include <compiler/TypeUsage_Tuple.h>
 
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Tuple TypeUsage_Tuple__new(struct ArenaAllocator* allocator, struct Tuple* type, uintptr_t impl_count);

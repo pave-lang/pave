@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 
-struct GenericMap;
 #include <std/HashSet_str.h>
 #include <std/HashMap_str_Type.h>
+struct GenericMap;
 
 #line 39 "src/compiler/Usages.pv"
 struct UsageContext {
@@ -18,9 +18,9 @@ struct UsageContext {
     struct HashMap_str_Type cpp_usages;
 };
 
+#include <compiler/UsageContext.h>
 struct ArenaAllocator;
 struct GenericMap;
-#include <compiler/UsageContext.h>
 
 #line 50 "src/compiler/Usages.pv"
 struct UsageContext UsageContext__new(struct ArenaAllocator* allocator, struct GenericMap* generic_map);
