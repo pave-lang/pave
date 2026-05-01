@@ -19,6 +19,7 @@ struct Array_Type {
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/Iter_ref_Type.h>
+#include <slice_Type.h>
 struct Array_Type;
 struct Type;
 

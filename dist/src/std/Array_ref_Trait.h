@@ -17,6 +17,7 @@ struct Array_ref_Trait {
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Trait.h>
 #include <std/Iter_ref_ref_Trait.h>
+#include <slice_ref_Trait.h>
 struct Array_ref_Trait;
 struct Trait;
 

@@ -19,6 +19,7 @@ struct Array_UsageContext {
 #include <std/Array_UsageContext.h>
 #include <compiler/UsageContext.h>
 #include <std/Iter_ref_UsageContext.h>
+#include <slice_UsageContext.h>
 struct Array_UsageContext;
 struct UsageContext;
 

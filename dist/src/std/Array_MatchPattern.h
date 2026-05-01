@@ -19,6 +19,7 @@ struct Array_MatchPattern {
 #include <std/Array_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <std/Iter_ref_MatchPattern.h>
+#include <slice_MatchPattern.h>
 struct Array_MatchPattern;
 struct MatchPattern;
 

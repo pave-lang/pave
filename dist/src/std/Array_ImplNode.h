@@ -19,6 +19,7 @@ struct Array_ImplNode {
 #include <std/Array_ImplNode.h>
 #include <analyzer/ImplNode.h>
 #include <std/Iter_ref_ImplNode.h>
+#include <slice_ImplNode.h>
 struct Array_ImplNode;
 struct ImplNode;
 

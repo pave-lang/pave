@@ -19,6 +19,7 @@ struct Array_TypeImpl {
 #include <std/Array_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
 #include <std/Iter_ref_TypeImpl.h>
+#include <slice_TypeImpl.h>
 struct Array_TypeImpl;
 struct TypeImpl;
 

@@ -17,6 +17,7 @@ struct Array_ptrc_char {
 #include <std/trait_Allocator.h>
 #include <std/Array_ptrc_char.h>
 #include <std/Iter_ref_ptrc_char.h>
+#include <slice_ptrc_char.h>
 struct Array_ptrc_char;
 
 #line 77 "src/std/Array.pv"

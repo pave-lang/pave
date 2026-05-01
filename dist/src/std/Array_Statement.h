@@ -19,6 +19,7 @@ struct Array_Statement {
 #include <std/Array_Statement.h>
 #include <analyzer/statement/Statement.h>
 #include <std/Iter_ref_Statement.h>
+#include <slice_Statement.h>
 struct Array_Statement;
 struct Statement;
 

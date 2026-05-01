@@ -19,6 +19,7 @@ struct Array_ForVariable {
 #include <std/Array_ForVariable.h>
 #include <analyzer/statement/ForVariable.h>
 #include <std/Iter_ref_ForVariable.h>
+#include <slice_ForVariable.h>
 struct Array_ForVariable;
 struct ForVariable;
 

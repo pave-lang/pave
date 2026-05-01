@@ -19,6 +19,7 @@ struct Array_ElseStatement {
 #include <std/Array_ElseStatement.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <std/Iter_ref_ElseStatement.h>
+#include <slice_ElseStatement.h>
 struct Array_ElseStatement;
 struct ElseStatement;
 

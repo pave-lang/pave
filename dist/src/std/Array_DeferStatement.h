@@ -19,6 +19,7 @@ struct Array_DeferStatement {
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
 #include <std/Iter_ref_DeferStatement.h>
+#include <slice_DeferStatement.h>
 struct Array_DeferStatement;
 struct DeferStatement;
 

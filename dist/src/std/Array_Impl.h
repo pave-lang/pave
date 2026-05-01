@@ -19,6 +19,7 @@ struct Array_Impl {
 #include <std/Array_Impl.h>
 #include <analyzer/Impl.h>
 #include <std/Iter_ref_Impl.h>
+#include <slice_Impl.h>
 struct Array_Impl;
 struct Impl;
 

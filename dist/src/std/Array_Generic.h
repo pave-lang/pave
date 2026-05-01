@@ -19,6 +19,7 @@ struct Array_Generic {
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generic.h>
 #include <std/Iter_ref_Generic.h>
+#include <slice_Generic.h>
 struct Array_Generic;
 struct Generic;
 

@@ -19,6 +19,7 @@ struct Array_EnumVariantParameter {
 #include <std/Array_EnumVariantParameter.h>
 #include <analyzer/types/EnumVariantParameter.h>
 #include <std/Iter_ref_EnumVariantParameter.h>
+#include <slice_EnumVariantParameter.h>
 struct Array_EnumVariantParameter;
 struct EnumVariantParameter;
 

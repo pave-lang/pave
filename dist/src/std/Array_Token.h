@@ -19,6 +19,7 @@ struct Array_Token {
 #include <std/Array_Token.h>
 #include <analyzer/Token.h>
 #include <std/Iter_ref_Token.h>
+#include <slice_Token.h>
 struct Array_Token;
 struct Token;
 

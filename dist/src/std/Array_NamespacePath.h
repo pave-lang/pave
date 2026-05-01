@@ -19,6 +19,7 @@ struct Array_NamespacePath {
 #include <std/Array_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
 #include <std/Iter_ref_NamespacePath.h>
+#include <slice_NamespacePath.h>
 struct Array_NamespacePath;
 struct NamespacePath;
 

@@ -17,6 +17,7 @@ struct Array_ref_Namespace {
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Namespace.h>
 #include <std/Iter_ref_ref_Namespace.h>
+#include <slice_ref_Namespace.h>
 struct Array_ref_Namespace;
 struct Namespace;
 

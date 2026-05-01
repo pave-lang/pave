@@ -19,6 +19,7 @@ struct Array_MatchCase {
 #include <std/Array_MatchCase.h>
 #include <analyzer/statement/MatchCase.h>
 #include <std/Iter_ref_MatchCase.h>
+#include <slice_MatchCase.h>
 struct Array_MatchCase;
 struct MatchCase;
 

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include <std/trait_Struct.h>
+#include <slice_tuple_usize_str_TypeId.h>
 #line 1 "src/std/Struct.pv"
 struct trait_StructVTable {
     #line 2 "src/std/Struct.pv"

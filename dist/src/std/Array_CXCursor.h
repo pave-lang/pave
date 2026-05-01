@@ -18,6 +18,7 @@ struct Array_CXCursor {
 #include <std/trait_Allocator.h>
 #include <std/Array_CXCursor.h>
 #include <std/Iter_ref_CXCursor.h>
+#include <slice_CXCursor.h>
 struct Array_CXCursor;
 
 #line 77 "src/std/Array.pv"

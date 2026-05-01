@@ -19,6 +19,7 @@ struct Array_Diagnostic {
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <std/Iter_ref_Diagnostic.h>
+#include <slice_Diagnostic.h>
 struct Array_Diagnostic;
 struct Diagnostic;
 
