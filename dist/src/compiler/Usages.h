@@ -86,22 +86,22 @@ void Usages__process_tuple(struct Usages* self, struct Tuple* tuple);
 #line 450 "src/compiler/Usages.pv"
 void Usages__process_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 477 "src/compiler/Usages.pv"
+#line 482 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 495 "src/compiler/Usages.pv"
+#line 500 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map);
 
-#line 507 "src/compiler/Usages.pv"
+#line 512 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 585 "src/compiler/Usages.pv"
+#line 590 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 668 "src/compiler/Usages.pv"
+#line 673 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 825 "src/compiler/Usages.pv"
+#line 830 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

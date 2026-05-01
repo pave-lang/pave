@@ -465,6 +465,11 @@ impl Usages {
                     }
                     self.add_type(&param_func_info.return_type, &resolved_generic_map);
                 },
+                Type::Sequence(sequence) => {
+                    if sequence.is_fixed_array() {
+                        self.add_type(&sequence.element, generic_map);
+                    }
+                },
                 _ => {},
             }
         }

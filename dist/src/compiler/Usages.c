@@ -896,504 +896,514 @@ void Usages__process_struct(struct Usages* self, struct Struct* struct_info, str
                 Usages__add_type(self, &param_func_info->return_type, &resolved_generic_map);
             } break;
             #line 468 "src/compiler/Usages.pv"
+            case TYPE__SEQUENCE: {
+                #line 468 "src/compiler/Usages.pv"
+                struct Sequence* sequence = Type__deref_all(&field->type)->sequence_value;
+                #line 469 "src/compiler/Usages.pv"
+                if (Sequence__is_fixed_array(sequence)) {
+                    #line 470 "src/compiler/Usages.pv"
+                    Usages__add_type(self, &sequence->element, generic_map);
+                }
+            } break;
+            #line 473 "src/compiler/Usages.pv"
             default: {
             } break;
         }
     } }
 
-    #line 472 "src/compiler/Usages.pv"
+    #line 477 "src/compiler/Usages.pv"
     Usages__process_impls(self, &struct_info->impls, generic_map);
 
-    #line 474 "src/compiler/Usages.pv"
+    #line 479 "src/compiler/Usages.pv"
     self->usage_context = 0;
 }
 
-#line 477 "src/compiler/Usages.pv"
+#line 482 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map) {
-    #line 478 "src/compiler/Usages.pv"
+    #line 483 "src/compiler/Usages.pv"
     uintptr_t parent_ptr = (uintptr_t)(enum_info);
-    #line 479 "src/compiler/Usages.pv"
+    #line 484 "src/compiler/Usages.pv"
     struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
-    #line 480 "src/compiler/Usages.pv"
+    #line 485 "src/compiler/Usages.pv"
     self->usage_context = TypeUsage_Enum__add_usage(parent_usage, generic_map);
 
-    #line 482 "src/compiler/Usages.pv"
+    #line 487 "src/compiler/Usages.pv"
     self->usage_mode = USAGE_MODE__LAYOUT;
 
-    #line 484 "src/compiler/Usages.pv"
+    #line 489 "src/compiler/Usages.pv"
     { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-    #line 484 "src/compiler/Usages.pv"
+    #line 489 "src/compiler/Usages.pv"
     while (HashMapIter_str_EnumVariant__next(&__iter)) {
-        #line 484 "src/compiler/Usages.pv"
+        #line 489 "src/compiler/Usages.pv"
         struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-        #line 485 "src/compiler/Usages.pv"
+        #line 490 "src/compiler/Usages.pv"
         { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
-        #line 485 "src/compiler/Usages.pv"
+        #line 490 "src/compiler/Usages.pv"
         while (Iter_ref_Type__next(&__iter)) {
-            #line 485 "src/compiler/Usages.pv"
+            #line 490 "src/compiler/Usages.pv"
             struct Type* type = Iter_ref_Type__value(&__iter);
 
-            #line 486 "src/compiler/Usages.pv"
+            #line 491 "src/compiler/Usages.pv"
             Usages__add_type(self, type, generic_map);
         } }
     } }
 
-    #line 490 "src/compiler/Usages.pv"
+    #line 495 "src/compiler/Usages.pv"
     Usages__process_impls(self, &enum_info->impls, generic_map);
 
-    #line 492 "src/compiler/Usages.pv"
+    #line 497 "src/compiler/Usages.pv"
     self->usage_context = 0;
 }
 
-#line 495 "src/compiler/Usages.pv"
+#line 500 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map) {
-    #line 496 "src/compiler/Usages.pv"
+    #line 501 "src/compiler/Usages.pv"
     uintptr_t parent_ptr = (uintptr_t)(trait_info);
-    #line 497 "src/compiler/Usages.pv"
+    #line 502 "src/compiler/Usages.pv"
     struct TypeUsage_Trait* parent_usage = HashMap_usize_TypeUsage_Trait__find(&self->traits, &parent_ptr);
-    #line 498 "src/compiler/Usages.pv"
+    #line 503 "src/compiler/Usages.pv"
     self->usage_context = TypeUsage_Trait__add_usage(parent_usage, generic_map);
 
-    #line 500 "src/compiler/Usages.pv"
+    #line 505 "src/compiler/Usages.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-    #line 500 "src/compiler/Usages.pv"
+    #line 505 "src/compiler/Usages.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 500 "src/compiler/Usages.pv"
+        #line 505 "src/compiler/Usages.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 501 "src/compiler/Usages.pv"
+        #line 506 "src/compiler/Usages.pv"
         Usages__process_function(self, func_info, generic_map);
     } }
 
-    #line 504 "src/compiler/Usages.pv"
+    #line 509 "src/compiler/Usages.pv"
     self->usage_context = 0;
 }
 
-#line 507 "src/compiler/Usages.pv"
+#line 512 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map) {
-    #line 508 "src/compiler/Usages.pv"
+    #line 513 "src/compiler/Usages.pv"
     struct UsageContext* parent_usage_context = self->usage_context;
 
-    #line 510 "src/compiler/Usages.pv"
+    #line 515 "src/compiler/Usages.pv"
     if (func_info->type == FUNCTION_TYPE__BUILTIN) {
-        #line 510 "src/compiler/Usages.pv"
+        #line 515 "src/compiler/Usages.pv"
         return;
     }
 
-    #line 512 "src/compiler/Usages.pv"
+    #line 517 "src/compiler/Usages.pv"
     uintptr_t func_ptr = (uintptr_t)(func_info);
 
-    #line 514 "src/compiler/Usages.pv"
+    #line 519 "src/compiler/Usages.pv"
     switch (func_info->parent.type) {
-        #line 515 "src/compiler/Usages.pv"
+        #line 520 "src/compiler/Usages.pv"
         case FUNCTION_PARENT__NONE: {
-            #line 516 "src/compiler/Usages.pv"
+            #line 521 "src/compiler/Usages.pv"
             struct TypeFunctionUsage* func_usage = HashMap_usize_TypeFunctionUsage__find(&self->functions, &func_ptr);
-            #line 517 "src/compiler/Usages.pv"
+            #line 522 "src/compiler/Usages.pv"
             self->function_context = &func_usage->function_context;
-            #line 518 "src/compiler/Usages.pv"
+            #line 523 "src/compiler/Usages.pv"
             self->usage_context = TypeFunctionUsage__add_usage(func_usage, generic_map);
         } break;
-        #line 520 "src/compiler/Usages.pv"
+        #line 525 "src/compiler/Usages.pv"
         case FUNCTION_PARENT__PRIMITIVE: {
-            #line 520 "src/compiler/Usages.pv"
+            #line 525 "src/compiler/Usages.pv"
             struct Primitive* primitive_info = func_info->parent.primitive_value._0;
-            #line 520 "src/compiler/Usages.pv"
+            #line 525 "src/compiler/Usages.pv"
             uintptr_t impl_index = func_info->parent.primitive_value._1;
-            #line 521 "src/compiler/Usages.pv"
+            #line 526 "src/compiler/Usages.pv"
             uintptr_t parent_ptr = (uintptr_t)(primitive_info);
-            #line 522 "src/compiler/Usages.pv"
+            #line 527 "src/compiler/Usages.pv"
             struct TypeUsage_Primitive* parent_usage = HashMap_usize_TypeUsage_Primitive__find(&self->primitives, &parent_ptr);
 
-            #line 524 "src/compiler/Usages.pv"
+            #line 529 "src/compiler/Usages.pv"
             struct TypeFunctionUsage* func_usage = HashMap_usize_TypeFunctionUsage__find(Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index), &func_ptr);
-            #line 525 "src/compiler/Usages.pv"
+            #line 530 "src/compiler/Usages.pv"
             self->function_context = &func_usage->function_context;
 
-            #line 527 "src/compiler/Usages.pv"
+            #line 532 "src/compiler/Usages.pv"
             if (func_info->generics.array.length > 0) {
-                #line 528 "src/compiler/Usages.pv"
+                #line 533 "src/compiler/Usages.pv"
                 self->usage_context = TypeFunctionUsage__add_usage(func_usage, generic_map);
             }
         } break;
-        #line 531 "src/compiler/Usages.pv"
+        #line 536 "src/compiler/Usages.pv"
         case FUNCTION_PARENT__STRUCT: {
-            #line 531 "src/compiler/Usages.pv"
+            #line 536 "src/compiler/Usages.pv"
             struct Struct* struct_info = func_info->parent.struct_value._0;
-            #line 531 "src/compiler/Usages.pv"
+            #line 536 "src/compiler/Usages.pv"
             uintptr_t impl_index = func_info->parent.struct_value._1;
-            #line 532 "src/compiler/Usages.pv"
+            #line 537 "src/compiler/Usages.pv"
             uintptr_t parent_ptr = (uintptr_t)(struct_info);
-            #line 533 "src/compiler/Usages.pv"
+            #line 538 "src/compiler/Usages.pv"
             struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
 
-            #line 535 "src/compiler/Usages.pv"
+            #line 540 "src/compiler/Usages.pv"
             struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-            #line 536 "src/compiler/Usages.pv"
+            #line 541 "src/compiler/Usages.pv"
             struct TypeFunctionUsage* func_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
-            #line 537 "src/compiler/Usages.pv"
+            #line 542 "src/compiler/Usages.pv"
             self->function_context = &func_usage->function_context;
 
-            #line 539 "src/compiler/Usages.pv"
+            #line 544 "src/compiler/Usages.pv"
             if (func_info->generics.array.length > 0) {
-                #line 540 "src/compiler/Usages.pv"
+                #line 545 "src/compiler/Usages.pv"
                 self->usage_context = TypeFunctionUsage__add_usage(func_usage, generic_map);
             }
         } break;
-        #line 543 "src/compiler/Usages.pv"
+        #line 548 "src/compiler/Usages.pv"
         case FUNCTION_PARENT__ENUM: {
-            #line 543 "src/compiler/Usages.pv"
+            #line 548 "src/compiler/Usages.pv"
             struct Enum* enum_info = func_info->parent.enum_value._0;
-            #line 543 "src/compiler/Usages.pv"
+            #line 548 "src/compiler/Usages.pv"
             uintptr_t impl_index = func_info->parent.enum_value._1;
-            #line 544 "src/compiler/Usages.pv"
+            #line 549 "src/compiler/Usages.pv"
             uintptr_t parent_ptr = (uintptr_t)(enum_info);
-            #line 545 "src/compiler/Usages.pv"
+            #line 550 "src/compiler/Usages.pv"
             struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
 
-            #line 547 "src/compiler/Usages.pv"
+            #line 552 "src/compiler/Usages.pv"
             struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-            #line 548 "src/compiler/Usages.pv"
+            #line 553 "src/compiler/Usages.pv"
             struct TypeFunctionUsage* func_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
-            #line 549 "src/compiler/Usages.pv"
+            #line 554 "src/compiler/Usages.pv"
             self->function_context = &func_usage->function_context;
         } break;
-        #line 551 "src/compiler/Usages.pv"
+        #line 556 "src/compiler/Usages.pv"
         case FUNCTION_PARENT__TRAIT: {
-            #line 551 "src/compiler/Usages.pv"
+            #line 556 "src/compiler/Usages.pv"
             struct Trait* trait_info = func_info->parent.trait_value;
-            #line 552 "src/compiler/Usages.pv"
+            #line 557 "src/compiler/Usages.pv"
             uintptr_t parent_ptr = (uintptr_t)(trait_info);
-            #line 553 "src/compiler/Usages.pv"
+            #line 558 "src/compiler/Usages.pv"
             struct TypeUsage_Trait* parent_usage = HashMap_usize_TypeUsage_Trait__find(&self->traits, &parent_ptr);
 
-            #line 555 "src/compiler/Usages.pv"
+            #line 560 "src/compiler/Usages.pv"
             struct TypeFunctionUsage* func_usage = HashMap_usize_TypeFunctionUsage__find(Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, 0), &func_ptr);
-            #line 556 "src/compiler/Usages.pv"
+            #line 561 "src/compiler/Usages.pv"
             self->function_context = &func_usage->function_context;
         } break;
-        #line 558 "src/compiler/Usages.pv"
+        #line 563 "src/compiler/Usages.pv"
         case FUNCTION_PARENT__TYPE: {
-            #line 559 "src/compiler/Usages.pv"
+            #line 564 "src/compiler/Usages.pv"
             return;
         } break;
     }
 
-    #line 563 "src/compiler/Usages.pv"
+    #line 568 "src/compiler/Usages.pv"
     if (self->std_namespace && func_info->type == FUNCTION_TYPE__COROUTINE) {
-        #line 564 "src/compiler/Usages.pv"
+        #line 569 "src/compiler/Usages.pv"
         struct Trait* iter_trait = Namespace__find_trait(self->std_namespace, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
-        #line 565 "src/compiler/Usages.pv"
+        #line 570 "src/compiler/Usages.pv"
         struct Type* sequence_iter = Root__make_type_usage(self->root, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = iter_trait, ._1 = 0} }, &(struct Array_Type) { .data = &func_info->return_type, .length = 1 });
-        #line 566 "src/compiler/Usages.pv"
+        #line 571 "src/compiler/Usages.pv"
         Usages__add_type(self, sequence_iter, generic_map);
     }
 
-    #line 569 "src/compiler/Usages.pv"
+    #line 574 "src/compiler/Usages.pv"
     self->usage_mode = USAGE_MODE__SIGNATURE;
 
-    #line 571 "src/compiler/Usages.pv"
+    #line 576 "src/compiler/Usages.pv"
     { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-    #line 571 "src/compiler/Usages.pv"
+    #line 576 "src/compiler/Usages.pv"
     while (Iter_ref_Parameter__next(&__iter)) {
-        #line 571 "src/compiler/Usages.pv"
+        #line 576 "src/compiler/Usages.pv"
         struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-        #line 572 "src/compiler/Usages.pv"
+        #line 577 "src/compiler/Usages.pv"
         Usages__add_type(self, &param->type, generic_map);
     } }
 
-    #line 575 "src/compiler/Usages.pv"
+    #line 580 "src/compiler/Usages.pv"
     Usages__add_type(self, &func_info->return_type, generic_map);
 
-    #line 577 "src/compiler/Usages.pv"
+    #line 582 "src/compiler/Usages.pv"
     self->usage_mode = USAGE_MODE__BODY;
 
-    #line 579 "src/compiler/Usages.pv"
+    #line 584 "src/compiler/Usages.pv"
     Usages__process_block(self, func_info->body, generic_map);
 
-    #line 581 "src/compiler/Usages.pv"
+    #line 586 "src/compiler/Usages.pv"
     self->usage_context = parent_usage_context;
-    #line 582 "src/compiler/Usages.pv"
+    #line 587 "src/compiler/Usages.pv"
     self->function_context = 0;
 }
 
-#line 585 "src/compiler/Usages.pv"
+#line 590 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map) {
-    #line 586 "src/compiler/Usages.pv"
+    #line 591 "src/compiler/Usages.pv"
     if (block == 0) {
-        #line 586 "src/compiler/Usages.pv"
+        #line 591 "src/compiler/Usages.pv"
         return;
     }
 
-    #line 588 "src/compiler/Usages.pv"
+    #line 593 "src/compiler/Usages.pv"
     { struct Iter_ref_Statement __iter = Array_Statement__iter(&block->statements);
-    #line 588 "src/compiler/Usages.pv"
+    #line 593 "src/compiler/Usages.pv"
     while (Iter_ref_Statement__next(&__iter)) {
-        #line 588 "src/compiler/Usages.pv"
+        #line 593 "src/compiler/Usages.pv"
         struct Statement* statement_iter = Iter_ref_Statement__value(&__iter);
 
-        #line 589 "src/compiler/Usages.pv"
+        #line 594 "src/compiler/Usages.pv"
         switch (statement_iter->data.type) {
-            #line 590 "src/compiler/Usages.pv"
+            #line 595 "src/compiler/Usages.pv"
             case STATEMENT_DATA__BLOCK_STATEMENT: {
-                #line 590 "src/compiler/Usages.pv"
+                #line 595 "src/compiler/Usages.pv"
                 struct Block* child_block = statement_iter->data.blockstatement_value;
-                #line 591 "src/compiler/Usages.pv"
+                #line 596 "src/compiler/Usages.pv"
                 Usages__process_block(self, child_block, generic_map);
             } break;
-            #line 593 "src/compiler/Usages.pv"
+            #line 598 "src/compiler/Usages.pv"
             case STATEMENT_DATA__LET_STATEMENT: {
-                #line 593 "src/compiler/Usages.pv"
+                #line 598 "src/compiler/Usages.pv"
                 struct LetStatement* statement = statement_iter->data.letstatement_value;
-                #line 594 "src/compiler/Usages.pv"
+                #line 599 "src/compiler/Usages.pv"
                 if (!statement->is_static) {
-                    #line 595 "src/compiler/Usages.pv"
+                    #line 600 "src/compiler/Usages.pv"
                     FunctionContext__add_variable(self->function_context, statement->name->value, statement->type);
                 }
 
-                #line 598 "src/compiler/Usages.pv"
+                #line 603 "src/compiler/Usages.pv"
                 Usages__add_type(self, statement->type, generic_map);
 
-                #line 600 "src/compiler/Usages.pv"
+                #line 605 "src/compiler/Usages.pv"
                 if (statement->value != 0) {
-                    #line 601 "src/compiler/Usages.pv"
+                    #line 606 "src/compiler/Usages.pv"
                     Usages__process_expression(self, statement->value, generic_map);
                 }
             } break;
-            #line 604 "src/compiler/Usages.pv"
+            #line 609 "src/compiler/Usages.pv"
             case STATEMENT_DATA__RETURN_STATEMENT: {
-                #line 604 "src/compiler/Usages.pv"
+                #line 609 "src/compiler/Usages.pv"
                 struct ReturnStatement* statement = statement_iter->data.returnstatement_value;
-                #line 605 "src/compiler/Usages.pv"
+                #line 610 "src/compiler/Usages.pv"
                 if (statement->expression != 0) {
-                    #line 606 "src/compiler/Usages.pv"
+                    #line 611 "src/compiler/Usages.pv"
                     Usages__process_expression(self, statement->expression, generic_map);
                 }
             } break;
-            #line 609 "src/compiler/Usages.pv"
+            #line 614 "src/compiler/Usages.pv"
             case STATEMENT_DATA__YIELD_STATEMENT: {
-                #line 609 "src/compiler/Usages.pv"
+                #line 614 "src/compiler/Usages.pv"
                 struct YieldStatement* statement = statement_iter->data.yieldstatement_value;
-                #line 610 "src/compiler/Usages.pv"
+                #line 615 "src/compiler/Usages.pv"
                 self->function_context->coroutine.yield_count += 1;
-                #line 611 "src/compiler/Usages.pv"
+                #line 616 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->expression, generic_map);
             } break;
-            #line 613 "src/compiler/Usages.pv"
+            #line 618 "src/compiler/Usages.pv"
             case STATEMENT_DATA__IF_STATEMENT: {
-                #line 613 "src/compiler/Usages.pv"
+                #line 618 "src/compiler/Usages.pv"
                 struct IfStatement* statement = statement_iter->data.ifstatement_value;
-                #line 614 "src/compiler/Usages.pv"
+                #line 619 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->expression, generic_map);
-                #line 615 "src/compiler/Usages.pv"
+                #line 620 "src/compiler/Usages.pv"
                 Usages__process_block(self, statement->block, generic_map);
 
-                #line 617 "src/compiler/Usages.pv"
+                #line 622 "src/compiler/Usages.pv"
                 { struct Iter_ref_ElseStatement __iter = Array_ElseStatement__iter(&statement->else_statements);
-                #line 617 "src/compiler/Usages.pv"
+                #line 622 "src/compiler/Usages.pv"
                 while (Iter_ref_ElseStatement__next(&__iter)) {
-                    #line 617 "src/compiler/Usages.pv"
+                    #line 622 "src/compiler/Usages.pv"
                     struct ElseStatement* else_statement = Iter_ref_ElseStatement__value(&__iter);
 
-                    #line 618 "src/compiler/Usages.pv"
+                    #line 623 "src/compiler/Usages.pv"
                     if (else_statement->expression) {
-                        #line 618 "src/compiler/Usages.pv"
+                        #line 623 "src/compiler/Usages.pv"
                         Usages__process_expression(self, else_statement->expression, generic_map);
                     }
-                    #line 619 "src/compiler/Usages.pv"
+                    #line 624 "src/compiler/Usages.pv"
                     Usages__process_block(self, else_statement->block, generic_map);
                 } }
             } break;
-            #line 622 "src/compiler/Usages.pv"
+            #line 627 "src/compiler/Usages.pv"
             case STATEMENT_DATA__MATCH_STATEMENT: {
-                #line 622 "src/compiler/Usages.pv"
+                #line 627 "src/compiler/Usages.pv"
                 struct MatchStatement* statement = statement_iter->data.matchstatement_value;
-                #line 623 "src/compiler/Usages.pv"
+                #line 628 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->expression, generic_map);
 
-                #line 625 "src/compiler/Usages.pv"
+                #line 630 "src/compiler/Usages.pv"
                 { struct Iter_ref_MatchCase __iter = Array_MatchCase__iter(&statement->cases);
-                #line 625 "src/compiler/Usages.pv"
+                #line 630 "src/compiler/Usages.pv"
                 while (Iter_ref_MatchCase__next(&__iter)) {
-                    #line 625 "src/compiler/Usages.pv"
+                    #line 630 "src/compiler/Usages.pv"
                     struct MatchCase* case_info = Iter_ref_MatchCase__value(&__iter);
 
-                    #line 626 "src/compiler/Usages.pv"
+                    #line 631 "src/compiler/Usages.pv"
                     Usages__process_block(self, case_info->body, generic_map);
                 } }
             } break;
-            #line 629 "src/compiler/Usages.pv"
+            #line 634 "src/compiler/Usages.pv"
             case STATEMENT_DATA__WHILE_STATEMENT: {
-                #line 629 "src/compiler/Usages.pv"
+                #line 634 "src/compiler/Usages.pv"
                 struct WhileStatement* statement = statement_iter->data.whilestatement_value;
-                #line 630 "src/compiler/Usages.pv"
+                #line 635 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->expression, generic_map);
-                #line 631 "src/compiler/Usages.pv"
+                #line 636 "src/compiler/Usages.pv"
                 Usages__process_block(self, statement->block, generic_map);
             } break;
-            #line 633 "src/compiler/Usages.pv"
+            #line 638 "src/compiler/Usages.pv"
             case STATEMENT_DATA__FOR_STATEMENT: {
-                #line 633 "src/compiler/Usages.pv"
+                #line 638 "src/compiler/Usages.pv"
                 struct ForStatement* statement = statement_iter->data.forstatement_value;
-                #line 634 "src/compiler/Usages.pv"
+                #line 639 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->expression, generic_map);
-                #line 635 "src/compiler/Usages.pv"
+                #line 640 "src/compiler/Usages.pv"
                 Usages__add_type(self, statement->iter_type, generic_map);
-                #line 636 "src/compiler/Usages.pv"
+                #line 641 "src/compiler/Usages.pv"
                 if (statement->value_type) {
-                    #line 637 "src/compiler/Usages.pv"
+                    #line 642 "src/compiler/Usages.pv"
                     Usages__add_type(self, statement->value_type, generic_map);
                 }
 
-                #line 640 "src/compiler/Usages.pv"
+                #line 645 "src/compiler/Usages.pv"
                 switch (statement->type.type) {
-                    #line 641 "src/compiler/Usages.pv"
+                    #line 646 "src/compiler/Usages.pv"
                     case FOR_STATEMENT_TYPE__RANGE: {
-                        #line 641 "src/compiler/Usages.pv"
+                        #line 646 "src/compiler/Usages.pv"
                         struct Expression* start = statement->type.range_value._0;
-                        #line 641 "src/compiler/Usages.pv"
+                        #line 646 "src/compiler/Usages.pv"
                         struct Expression* end = statement->type.range_value._1;
-                        #line 642 "src/compiler/Usages.pv"
+                        #line 647 "src/compiler/Usages.pv"
                         Usages__process_expression(self, start, generic_map);
-                        #line 643 "src/compiler/Usages.pv"
+                        #line 648 "src/compiler/Usages.pv"
                         Usages__process_expression(self, end, generic_map);
                     } break;
-                    #line 645 "src/compiler/Usages.pv"
+                    #line 650 "src/compiler/Usages.pv"
                     case FOR_STATEMENT_TYPE__SEQUENCE: {
-                        #line 645 "src/compiler/Usages.pv"
+                        #line 650 "src/compiler/Usages.pv"
                         struct Expression* iter_expression = statement->type.sequence_value;
-                        #line 646 "src/compiler/Usages.pv"
+                        #line 651 "src/compiler/Usages.pv"
                         Usages__process_expression(self, iter_expression, generic_map);
                     } break;
-                    #line 648 "src/compiler/Usages.pv"
+                    #line 653 "src/compiler/Usages.pv"
                     case FOR_STATEMENT_TYPE__ITER: {
-                        #line 648 "src/compiler/Usages.pv"
+                        #line 653 "src/compiler/Usages.pv"
                         struct Expression* iter_expression = statement->type.iter_value;
-                        #line 649 "src/compiler/Usages.pv"
+                        #line 654 "src/compiler/Usages.pv"
                         Usages__process_expression(self, iter_expression, generic_map);
                     } break;
                 }
 
-                #line 653 "src/compiler/Usages.pv"
+                #line 658 "src/compiler/Usages.pv"
                 Usages__process_block(self, statement->block, generic_map);
             } break;
-            #line 655 "src/compiler/Usages.pv"
+            #line 660 "src/compiler/Usages.pv"
             case STATEMENT_DATA__ASSIGNMENT_STATEMENT: {
-                #line 655 "src/compiler/Usages.pv"
+                #line 660 "src/compiler/Usages.pv"
                 struct AssignmentStatement* statement = statement_iter->data.assignmentstatement_value;
-                #line 656 "src/compiler/Usages.pv"
+                #line 661 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->left, generic_map);
-                #line 657 "src/compiler/Usages.pv"
+                #line 662 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement->right, generic_map);
             } break;
-            #line 659 "src/compiler/Usages.pv"
+            #line 664 "src/compiler/Usages.pv"
             case STATEMENT_DATA__EXPRESSION_STATEMENT: {
-                #line 659 "src/compiler/Usages.pv"
+                #line 664 "src/compiler/Usages.pv"
                 struct Expression* statement = statement_iter->data.expressionstatement_value;
-                #line 660 "src/compiler/Usages.pv"
+                #line 665 "src/compiler/Usages.pv"
                 Usages__process_expression(self, statement, generic_map);
             } break;
-            #line 662 "src/compiler/Usages.pv"
+            #line 667 "src/compiler/Usages.pv"
             case STATEMENT_DATA__CONTINUE_STATEMENT: {
             } break;
-            #line 663 "src/compiler/Usages.pv"
+            #line 668 "src/compiler/Usages.pv"
             case STATEMENT_DATA__BREAK_STATEMENT: {
             } break;
         }
     } }
 }
 
-#line 668 "src/compiler/Usages.pv"
+#line 673 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map) {
-    #line 669 "src/compiler/Usages.pv"
+    #line 674 "src/compiler/Usages.pv"
     Usages__add_type(self, &expression->return_type, generic_map);
 
-    #line 671 "src/compiler/Usages.pv"
+    #line 676 "src/compiler/Usages.pv"
     switch (expression->data.type) {
-        #line 672 "src/compiler/Usages.pv"
+        #line 677 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__ENUM_VARIANT: {
         } break;
-        #line 673 "src/compiler/Usages.pv"
+        #line 678 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 673 "src/compiler/Usages.pv"
+            #line 678 "src/compiler/Usages.pv"
             struct Expression* target = expression->data.invoke_value._0;
-            #line 673 "src/compiler/Usages.pv"
+            #line 678 "src/compiler/Usages.pv"
             struct Array_InvokeArgument arguments = expression->data.invoke_value._1;
-            #line 674 "src/compiler/Usages.pv"
+            #line 679 "src/compiler/Usages.pv"
             Usages__process_expression(self, target, generic_map);
-            #line 675 "src/compiler/Usages.pv"
+            #line 680 "src/compiler/Usages.pv"
             { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(&arguments);
-            #line 675 "src/compiler/Usages.pv"
+            #line 680 "src/compiler/Usages.pv"
             while (Iter_ref_InvokeArgument__next(&__iter)) {
-                #line 675 "src/compiler/Usages.pv"
+                #line 680 "src/compiler/Usages.pv"
                 struct InvokeArgument arg = *Iter_ref_InvokeArgument__value(&__iter);
 
-                #line 676 "src/compiler/Usages.pv"
+                #line 681 "src/compiler/Usages.pv"
                 Usages__process_expression(self, arg.value, generic_map);
             } }
 
-            #line 679 "src/compiler/Usages.pv"
+            #line 684 "src/compiler/Usages.pv"
             switch (target->return_type.type) {
-                #line 680 "src/compiler/Usages.pv"
+                #line 685 "src/compiler/Usages.pv"
                 case TYPE__FUNCTION: {
-                    #line 680 "src/compiler/Usages.pv"
+                    #line 685 "src/compiler/Usages.pv"
                     struct Function* func_info = target->return_type.function_value._0;
-                    #line 681 "src/compiler/Usages.pv"
+                    #line 686 "src/compiler/Usages.pv"
                     switch (func_info->parent.type) {
-                        #line 682 "src/compiler/Usages.pv"
+                        #line 687 "src/compiler/Usages.pv"
                         case FUNCTION_PARENT__TRAIT: {
-                            #line 683 "src/compiler/Usages.pv"
+                            #line 688 "src/compiler/Usages.pv"
                             if (arguments.length > 0) {
-                                #line 684 "src/compiler/Usages.pv"
+                                #line 689 "src/compiler/Usages.pv"
                                 struct Type* type = Type__deref(&arguments.data[0].value->return_type);
 
-                                #line 686 "src/compiler/Usages.pv"
+                                #line 691 "src/compiler/Usages.pv"
                                 switch (type->type) {
-                                    #line 687 "src/compiler/Usages.pv"
+                                    #line 692 "src/compiler/Usages.pv"
                                     case TYPE__GENERIC: {
-                                        #line 687 "src/compiler/Usages.pv"
+                                        #line 692 "src/compiler/Usages.pv"
                                         struct Generic* generic = type->generic_value;
-                                        #line 688 "src/compiler/Usages.pv"
+                                        #line 693 "src/compiler/Usages.pv"
                                         struct str name = generic->name->value;
-                                        #line 689 "src/compiler/Usages.pv"
+                                        #line 694 "src/compiler/Usages.pv"
                                         struct Type* resolved_type = GenericMap__get(generic_map, name);
-                                        #line 690 "src/compiler/Usages.pv"
+                                        #line 695 "src/compiler/Usages.pv"
                                         if (resolved_type != 0) {
-                                            #line 690 "src/compiler/Usages.pv"
+                                            #line 695 "src/compiler/Usages.pv"
                                             type = resolved_type;
                                         }
                                     } break;
-                                    #line 692 "src/compiler/Usages.pv"
+                                    #line 697 "src/compiler/Usages.pv"
                                     default: {
                                     } break;
                                 }
 
-                                #line 695 "src/compiler/Usages.pv"
+                                #line 700 "src/compiler/Usages.pv"
                                 if (Type__is_primitive_or_c_type(type)) {
-                                    #line 696 "src/compiler/Usages.pv"
+                                    #line 701 "src/compiler/Usages.pv"
                                     struct UsageContext* usage_context = self->usage_context;
-                                    #line 697 "src/compiler/Usages.pv"
+                                    #line 702 "src/compiler/Usages.pv"
                                     if (usage_context) {
-                                        #line 698 "src/compiler/Usages.pv"
+                                        #line 703 "src/compiler/Usages.pv"
                                         struct String type_name = Naming__get_type_name(&self->root->naming_decl, type, generic_map->self_type, 0);
 
-                                        #line 700 "src/compiler/Usages.pv"
+                                        #line 705 "src/compiler/Usages.pv"
                                         switch (self->usage_mode) {
-                                            #line 701 "src/compiler/Usages.pv"
+                                            #line 706 "src/compiler/Usages.pv"
                                             case USAGE_MODE__LAYOUT: {
-                                                #line 701 "src/compiler/Usages.pv"
+                                                #line 706 "src/compiler/Usages.pv"
                                                 HashMap_str_Type__insert(&usage_context->layout, String__as_str(&type_name), *type);
                                             } break;
-                                            #line 702 "src/compiler/Usages.pv"
+                                            #line 707 "src/compiler/Usages.pv"
                                             case USAGE_MODE__SIGNATURE: {
-                                                #line 702 "src/compiler/Usages.pv"
+                                                #line 707 "src/compiler/Usages.pv"
                                                 HashMap_str_Type__insert(&usage_context->signature, String__as_str(&type_name), *type);
                                             } break;
-                                            #line 703 "src/compiler/Usages.pv"
+                                            #line 708 "src/compiler/Usages.pv"
                                             case USAGE_MODE__BODY: {
-                                                #line 703 "src/compiler/Usages.pv"
+                                                #line 708 "src/compiler/Usages.pv"
                                                 HashMap_str_Type__insert(&usage_context->body, String__as_str(&type_name), *type);
                                             } break;
                                         }
@@ -1401,264 +1411,264 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                 }
                             }
                         } break;
-                        #line 709 "src/compiler/Usages.pv"
+                        #line 714 "src/compiler/Usages.pv"
                         default: {
                         } break;
                     }
                 } break;
-                #line 712 "src/compiler/Usages.pv"
+                #line 717 "src/compiler/Usages.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 715 "src/compiler/Usages.pv"
+        #line 720 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__TYPE: {
-            #line 715 "src/compiler/Usages.pv"
+            #line 720 "src/compiler/Usages.pv"
             struct Type* type = expression->data.type_value;
-            #line 715 "src/compiler/Usages.pv"
+            #line 720 "src/compiler/Usages.pv"
             Usages__add_type(self, type, generic_map);
         } break;
-        #line 716 "src/compiler/Usages.pv"
+        #line 721 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__LITERAL: {
         } break;
-        #line 717 "src/compiler/Usages.pv"
+        #line 722 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__VARIABLE: {
         } break;
-        #line 718 "src/compiler/Usages.pv"
+        #line 723 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__UNARY_EXPRESSION: {
-            #line 718 "src/compiler/Usages.pv"
+            #line 723 "src/compiler/Usages.pv"
             struct Expression* inner = expression->data.unaryexpression_value._1;
-            #line 719 "src/compiler/Usages.pv"
+            #line 724 "src/compiler/Usages.pv"
             Usages__process_expression(self, inner, generic_map);
         } break;
-        #line 721 "src/compiler/Usages.pv"
+        #line 726 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 721 "src/compiler/Usages.pv"
+            #line 726 "src/compiler/Usages.pv"
             struct Expression* left = expression->data.binaryexpression_value._0;
-            #line 721 "src/compiler/Usages.pv"
+            #line 726 "src/compiler/Usages.pv"
             struct Expression* right = expression->data.binaryexpression_value._2;
-            #line 722 "src/compiler/Usages.pv"
+            #line 727 "src/compiler/Usages.pv"
             Usages__process_expression(self, left, generic_map);
-            #line 723 "src/compiler/Usages.pv"
+            #line 728 "src/compiler/Usages.pv"
             Usages__process_expression(self, right, generic_map);
         } break;
-        #line 725 "src/compiler/Usages.pv"
+        #line 730 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION: {
-            #line 725 "src/compiler/Usages.pv"
-            struct Expression* inner = expression->data.memberstaticexpression_value._0;
-            #line 726 "src/compiler/Usages.pv"
-            Usages__add_type(self, Type__deref(&inner->return_type), generic_map);
-            #line 727 "src/compiler/Usages.pv"
-            Usages__process_expression(self, inner, generic_map);
-        } break;
-        #line 729 "src/compiler/Usages.pv"
-        case EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION: {
-            #line 729 "src/compiler/Usages.pv"
-            struct Expression* inner = expression->data.memberinstanceexpression_value._0;
             #line 730 "src/compiler/Usages.pv"
-            Usages__add_type(self, Type__deref(&inner->return_type), generic_map);
+            struct Expression* inner = expression->data.memberstaticexpression_value._0;
             #line 731 "src/compiler/Usages.pv"
+            Usages__add_type(self, Type__deref(&inner->return_type), generic_map);
+            #line 732 "src/compiler/Usages.pv"
             Usages__process_expression(self, inner, generic_map);
         } break;
-        #line 733 "src/compiler/Usages.pv"
-        case EXPRESSION_DATA__INDEX_EXPRESSION: {
-            #line 733 "src/compiler/Usages.pv"
-            struct Expression* inner = expression->data.indexexpression_value._0;
-            #line 733 "src/compiler/Usages.pv"
-            struct Expression* index = expression->data.indexexpression_value._1;
+        #line 734 "src/compiler/Usages.pv"
+        case EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION: {
             #line 734 "src/compiler/Usages.pv"
-            Usages__process_expression(self, inner, generic_map);
+            struct Expression* inner = expression->data.memberinstanceexpression_value._0;
             #line 735 "src/compiler/Usages.pv"
+            Usages__add_type(self, Type__deref(&inner->return_type), generic_map);
+            #line 736 "src/compiler/Usages.pv"
+            Usages__process_expression(self, inner, generic_map);
+        } break;
+        #line 738 "src/compiler/Usages.pv"
+        case EXPRESSION_DATA__INDEX_EXPRESSION: {
+            #line 738 "src/compiler/Usages.pv"
+            struct Expression* inner = expression->data.indexexpression_value._0;
+            #line 738 "src/compiler/Usages.pv"
+            struct Expression* index = expression->data.indexexpression_value._1;
+            #line 739 "src/compiler/Usages.pv"
+            Usages__process_expression(self, inner, generic_map);
+            #line 740 "src/compiler/Usages.pv"
             Usages__process_expression(self, index, generic_map);
         } break;
-        #line 737 "src/compiler/Usages.pv"
+        #line 742 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 737 "src/compiler/Usages.pv"
+            #line 742 "src/compiler/Usages.pv"
             struct Expression* inner = expression->data.parenthesizedexpression_value;
-            #line 738 "src/compiler/Usages.pv"
+            #line 743 "src/compiler/Usages.pv"
             Usages__process_expression(self, inner, generic_map);
         } break;
-        #line 740 "src/compiler/Usages.pv"
+        #line 745 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__IF_EXPRESSION: {
-            #line 740 "src/compiler/Usages.pv"
+            #line 745 "src/compiler/Usages.pv"
             struct Expression* cond = expression->data.ifexpression_value._0;
-            #line 740 "src/compiler/Usages.pv"
+            #line 745 "src/compiler/Usages.pv"
             struct Expression* a = expression->data.ifexpression_value._1;
-            #line 740 "src/compiler/Usages.pv"
+            #line 745 "src/compiler/Usages.pv"
             struct Expression* b = expression->data.ifexpression_value._2;
-            #line 741 "src/compiler/Usages.pv"
+            #line 746 "src/compiler/Usages.pv"
             Usages__process_expression(self, cond, generic_map);
-            #line 742 "src/compiler/Usages.pv"
+            #line 747 "src/compiler/Usages.pv"
             Usages__process_expression(self, a, generic_map);
-            #line 743 "src/compiler/Usages.pv"
+            #line 748 "src/compiler/Usages.pv"
             Usages__process_expression(self, b, generic_map);
         } break;
-        #line 745 "src/compiler/Usages.pv"
+        #line 750 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__CPP_EXPRESSION: {
-            #line 745 "src/compiler/Usages.pv"
+            #line 750 "src/compiler/Usages.pv"
             struct CppExpression cpp_expression = expression->data.cppexpression_value;
-            #line 746 "src/compiler/Usages.pv"
+            #line 751 "src/compiler/Usages.pv"
             switch (cpp_expression.type) {
-                #line 747 "src/compiler/Usages.pv"
+                #line 752 "src/compiler/Usages.pv"
                 case CPP_EXPRESSION__NEW: {
-                    #line 747 "src/compiler/Usages.pv"
+                    #line 752 "src/compiler/Usages.pv"
                     struct Expression* placement = cpp_expression.new_value._0;
-                    #line 747 "src/compiler/Usages.pv"
+                    #line 752 "src/compiler/Usages.pv"
                     struct Expression* new_expression = cpp_expression.new_value._1;
-                    #line 748 "src/compiler/Usages.pv"
+                    #line 753 "src/compiler/Usages.pv"
                     if (placement != 0) {
-                        #line 748 "src/compiler/Usages.pv"
+                        #line 753 "src/compiler/Usages.pv"
                         Usages__process_expression(self, placement, generic_map);
                     }
-                    #line 749 "src/compiler/Usages.pv"
+                    #line 754 "src/compiler/Usages.pv"
                     Usages__process_expression(self, new_expression, generic_map);
                 } break;
-                #line 751 "src/compiler/Usages.pv"
+                #line 756 "src/compiler/Usages.pv"
                 case CPP_EXPRESSION__DELETE: {
-                    #line 751 "src/compiler/Usages.pv"
+                    #line 756 "src/compiler/Usages.pv"
                     struct Expression* delete_expression = cpp_expression.delete_value;
-                    #line 752 "src/compiler/Usages.pv"
+                    #line 757 "src/compiler/Usages.pv"
                     Usages__process_expression(self, delete_expression, generic_map);
                 } break;
             }
         } break;
-        #line 756 "src/compiler/Usages.pv"
+        #line 761 "src/compiler/Usages.pv"
         case EXPRESSION_DATA__IMPLICIT_CAST: {
-            #line 756 "src/compiler/Usages.pv"
+            #line 761 "src/compiler/Usages.pv"
             struct Expression* inner = expression->data.implicitcast_value;
-            #line 757 "src/compiler/Usages.pv"
+            #line 762 "src/compiler/Usages.pv"
             Usages__process_expression(self, inner, generic_map);
 
-            #line 759 "src/compiler/Usages.pv"
+            #line 764 "src/compiler/Usages.pv"
             switch (expression->return_type.type) {
-                #line 760 "src/compiler/Usages.pv"
+                #line 765 "src/compiler/Usages.pv"
                 case TYPE__STRUCT: {
-                    #line 760 "src/compiler/Usages.pv"
+                    #line 765 "src/compiler/Usages.pv"
                     struct Struct* struct_info = expression->return_type.struct_value._0;
-                    #line 761 "src/compiler/Usages.pv"
+                    #line 766 "src/compiler/Usages.pv"
                     if (str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
-                        #line 762 "src/compiler/Usages.pv"
+                        #line 767 "src/compiler/Usages.pv"
                         HashSet_str__insert(&self->usage_context->primitive_code, (struct str){ .ptr = "str", .length = strlen("str") });
                     }
                 } break;
-                #line 765 "src/compiler/Usages.pv"
+                #line 770 "src/compiler/Usages.pv"
                 default: {
                 } break;
             }
 
-            #line 768 "src/compiler/Usages.pv"
+            #line 773 "src/compiler/Usages.pv"
             struct Type* return_type = Type__deref(Context__resolve_type(self->allocator, &inner->return_type, generic_map, 0));
-            #line 769 "src/compiler/Usages.pv"
+            #line 774 "src/compiler/Usages.pv"
             switch (return_type->type) {
-                #line 770 "src/compiler/Usages.pv"
+                #line 775 "src/compiler/Usages.pv"
                 case TYPE__FUNCTION: {
-                    #line 770 "src/compiler/Usages.pv"
+                    #line 775 "src/compiler/Usages.pv"
                     struct Function* func_info = return_type->function_value._0;
-                    #line 771 "src/compiler/Usages.pv"
+                    #line 776 "src/compiler/Usages.pv"
                     uintptr_t func_ptr = (uintptr_t)(func_info);
 
-                    #line 773 "src/compiler/Usages.pv"
+                    #line 778 "src/compiler/Usages.pv"
                     switch (func_info->parent.type) {
-                        #line 774 "src/compiler/Usages.pv"
+                        #line 779 "src/compiler/Usages.pv"
                         case FUNCTION_PARENT__NONE: {
-                            #line 775 "src/compiler/Usages.pv"
+                            #line 780 "src/compiler/Usages.pv"
                             struct TypeFunctionUsage* usage = HashMap_usize_TypeFunctionUsage__find(&self->functions, &func_ptr);
-                            #line 776 "src/compiler/Usages.pv"
+                            #line 781 "src/compiler/Usages.pv"
                             usage->impl_dynamic_function = true;
                         } break;
-                        #line 778 "src/compiler/Usages.pv"
+                        #line 783 "src/compiler/Usages.pv"
                         case FUNCTION_PARENT__PRIMITIVE: {
-                            #line 778 "src/compiler/Usages.pv"
-                            struct Primitive* primitive_info = func_info->parent.primitive_value._0;
-                            #line 778 "src/compiler/Usages.pv"
-                            uintptr_t impl_index = func_info->parent.primitive_value._1;
-                            #line 779 "src/compiler/Usages.pv"
-                            uintptr_t parent_ptr = (uintptr_t)(primitive_info);
-                            #line 780 "src/compiler/Usages.pv"
-                            struct TypeUsage_Primitive* parent_usage = HashMap_usize_TypeUsage_Primitive__find(&self->primitives, &parent_ptr);
-                            #line 781 "src/compiler/Usages.pv"
-                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                            #line 782 "src/compiler/Usages.pv"
-                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
                             #line 783 "src/compiler/Usages.pv"
-                            impl_function->impl_dynamic_function = true;
-                        } break;
-                        #line 785 "src/compiler/Usages.pv"
-                        case FUNCTION_PARENT__STRUCT: {
+                            struct Primitive* primitive_info = func_info->parent.primitive_value._0;
+                            #line 783 "src/compiler/Usages.pv"
+                            uintptr_t impl_index = func_info->parent.primitive_value._1;
+                            #line 784 "src/compiler/Usages.pv"
+                            uintptr_t parent_ptr = (uintptr_t)(primitive_info);
                             #line 785 "src/compiler/Usages.pv"
-                            struct Struct* struct_info = func_info->parent.struct_value._0;
-                            #line 785 "src/compiler/Usages.pv"
-                            uintptr_t impl_index = func_info->parent.struct_value._1;
+                            struct TypeUsage_Primitive* parent_usage = HashMap_usize_TypeUsage_Primitive__find(&self->primitives, &parent_ptr);
                             #line 786 "src/compiler/Usages.pv"
-                            uintptr_t parent_ptr = (uintptr_t)(struct_info);
+                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
                             #line 787 "src/compiler/Usages.pv"
-                            struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
+                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
                             #line 788 "src/compiler/Usages.pv"
-                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                            #line 789 "src/compiler/Usages.pv"
-                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
+                            impl_function->impl_dynamic_function = true;
+                        } break;
+                        #line 790 "src/compiler/Usages.pv"
+                        case FUNCTION_PARENT__STRUCT: {
                             #line 790 "src/compiler/Usages.pv"
-                            impl_function->impl_dynamic_function = true;
-                        } break;
-                        #line 792 "src/compiler/Usages.pv"
-                        case FUNCTION_PARENT__ENUM: {
+                            struct Struct* struct_info = func_info->parent.struct_value._0;
+                            #line 790 "src/compiler/Usages.pv"
+                            uintptr_t impl_index = func_info->parent.struct_value._1;
+                            #line 791 "src/compiler/Usages.pv"
+                            uintptr_t parent_ptr = (uintptr_t)(struct_info);
                             #line 792 "src/compiler/Usages.pv"
-                            struct Enum* enum_info = func_info->parent.enum_value._0;
-                            #line 792 "src/compiler/Usages.pv"
-                            uintptr_t impl_index = func_info->parent.enum_value._1;
+                            struct TypeUsage_Struct* parent_usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &parent_ptr);
                             #line 793 "src/compiler/Usages.pv"
-                            uintptr_t parent_ptr = (uintptr_t)(enum_info);
-                            #line 794 "src/compiler/Usages.pv"
-                            struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
-                            #line 795 "src/compiler/Usages.pv"
                             struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                            #line 796 "src/compiler/Usages.pv"
+                            #line 794 "src/compiler/Usages.pv"
                             struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
-                            #line 797 "src/compiler/Usages.pv"
+                            #line 795 "src/compiler/Usages.pv"
                             impl_function->impl_dynamic_function = true;
                         } break;
-                        #line 799 "src/compiler/Usages.pv"
+                        #line 797 "src/compiler/Usages.pv"
+                        case FUNCTION_PARENT__ENUM: {
+                            #line 797 "src/compiler/Usages.pv"
+                            struct Enum* enum_info = func_info->parent.enum_value._0;
+                            #line 797 "src/compiler/Usages.pv"
+                            uintptr_t impl_index = func_info->parent.enum_value._1;
+                            #line 798 "src/compiler/Usages.pv"
+                            uintptr_t parent_ptr = (uintptr_t)(enum_info);
+                            #line 799 "src/compiler/Usages.pv"
+                            struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
+                            #line 800 "src/compiler/Usages.pv"
+                            struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
+                            #line 801 "src/compiler/Usages.pv"
+                            struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
+                            #line 802 "src/compiler/Usages.pv"
+                            impl_function->impl_dynamic_function = true;
+                        } break;
+                        #line 804 "src/compiler/Usages.pv"
                         default: {
                         } break;
                     }
                 } break;
-                #line 802 "src/compiler/Usages.pv"
+                #line 807 "src/compiler/Usages.pv"
                 case TYPE__STRUCT: {
-                    #line 802 "src/compiler/Usages.pv"
+                    #line 807 "src/compiler/Usages.pv"
                     struct Struct* struct_info = return_type->struct_value._0;
-                    #line 803 "src/compiler/Usages.pv"
+                    #line 808 "src/compiler/Usages.pv"
                     switch (expression->return_type.type) {
-                        #line 804 "src/compiler/Usages.pv"
+                        #line 809 "src/compiler/Usages.pv"
                         case TYPE__INDIRECT: {
-                            #line 804 "src/compiler/Usages.pv"
+                            #line 809 "src/compiler/Usages.pv"
                             struct Indirect* indirect = expression->return_type.indirect_value;
-                            #line 805 "src/compiler/Usages.pv"
+                            #line 810 "src/compiler/Usages.pv"
                             switch (indirect->to.type) {
-                                #line 806 "src/compiler/Usages.pv"
+                                #line 811 "src/compiler/Usages.pv"
                                 case TYPE__TRAIT: {
-                                    #line 806 "src/compiler/Usages.pv"
+                                    #line 811 "src/compiler/Usages.pv"
                                     struct Trait* trait_info = indirect->to.trait_value._0;
-                                    #line 807 "src/compiler/Usages.pv"
+                                    #line 812 "src/compiler/Usages.pv"
                                     if (str__eq(trait_info->name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
-                                        #line 808 "src/compiler/Usages.pv"
+                                        #line 813 "src/compiler/Usages.pv"
                                         uintptr_t ptr = (uintptr_t)(struct_info);
-                                        #line 809 "src/compiler/Usages.pv"
+                                        #line 814 "src/compiler/Usages.pv"
                                         struct TypeUsage_Struct* usage = HashMap_usize_TypeUsage_Struct__find(&self->structs, &ptr);
-                                        #line 810 "src/compiler/Usages.pv"
+                                        #line 815 "src/compiler/Usages.pv"
                                         usage->impl_dynamic_usage = true;
                                     }
                                 } break;
-                                #line 813 "src/compiler/Usages.pv"
+                                #line 818 "src/compiler/Usages.pv"
                                 default: {
                                 } break;
                             }
                         } break;
-                        #line 816 "src/compiler/Usages.pv"
+                        #line 821 "src/compiler/Usages.pv"
                         default: {
                         } break;
                     }
                 } break;
-                #line 819 "src/compiler/Usages.pv"
+                #line 824 "src/compiler/Usages.pv"
                 default: {
                 } break;
             }
@@ -1666,64 +1676,64 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
     }
 }
 
-#line 825 "src/compiler/Usages.pv"
+#line 830 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self) {
-    #line 826 "src/compiler/Usages.pv"
+    #line 831 "src/compiler/Usages.pv"
     { struct Iter_ref_Type __iter = Array_Type__iter(&self->usages);
-    #line 826 "src/compiler/Usages.pv"
+    #line 831 "src/compiler/Usages.pv"
     while (Iter_ref_Type__next(&__iter)) {
-        #line 826 "src/compiler/Usages.pv"
+        #line 831 "src/compiler/Usages.pv"
         struct Type* usage = Iter_ref_Type__value(&__iter);
 
-        #line 827 "src/compiler/Usages.pv"
+        #line 832 "src/compiler/Usages.pv"
         switch (usage->type) {
-            #line 828 "src/compiler/Usages.pv"
+            #line 833 "src/compiler/Usages.pv"
             case TYPE__FUNCTION: {
-                #line 828 "src/compiler/Usages.pv"
+                #line 833 "src/compiler/Usages.pv"
                 struct Function* func_info = usage->function_value._0;
-                #line 828 "src/compiler/Usages.pv"
+                #line 833 "src/compiler/Usages.pv"
                 struct GenericMap* generic_map = usage->function_value._1;
-                #line 829 "src/compiler/Usages.pv"
+                #line 834 "src/compiler/Usages.pv"
                 if (func_info->type == FUNCTION_TYPE__BUILTIN) {
-                    #line 829 "src/compiler/Usages.pv"
+                    #line 834 "src/compiler/Usages.pv"
                     continue;
                 }
 
-                #line 831 "src/compiler/Usages.pv"
+                #line 836 "src/compiler/Usages.pv"
                 uintptr_t func_ptr = (uintptr_t)(func_info);
 
-                #line 833 "src/compiler/Usages.pv"
+                #line 838 "src/compiler/Usages.pv"
                 switch (func_info->parent.type) {
-                    #line 834 "src/compiler/Usages.pv"
+                    #line 839 "src/compiler/Usages.pv"
                     case FUNCTION_PARENT__ENUM: {
-                        #line 834 "src/compiler/Usages.pv"
+                        #line 839 "src/compiler/Usages.pv"
                         struct Enum* enum_info = func_info->parent.enum_value._0;
-                        #line 834 "src/compiler/Usages.pv"
+                        #line 839 "src/compiler/Usages.pv"
                         uintptr_t impl_index = func_info->parent.enum_value._1;
-                        #line 835 "src/compiler/Usages.pv"
+                        #line 840 "src/compiler/Usages.pv"
                         uintptr_t parent_ptr = (uintptr_t)(enum_info);
-                        #line 836 "src/compiler/Usages.pv"
+                        #line 841 "src/compiler/Usages.pv"
                         struct TypeUsage_Enum* parent_usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &parent_ptr);
-                        #line 837 "src/compiler/Usages.pv"
+                        #line 842 "src/compiler/Usages.pv"
                         if (parent_usage == 0) {
-                            #line 837 "src/compiler/Usages.pv"
+                            #line 842 "src/compiler/Usages.pv"
                             fprintf(stderr, "Could not find parent usage\n");
                         }
 
-                        #line 839 "src/compiler/Usages.pv"
+                        #line 844 "src/compiler/Usages.pv"
                         struct HashMap_usize_TypeFunctionUsage* impl_functions = Array_HashMap_usize_TypeFunctionUsage__get(&parent_usage->impl_functions, impl_index);
-                        #line 840 "src/compiler/Usages.pv"
+                        #line 845 "src/compiler/Usages.pv"
                         struct TypeFunctionUsage* impl_function = HashMap_usize_TypeFunctionUsage__find(impl_functions, &func_ptr);
 
-                        #line 842 "src/compiler/Usages.pv"
+                        #line 847 "src/compiler/Usages.pv"
                         TypeFunctionUsage__add_usage(impl_function, generic_map);
                     } break;
-                    #line 844 "src/compiler/Usages.pv"
+                    #line 849 "src/compiler/Usages.pv"
                     default: {
                     } break;
                 }
             } break;
-            #line 847 "src/compiler/Usages.pv"
+            #line 852 "src/compiler/Usages.pv"
             default: {
             } break;
         }

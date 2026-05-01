@@ -69,6 +69,14 @@ impl IncludeWriter {
                                 if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                             }
                         },
+                        Type::StructC(_) => {
+                            let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
+                            if self.type_declarations.insert(name.as_str()) { type_declarations.insert(name.as_str()); }
+                        },
+                        Type::EnumC(_) => {
+                            let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
+                            if self.type_declarations.insert(name.as_str()) { type_declarations.insert(name.as_str()); }
+                        },
                         _ => {},
                     }
                 },
