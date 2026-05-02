@@ -2,6 +2,19 @@ use std
 use types
 
 struct UnknownC {
+    include: &Include,
     name: str,
     generics: Array<Type>,
+}
+
+impl UnknownC {
+    fn new(include: &Include, name: *const char) -> &Self {
+        let allocator = include.root.allocator;
+
+        return allocator.store(Self {
+            include,
+            name: name,
+            generics: Array<Type>::new(allocator),
+        });
+    }
 }

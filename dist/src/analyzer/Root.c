@@ -1,5 +1,5 @@
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -102,7 +102,7 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     #line 71 "src/analyzer/Root.pv"
     self->type_bool = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = self->primitive_bool };
     #line 72 "src/analyzer/Root.pv"
-    struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(allocator, (struct UnknownC) { .name = (struct str){ .ptr = "unknown", .length = strlen("unknown") }, .generics = (struct Array_Type) {} });
+    struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(allocator, (struct UnknownC) { .include = 0, .name = (struct str){ .ptr = "unknown", .length = strlen("unknown") }, .generics = (struct Array_Type) {} });
     #line 73 "src/analyzer/Root.pv"
     self->type_unknown = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c };
     #line 74 "src/analyzer/Root.pv"

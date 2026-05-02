@@ -7,8 +7,8 @@
 #include <analyzer/Scope.h>
 #include <analyzer/Block.h>
 #include <analyzer/TokenType.h>
-#include <analyzer/statement/DeferStatement.h>
 #include <analyzer/types/Generics.h>
+#include <analyzer/statement/DeferStatement.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/statement/DeferStatement.h>

@@ -3,10 +3,10 @@
 #include <string.h>
 #include <std/HashMap_usize_TypeUsage_Sequence.h>
 #include <std/HashMapBucket_usize_TypeUsage_Sequence.h>
-#include <compiler/TypeUsage_Sequence.h>
 #include <std/Hashed.h>
 #include <std/trait_Hash.h>
 #include <usize.h>
+#include <compiler/TypeUsage_Sequence.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_usize_TypeUsage_Sequence.h>
 #include <std/HashMap_usize_TypeUsage_Sequence.h>

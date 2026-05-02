@@ -23,6 +23,7 @@
 #include <std/str.h>
 #include <std/Range_usize.h>
 #include <analyzer/Token.h>
+#include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <analyzer/Module.h>
 #include <analyzer/types/Type.h>

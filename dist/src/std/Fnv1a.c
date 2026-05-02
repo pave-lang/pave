@@ -9,9 +9,9 @@
 #line 5 "src/std/Hash.pv"
 Hashed Fnv1a__hash(void const* value, uintptr_t size) {
     #line 6 "src/std/Hash.pv"
-    uint64_t fnv_prime = 1099511628211ULL;
+    uint64_t fnv_prime = 1099511628211u;
     #line 7 "src/std/Hash.pv"
-    uint64_t fnv_offset_basis = 14695981039346656037ULL;
+    uint64_t fnv_offset_basis = 14695981039346656037u;
 
     #line 9 "src/std/Hash.pv"
     uint64_t result = fnv_offset_basis;
@@ -38,7 +38,7 @@ Hashed Fnv1a__hash(void const* value, uintptr_t size) {
 #line 23 "src/std/Hash.pv"
 Hashed Fnv1a__continue_with(Hashed hash, void const* value, uintptr_t size) {
     #line 24 "src/std/Hash.pv"
-    uint64_t fnv_prime = 1099511628211ULL;
+    uint64_t fnv_prime = 1099511628211u;
 
     #line 26 "src/std/Hash.pv"
     uint64_t result = hash;

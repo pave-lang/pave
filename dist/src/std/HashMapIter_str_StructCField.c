@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_str_StructCField.h>
 #include <std/HashMapIter_str_StructCField.h>
 #include <tuple_str_StructCField.h>

@@ -9,13 +9,12 @@
 #include <analyzer/Module.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/Root.h>
-#include <analyzer/Token.h>
 #include <std/Array_Token.h>
+#include <analyzer/Token.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/TokenType.h>
-#include <analyzer/Block.h>
 #include <analyzer/types/Generic.h>
 #include <std/Array_Generic.h>
 #include <std/Array_Parameter.h>
@@ -38,6 +37,7 @@
 #include <std/Array_InlayHint.h>
 #include <analyzer/InlayHint.h>
 #include <analyzer/InlayHintKind.h>
+#include <analyzer/Block.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/types/Tuple.h>
@@ -56,6 +56,7 @@
 #include <analyzer/statement/DeferStatement.h>
 #include <std/Array_ref_Trait.h>
 #include <std/Iter_ref_ref_Trait.h>
+#include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <analyzer/Context.h>
 
@@ -852,7 +853,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 505 "src/analyzer/Context.pv"
         Context__error_token(self, name, "Unknown type");
         #line 506 "src/analyzer/Context.pv"
-        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(self->allocator, (struct UnknownC) { .name = name->value, .generics = generics_ });
+        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(self->allocator, (struct UnknownC) { .include = 0, .name = name->value, .generics = generics_ });
         #line 507 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c };
         #line 508 "src/analyzer/Context.pv"

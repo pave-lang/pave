@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_str_ref_Module.h>
 #include <std/HashMapIter_str_ref_Module.h>
 #include <tuple_str_ref_Module.h>

@@ -69,7 +69,7 @@ impl Root {
         self.primitive_void = self.add_primitive("void");
         self.type_void = Type::Primitive(self.primitive_void);
         self.type_bool = Type::Primitive(self.primitive_bool);
-        let unknown_c = allocator.store(UnknownC { name: "unknown", generics: Array<Type> {} });
+        let unknown_c = allocator.store(UnknownC { include: 0, name: "unknown", generics: Array<Type> {} });
         self.type_unknown = Type::UnknownC(unknown_c);
         self.type_self = Type::Self;
         self.type_ref_self = Type::Indirect(Indirect::new_reference(self.allocator, self.type_self));

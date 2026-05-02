@@ -3,10 +3,10 @@
 #include <string.h>
 #include <std/HashMap_str_Function.h>
 #include <std/HashMapBucket_str_Function.h>
-#include <analyzer/types/Function.h>
 #include <std/Hashed.h>
 #include <std/trait_Hash.h>
 #include <std/str.h>
+#include <analyzer/types/Function.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_Function.h>
 #include <std/HashMap_str_Function.h>

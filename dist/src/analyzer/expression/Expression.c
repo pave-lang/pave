@@ -26,9 +26,9 @@
 #include <analyzer/types/Struct.h>
 #include <analyzer/Root.h>
 #include <analyzer/types/FunctionParent.h>
-#include <analyzer/types/Trait.h>
 #include <std/trait_Allocator.h>
 #include <std/HashMap_str_Function.h>
+#include <analyzer/types/Trait.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/StructCField.h>
 #include <std/HashMap_str_StructCField.h>
@@ -1907,7 +1907,7 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
     #line 929 "src/analyzer/expression/Expression.pv"
     if (element_type == 0 && context->module->mode_cpp) {
         #line 930 "src/analyzer/expression/Expression.pv"
-        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(context->allocator, (struct UnknownC) { .name = (struct str){ .ptr = "", .length = strlen("") }, .generics = (struct Array_Type) {} });
+        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(context->allocator, (struct UnknownC) { .include = 0, .name = (struct str){ .ptr = "", .length = strlen("") }, .generics = (struct Array_Type) {} });
         #line 931 "src/analyzer/expression/Expression.pv"
         element_type = Type__to_ptr(&(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c }, context->allocator);
     }
@@ -3022,9 +3022,6 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
         #line 1519 "src/analyzer/expression/Expression.pv"
         return false;
     }
-
-    #line 1522 "src/analyzer/expression/Expression.pv"
-    self->return_type = *type;
     #line 1523 "src/analyzer/expression/Expression.pv"
     return true;
 }

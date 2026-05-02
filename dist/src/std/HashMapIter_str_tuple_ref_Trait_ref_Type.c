@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_str_tuple_ref_Trait_ref_Type.h>
 #include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
 #include <tuple_str_tuple_ref_Trait_ref_Type.h>

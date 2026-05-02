@@ -927,7 +927,7 @@ impl Expression {
         }
 
         if element_type == 0 && context.module.mode_cpp {
-            let unknown_c = context.allocator.store(UnknownC { name: "", generics: Array<Type> {} });
+            let unknown_c = context.allocator.store(UnknownC { include: 0, name: "", generics: Array<Type> {} });
             element_type = Type::UnknownC(unknown_c).to_ptr(context.allocator);
         }
 
@@ -1519,7 +1519,7 @@ impl Expression {
             return false;
         }
         
-        self.return_type = *type;
+        // self.return_type = *type;
         return true;
     }
 

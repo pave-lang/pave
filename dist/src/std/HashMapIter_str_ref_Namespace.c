@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_str_ref_Namespace.h>
 #include <std/HashMapIter_str_ref_Namespace.h>
 #include <tuple_str_ref_Namespace.h>

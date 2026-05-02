@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_str_bool.h>
 #include <std/HashMapIter_str_bool.h>
 #include <tuple_str_bool.h>

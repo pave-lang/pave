@@ -320,6 +320,7 @@ impl Usages {
             Type::StructC(struct_c) => { is_type = !struct_c.include.mode_cpp; },
             Type::UnionC(union_c) => { is_type = !union_c.include.mode_cpp; },
             Type::EnumC(enum_c) => { is_type = !enum_c.include.mode_cpp; },
+            Type::UnknownC(unknown_c) => { is_type = unknown_c.include != 0 && !unknown_c.include.mode_cpp; },
             Type::FunctionC(function_c) => { is_type = !function_c.include.mode_cpp; },
             Type::TypedefC(typedef_c) => { is_type = !typedef_c.include.mode_cpp; },
             Type::ClassCpp(class_info) => {

@@ -3,10 +3,10 @@
 #include <string.h>
 #include <std/HashMap_u32_Type.h>
 #include <std/HashMapBucket_u32_Type.h>
-#include <analyzer/types/Type.h>
 #include <std/Hashed.h>
 #include <std/trait_Hash.h>
 #include <u32.h>
+#include <analyzer/types/Type.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_u32_Type.h>
 #include <std/HashMap_u32_Type.h>

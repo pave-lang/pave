@@ -3,8 +3,8 @@ struct Hashed(u64);
 struct Fnv1a;
 impl Fnv1a {
     fn hash(value: *const void, size: usize) -> Hashed {
-        let fnv_prime: u64 = 1099511628211;
-        let fnv_offset_basis: u64 = 14695981039346656037;
+        let fnv_prime: u64 = 1099511628211u;
+        let fnv_offset_basis: u64 = 14695981039346656037u;
         
         let result = fnv_offset_basis;
 
@@ -21,7 +21,7 @@ impl Fnv1a {
     }
 
     fn continue_with(hash: Hashed, value: *const void, size: usize) -> Hashed {
-        let fnv_prime: u64 = 1099511628211;
+        let fnv_prime: u64 = 1099511628211u;
         
         let result = hash._0; 
 

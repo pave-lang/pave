@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashSetBucket_str.h>
 #include <std/HashSetIter_str.h>
 #include <std/str.h>

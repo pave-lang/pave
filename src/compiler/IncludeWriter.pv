@@ -116,6 +116,9 @@ impl IncludeWriter {
                 Type::ClassCpp(info) => {
                     if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                 },
+                Type::UnknownC(info) => {
+                    if info.include != 0 && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                },
                 _ => {
                     let name = generator.naming_ident.get_type_name(resolved, generics.self_type, generics);
                     let module = resolved.get_module();

@@ -71,37 +71,37 @@ void Usages__add_module(struct Usages* self, struct Module* module);
 #line 259 "src/compiler/Usages.pv"
 void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap* generic_map);
 
-#line 358 "src/compiler/Usages.pv"
+#line 359 "src/compiler/Usages.pv"
 void Usages__process_impls(struct Usages* self, struct Array_ref_Impl* impls, struct GenericMap* generic_map);
 
-#line 381 "src/compiler/Usages.pv"
+#line 382 "src/compiler/Usages.pv"
 void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_info);
 
-#line 394 "src/compiler/Usages.pv"
+#line 395 "src/compiler/Usages.pv"
 void Usages__process_sequence(struct Usages* self, struct Sequence* sequence);
 
-#line 424 "src/compiler/Usages.pv"
+#line 425 "src/compiler/Usages.pv"
 void Usages__process_tuple(struct Usages* self, struct Tuple* tuple);
 
-#line 450 "src/compiler/Usages.pv"
+#line 451 "src/compiler/Usages.pv"
 void Usages__process_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 482 "src/compiler/Usages.pv"
+#line 483 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 500 "src/compiler/Usages.pv"
+#line 501 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map);
 
-#line 512 "src/compiler/Usages.pv"
+#line 513 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 590 "src/compiler/Usages.pv"
+#line 591 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 673 "src/compiler/Usages.pv"
+#line 674 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 830 "src/compiler/Usages.pv"
+#line 831 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

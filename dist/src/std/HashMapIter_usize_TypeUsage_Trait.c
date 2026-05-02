@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_usize_TypeUsage_Trait.h>
 #include <std/HashMapIter_usize_TypeUsage_Trait.h>
 #include <tuple_usize_TypeUsage_Trait.h>

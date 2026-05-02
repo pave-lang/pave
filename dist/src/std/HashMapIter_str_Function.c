@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <std/HashMapBucket_str_Function.h>
 #include <std/HashMapIter_str_Function.h>
 #include <tuple_str_Function.h>

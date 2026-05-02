@@ -503,7 +503,7 @@ impl Context {
         let new_type = self.module.find_make_type(name.value, &generics_);
         if new_type == 0 {
             self.error_token(name, "Unknown type");
-            let unknown_c = self.allocator.store(UnknownC { name: name.value, generics: generics_ });
+            let unknown_c = self.allocator.store(UnknownC { include: 0, name: name.value, generics: generics_ });
             *type = Type::UnknownC(unknown_c);
             return false;
         }

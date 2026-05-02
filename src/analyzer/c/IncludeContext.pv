@@ -33,13 +33,14 @@ impl IncludeContext {
 
         let cursor_return_type = clang_getCursorResultType(cursor);
         let return_type = include.parse_type(cursor_return_type);
-        if return_type == 0 { return_type = &include.root.type_unknown; }
+        if return_type == 0 { return_type = include.root.allocator.store(Type::UnknownC(UnknownC::new(include, ""))); }
 
         self.insert_function(name, return_type);
     }
 
     fn add_basic_function(&self, name: *const char) {
-        self.insert_function(name, &self.include.root.type_unknown);
+        let include = self.include;
+        self.insert_function(name, include.root.allocator.store(Type::UnknownC(UnknownC::new(include, ""))));
     }
 
     fn add_struct(&self, name: *const char) -> &StructC {
@@ -162,7 +163,7 @@ impl IncludeContext {
 
     fn add_typedef_function_pointer(&self, name: *const char) -> &FunctionC {
         let include = self.include;
-        let func_info = FunctionC::new(include, name, &include.root.type_unknown);
+        let func_info = FunctionC::new(include, name, include.root.allocator.store(Type::UnknownC(UnknownC::new(include, ""))));
         let indirect = Indirect::new_pointer(include.root.allocator, Type::FunctionC(func_info));
         let indirect_type: Type = Type::Indirect(indirect);
 
@@ -328,7 +329,7 @@ impl IncludeContext {
             if include.is_function_like_macro(cursor) {
                 self.add_basic_function(name);
             } else {
-                self.insert_value(name, include.root.type_unknown);
+                self.insert_value(name, Type::UnknownC(UnknownC::new(include, name)));
             }
 
             return CXChildVisit_Continue;
