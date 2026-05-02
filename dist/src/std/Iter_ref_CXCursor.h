@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <clang-c/Index.h>
 
 #line 4 "src/std/Array.pv"
 struct Iter_ref_CXCursor {
@@ -13,6 +14,7 @@ struct Iter_ref_CXCursor {
     CXCursor* end;
 };
 
+#include <clang-c/Index.h>
 #include <std/Iter_ref_CXCursor.h>
 #include <std/IterEnumerate_ref_CXCursor.h>
 struct Iter_ref_CXCursor;

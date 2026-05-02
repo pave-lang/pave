@@ -77,6 +77,22 @@ impl IncludeWriter {
                             let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
                             if self.type_declarations.insert(name.as_str()) { type_declarations.insert(name.as_str()); }
                         },
+                        Type::UnionC(_) => {
+                            let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
+                            if self.type_declarations.insert(name.as_str()) { type_declarations.insert(name.as_str()); }
+                        },
+                        Type::FunctionC(info) => {
+                            if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                        },
+                        Type::TypedefC(info) => {
+                            if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                        },
+                        Type::ClassCpp(info) => {
+                            if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                        },
+                        Type::UnknownC(info) => {
+                            if info.include != 0 && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                        },
                         _ => {},
                     }
                 },
@@ -94,6 +110,12 @@ impl IncludeWriter {
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                         },
                         FunctionParent::Trait(_) => {},
+                        FunctionParent::Type(type_info, _, _) => {
+                            let name = generator.naming_ident.get_type_name(type_info, generics.self_type, generics);
+                            let module = type_info.get_module();
+                            let path = generator.make_rel_path(module, name.as_str(), "");
+                            if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                        },
                         _ => {},
                     }
 

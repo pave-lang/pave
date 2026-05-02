@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <clang-c/Index.h>
 #include <std/trait_Allocator.h>
 
 #line 69 "src/std/Array.pv"

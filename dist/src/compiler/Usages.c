@@ -62,7 +62,6 @@
 #include <analyzer/c/StructC.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/UnknownC.h>
-#include <analyzer/c/FunctionC.h>
 #include <analyzer/c/TypedefC.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/c/ClassCpp.h>
@@ -586,14 +585,14 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
             #line 323 "src/compiler/Usages.pv"
             struct UnknownC* unknown_c = type_deref->unknownc_value;
             #line 323 "src/compiler/Usages.pv"
-            is_type = unknown_c->include != 0 && !unknown_c->include->mode_cpp;
+            is_type = unknown_c->include != 0;
         } break;
         #line 324 "src/compiler/Usages.pv"
         case TYPE__FUNCTION_C: {
             #line 324 "src/compiler/Usages.pv"
             struct FunctionC* function_c = type_deref->functionc_value;
             #line 324 "src/compiler/Usages.pv"
-            is_type = !function_c->include->mode_cpp;
+            is_type = true;
         } break;
         #line 325 "src/compiler/Usages.pv"
         case TYPE__TYPEDEF_C: {

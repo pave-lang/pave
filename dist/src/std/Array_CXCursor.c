@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-#include <clang-c/Index.h>
 #include <string.h>
 #include <std/Array_CXCursor.h>
 #include <std/Iter_ref_CXCursor.h>

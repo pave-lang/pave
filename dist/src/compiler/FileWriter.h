@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <stdio.h>
 
 #line 6 "src/compiler/FileWriter.pv"
 struct FileWriter {
@@ -11,6 +12,7 @@ struct FileWriter {
     uintptr_t indent;
 };
 
+#include <stdio.h>
 #include <compiler/FileWriter.h>
 #include <std/str.h>
 struct FileWriter;

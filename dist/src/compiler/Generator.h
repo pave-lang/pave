@@ -30,6 +30,7 @@ struct Generator {
     struct FunctionContext* function_context;
 };
 
+#include <stdio.h>
 #include <std/str.h>
 #include <std/String.h>
 struct Generator;

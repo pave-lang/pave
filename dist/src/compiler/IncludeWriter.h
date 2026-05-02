@@ -14,6 +14,7 @@ struct IncludeWriter {
     struct HashSet_str type_declarations;
 };
 
+#include <stdio.h>
 #include <compiler/IncludeWriter.h>
 struct ArenaAllocator;
 struct IncludeWriter;
@@ -27,7 +28,7 @@ struct IncludeWriter IncludeWriter__new(struct ArenaAllocator* allocator);
 #line 25 "src/compiler/IncludeWriter.pv"
 void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generator* generator, struct HashMap_str_Type* types, struct GenericMap* generics, bool deref);
 
-#line 145 "src/compiler/IncludeWriter.pv"
+#line 167 "src/compiler/IncludeWriter.pv"
 void IncludeWriter__release(struct IncludeWriter* self);
 
 #endif

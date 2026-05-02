@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include <clang-c/Index.h>
 struct tuple_usize_ref_CXCursor {
     uintptr_t _0;
     CXCursor* _1;
