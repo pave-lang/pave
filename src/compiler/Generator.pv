@@ -2264,7 +2264,7 @@ impl Generator {
         self.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !self.write_impls(code_file, module, &enum_info.impls, &usage.impl_functions, generics) { fclose(code_file); return false; }
+        if !self.write_impls(code_file, module, &enum_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -2552,7 +2552,7 @@ impl Generator {
         return trait_name;
     }
 
-    fn write_impls(&self, file: &FILE, module: &Module, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap) -> bool {
+    fn write_impls(&self, file: &FILE, module: &Module, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap, include_writer: &IncludeWriter) -> bool {
         // Deref is for slices
         let name = self.naming_ident.get_type_name(generics.self_type.deref(), generics.self_type, generics);
         let name_length: i32 = name.array.length;
@@ -2862,10 +2862,11 @@ impl Generator {
 
                         for usage_context in function_usage.usage_contexts {
                             let generics3 = usage_context.generic_map;
-                            
+
                             // TODO: Is this needed?
                             generics3.self_type = generics.self_type;
 
+                            include_writer.write(file, self, &usage_context.body, generics3, true);
                             fprintf(file, "\n");
                             if !self.write_function_definition(file, func_info, generics3, 0) {
                                 let func_name_length: u32 = func_info.name.value.length;
@@ -3070,7 +3071,7 @@ impl Generator {
         self.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !self.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics) { fclose(code_file); return false; }
+        if !self.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         if struct_info.traits.length > 0 {
             fprintf(code_file, "\n");
@@ -3325,7 +3326,7 @@ impl Generator {
         self.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !self.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, generics) { fclose(code_file); return false; }
+        if !self.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         for (_, trait_info) in primitive_info.traits {
             fprintf(code_file, "\nstruct trait_");
@@ -3433,7 +3434,7 @@ impl Generator {
         let impls = Array<&Impl> { data: impls_base, length: impls_base.length };
         let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: 0, length: 0 };
 
-        if !self.write_impls(code_file, 0, &impls, &impl_functions, generics) { fclose(code_file); return false; }
+        if !self.write_impls(code_file, 0, &impls, &impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);

@@ -55,6 +55,7 @@ void ArenaAllocator__destroy(struct ArenaAllocator* self) {
     #line 162 "src/std/ArenaAllocator.pv"
     self->last_block = 0;
 }
+#include <analyzer/types/Function.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, struct Function value) {
@@ -71,6 +72,7 @@ struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, str
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/GenericMap.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self, struct GenericMap value) {
@@ -87,6 +89,7 @@ struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self,
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/Type.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type value) {
@@ -103,6 +106,7 @@ struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/Indirect.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, struct Indirect value) {
@@ -119,6 +123,7 @@ struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, str
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/Block.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Block value) {
@@ -135,6 +140,7 @@ struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Bl
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/AssignmentStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct ArenaAllocator* self, struct AssignmentStatement value) {
@@ -151,6 +157,7 @@ struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct Are
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/Token.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value) {
@@ -167,6 +174,7 @@ struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct To
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/UnknownC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, struct UnknownC value) {
@@ -183,6 +191,7 @@ struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, str
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/Sequence.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, struct Sequence value) {
@@ -199,6 +208,7 @@ struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, str
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/Tuple.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tuple value) {
@@ -215,6 +225,7 @@ struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tu
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/Generic.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struct Generic value) {
@@ -231,6 +242,7 @@ struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struc
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/expression/Expression.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value) {
@@ -247,6 +259,7 @@ struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self,
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/DeferStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocator* self, struct DeferStatement value) {
@@ -263,6 +276,7 @@ struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocato
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/ForStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value) {
@@ -279,6 +293,7 @@ struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* s
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/IfStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* self, struct IfStatement value) {
@@ -295,6 +310,7 @@ struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* sel
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/LetStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value) {
@@ -311,6 +327,7 @@ struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* s
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/MatchStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocator* self, struct MatchStatement value) {
@@ -327,6 +344,7 @@ struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocato
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/ReturnStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAllocator* self, struct ReturnStatement value) {
@@ -343,6 +361,7 @@ struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAlloca
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/WhileStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocator* self, struct WhileStatement value) {
@@ -359,6 +378,7 @@ struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocato
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/YieldStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocator* self, struct YieldStatement value) {
@@ -375,6 +395,7 @@ struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocato
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/ClassCpp.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp value) {
@@ -391,6 +412,7 @@ struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, str
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/EnumC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct EnumC value) {
@@ -407,6 +429,7 @@ struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct En
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/FunctionC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, struct FunctionC value) {
@@ -423,6 +446,7 @@ struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, s
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/Include.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include value) {
@@ -439,6 +463,7 @@ struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struc
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/IncludeContext.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct IncludeContext* ArenaAllocator__store_IncludeContext(struct ArenaAllocator* self, struct IncludeContext value) {
@@ -455,6 +480,7 @@ struct IncludeContext* ArenaAllocator__store_IncludeContext(struct ArenaAllocato
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/NamespaceCpp.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* self, struct NamespaceCpp value) {
@@ -471,6 +497,7 @@ struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* s
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/StructC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct StructC* ArenaAllocator__store_StructC(struct ArenaAllocator* self, struct StructC value) {
@@ -487,6 +514,7 @@ struct StructC* ArenaAllocator__store_StructC(struct ArenaAllocator* self, struc
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/c/TypedefC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, struct TypedefC value) {
