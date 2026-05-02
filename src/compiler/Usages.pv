@@ -553,6 +553,10 @@ impl Usages {
                 let impl_functions = parent_usage.impl_functions.get(impl_index);
                 let func_usage = impl_functions.find(&func_ptr);
                 self.function_context = &func_usage.function_context;
+
+                if func_info.generics.array.length > 0 {
+                    self.usage_context = func_usage.add_usage(generic_map);
+                }
             },
             FunctionParent::Trait(trait_info) => {
                 let parent_ptr = cast<usize>(trait_info);
@@ -829,29 +833,5 @@ impl Usages {
     }
 
     fn normalize(&self) {
-        for usage in self.usages {
-            match usage {
-                Type::Function(func_info, generic_map) => {
-                    if func_info.type == FunctionType::Builtin { continue; }
-
-                    let func_ptr = cast<usize>(func_info);
-
-                    match func_info.parent {
-                        FunctionParent::Enum(enum_info, impl_index, _) => {
-                            let parent_ptr = cast<usize>(enum_info);
-                            let parent_usage = self.enums.find(&parent_ptr);
-                            if parent_usage == 0 { fprintf(stderr, "Could not find parent usage\n"); }
-
-                            let impl_functions = parent_usage.impl_functions.get(impl_index);
-                            let impl_function = impl_functions.find(&func_ptr);
-
-                            impl_function.add_usage(generic_map);
-                        },
-                        _ => {},
-                    }
-                },
-                _ => {},
-            }
-        }
     }
 }

@@ -2035,7 +2035,7 @@ impl Generator {
         return true;
     }
 
-    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage_context: &UsageContext, include_writer: &IncludeWriter) -> bool {
+    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage: &TypeUsage<Enum>, usage_context: &UsageContext, include_writer: &IncludeWriter) -> bool {
         let generics = usage_context.generic_map;
         let enum_name = enum_info.name;
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
@@ -2176,12 +2176,30 @@ impl Generator {
         fprintf(file, "\n");
         include_writer.write(file, self, &usage_context.signature, generics, false);
 
-        for *impl_info in enum_info.impls {
-            fprintf(file, "\n");
+        for (impl_index, *impl_info) in enum_info.impls.iter().enumerate() {
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if usage != 0 { impl_functions_for_impl = usage.impl_functions.get(impl_index); }
 
             for (_, &func_info) in impl_info.functions {
-                if !self.write_function_definition(file, func_info, generics, 0) { return false; }
-                fprintf(file, ";\n");
+                let func_ptr = cast<usize>(func_info);
+                let function_usage: &TypeFunctionUsage = 0;
+                if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                if func_info.generics.array.length == 0 {
+                    fprintf(file, "\n");
+                    if !self.write_function_definition(file, func_info, generics, 0) { return false; }
+                    fprintf(file, ";\n");
+                }
+
+                if impl_functions_for_impl != 0 && function_usage != 0 {
+                    for usage_context in function_usage.usage_contexts {
+                        include_writer.write(file, self, &usage_context.signature, usage_context.generic_map, false);
+                        usage_context.generic_map.self_type = generics.self_type;
+                        fprintf(file, "\n");
+                        if !self.write_function_definition(file, func_info, usage_context.generic_map, 0) { return false; }
+                        fprintf(file, ";\n");
+                    }
+                }
             }
         }
 
@@ -2220,7 +2238,7 @@ impl Generator {
         // self.write_includes_raw(header_file, &module.includes);
         include_writer.write(header_file, self, &usage_context.layout, generics, false);
 
-        if !self.write_enum_definition(header_file, enum_info, usage_context, &include_writer) { fclose(header_file); return false; }
+        if !self.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 

@@ -95,13 +95,13 @@ void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct
 #line 513 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 591 "src/compiler/Usages.pv"
+#line 595 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 674 "src/compiler/Usages.pv"
+#line 678 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 831 "src/compiler/Usages.pv"
+#line 835 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

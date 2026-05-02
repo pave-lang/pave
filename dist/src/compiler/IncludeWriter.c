@@ -229,12 +229,14 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
             case TYPE__FUNCTION: {
                 #line 99 "src/compiler/IncludeWriter.pv"
                 struct Function* func_info = resolved->function_value._0;
+                #line 99 "src/compiler/IncludeWriter.pv"
+                struct GenericMap* func_generic_map = resolved->function_value._1;
                 #line 100 "src/compiler/IncludeWriter.pv"
                 switch (func_info->parent.type) {
                     #line 101 "src/compiler/IncludeWriter.pv"
                     case FUNCTION_PARENT__NONE: {
                         #line 102 "src/compiler/IncludeWriter.pv"
-                        struct String name = Naming__get_type_name(&generator->naming_ident, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }, generics->self_type, generics);
+                        struct String name = Naming__get_type_name(&generator->naming_ident, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = func_generic_map} }, func_generic_map->self_type, func_generic_map);
                         #line 103 "src/compiler/IncludeWriter.pv"
                         struct Module* module = func_info->context->module;
                         #line 104 "src/compiler/IncludeWriter.pv"

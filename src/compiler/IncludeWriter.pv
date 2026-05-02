@@ -96,10 +96,10 @@ impl IncludeWriter {
                         _ => {},
                     }
                 },
-                Type::Function(func_info, _) => {
+                Type::Function(func_info, func_generic_map) => {
                     match func_info.parent {
                         FunctionParent::None => {
-                            let name = generator.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+                            let name = generator.naming_ident.get_type_name(&Type::Function(func_info, func_generic_map), func_generic_map.self_type, func_generic_map);
                             let module = func_info.context.module;
                             let path = generator.make_rel_path(module, name.as_str(), "");
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
