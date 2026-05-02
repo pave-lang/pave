@@ -1,0 +1,7 @@
+use std
+use types
+
+struct UnknownC {
+    name: str,
+    generics: Array<Type>,
+}

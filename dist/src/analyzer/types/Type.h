@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/str.h>
-#include <std/Array_Type.h>
 struct Primitive;
 struct Indirect;
 struct Sequence;
@@ -20,6 +18,7 @@ struct EnumC;
 struct StructC;
 struct FunctionC;
 struct ClassCpp;
+struct UnknownC;
 struct NamespaceCpp;
 #line 82 "src/analyzer/types/Type.pv"
 struct Type {
@@ -62,11 +61,12 @@ struct Type {
         struct StructC* unionc_value;
         struct FunctionC* functionc_value;
         struct ClassCpp* classcpp_value;
-        struct { struct str _0; struct Array_Type _1; } unknownc_value;
+        struct UnknownC* unknownc_value;
         struct NamespaceCpp* namespacecpp_value;
     };
 };
 
+#include <std/Array_Type.h>
 struct Type;
 struct ArenaAllocator;
 struct Context;

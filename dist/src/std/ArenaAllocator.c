@@ -169,6 +169,22 @@ struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct To
 }
 
 #line 165 "src/std/ArenaAllocator.pv"
+struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, struct UnknownC value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct UnknownC* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct UnknownC));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, &value, sizeof(struct UnknownC));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 165 "src/std/ArenaAllocator.pv"
 struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, struct Sequence value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Sequence* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Sequence));

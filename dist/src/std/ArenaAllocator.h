@@ -60,6 +60,11 @@ struct Token;
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value);
+#include <analyzer/c/UnknownC.h>
+struct UnknownC;
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, struct UnknownC value);
 #include <analyzer/types/Sequence.h>
 struct Sequence;
 

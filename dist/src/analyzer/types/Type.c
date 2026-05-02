@@ -20,6 +20,7 @@
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/NamespaceCpp.h>
+#include <std/str.h>
 #include <std/Range_usize.h>
 #include <analyzer/Token.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>

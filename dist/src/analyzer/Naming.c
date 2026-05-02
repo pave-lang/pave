@@ -24,6 +24,7 @@
 #include <analyzer/types/Generics.h>
 #include <analyzer/types/Trait.h>
 #include <analyzer/types/Generic.h>
+#include <analyzer/c/UnknownC.h>
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/Function.h>
 #include <std/HashMap_str_usize.h>
@@ -415,13 +416,11 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
         #line 244 "src/analyzer/Naming.pv"
         case TYPE__UNKNOWN_C: {
             #line 244 "src/analyzer/Naming.pv"
-            struct str name = type->unknownc_value._0;
-            #line 244 "src/analyzer/Naming.pv"
-            struct Array_Type generics2 = type->unknownc_value._1;
+            struct UnknownC* info = type->unknownc_value;
             #line 245 "src/analyzer/Naming.pv"
-            String__append(&result, name);
+            String__append(&result, info->name);
             #line 246 "src/analyzer/Naming.pv"
-            generics = generics2;
+            generics = info->generics;
         } break;
         #line 248 "src/analyzer/Naming.pv"
         case TYPE__FUNCTION: {

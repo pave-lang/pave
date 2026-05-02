@@ -241,9 +241,9 @@ impl Naming {
                 
                 return self.get_type_name(generic_type, type_self, generics_map);
             },
-            Type::UnknownC(name, generics2) => {
-                result.append(name);
-                generics = generics2;
+            Type::UnknownC(info) => {
+                result.append(info.name);
+                generics = info.generics;
             },
             Type::Function(func_info, generics2) => {
                 let has_parent = false;
