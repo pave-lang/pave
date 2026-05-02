@@ -88,7 +88,6 @@ enum Type {
     Struct(&Struct, &GenericMap),
     Trait(&Trait, &GenericMap),
     Generic(&Generic),
-    Unknown(str, Array<Type>),
     Function(&Function, &GenericMap),
     CoroutineInstance(&Function, &GenericMap),
     Self,
@@ -98,6 +97,7 @@ enum Type {
     UnionC(&StructC),
     FunctionC(&FunctionC),
     ClassCpp(&ClassCpp),
+    UnknownC(str, Array<Type>),
     NamespaceCpp(&NamespaceCpp),
 }
 
@@ -112,7 +112,7 @@ impl Type {
             Type::Struct(_, _) => { return "Type::Struct"; },
             Type::Trait(_, _) => { return "Type::Trait"; },
             Type::Generic(_) => { return "Type::Generic"; },
-            Type::Unknown(_, _) => { return "Type::Unknown"; },
+            Type::UnknownC(_, _) => { return "Type::UnknownC"; },
             Type::Function(_, _) => { return "Type::Function"; },
             Type::CoroutineInstance(_, _) => { return "Type::CoroutineInstance"; },
             Type::Self => { return "Type::Self"; },
@@ -206,7 +206,7 @@ impl Type {
             Type::Struct(struct_info, generics) => { return self.eq_struct(struct_info, generics.array); },
             Type::Trait(trait_info, generics) => { return self.eq_trait(trait_info, generics.array); },
             Type::Generic(generic) => { return self.eq_generic(generic); },
-            Type::Unknown(_, _) => { return true; },
+            Type::UnknownC(_, _) => { return true; },
             Type::Function(function, _) => { return self.eq_function(function); },
             Type::CoroutineInstance(function, _) => { return self.eq_coroutine_instance(function); },
             Type::Self => { return self.eq_self(); },
@@ -448,7 +448,7 @@ impl Type {
 
     fn is_unknown(&self) -> bool {
         match self {
-            Type::Unknown(_, _) => { return true; },
+            Type::UnknownC(_, _) => { return true; },
             _ => { return false; },
         }
     }
@@ -465,7 +465,7 @@ impl Type {
         match self {
             Type::Function(_, _) => { return true; },
             Type::FunctionC(_) => { return true; },
-            Type::Unknown(_, _) => { return true; },
+            Type::UnknownC(_, _) => { return true; },
             _ => { return false; },
         }
     }
@@ -618,7 +618,7 @@ impl Type {
             Type::Struct(struct_info, _) => { return struct_info.module; },
             Type::Trait(trait_info, _) => { return trait_info.module; },
             Type::Generic(_) => { return 0; },
-            Type::Unknown(_, _) => { return 0; },
+            Type::UnknownC(_, _) => { return 0; },
             Type::Function(func_info, _) => { if func_info.context != 0 { return func_info.context.module; } else { return 0; } },
             Type::CoroutineInstance(func_info, _) => { return func_info.context.module; },
             Type::Self => { return 0; },

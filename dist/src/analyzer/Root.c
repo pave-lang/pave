@@ -101,7 +101,7 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
     #line 71 "src/analyzer/Root.pv"
     self->type_bool = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = self->primitive_bool };
     #line 72 "src/analyzer/Root.pv"
-    self->type_unknown = (struct Type) { .type = TYPE__UNKNOWN, .unknown_value = { ._0 = (struct str){ .ptr = "unknown", .length = strlen("unknown") }, ._1 = (struct Array_Type) {}} };
+    self->type_unknown = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = { ._0 = (struct str){ .ptr = "unknown", .length = strlen("unknown") }, ._1 = (struct Array_Type) {}} };
     #line 73 "src/analyzer/Root.pv"
     self->type_self = (struct Type) { .type = TYPE__SELF };
     #line 74 "src/analyzer/Root.pv"

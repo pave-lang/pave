@@ -32,7 +32,6 @@ struct Type {
         TYPE__STRUCT,
         TYPE__TRAIT,
         TYPE__GENERIC,
-        TYPE__UNKNOWN,
         TYPE__FUNCTION,
         TYPE__COROUTINE_INSTANCE,
         TYPE__SELF,
@@ -42,6 +41,7 @@ struct Type {
         TYPE__UNION_C,
         TYPE__FUNCTION_C,
         TYPE__CLASS_CPP,
+        TYPE__UNKNOWN_C,
         TYPE__NAMESPACE_CPP,
     } type;
 
@@ -54,7 +54,6 @@ struct Type {
         struct { struct Struct* _0; struct GenericMap* _1; } struct_value;
         struct { struct Trait* _0; struct GenericMap* _1; } trait_value;
         struct Generic* generic_value;
-        struct { struct str _0; struct Array_Type _1; } unknown_value;
         struct { struct Function* _0; struct GenericMap* _1; } function_value;
         struct { struct Function* _0; struct GenericMap* _1; } coroutineinstance_value;
         struct TypedefC* typedefc_value;
@@ -63,6 +62,7 @@ struct Type {
         struct StructC* unionc_value;
         struct FunctionC* functionc_value;
         struct ClassCpp* classcpp_value;
+        struct { struct str _0; struct Array_Type _1; } unknownc_value;
         struct NamespaceCpp* namespacecpp_value;
     };
 };

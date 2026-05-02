@@ -234,7 +234,7 @@ impl Expression {
 
                 return 0;
             },
-            Type::Unknown(_, _) => { return type; },
+            Type::UnknownC(_, _) => { return type; },
             _ => { context.error_token(member, "Type does not have members"); },
         }
 
@@ -382,7 +382,7 @@ impl Expression {
             },
             Type::FunctionC(_) => { return true; },
             Type::ClassCpp(_) => { return true; },
-            Type::Unknown(_, _) => { return true; },
+            Type::UnknownC(_, _) => { return true; },
             _ => { context.error_token(token, "Type can't be called"); },
         }
 
@@ -429,7 +429,7 @@ impl Expression {
                 return Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, generic_map);
             },
             Type::FunctionC(func_info) => { return &func_info.return_type; },
-            Type::Unknown(_, _) => { return type; },
+            Type::UnknownC(_, _) => { return type; },
             _ => { context.error_token(token, "Type can't be called"); },
         }
 
@@ -796,7 +796,7 @@ impl Expression {
                 func_info = func_info2;
             },
             Type::FunctionC(_) => { is_function = true; },
-            Type::Unknown(_, _) => { is_function = true; },
+            Type::UnknownC(_, _) => { is_function = true; },
             _ => {},
         }
         
@@ -926,7 +926,7 @@ impl Expression {
         }
 
         if element_type == 0 && context.module.mode_cpp {
-            element_type = Type::Unknown("", Array<Type> {}).to_ptr(context.allocator);
+            element_type = Type::UnknownC("", Array<Type> {}).to_ptr(context.allocator);
         }
 
         if element_type == 0 {
@@ -1009,7 +1009,7 @@ impl Expression {
                 Type::ClassCpp(_) => {
                     return Expression::parse_class(context, token, inner, generics);
                 },
-                Type::Unknown(_, _) => {
+                Type::UnknownC(_, _) => {
                     if !context.expect_value(TokenType::Symbol, "(") { return 0; }
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
@@ -1211,7 +1211,7 @@ impl Expression {
                             context.next_token();
                             result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
                         },
-                        Type::Unknown(_, _) => {
+                        Type::UnknownC(_, _) => {
                             context.next_token();
                             result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
                         },

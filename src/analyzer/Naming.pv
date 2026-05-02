@@ -241,7 +241,7 @@ impl Naming {
                 
                 return self.get_type_name(generic_type, type_self, generics_map);
             },
-            Type::Unknown(name, generics2) => {
+            Type::UnknownC(name, generics2) => {
                 result.append(name);
                 generics = generics2;
             },

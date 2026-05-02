@@ -558,7 +558,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             return 0;
         } break;
         #line 237 "src/analyzer/expression/Expression.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 237 "src/analyzer/expression/Expression.pv"
             return type;
         } break;
@@ -861,7 +861,7 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
             return true;
         } break;
         #line 385 "src/analyzer/expression/Expression.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 385 "src/analyzer/expression/Expression.pv"
             return true;
         } break;
@@ -955,7 +955,7 @@ struct Type* Expression__get_return_type(struct Context* context, struct Type* t
             return &func_info->return_type;
         } break;
         #line 432 "src/analyzer/expression/Expression.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 432 "src/analyzer/expression/Expression.pv"
             return type;
         } break;
@@ -1668,7 +1668,7 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
             is_function = true;
         } break;
         #line 799 "src/analyzer/expression/Expression.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 799 "src/analyzer/expression/Expression.pv"
             is_function = true;
         } break;
@@ -1906,7 +1906,7 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
     #line 928 "src/analyzer/expression/Expression.pv"
     if (element_type == 0 && context->module->mode_cpp) {
         #line 929 "src/analyzer/expression/Expression.pv"
-        element_type = Type__to_ptr(&(struct Type) { .type = TYPE__UNKNOWN, .unknown_value = { ._0 = (struct str){ .ptr = "", .length = strlen("") }, ._1 = (struct Array_Type) {}} }, context->allocator);
+        element_type = Type__to_ptr(&(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = { ._0 = (struct str){ .ptr = "", .length = strlen("") }, ._1 = (struct Array_Type) {}} }, context->allocator);
     }
 
     #line 932 "src/analyzer/expression/Expression.pv"
@@ -2058,7 +2058,7 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
                 return Expression__parse_class(context, token, inner, generics);
             } break;
             #line 1012 "src/analyzer/expression/Expression.pv"
-            case TYPE__UNKNOWN: {
+            case TYPE__UNKNOWN_C: {
                 #line 1013 "src/analyzer/expression/Expression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
                     #line 1013 "src/analyzer/expression/Expression.pv"
@@ -2445,7 +2445,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
                     } break;
                     #line 1214 "src/analyzer/expression/Expression.pv"
-                    case TYPE__UNKNOWN: {
+                    case TYPE__UNKNOWN_C: {
                         #line 1215 "src/analyzer/expression/Expression.pv"
                         Context__next_token(context);
                         #line 1216 "src/analyzer/expression/Expression.pv"

@@ -851,7 +851,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 505 "src/analyzer/Context.pv"
         Context__error_token(self, name, "Unknown type");
         #line 506 "src/analyzer/Context.pv"
-        *type = (struct Type) { .type = TYPE__UNKNOWN, .unknown_value = { ._0 = name->value, ._1 = generics_} };
+        *type = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = { ._0 = name->value, ._1 = generics_} };
         #line 507 "src/analyzer/Context.pv"
         return false;
     }

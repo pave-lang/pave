@@ -413,11 +413,11 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
             return Naming__get_type_name(self, generic_type, type_self, generics_map);
         } break;
         #line 244 "src/analyzer/Naming.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 244 "src/analyzer/Naming.pv"
-            struct str name = type->unknown_value._0;
+            struct str name = type->unknownc_value._0;
             #line 244 "src/analyzer/Naming.pv"
-            struct Array_Type generics2 = type->unknown_value._1;
+            struct Array_Type generics2 = type->unknownc_value._1;
             #line 245 "src/analyzer/Naming.pv"
             String__append(&result, name);
             #line 246 "src/analyzer/Naming.pv"

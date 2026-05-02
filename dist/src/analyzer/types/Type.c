@@ -73,9 +73,9 @@ char const* Type__name(struct Type* self) {
             return "Type::Generic";
         } break;
         #line 115 "src/analyzer/types/Type.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 115 "src/analyzer/types/Type.pv"
-            return "Type::Unknown";
+            return "Type::UnknownC";
         } break;
         #line 116 "src/analyzer/types/Type.pv"
         case TYPE__FUNCTION: {
@@ -370,7 +370,7 @@ bool Type__eq(struct Type* self, struct Type* other) {
             return Type__eq_generic(self, generic);
         } break;
         #line 209 "src/analyzer/types/Type.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 209 "src/analyzer/types/Type.pv"
             return true;
         } break;
@@ -963,7 +963,7 @@ bool Type__is_unknown(struct Type* self) {
     #line 450 "src/analyzer/types/Type.pv"
     switch (self->type) {
         #line 451 "src/analyzer/types/Type.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 451 "src/analyzer/types/Type.pv"
             return true;
         } break;
@@ -1012,7 +1012,7 @@ bool Type__is_function(struct Type* self) {
             return true;
         } break;
         #line 468 "src/analyzer/types/Type.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 468 "src/analyzer/types/Type.pv"
             return true;
         } break;
@@ -1445,7 +1445,7 @@ struct Module* Type__get_module(struct Type* self) {
             return 0;
         } break;
         #line 621 "src/analyzer/types/Type.pv"
-        case TYPE__UNKNOWN: {
+        case TYPE__UNKNOWN_C: {
             #line 621 "src/analyzer/types/Type.pv"
             return 0;
         } break;
