@@ -292,7 +292,9 @@ impl Usages {
                 is_type = func_info.type != FunctionType::Builtin && func_info.generics.array.length > 0;
 
                 match func_info.parent {
-                    FunctionParent::None => {},
+                    FunctionParent::None => {
+                        is_type = (func_info.type == FunctionType::Standard || func_info.type == FunctionType::Coroutine) && func_info.name != 0;
+                    },
                     FunctionParent::Primitive(primitive_info, _, _) => {
                         self.add_type(&Type::Primitive(primitive_info), generic_map);
                     },
@@ -321,7 +323,7 @@ impl Usages {
             Type::UnionC(union_c) => { is_type = !union_c.include.mode_cpp; },
             Type::EnumC(enum_c) => { is_type = !enum_c.include.mode_cpp; },
             Type::UnknownC(unknown_c) => { is_type = unknown_c.include != 0; },
-            Type::FunctionC(function_c) => { is_type = true; },
+            Type::FunctionC(_) => { is_type = true; },
             Type::TypedefC(typedef_c) => { is_type = !typedef_c.include.mode_cpp; },
             Type::ClassCpp(class_info) => {
                 if self.usage_mode != UsageMode::Body {
