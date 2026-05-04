@@ -54,7 +54,7 @@ impl LetStatement {
             context.error_token(first_token, "Let statement cannot have void type");
         }
 
-        return context.allocator.store(LetStatement {
+        return context.allocator.store(&LetStatement {
             is_static,
             name,
             type,

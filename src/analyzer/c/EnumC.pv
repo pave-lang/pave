@@ -11,7 +11,7 @@ impl EnumC {
     fn new(include: &Include, name: *const char, parent: ParentCpp) -> &Self {
         let allocator = include.root.allocator;
 
-        return allocator.store(Self {
+        return allocator.store(&Self {
             include,
             name: name,
             parent,

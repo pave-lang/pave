@@ -75,11 +75,11 @@ impl IncludeObjectContext {
                 let return_type_resolved = include.parse_type(return_type);
 
                 let func_info = Function::new_allocator(include.root.allocator);
-                func_info.name = allocator.store(Token { value: method_name });
+                func_info.name = allocator.store(&Token { value: method_name });
                 func_info.return_type = *return_type_resolved;
                 func_info.type = FunctionType::MethodCpp;
 
-                let func_type = Type::Function(allocator.store(func_info), 0);
+                let func_type = Type::Function(allocator.store(&func_info), 0);
                 class_info.fields.insert(method_name, func_type);
             },
             CXCursor_EnumDecl => {

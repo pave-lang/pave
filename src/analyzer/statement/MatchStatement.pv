@@ -35,7 +35,7 @@ impl MatchStatement {
 
         if !context.expect_value(TokenType::Symbol, "}") { return 0; }
 
-        return context.allocator.store(MatchStatement {
+        return context.allocator.store(&MatchStatement {
             expression,
             cases,
         });

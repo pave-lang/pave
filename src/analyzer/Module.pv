@@ -240,7 +240,7 @@ impl Module {
     fn fill_namespace(&self) -> bool {
         let namespace = self.namespace;
         let allocator = namespace.root.allocator;
-        let blank_generics = allocator.store(GenericMap {});
+        let blank_generics = allocator.store(&GenericMap {});
         blank_generics.self_type = Type::Self.to_ptr(allocator);
 
         for (_, &func_info) in self.functions {
@@ -252,7 +252,8 @@ impl Module {
         }
 
         for (_, &struct_info) in self.structs {
-            let generics = allocator.store(GenericMap::from_generics(allocator, &struct_info.generics));
+            let generics_val = GenericMap::from_generics(allocator, &struct_info.generics);
+            let generics = allocator.store(&generics_val);
             generics.self_type = blank_generics.self_type;
 
             namespace.types.insert(struct_info.name.value, Type::Struct(struct_info, generics));
@@ -271,9 +272,9 @@ impl Module {
         for *namespace in self.used_namespaces {
             if namespace.name.eq("std") {
                 let t = Generic::new(self.context.allocator);
-                t.name = self.context.allocator.store(Token { type: TokenType::String, value: "T" });
+                t.name = self.context.allocator.store(&Token { type: TokenType::String, value: "T" });
 
-                let param_name = self.context.allocator.store(Token { type: TokenType::String, value: "type" });
+                let param_name = self.context.allocator.store(&Token { type: TokenType::String, value: "type" });
 
                 let generics = Array<Generic>::new(self.context.allocator);
                 generics.append(t);

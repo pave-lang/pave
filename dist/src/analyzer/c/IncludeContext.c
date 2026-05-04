@@ -63,7 +63,7 @@ void IncludeContext__add_function(struct IncludeContext* self, char const* name,
     #line 36 "src/analyzer/c/IncludeContext.pv"
     if (return_type == 0) {
         #line 36 "src/analyzer/c/IncludeContext.pv"
-        return_type = ArenaAllocator__store_Type(include->root->allocator, (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") });
+        return_type = ArenaAllocator__store_Type(include->root->allocator, &(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") });
     }
 
     #line 38 "src/analyzer/c/IncludeContext.pv"
@@ -75,7 +75,7 @@ void IncludeContext__add_basic_function(struct IncludeContext* self, char const*
     #line 42 "src/analyzer/c/IncludeContext.pv"
     struct Include* include = self->include;
     #line 43 "src/analyzer/c/IncludeContext.pv"
-    IncludeContext__insert_function(self, name, ArenaAllocator__store_Type(include->root->allocator, (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }));
+    IncludeContext__insert_function(self, name, ArenaAllocator__store_Type(include->root->allocator, &(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }));
 }
 
 #line 46 "src/analyzer/c/IncludeContext.pv"
@@ -134,7 +134,7 @@ struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self
                 #line 76 "src/analyzer/c/IncludeContext.pv"
                 struct NamespaceCpp* ns_info = existing->namespacecpp_value;
                 #line 77 "src/analyzer/c/IncludeContext.pv"
-                return ArenaAllocator__store_IncludeContext(allocator, (struct IncludeContext) {
+                return ArenaAllocator__store_IncludeContext(allocator, &(struct IncludeContext) {
                     .include = include,
                     .parent_context = self,
                     .types = &ns_info->types,
@@ -154,7 +154,7 @@ struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self
     IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__NAMESPACE_CPP, .namespacecpp_value = ns_info });
 
     #line 92 "src/analyzer/c/IncludeContext.pv"
-    return ArenaAllocator__store_IncludeContext(allocator, (struct IncludeContext) {
+    return ArenaAllocator__store_IncludeContext(allocator, &(struct IncludeContext) {
         .include = include,
         .parent_context = self,
         .types = &ns_info->types,
@@ -272,7 +272,7 @@ struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeCon
     #line 165 "src/analyzer/c/IncludeContext.pv"
     struct Include* include = self->include;
     #line 166 "src/analyzer/c/IncludeContext.pv"
-    struct FunctionC* func_info = FunctionC__new(include, name, ArenaAllocator__store_Type(include->root->allocator, (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }));
+    struct FunctionC* func_info = FunctionC__new(include, name, ArenaAllocator__store_Type(include->root->allocator, &(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }));
     #line 167 "src/analyzer/c/IncludeContext.pv"
     struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator }, (struct Type) { .type = TYPE__FUNCTION_C, .functionc_value = func_info });
     #line 168 "src/analyzer/c/IncludeContext.pv"

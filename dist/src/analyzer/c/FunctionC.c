@@ -15,7 +15,7 @@ struct FunctionC* FunctionC__new(struct Include* include, char const* name, stru
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 16 "src/analyzer/c/FunctionC.pv"
-    return ArenaAllocator__store_FunctionC(allocator, (struct FunctionC) {
+    return ArenaAllocator__store_FunctionC(allocator, &(struct FunctionC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .return_type = *return_type,

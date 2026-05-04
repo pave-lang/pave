@@ -147,14 +147,14 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             #line 77 "src/analyzer/c/IncludeObjectContext.pv"
             struct Function func_info = Function__new_allocator((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator });
             #line 78 "src/analyzer/c/IncludeObjectContext.pv"
-            func_info.name = ArenaAllocator__store_Token(allocator, (struct Token) { .value = (struct str){ .ptr = method_name, .length = strlen(method_name) } });
+            func_info.name = ArenaAllocator__store_Token(allocator, &(struct Token) { .value = (struct str){ .ptr = method_name, .length = strlen(method_name) } });
             #line 79 "src/analyzer/c/IncludeObjectContext.pv"
             func_info.return_type = *return_type_resolved;
             #line 80 "src/analyzer/c/IncludeObjectContext.pv"
             func_info.type = FUNCTION_TYPE__METHOD_CPP;
 
             #line 82 "src/analyzer/c/IncludeObjectContext.pv"
-            struct Type func_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = ArenaAllocator__store_Function(allocator, func_info), ._1 = 0} };
+            struct Type func_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = ArenaAllocator__store_Function(allocator, &func_info), ._1 = 0} };
             #line 83 "src/analyzer/c/IncludeObjectContext.pv"
             HashMap_str_Type__insert(&class_info->fields, (struct str){ .ptr = method_name, .length = strlen(method_name) }, func_type);
         } break;

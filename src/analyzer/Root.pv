@@ -69,26 +69,26 @@ impl Root {
         self.primitive_void = self.add_primitive("void");
         self.type_void = Type::Primitive(self.primitive_void);
         self.type_bool = Type::Primitive(self.primitive_bool);
-        let unknown_c = allocator.store(UnknownC { include: 0, name: "unknown", generics: Array<Type> {} });
+        let unknown_c = allocator.store(&UnknownC { include: 0, name: "unknown", generics: Array<Type> {} });
         self.type_unknown = Type::UnknownC(unknown_c);
         self.type_self = Type::Self;
         self.type_ref_self = Type::Indirect(Indirect::new_reference(self.allocator, self.type_self));
         self.type_usize = Type::Primitive(self.primitive_usize);
         self.func_next = Function {
             type: FunctionType::Standard,
-            name: allocator.store(Token { value: "next" }),
+            name: allocator.store(&Token { value: "next" }),
             parameters: Array<Parameter>::new(allocator),
             return_type: Type::Primitive(self.primitive_bool),
         };
-        self.func_next.parameters.append(Parameter { name: allocator.store(Token { value: "self" }), type: self.type_ref_self });
+        self.func_next.parameters.append(Parameter { name: allocator.store(&Token { value: "self" }), type: self.type_ref_self });
 
         self.func_value = Function {
             type: FunctionType::Standard,
-            name: allocator.store(Token { value: "value" }),
+            name: allocator.store(&Token { value: "value" }),
             parameters: Array<Parameter>::new(allocator),
-            return_type: Type::Generic(allocator.store(Generic { name: allocator.store(Token { value: "T" }) })),
+            return_type: Type::Generic(allocator.store(&Generic { name: allocator.store(&Token { value: "T" }) })),
         };
-        self.func_value.parameters.append(Parameter { name: allocator.store(Token { value: "self" }), type: self.type_ref_self });
+        self.func_value.parameters.append(Parameter { name: allocator.store(&Token { value: "self" }), type: self.type_ref_self });
 
         for (key, &value) in self.primitives {
             self.types.insert(key, Type::Primitive(value));
@@ -263,28 +263,28 @@ impl Root {
                 let generics = GenericMap::new(allocator, &enum_info.generics, usage_types);
                 let self_type: &Type = allocator.alloc(sizeof(Type));
                 generics.self_type = self_type;
-                *self_type = Type::Enum(enum_info, allocator.store(generics));
+                *self_type = Type::Enum(enum_info, allocator.store(&generics));
                 return self_type;
             },
             Type::Struct(struct_info, _) => {
                 let generics = GenericMap::new(allocator, &struct_info.generics, usage_types);
                 let self_type: &Type = allocator.alloc(sizeof(Type));
                 generics.self_type = self_type;
-                *self_type = Type::Struct(struct_info, allocator.store(generics));
+                *self_type = Type::Struct(struct_info, allocator.store(&generics));
                 return self_type;
             },
             Type::Trait(trait_info, _) => {
                 let generics = GenericMap::new(allocator, &trait_info.generics, usage_types);
                 let self_type: &Type = allocator.alloc(sizeof(Type));
                 generics.self_type = self_type;
-                *self_type = Type::Trait(trait_info, allocator.store(generics));
+                *self_type = Type::Trait(trait_info, allocator.store(&generics));
                 return self_type;
             },
             Type::Function(function_info, _) => {
                 let generics = GenericMap::new(allocator, &function_info.generics, usage_types);
                 let self_type: &Type = allocator.alloc(sizeof(Type));
                 generics.self_type = self_type;
-                *self_type = Type::Function(function_info, allocator.store(generics));
+                *self_type = Type::Function(function_info, allocator.store(&generics));
                 return self_type;
             },
             _ => { return type; }

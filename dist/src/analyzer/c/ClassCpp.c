@@ -15,7 +15,7 @@ struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 19 "src/analyzer/c/ClassCpp.pv"
-    return ArenaAllocator__store_ClassCpp(allocator, (struct ClassCpp) {
+    return ArenaAllocator__store_ClassCpp(allocator, &(struct ClassCpp) {
         .include = include,
         .is_struct = is_struct,
         .name = (struct str){ .ptr = name, .length = strlen(name) },

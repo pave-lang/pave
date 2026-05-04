@@ -105,7 +105,7 @@ impl ForStatement {
             }
 
             if !is_sequence {
-                let iter_member = context.allocator.store(*expression_first_token);
+                let iter_member = context.allocator.store(expression_first_token);
                 iter_member.value = "iter";
 
                 let iter_member_type = Expression::get_member_type(context, &for_statement.expression.return_type, iter_member, false);
@@ -179,6 +179,6 @@ impl ForStatement {
 
         context.pop_scope();
 
-        return context.allocator.store(for_statement);
+        return context.allocator.store(&for_statement);
     }
 }

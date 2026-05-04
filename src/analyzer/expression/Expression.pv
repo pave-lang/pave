@@ -13,7 +13,7 @@ struct Expression {
 
 impl Expression {
     fn make(allocator: &ArenaAllocator, token: &Token, data: ExpressionData, return_type: &Type) -> &Expression {
-        return allocator.store(Expression {
+        return allocator.store(&Expression {
             token,
             data,
             return_type: *return_type
@@ -21,7 +21,7 @@ impl Expression {
     }
 
     fn make_next(context: &Context, node: Expression) -> &Expression {
-        let result: &Expression = context.allocator.store(node);
+        let result: &Expression = context.allocator.store(&node);
 
         context.next_token();
 
@@ -78,7 +78,7 @@ impl Expression {
                 for *impl_info in primitive_info.impls {
                     let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
-                        return context.allocator.store(Type::Function(function, context.allocator.store(GenericMap { self_type: type })));
+                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap { self_type: type })));
                     }
                 }
 
@@ -94,7 +94,7 @@ impl Expression {
                 for *impl_info in struct_info.impls {
                     let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
-                        return context.allocator.store(Type::Function(function, generic_map));
+                        return context.allocator.store(&Type::Function(function, generic_map));
                     }
                 }
 
@@ -105,16 +105,16 @@ impl Expression {
             },
             Type::CoroutineInstance(func_info, generic_map) => {
                 if member.value.eq("next") {
-                    let func_next = context.allocator.store(context.root.func_next);
+                    let func_next = context.allocator.store(&context.root.func_next);
                     func_next.parent = FunctionParent::Type(type, 0, 0);
-                    return context.allocator.store(Type::Function(func_next, generic_map));
+                    return context.allocator.store(&Type::Function(func_next, generic_map));
                 }
 
                 if member.value.eq("value") {
-                    let func_value = context.allocator.store(context.root.func_value);
+                    let func_value = context.allocator.store(&context.root.func_value);
                     func_value.parent = FunctionParent::Type(type, 0, 0);
                     func_value.return_type = func_info.return_type;
-                    return context.allocator.store(Type::Function(func_value, generic_map));
+                    return context.allocator.store(&Type::Function(func_value, generic_map));
                 }
 
                 if output_error { context.error_token(member, "Only next() and value() functions exist on coroutine instances"); }
@@ -124,7 +124,7 @@ impl Expression {
                 for *impl_info in enum_info.impls {
                     let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
-                        return context.allocator.store(Type::Function(function, generic_map));
+                        return context.allocator.store(&Type::Function(function, generic_map));
                     }
                 }
 
@@ -133,7 +133,7 @@ impl Expression {
             },
             Type::Trait(trait_info, generic_map) => {
                 if member.value.eq("instance") {
-                    return context.allocator.store(Type::Indirect(Indirect::new_pointer(context.allocator, context.root.type_void)));
+                    return context.allocator.store(&Type::Indirect(Indirect::new_pointer(context.allocator, context.root.type_void)));
                 }
 
                 let function: &Function = trait_info.functions.find(&member.value);
@@ -142,7 +142,7 @@ impl Expression {
                     return 0;
                 }
 
-                return context.allocator.store(Type::Function(function, generic_map));
+                return context.allocator.store(&Type::Function(function, generic_map));
             },
             Type::TypedefC(typedef_info) => {
                 return Expression::get_member_type(context, typedef_info.type, member, output_error);
@@ -180,7 +180,7 @@ impl Expression {
                 for *trait_info in generic.traits {
                     let function: &Function = trait_info.functions.find(&member.value);
                     if function != 0 {
-                        return context.allocator.store(Type::Function(function, context.allocator.store(GenericMap {})));
+                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap {})));
                     }
                 }
 
@@ -202,9 +202,9 @@ impl Expression {
                 if function != 0 {
                     let generic_map = GenericMap::new(context.allocator, &Generics {}, &Array<Type> {});
                     generic_map.insert("T", sequence.element);
-                    generic_map.self_type = context.allocator.store(Type::Indirect(Indirect::new_reference(context.allocator, Type::Sequence(sequence))));
+                    generic_map.self_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, Type::Sequence(sequence))));
 
-                    return context.allocator.store(Type::Function(function, context.allocator.store(generic_map)));
+                    return context.allocator.store(&Type::Function(function, context.allocator.store(&generic_map)));
                 }
 
                 if output_error { context.error_token(member, "Sequences do not have this member"); }
@@ -253,7 +253,7 @@ impl Expression {
         }
 
         if i == generic_map.array.length {
-            return context.allocator.store(generic_map);
+            return context.allocator.store(&generic_map);
         }
 
         let params = func_info.parameters.iter();
@@ -266,7 +266,7 @@ impl Expression {
             Expression::resolve_generic_type(context, param_type, arg_type, &generic_map);
         }
 
-        return context.allocator.store(generic_map);
+        return context.allocator.store(&generic_map);
     }
 
     fn resolve_generic_type(context: &Context, param_type: &Type, arg_type: &Type, generic_map: &GenericMap) {
@@ -355,7 +355,7 @@ impl Expression {
                     let param_type = &param_iter.value().type;
 
                     if param_type.is_indirect() && !arg.value.return_type.is_indirect() {
-                        let new_type = context.allocator.store(Type::Indirect(Indirect::new_reference(context.allocator, arg.value.return_type)));
+                        let new_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, arg.value.return_type)));
                         arg.value = Expression::make(context.allocator, token, ExpressionData::UnaryExpression("&", arg.value), new_type);
                     }
                 }
@@ -469,7 +469,7 @@ impl Expression {
                     return 0;
                 },
                 EnumVariantResult::Function(function, generic_map) => {
-                    let member_type = context.allocator.store(Type::Function(function, generic_map));
+                    let member_type = context.allocator.store(&Type::Function(function, generic_map));
 
                     if !context.check_value(TokenType::Symbol, "(") {
                         return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
@@ -643,7 +643,7 @@ impl Expression {
                 if value == 0 { return 0; }
 
                 fields.append(InvokeArgument {
-                    name: context.allocator.store(name_token),
+                    name: context.allocator.store(&name_token),
                     value,
                 });
 
@@ -860,7 +860,7 @@ impl Expression {
                 match target.return_type {
                     Type::Enum(enum_info, _) => {
                         if enum_info.name.value.eq("Range") {
-                            let sequence = context.allocator.store(Sequence {
+                            let sequence = context.allocator.store(&Sequence {
                                 type: SequenceType::Slice,
                                 element: *inner.return_type.deref(),
                                 element_pointer: inner.return_type,
@@ -871,11 +871,11 @@ impl Expression {
 
                             let arguments = Array<InvokeArgument>::new(context.allocator);
 
-                            let argument_name_data = context.allocator.store(*index_expr.token);
+                            let argument_name_data = context.allocator.store(index_expr.token);
                             argument_name_data.type = TokenType::Identifier;
                             argument_name_data.value = "data";
 
-                            let argument_name_length = context.allocator.store(*argument_name_data);
+                            let argument_name_length = context.allocator.store(argument_name_data);
                             argument_name_length.value = "length";
 
                             if start.is_zero() {
@@ -893,7 +893,7 @@ impl Expression {
                                 });
                             }
 
-                            let sequence_type = context.allocator.store(Type::Sequence(sequence));
+                            let sequence_type = context.allocator.store(&Type::Sequence(sequence));
                             let sequence_expr = Expression::make(context.allocator, index_expr.token, ExpressionData::Type(sequence_type), sequence_type);
                             return Expression::make(context.allocator, index_expr.token, ExpressionData::Invoke(sequence_expr, arguments), sequence_type);
                         }
@@ -927,7 +927,7 @@ impl Expression {
         }
 
         if element_type == 0 && context.module.mode_cpp {
-            let unknown_c = context.allocator.store(UnknownC { include: 0, name: "", generics: Array<Type> {} });
+            let unknown_c = context.allocator.store(&UnknownC { include: 0, name: "", generics: Array<Type> {} });
             element_type = Type::UnknownC(unknown_c).to_ptr(context.allocator);
         }
 
@@ -1168,7 +1168,7 @@ impl Expression {
                                 Type::Function(_, func_generic_map) => {
                                     match func_info.type {
                                         FunctionType::Coroutine => {
-                                            func_return_type = context.allocator.store(Type::CoroutineInstance(func_info, func_generic_map));
+                                            func_return_type = context.allocator.store(&Type::CoroutineInstance(func_info, func_generic_map));
                                         },
                                         _ => {
                                             func_return_type = Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, 0);
@@ -1300,7 +1300,7 @@ impl Expression {
                         if operator.value.eq("&") {
                             match child.data {
                                 ExpressionData::Type(type) => {
-                                    let new_type = context.allocator.store(Type::Indirect(Indirect::new_reference(context.allocator, *type)));
+                                    let new_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, *type)));
                                     result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
                                 },
                                 _ => {
@@ -1312,7 +1312,7 @@ impl Expression {
                             match child.data {
                                 ExpressionData::Type(type) => {
                                     let new_indirect = Indirect::new_pointer(context.allocator, *type);
-                                    let new_type = context.allocator.store(Type::Indirect(new_indirect));
+                                    let new_type = context.allocator.store(&Type::Indirect(new_indirect));
                                     result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
                                 },
                                 _ => { result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), child.return_type.deref()); },
@@ -1330,7 +1330,7 @@ impl Expression {
                     if context.check_next(TokenType::Symbol, ",") {
                         let arguments = Array<InvokeArgument>::new(context.allocator);
 
-                        let name = context.allocator.store(*expr.token);
+                        let name = context.allocator.store(expr.token);
                         name.value = "_0";
 
                         arguments.append(InvokeArgument { name, value: expr });
@@ -1340,7 +1340,7 @@ impl Expression {
                             name_string.append("_");
                             name_string.append_usize(arguments.length);
 
-                            let name = context.allocator.store(*context.current());
+                            let name = context.allocator.store(context.current());
                             name.value = name_string.as_str();
 
                             let value = Expression::parse(context, generics);
@@ -1354,13 +1354,13 @@ impl Expression {
                             }
                         }
 
-                        let tuple = context.allocator.store(Tuple {});
+                        let tuple = context.allocator.store(&Tuple {});
                         tuple.elements = Array<Type>::new_with_length(context.allocator, arguments.length);
                         for (i, *expr) in arguments.iter().enumerate() {
                             tuple.elements.data[i] = expr.value.return_type;
                         }
 
-                        result = Expression::make_type_function_call(context, token, context.allocator.store(Type::Tuple(tuple)), arguments, 0);
+                        result = Expression::make_type_function_call(context, token, context.allocator.store(&Type::Tuple(tuple)), arguments, 0);
                     } else {
                         if !context.expect_value(TokenType::Symbol, ")") { return 0; }
 
@@ -1390,8 +1390,8 @@ impl Expression {
                     
                     context.expect_value(TokenType::Symbol, "]");
 
-                    let parent_sequence = context.allocator.store(Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type });
-                    let parent_type = context.allocator.store(Type::Sequence(parent_sequence));
+                    let parent_sequence = context.allocator.store(&Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type });
+                    let parent_type = context.allocator.store(&Type::Sequence(parent_sequence));
                     let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(parent_type), parent_type);
 
                     result = Expression::make(context.allocator, token, ExpressionData::Invoke(parent_expression, elements), parent_type);
@@ -1501,7 +1501,7 @@ impl Expression {
         }
 
         if apply_implicit_cast && type.needs_implicit_cast(&self.return_type) {
-            let expression = context.allocator.store(*self);
+            let expression = context.allocator.store(self);
             self.data = ExpressionData::ImplicitCast(expression);
             self.return_type = *type;
             return true;

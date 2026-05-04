@@ -11,7 +11,7 @@ impl YieldStatement {
         if !context.expect_value(TokenType::Keyword, "yield") { return 0; }
 
         if context.check_next(TokenType::Symbol, ";") {
-            return context.allocator.store(YieldStatement { expression: 0 });
+            return context.allocator.store(&YieldStatement { expression: 0 });
         }
 
         let expression = Expression::parse(context, generics);
@@ -20,6 +20,6 @@ impl YieldStatement {
 
         expression.validate_type(context, &context.function.return_type, true);
 
-        return context.allocator.store(YieldStatement { expression });
+        return context.allocator.store(&YieldStatement { expression });
     }
 }

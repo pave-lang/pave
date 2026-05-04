@@ -23,7 +23,8 @@ impl Block {
     }
 
     fn new_ptr(context: &Context) -> &Self {
-        return context.allocator.store(Block::new(context));
+        let block = Block::new(context);
+        return context.allocator.store(&block);
     }
 
     fn parse_expression_statement(&self, context: &Context, generics: &Generics, data: *StatementData) -> bool {
@@ -39,7 +40,7 @@ impl Block {
 
             value.validate_type(context, &expression.return_type, true);
 
-            let assignment = context.allocator.store(AssignmentStatement { left: expression, operator, right: value });
+            let assignment = context.allocator.store(&AssignmentStatement { left: expression, operator, right: value });
             *data = StatementData::AssignmentStatement(assignment);
         } else {
             *data = StatementData::ExpressionStatement(expression);

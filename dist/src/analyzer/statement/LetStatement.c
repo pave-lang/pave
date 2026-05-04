@@ -109,7 +109,7 @@ struct LetStatement* LetStatement__parse(struct Context* context, struct Generic
     }
 
     #line 57 "src/analyzer/statement/LetStatement.pv"
-    return ArenaAllocator__store_LetStatement(context->allocator, (struct LetStatement) {
+    return ArenaAllocator__store_LetStatement(context->allocator, &(struct LetStatement) {
         .is_static = is_static,
         .name = name,
         .type = type,

@@ -20,7 +20,7 @@ impl ReturnStatement {
                 context.error_token(first_token, "Return statement is blank but function has a return type");
             }
 
-            return context.allocator.store(ReturnStatement {
+            return context.allocator.store(&ReturnStatement {
                 expression: 0,
                 defer_statements,
             });
@@ -36,7 +36,7 @@ impl ReturnStatement {
             context.error_token(first_token, "Function does not have a return type");
         }
 
-        return context.allocator.store(ReturnStatement {
+        return context.allocator.store(&ReturnStatement {
             expression,
             defer_statements,
         });

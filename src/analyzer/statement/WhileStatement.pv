@@ -18,7 +18,7 @@ impl WhileStatement {
         block.is_loop = true;
         if !block.parse(context, generics, true) { return 0; }
 
-        return context.allocator.store(WhileStatement {
+        return context.allocator.store(&WhileStatement {
             expression,
             block,
         });

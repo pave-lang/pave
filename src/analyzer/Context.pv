@@ -46,15 +46,15 @@ impl Context {
         self.type_self = &self.root.type_self;
         self.pointer_const_char = Indirect { type: IndirectType::ConstPointer, to: Type::Primitive(module.find_primitive("char")) };
 
-        let param_name = allocator.store(Token { type: TokenType::String, value: "value" });
+        let param_name = allocator.store(&Token { type: TokenType::String, value: "value" });
 
         self.push_scope(0);
 
         let t = Generic::new(allocator);
-        t.name = allocator.store(Token { type: TokenType::String, value: "T" });
+        t.name = allocator.store(&Token { type: TokenType::String, value: "T" });
 
         let u = Generic::new(allocator);
-        u.name = allocator.store(Token { type: TokenType::String, value: "U" });
+        u.name = allocator.store(&Token { type: TokenType::String, value: "U" });
 
         let generics = Array<Generic>::new(allocator);
         generics.append(t);
@@ -90,7 +90,7 @@ impl Context {
         if values.find(name) != 0 { return true; }
         
         let func_info = Function::new(self);
-        func_info.name = self.allocator.store(Token { type: TokenType::String, value: name });
+        func_info.name = self.allocator.store(&Token { type: TokenType::String, value: name });
         func_info.type = FunctionType::Builtin;
         func_info.return_type = return_type;
 
@@ -107,9 +107,10 @@ impl Context {
             }
         }
 
-        let generic_map = self.allocator.store(GenericMap::from_generics(self.allocator, &func_info.generics));
+        let generic_map_val = GenericMap::from_generics(self.allocator, &func_info.generics);
+        let generic_map = self.allocator.store(&generic_map_val);
 
-        let func_type: Type = Type::Function(self.allocator.store(func_info), generic_map);
+        let func_type: Type = Type::Function(self.allocator.store(&func_info), generic_map);
         return values.insert(name, func_type);
     }
 
@@ -380,7 +381,7 @@ impl Context {
             let indirect_type = IndirectType::Pointer;
             if self.check_next(TokenType::Keyword, "const") { indirect_type = IndirectType::ConstPointer; }
 
-            let indirect = self.allocator.store(Indirect { type: indirect_type });
+            let indirect = self.allocator.store(&Indirect { type: indirect_type });
 
             if !self.parse_type(&indirect.to, generics) {
                 return false;
@@ -392,7 +393,7 @@ impl Context {
             let sequence: &Sequence = self.allocator.alloc(sizeof(Sequence));
 
             if !self.parse_type(&sequence.element, generics) { return false; }
-            sequence.element_pointer = Type::Indirect(self.allocator.store(Indirect { type: IndirectType::Pointer, to: sequence.element }));
+            sequence.element_pointer = Type::Indirect(self.allocator.store(&Indirect { type: IndirectType::Pointer, to: sequence.element }));
 
             if !self.check_next(TokenType::Symbol, ";") {
                 sequence.type = SequenceType::Slice;
@@ -451,8 +452,9 @@ impl Context {
             *type = Type::Tuple(tuple);
             return true;
         } else if self.check_next(TokenType::Keyword, "fn") {
-            let func_info = self.allocator.store(Function::new(self));
-            let generic_map = self.allocator.store(GenericMap { self_type: self.type_self });
+            let func_info_val = Function::new(self);
+            let func_info = self.allocator.store(&func_info_val);
+            let generic_map = self.allocator.store(&GenericMap { self_type: self.type_self });
             
             if !func_info.parse_parameters(&func_info.generics) || !func_info.parse_return_type(&func_info.generics) { return false; }
 
@@ -503,7 +505,7 @@ impl Context {
         let new_type = self.module.find_make_type(name.value, &generics_);
         if new_type == 0 {
             self.error_token(name, "Unknown type");
-            let unknown_c = self.allocator.store(UnknownC { include: 0, name: name.value, generics: generics_ });
+            let unknown_c = self.allocator.store(&UnknownC { include: 0, name: name.value, generics: generics_ });
             *type = Type::UnknownC(unknown_c);
             return false;
         }
@@ -639,7 +641,7 @@ impl Context {
     fn resolve_type(allocator: &ArenaAllocator, type: &Type, generics_map: &GenericMap, fallback_generics_map: &GenericMap) -> &Type {
         match type {
             Type::Indirect(indirect) => {
-                let resolved = allocator.store(Indirect {
+                let resolved = allocator.store(&Indirect {
                     type: indirect.type,
                     to: *Context::resolve_type(allocator, &indirect.to, generics_map, fallback_generics_map),
                 });
@@ -647,11 +649,11 @@ impl Context {
                 return Type::Indirect(resolved).to_ptr(allocator);
             },
             Type::Sequence(sequence) => {
-                let resolved = allocator.store(Sequence {
+                let resolved = allocator.store(&Sequence {
                     type: sequence.type,
                     element: *Context::resolve_type(allocator, &sequence.element, generics_map, fallback_generics_map),
                 });
-                resolved.element_pointer = Type::Indirect(allocator.store(Indirect { type: IndirectType::Pointer, to: resolved.element }));
+                resolved.element_pointer = Type::Indirect(allocator.store(&Indirect { type: IndirectType::Pointer, to: resolved.element }));
 
                 return Type::Sequence(resolved).to_ptr(allocator);
             },
@@ -662,7 +664,7 @@ impl Context {
                     *element = *Context::resolve_type(allocator, element, generics_map, fallback_generics_map);
                 }
 
-                return Type::Tuple(allocator.store(resolved)).to_ptr(allocator);
+                return Type::Tuple(allocator.store(&resolved)).to_ptr(allocator);
             },
             Type::Primitive(_) => {
                 return type;
@@ -676,12 +678,13 @@ impl Context {
 
                 let self_type: &Type = allocator.alloc(sizeof(Type));
                 resolved_generics.self_type = self_type;
-                *self_type = Type::Enum(enum_info, allocator.store(resolved_generics));
+                *self_type = Type::Enum(enum_info, allocator.store(&resolved_generics));
 
                 return self_type;
             },
             Type::Struct(struct_info, generics) => {
-                let resolved_generics = allocator.store(generics.clone(allocator));
+                let resolved_generics_val = generics.clone(allocator);
+                let resolved_generics = allocator.store(&resolved_generics_val);
                 
                 for generic in resolved_generics.array {
                     *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
@@ -694,7 +697,8 @@ impl Context {
                 return self_type;
             },
             Type::Trait(trait_info, generics) => {
-                let resolved_generics = allocator.store(generics.clone(allocator));
+                let resolved_generics_val = generics.clone(allocator);
+                let resolved_generics = allocator.store(&resolved_generics_val);
                 
                 for generic in resolved_generics.array {
                     *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
@@ -708,7 +712,8 @@ impl Context {
             },
             Type::Function(func_info, generics) => {
                 if func_info.type == FunctionType::MethodCpp { return type; }
-                let resolved_generics = allocator.store(generics.clone(allocator));
+                let resolved_generics_val = generics.clone(allocator);
+                let resolved_generics = allocator.store(&resolved_generics_val);
                 
                 for generic in resolved_generics.array {
                     *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);

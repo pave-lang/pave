@@ -58,7 +58,7 @@ void ArenaAllocator__destroy(struct ArenaAllocator* self) {
 #include <analyzer/types/Function.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, struct Function value) {
+struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, struct Function* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Function* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Function));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -68,14 +68,14 @@ struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, str
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Function));
+    memcpy(new_memory, value, sizeof(struct Function));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/types/GenericMap.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self, struct GenericMap value) {
+struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self, struct GenericMap* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct GenericMap* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct GenericMap));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -85,14 +85,14 @@ struct GenericMap* ArenaAllocator__store_GenericMap(struct ArenaAllocator* self,
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct GenericMap));
+    memcpy(new_memory, value, sizeof(struct GenericMap));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/types/Type.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type value) {
+struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Type* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Type));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -102,14 +102,14 @@ struct Type* ArenaAllocator__store_Type(struct ArenaAllocator* self, struct Type
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Type));
+    memcpy(new_memory, value, sizeof(struct Type));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/types/Indirect.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, struct Indirect value) {
+struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, struct Indirect* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Indirect* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Indirect));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -119,14 +119,14 @@ struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, str
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Indirect));
+    memcpy(new_memory, value, sizeof(struct Indirect));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/Block.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Block value) {
+struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Block* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Block* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Block));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -136,14 +136,14 @@ struct Block* ArenaAllocator__store_Block(struct ArenaAllocator* self, struct Bl
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Block));
+    memcpy(new_memory, value, sizeof(struct Block));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/AssignmentStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct ArenaAllocator* self, struct AssignmentStatement value) {
+struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct ArenaAllocator* self, struct AssignmentStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct AssignmentStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct AssignmentStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -153,14 +153,14 @@ struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct Are
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct AssignmentStatement));
+    memcpy(new_memory, value, sizeof(struct AssignmentStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/Token.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token value) {
+struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Token* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Token));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -170,14 +170,14 @@ struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct To
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Token));
+    memcpy(new_memory, value, sizeof(struct Token));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/UnknownC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, struct UnknownC value) {
+struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, struct UnknownC* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct UnknownC* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct UnknownC));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -187,14 +187,14 @@ struct UnknownC* ArenaAllocator__store_UnknownC(struct ArenaAllocator* self, str
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct UnknownC));
+    memcpy(new_memory, value, sizeof(struct UnknownC));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/types/Sequence.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, struct Sequence value) {
+struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, struct Sequence* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Sequence* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Sequence));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -204,14 +204,14 @@ struct Sequence* ArenaAllocator__store_Sequence(struct ArenaAllocator* self, str
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Sequence));
+    memcpy(new_memory, value, sizeof(struct Sequence));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/types/Tuple.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tuple value) {
+struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tuple* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Tuple* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Tuple));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -221,14 +221,14 @@ struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tu
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Tuple));
+    memcpy(new_memory, value, sizeof(struct Tuple));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/types/Generic.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struct Generic value) {
+struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struct Generic* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Generic* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Generic));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -238,14 +238,14 @@ struct Generic* ArenaAllocator__store_Generic(struct ArenaAllocator* self, struc
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Generic));
+    memcpy(new_memory, value, sizeof(struct Generic));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/expression/Expression.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression value) {
+struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Expression* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Expression));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -255,14 +255,14 @@ struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self,
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Expression));
+    memcpy(new_memory, value, sizeof(struct Expression));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/DeferStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocator* self, struct DeferStatement value) {
+struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocator* self, struct DeferStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct DeferStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct DeferStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -272,14 +272,14 @@ struct DeferStatement* ArenaAllocator__store_DeferStatement(struct ArenaAllocato
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct DeferStatement));
+    memcpy(new_memory, value, sizeof(struct DeferStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/ForStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement value) {
+struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct ForStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ForStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -289,14 +289,14 @@ struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* s
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct ForStatement));
+    memcpy(new_memory, value, sizeof(struct ForStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/IfStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* self, struct IfStatement value) {
+struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* self, struct IfStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct IfStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct IfStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -306,14 +306,14 @@ struct IfStatement* ArenaAllocator__store_IfStatement(struct ArenaAllocator* sel
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct IfStatement));
+    memcpy(new_memory, value, sizeof(struct IfStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/LetStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement value) {
+struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* self, struct LetStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct LetStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct LetStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -323,14 +323,14 @@ struct LetStatement* ArenaAllocator__store_LetStatement(struct ArenaAllocator* s
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct LetStatement));
+    memcpy(new_memory, value, sizeof(struct LetStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/MatchStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocator* self, struct MatchStatement value) {
+struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocator* self, struct MatchStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct MatchStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct MatchStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -340,14 +340,14 @@ struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocato
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct MatchStatement));
+    memcpy(new_memory, value, sizeof(struct MatchStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/ReturnStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAllocator* self, struct ReturnStatement value) {
+struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAllocator* self, struct ReturnStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct ReturnStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ReturnStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -357,14 +357,14 @@ struct ReturnStatement* ArenaAllocator__store_ReturnStatement(struct ArenaAlloca
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct ReturnStatement));
+    memcpy(new_memory, value, sizeof(struct ReturnStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/WhileStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocator* self, struct WhileStatement value) {
+struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocator* self, struct WhileStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct WhileStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct WhileStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -374,14 +374,14 @@ struct WhileStatement* ArenaAllocator__store_WhileStatement(struct ArenaAllocato
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct WhileStatement));
+    memcpy(new_memory, value, sizeof(struct WhileStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/statement/YieldStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocator* self, struct YieldStatement value) {
+struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocator* self, struct YieldStatement* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct YieldStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct YieldStatement));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -391,14 +391,14 @@ struct YieldStatement* ArenaAllocator__store_YieldStatement(struct ArenaAllocato
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct YieldStatement));
+    memcpy(new_memory, value, sizeof(struct YieldStatement));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/ClassCpp.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp value) {
+struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, struct ClassCpp* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct ClassCpp* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ClassCpp));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -408,14 +408,14 @@ struct ClassCpp* ArenaAllocator__store_ClassCpp(struct ArenaAllocator* self, str
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct ClassCpp));
+    memcpy(new_memory, value, sizeof(struct ClassCpp));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/EnumC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct EnumC value) {
+struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct EnumC* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct EnumC* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct EnumC));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -425,14 +425,14 @@ struct EnumC* ArenaAllocator__store_EnumC(struct ArenaAllocator* self, struct En
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct EnumC));
+    memcpy(new_memory, value, sizeof(struct EnumC));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/FunctionC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, struct FunctionC value) {
+struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, struct FunctionC* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct FunctionC* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct FunctionC));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -442,14 +442,14 @@ struct FunctionC* ArenaAllocator__store_FunctionC(struct ArenaAllocator* self, s
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct FunctionC));
+    memcpy(new_memory, value, sizeof(struct FunctionC));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/Include.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include value) {
+struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct Include* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Include));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -459,14 +459,14 @@ struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struc
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct Include));
+    memcpy(new_memory, value, sizeof(struct Include));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/IncludeContext.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct IncludeContext* ArenaAllocator__store_IncludeContext(struct ArenaAllocator* self, struct IncludeContext value) {
+struct IncludeContext* ArenaAllocator__store_IncludeContext(struct ArenaAllocator* self, struct IncludeContext* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct IncludeContext* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct IncludeContext));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -476,14 +476,14 @@ struct IncludeContext* ArenaAllocator__store_IncludeContext(struct ArenaAllocato
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct IncludeContext));
+    memcpy(new_memory, value, sizeof(struct IncludeContext));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/NamespaceCpp.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* self, struct NamespaceCpp value) {
+struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* self, struct NamespaceCpp* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct NamespaceCpp* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct NamespaceCpp));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -493,14 +493,14 @@ struct NamespaceCpp* ArenaAllocator__store_NamespaceCpp(struct ArenaAllocator* s
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct NamespaceCpp));
+    memcpy(new_memory, value, sizeof(struct NamespaceCpp));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/StructC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct StructC* ArenaAllocator__store_StructC(struct ArenaAllocator* self, struct StructC value) {
+struct StructC* ArenaAllocator__store_StructC(struct ArenaAllocator* self, struct StructC* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct StructC* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct StructC));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -510,14 +510,14 @@ struct StructC* ArenaAllocator__store_StructC(struct ArenaAllocator* self, struc
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct StructC));
+    memcpy(new_memory, value, sizeof(struct StructC));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
 #include <analyzer/c/TypedefC.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
-struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, struct TypedefC value) {
+struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, struct TypedefC* value) {
     #line 166 "src/std/ArenaAllocator.pv"
     struct TypedefC* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct TypedefC));
     #line 167 "src/std/ArenaAllocator.pv"
@@ -527,7 +527,7 @@ struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, str
     }
 
     #line 169 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, &value, sizeof(struct TypedefC));
+    memcpy(new_memory, value, sizeof(struct TypedefC));
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }

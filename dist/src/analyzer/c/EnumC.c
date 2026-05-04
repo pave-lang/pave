@@ -15,7 +15,7 @@ struct EnumC* EnumC__new(struct Include* include, char const* name, struct Paren
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 14 "src/analyzer/c/EnumC.pv"
-    return ArenaAllocator__store_EnumC(allocator, (struct EnumC) {
+    return ArenaAllocator__store_EnumC(allocator, &(struct EnumC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .parent = parent,

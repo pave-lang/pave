@@ -44,7 +44,7 @@ impl IfStatement {
             else_statements.append(else_statement);
         }
 
-        return context.allocator.store(IfStatement {
+        return context.allocator.store(&IfStatement {
             expression,
             block,
             else_statements,

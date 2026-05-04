@@ -652,7 +652,7 @@ struct Function* Generator__get_function(struct Generator* self, struct Type* ty
                 #line 272 "src/compiler/Generator.pv"
                 if (func_info != 0) {
                     #line 273 "src/compiler/Generator.pv"
-                    func_info = ArenaAllocator__store_Function(self->allocator, *func_info);
+                    func_info = ArenaAllocator__store_Function(self->allocator, func_info);
                     #line 274 "src/compiler/Generator.pv"
                     func_info->parent = (struct FunctionParent) { .type = FUNCTION_PARENT__STRUCT, .struct_value = { ._0 = struct_info, ._1 = impl_index, ._2 = impl_info->trait_} };
                     #line 275 "src/compiler/Generator.pv"

@@ -15,7 +15,7 @@ struct UnknownC* UnknownC__new(struct Include* include, char const* name) {
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 14 "src/analyzer/c/UnknownC.pv"
-    return ArenaAllocator__store_UnknownC(allocator, (struct UnknownC) {
+    return ArenaAllocator__store_UnknownC(allocator, &(struct UnknownC) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .generics = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),

@@ -11,7 +11,7 @@ impl TypedefC {
     fn new(include: &Include, name: str, type: &Type) -> &Self {
         let allocator = include.root.allocator;
 
-        return allocator.store(Self {
+        return allocator.store(&Self {
             include,
             name,
             type,

@@ -16,7 +16,7 @@ impl ClassCpp {
     fn new(include: &Include, name: *const char, parent: ParentCpp, is_struct: bool) -> &Self {
         let allocator = include.root.allocator;
 
-        return allocator.store(Self {
+        return allocator.store(&Self {
             include,
             is_struct,
             name: name,

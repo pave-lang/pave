@@ -36,7 +36,7 @@ struct ReturnStatement* ReturnStatement__parse(struct Context* context, struct G
         }
 
         #line 23 "src/analyzer/statement/ReturnStatement.pv"
-        return ArenaAllocator__store_ReturnStatement(context->allocator, (struct ReturnStatement) {
+        return ArenaAllocator__store_ReturnStatement(context->allocator, &(struct ReturnStatement) {
             .expression = 0,
             .defer_statements = defer_statements,
         });
@@ -65,7 +65,7 @@ struct ReturnStatement* ReturnStatement__parse(struct Context* context, struct G
     }
 
     #line 39 "src/analyzer/statement/ReturnStatement.pv"
-    return ArenaAllocator__store_ReturnStatement(context->allocator, (struct ReturnStatement) {
+    return ArenaAllocator__store_ReturnStatement(context->allocator, &(struct ReturnStatement) {
         .expression = expression,
         .defer_statements = defer_statements,
     });

@@ -26,7 +26,7 @@
 #line 20 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp) {
     #line 21 "src/analyzer/c/Include.pv"
-    struct Include* self = ArenaAllocator__store_Include(root->allocator, (struct Include) {
+    struct Include* self = ArenaAllocator__store_Include(root->allocator, &(struct Include) {
         .root = root,
         .mode_cpp = mode_cpp,
         .path = path,
@@ -309,7 +309,7 @@ struct Type* Include__parse_type(struct Include* self, CXType type) {
         }
 
         #line 202 "src/analyzer/c/Include.pv"
-        return ArenaAllocator__store_Type(self->root->allocator, (struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
+        return ArenaAllocator__store_Type(self->root->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
     }
 
     #line 205 "src/analyzer/c/Include.pv"

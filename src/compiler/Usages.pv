@@ -195,8 +195,8 @@ impl Usages {
             self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
             
             if func_info.generics.array.length == 0 && self.usage_types.insert(func_info.name.value) {
-                let generic_map = self.allocator.store(GenericMap {});
-                let self_type = self.allocator.store(Type::Function(func_info, generic_map));
+                let generic_map = self.allocator.store(&GenericMap {});
+                let self_type = self.allocator.store(&Type::Function(func_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Function(func_info, generic_map));
             }
@@ -214,8 +214,8 @@ impl Usages {
             }
 
             if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
-                let generic_map = self.allocator.store(GenericMap {});
-                let self_type = self.allocator.store(Type::Enum(enum_info, generic_map));
+                let generic_map = self.allocator.store(&GenericMap {});
+                let self_type = self.allocator.store(&Type::Enum(enum_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Enum(enum_info, generic_map));
             }
@@ -233,8 +233,8 @@ impl Usages {
             }
 
             if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
-                let generic_map = self.allocator.store(GenericMap {});
-                let self_type = self.allocator.store(Type::Struct(struct_info, generic_map));
+                let generic_map = self.allocator.store(&GenericMap {});
+                let self_type = self.allocator.store(&Type::Struct(struct_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Struct(struct_info, generic_map));
             }
@@ -248,8 +248,8 @@ impl Usages {
             }
 
             if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
-                let generic_map = self.allocator.store(GenericMap {});
-                let self_type = self.allocator.store(Type::Trait(trait_info, generic_map));
+                let generic_map = self.allocator.store(&GenericMap {});
+                let self_type = self.allocator.store(&Type::Trait(trait_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Trait(trait_info, generic_map));
             }
@@ -344,7 +344,7 @@ impl Usages {
             UsageMode::Signature => { usage_context.signature.insert(type_name_generic.as_str(), *type); },
             UsageMode::Body => { usage_context.body.insert(type_name_generic.as_str(), *type); },
         }
-
+        
         if !is_type && !is_trait { return; }
 
         let type_name = self.root.naming_decl.get_type_name(type_deref_all, generic_map.self_type, generic_map);
@@ -382,8 +382,8 @@ impl Usages {
     }
 
     fn process_primitive(&self, primitive_info: &Primitive) {
-        let self_type = self.allocator.store(Type::Primitive(primitive_info));
-        let generic_map = self.allocator.store(GenericMap { self_type });
+        let self_type = self.allocator.store(&Type::Primitive(primitive_info));
+        let generic_map = self.allocator.store(&GenericMap { self_type });
 
         let parent_ptr = cast<usize>(primitive_info);
         let parent_usage = self.primitives.find(&parent_ptr);
@@ -395,11 +395,12 @@ impl Usages {
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
-        let generic_map = self.allocator.store(GenericMap::new(self.allocator, &Generics {}, &Array<Type> {}));
+        let generic_map_val = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        let generic_map = self.allocator.store(&generic_map_val);
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
-        let indirect = self.allocator.store(Indirect { type: IndirectType::Reference, to: sequence_type });
-        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));
+        let indirect = self.allocator.store(&Indirect { type: IndirectType::Reference, to: sequence_type });
+        generic_map.self_type = self.allocator.store(&Type::Indirect(indirect));
 
         let parent_ptr = cast<usize>(sequence);
         let parent_usage = self.sequences.find(&parent_ptr);
@@ -425,7 +426,8 @@ impl Usages {
     }
 
     fn process_tuple(&self, tuple: &Tuple) {
-        let generic_map = self.allocator.store(GenericMap::new(self.allocator, &Generics {}, &Array<Type> {}));
+        let generic_map_val = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        let generic_map = self.allocator.store(&generic_map_val);
         let tuple_type = Type::Tuple(tuple);
 
         let parent_ptr = cast<usize>(tuple);
@@ -436,8 +438,8 @@ impl Usages {
         self.usage_context = parent_usage.add_usage(generic_map);
         self.usage_mode = UsageMode::Layout;
 
-        let indirect = self.allocator.store(Indirect { type: IndirectType::Reference, to: tuple_type });
-        generic_map.self_type = self.allocator.store(Type::Indirect(indirect));
+        let indirect = self.allocator.store(&Indirect { type: IndirectType::Reference, to: tuple_type });
+        generic_map.self_type = self.allocator.store(&Type::Indirect(indirect));
 
         for element in tuple.elements {
             self.add_type(element, generic_map);

@@ -28,12 +28,12 @@ impl DeferStatement {
         if context.check_value(TokenType::Symbol, "{") {
             let defer_block = Block::new_ptr(context);
             if !defer_block.parse(context, generics, true) { return 0; }
-            return context.allocator.store(DeferStatement::Block(defer_block));
+            return context.allocator.store(&DeferStatement::Block(defer_block));
         } else {
             let expression = Expression::parse(context, generics);
             if expression == 0 { return 0; }
             if !context.expect_value(TokenType::Symbol, ";") { return 0; }
-            return context.allocator.store(DeferStatement::Expression(expression));
+            return context.allocator.store(&DeferStatement::Expression(expression));
         }
     }
 }

@@ -63,7 +63,7 @@ struct DeferStatement* DeferStatement__parse(struct Block* parent_block, struct 
             return 0;
         }
         #line 31 "src/analyzer/statement/DeferStatement.pv"
-        return ArenaAllocator__store_DeferStatement(context->allocator, (struct DeferStatement) { .type = DEFER_STATEMENT__BLOCK, .block_value = defer_block });
+        return ArenaAllocator__store_DeferStatement(context->allocator, &(struct DeferStatement) { .type = DEFER_STATEMENT__BLOCK, .block_value = defer_block });
     } else {
         #line 33 "src/analyzer/statement/DeferStatement.pv"
         struct Expression* expression = Expression__parse(context, generics);
@@ -78,6 +78,6 @@ struct DeferStatement* DeferStatement__parse(struct Block* parent_block, struct 
             return 0;
         }
         #line 36 "src/analyzer/statement/DeferStatement.pv"
-        return ArenaAllocator__store_DeferStatement(context->allocator, (struct DeferStatement) { .type = DEFER_STATEMENT__EXPRESSION, .expression_value = expression });
+        return ArenaAllocator__store_DeferStatement(context->allocator, &(struct DeferStatement) { .type = DEFER_STATEMENT__EXPRESSION, .expression_value = expression });
     }
 }

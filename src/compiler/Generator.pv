@@ -270,7 +270,7 @@ impl Generator {
                     func_info = impl_info.trait_.functions.find(&func_name);
 
                     if func_info != 0 {
-                        func_info = self.allocator.store(*func_info);
+                        func_info = self.allocator.store(func_info);
                         func_info.parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
                         break;
                     }

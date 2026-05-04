@@ -156,7 +156,7 @@ impl Struct {
             if !context.parse_type(&type, &self.generics) { return false; }
 
             let field: StructField = StructField {
-                name: context.allocator.store(name_token),
+                name: context.allocator.store(&name_token),
                 type,
             };
 

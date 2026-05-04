@@ -24,7 +24,7 @@ struct YieldStatement* YieldStatement__parse(struct Context* context, struct Gen
     #line 13 "src/analyzer/statement/YieldStatement.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 14 "src/analyzer/statement/YieldStatement.pv"
-        return ArenaAllocator__store_YieldStatement(context->allocator, (struct YieldStatement) { .expression = 0 });
+        return ArenaAllocator__store_YieldStatement(context->allocator, &(struct YieldStatement) { .expression = 0 });
     }
 
     #line 17 "src/analyzer/statement/YieldStatement.pv"
@@ -44,5 +44,5 @@ struct YieldStatement* YieldStatement__parse(struct Context* context, struct Gen
     Expression__validate_type(expression, context, &context->function->return_type, true);
 
     #line 23 "src/analyzer/statement/YieldStatement.pv"
-    return ArenaAllocator__store_YieldStatement(context->allocator, (struct YieldStatement) { .expression = expression });
+    return ArenaAllocator__store_YieldStatement(context->allocator, &(struct YieldStatement) { .expression = expression });
 }

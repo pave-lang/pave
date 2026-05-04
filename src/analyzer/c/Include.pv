@@ -18,7 +18,7 @@ struct Include {
 
 impl Include {
     fn new(root: &Root, path: str, mode_cpp: bool) -> &Self {
-        let self = root.allocator.store(Self {
+        let self = root.allocator.store(&Self {
             root,
             mode_cpp,
             path,
@@ -199,7 +199,7 @@ impl Include {
                 indirect = Indirect::new_pointer(self.root.allocator, *resolved_pointee_type);
             }
 
-            return self.root.allocator.store(Type::Indirect(indirect)); 
+            return self.root.allocator.store(&Type::Indirect(indirect));
         }
         
         if type.kind == CXType_Elaborated {

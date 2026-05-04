@@ -221,7 +221,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
         #line 107 "src/analyzer/statement/ForStatement.pv"
         if (!is_sequence) {
             #line 108 "src/analyzer/statement/ForStatement.pv"
-            struct Token* iter_member = ArenaAllocator__store_Token(context->allocator, *expression_first_token);
+            struct Token* iter_member = ArenaAllocator__store_Token(context->allocator, expression_first_token);
             #line 109 "src/analyzer/statement/ForStatement.pv"
             iter_member->value = (struct str){ .ptr = "iter", .length = strlen("iter") };
 
@@ -365,5 +365,5 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
     Context__pop_scope(context);
 
     #line 182 "src/analyzer/statement/ForStatement.pv"
-    return ArenaAllocator__store_ForStatement(context->allocator, for_statement);
+    return ArenaAllocator__store_ForStatement(context->allocator, &for_statement);
 }

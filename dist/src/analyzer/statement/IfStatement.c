@@ -84,7 +84,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
     }
 
     #line 47 "src/analyzer/statement/IfStatement.pv"
-    return ArenaAllocator__store_IfStatement(context->allocator, (struct IfStatement) {
+    return ArenaAllocator__store_IfStatement(context->allocator, &(struct IfStatement) {
         .expression = expression,
         .block = block,
         .else_statements = else_statements,

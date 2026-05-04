@@ -162,11 +162,11 @@ impl ArenaAllocator {
         self.last_block = 0;
     }
 
-    fn store<T>(&self, value: T) -> *T {
+    fn store<T>(&self, value: *T) -> *T {
         let new_memory: *T = self.alloc(sizeof(T));
         if new_memory == 0 { return 0; }
 
-        memcpy(new_memory, &value, sizeof(T));
+        memcpy(new_memory, value, sizeof(T));
         return new_memory;
     }
 }

@@ -291,7 +291,7 @@ bool Struct__fill_types_tuple(struct Struct* self) {
 
         #line 158 "src/analyzer/types/Struct.pv"
         struct StructField field = (struct StructField) {
-            .name = ArenaAllocator__store_Token(context->allocator, name_token),
+            .name = ArenaAllocator__store_Token(context->allocator, &name_token),
             .type = type,
         };
 

@@ -118,8 +118,8 @@ impl MatchPattern {
                         if variable_type == 0 { return false; }
 
                         if ref {
-                            let indirect = context.allocator.store(Indirect { type: IndirectType::Reference, to: *variable_type });
-                            variable_type = context.allocator.store(Type::Indirect(indirect));
+                            let indirect = context.allocator.store(&Indirect { type: IndirectType::Reference, to: *variable_type });
+                            variable_type = context.allocator.store(&Type::Indirect(indirect));
                         }
 
                         let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);

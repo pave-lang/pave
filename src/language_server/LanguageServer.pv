@@ -20,7 +20,7 @@ struct LanguageServer {
 
 impl LanguageServer {
     fn new(allocator: &ArenaAllocator, args: &Array<*const char>) -> &LanguageServer {
-        let self = allocator.store(LanguageServer {
+        let self = allocator.store(&LanguageServer {
             allocator,
             args: Array<*const char>::new(allocator),
             clang_args: Array<*const char>::new(allocator),
