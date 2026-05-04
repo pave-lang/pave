@@ -2502,6 +2502,7 @@ impl Generator {
         let name = self.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: i32 = name.array.length;
 
+        fprintf(file, "\n");
         self.write_line_directive(file, &trait_info.module.context, trait_info.name);
 
         fprintf(file, "struct %.*sVTable {\n", name_length, name.array.data);
@@ -2513,9 +2514,11 @@ impl Generator {
                 func_name.append("(*");
                 func_name.append(func_info.name.value);
                 func_name.append(")");
+
+                self.write_indent(file);
                 if !self.write_function_definition(file, func_info, &void_self_generics, &func_name) { return false; }
                 fprintf(file, ";\n");
-            } /* else { TODO } */
+            }
         }
 
         self.indent -= 1;

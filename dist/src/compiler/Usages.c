@@ -441,11 +441,11 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
         #line 268 "src/compiler/Usages.pv"
         case TYPE__INDIRECT: {
             #line 269 "src/compiler/Usages.pv"
-            switch (Type__deref_all(type)->type) {
+            switch (type_deref_all->type) {
                 #line 270 "src/compiler/Usages.pv"
                 case TYPE__PRIMITIVE: {
                     #line 270 "src/compiler/Usages.pv"
-                    struct Primitive* primitive_info = Type__deref_all(type)->primitive_value;
+                    struct Primitive* primitive_info = type_deref_all->primitive_value;
                     #line 271 "src/compiler/Usages.pv"
                     if (self->usage_mode == USAGE_MODE__LAYOUT || self->usage_mode == USAGE_MODE__SIGNATURE) {
                         #line 272 "src/compiler/Usages.pv"
@@ -459,82 +459,87 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
                     return;
                 } break;
                 #line 279 "src/compiler/Usages.pv"
+                case TYPE__TRAIT: {
+                    #line 279 "src/compiler/Usages.pv"
+                    is_trait = true;
+                } break;
+                #line 280 "src/compiler/Usages.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 282 "src/compiler/Usages.pv"
+        #line 283 "src/compiler/Usages.pv"
         case TYPE__PRIMITIVE: {
-            #line 282 "src/compiler/Usages.pv"
-            struct Primitive* primitive_info = type_deref->primitive_value;
             #line 283 "src/compiler/Usages.pv"
+            struct Primitive* primitive_info = type_deref->primitive_value;
+            #line 284 "src/compiler/Usages.pv"
             if (self->usage_mode == USAGE_MODE__LAYOUT || self->usage_mode == USAGE_MODE__SIGNATURE) {
-                #line 284 "src/compiler/Usages.pv"
+                #line 285 "src/compiler/Usages.pv"
                 HashSet_str__insert(&usage_context->primitive_header, primitive_info->name);
             } else {
-                #line 286 "src/compiler/Usages.pv"
+                #line 287 "src/compiler/Usages.pv"
                 HashSet_str__insert(&usage_context->primitive_code, primitive_info->name);
             }
         } break;
-        #line 289 "src/compiler/Usages.pv"
-        case TYPE__STRUCT: {
-            #line 289 "src/compiler/Usages.pv"
-            is_type = true;
-        } break;
         #line 290 "src/compiler/Usages.pv"
-        case TYPE__ENUM: {
+        case TYPE__STRUCT: {
             #line 290 "src/compiler/Usages.pv"
             is_type = true;
         } break;
         #line 291 "src/compiler/Usages.pv"
+        case TYPE__ENUM: {
+            #line 291 "src/compiler/Usages.pv"
+            is_type = true;
+        } break;
+        #line 292 "src/compiler/Usages.pv"
         case TYPE__FUNCTION: {
-            #line 291 "src/compiler/Usages.pv"
-            struct Function* func_info = type_deref->function_value._0;
-            #line 291 "src/compiler/Usages.pv"
-            struct GenericMap* type_generic_map = type_deref->function_value._1;
             #line 292 "src/compiler/Usages.pv"
+            struct Function* func_info = type_deref->function_value._0;
+            #line 292 "src/compiler/Usages.pv"
+            struct GenericMap* type_generic_map = type_deref->function_value._1;
+            #line 293 "src/compiler/Usages.pv"
             is_type = func_info->type != FUNCTION_TYPE__BUILTIN && func_info->generics.array.length > 0;
 
-            #line 294 "src/compiler/Usages.pv"
+            #line 295 "src/compiler/Usages.pv"
             switch (func_info->parent.type) {
-                #line 295 "src/compiler/Usages.pv"
+                #line 296 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__NONE: {
-                    #line 296 "src/compiler/Usages.pv"
+                    #line 297 "src/compiler/Usages.pv"
                     is_type = (func_info->type == FUNCTION_TYPE__STANDARD || func_info->type == FUNCTION_TYPE__COROUTINE) && func_info->name != 0;
                 } break;
-                #line 298 "src/compiler/Usages.pv"
+                #line 299 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__PRIMITIVE: {
-                    #line 298 "src/compiler/Usages.pv"
-                    struct Primitive* primitive_info = func_info->parent.primitive_value._0;
                     #line 299 "src/compiler/Usages.pv"
+                    struct Primitive* primitive_info = func_info->parent.primitive_value._0;
+                    #line 300 "src/compiler/Usages.pv"
                     Usages__add_type(self, &(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }, generic_map);
                 } break;
-                #line 301 "src/compiler/Usages.pv"
+                #line 302 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__STRUCT: {
-                    #line 301 "src/compiler/Usages.pv"
-                    struct Struct* struct_info = func_info->parent.struct_value._0;
                     #line 302 "src/compiler/Usages.pv"
+                    struct Struct* struct_info = func_info->parent.struct_value._0;
+                    #line 303 "src/compiler/Usages.pv"
                     Usages__add_type(self, &(struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = type_generic_map} }, generic_map);
                 } break;
-                #line 304 "src/compiler/Usages.pv"
+                #line 305 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__ENUM: {
-                    #line 304 "src/compiler/Usages.pv"
-                    struct Enum* enum_info = func_info->parent.enum_value._0;
                     #line 305 "src/compiler/Usages.pv"
+                    struct Enum* enum_info = func_info->parent.enum_value._0;
+                    #line 306 "src/compiler/Usages.pv"
                     Usages__add_type(self, &(struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = type_generic_map} }, generic_map);
                 } break;
-                #line 307 "src/compiler/Usages.pv"
+                #line 308 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__TRAIT: {
-                    #line 307 "src/compiler/Usages.pv"
-                    struct Trait* trait_info = func_info->parent.trait_value;
                     #line 308 "src/compiler/Usages.pv"
+                    struct Trait* trait_info = func_info->parent.trait_value;
+                    #line 309 "src/compiler/Usages.pv"
                     Usages__add_type(self, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = type_generic_map} }, generic_map);
                 } break;
-                #line 310 "src/compiler/Usages.pv"
+                #line 311 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__TYPE: {
-                    #line 310 "src/compiler/Usages.pv"
-                    struct Type* type_info = func_info->parent.type_value._0;
                     #line 311 "src/compiler/Usages.pv"
+                    struct Type* type_info = func_info->parent.type_value._0;
+                    #line 312 "src/compiler/Usages.pv"
                     Usages__add_type(self, type_info, type_generic_map);
                 } break;
             }

@@ -266,7 +266,7 @@ impl Usages {
 
         match type_deref {
             Type::Indirect(_) => {
-                match type.deref_all() {
+                match type_deref_all {
                     Type::Primitive(primitive_info) => {
                         if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {
                             usage_context.primitive_header.insert(primitive_info.name);
@@ -276,6 +276,7 @@ impl Usages {
 
                         return;
                     },
+                    Type::Trait(_, _) => { is_trait = true; },
                     _ => {},
                 }
             },
