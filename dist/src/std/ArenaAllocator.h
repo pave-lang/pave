@@ -41,6 +41,10 @@ struct Indirect;
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, struct Indirect* value);
+struct Primitive;
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct Primitive* ArenaAllocator__store_Primitive(struct ArenaAllocator* self, struct Primitive* value);
 struct Block;
 
 #line 165 "src/std/ArenaAllocator.pv"

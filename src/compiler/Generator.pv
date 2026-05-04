@@ -1821,7 +1821,7 @@ impl Generator {
         return success;
     }
 
-    fn write_function_block(&self, file: &FILE, name: str, func_info: &Function, generics: &GenericMap) -> bool {
+    fn write_function_block(&self, file: &FILE, name: str, func_info: &Function, generics: &GenericMap, function_usage: &TypeFunctionUsage) -> bool {
         if func_info.type == FunctionType::Coroutine {
             fprintf(file, " {\n");
             self.indent += 1;
@@ -1835,16 +1835,13 @@ impl Generator {
             fprintf(file, "switch (ctx->_state) {\n");
             self.indent += 1;
 
-            self.write_indent(file);
-            fprintf(file, "case -1: return false;\n");
-
-            let i: usize = 0;
-            while i < self.function_context.coroutine.yield_count {
-                i += 1;
-
+            for i in 1..function_usage.function_context.coroutine.yield_count + 1 {
                 self.write_indent(file);
                 fprintf(file, "case %zu: goto yield_%zu;\n", i, i);
             }
+
+            self.write_indent(file);
+            fprintf(file, "default: return false;\n");
 
             self.indent -= 1;
             self.write_indent(file);
@@ -1991,7 +1988,7 @@ impl Generator {
 
         if !self.write_function_definition(code_file, func_info, generics, 0) { fclose(code_file); return false; }
 
-        self.write_function_block(code_file, name_str, func_info, generics);
+        self.write_function_block(code_file, name_str, func_info, generics, usage);
 
         self.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -2625,7 +2622,7 @@ impl Generator {
                         if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
                         self.function_context = &func_context;
 
-                        if !self.write_function_block(file, name.as_str(), func_info, generics) {
+                        if !self.write_function_block(file, name.as_str(), func_info, generics, function_usage) {
                             let func_name_length: u32 = func_info.name.value.length;
                             fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
                             return false;
@@ -2878,7 +2875,7 @@ impl Generator {
                             func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count;
                             self.function_context = &func_context;
 
-                            self.write_function_block(file, name.as_str(), func_info, generics3);
+                            self.write_function_block(file, name.as_str(), func_info, generics3, function_usage);
                             
                             self.function_context = 0;
                         }

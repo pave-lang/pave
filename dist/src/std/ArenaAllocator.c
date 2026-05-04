@@ -123,6 +123,23 @@ struct Indirect* ArenaAllocator__store_Indirect(struct ArenaAllocator* self, str
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/Primitive.h>
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct Primitive* ArenaAllocator__store_Primitive(struct ArenaAllocator* self, struct Primitive* value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct Primitive* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Primitive));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct Primitive));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/Block.h>
 
 #line 165 "src/std/ArenaAllocator.pv"
