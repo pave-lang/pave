@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/c/TypedefC.h>

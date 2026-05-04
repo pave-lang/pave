@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <string.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>

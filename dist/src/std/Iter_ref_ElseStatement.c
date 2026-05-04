@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/Iter_ref_ElseStatement.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <std/IterEnumerate_ref_ElseStatement.h>

@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #include <analyzer/types/Function.h>
 #include <analyzer/Context.h>
 #include <std/trait_Allocator.h>

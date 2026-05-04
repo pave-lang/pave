@@ -3,6 +3,9 @@
 
 #include <clang-c/Index.h>
 #include <string.h>
+
+#include <clang-c/Index.h>
+#include <string.h>
 #include <analyzer/c/Include.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>

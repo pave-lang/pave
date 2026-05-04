@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/IterEnumerate_ref_Impl.h>
 #include <tuple_usize_ref_Impl.h>
 #include <analyzer/Impl.h>

@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/IterEnumerate_ref_Generic.h>
 #include <tuple_usize_ref_Generic.h>
 #include <analyzer/types/Generic.h>

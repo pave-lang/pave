@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <std/HashMapBucket_usize_TypeUsage_Sequence.h>
 #include <std/HashMapIter_usize_TypeUsage_Sequence.h>
 #include <tuple_usize_TypeUsage_Sequence.h>

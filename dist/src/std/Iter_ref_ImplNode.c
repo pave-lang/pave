@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/Iter_ref_ImplNode.h>
 #include <analyzer/ImplNode.h>
 #include <std/IterEnumerate_ref_ImplNode.h>

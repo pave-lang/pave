@@ -2,6 +2,8 @@
 #include <string.h>
 
 #include <stdlib.h>
+
+#include <stdlib.h>
 #include <analyzer/expression/Expression.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Token.h>

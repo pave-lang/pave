@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <string.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMapBucket_str_ref_Namespace.h>

@@ -2,6 +2,8 @@
 #include <stdbool.h>
 
 #include <stdio.h>
+
+#include <stdio.h>
 #include <analyzer/Analysis.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>

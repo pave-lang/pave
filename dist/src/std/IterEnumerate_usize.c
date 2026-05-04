@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/IterEnumerate_usize.h>
 #include <tuple_usize_usize.h>
 #include <std/IterEnumerate_usize.h>

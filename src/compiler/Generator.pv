@@ -1978,7 +1978,7 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        // self.write_includes_raw(code_file, &func_info.context.module.includes);
+        self.write_includes_raw(code_file, &func_info.context.module.includes);
         include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(func_info.context.module, name_str, ".h");
@@ -2011,7 +2011,6 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         self.write_context_primitives(header_file, &usage_context.primitive_code, 0);
-        // self.write_includes_raw(header_file, &func_info.context.module.includes);
         include_writer.write(header_file, self, &usage_context.signature, generics, false);
 
         if self.is_coroutine() {
@@ -2232,7 +2231,6 @@ impl Generator {
         fprintf(header_file, "\n\n");
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        // self.write_includes_raw(header_file, &module.includes);
         include_writer.write(header_file, self, &usage_context.layout, generics, false);
 
         if !self.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) { fclose(header_file); return false; }
@@ -2253,7 +2251,7 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        // self.write_includes_raw(code_file, &module.includes);
+        self.write_includes_raw(code_file, &module.includes);
         include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(module, name.as_str(), ".h");
@@ -3026,7 +3024,6 @@ impl Generator {
         }
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-        // self.write_includes_raw(header_file, &struct_info.module.includes);
         include_writer.write(header_file, self, &usage_context.layout, generics, false);
         if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
 
@@ -3063,7 +3060,7 @@ impl Generator {
         if code_file == 0 { perror(code.c_str()); return false; }
 
         self.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        // self.write_includes_raw(code_file, &struct_info.module.includes);
+        self.write_includes_raw(code_file, &struct_info.module.includes);
         include_writer.write(code_file, self, &usage_context.body, generics, true);
 
         let header_rel = self.make_rel_path(struct_info.module, name.as_str(), ".h");
@@ -3541,11 +3538,6 @@ impl Generator {
         }
 
         self.write_context_primitives(header_file, &usage_context.primitive_header, 0);
-
-        if !trait_info.module.mode_cpp {
-            // self.write_includes_raw(header_file, &trait_info.module.includes);
-        }
-
         include_writer.write(header_file, self, &usage_context.signature, generics, false);
 
         if !self.write_trait_definition(header_file, trait_info, generics) { fclose(header_file); return false; }

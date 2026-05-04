@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/IterEnumerate_ref_TypeImpl.h>
 #include <tuple_usize_ref_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>

@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include <stdio.h>
+
 #include <compiler/TypeFunctionUsage.h>
 #include <analyzer/types/Function.h>
 #include <std/ArenaAllocator.h>

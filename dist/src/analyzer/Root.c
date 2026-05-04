@@ -1,6 +1,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <analyzer/Root.h>

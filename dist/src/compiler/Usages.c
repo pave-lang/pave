@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <stdio.h>
+
 #include <std/ArenaAllocator.h>
 #include <compiler/Generator.h>
 #include <compiler/Usages.h>

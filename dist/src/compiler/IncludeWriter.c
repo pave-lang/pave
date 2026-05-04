@@ -2,6 +2,8 @@
 #include <string.h>
 
 #include <stdio.h>
+
+#include <stdio.h>
 #include <compiler/IncludeWriter.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashMap_str_Type.h>

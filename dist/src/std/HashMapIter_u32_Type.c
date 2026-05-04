@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <std/HashMapBucket_u32_Type.h>
 #include <std/HashMapIter_u32_Type.h>
 #include <tuple_u32_Type.h>

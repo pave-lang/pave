@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include <stdio.h>
+
 #include <compiler/FileWriter.h>
 #include <std/str.h>
 #include <analyzer/Token.h>

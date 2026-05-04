@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <std/HashMapBucket_str_Enum.h>
 #include <std/HashMapIter_str_Enum.h>
 #include <tuple_str_Enum.h>

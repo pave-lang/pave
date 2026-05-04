@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include <stdio.h>
+
 #include <compiler/TypeUsage_Primitive.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Primitive.h>

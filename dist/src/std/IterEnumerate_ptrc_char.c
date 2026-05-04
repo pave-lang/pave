@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/IterEnumerate_ptrc_char.h>
 #include <tuple_usize_ptrc_char.h>
 #include <std/IterEnumerate_ptrc_char.h>

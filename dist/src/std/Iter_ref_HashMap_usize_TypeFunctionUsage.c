@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <std/IterEnumerate_ref_HashMap_usize_TypeFunctionUsage.h>

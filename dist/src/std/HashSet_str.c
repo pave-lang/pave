@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <string.h>
 #include <std/HashSet_str.h>
 #include <std/ArenaAllocator.h>

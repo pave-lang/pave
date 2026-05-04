@@ -1,6 +1,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <std/ArenaAllocator.h>

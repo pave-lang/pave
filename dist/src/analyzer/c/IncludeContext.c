@@ -4,6 +4,10 @@
 #include <clang-c/Index.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <clang-c/Index.h>
+#include <stdio.h>
+#include <string.h>
 #include <analyzer/types/Type.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/c/IncludeContext.h>
