@@ -1833,6 +1833,7 @@ impl Generator {
 
             self.write_indent(file);
             fprintf(file, "switch (ctx->_state) {\n");
+            fprintf(file, "case 0: break;\n");
             self.indent += 1;
 
             for i in 1..function_usage.function_context.coroutine.yield_count + 1 {

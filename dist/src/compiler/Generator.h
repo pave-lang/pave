@@ -196,79 +196,79 @@ bool Generator__generate_function_loop(struct Generator* self, struct TypeFuncti
 #line 1824 "src/compiler/Generator.pv"
 bool Generator__write_function_block(struct Generator* self, FILE* file, struct str name, struct Function* func_info, struct GenericMap* generics, struct TypeFunctionUsage* function_usage);
 
-#line 1909 "src/compiler/Generator.pv"
+#line 1910 "src/compiler/Generator.pv"
 bool Generator__write_function_coroutine(struct Generator* self, FILE* file, struct Function* func_info, struct GenericMap* generics);
 
-#line 1957 "src/compiler/Generator.pv"
+#line 1958 "src/compiler/Generator.pv"
 bool Generator__generate_function(struct Generator* self, struct TypeFunctionUsage* usage, struct UsageContext* usage_context);
 
-#line 2034 "src/compiler/Generator.pv"
+#line 2035 "src/compiler/Generator.pv"
 bool Generator__write_enum_definition(struct Generator* self, FILE* file, struct Enum* enum_info, struct TypeUsage_Enum* usage, struct UsageContext* usage_context, struct IncludeWriter* include_writer);
 
-#line 2205 "src/compiler/Generator.pv"
+#line 2206 "src/compiler/Generator.pv"
 bool Generator__generate_enum_loop(struct Generator* self, struct TypeUsage_Enum* usage);
 
-#line 2215 "src/compiler/Generator.pv"
+#line 2216 "src/compiler/Generator.pv"
 bool Generator__generate_enum(struct Generator* self, struct TypeUsage_Enum* usage, struct UsageContext* usage_context);
 
-#line 2271 "src/compiler/Generator.pv"
+#line 2272 "src/compiler/Generator.pv"
 bool Generator__write_struct_definition(struct Generator* self, FILE* file, struct Struct* struct_info, struct TypeUsage_Struct* usage, struct UsageContext* usage_context);
 
-#line 2435 "src/compiler/Generator.pv"
+#line 2436 "src/compiler/Generator.pv"
 bool Generator__write_impl_definition(struct Generator* self, FILE* file, struct str name, struct Impl* impl_info, struct GenericMap* generics);
 
-#line 2474 "src/compiler/Generator.pv"
+#line 2475 "src/compiler/Generator.pv"
 bool Generator__write_primitive_definition(struct Generator* self, FILE* file, struct Primitive* primitive_info, struct GenericMap* generics);
 
-#line 2496 "src/compiler/Generator.pv"
+#line 2497 "src/compiler/Generator.pv"
 bool Generator__write_trait_definition(struct Generator* self, FILE* file, struct Trait* trait_info, struct GenericMap* generics);
 
-#line 2541 "src/compiler/Generator.pv"
+#line 2542 "src/compiler/Generator.pv"
 struct String Generator__get_trait_function_name(struct Generator* self, struct str struct_name, struct Trait* trait_info, struct Function* func_info, struct GenericMap* generics);
 
-#line 2553 "src/compiler/Generator.pv"
+#line 2554 "src/compiler/Generator.pv"
 bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* module, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics, struct IncludeWriter* include_writer);
 
-#line 2940 "src/compiler/Generator.pv"
+#line 2941 "src/compiler/Generator.pv"
 bool Generator__generate_struct_loop(struct Generator* self, struct TypeUsage_Struct* usage);
 
-#line 2950 "src/compiler/Generator.pv"
+#line 2951 "src/compiler/Generator.pv"
 struct String Generator__make_path(struct Generator* self, struct Module* module, struct str name, struct str ext);
 
-#line 2957 "src/compiler/Generator.pv"
+#line 2958 "src/compiler/Generator.pv"
 struct String Generator__make_rel_path(struct Generator* self, struct Module* module, struct str name, struct str ext);
 
-#line 2974 "src/compiler/Generator.pv"
+#line 2975 "src/compiler/Generator.pv"
 bool Generator__generate_struct(struct Generator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context);
 
-#line 3267 "src/compiler/Generator.pv"
+#line 3268 "src/compiler/Generator.pv"
 bool Generator__generate_primitive_loop(struct Generator* self, struct TypeUsage_Primitive* usage);
 
-#line 3277 "src/compiler/Generator.pv"
+#line 3278 "src/compiler/Generator.pv"
 bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Primitive* usage, struct UsageContext* usage_context);
 
-#line 3359 "src/compiler/Generator.pv"
+#line 3360 "src/compiler/Generator.pv"
 bool Generator__generate_sequence(struct Generator* self, struct TypeUsage_Sequence* usage);
 
-#line 3374 "src/compiler/Generator.pv"
+#line 3375 "src/compiler/Generator.pv"
 bool Generator__generate_slice(struct Generator* self, struct TypeUsage_Sequence* usage, struct UsageContext* usage_context);
 
-#line 3443 "src/compiler/Generator.pv"
+#line 3444 "src/compiler/Generator.pv"
 bool Generator__generate_tuple_loop(struct Generator* self, struct TypeUsage_Tuple* usage);
 
-#line 3453 "src/compiler/Generator.pv"
+#line 3454 "src/compiler/Generator.pv"
 bool Generator__generate_tuple(struct Generator* self, struct TypeUsage_Tuple* usage, struct UsageContext* usage_context);
 
-#line 3506 "src/compiler/Generator.pv"
+#line 3507 "src/compiler/Generator.pv"
 bool Generator__generate_trait_loop(struct Generator* self, struct TypeUsage_Trait* usage);
 
-#line 3516 "src/compiler/Generator.pv"
+#line 3517 "src/compiler/Generator.pv"
 bool Generator__generate_trait(struct Generator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
-#line 3560 "src/compiler/Generator.pv"
+#line 3561 "src/compiler/Generator.pv"
 void Generator__create_directories(struct Generator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
-#line 3572 "src/compiler/Generator.pv"
+#line 3573 "src/compiler/Generator.pv"
 bool Generator__generate(struct ArenaAllocator* allocator, char const* path, bool output_line_directives, char const* output_seperator, struct Root* root);
 
 #endif

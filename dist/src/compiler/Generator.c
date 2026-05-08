@@ -3777,1112 +3777,1114 @@ bool Generator__write_function_block(struct Generator* self, FILE* file, struct 
         #line 1835 "src/compiler/Generator.pv"
         fprintf(file, "switch (ctx->_state) {\n");
         #line 1836 "src/compiler/Generator.pv"
+        fprintf(file, "case 0: break;\n");
+        #line 1837 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 1838 "src/compiler/Generator.pv"
+        #line 1839 "src/compiler/Generator.pv"
         for (uintptr_t i = 1; i < function_usage->function_context.coroutine.yield_count + 1; i++) {
-            #line 1839 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 1840 "src/compiler/Generator.pv"
+            Generator__write_indent(self, file);
+            #line 1841 "src/compiler/Generator.pv"
             fprintf(file, "case %zu: goto yield_%zu;\n", i, i);
         }
 
-        #line 1843 "src/compiler/Generator.pv"
-        Generator__write_indent(self, file);
         #line 1844 "src/compiler/Generator.pv"
+        Generator__write_indent(self, file);
+        #line 1845 "src/compiler/Generator.pv"
         fprintf(file, "default: return false;\n");
 
-        #line 1846 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 1847 "src/compiler/Generator.pv"
-        Generator__write_indent(self, file);
+        self->indent -= 1;
         #line 1848 "src/compiler/Generator.pv"
+        Generator__write_indent(self, file);
+        #line 1849 "src/compiler/Generator.pv"
         fprintf(file, "}\n\n");
 
-        #line 1850 "src/compiler/Generator.pv"
-        self->function_context->coroutine.yield_count = 0;
         #line 1851 "src/compiler/Generator.pv"
+        self->function_context->coroutine.yield_count = 0;
+        #line 1852 "src/compiler/Generator.pv"
         if (!Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true)) {
-            #line 1852 "src/compiler/Generator.pv"
-            uint32_t name_length = name.length;
             #line 1853 "src/compiler/Generator.pv"
-            fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+            uint32_t name_length = name.length;
             #line 1854 "src/compiler/Generator.pv"
-            fclose(file);
+            fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
             #line 1855 "src/compiler/Generator.pv"
+            fclose(file);
+            #line 1856 "src/compiler/Generator.pv"
             return false;
         }
 
-        #line 1858 "src/compiler/Generator.pv"
-        Generator__write_indent(self, file);
         #line 1859 "src/compiler/Generator.pv"
+        Generator__write_indent(self, file);
+        #line 1860 "src/compiler/Generator.pv"
         fprintf(file, "ctx->_state = -1; return false;\n");
 
-        #line 1861 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 1862 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 1863 "src/compiler/Generator.pv"
         fprintf(file, "}\n");
 
-        #line 1864 "src/compiler/Generator.pv"
-        Generator__write_type(self, file, &func_info->return_type, generics);
         #line 1865 "src/compiler/Generator.pv"
-        fprintf(file, " ");
+        Generator__write_type(self, file, &func_info->return_type, generics);
         #line 1866 "src/compiler/Generator.pv"
-        Generator__write_function_name(self, file, func_info, generics);
+        fprintf(file, " ");
         #line 1867 "src/compiler/Generator.pv"
-        fprintf(file, "__value(void* ctx) { return ((struct ");
-        #line 1868 "src/compiler/Generator.pv"
         Generator__write_function_name(self, file, func_info, generics);
+        #line 1868 "src/compiler/Generator.pv"
+        fprintf(file, "__value(void* ctx) { return ((struct ");
         #line 1869 "src/compiler/Generator.pv"
+        Generator__write_function_name(self, file, func_info, generics);
+        #line 1870 "src/compiler/Generator.pv"
         fprintf(file, "*)ctx)->_value; }\n");
 
-        #line 1871 "src/compiler/Generator.pv"
+        #line 1872 "src/compiler/Generator.pv"
         fprintf(file, "struct trait_Iter_");
 
-        #line 1873 "src/compiler/Generator.pv"
-        struct String name = Naming__get_type_name(&self->naming_ident, &func_info->return_type, generics->self_type, generics);
         #line 1874 "src/compiler/Generator.pv"
-        Generator__write_string(self, file, &name);
+        struct String name = Naming__get_type_name(&self->naming_ident, &func_info->return_type, generics->self_type, generics);
         #line 1875 "src/compiler/Generator.pv"
+        Generator__write_string(self, file, &name);
+        #line 1876 "src/compiler/Generator.pv"
         String__release(&name);
 
-        #line 1877 "src/compiler/Generator.pv"
+        #line 1878 "src/compiler/Generator.pv"
         fprintf(file, "VTable ");
 
-        #line 1879 "src/compiler/Generator.pv"
+        #line 1880 "src/compiler/Generator.pv"
         switch (func_info->parent.type) {
-            #line 1880 "src/compiler/Generator.pv"
+            #line 1881 "src/compiler/Generator.pv"
             case FUNCTION_PARENT__STRUCT: {
-                #line 1880 "src/compiler/Generator.pv"
-                struct Struct* struct_info = func_info->parent.struct_value._0;
                 #line 1881 "src/compiler/Generator.pv"
-                Generator__write_str_title(self, file, struct_info->name->value);
+                struct Struct* struct_info = func_info->parent.struct_value._0;
                 #line 1882 "src/compiler/Generator.pv"
+                Generator__write_str_title(self, file, struct_info->name->value);
+                #line 1883 "src/compiler/Generator.pv"
                 fprintf(file, "__");
             } break;
-            #line 1884 "src/compiler/Generator.pv"
+            #line 1885 "src/compiler/Generator.pv"
             default: {
             } break;
         }
 
-        #line 1887 "src/compiler/Generator.pv"
+        #line 1888 "src/compiler/Generator.pv"
         Generator__write_str_title(self, file, func_info->name->value);
 
-        #line 1889 "src/compiler/Generator.pv"
-        fprintf(file, "__VTABLE__ITER = { .next = ");
         #line 1890 "src/compiler/Generator.pv"
-        Generator__write_function_name(self, file, func_info, generics);
+        fprintf(file, "__VTABLE__ITER = { .next = ");
         #line 1891 "src/compiler/Generator.pv"
-        fprintf(file, "__next, .value = ");
-        #line 1892 "src/compiler/Generator.pv"
         Generator__write_function_name(self, file, func_info, generics);
+        #line 1892 "src/compiler/Generator.pv"
+        fprintf(file, "__next, .value = ");
         #line 1893 "src/compiler/Generator.pv"
+        Generator__write_function_name(self, file, func_info, generics);
+        #line 1894 "src/compiler/Generator.pv"
         fprintf(file, "__value };\n\n");
 
-        #line 1895 "src/compiler/Generator.pv"
+        #line 1896 "src/compiler/Generator.pv"
         return true;
     }
 
-    #line 1898 "src/compiler/Generator.pv"
-    fprintf(file, " ");
     #line 1899 "src/compiler/Generator.pv"
+    fprintf(file, " ");
+    #line 1900 "src/compiler/Generator.pv"
     if (!Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, false)) {
-        #line 1900 "src/compiler/Generator.pv"
-        uint32_t name_length = name.length;
         #line 1901 "src/compiler/Generator.pv"
-        fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+        uint32_t name_length = name.length;
         #line 1902 "src/compiler/Generator.pv"
-        fclose(file);
+        fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
         #line 1903 "src/compiler/Generator.pv"
+        fclose(file);
+        #line 1904 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 1906 "src/compiler/Generator.pv"
+    #line 1907 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 1909 "src/compiler/Generator.pv"
+#line 1910 "src/compiler/Generator.pv"
 bool Generator__write_function_coroutine(struct Generator* self, FILE* file, struct Function* func_info, struct GenericMap* generics) {
-    #line 1910 "src/compiler/Generator.pv"
-    fprintf(file, "struct ");
     #line 1911 "src/compiler/Generator.pv"
-    Generator__write_function_name(self, file, func_info, generics);
+    fprintf(file, "struct ");
     #line 1912 "src/compiler/Generator.pv"
-    fprintf(file, " {\n");
+    Generator__write_function_name(self, file, func_info, generics);
     #line 1913 "src/compiler/Generator.pv"
+    fprintf(file, " {\n");
+    #line 1914 "src/compiler/Generator.pv"
     self->indent += 1;
 
-    #line 1915 "src/compiler/Generator.pv"
-    Generator__write_indent(self, file);
     #line 1916 "src/compiler/Generator.pv"
+    Generator__write_indent(self, file);
+    #line 1917 "src/compiler/Generator.pv"
     fprintf(file, "int32_t _state;\n");
 
-    #line 1918 "src/compiler/Generator.pv"
-    Generator__write_indent(self, file);
     #line 1919 "src/compiler/Generator.pv"
-    Generator__write_type(self, file, &func_info->return_type, generics);
+    Generator__write_indent(self, file);
     #line 1920 "src/compiler/Generator.pv"
+    Generator__write_type(self, file, &func_info->return_type, generics);
+    #line 1921 "src/compiler/Generator.pv"
     fprintf(file, " _value;\n\n");
 
-    #line 1922 "src/compiler/Generator.pv"
+    #line 1923 "src/compiler/Generator.pv"
     { struct HashMapIter_str_ref_Type __iter = HashMap_str_ref_Type__iter(&self->function_context->coroutine.variables);
-    #line 1922 "src/compiler/Generator.pv"
+    #line 1923 "src/compiler/Generator.pv"
     while (HashMapIter_str_ref_Type__next(&__iter)) {
-        #line 1922 "src/compiler/Generator.pv"
+        #line 1923 "src/compiler/Generator.pv"
         struct str name = HashMapIter_str_ref_Type__value(&__iter)->_0;
-        #line 1922 "src/compiler/Generator.pv"
+        #line 1923 "src/compiler/Generator.pv"
         struct Type* type = HashMapIter_str_ref_Type__value(&__iter)->_1;
 
-        #line 1923 "src/compiler/Generator.pv"
-        Generator__write_indent(self, file);
         #line 1924 "src/compiler/Generator.pv"
-        Generator__write_type(self, file, type, generics);
+        Generator__write_indent(self, file);
         #line 1925 "src/compiler/Generator.pv"
-        fprintf(file, " ");
+        Generator__write_type(self, file, type, generics);
         #line 1926 "src/compiler/Generator.pv"
-        Generator__write_str(self, file, name);
+        fprintf(file, " ");
         #line 1927 "src/compiler/Generator.pv"
+        Generator__write_str(self, file, name);
+        #line 1928 "src/compiler/Generator.pv"
         fprintf(file, ";\n");
     } }
 
-    #line 1930 "src/compiler/Generator.pv"
-    self->indent -= 1;
     #line 1931 "src/compiler/Generator.pv"
+    self->indent -= 1;
+    #line 1932 "src/compiler/Generator.pv"
     fprintf(file, "};\n\n");
 
-    #line 1933 "src/compiler/Generator.pv"
+    #line 1934 "src/compiler/Generator.pv"
     fprintf(file, "#include <std/trait_Iter_");
 
-    #line 1935 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, &func_info->return_type, generics->self_type, generics);
     #line 1936 "src/compiler/Generator.pv"
+    struct String name = Naming__get_type_name(&self->naming_ident, &func_info->return_type, generics->self_type, generics);
+    #line 1937 "src/compiler/Generator.pv"
     Generator__write_string(self, file, &name);
 
-    #line 1938 "src/compiler/Generator.pv"
+    #line 1939 "src/compiler/Generator.pv"
     fprintf(file, ".h>\n");
 
-    #line 1940 "src/compiler/Generator.pv"
-    Generator__write_type(self, file, &func_info->return_type, generics);
     #line 1941 "src/compiler/Generator.pv"
-    fprintf(file, " ");
+    Generator__write_type(self, file, &func_info->return_type, generics);
     #line 1942 "src/compiler/Generator.pv"
-    Generator__write_function_name(self, file, func_info, generics);
+    fprintf(file, " ");
     #line 1943 "src/compiler/Generator.pv"
+    Generator__write_function_name(self, file, func_info, generics);
+    #line 1944 "src/compiler/Generator.pv"
     fprintf(file, "__value(void* ctx);\n");
 
-    #line 1945 "src/compiler/Generator.pv"
-    fprintf(file, "extern struct trait_Iter_");
     #line 1946 "src/compiler/Generator.pv"
-    Generator__write_string(self, file, &name);
+    fprintf(file, "extern struct trait_Iter_");
     #line 1947 "src/compiler/Generator.pv"
+    Generator__write_string(self, file, &name);
+    #line 1948 "src/compiler/Generator.pv"
     String__release(&name);
 
-    #line 1949 "src/compiler/Generator.pv"
+    #line 1950 "src/compiler/Generator.pv"
     fprintf(file, "VTable ");
 
-    #line 1951 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, file, func_info->name->value);
     #line 1952 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, file, func_info->name->value);
+    #line 1953 "src/compiler/Generator.pv"
     fprintf(file, "__VTABLE__ITER;\n");
 
-    #line 1954 "src/compiler/Generator.pv"
+    #line 1955 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 1957 "src/compiler/Generator.pv"
+#line 1958 "src/compiler/Generator.pv"
 bool Generator__generate_function(struct Generator* self, struct TypeFunctionUsage* usage, struct UsageContext* usage_context) {
-    #line 1958 "src/compiler/Generator.pv"
-    struct Function* func_info = usage->type;
     #line 1959 "src/compiler/Generator.pv"
+    struct Function* func_info = usage->type;
+    #line 1960 "src/compiler/Generator.pv"
     if (func_info->type == FUNCTION_TYPE__BUILTIN) {
-        #line 1959 "src/compiler/Generator.pv"
+        #line 1960 "src/compiler/Generator.pv"
         return true;
     }
 
-    #line 1961 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 1962 "src/compiler/Generator.pv"
+    struct GenericMap* generics = usage_context->generic_map;
+    #line 1963 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 1964 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 1965 "src/compiler/Generator.pv"
-    struct str name_str = String__as_str(&name);
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 1966 "src/compiler/Generator.pv"
-    struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
+    struct str name_str = String__as_str(&name);
     #line 1967 "src/compiler/Generator.pv"
+    struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
+    #line 1968 "src/compiler/Generator.pv"
     self->function_context = &func_context;
 
-    #line 1969 "src/compiler/Generator.pv"
-    struct String code = Generator__make_path(self, func_info->context->module, name_str, (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 1970 "src/compiler/Generator.pv"
-    FILE* code_file = 0;
+    struct String code = Generator__make_path(self, func_info->context->module, name_str, (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 1971 "src/compiler/Generator.pv"
+    FILE* code_file = 0;
+    #line 1972 "src/compiler/Generator.pv"
     char const* code_tmp = 0;
 
-    #line 1973 "src/compiler/Generator.pv"
-    code_tmp = tmpnam(0);
     #line 1974 "src/compiler/Generator.pv"
+    code_tmp = tmpnam(0);
+    #line 1975 "src/compiler/Generator.pv"
     code_file = fopen(code_tmp, "w+");
 
-    #line 1976 "src/compiler/Generator.pv"
+    #line 1977 "src/compiler/Generator.pv"
     Array_String__append(&self->code_files, code);
 
-    #line 1978 "src/compiler/Generator.pv"
+    #line 1979 "src/compiler/Generator.pv"
     if (code_file == 0) {
-        #line 1978 "src/compiler/Generator.pv"
+        #line 1979 "src/compiler/Generator.pv"
         perror(String__c_str(&code));
-        #line 1978 "src/compiler/Generator.pv"
+        #line 1979 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 1980 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 1981 "src/compiler/Generator.pv"
-    Generator__write_includes_raw(self, code_file, &func_info->context->module->includes);
+    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 1982 "src/compiler/Generator.pv"
+    Generator__write_includes_raw(self, code_file, &func_info->context->module->includes);
+    #line 1983 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, code_file, self, &usage_context->body, generics, true);
 
-    #line 1984 "src/compiler/Generator.pv"
-    struct String header_rel = Generator__make_rel_path(self, func_info->context->module, name_str, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 1985 "src/compiler/Generator.pv"
-    fprintf(code_file, "#include <");
+    struct String header_rel = Generator__make_rel_path(self, func_info->context->module, name_str, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 1986 "src/compiler/Generator.pv"
-    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    fprintf(code_file, "#include <");
     #line 1987 "src/compiler/Generator.pv"
+    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    #line 1988 "src/compiler/Generator.pv"
     fprintf(code_file, ">\n\n");
 
-    #line 1989 "src/compiler/Generator.pv"
+    #line 1990 "src/compiler/Generator.pv"
     if (!Generator__write_function_definition(self, code_file, func_info, generics, 0)) {
-        #line 1989 "src/compiler/Generator.pv"
+        #line 1990 "src/compiler/Generator.pv"
         fclose(code_file);
-        #line 1989 "src/compiler/Generator.pv"
+        #line 1990 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 1991 "src/compiler/Generator.pv"
+    #line 1992 "src/compiler/Generator.pv"
     Generator__write_function_block(self, code_file, name_str, func_info, generics, usage);
 
-    #line 1993 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 1994 "src/compiler/Generator.pv"
-    fclose(code_file);
+    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 1995 "src/compiler/Generator.pv"
+    fclose(code_file);
+    #line 1996 "src/compiler/Generator.pv"
     remove(code_tmp);
 
-    #line 1997 "src/compiler/Generator.pv"
+    #line 1998 "src/compiler/Generator.pv"
     include_writer = IncludeWriter__new(self->allocator);
 
-    #line 1999 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, func_info->context->module, name_str, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2000 "src/compiler/Generator.pv"
-    FILE* header_file = 0;
+    struct String header = Generator__make_path(self, func_info->context->module, name_str, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2001 "src/compiler/Generator.pv"
-    char const* header_tmp = 0;
+    FILE* header_file = 0;
     #line 2002 "src/compiler/Generator.pv"
-    header_tmp = tmpnam(0);
+    char const* header_tmp = 0;
     #line 2003 "src/compiler/Generator.pv"
+    header_tmp = tmpnam(0);
+    #line 2004 "src/compiler/Generator.pv"
     header_file = fopen(header_tmp, "w+");
 
-    #line 2005 "src/compiler/Generator.pv"
+    #line 2006 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 2005 "src/compiler/Generator.pv"
+        #line 2006 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 2005 "src/compiler/Generator.pv"
+        #line 2006 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 2007 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 2008 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, name_str);
+    fprintf(header_file, "#ifndef PAVE_");
     #line 2009 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 2010 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, name_str);
+    #line 2010 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 2011 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, name_str);
+    #line 2012 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 2013 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_code, 0);
     #line 2014 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_code, 0);
+    #line 2015 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, header_file, self, &usage_context->signature, generics, false);
 
-    #line 2016 "src/compiler/Generator.pv"
+    #line 2017 "src/compiler/Generator.pv"
     if (Generator__is_coroutine(self)) {
-        #line 2017 "src/compiler/Generator.pv"
+        #line 2018 "src/compiler/Generator.pv"
         Generator__write_function_coroutine(self, header_file, func_info, generics);
     }
 
-    #line 2020 "src/compiler/Generator.pv"
+    #line 2021 "src/compiler/Generator.pv"
     if (!Generator__write_function_definition(self, header_file, func_info, generics, 0)) {
-        #line 2020 "src/compiler/Generator.pv"
+        #line 2021 "src/compiler/Generator.pv"
         fclose(header_file);
-        #line 2020 "src/compiler/Generator.pv"
+        #line 2021 "src/compiler/Generator.pv"
         return false;
     }
-    #line 2021 "src/compiler/Generator.pv"
+    #line 2022 "src/compiler/Generator.pv"
     fprintf(header_file, ";\n");
 
-    #line 2023 "src/compiler/Generator.pv"
+    #line 2024 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 2025 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 2026 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 2027 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 2028 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 2029 "src/compiler/Generator.pv"
+    #line 2030 "src/compiler/Generator.pv"
     self->function_context = 0;
 
-    #line 2031 "src/compiler/Generator.pv"
+    #line 2032 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2034 "src/compiler/Generator.pv"
+#line 2035 "src/compiler/Generator.pv"
 bool Generator__write_enum_definition(struct Generator* self, FILE* file, struct Enum* enum_info, struct TypeUsage_Enum* usage, struct UsageContext* usage_context, struct IncludeWriter* include_writer) {
-    #line 2035 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 2036 "src/compiler/Generator.pv"
-    struct Token* enum_name = enum_info->name;
+    struct GenericMap* generics = usage_context->generic_map;
     #line 2037 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
+    struct Token* enum_name = enum_info->name;
     #line 2038 "src/compiler/Generator.pv"
-    uint32_t name_length = name.array.length;
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 2039 "src/compiler/Generator.pv"
+    uint32_t name_length = name.array.length;
+    #line 2040 "src/compiler/Generator.pv"
     bool is_discriminated_union = Enum__is_discriminated_union(enum_info);
 
-    #line 2041 "src/compiler/Generator.pv"
+    #line 2042 "src/compiler/Generator.pv"
     Generator__write_line_directive(self, file, enum_info->context, enum_info->name);
 
-    #line 2043 "src/compiler/Generator.pv"
+    #line 2044 "src/compiler/Generator.pv"
     if (!is_discriminated_union) {
-        #line 2044 "src/compiler/Generator.pv"
-        fprintf(file, "enum ");
         #line 2045 "src/compiler/Generator.pv"
-        Generator__write_str(self, file, enum_name->value);
+        fprintf(file, "enum ");
         #line 2046 "src/compiler/Generator.pv"
-        fprintf(file, " {\n");
+        Generator__write_str(self, file, enum_name->value);
         #line 2047 "src/compiler/Generator.pv"
+        fprintf(file, " {\n");
+        #line 2048 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 2049 "src/compiler/Generator.pv"
+        #line 2050 "src/compiler/Generator.pv"
         { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-        #line 2049 "src/compiler/Generator.pv"
+        #line 2050 "src/compiler/Generator.pv"
         while (HashMapIter_str_EnumVariant__next(&__iter)) {
-            #line 2049 "src/compiler/Generator.pv"
+            #line 2050 "src/compiler/Generator.pv"
             struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-            #line 2050 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 2051 "src/compiler/Generator.pv"
+            Generator__write_indent(self, file);
+            #line 2052 "src/compiler/Generator.pv"
             Generator__write_enum_variant_name(self, file, generics->self_type, variant);
 
-            #line 2053 "src/compiler/Generator.pv"
+            #line 2054 "src/compiler/Generator.pv"
             if (variant->value != 0) {
-                #line 2054 "src/compiler/Generator.pv"
-                fprintf(file, " = ");
                 #line 2055 "src/compiler/Generator.pv"
+                fprintf(file, " = ");
+                #line 2056 "src/compiler/Generator.pv"
                 Generator__write_expression(self, file, variant->value, generics);
             }
 
-            #line 2058 "src/compiler/Generator.pv"
+            #line 2059 "src/compiler/Generator.pv"
             fprintf(file, ",\n");
         } }
 
-        #line 2061 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 2062 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 2063 "src/compiler/Generator.pv"
         fprintf(file, "};\n");
     } else {
-        #line 2064 "src/compiler/Generator.pv"
+        #line 2065 "src/compiler/Generator.pv"
         bool has_generics = enum_info->generics.array.length > 0;
 
-        #line 2066 "src/compiler/Generator.pv"
+        #line 2067 "src/compiler/Generator.pv"
         if (has_generics) {
-            #line 2067 "src/compiler/Generator.pv"
-            fprintf(file, "#ifndef PAVE_");
             #line 2068 "src/compiler/Generator.pv"
-            Generator__write_str_title(self, file, enum_info->name->value);
+            fprintf(file, "#ifndef PAVE_");
             #line 2069 "src/compiler/Generator.pv"
-            Generator__write_str_title(self, file, self->naming_ident.enum_generic_type_suffix);
-            #line 2070 "src/compiler/Generator.pv"
-            fprintf(file, "\n#define PAVE_");
-            #line 2071 "src/compiler/Generator.pv"
             Generator__write_str_title(self, file, enum_info->name->value);
-            #line 2072 "src/compiler/Generator.pv"
+            #line 2070 "src/compiler/Generator.pv"
             Generator__write_str_title(self, file, self->naming_ident.enum_generic_type_suffix);
+            #line 2071 "src/compiler/Generator.pv"
+            fprintf(file, "\n#define PAVE_");
+            #line 2072 "src/compiler/Generator.pv"
+            Generator__write_str_title(self, file, enum_info->name->value);
             #line 2073 "src/compiler/Generator.pv"
+            Generator__write_str_title(self, file, self->naming_ident.enum_generic_type_suffix);
+            #line 2074 "src/compiler/Generator.pv"
             fprintf(file, "\n");
 
-            #line 2075 "src/compiler/Generator.pv"
-            fprintf(file, "enum ");
             #line 2076 "src/compiler/Generator.pv"
-            Generator__write_token(self, file, enum_info->name);
+            fprintf(file, "enum ");
             #line 2077 "src/compiler/Generator.pv"
-            Generator__write_str(self, file, self->naming_ident.enum_generic_type_suffix);
+            Generator__write_token(self, file, enum_info->name);
             #line 2078 "src/compiler/Generator.pv"
+            Generator__write_str(self, file, self->naming_ident.enum_generic_type_suffix);
+            #line 2079 "src/compiler/Generator.pv"
             fprintf(file, " {\n");
 
-            #line 2080 "src/compiler/Generator.pv"
+            #line 2081 "src/compiler/Generator.pv"
             self->indent += 1;
 
-            #line 2082 "src/compiler/Generator.pv"
+            #line 2083 "src/compiler/Generator.pv"
             { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-            #line 2082 "src/compiler/Generator.pv"
+            #line 2083 "src/compiler/Generator.pv"
             while (HashMapIter_str_EnumVariant__next(&__iter)) {
-                #line 2082 "src/compiler/Generator.pv"
+                #line 2083 "src/compiler/Generator.pv"
                 struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-                #line 2083 "src/compiler/Generator.pv"
-                Generator__write_indent(self, file);
                 #line 2084 "src/compiler/Generator.pv"
+                Generator__write_indent(self, file);
+                #line 2085 "src/compiler/Generator.pv"
                 Generator__write_enum_variant_name(self, file, generics->self_type, variant);
 
-                #line 2086 "src/compiler/Generator.pv"
+                #line 2087 "src/compiler/Generator.pv"
                 if (variant->value != 0) {
-                    #line 2087 "src/compiler/Generator.pv"
-                    fprintf(file, " = ");
                     #line 2088 "src/compiler/Generator.pv"
+                    fprintf(file, " = ");
+                    #line 2089 "src/compiler/Generator.pv"
                     Generator__write_expression(self, file, variant->value, generics);
                 }
 
-                #line 2091 "src/compiler/Generator.pv"
+                #line 2092 "src/compiler/Generator.pv"
                 fprintf(file, ",\n");
             } }
 
-            #line 2094 "src/compiler/Generator.pv"
-            self->indent -= 1;
             #line 2095 "src/compiler/Generator.pv"
-            fprintf(file, "};\n");
+            self->indent -= 1;
             #line 2096 "src/compiler/Generator.pv"
-            fprintf(file, "#endif\n");
+            fprintf(file, "};\n");
             #line 2097 "src/compiler/Generator.pv"
+            fprintf(file, "#endif\n");
+            #line 2098 "src/compiler/Generator.pv"
             fprintf(file, "\n");
         }
 
-        #line 2100 "src/compiler/Generator.pv"
-        fprintf(file, "struct %.*s {\n", name_length, name.array.data);
         #line 2101 "src/compiler/Generator.pv"
+        fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+        #line 2102 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 2103 "src/compiler/Generator.pv"
+        #line 2104 "src/compiler/Generator.pv"
         if (!has_generics) {
-            #line 2104 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 2105 "src/compiler/Generator.pv"
-            fprintf(file, "enum {\n");
+            Generator__write_indent(self, file);
             #line 2106 "src/compiler/Generator.pv"
+            fprintf(file, "enum {\n");
+            #line 2107 "src/compiler/Generator.pv"
             self->indent += 1;
 
-            #line 2108 "src/compiler/Generator.pv"
+            #line 2109 "src/compiler/Generator.pv"
             { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-            #line 2108 "src/compiler/Generator.pv"
+            #line 2109 "src/compiler/Generator.pv"
             while (HashMapIter_str_EnumVariant__next(&__iter)) {
-                #line 2108 "src/compiler/Generator.pv"
+                #line 2109 "src/compiler/Generator.pv"
                 struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-                #line 2109 "src/compiler/Generator.pv"
-                Generator__write_indent(self, file);
                 #line 2110 "src/compiler/Generator.pv"
-                Generator__write_enum_variant_name(self, file, generics->self_type, variant);
+                Generator__write_indent(self, file);
                 #line 2111 "src/compiler/Generator.pv"
+                Generator__write_enum_variant_name(self, file, generics->self_type, variant);
+                #line 2112 "src/compiler/Generator.pv"
                 fprintf(file, ",\n");
             } }
 
-            #line 2114 "src/compiler/Generator.pv"
-            self->indent -= 1;
             #line 2115 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
+            self->indent -= 1;
             #line 2116 "src/compiler/Generator.pv"
-            fprintf(file, "} type;\n");
+            Generator__write_indent(self, file);
             #line 2117 "src/compiler/Generator.pv"
+            fprintf(file, "} type;\n");
+            #line 2118 "src/compiler/Generator.pv"
             fprintf(file, "\n");
         } else {
-            #line 2119 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 2120 "src/compiler/Generator.pv"
-            fprintf(file, "enum ");
+            Generator__write_indent(self, file);
             #line 2121 "src/compiler/Generator.pv"
-            Generator__write_token(self, file, enum_info->name);
+            fprintf(file, "enum ");
             #line 2122 "src/compiler/Generator.pv"
-            Generator__write_str(self, file, self->naming_ident.enum_generic_type_suffix);
+            Generator__write_token(self, file, enum_info->name);
             #line 2123 "src/compiler/Generator.pv"
+            Generator__write_str(self, file, self->naming_ident.enum_generic_type_suffix);
+            #line 2124 "src/compiler/Generator.pv"
             fprintf(file, " type;\n");
         }
 
-        #line 2126 "src/compiler/Generator.pv"
+        #line 2127 "src/compiler/Generator.pv"
         uintptr_t variants_with_data = 0;
-        #line 2127 "src/compiler/Generator.pv"
+        #line 2128 "src/compiler/Generator.pv"
         { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-        #line 2127 "src/compiler/Generator.pv"
+        #line 2128 "src/compiler/Generator.pv"
         while (HashMapIter_str_EnumVariant__next(&__iter)) {
-            #line 2127 "src/compiler/Generator.pv"
+            #line 2128 "src/compiler/Generator.pv"
             struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-            #line 2128 "src/compiler/Generator.pv"
+            #line 2129 "src/compiler/Generator.pv"
             variants_with_data += (uintptr_t)(variant->types.length > 0);
         } }
 
-        #line 2131 "src/compiler/Generator.pv"
+        #line 2132 "src/compiler/Generator.pv"
         if (variants_with_data > 1) {
-            #line 2132 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 2133 "src/compiler/Generator.pv"
-            fprintf(file, "union {\n");
+            Generator__write_indent(self, file);
             #line 2134 "src/compiler/Generator.pv"
+            fprintf(file, "union {\n");
+            #line 2135 "src/compiler/Generator.pv"
             self->indent += 1;
         }
 
-        #line 2137 "src/compiler/Generator.pv"
+        #line 2138 "src/compiler/Generator.pv"
         { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-        #line 2137 "src/compiler/Generator.pv"
+        #line 2138 "src/compiler/Generator.pv"
         while (HashMapIter_str_EnumVariant__next(&__iter)) {
-            #line 2137 "src/compiler/Generator.pv"
+            #line 2138 "src/compiler/Generator.pv"
             struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-            #line 2138 "src/compiler/Generator.pv"
+            #line 2139 "src/compiler/Generator.pv"
             if (variant->types.length == 1) {
-                #line 2139 "src/compiler/Generator.pv"
-                Generator__write_indent(self, file);
                 #line 2140 "src/compiler/Generator.pv"
-                Generator__write_type(self, file, variant->types.data, generics);
+                Generator__write_indent(self, file);
                 #line 2141 "src/compiler/Generator.pv"
+                Generator__write_type(self, file, variant->types.data, generics);
+                #line 2142 "src/compiler/Generator.pv"
                 fprintf(file, " ");
 
-                #line 2143 "src/compiler/Generator.pv"
-                struct Token* name = variant->name;
                 #line 2144 "src/compiler/Generator.pv"
-                Generator__write_str_lowercase(self, file, name->value);
+                struct Token* name = variant->name;
                 #line 2145 "src/compiler/Generator.pv"
+                Generator__write_str_lowercase(self, file, name->value);
+                #line 2146 "src/compiler/Generator.pv"
                 fprintf(file, "_value;\n");
             } else if (variant->types.length > 1) {
-                #line 2147 "src/compiler/Generator.pv"
-                Generator__write_indent(self, file);
                 #line 2148 "src/compiler/Generator.pv"
+                Generator__write_indent(self, file);
+                #line 2149 "src/compiler/Generator.pv"
                 fprintf(file, "struct { ");
 
-                #line 2150 "src/compiler/Generator.pv"
+                #line 2151 "src/compiler/Generator.pv"
                 { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
-                #line 2150 "src/compiler/Generator.pv"
+                #line 2151 "src/compiler/Generator.pv"
                 while (Iter_ref_Type__next(&__iter)) {
-                    #line 2150 "src/compiler/Generator.pv"
+                    #line 2151 "src/compiler/Generator.pv"
                     struct Type* type = Iter_ref_Type__value(&__iter);
 
-                    #line 2151 "src/compiler/Generator.pv"
-                    Generator__write_type(self, file, type, generics);
                     #line 2152 "src/compiler/Generator.pv"
+                    Generator__write_type(self, file, type, generics);
+                    #line 2153 "src/compiler/Generator.pv"
                     fprintf(file, " _%zu; ", type - variant->types.data);
                 } }
 
-                #line 2155 "src/compiler/Generator.pv"
-                fprintf(file, "} ");
                 #line 2156 "src/compiler/Generator.pv"
-                struct Token* name = variant->name;
+                fprintf(file, "} ");
                 #line 2157 "src/compiler/Generator.pv"
-                Generator__write_str_lowercase(self, file, name->value);
+                struct Token* name = variant->name;
                 #line 2158 "src/compiler/Generator.pv"
+                Generator__write_str_lowercase(self, file, name->value);
+                #line 2159 "src/compiler/Generator.pv"
                 fprintf(file, "_value;\n");
             }
         } }
 
-        #line 2162 "src/compiler/Generator.pv"
+        #line 2163 "src/compiler/Generator.pv"
         if (variants_with_data > 1) {
-            #line 2163 "src/compiler/Generator.pv"
-            self->indent -= 1;
             #line 2164 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
+            self->indent -= 1;
             #line 2165 "src/compiler/Generator.pv"
+            Generator__write_indent(self, file);
+            #line 2166 "src/compiler/Generator.pv"
             fprintf(file, "};\n");
         }
 
-        #line 2168 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 2169 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 2170 "src/compiler/Generator.pv"
         fprintf(file, "};\n");
     }
 
-    #line 2172 "src/compiler/Generator.pv"
-    fprintf(file, "\n");
     #line 2173 "src/compiler/Generator.pv"
+    fprintf(file, "\n");
+    #line 2174 "src/compiler/Generator.pv"
     IncludeWriter__write(include_writer, file, self, &usage_context->signature, generics, false);
 
-    #line 2175 "src/compiler/Generator.pv"
+    #line 2176 "src/compiler/Generator.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&enum_info->impls));
-    #line 2175 "src/compiler/Generator.pv"
+    #line 2176 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 2175 "src/compiler/Generator.pv"
+        #line 2176 "src/compiler/Generator.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 2175 "src/compiler/Generator.pv"
+        #line 2176 "src/compiler/Generator.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 2176 "src/compiler/Generator.pv"
-        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
         #line 2177 "src/compiler/Generator.pv"
+        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
+        #line 2178 "src/compiler/Generator.pv"
         if (usage != 0) {
-            #line 2177 "src/compiler/Generator.pv"
+            #line 2178 "src/compiler/Generator.pv"
             impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(&usage->impl_functions, impl_index);
         }
 
-        #line 2179 "src/compiler/Generator.pv"
+        #line 2180 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 2179 "src/compiler/Generator.pv"
+        #line 2180 "src/compiler/Generator.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 2179 "src/compiler/Generator.pv"
+            #line 2180 "src/compiler/Generator.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 2180 "src/compiler/Generator.pv"
-            uintptr_t func_ptr = (uintptr_t)(func_info);
             #line 2181 "src/compiler/Generator.pv"
-            struct TypeFunctionUsage* function_usage = 0;
+            uintptr_t func_ptr = (uintptr_t)(func_info);
             #line 2182 "src/compiler/Generator.pv"
+            struct TypeFunctionUsage* function_usage = 0;
+            #line 2183 "src/compiler/Generator.pv"
             if (impl_functions_for_impl != 0) {
-                #line 2182 "src/compiler/Generator.pv"
+                #line 2183 "src/compiler/Generator.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 2184 "src/compiler/Generator.pv"
+            #line 2185 "src/compiler/Generator.pv"
             if (func_info->generics.array.length == 0) {
-                #line 2185 "src/compiler/Generator.pv"
-                fprintf(file, "\n");
                 #line 2186 "src/compiler/Generator.pv"
+                fprintf(file, "\n");
+                #line 2187 "src/compiler/Generator.pv"
                 if (!Generator__write_function_definition(self, file, func_info, generics, 0)) {
-                    #line 2186 "src/compiler/Generator.pv"
+                    #line 2187 "src/compiler/Generator.pv"
                     return false;
                 }
-                #line 2187 "src/compiler/Generator.pv"
+                #line 2188 "src/compiler/Generator.pv"
                 fprintf(file, ";\n");
             }
 
-            #line 2190 "src/compiler/Generator.pv"
+            #line 2191 "src/compiler/Generator.pv"
             if (impl_functions_for_impl != 0 && function_usage != 0) {
-                #line 2191 "src/compiler/Generator.pv"
+                #line 2192 "src/compiler/Generator.pv"
                 { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
-                #line 2191 "src/compiler/Generator.pv"
+                #line 2192 "src/compiler/Generator.pv"
                 while (Iter_ref_UsageContext__next(&__iter)) {
-                    #line 2191 "src/compiler/Generator.pv"
+                    #line 2192 "src/compiler/Generator.pv"
                     struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-                    #line 2192 "src/compiler/Generator.pv"
-                    IncludeWriter__write(include_writer, file, self, &usage_context->signature, usage_context->generic_map, false);
                     #line 2193 "src/compiler/Generator.pv"
-                    usage_context->generic_map->self_type = generics->self_type;
+                    IncludeWriter__write(include_writer, file, self, &usage_context->signature, usage_context->generic_map, false);
                     #line 2194 "src/compiler/Generator.pv"
-                    fprintf(file, "\n");
+                    usage_context->generic_map->self_type = generics->self_type;
                     #line 2195 "src/compiler/Generator.pv"
+                    fprintf(file, "\n");
+                    #line 2196 "src/compiler/Generator.pv"
                     if (!Generator__write_function_definition(self, file, func_info, usage_context->generic_map, 0)) {
-                        #line 2195 "src/compiler/Generator.pv"
+                        #line 2196 "src/compiler/Generator.pv"
                         return false;
                     }
-                    #line 2196 "src/compiler/Generator.pv"
+                    #line 2197 "src/compiler/Generator.pv"
                     fprintf(file, ";\n");
                 } }
             }
         } }
     } }
 
-    #line 2202 "src/compiler/Generator.pv"
+    #line 2203 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2205 "src/compiler/Generator.pv"
+#line 2206 "src/compiler/Generator.pv"
 bool Generator__generate_enum_loop(struct Generator* self, struct TypeUsage_Enum* usage) {
-    #line 2206 "src/compiler/Generator.pv"
+    #line 2207 "src/compiler/Generator.pv"
     bool success = true;
 
-    #line 2208 "src/compiler/Generator.pv"
+    #line 2209 "src/compiler/Generator.pv"
     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&usage->usage_contexts);
-    #line 2208 "src/compiler/Generator.pv"
+    #line 2209 "src/compiler/Generator.pv"
     while (Iter_ref_UsageContext__next(&__iter)) {
-        #line 2208 "src/compiler/Generator.pv"
+        #line 2209 "src/compiler/Generator.pv"
         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-        #line 2209 "src/compiler/Generator.pv"
+        #line 2210 "src/compiler/Generator.pv"
         success = Generator__generate_enum(self, usage, usage_context) && success;
     } }
 
-    #line 2212 "src/compiler/Generator.pv"
+    #line 2213 "src/compiler/Generator.pv"
     return success;
 }
 
-#line 2215 "src/compiler/Generator.pv"
+#line 2216 "src/compiler/Generator.pv"
 bool Generator__generate_enum(struct Generator* self, struct TypeUsage_Enum* usage, struct UsageContext* usage_context) {
-    #line 2216 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 2217 "src/compiler/Generator.pv"
-    struct Enum* enum_info = usage->type;
+    struct GenericMap* generics = usage_context->generic_map;
     #line 2218 "src/compiler/Generator.pv"
-    struct Module* module = enum_info->context->module;
+    struct Enum* enum_info = usage->type;
     #line 2219 "src/compiler/Generator.pv"
+    struct Module* module = enum_info->context->module;
+    #line 2220 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 2221 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 2222 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 2223 "src/compiler/Generator.pv"
-    char const* header_tmp = tmpnam(0);
+    struct String header = Generator__make_path(self, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2224 "src/compiler/Generator.pv"
-    FILE* header_file = fopen(header_tmp, "w+");
+    char const* header_tmp = tmpnam(0);
     #line 2225 "src/compiler/Generator.pv"
+    FILE* header_file = fopen(header_tmp, "w+");
+    #line 2226 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 2225 "src/compiler/Generator.pv"
+        #line 2226 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 2225 "src/compiler/Generator.pv"
+        #line 2226 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 2227 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 2228 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, String__as_str(&name));
+    fprintf(header_file, "#ifndef PAVE_");
     #line 2229 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 2230 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 2230 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 2231 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 2232 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 2233 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
     #line 2234 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
+    #line 2235 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, header_file, self, &usage_context->layout, generics, false);
 
-    #line 2236 "src/compiler/Generator.pv"
+    #line 2237 "src/compiler/Generator.pv"
     if (!Generator__write_enum_definition(self, header_file, enum_info, usage, usage_context, &include_writer)) {
-        #line 2236 "src/compiler/Generator.pv"
+        #line 2237 "src/compiler/Generator.pv"
         fclose(header_file);
-        #line 2236 "src/compiler/Generator.pv"
+        #line 2237 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 2238 "src/compiler/Generator.pv"
+    #line 2239 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 2240 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 2241 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 2242 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 2243 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 2244 "src/compiler/Generator.pv"
+    #line 2245 "src/compiler/Generator.pv"
     if (enum_info->impls.length == 0) {
-        #line 2244 "src/compiler/Generator.pv"
+        #line 2245 "src/compiler/Generator.pv"
         return true;
     }
 
-    #line 2246 "src/compiler/Generator.pv"
-    struct String code = Generator__make_path(self, module, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 2247 "src/compiler/Generator.pv"
+    struct String code = Generator__make_path(self, module, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
+    #line 2248 "src/compiler/Generator.pv"
     Array_String__append(&self->code_files, code);
 
-    #line 2249 "src/compiler/Generator.pv"
-    char const* code_tmp = tmpnam(0);
     #line 2250 "src/compiler/Generator.pv"
-    FILE* code_file = fopen(code_tmp, "w+");
+    char const* code_tmp = tmpnam(0);
     #line 2251 "src/compiler/Generator.pv"
+    FILE* code_file = fopen(code_tmp, "w+");
+    #line 2252 "src/compiler/Generator.pv"
     if (code_file == 0) {
-        #line 2251 "src/compiler/Generator.pv"
+        #line 2252 "src/compiler/Generator.pv"
         perror(String__c_str(&code));
-        #line 2251 "src/compiler/Generator.pv"
+        #line 2252 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 2253 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 2254 "src/compiler/Generator.pv"
-    Generator__write_includes_raw(self, code_file, &module->includes);
+    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 2255 "src/compiler/Generator.pv"
+    Generator__write_includes_raw(self, code_file, &module->includes);
+    #line 2256 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, code_file, self, &usage_context->body, generics, true);
 
-    #line 2257 "src/compiler/Generator.pv"
-    struct String header_rel = Generator__make_rel_path(self, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2258 "src/compiler/Generator.pv"
-    fprintf(code_file, "#include <");
+    struct String header_rel = Generator__make_rel_path(self, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2259 "src/compiler/Generator.pv"
-    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    fprintf(code_file, "#include <");
     #line 2260 "src/compiler/Generator.pv"
+    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    #line 2261 "src/compiler/Generator.pv"
     fprintf(code_file, ">\n\n");
 
-    #line 2262 "src/compiler/Generator.pv"
+    #line 2263 "src/compiler/Generator.pv"
     if (!Generator__write_impls(self, code_file, module, &enum_info->impls, &usage->impl_functions, generics, &include_writer)) {
-        #line 2262 "src/compiler/Generator.pv"
+        #line 2263 "src/compiler/Generator.pv"
         fclose(code_file);
-        #line 2262 "src/compiler/Generator.pv"
+        #line 2263 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 2264 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 2265 "src/compiler/Generator.pv"
-    fclose(code_file);
+    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 2266 "src/compiler/Generator.pv"
+    fclose(code_file);
+    #line 2267 "src/compiler/Generator.pv"
     remove(code_tmp);
 
-    #line 2268 "src/compiler/Generator.pv"
+    #line 2269 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2271 "src/compiler/Generator.pv"
+#line 2272 "src/compiler/Generator.pv"
 bool Generator__write_struct_definition(struct Generator* self, FILE* file, struct Struct* struct_info, struct TypeUsage_Struct* usage, struct UsageContext* usage_context) {
-    #line 2272 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 2273 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
+    struct GenericMap* generics = usage_context->generic_map;
     #line 2274 "src/compiler/Generator.pv"
-    int32_t name_length = name.array.length;
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 2275 "src/compiler/Generator.pv"
-    struct Array_HashMap_usize_TypeFunctionUsage* impl_functions = &usage->impl_functions;
+    int32_t name_length = name.array.length;
     #line 2276 "src/compiler/Generator.pv"
+    struct Array_HashMap_usize_TypeFunctionUsage* impl_functions = &usage->impl_functions;
+    #line 2277 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 2278 "src/compiler/Generator.pv"
+    #line 2279 "src/compiler/Generator.pv"
     Generator__write_line_directive(self, file, &struct_info->module->context, struct_info->name);
 
-    #line 2280 "src/compiler/Generator.pv"
+    #line 2281 "src/compiler/Generator.pv"
     if (struct_info->type == STRUCT_TYPE__INCOMPLETE) {
-        #line 2281 "src/compiler/Generator.pv"
+        #line 2282 "src/compiler/Generator.pv"
         fprintf(file, "struct %.*s;\n", name_length, name.array.data);
     } else if (Struct__is_newtype(struct_info)) {
-        #line 2283 "src/compiler/Generator.pv"
+        #line 2284 "src/compiler/Generator.pv"
         struct StructField* field = &struct_info->fields.data[0].value;
 
-        #line 2285 "src/compiler/Generator.pv"
-        fprintf(file, "typedef ");
         #line 2286 "src/compiler/Generator.pv"
-        Generator__write_type(self, file, &field->type, generics);
+        fprintf(file, "typedef ");
         #line 2287 "src/compiler/Generator.pv"
+        Generator__write_type(self, file, &field->type, generics);
+        #line 2288 "src/compiler/Generator.pv"
         fprintf(file, " %.*s;\n", name_length, name.array.data);
     } else {
-        #line 2289 "src/compiler/Generator.pv"
-        fprintf(file, "struct %.*s {\n", name_length, name.array.data);
         #line 2290 "src/compiler/Generator.pv"
+        fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+        #line 2291 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 2292 "src/compiler/Generator.pv"
+        #line 2293 "src/compiler/Generator.pv"
         { struct HashMapIter_str_StructField __iter = HashMap_str_StructField__iter(&struct_info->fields);
-        #line 2292 "src/compiler/Generator.pv"
+        #line 2293 "src/compiler/Generator.pv"
         while (HashMapIter_str_StructField__next(&__iter)) {
-            #line 2292 "src/compiler/Generator.pv"
+            #line 2293 "src/compiler/Generator.pv"
             struct StructField* field = &HashMapIter_str_StructField__value(&__iter)->_1;
 
-            #line 2293 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 2294 "src/compiler/Generator.pv"
-            Generator__write_variable_decl(self, file, field->name->value, &field->type, generics);
+            Generator__write_indent(self, file);
             #line 2295 "src/compiler/Generator.pv"
+            Generator__write_variable_decl(self, file, field->name->value, &field->type, generics);
+            #line 2296 "src/compiler/Generator.pv"
             fprintf(file, ";\n");
         } }
 
-        #line 2298 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 2299 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 2300 "src/compiler/Generator.pv"
         fprintf(file, "};\n");
     }
 
-    #line 2302 "src/compiler/Generator.pv"
+    #line 2303 "src/compiler/Generator.pv"
     if (usage_context->signature.length > 0) {
-        #line 2302 "src/compiler/Generator.pv"
+        #line 2303 "src/compiler/Generator.pv"
         fprintf(file, "\n");
     }
-    #line 2303 "src/compiler/Generator.pv"
+    #line 2304 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, file, self, &usage_context->signature, generics, false);
 
-    #line 2305 "src/compiler/Generator.pv"
+    #line 2306 "src/compiler/Generator.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
-    #line 2305 "src/compiler/Generator.pv"
+    #line 2306 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 2305 "src/compiler/Generator.pv"
+        #line 2306 "src/compiler/Generator.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 2305 "src/compiler/Generator.pv"
+        #line 2306 "src/compiler/Generator.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 2306 "src/compiler/Generator.pv"
-        struct Trait* trait_info = impl_info->trait_;
         #line 2307 "src/compiler/Generator.pv"
-        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
+        struct Trait* trait_info = impl_info->trait_;
         #line 2308 "src/compiler/Generator.pv"
+        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
+        #line 2309 "src/compiler/Generator.pv"
         if (impl_functions != 0) {
-            #line 2308 "src/compiler/Generator.pv"
+            #line 2309 "src/compiler/Generator.pv"
             impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(impl_functions, impl_index);
         }
 
-        #line 2310 "src/compiler/Generator.pv"
+        #line 2311 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 2310 "src/compiler/Generator.pv"
+        #line 2311 "src/compiler/Generator.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 2310 "src/compiler/Generator.pv"
+            #line 2311 "src/compiler/Generator.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 2311 "src/compiler/Generator.pv"
-            uintptr_t func_ptr = (uintptr_t)(func_info);
             #line 2312 "src/compiler/Generator.pv"
-            struct TypeFunctionUsage* function_usage = 0;
+            uintptr_t func_ptr = (uintptr_t)(func_info);
             #line 2313 "src/compiler/Generator.pv"
+            struct TypeFunctionUsage* function_usage = 0;
+            #line 2314 "src/compiler/Generator.pv"
             if (impl_functions_for_impl != 0) {
-                #line 2313 "src/compiler/Generator.pv"
+                #line 2314 "src/compiler/Generator.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 2315 "src/compiler/Generator.pv"
+            #line 2316 "src/compiler/Generator.pv"
             if (func_info->generics.array.length == 0) {
-                #line 2316 "src/compiler/Generator.pv"
+                #line 2317 "src/compiler/Generator.pv"
                 if (trait_info == 0) {
-                    #line 2317 "src/compiler/Generator.pv"
+                    #line 2318 "src/compiler/Generator.pv"
                     if (func_info->type == FUNCTION_TYPE__COROUTINE && function_usage != 0) {
-                        #line 2318 "src/compiler/Generator.pv"
-                        self->function_context = &function_usage->function_context;
                         #line 2319 "src/compiler/Generator.pv"
-                        Generator__write_function_coroutine(self, file, func_info, generics);
+                        self->function_context = &function_usage->function_context;
                         #line 2320 "src/compiler/Generator.pv"
+                        Generator__write_function_coroutine(self, file, func_info, generics);
+                        #line 2321 "src/compiler/Generator.pv"
                         self->function_context = 0;
                     }
 
-                    #line 2323 "src/compiler/Generator.pv"
-                    fprintf(file, "\n");
                     #line 2324 "src/compiler/Generator.pv"
+                    fprintf(file, "\n");
+                    #line 2325 "src/compiler/Generator.pv"
                     if (!Generator__write_function_definition(self, file, func_info, generics, 0)) {
-                        #line 2324 "src/compiler/Generator.pv"
+                        #line 2325 "src/compiler/Generator.pv"
                         return false;
                     }
                 } else {
-                    #line 2326 "src/compiler/Generator.pv"
-                    struct GenericMap generics_void = *generics;
                     #line 2327 "src/compiler/Generator.pv"
+                    struct GenericMap generics_void = *generics;
+                    #line 2328 "src/compiler/Generator.pv"
                     generics_void.self_type = &self->root->type_void;
 
-                    #line 2329 "src/compiler/Generator.pv"
-                    struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                     #line 2330 "src/compiler/Generator.pv"
-                    fprintf(file, "\n");
+                    struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                     #line 2331 "src/compiler/Generator.pv"
+                    fprintf(file, "\n");
+                    #line 2332 "src/compiler/Generator.pv"
                     if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
-                        #line 2331 "src/compiler/Generator.pv"
+                        #line 2332 "src/compiler/Generator.pv"
                         return false;
                     }
                 }
 
-                #line 2334 "src/compiler/Generator.pv"
+                #line 2335 "src/compiler/Generator.pv"
                 fprintf(file, ";\n");
             }
 
-            #line 2337 "src/compiler/Generator.pv"
+            #line 2338 "src/compiler/Generator.pv"
             if (impl_functions_for_impl != 0) {
-                #line 2338 "src/compiler/Generator.pv"
-                struct TypeFunctionUsage* function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
                 #line 2339 "src/compiler/Generator.pv"
+                struct TypeFunctionUsage* function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
+                #line 2340 "src/compiler/Generator.pv"
                 if (function_usage != 0) {
-                    #line 2340 "src/compiler/Generator.pv"
+                    #line 2341 "src/compiler/Generator.pv"
                     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
-                    #line 2340 "src/compiler/Generator.pv"
+                    #line 2341 "src/compiler/Generator.pv"
                     while (Iter_ref_UsageContext__next(&__iter)) {
-                        #line 2340 "src/compiler/Generator.pv"
+                        #line 2341 "src/compiler/Generator.pv"
                         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-                        #line 2341 "src/compiler/Generator.pv"
+                        #line 2342 "src/compiler/Generator.pv"
                         IncludeWriter__write(&include_writer, file, self, &usage_context->signature, usage_context->generic_map, false);
-                        #line 2344 "src/compiler/Generator.pv"
-                        usage_context->generic_map->self_type = generics->self_type;
                         #line 2345 "src/compiler/Generator.pv"
-                        fprintf(file, "\n");
+                        usage_context->generic_map->self_type = generics->self_type;
                         #line 2346 "src/compiler/Generator.pv"
+                        fprintf(file, "\n");
+                        #line 2347 "src/compiler/Generator.pv"
                         if (!Generator__write_function_definition(self, file, func_info, usage_context->generic_map, 0)) {
-                            #line 2346 "src/compiler/Generator.pv"
+                            #line 2347 "src/compiler/Generator.pv"
                             return false;
                         }
-                        #line 2347 "src/compiler/Generator.pv"
+                        #line 2348 "src/compiler/Generator.pv"
                         fprintf(file, ";\n");
                     } }
 
-                    #line 2350 "src/compiler/Generator.pv"
+                    #line 2351 "src/compiler/Generator.pv"
                     if (function_usage->impl_dynamic_function) {
-                        #line 2351 "src/compiler/Generator.pv"
+                        #line 2352 "src/compiler/Generator.pv"
                         if (func_info->type == FUNCTION_TYPE__COROUTINE) {
-                            #line 2352 "src/compiler/Generator.pv"
-                            fprintf(file, "#include <std/trait_Co_CoroutineStatus.h>\n");
                             #line 2353 "src/compiler/Generator.pv"
-                            fprintf(file, "struct ");
+                            fprintf(file, "#include <std/trait_Co_CoroutineStatus.h>\n");
                             #line 2354 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "struct ");
                             #line 2355 "src/compiler/Generator.pv"
-                            fprintf(file, "__Co_CoroutineStatus__Instance { ");
+                            Generator__write_function_name(self, file, func_info, generics);
                             #line 2356 "src/compiler/Generator.pv"
+                            fprintf(file, "__Co_CoroutineStatus__Instance { ");
+                            #line 2357 "src/compiler/Generator.pv"
                             self->indent += 1;
-                            #line 2357 "src/compiler/Generator.pv"
+                            #line 2358 "src/compiler/Generator.pv"
                             { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-                            #line 2357 "src/compiler/Generator.pv"
+                            #line 2358 "src/compiler/Generator.pv"
                             while (Iter_ref_Parameter__next(&__iter)) {
-                                #line 2357 "src/compiler/Generator.pv"
+                                #line 2358 "src/compiler/Generator.pv"
                                 struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                                #line 2358 "src/compiler/Generator.pv"
-                                Generator__write_type(self, file, &param->type, generics);
                                 #line 2359 "src/compiler/Generator.pv"
-                                fprintf(file, " ");
+                                Generator__write_type(self, file, &param->type, generics);
                                 #line 2360 "src/compiler/Generator.pv"
-                                Generator__write_token(self, file, param->name);
+                                fprintf(file, " ");
                                 #line 2361 "src/compiler/Generator.pv"
+                                Generator__write_token(self, file, param->name);
+                                #line 2362 "src/compiler/Generator.pv"
                                 fprintf(file, "; ");
                             } }
-                            #line 2363 "src/compiler/Generator.pv"
-                            self->indent -= 1;
                             #line 2364 "src/compiler/Generator.pv"
+                            self->indent -= 1;
+                            #line 2365 "src/compiler/Generator.pv"
                             fprintf(file, "};\n");
 
-                            #line 2366 "src/compiler/Generator.pv"
-                            fprintf(file, "extern struct trait_Co_CoroutineStatusVTable ");
                             #line 2367 "src/compiler/Generator.pv"
-                            Generator__write_str_title(self, file, struct_info->name->value);
+                            fprintf(file, "extern struct trait_Co_CoroutineStatusVTable ");
                             #line 2368 "src/compiler/Generator.pv"
-                            fprintf(file, "__");
+                            Generator__write_str_title(self, file, struct_info->name->value);
                             #line 2369 "src/compiler/Generator.pv"
-                            Generator__write_str_title(self, file, func_info->name->value);
+                            fprintf(file, "__");
                             #line 2370 "src/compiler/Generator.pv"
+                            Generator__write_str_title(self, file, func_info->name->value);
+                            #line 2371 "src/compiler/Generator.pv"
                             fprintf(file, "__VTABLE__CO;\n");
                         } else {
-                            #line 2372 "src/compiler/Generator.pv"
-                            fprintf(file, "#include <std/trait_Fn.h>\n");
                             #line 2373 "src/compiler/Generator.pv"
-                            fprintf(file, "struct ");
+                            fprintf(file, "#include <std/trait_Fn.h>\n");
                             #line 2374 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "struct ");
                             #line 2375 "src/compiler/Generator.pv"
-                            fprintf(file, "__Fn__Instance { ");
+                            Generator__write_function_name(self, file, func_info, generics);
                             #line 2376 "src/compiler/Generator.pv"
+                            fprintf(file, "__Fn__Instance { ");
+                            #line 2377 "src/compiler/Generator.pv"
                             self->indent += 1;
-                            #line 2377 "src/compiler/Generator.pv"
+                            #line 2378 "src/compiler/Generator.pv"
                             { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-                            #line 2377 "src/compiler/Generator.pv"
+                            #line 2378 "src/compiler/Generator.pv"
                             while (Iter_ref_Parameter__next(&__iter)) {
-                                #line 2377 "src/compiler/Generator.pv"
+                                #line 2378 "src/compiler/Generator.pv"
                                 struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                                #line 2378 "src/compiler/Generator.pv"
-                                Generator__write_type(self, file, &param->type, generics);
                                 #line 2379 "src/compiler/Generator.pv"
-                                fprintf(file, " ");
+                                Generator__write_type(self, file, &param->type, generics);
                                 #line 2380 "src/compiler/Generator.pv"
-                                Generator__write_token(self, file, param->name);
+                                fprintf(file, " ");
                                 #line 2381 "src/compiler/Generator.pv"
+                                Generator__write_token(self, file, param->name);
+                                #line 2382 "src/compiler/Generator.pv"
                                 fprintf(file, "; ");
                             } }
-                            #line 2383 "src/compiler/Generator.pv"
-                            self->indent -= 1;
                             #line 2384 "src/compiler/Generator.pv"
+                            self->indent -= 1;
+                            #line 2385 "src/compiler/Generator.pv"
                             fprintf(file, "};\n");
 
-                            #line 2386 "src/compiler/Generator.pv"
-                            fprintf(file, "extern struct trait_FnVTable ");
                             #line 2387 "src/compiler/Generator.pv"
-                            Generator__write_str_title(self, file, struct_info->name->value);
+                            fprintf(file, "extern struct trait_FnVTable ");
                             #line 2388 "src/compiler/Generator.pv"
-                            fprintf(file, "__");
+                            Generator__write_str_title(self, file, struct_info->name->value);
                             #line 2389 "src/compiler/Generator.pv"
-                            Generator__write_str_title(self, file, func_info->name->value);
+                            fprintf(file, "__");
                             #line 2390 "src/compiler/Generator.pv"
+                            Generator__write_str_title(self, file, func_info->name->value);
+                            #line 2391 "src/compiler/Generator.pv"
                             fprintf(file, "__VTABLE__DYN_FN;\n");
                         }
                     }
@@ -4890,2286 +4892,2286 @@ bool Generator__write_struct_definition(struct Generator* self, FILE* file, stru
             }
         } }
 
-        #line 2397 "src/compiler/Generator.pv"
+        #line 2398 "src/compiler/Generator.pv"
         if (trait_info != 0) {
-            #line 2398 "src/compiler/Generator.pv"
+            #line 2399 "src/compiler/Generator.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-            #line 2398 "src/compiler/Generator.pv"
+            #line 2399 "src/compiler/Generator.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 2398 "src/compiler/Generator.pv"
+                #line 2399 "src/compiler/Generator.pv"
                 struct str func_base_name = HashMapIter_str_Function__value(&__iter)->_0;
-                #line 2398 "src/compiler/Generator.pv"
+                #line 2399 "src/compiler/Generator.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 2399 "src/compiler/Generator.pv"
+                #line 2400 "src/compiler/Generator.pv"
                 if (HashMap_str_Function__find(&impl_info->functions, &func_base_name) != 0) {
-                    #line 2399 "src/compiler/Generator.pv"
+                    #line 2400 "src/compiler/Generator.pv"
                     continue;
                 }
 
-                #line 2401 "src/compiler/Generator.pv"
-                fprintf(file, "\n");
                 #line 2402 "src/compiler/Generator.pv"
-                struct GenericMap generics_void = *generics;
+                fprintf(file, "\n");
                 #line 2403 "src/compiler/Generator.pv"
+                struct GenericMap generics_void = *generics;
+                #line 2404 "src/compiler/Generator.pv"
                 generics_void.self_type = &self->root->type_void;
 
-                #line 2405 "src/compiler/Generator.pv"
-                struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                 #line 2406 "src/compiler/Generator.pv"
+                struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
+                #line 2407 "src/compiler/Generator.pv"
                 if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
-                    #line 2406 "src/compiler/Generator.pv"
+                    #line 2407 "src/compiler/Generator.pv"
                     return false;
                 }
-                #line 2407 "src/compiler/Generator.pv"
+                #line 2408 "src/compiler/Generator.pv"
                 fprintf(file, ";\n");
             } }
         }
     } }
 
-    #line 2412 "src/compiler/Generator.pv"
+    #line 2413 "src/compiler/Generator.pv"
     if (struct_info->traits.length > 0) {
-        #line 2412 "src/compiler/Generator.pv"
+        #line 2413 "src/compiler/Generator.pv"
         fprintf(file, "\n");
     }
 
-    #line 2414 "src/compiler/Generator.pv"
+    #line 2415 "src/compiler/Generator.pv"
     { struct HashMapIter_str_tuple_ref_Trait_ref_Type __iter = HashMap_str_tuple_ref_Trait_ref_Type__iter(&struct_info->traits);
-    #line 2414 "src/compiler/Generator.pv"
+    #line 2415 "src/compiler/Generator.pv"
     while (HashMapIter_str_tuple_ref_Trait_ref_Type__next(&__iter)) {
-        #line 2414 "src/compiler/Generator.pv"
+        #line 2415 "src/compiler/Generator.pv"
         struct tuple_ref_Trait_ref_Type trait_entry = HashMapIter_str_tuple_ref_Trait_ref_Type__value(&__iter)->_1;
 
-        #line 2415 "src/compiler/Generator.pv"
-        struct Trait* trait_info = trait_entry._0;
         #line 2416 "src/compiler/Generator.pv"
-        fprintf(file, "extern struct ");
+        struct Trait* trait_info = trait_entry._0;
         #line 2417 "src/compiler/Generator.pv"
-        Generator__write_type_name(self, file, trait_entry._1, generics);
+        fprintf(file, "extern struct ");
         #line 2418 "src/compiler/Generator.pv"
-        fprintf(file, "VTable ");
+        Generator__write_type_name(self, file, trait_entry._1, generics);
         #line 2419 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, file, String__as_str(&name));
+        fprintf(file, "VTable ");
         #line 2420 "src/compiler/Generator.pv"
-        fprintf(file, "__VTABLE__");
+        Generator__write_str_title(self, file, String__as_str(&name));
         #line 2421 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, file, trait_info->name->value);
+        fprintf(file, "__VTABLE__");
         #line 2422 "src/compiler/Generator.pv"
+        Generator__write_str_title(self, file, trait_info->name->value);
+        #line 2423 "src/compiler/Generator.pv"
         fprintf(file, ";\n");
     } }
 
-    #line 2425 "src/compiler/Generator.pv"
+    #line 2426 "src/compiler/Generator.pv"
     if (usage->impl_dynamic_usage) {
-        #line 2426 "src/compiler/Generator.pv"
-        fprintf(file, "#include <std/trait_Struct.h>\n");
         #line 2427 "src/compiler/Generator.pv"
-        fprintf(file, "extern struct trait_StructVTable ");
+        fprintf(file, "#include <std/trait_Struct.h>\n");
         #line 2428 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, file, String__as_str(&name));
+        fprintf(file, "extern struct trait_StructVTable ");
         #line 2429 "src/compiler/Generator.pv"
+        Generator__write_str_title(self, file, String__as_str(&name));
+        #line 2430 "src/compiler/Generator.pv"
         fprintf(file, "__VTABLE__STRUCT;\n");
     }
 
-    #line 2432 "src/compiler/Generator.pv"
+    #line 2433 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2435 "src/compiler/Generator.pv"
+#line 2436 "src/compiler/Generator.pv"
 bool Generator__write_impl_definition(struct Generator* self, FILE* file, struct str name, struct Impl* impl_info, struct GenericMap* generics) {
-    #line 2436 "src/compiler/Generator.pv"
+    #line 2437 "src/compiler/Generator.pv"
     struct Trait* trait_info = impl_info->trait_;
 
-    #line 2438 "src/compiler/Generator.pv"
+    #line 2439 "src/compiler/Generator.pv"
     fprintf(file, "\n");
 
-    #line 2440 "src/compiler/Generator.pv"
+    #line 2441 "src/compiler/Generator.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-    #line 2440 "src/compiler/Generator.pv"
+    #line 2441 "src/compiler/Generator.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 2440 "src/compiler/Generator.pv"
+        #line 2441 "src/compiler/Generator.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 2441 "src/compiler/Generator.pv"
+        #line 2442 "src/compiler/Generator.pv"
         if (func_info->generics.array.length == 0) {
-            #line 2442 "src/compiler/Generator.pv"
+            #line 2443 "src/compiler/Generator.pv"
             if (trait_info == 0) {
-                #line 2443 "src/compiler/Generator.pv"
+                #line 2444 "src/compiler/Generator.pv"
                 if (!Generator__write_function_definition(self, file, func_info, generics, 0)) {
-                    #line 2443 "src/compiler/Generator.pv"
+                    #line 2444 "src/compiler/Generator.pv"
                     return false;
                 }
             } else {
-                #line 2445 "src/compiler/Generator.pv"
-                struct GenericMap generics_void = *generics;
                 #line 2446 "src/compiler/Generator.pv"
+                struct GenericMap generics_void = *generics;
+                #line 2447 "src/compiler/Generator.pv"
                 generics_void.self_type = &self->root->type_void;
 
-                #line 2448 "src/compiler/Generator.pv"
-                struct String func_name = Generator__get_trait_function_name(self, name, trait_info, func_info, generics);
                 #line 2449 "src/compiler/Generator.pv"
+                struct String func_name = Generator__get_trait_function_name(self, name, trait_info, func_info, generics);
+                #line 2450 "src/compiler/Generator.pv"
                 if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
-                    #line 2449 "src/compiler/Generator.pv"
+                    #line 2450 "src/compiler/Generator.pv"
                     return false;
                 }
             }
 
-            #line 2452 "src/compiler/Generator.pv"
+            #line 2453 "src/compiler/Generator.pv"
             fprintf(file, ";\n");
         }
     } }
-    #line 2457 "src/compiler/Generator.pv"
+    #line 2458 "src/compiler/Generator.pv"
     if (trait_info != 0) {
-        #line 2458 "src/compiler/Generator.pv"
+        #line 2459 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-        #line 2458 "src/compiler/Generator.pv"
+        #line 2459 "src/compiler/Generator.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 2458 "src/compiler/Generator.pv"
+            #line 2459 "src/compiler/Generator.pv"
             struct str func_base_name = HashMapIter_str_Function__value(&__iter)->_0;
-            #line 2458 "src/compiler/Generator.pv"
+            #line 2459 "src/compiler/Generator.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 2459 "src/compiler/Generator.pv"
+            #line 2460 "src/compiler/Generator.pv"
             if (HashMap_str_Function__find(&impl_info->functions, &func_base_name) != 0) {
-                #line 2459 "src/compiler/Generator.pv"
+                #line 2460 "src/compiler/Generator.pv"
                 continue;
             }
 
-            #line 2461 "src/compiler/Generator.pv"
-            fprintf(file, "\n");
             #line 2462 "src/compiler/Generator.pv"
-            struct GenericMap generics_void = *generics;
+            fprintf(file, "\n");
             #line 2463 "src/compiler/Generator.pv"
+            struct GenericMap generics_void = *generics;
+            #line 2464 "src/compiler/Generator.pv"
             generics_void.self_type = &self->root->type_void;
 
-            #line 2465 "src/compiler/Generator.pv"
-            struct String func_name = Generator__get_trait_function_name(self, name, trait_info, func_info, generics);
             #line 2466 "src/compiler/Generator.pv"
+            struct String func_name = Generator__get_trait_function_name(self, name, trait_info, func_info, generics);
+            #line 2467 "src/compiler/Generator.pv"
             if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
-                #line 2466 "src/compiler/Generator.pv"
+                #line 2467 "src/compiler/Generator.pv"
                 return false;
             }
-            #line 2467 "src/compiler/Generator.pv"
+            #line 2468 "src/compiler/Generator.pv"
             fprintf(file, ";\n");
         } }
     }
 
-    #line 2471 "src/compiler/Generator.pv"
+    #line 2472 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2474 "src/compiler/Generator.pv"
+#line 2475 "src/compiler/Generator.pv"
 bool Generator__write_primitive_definition(struct Generator* self, FILE* file, struct Primitive* primitive_info, struct GenericMap* generics) {
-    #line 2475 "src/compiler/Generator.pv"
+    #line 2476 "src/compiler/Generator.pv"
     struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
 
-    #line 2477 "src/compiler/Generator.pv"
+    #line 2478 "src/compiler/Generator.pv"
     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
-    #line 2477 "src/compiler/Generator.pv"
+    #line 2478 "src/compiler/Generator.pv"
     while (Iter_ref_ref_Impl__next(&__iter)) {
-        #line 2477 "src/compiler/Generator.pv"
+        #line 2478 "src/compiler/Generator.pv"
         struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-        #line 2478 "src/compiler/Generator.pv"
+        #line 2479 "src/compiler/Generator.pv"
         Generator__write_impl_definition(self, file, String__as_str(&name), impl_info, generics);
     } }
 
-    #line 2481 "src/compiler/Generator.pv"
+    #line 2482 "src/compiler/Generator.pv"
     if (primitive_info->traits.length > 0) {
-        #line 2481 "src/compiler/Generator.pv"
+        #line 2482 "src/compiler/Generator.pv"
         fprintf(file, "\n");
     }
 
-    #line 2483 "src/compiler/Generator.pv"
+    #line 2484 "src/compiler/Generator.pv"
     { struct HashMapIter_str_ref_Trait __iter = HashMap_str_ref_Trait__iter(&primitive_info->traits);
-    #line 2483 "src/compiler/Generator.pv"
+    #line 2484 "src/compiler/Generator.pv"
     while (HashMapIter_str_ref_Trait__next(&__iter)) {
-        #line 2483 "src/compiler/Generator.pv"
+        #line 2484 "src/compiler/Generator.pv"
         struct Trait* trait_info = HashMapIter_str_ref_Trait__value(&__iter)->_1;
 
-        #line 2484 "src/compiler/Generator.pv"
-        fprintf(file, "extern struct trait_");
         #line 2485 "src/compiler/Generator.pv"
-        Generator__write_token(self, file, trait_info->name);
+        fprintf(file, "extern struct trait_");
         #line 2486 "src/compiler/Generator.pv"
-        fprintf(file, "VTable ");
+        Generator__write_token(self, file, trait_info->name);
         #line 2487 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, file, String__as_str(&name));
+        fprintf(file, "VTable ");
         #line 2488 "src/compiler/Generator.pv"
-        fprintf(file, "__VTABLE__");
+        Generator__write_str_title(self, file, String__as_str(&name));
         #line 2489 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, file, trait_info->name->value);
+        fprintf(file, "__VTABLE__");
         #line 2490 "src/compiler/Generator.pv"
+        Generator__write_str_title(self, file, trait_info->name->value);
+        #line 2491 "src/compiler/Generator.pv"
         fprintf(file, ";\n");
     } }
 
-    #line 2493 "src/compiler/Generator.pv"
+    #line 2494 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2496 "src/compiler/Generator.pv"
+#line 2497 "src/compiler/Generator.pv"
 bool Generator__write_trait_definition(struct Generator* self, FILE* file, struct Trait* trait_info, struct GenericMap* generics) {
-    #line 2497 "src/compiler/Generator.pv"
-    struct GenericMap void_self_generics = *generics;
     #line 2498 "src/compiler/Generator.pv"
+    struct GenericMap void_self_generics = *generics;
+    #line 2499 "src/compiler/Generator.pv"
     void_self_generics.self_type = &self->root->type_void;
 
-    #line 2500 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 2501 "src/compiler/Generator.pv"
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
+    #line 2502 "src/compiler/Generator.pv"
     int32_t name_length = name.array.length;
 
-    #line 2503 "src/compiler/Generator.pv"
-    fprintf(file, "\n");
     #line 2504 "src/compiler/Generator.pv"
+    fprintf(file, "\n");
+    #line 2505 "src/compiler/Generator.pv"
     Generator__write_line_directive(self, file, &trait_info->module->context, trait_info->name);
 
-    #line 2506 "src/compiler/Generator.pv"
-    fprintf(file, "struct %.*sVTable {\n", name_length, name.array.data);
     #line 2507 "src/compiler/Generator.pv"
+    fprintf(file, "struct %.*sVTable {\n", name_length, name.array.data);
+    #line 2508 "src/compiler/Generator.pv"
     self->indent += 1;
 
-    #line 2509 "src/compiler/Generator.pv"
+    #line 2510 "src/compiler/Generator.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-    #line 2509 "src/compiler/Generator.pv"
+    #line 2510 "src/compiler/Generator.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 2509 "src/compiler/Generator.pv"
+        #line 2510 "src/compiler/Generator.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 2510 "src/compiler/Generator.pv"
+        #line 2511 "src/compiler/Generator.pv"
         if (func_info->generics.array.length == 0) {
-            #line 2511 "src/compiler/Generator.pv"
-            struct String func_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
             #line 2512 "src/compiler/Generator.pv"
-            String__append(&func_name, (struct str){ .ptr = "(*", .length = strlen("(*") });
+            struct String func_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
             #line 2513 "src/compiler/Generator.pv"
-            String__append(&func_name, func_info->name->value);
+            String__append(&func_name, (struct str){ .ptr = "(*", .length = strlen("(*") });
             #line 2514 "src/compiler/Generator.pv"
+            String__append(&func_name, func_info->name->value);
+            #line 2515 "src/compiler/Generator.pv"
             String__append(&func_name, (struct str){ .ptr = ")", .length = strlen(")") });
 
-            #line 2516 "src/compiler/Generator.pv"
-            Generator__write_indent(self, file);
             #line 2517 "src/compiler/Generator.pv"
+            Generator__write_indent(self, file);
+            #line 2518 "src/compiler/Generator.pv"
             if (!Generator__write_function_definition(self, file, func_info, &void_self_generics, &func_name)) {
-                #line 2517 "src/compiler/Generator.pv"
+                #line 2518 "src/compiler/Generator.pv"
                 return false;
             }
-            #line 2518 "src/compiler/Generator.pv"
+            #line 2519 "src/compiler/Generator.pv"
             fprintf(file, ";\n");
         }
     } }
 
-    #line 2522 "src/compiler/Generator.pv"
-    self->indent -= 1;
     #line 2523 "src/compiler/Generator.pv"
+    self->indent -= 1;
+    #line 2524 "src/compiler/Generator.pv"
     fprintf(file, "};\n\n");
 
-    #line 2525 "src/compiler/Generator.pv"
+    #line 2526 "src/compiler/Generator.pv"
     Generator__write_line_directive(self, file, &trait_info->module->context, trait_info->name);
 
-    #line 2527 "src/compiler/Generator.pv"
-    fprintf(file, "struct %.*s {\n", name_length, name.array.data);
     #line 2528 "src/compiler/Generator.pv"
+    fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+    #line 2529 "src/compiler/Generator.pv"
     self->indent += 1;
 
-    #line 2530 "src/compiler/Generator.pv"
-    Generator__write_indent(self, file);
     #line 2531 "src/compiler/Generator.pv"
-    fprintf(file, "const struct %.*sVTable* vtable;\n", name_length, name.array.data);
-    #line 2532 "src/compiler/Generator.pv"
     Generator__write_indent(self, file);
+    #line 2532 "src/compiler/Generator.pv"
+    fprintf(file, "const struct %.*sVTable* vtable;\n", name_length, name.array.data);
     #line 2533 "src/compiler/Generator.pv"
+    Generator__write_indent(self, file);
+    #line 2534 "src/compiler/Generator.pv"
     fprintf(file, "void* instance;\n");
 
-    #line 2535 "src/compiler/Generator.pv"
-    self->indent -= 1;
     #line 2536 "src/compiler/Generator.pv"
+    self->indent -= 1;
+    #line 2537 "src/compiler/Generator.pv"
     fprintf(file, "};\n");
 
-    #line 2538 "src/compiler/Generator.pv"
+    #line 2539 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2541 "src/compiler/Generator.pv"
+#line 2542 "src/compiler/Generator.pv"
 struct String Generator__get_trait_function_name(struct Generator* self, struct str struct_name, struct Trait* trait_info, struct Function* func_info, struct GenericMap* generics) {
-    #line 2542 "src/compiler/Generator.pv"
+    #line 2543 "src/compiler/Generator.pv"
     struct String trait_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 2544 "src/compiler/Generator.pv"
-    String__append(&trait_name, struct_name);
     #line 2545 "src/compiler/Generator.pv"
-    String__append(&trait_name, (struct str){ .ptr = "__", .length = strlen("__") });
+    String__append(&trait_name, struct_name);
     #line 2546 "src/compiler/Generator.pv"
-    String__append(&trait_name, trait_info->name->value);
-    #line 2547 "src/compiler/Generator.pv"
     String__append(&trait_name, (struct str){ .ptr = "__", .length = strlen("__") });
+    #line 2547 "src/compiler/Generator.pv"
+    String__append(&trait_name, trait_info->name->value);
     #line 2548 "src/compiler/Generator.pv"
+    String__append(&trait_name, (struct str){ .ptr = "__", .length = strlen("__") });
+    #line 2549 "src/compiler/Generator.pv"
     String__append(&trait_name, func_info->name->value);
 
-    #line 2550 "src/compiler/Generator.pv"
+    #line 2551 "src/compiler/Generator.pv"
     return trait_name;
 }
 
-#line 2553 "src/compiler/Generator.pv"
+#line 2554 "src/compiler/Generator.pv"
 bool Generator__write_impls(struct Generator* self, FILE* file, struct Module* module, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics, struct IncludeWriter* include_writer) {
-    #line 2555 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, Type__deref(generics->self_type), generics->self_type, generics);
     #line 2556 "src/compiler/Generator.pv"
-    int32_t name_length = name.array.length;
+    struct String name = Naming__get_type_name(&self->naming_ident, Type__deref(generics->self_type), generics->self_type, generics);
     #line 2557 "src/compiler/Generator.pv"
+    int32_t name_length = name.array.length;
+    #line 2558 "src/compiler/Generator.pv"
     struct String path = Generator__make_rel_path(self, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
 
-    #line 2559 "src/compiler/Generator.pv"
+    #line 2560 "src/compiler/Generator.pv"
     fprintf(file, "#include <%.*s>\n", (int32_t)(path.array.length), path.array.data);
 
-    #line 2561 "src/compiler/Generator.pv"
+    #line 2562 "src/compiler/Generator.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
-    #line 2561 "src/compiler/Generator.pv"
+    #line 2562 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 2561 "src/compiler/Generator.pv"
+        #line 2562 "src/compiler/Generator.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 2561 "src/compiler/Generator.pv"
+        #line 2562 "src/compiler/Generator.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 2562 "src/compiler/Generator.pv"
-        struct Trait* trait_info = impl_info->trait_;
         #line 2563 "src/compiler/Generator.pv"
-        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
+        struct Trait* trait_info = impl_info->trait_;
         #line 2564 "src/compiler/Generator.pv"
+        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
+        #line 2565 "src/compiler/Generator.pv"
         if (impl_functions != 0) {
-            #line 2564 "src/compiler/Generator.pv"
+            #line 2565 "src/compiler/Generator.pv"
             impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(impl_functions, impl_index);
         }
 
-        #line 2566 "src/compiler/Generator.pv"
+        #line 2567 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 2566 "src/compiler/Generator.pv"
+        #line 2567 "src/compiler/Generator.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 2566 "src/compiler/Generator.pv"
+            #line 2567 "src/compiler/Generator.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 2567 "src/compiler/Generator.pv"
-            uintptr_t func_ptr = (uintptr_t)(func_info);
             #line 2568 "src/compiler/Generator.pv"
-            struct TypeFunctionUsage* function_usage = 0;
+            uintptr_t func_ptr = (uintptr_t)(func_info);
             #line 2569 "src/compiler/Generator.pv"
+            struct TypeFunctionUsage* function_usage = 0;
+            #line 2570 "src/compiler/Generator.pv"
             if (impl_functions_for_impl != 0) {
-                #line 2569 "src/compiler/Generator.pv"
+                #line 2570 "src/compiler/Generator.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 2571 "src/compiler/Generator.pv"
+            #line 2572 "src/compiler/Generator.pv"
             if (func_info->generics.array.length == 0) {
-                #line 2572 "src/compiler/Generator.pv"
-                fprintf(file, "\n");
                 #line 2573 "src/compiler/Generator.pv"
+                fprintf(file, "\n");
+                #line 2574 "src/compiler/Generator.pv"
                 if (trait_info != 0) {
-                    #line 2574 "src/compiler/Generator.pv"
-                    struct GenericMap generics_void = *generics;
                     #line 2575 "src/compiler/Generator.pv"
+                    struct GenericMap generics_void = *generics;
+                    #line 2576 "src/compiler/Generator.pv"
                     generics_void.self_type = &self->root->type_void;
 
-                    #line 2577 "src/compiler/Generator.pv"
-                    struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                     #line 2578 "src/compiler/Generator.pv"
+                    struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
+                    #line 2579 "src/compiler/Generator.pv"
                     if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
-                        #line 2579 "src/compiler/Generator.pv"
-                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2580 "src/compiler/Generator.pv"
-                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2581 "src/compiler/Generator.pv"
+                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        #line 2582 "src/compiler/Generator.pv"
                         return false;
                     }
 
-                    #line 2584 "src/compiler/Generator.pv"
-                    fprintf(file, " {\n");
                     #line 2585 "src/compiler/Generator.pv"
+                    fprintf(file, " {\n");
+                    #line 2586 "src/compiler/Generator.pv"
                     self->indent += 1;
 
-                    #line 2587 "src/compiler/Generator.pv"
-                    Generator__write_indent(self, file);
                     #line 2588 "src/compiler/Generator.pv"
-                    Generator__write_type(self, file, generics->self_type, generics);
+                    Generator__write_indent(self, file);
                     #line 2589 "src/compiler/Generator.pv"
+                    Generator__write_type(self, file, generics->self_type, generics);
+                    #line 2590 "src/compiler/Generator.pv"
                     fprintf(file, "* self = ");
 
-                    #line 2591 "src/compiler/Generator.pv"
+                    #line 2592 "src/compiler/Generator.pv"
                     if (module != 0 && module->mode_cpp) {
-                        #line 2592 "src/compiler/Generator.pv"
-                        fprintf(file, "(");
                         #line 2593 "src/compiler/Generator.pv"
-                        Generator__write_type(self, file, generics->self_type, generics);
+                        fprintf(file, "(");
                         #line 2594 "src/compiler/Generator.pv"
+                        Generator__write_type(self, file, generics->self_type, generics);
+                        #line 2595 "src/compiler/Generator.pv"
                         fprintf(file, "*)");
                     }
 
-                    #line 2597 "src/compiler/Generator.pv"
-                    fprintf(file, "__self");
                     #line 2598 "src/compiler/Generator.pv"
+                    fprintf(file, "__self");
+                    #line 2599 "src/compiler/Generator.pv"
                     fprintf(file, "; (void)self;\n");
 
-                    #line 2600 "src/compiler/Generator.pv"
-                    struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
                     #line 2601 "src/compiler/Generator.pv"
+                    struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
+                    #line 2602 "src/compiler/Generator.pv"
                     if (function_usage != 0) {
-                        #line 2601 "src/compiler/Generator.pv"
+                        #line 2602 "src/compiler/Generator.pv"
                         func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
                     }
-                    #line 2602 "src/compiler/Generator.pv"
+                    #line 2603 "src/compiler/Generator.pv"
                     self->function_context = &func_context;
 
-                    #line 2604 "src/compiler/Generator.pv"
+                    #line 2605 "src/compiler/Generator.pv"
                     if (!Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true)) {
-                        #line 2605 "src/compiler/Generator.pv"
-                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2606 "src/compiler/Generator.pv"
-                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2607 "src/compiler/Generator.pv"
+                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        #line 2608 "src/compiler/Generator.pv"
                         return false;
                     }
 
-                    #line 2610 "src/compiler/Generator.pv"
-                    self->indent -= 1;
                     #line 2611 "src/compiler/Generator.pv"
-                    Generator__write_indent(self, file);
+                    self->indent -= 1;
                     #line 2612 "src/compiler/Generator.pv"
+                    Generator__write_indent(self, file);
+                    #line 2613 "src/compiler/Generator.pv"
                     fprintf(file, "}\n");
 
-                    #line 2614 "src/compiler/Generator.pv"
+                    #line 2615 "src/compiler/Generator.pv"
                     self->function_context = 0;
                 } else {
-                    #line 2616 "src/compiler/Generator.pv"
+                    #line 2617 "src/compiler/Generator.pv"
                     if (!Generator__write_function_definition(self, file, func_info, generics, 0)) {
-                        #line 2617 "src/compiler/Generator.pv"
-                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2618 "src/compiler/Generator.pv"
-                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2619 "src/compiler/Generator.pv"
+                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        #line 2620 "src/compiler/Generator.pv"
                         return false;
                     }
 
-                    #line 2622 "src/compiler/Generator.pv"
-                    struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
                     #line 2623 "src/compiler/Generator.pv"
+                    struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
+                    #line 2624 "src/compiler/Generator.pv"
                     if (function_usage != 0) {
-                        #line 2623 "src/compiler/Generator.pv"
+                        #line 2624 "src/compiler/Generator.pv"
                         func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
                     }
-                    #line 2624 "src/compiler/Generator.pv"
+                    #line 2625 "src/compiler/Generator.pv"
                     self->function_context = &func_context;
 
-                    #line 2626 "src/compiler/Generator.pv"
+                    #line 2627 "src/compiler/Generator.pv"
                     if (!Generator__write_function_block(self, file, String__as_str(&name), func_info, generics, function_usage)) {
-                        #line 2627 "src/compiler/Generator.pv"
-                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2628 "src/compiler/Generator.pv"
-                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        uint32_t func_name_length = func_info->name->value.length;
                         #line 2629 "src/compiler/Generator.pv"
+                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                        #line 2630 "src/compiler/Generator.pv"
                         return false;
                     }
 
-                    #line 2632 "src/compiler/Generator.pv"
-                    struct TypeFunctionUsage* function_usage = 0;
                     #line 2633 "src/compiler/Generator.pv"
+                    struct TypeFunctionUsage* function_usage = 0;
+                    #line 2634 "src/compiler/Generator.pv"
                     if (impl_functions_for_impl != 0) {
-                        #line 2633 "src/compiler/Generator.pv"
+                        #line 2634 "src/compiler/Generator.pv"
                         function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
                     }
 
-                    #line 2635 "src/compiler/Generator.pv"
+                    #line 2636 "src/compiler/Generator.pv"
                     if (function_usage != 0 && function_usage->impl_dynamic_function) {
-                        #line 2636 "src/compiler/Generator.pv"
-                        fprintf(file, "\n");
                         #line 2637 "src/compiler/Generator.pv"
+                        fprintf(file, "\n");
+                        #line 2638 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2638 "src/compiler/Generator.pv"
+                            #line 2639 "src/compiler/Generator.pv"
                             fprintf(file, "#include <std/trait_Allocator.h>\n");
                         }
 
-                        #line 2641 "src/compiler/Generator.pv"
-                        fprintf(file, "#include <std/Array_TypeId.h>\n");
                         #line 2642 "src/compiler/Generator.pv"
-                        fprintf(file, "struct Array_TypeId* ");
+                        fprintf(file, "#include <std/Array_TypeId.h>\n");
                         #line 2643 "src/compiler/Generator.pv"
+                        fprintf(file, "struct Array_TypeId* ");
+                        #line 2644 "src/compiler/Generator.pv"
                         Generator__write_function_name(self, file, func_info, generics);
 
-                        #line 2645 "src/compiler/Generator.pv"
+                        #line 2646 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2646 "src/compiler/Generator.pv"
+                            #line 2647 "src/compiler/Generator.pv"
                             fprintf(file, "__Co__get_params(void* __self) {\n");
                         } else {
-                            #line 2648 "src/compiler/Generator.pv"
+                            #line 2649 "src/compiler/Generator.pv"
                             fprintf(file, "__Fn__get_params(void* __self) {\n");
                         }
 
-                        #line 2651 "src/compiler/Generator.pv"
-                        self->indent += 1;
                         #line 2652 "src/compiler/Generator.pv"
-                        Generator__write_indent(self, file);
+                        self->indent += 1;
                         #line 2653 "src/compiler/Generator.pv"
+                        Generator__write_indent(self, file);
+                        #line 2654 "src/compiler/Generator.pv"
                         fprintf(file, "static TypeId type_ids[] = { ");
 
-                        #line 2655 "src/compiler/Generator.pv"
+                        #line 2656 "src/compiler/Generator.pv"
                         bool first = true;
-                        #line 2656 "src/compiler/Generator.pv"
+                        #line 2657 "src/compiler/Generator.pv"
                         { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-                        #line 2656 "src/compiler/Generator.pv"
+                        #line 2657 "src/compiler/Generator.pv"
                         while (Iter_ref_Parameter__next(&__iter)) {
-                            #line 2656 "src/compiler/Generator.pv"
+                            #line 2657 "src/compiler/Generator.pv"
                             struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                            #line 2657 "src/compiler/Generator.pv"
+                            #line 2658 "src/compiler/Generator.pv"
                             if (first) {
-                                #line 2657 "src/compiler/Generator.pv"
+                                #line 2658 "src/compiler/Generator.pv"
                                 first = false;
                             } else {
-                                #line 2657 "src/compiler/Generator.pv"
+                                #line 2658 "src/compiler/Generator.pv"
                                 fprintf(file, ", ");
                             }
-                            #line 2658 "src/compiler/Generator.pv"
+                            #line 2659 "src/compiler/Generator.pv"
                             Generator__write_typeid(self, file, &param->type, generics);
                         } }
 
-                        #line 2661 "src/compiler/Generator.pv"
-                        fprintf(file, " };\n");
                         #line 2662 "src/compiler/Generator.pv"
-                        Generator__write_indent(self, file);
+                        fprintf(file, " };\n");
                         #line 2663 "src/compiler/Generator.pv"
-                        fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info->parameters.length);
-                        #line 2664 "src/compiler/Generator.pv"
                         Generator__write_indent(self, file);
+                        #line 2664 "src/compiler/Generator.pv"
+                        fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info->parameters.length);
                         #line 2665 "src/compiler/Generator.pv"
-                        fprintf(file, "return &result;\n");
+                        Generator__write_indent(self, file);
                         #line 2666 "src/compiler/Generator.pv"
-                        self->indent -= 1;
+                        fprintf(file, "return &result;\n");
                         #line 2667 "src/compiler/Generator.pv"
+                        self->indent -= 1;
+                        #line 2668 "src/compiler/Generator.pv"
                         fprintf(file, "}\n");
 
-                        #line 2669 "src/compiler/Generator.pv"
-                        fprintf(file, "bool ");
                         #line 2670 "src/compiler/Generator.pv"
+                        fprintf(file, "bool ");
+                        #line 2671 "src/compiler/Generator.pv"
                         Generator__write_function_name(self, file, func_info, generics);
 
-                        #line 2672 "src/compiler/Generator.pv"
+                        #line 2673 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2673 "src/compiler/Generator.pv"
+                            #line 2674 "src/compiler/Generator.pv"
                             fprintf(file, "__Co__set_arg(void* __self, uintptr_t index, void* value) {\n");
                         } else {
-                            #line 2675 "src/compiler/Generator.pv"
+                            #line 2676 "src/compiler/Generator.pv"
                             fprintf(file, "__Fn__set_arg(void* __self, uintptr_t index, void* value) {\n");
                         }
 
-                        #line 2678 "src/compiler/Generator.pv"
+                        #line 2679 "src/compiler/Generator.pv"
                         self->indent += 1;
 
-                        #line 2680 "src/compiler/Generator.pv"
-                        Generator__write_indent(self, file);
                         #line 2681 "src/compiler/Generator.pv"
-                        fprintf(file, "struct ");
+                        Generator__write_indent(self, file);
                         #line 2682 "src/compiler/Generator.pv"
+                        fprintf(file, "struct ");
+                        #line 2683 "src/compiler/Generator.pv"
                         Generator__write_function_name(self, file, func_info, generics);
 
-                        #line 2684 "src/compiler/Generator.pv"
+                        #line 2685 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2685 "src/compiler/Generator.pv"
+                            #line 2686 "src/compiler/Generator.pv"
                             fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
                         } else {
-                            #line 2687 "src/compiler/Generator.pv"
+                            #line 2688 "src/compiler/Generator.pv"
                             if (module->mode_cpp) {
-                                #line 2688 "src/compiler/Generator.pv"
-                                fprintf(file, "__Fn__Instance* self = (struct ");
                                 #line 2689 "src/compiler/Generator.pv"
-                                Generator__write_function_name(self, file, func_info, generics);
+                                fprintf(file, "__Fn__Instance* self = (struct ");
                                 #line 2690 "src/compiler/Generator.pv"
+                                Generator__write_function_name(self, file, func_info, generics);
+                                #line 2691 "src/compiler/Generator.pv"
                                 fprintf(file, "__Fn__Instance*)__self;\n");
                             } else {
-                                #line 2693 "src/compiler/Generator.pv"
+                                #line 2694 "src/compiler/Generator.pv"
                                 fprintf(file, "__Fn__Instance* self = __self;\n");
                             }
                         }
 
-                        #line 2697 "src/compiler/Generator.pv"
-                        Generator__write_indent(self, file);
                         #line 2698 "src/compiler/Generator.pv"
-                        fprintf(file, "switch (index) {\n");
+                        Generator__write_indent(self, file);
                         #line 2699 "src/compiler/Generator.pv"
+                        fprintf(file, "switch (index) {\n");
+                        #line 2700 "src/compiler/Generator.pv"
                         self->indent += 1;
 
-                        #line 2701 "src/compiler/Generator.pv"
+                        #line 2702 "src/compiler/Generator.pv"
                         uintptr_t i = 0;
-                        #line 2702 "src/compiler/Generator.pv"
+                        #line 2703 "src/compiler/Generator.pv"
                         { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-                        #line 2702 "src/compiler/Generator.pv"
+                        #line 2703 "src/compiler/Generator.pv"
                         while (Iter_ref_Parameter__next(&__iter)) {
-                            #line 2702 "src/compiler/Generator.pv"
+                            #line 2703 "src/compiler/Generator.pv"
                             struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                            #line 2703 "src/compiler/Generator.pv"
-                            Generator__write_indent(self, file);
                             #line 2704 "src/compiler/Generator.pv"
-                            fprintf(file, "case %zu: self->", i);
+                            Generator__write_indent(self, file);
                             #line 2705 "src/compiler/Generator.pv"
-                            Generator__write_token(self, file, param->name);
+                            fprintf(file, "case %zu: self->", i);
                             #line 2706 "src/compiler/Generator.pv"
+                            Generator__write_token(self, file, param->name);
+                            #line 2707 "src/compiler/Generator.pv"
                             fprintf(file, " = ");
 
-                            #line 2708 "src/compiler/Generator.pv"
+                            #line 2709 "src/compiler/Generator.pv"
                             if (!Generator__is_reference(&param->type)) {
-                                #line 2709 "src/compiler/Generator.pv"
-                                fprintf(file, "*(");
                                 #line 2710 "src/compiler/Generator.pv"
-                                Generator__write_type(self, file, &param->type, generics);
+                                fprintf(file, "*(");
                                 #line 2711 "src/compiler/Generator.pv"
+                                Generator__write_type(self, file, &param->type, generics);
+                                #line 2712 "src/compiler/Generator.pv"
                                 fprintf(file, "*)");
                             } else {
-                                #line 2713 "src/compiler/Generator.pv"
+                                #line 2714 "src/compiler/Generator.pv"
                                 if (module->mode_cpp) {
-                                    #line 2714 "src/compiler/Generator.pv"
-                                    fprintf(file, "(");
                                     #line 2715 "src/compiler/Generator.pv"
-                                    Generator__write_type(self, file, &param->type, generics);
+                                    fprintf(file, "(");
                                     #line 2716 "src/compiler/Generator.pv"
+                                    Generator__write_type(self, file, &param->type, generics);
+                                    #line 2717 "src/compiler/Generator.pv"
                                     fprintf(file, ")");
                                 }
                             }
 
-                            #line 2720 "src/compiler/Generator.pv"
-                            fprintf(file, "value; return true;\n");
                             #line 2721 "src/compiler/Generator.pv"
+                            fprintf(file, "value; return true;\n");
+                            #line 2722 "src/compiler/Generator.pv"
                             i += 1;
                         } }
 
-                        #line 2724 "src/compiler/Generator.pv"
-                        self->indent -= 1;
                         #line 2725 "src/compiler/Generator.pv"
-                        Generator__write_indent(self, file);
+                        self->indent -= 1;
                         #line 2726 "src/compiler/Generator.pv"
+                        Generator__write_indent(self, file);
+                        #line 2727 "src/compiler/Generator.pv"
                         fprintf(file, "}\n");
 
-                        #line 2728 "src/compiler/Generator.pv"
-                        Generator__write_indent(self, file);
                         #line 2729 "src/compiler/Generator.pv"
+                        Generator__write_indent(self, file);
+                        #line 2730 "src/compiler/Generator.pv"
                         fprintf(file, "return false;\n");
 
-                        #line 2731 "src/compiler/Generator.pv"
-                        self->indent -= 1;
                         #line 2732 "src/compiler/Generator.pv"
+                        self->indent -= 1;
+                        #line 2733 "src/compiler/Generator.pv"
                         fprintf(file, "}\n");
 
-                        #line 2734 "src/compiler/Generator.pv"
+                        #line 2735 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2735 "src/compiler/Generator.pv"
-                            fprintf(file, "struct Iter_CoroutineStatus ");
                             #line 2736 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "struct Iter_CoroutineStatus ");
                             #line 2737 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2738 "src/compiler/Generator.pv"
                             fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
 
-                            #line 2739 "src/compiler/Generator.pv"
+                            #line 2740 "src/compiler/Generator.pv"
                             self->indent += 1;
 
-                            #line 2741 "src/compiler/Generator.pv"
-                            Generator__write_indent(self, file);
                             #line 2742 "src/compiler/Generator.pv"
-                            fprintf(file, "struct ");
+                            Generator__write_indent(self, file);
                             #line 2743 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "struct ");
                             #line 2744 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2745 "src/compiler/Generator.pv"
                             fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
 
-                            #line 2746 "src/compiler/Generator.pv"
-                            Generator__write_indent(self, file);
                             #line 2747 "src/compiler/Generator.pv"
-                            fprintf(file, "struct ");
+                            Generator__write_indent(self, file);
                             #line 2748 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "struct ");
                             #line 2749 "src/compiler/Generator.pv"
-                            fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
-                            #line 2750 "src/compiler/Generator.pv"
                             Generator__write_function_name(self, file, func_info, generics);
+                            #line 2750 "src/compiler/Generator.pv"
+                            fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
                             #line 2751 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2752 "src/compiler/Generator.pv"
                             fprintf(file, "));\n");
 
-                            #line 2753 "src/compiler/Generator.pv"
+                            #line 2754 "src/compiler/Generator.pv"
                             { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-                            #line 2753 "src/compiler/Generator.pv"
+                            #line 2754 "src/compiler/Generator.pv"
                             while (Iter_ref_Parameter__next(&__iter)) {
-                                #line 2753 "src/compiler/Generator.pv"
+                                #line 2754 "src/compiler/Generator.pv"
                                 struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                                #line 2754 "src/compiler/Generator.pv"
-                                Generator__write_indent(self, file);
                                 #line 2755 "src/compiler/Generator.pv"
-                                fprintf(file, "instance->");
+                                Generator__write_indent(self, file);
                                 #line 2756 "src/compiler/Generator.pv"
-                                Generator__write_token(self, file, param->name);
+                                fprintf(file, "instance->");
                                 #line 2757 "src/compiler/Generator.pv"
-                                fprintf(file, " = ");
-                                #line 2758 "src/compiler/Generator.pv"
-                                fprintf(file, "self->");
-                                #line 2759 "src/compiler/Generator.pv"
                                 Generator__write_token(self, file, param->name);
+                                #line 2758 "src/compiler/Generator.pv"
+                                fprintf(file, " = ");
+                                #line 2759 "src/compiler/Generator.pv"
+                                fprintf(file, "self->");
                                 #line 2760 "src/compiler/Generator.pv"
+                                Generator__write_token(self, file, param->name);
+                                #line 2761 "src/compiler/Generator.pv"
                                 fprintf(file, ";\n");
                             } }
 
-                            #line 2763 "src/compiler/Generator.pv"
-                            Generator__write_indent(self, file);
                             #line 2764 "src/compiler/Generator.pv"
+                            Generator__write_indent(self, file);
+                            #line 2765 "src/compiler/Generator.pv"
                             fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
 
-                            #line 2766 "src/compiler/Generator.pv"
+                            #line 2767 "src/compiler/Generator.pv"
                             switch (func_info->parent.type) {
-                                #line 2767 "src/compiler/Generator.pv"
+                                #line 2768 "src/compiler/Generator.pv"
                                 case FUNCTION_PARENT__STRUCT: {
-                                    #line 2767 "src/compiler/Generator.pv"
-                                    struct Struct* struct_info = func_info->parent.struct_value._0;
                                     #line 2768 "src/compiler/Generator.pv"
-                                    Generator__write_str_title(self, file, struct_info->name->value);
+                                    struct Struct* struct_info = func_info->parent.struct_value._0;
                                     #line 2769 "src/compiler/Generator.pv"
+                                    Generator__write_str_title(self, file, struct_info->name->value);
+                                    #line 2770 "src/compiler/Generator.pv"
                                     fprintf(file, "__");
                                 } break;
-                                #line 2771 "src/compiler/Generator.pv"
+                                #line 2772 "src/compiler/Generator.pv"
                                 default: {
                                 } break;
                             }
-                            #line 2773 "src/compiler/Generator.pv"
+                            #line 2774 "src/compiler/Generator.pv"
                             Generator__write_str_title(self, file, func_info->name->value);
 
-                            #line 2775 "src/compiler/Generator.pv"
+                            #line 2776 "src/compiler/Generator.pv"
                             fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
 
-                            #line 2777 "src/compiler/Generator.pv"
-                            self->indent -= 1;
                             #line 2778 "src/compiler/Generator.pv"
+                            self->indent -= 1;
+                            #line 2779 "src/compiler/Generator.pv"
                             fprintf(file, "}\n");
                         } else {
-                            #line 2780 "src/compiler/Generator.pv"
-                            fprintf(file, "void ");
                             #line 2781 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "void ");
                             #line 2782 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2783 "src/compiler/Generator.pv"
                             fprintf(file, "__Fn__execute(void* __self) {\n");
 
-                            #line 2784 "src/compiler/Generator.pv"
+                            #line 2785 "src/compiler/Generator.pv"
                             self->indent += 1;
 
-                            #line 2786 "src/compiler/Generator.pv"
-                            Generator__write_indent(self, file);
                             #line 2787 "src/compiler/Generator.pv"
-                            fprintf(file, "struct ");
+                            Generator__write_indent(self, file);
                             #line 2788 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "struct ");
                             #line 2789 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2790 "src/compiler/Generator.pv"
                             if (module->mode_cpp) {
-                                #line 2790 "src/compiler/Generator.pv"
-                                fprintf(file, "__Fn__Instance* self = (struct ");
                                 #line 2791 "src/compiler/Generator.pv"
-                                Generator__write_function_name(self, file, func_info, generics);
+                                fprintf(file, "__Fn__Instance* self = (struct ");
                                 #line 2792 "src/compiler/Generator.pv"
+                                Generator__write_function_name(self, file, func_info, generics);
+                                #line 2793 "src/compiler/Generator.pv"
                                 fprintf(file, "__Fn__Instance*)__self;\n");
                             } else {
-                                #line 2795 "src/compiler/Generator.pv"
+                                #line 2796 "src/compiler/Generator.pv"
                                 fprintf(file, "__Fn__Instance* self = __self;\n");
                             }
 
-                            #line 2798 "src/compiler/Generator.pv"
-                            Generator__write_indent(self, file);
                             #line 2799 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            Generator__write_indent(self, file);
                             #line 2800 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2801 "src/compiler/Generator.pv"
                             fprintf(file, "(");
 
-                            #line 2802 "src/compiler/Generator.pv"
+                            #line 2803 "src/compiler/Generator.pv"
                             first = true;
-                            #line 2803 "src/compiler/Generator.pv"
+                            #line 2804 "src/compiler/Generator.pv"
                             { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-                            #line 2803 "src/compiler/Generator.pv"
+                            #line 2804 "src/compiler/Generator.pv"
                             while (Iter_ref_Parameter__next(&__iter)) {
-                                #line 2803 "src/compiler/Generator.pv"
+                                #line 2804 "src/compiler/Generator.pv"
                                 struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                                #line 2804 "src/compiler/Generator.pv"
+                                #line 2805 "src/compiler/Generator.pv"
                                 if (first) {
-                                    #line 2804 "src/compiler/Generator.pv"
+                                    #line 2805 "src/compiler/Generator.pv"
                                     first = false;
                                 } else {
-                                    #line 2804 "src/compiler/Generator.pv"
+                                    #line 2805 "src/compiler/Generator.pv"
                                     fprintf(file, ", ");
                                 }
-                                #line 2805 "src/compiler/Generator.pv"
-                                fprintf(file, "self->");
                                 #line 2806 "src/compiler/Generator.pv"
+                                fprintf(file, "self->");
+                                #line 2807 "src/compiler/Generator.pv"
                                 Generator__write_token(self, file, param->name);
                             } }
 
-                            #line 2809 "src/compiler/Generator.pv"
+                            #line 2810 "src/compiler/Generator.pv"
                             fprintf(file, ");\n");
 
-                            #line 2811 "src/compiler/Generator.pv"
-                            self->indent -= 1;
                             #line 2812 "src/compiler/Generator.pv"
+                            self->indent -= 1;
+                            #line 2813 "src/compiler/Generator.pv"
                             fprintf(file, "}\n");
                         }
 
-                        #line 2815 "src/compiler/Generator.pv"
+                        #line 2816 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2816 "src/compiler/Generator.pv"
+                            #line 2817 "src/compiler/Generator.pv"
                             fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
                         } else {
-                            #line 2818 "src/compiler/Generator.pv"
+                            #line 2819 "src/compiler/Generator.pv"
                             fprintf(file, "struct trait_FnVTable ");
                         }
 
-                        #line 2821 "src/compiler/Generator.pv"
+                        #line 2822 "src/compiler/Generator.pv"
                         switch (func_info->parent.type) {
-                            #line 2822 "src/compiler/Generator.pv"
+                            #line 2823 "src/compiler/Generator.pv"
                             case FUNCTION_PARENT__STRUCT: {
-                                #line 2822 "src/compiler/Generator.pv"
-                                struct Struct* struct_info = func_info->parent.struct_value._0;
                                 #line 2823 "src/compiler/Generator.pv"
-                                Generator__write_str_title(self, file, struct_info->name->value);
+                                struct Struct* struct_info = func_info->parent.struct_value._0;
                                 #line 2824 "src/compiler/Generator.pv"
+                                Generator__write_str_title(self, file, struct_info->name->value);
+                                #line 2825 "src/compiler/Generator.pv"
                                 fprintf(file, "__");
                             } break;
-                            #line 2826 "src/compiler/Generator.pv"
+                            #line 2827 "src/compiler/Generator.pv"
                             default: {
                             } break;
                         }
-                        #line 2828 "src/compiler/Generator.pv"
+                        #line 2829 "src/compiler/Generator.pv"
                         Generator__write_str_title(self, file, func_info->name->value);
 
-                        #line 2830 "src/compiler/Generator.pv"
+                        #line 2831 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2831 "src/compiler/Generator.pv"
+                            #line 2832 "src/compiler/Generator.pv"
                             fprintf(file, "__VTABLE__CO");
                         } else {
-                            #line 2833 "src/compiler/Generator.pv"
+                            #line 2834 "src/compiler/Generator.pv"
                             fprintf(file, "__VTABLE__DYN_FN");
                         }
 
-                        #line 2836 "src/compiler/Generator.pv"
-                        fprintf(file, " = { .get_params = &");
                         #line 2837 "src/compiler/Generator.pv"
+                        fprintf(file, " = { .get_params = &");
+                        #line 2838 "src/compiler/Generator.pv"
                         Generator__write_function_name(self, file, func_info, generics);
 
-                        #line 2839 "src/compiler/Generator.pv"
+                        #line 2840 "src/compiler/Generator.pv"
                         if (Generator__is_coroutine(self)) {
-                            #line 2840 "src/compiler/Generator.pv"
-                            fprintf(file, "__Co__get_params, .set_arg = &");
                             #line 2841 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "__Co__get_params, .set_arg = &");
                             #line 2842 "src/compiler/Generator.pv"
-                            fprintf(file, "__Co__set_arg, .init = &");
-                            #line 2843 "src/compiler/Generator.pv"
                             Generator__write_function_name(self, file, func_info, generics);
+                            #line 2843 "src/compiler/Generator.pv"
+                            fprintf(file, "__Co__set_arg, .init = &");
                             #line 2844 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2845 "src/compiler/Generator.pv"
                             fprintf(file, "__Co__init };\n");
                         } else {
-                            #line 2846 "src/compiler/Generator.pv"
-                            fprintf(file, "__Fn__get_params, .set_arg = &");
                             #line 2847 "src/compiler/Generator.pv"
-                            Generator__write_function_name(self, file, func_info, generics);
+                            fprintf(file, "__Fn__get_params, .set_arg = &");
                             #line 2848 "src/compiler/Generator.pv"
-                            fprintf(file, "__Fn__set_arg, .execute = &");
-                            #line 2849 "src/compiler/Generator.pv"
                             Generator__write_function_name(self, file, func_info, generics);
+                            #line 2849 "src/compiler/Generator.pv"
+                            fprintf(file, "__Fn__set_arg, .execute = &");
                             #line 2850 "src/compiler/Generator.pv"
+                            Generator__write_function_name(self, file, func_info, generics);
+                            #line 2851 "src/compiler/Generator.pv"
                             fprintf(file, "__Fn__execute };\n");
                         }
                     }
 
-                    #line 2854 "src/compiler/Generator.pv"
+                    #line 2855 "src/compiler/Generator.pv"
                     self->function_context = 0;
                 }
             } else if (impl_functions_for_impl != 0) {
-                #line 2857 "src/compiler/Generator.pv"
+                #line 2858 "src/compiler/Generator.pv"
                 if (function_usage != 0) {
-                    #line 2858 "src/compiler/Generator.pv"
-                    struct Function* func2 = ArenaAllocator__Allocator__alloc(self->allocator, sizeof(struct Function));
                     #line 2859 "src/compiler/Generator.pv"
+                    struct Function* func2 = ArenaAllocator__Allocator__alloc(self->allocator, sizeof(struct Function));
+                    #line 2860 "src/compiler/Generator.pv"
                     *func2 = *func_info;
 
-                    #line 2861 "src/compiler/Generator.pv"
+                    #line 2862 "src/compiler/Generator.pv"
                     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
-                    #line 2861 "src/compiler/Generator.pv"
+                    #line 2862 "src/compiler/Generator.pv"
                     while (Iter_ref_UsageContext__next(&__iter)) {
-                        #line 2861 "src/compiler/Generator.pv"
+                        #line 2862 "src/compiler/Generator.pv"
                         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-                        #line 2862 "src/compiler/Generator.pv"
+                        #line 2863 "src/compiler/Generator.pv"
                         struct GenericMap* generics3 = usage_context->generic_map;
-                        #line 2865 "src/compiler/Generator.pv"
+                        #line 2866 "src/compiler/Generator.pv"
                         generics3->self_type = generics->self_type;
 
-                        #line 2867 "src/compiler/Generator.pv"
-                        IncludeWriter__write(include_writer, file, self, &usage_context->body, generics3, true);
                         #line 2868 "src/compiler/Generator.pv"
-                        fprintf(file, "\n");
+                        IncludeWriter__write(include_writer, file, self, &usage_context->body, generics3, true);
                         #line 2869 "src/compiler/Generator.pv"
+                        fprintf(file, "\n");
+                        #line 2870 "src/compiler/Generator.pv"
                         if (!Generator__write_function_definition(self, file, func_info, generics3, 0)) {
-                            #line 2870 "src/compiler/Generator.pv"
-                            uint32_t func_name_length = func_info->name->value.length;
                             #line 2871 "src/compiler/Generator.pv"
-                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                            uint32_t func_name_length = func_info->name->value.length;
                             #line 2872 "src/compiler/Generator.pv"
+                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                            #line 2873 "src/compiler/Generator.pv"
                             return false;
                         }
 
-                        #line 2875 "src/compiler/Generator.pv"
-                        struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
                         #line 2876 "src/compiler/Generator.pv"
-                        func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
+                        struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
                         #line 2877 "src/compiler/Generator.pv"
+                        func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
+                        #line 2878 "src/compiler/Generator.pv"
                         self->function_context = &func_context;
 
-                        #line 2879 "src/compiler/Generator.pv"
+                        #line 2880 "src/compiler/Generator.pv"
                         Generator__write_function_block(self, file, String__as_str(&name), func_info, generics3, function_usage);
 
-                        #line 2881 "src/compiler/Generator.pv"
+                        #line 2882 "src/compiler/Generator.pv"
                         self->function_context = 0;
                     } }
                 }
             }
         } }
-        #line 2888 "src/compiler/Generator.pv"
+        #line 2889 "src/compiler/Generator.pv"
         if (trait_info != 0) {
-            #line 2889 "src/compiler/Generator.pv"
+            #line 2890 "src/compiler/Generator.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-            #line 2889 "src/compiler/Generator.pv"
+            #line 2890 "src/compiler/Generator.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 2889 "src/compiler/Generator.pv"
+                #line 2890 "src/compiler/Generator.pv"
                 struct str func_base_name = HashMapIter_str_Function__value(&__iter)->_0;
-                #line 2889 "src/compiler/Generator.pv"
+                #line 2890 "src/compiler/Generator.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 2890 "src/compiler/Generator.pv"
+                #line 2891 "src/compiler/Generator.pv"
                 if (HashMap_str_Function__find(&impl_info->functions, &func_base_name) != 0) {
-                    #line 2890 "src/compiler/Generator.pv"
+                    #line 2891 "src/compiler/Generator.pv"
                     continue;
                 }
 
-                #line 2892 "src/compiler/Generator.pv"
-                fprintf(file, "\n");
                 #line 2893 "src/compiler/Generator.pv"
-                struct GenericMap generics_void = *generics;
+                fprintf(file, "\n");
                 #line 2894 "src/compiler/Generator.pv"
+                struct GenericMap generics_void = *generics;
+                #line 2895 "src/compiler/Generator.pv"
                 generics_void.self_type = &self->root->type_void;
 
-                #line 2896 "src/compiler/Generator.pv"
-                struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
                 #line 2897 "src/compiler/Generator.pv"
+                struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
+                #line 2898 "src/compiler/Generator.pv"
                 if (!Generator__write_function_definition(self, file, func_info, &generics_void, &func_name)) {
-                    #line 2898 "src/compiler/Generator.pv"
-                    uint32_t func_name_length = func_info->name->value.length;
                     #line 2899 "src/compiler/Generator.pv"
-                    fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                    uint32_t func_name_length = func_info->name->value.length;
                     #line 2900 "src/compiler/Generator.pv"
+                    fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                    #line 2901 "src/compiler/Generator.pv"
                     return false;
                 }
 
-                #line 2903 "src/compiler/Generator.pv"
-                fprintf(file, " {\n");
                 #line 2904 "src/compiler/Generator.pv"
+                fprintf(file, " {\n");
+                #line 2905 "src/compiler/Generator.pv"
                 self->indent += 1;
 
-                #line 2906 "src/compiler/Generator.pv"
-                Generator__write_indent(self, file);
                 #line 2907 "src/compiler/Generator.pv"
+                Generator__write_indent(self, file);
+                #line 2908 "src/compiler/Generator.pv"
                 Generator__write_type(self, file, generics->self_type, generics);
 
-                #line 2909 "src/compiler/Generator.pv"
+                #line 2910 "src/compiler/Generator.pv"
                 fprintf(file, "* self = ");
 
-                #line 2911 "src/compiler/Generator.pv"
+                #line 2912 "src/compiler/Generator.pv"
                 if (module != 0 && module->mode_cpp) {
-                    #line 2912 "src/compiler/Generator.pv"
-                    fprintf(file, "(");
                     #line 2913 "src/compiler/Generator.pv"
-                    Generator__write_type(self, file, generics->self_type, generics);
+                    fprintf(file, "(");
                     #line 2914 "src/compiler/Generator.pv"
+                    Generator__write_type(self, file, generics->self_type, generics);
+                    #line 2915 "src/compiler/Generator.pv"
                     fprintf(file, "*)");
                 }
 
-                #line 2917 "src/compiler/Generator.pv"
+                #line 2918 "src/compiler/Generator.pv"
                 fprintf(file, "__self; (void)self;\n");
 
-                #line 2919 "src/compiler/Generator.pv"
-                struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
                 #line 2920 "src/compiler/Generator.pv"
+                struct FunctionContext func_context = FunctionContext__new(self->allocator, func_info, true);
+                #line 2921 "src/compiler/Generator.pv"
                 self->function_context = &func_context;
 
-                #line 2922 "src/compiler/Generator.pv"
+                #line 2923 "src/compiler/Generator.pv"
                 if (!Generator__write_block(self, file, &func_info->return_type, func_info->body, generics, false, true)) {
-                    #line 2923 "src/compiler/Generator.pv"
-                    uint32_t func_name_length = func_info->name->value.length;
                     #line 2924 "src/compiler/Generator.pv"
-                    fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                    uint32_t func_name_length = func_info->name->value.length;
                     #line 2925 "src/compiler/Generator.pv"
+                    fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
+                    #line 2926 "src/compiler/Generator.pv"
                     return false;
                 }
 
-                #line 2928 "src/compiler/Generator.pv"
-                self->indent -= 1;
                 #line 2929 "src/compiler/Generator.pv"
-                Generator__write_indent(self, file);
+                self->indent -= 1;
                 #line 2930 "src/compiler/Generator.pv"
+                Generator__write_indent(self, file);
+                #line 2931 "src/compiler/Generator.pv"
                 fprintf(file, "}\n");
 
-                #line 2932 "src/compiler/Generator.pv"
+                #line 2933 "src/compiler/Generator.pv"
                 self->function_context = 0;
             } }
         }
     } }
 
-    #line 2937 "src/compiler/Generator.pv"
+    #line 2938 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 2940 "src/compiler/Generator.pv"
+#line 2941 "src/compiler/Generator.pv"
 bool Generator__generate_struct_loop(struct Generator* self, struct TypeUsage_Struct* usage) {
-    #line 2941 "src/compiler/Generator.pv"
+    #line 2942 "src/compiler/Generator.pv"
     bool success = true;
 
-    #line 2943 "src/compiler/Generator.pv"
+    #line 2944 "src/compiler/Generator.pv"
     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&usage->usage_contexts);
-    #line 2943 "src/compiler/Generator.pv"
+    #line 2944 "src/compiler/Generator.pv"
     while (Iter_ref_UsageContext__next(&__iter)) {
-        #line 2943 "src/compiler/Generator.pv"
+        #line 2944 "src/compiler/Generator.pv"
         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-        #line 2944 "src/compiler/Generator.pv"
+        #line 2945 "src/compiler/Generator.pv"
         success = Generator__generate_struct(self, usage, usage_context) && success;
     } }
 
-    #line 2947 "src/compiler/Generator.pv"
+    #line 2948 "src/compiler/Generator.pv"
     return success;
 }
 
-#line 2950 "src/compiler/Generator.pv"
+#line 2951 "src/compiler/Generator.pv"
 struct String Generator__make_path(struct Generator* self, struct Module* module, struct str name, struct str ext) {
-    #line 2951 "src/compiler/Generator.pv"
-    struct String result = Generator__make_rel_path(self, module, name, ext);
     #line 2952 "src/compiler/Generator.pv"
-    String__prepend(&result, (struct str){ .ptr = "/", .length = strlen("/") });
+    struct String result = Generator__make_rel_path(self, module, name, ext);
     #line 2953 "src/compiler/Generator.pv"
-    String__prepend(&result, (struct str){ .ptr = self->path, .length = strlen(self->path) });
+    String__prepend(&result, (struct str){ .ptr = "/", .length = strlen("/") });
     #line 2954 "src/compiler/Generator.pv"
+    String__prepend(&result, (struct str){ .ptr = self->path, .length = strlen(self->path) });
+    #line 2955 "src/compiler/Generator.pv"
     return result;
 }
 
-#line 2957 "src/compiler/Generator.pv"
+#line 2958 "src/compiler/Generator.pv"
 struct String Generator__make_rel_path(struct Generator* self, struct Module* module, struct str name, struct str ext) {
-    #line 2958 "src/compiler/Generator.pv"
-    struct String result = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2959 "src/compiler/Generator.pv"
-    struct Namespace* namespace = 0;
+    struct String result = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
     #line 2960 "src/compiler/Generator.pv"
+    struct Namespace* namespace = 0;
+    #line 2961 "src/compiler/Generator.pv"
     if (module != 0) {
-        #line 2960 "src/compiler/Generator.pv"
+        #line 2961 "src/compiler/Generator.pv"
         namespace = module->namespace;
     }
 
-    #line 2962 "src/compiler/Generator.pv"
+    #line 2963 "src/compiler/Generator.pv"
     while (namespace != 0) {
-        #line 2963 "src/compiler/Generator.pv"
-        String__prepend(&result, (struct str){ .ptr = "/", .length = strlen("/") });
         #line 2964 "src/compiler/Generator.pv"
-        String__prepend(&result, namespace->name);
+        String__prepend(&result, (struct str){ .ptr = "/", .length = strlen("/") });
         #line 2965 "src/compiler/Generator.pv"
+        String__prepend(&result, namespace->name);
+        #line 2966 "src/compiler/Generator.pv"
         namespace = namespace->parent;
     }
 
-    #line 2968 "src/compiler/Generator.pv"
-    String__append(&result, name);
     #line 2969 "src/compiler/Generator.pv"
+    String__append(&result, name);
+    #line 2970 "src/compiler/Generator.pv"
     String__append(&result, ext);
 
-    #line 2971 "src/compiler/Generator.pv"
+    #line 2972 "src/compiler/Generator.pv"
     return result;
 }
 
-#line 2974 "src/compiler/Generator.pv"
+#line 2975 "src/compiler/Generator.pv"
 bool Generator__generate_struct(struct Generator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context) {
-    #line 2975 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 2976 "src/compiler/Generator.pv"
-    struct Struct* struct_info = usage->type;
+    struct GenericMap* generics = usage_context->generic_map;
     #line 2977 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
+    struct Struct* struct_info = usage->type;
     #line 2978 "src/compiler/Generator.pv"
-    struct Module* module = struct_info->module;
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 2979 "src/compiler/Generator.pv"
+    struct Module* module = struct_info->module;
+    #line 2980 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 2981 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2982 "src/compiler/Generator.pv"
-    char const* header_tmp = tmpnam(0);
+    struct String header = Generator__make_path(self, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 2983 "src/compiler/Generator.pv"
-    FILE* header_file = fopen(header_tmp, "w+");
+    char const* header_tmp = tmpnam(0);
     #line 2984 "src/compiler/Generator.pv"
+    FILE* header_file = fopen(header_tmp, "w+");
+    #line 2985 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 2984 "src/compiler/Generator.pv"
+        #line 2985 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 2984 "src/compiler/Generator.pv"
+        #line 2985 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 2986 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 2987 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, String__as_str(&name));
+    fprintf(header_file, "#ifndef PAVE_");
     #line 2988 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 2989 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 2989 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 2990 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 2991 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 2992 "src/compiler/Generator.pv"
+    #line 2993 "src/compiler/Generator.pv"
     if (struct_info->module->mode_cpp || usage_context->cpp_usages.length > 0) {
-        #line 2993 "src/compiler/Generator.pv"
+        #line 2994 "src/compiler/Generator.pv"
         fprintf(header_file, "#ifdef __cplusplus\n");
 
-        #line 2995 "src/compiler/Generator.pv"
+        #line 2996 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&usage_context->cpp_usages);
-        #line 2995 "src/compiler/Generator.pv"
+        #line 2996 "src/compiler/Generator.pv"
         while (HashMapIter_str_Type__next(&__iter)) {
-            #line 2995 "src/compiler/Generator.pv"
+            #line 2996 "src/compiler/Generator.pv"
             struct str name = HashMapIter_str_Type__value(&__iter)->_0;
-            #line 2995 "src/compiler/Generator.pv"
+            #line 2996 "src/compiler/Generator.pv"
             struct Type type = HashMapIter_str_Type__value(&__iter)->_1;
 
-            #line 2996 "src/compiler/Generator.pv"
+            #line 2997 "src/compiler/Generator.pv"
             switch (type.type) {
-                #line 2997 "src/compiler/Generator.pv"
+                #line 2998 "src/compiler/Generator.pv"
                 case TYPE__CLASS_CPP: {
-                    #line 2997 "src/compiler/Generator.pv"
-                    struct ClassCpp* class_info = type.classcpp_value;
                     #line 2998 "src/compiler/Generator.pv"
+                    struct ClassCpp* class_info = type.classcpp_value;
+                    #line 2999 "src/compiler/Generator.pv"
                     if (class_info->is_struct) {
-                        #line 2999 "src/compiler/Generator.pv"
+                        #line 3000 "src/compiler/Generator.pv"
                         fprintf(header_file, "struct %.*s;\n", (int32_t)(name.length), name.ptr);
                     } else {
-                        #line 3001 "src/compiler/Generator.pv"
+                        #line 3002 "src/compiler/Generator.pv"
                         fprintf(header_file, "class %.*s;\n", (int32_t)(name.length), name.ptr);
                     }
                 } break;
-                #line 3004 "src/compiler/Generator.pv"
+                #line 3005 "src/compiler/Generator.pv"
                 default: {
                 } break;
             }
         } }
 
-        #line 3008 "src/compiler/Generator.pv"
+        #line 3009 "src/compiler/Generator.pv"
         if (struct_info->module->mode_cpp) {
-            #line 3009 "src/compiler/Generator.pv"
+            #line 3010 "src/compiler/Generator.pv"
             if (usage_context->cpp_usages.length > 0) {
-                #line 3009 "src/compiler/Generator.pv"
+                #line 3010 "src/compiler/Generator.pv"
                 fprintf(header_file, "\n");
             }
-            #line 3010 "src/compiler/Generator.pv"
+            #line 3011 "src/compiler/Generator.pv"
             fprintf(header_file, "extern \"C\" {\n");
         }
 
-        #line 3013 "src/compiler/Generator.pv"
+        #line 3014 "src/compiler/Generator.pv"
         fprintf(header_file, "#else\n");
 
-        #line 3015 "src/compiler/Generator.pv"
+        #line 3016 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&usage_context->cpp_usages);
-        #line 3015 "src/compiler/Generator.pv"
+        #line 3016 "src/compiler/Generator.pv"
         while (HashMapIter_str_Type__next(&__iter)) {
-            #line 3015 "src/compiler/Generator.pv"
+            #line 3016 "src/compiler/Generator.pv"
             struct str name = HashMapIter_str_Type__value(&__iter)->_0;
 
-            #line 3016 "src/compiler/Generator.pv"
+            #line 3017 "src/compiler/Generator.pv"
             fprintf(header_file, "typedef struct %.*s %.*s;\n", (int32_t)(name.length), name.ptr, (int32_t)(name.length), name.ptr);
         } }
 
-        #line 3019 "src/compiler/Generator.pv"
+        #line 3020 "src/compiler/Generator.pv"
         fprintf(header_file, "#endif\n\n");
     } else if (self->root->mode_cpp) {
-        #line 3021 "src/compiler/Generator.pv"
-        fprintf(header_file, "#ifdef __cplusplus\n");
         #line 3022 "src/compiler/Generator.pv"
-        fprintf(header_file, "extern \"C\" {\n");
+        fprintf(header_file, "#ifdef __cplusplus\n");
         #line 3023 "src/compiler/Generator.pv"
+        fprintf(header_file, "extern \"C\" {\n");
+        #line 3024 "src/compiler/Generator.pv"
         fprintf(header_file, "#endif\n\n");
     }
 
-    #line 3026 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
     #line 3027 "src/compiler/Generator.pv"
-    IncludeWriter__write(&include_writer, header_file, self, &usage_context->layout, generics, false);
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
     #line 3028 "src/compiler/Generator.pv"
+    IncludeWriter__write(&include_writer, header_file, self, &usage_context->layout, generics, false);
+    #line 3029 "src/compiler/Generator.pv"
     if (usage_context->layout.length > 0) {
-        #line 3028 "src/compiler/Generator.pv"
+        #line 3029 "src/compiler/Generator.pv"
         fprintf(header_file, "\n");
     }
 
-    #line 3030 "src/compiler/Generator.pv"
+    #line 3031 "src/compiler/Generator.pv"
     if (!Generator__write_struct_definition(self, header_file, struct_info, usage, usage_context)) {
-        #line 3030 "src/compiler/Generator.pv"
+        #line 3031 "src/compiler/Generator.pv"
         fclose(header_file);
-        #line 3030 "src/compiler/Generator.pv"
+        #line 3031 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3032 "src/compiler/Generator.pv"
+    #line 3033 "src/compiler/Generator.pv"
     if (struct_info->module->mode_cpp || self->root->mode_cpp) {
-        #line 3033 "src/compiler/Generator.pv"
-        fprintf(header_file, "\n#ifdef __cplusplus\n");
         #line 3034 "src/compiler/Generator.pv"
-        fprintf(header_file, "}\n");
+        fprintf(header_file, "\n#ifdef __cplusplus\n");
         #line 3035 "src/compiler/Generator.pv"
+        fprintf(header_file, "}\n");
+        #line 3036 "src/compiler/Generator.pv"
         fprintf(header_file, "#endif\n");
     }
 
-    #line 3038 "src/compiler/Generator.pv"
+    #line 3039 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 3040 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3041 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3042 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 3043 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 3044 "src/compiler/Generator.pv"
+    #line 3045 "src/compiler/Generator.pv"
     if (struct_info->impls.length == 0 && !usage->impl_dynamic_usage) {
-        #line 3045 "src/compiler/Generator.pv"
+        #line 3046 "src/compiler/Generator.pv"
         return true;
     }
 
-    #line 3048 "src/compiler/Generator.pv"
-    struct str ext;
     #line 3049 "src/compiler/Generator.pv"
+    struct str ext;
+    #line 3050 "src/compiler/Generator.pv"
     if (struct_info->module->mode_cpp) {
-        #line 3050 "src/compiler/Generator.pv"
+        #line 3051 "src/compiler/Generator.pv"
         ext = (struct str){ .ptr = ".cpp", .length = strlen(".cpp") };
     } else {
-        #line 3052 "src/compiler/Generator.pv"
+        #line 3053 "src/compiler/Generator.pv"
         ext = (struct str){ .ptr = ".c", .length = strlen(".c") };
     }
 
-    #line 3055 "src/compiler/Generator.pv"
-    struct String code = Generator__make_path(self, struct_info->module, String__as_str(&name), ext);
     #line 3056 "src/compiler/Generator.pv"
+    struct String code = Generator__make_path(self, struct_info->module, String__as_str(&name), ext);
+    #line 3057 "src/compiler/Generator.pv"
     Array_String__append(&self->code_files, code);
 
-    #line 3058 "src/compiler/Generator.pv"
-    char const* code_tmp = tmpnam(0);
     #line 3059 "src/compiler/Generator.pv"
-    FILE* code_file = fopen(code_tmp, "w+");
+    char const* code_tmp = tmpnam(0);
     #line 3060 "src/compiler/Generator.pv"
+    FILE* code_file = fopen(code_tmp, "w+");
+    #line 3061 "src/compiler/Generator.pv"
     if (code_file == 0) {
-        #line 3060 "src/compiler/Generator.pv"
+        #line 3061 "src/compiler/Generator.pv"
         perror(String__c_str(&code));
-        #line 3060 "src/compiler/Generator.pv"
+        #line 3061 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3062 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 3063 "src/compiler/Generator.pv"
-    Generator__write_includes_raw(self, code_file, &struct_info->module->includes);
+    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 3064 "src/compiler/Generator.pv"
+    Generator__write_includes_raw(self, code_file, &struct_info->module->includes);
+    #line 3065 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, code_file, self, &usage_context->body, generics, true);
 
-    #line 3066 "src/compiler/Generator.pv"
-    struct String header_rel = Generator__make_rel_path(self, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3067 "src/compiler/Generator.pv"
-    fprintf(code_file, "#include <");
+    struct String header_rel = Generator__make_rel_path(self, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3068 "src/compiler/Generator.pv"
-    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    fprintf(code_file, "#include <");
     #line 3069 "src/compiler/Generator.pv"
+    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    #line 3070 "src/compiler/Generator.pv"
     fprintf(code_file, ">\n\n");
 
-    #line 3071 "src/compiler/Generator.pv"
+    #line 3072 "src/compiler/Generator.pv"
     if (!Generator__write_impls(self, code_file, struct_info->module, &struct_info->impls, &usage->impl_functions, generics, &include_writer)) {
-        #line 3071 "src/compiler/Generator.pv"
+        #line 3072 "src/compiler/Generator.pv"
         fclose(code_file);
-        #line 3071 "src/compiler/Generator.pv"
+        #line 3072 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3073 "src/compiler/Generator.pv"
+    #line 3074 "src/compiler/Generator.pv"
     if (struct_info->traits.length > 0) {
-        #line 3074 "src/compiler/Generator.pv"
+        #line 3075 "src/compiler/Generator.pv"
         fprintf(code_file, "\n");
     }
 
-    #line 3077 "src/compiler/Generator.pv"
+    #line 3078 "src/compiler/Generator.pv"
     { struct HashMapIter_str_tuple_ref_Trait_ref_Type __iter = HashMap_str_tuple_ref_Trait_ref_Type__iter(&struct_info->traits);
-    #line 3077 "src/compiler/Generator.pv"
+    #line 3078 "src/compiler/Generator.pv"
     while (HashMapIter_str_tuple_ref_Trait_ref_Type__next(&__iter)) {
-        #line 3077 "src/compiler/Generator.pv"
+        #line 3078 "src/compiler/Generator.pv"
         struct tuple_ref_Trait_ref_Type trait_entry = HashMapIter_str_tuple_ref_Trait_ref_Type__value(&__iter)->_1;
 
-        #line 3078 "src/compiler/Generator.pv"
-        struct Trait* trait_info = trait_entry._0;
         #line 3079 "src/compiler/Generator.pv"
-        fprintf(code_file, "struct ");
+        struct Trait* trait_info = trait_entry._0;
         #line 3080 "src/compiler/Generator.pv"
-        Generator__write_type_name(self, code_file, trait_entry._1, generics);
+        fprintf(code_file, "struct ");
         #line 3081 "src/compiler/Generator.pv"
-        fprintf(code_file, "VTable ");
+        Generator__write_type_name(self, code_file, trait_entry._1, generics);
         #line 3082 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, code_file, String__as_str(&name));
+        fprintf(code_file, "VTable ");
         #line 3083 "src/compiler/Generator.pv"
-        fprintf(code_file, "__VTABLE__");
+        Generator__write_str_title(self, code_file, String__as_str(&name));
         #line 3084 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, code_file, trait_info->name->value);
+        fprintf(code_file, "__VTABLE__");
         #line 3085 "src/compiler/Generator.pv"
+        Generator__write_str_title(self, code_file, trait_info->name->value);
+        #line 3086 "src/compiler/Generator.pv"
         fprintf(code_file, " = { ");
 
-        #line 3087 "src/compiler/Generator.pv"
+        #line 3088 "src/compiler/Generator.pv"
         bool first = true;
-        #line 3088 "src/compiler/Generator.pv"
+        #line 3089 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-        #line 3088 "src/compiler/Generator.pv"
+        #line 3089 "src/compiler/Generator.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 3088 "src/compiler/Generator.pv"
+            #line 3089 "src/compiler/Generator.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 3089 "src/compiler/Generator.pv"
+            #line 3090 "src/compiler/Generator.pv"
             if (first) {
-                #line 3089 "src/compiler/Generator.pv"
+                #line 3090 "src/compiler/Generator.pv"
                 first = false;
             } else {
-                #line 3090 "src/compiler/Generator.pv"
+                #line 3091 "src/compiler/Generator.pv"
                 fprintf(code_file, ", ");
             }
 
-            #line 3092 "src/compiler/Generator.pv"
-            fprintf(code_file, ".");
             #line 3093 "src/compiler/Generator.pv"
-            Generator__write_token(self, code_file, func_info->name);
+            fprintf(code_file, ".");
             #line 3094 "src/compiler/Generator.pv"
-            fprintf(code_file, " = &");
+            Generator__write_token(self, code_file, func_info->name);
             #line 3095 "src/compiler/Generator.pv"
-            struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
+            fprintf(code_file, " = &");
             #line 3096 "src/compiler/Generator.pv"
+            struct String func_name = Generator__get_trait_function_name(self, String__as_str(&name), trait_info, func_info, generics);
+            #line 3097 "src/compiler/Generator.pv"
             Generator__write_string(self, code_file, &func_name);
         } }
 
-        #line 3099 "src/compiler/Generator.pv"
+        #line 3100 "src/compiler/Generator.pv"
         fprintf(code_file, " };\n");
     } }
 
-    #line 3102 "src/compiler/Generator.pv"
+    #line 3103 "src/compiler/Generator.pv"
     if (usage->impl_dynamic_usage) {
-        #line 3103 "src/compiler/Generator.pv"
+        #line 3104 "src/compiler/Generator.pv"
         fprintf(code_file, "\n");
 
-        #line 3105 "src/compiler/Generator.pv"
-        fprintf(code_file, "#include <tuple_usize_str_TypeId.h>\n");
         #line 3106 "src/compiler/Generator.pv"
-        fprintf(code_file, "#include <slice_tuple_usize_str_TypeId.h>\n");
+        fprintf(code_file, "#include <tuple_usize_str_TypeId.h>\n");
         #line 3107 "src/compiler/Generator.pv"
-        fprintf(code_file, "struct slice_tuple_usize_str_TypeId ");
+        fprintf(code_file, "#include <slice_tuple_usize_str_TypeId.h>\n");
         #line 3108 "src/compiler/Generator.pv"
-        Generator__write_string(self, code_file, &name);
+        fprintf(code_file, "struct slice_tuple_usize_str_TypeId ");
         #line 3109 "src/compiler/Generator.pv"
+        Generator__write_string(self, code_file, &name);
+        #line 3110 "src/compiler/Generator.pv"
         fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
 
-        #line 3111 "src/compiler/Generator.pv"
-        self->indent += 1;
         #line 3112 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
+        self->indent += 1;
         #line 3113 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3114 "src/compiler/Generator.pv"
         fprintf(code_file, "static struct tuple_usize_str_TypeId fields[] = { ");
 
-        #line 3115 "src/compiler/Generator.pv"
+        #line 3116 "src/compiler/Generator.pv"
         uintptr_t field_index = 0;
-        #line 3116 "src/compiler/Generator.pv"
+        #line 3117 "src/compiler/Generator.pv"
         { struct HashMapIter_str_StructField __iter = HashMap_str_StructField__iter(&struct_info->fields);
-        #line 3116 "src/compiler/Generator.pv"
+        #line 3117 "src/compiler/Generator.pv"
         while (HashMapIter_str_StructField__next(&__iter)) {
-            #line 3116 "src/compiler/Generator.pv"
+            #line 3117 "src/compiler/Generator.pv"
             struct StructField* field = &HashMapIter_str_StructField__value(&__iter)->_1;
 
-            #line 3117 "src/compiler/Generator.pv"
+            #line 3118 "src/compiler/Generator.pv"
             if (field_index > 0) {
-                #line 3117 "src/compiler/Generator.pv"
+                #line 3118 "src/compiler/Generator.pv"
                 fprintf(code_file, ", ");
             }
-            #line 3118 "src/compiler/Generator.pv"
-            fprintf(code_file, "(struct tuple_usize_str_TypeId){ ._0 = %zu, ._1 = (struct str){ .ptr = \"", field_index);
             #line 3119 "src/compiler/Generator.pv"
-            Generator__write_token(self, code_file, field->name);
+            fprintf(code_file, "(struct tuple_usize_str_TypeId){ ._0 = %zu, ._1 = (struct str){ .ptr = \"", field_index);
             #line 3120 "src/compiler/Generator.pv"
-            fprintf(code_file, "\", .length = %zu }, ._2 = ", field->name->value.length);
+            Generator__write_token(self, code_file, field->name);
             #line 3121 "src/compiler/Generator.pv"
-            Generator__write_typeid(self, code_file, &field->type, generics);
+            fprintf(code_file, "\", .length = %zu }, ._2 = ", field->name->value.length);
             #line 3122 "src/compiler/Generator.pv"
-            fprintf(code_file, " }");
+            Generator__write_typeid(self, code_file, &field->type, generics);
             #line 3123 "src/compiler/Generator.pv"
+            fprintf(code_file, " }");
+            #line 3124 "src/compiler/Generator.pv"
             field_index += 1;
         } }
 
-        #line 3126 "src/compiler/Generator.pv"
-        fprintf(code_file, " };\n");
         #line 3127 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
+        fprintf(code_file, " };\n");
         #line 3128 "src/compiler/Generator.pv"
-        fprintf(code_file, "return (struct slice_tuple_usize_str_TypeId){ .data = fields, .length = %zu };\n", struct_info->fields.length);
+        Generator__write_indent(self, code_file);
         #line 3129 "src/compiler/Generator.pv"
-        self->indent -= 1;
+        fprintf(code_file, "return (struct slice_tuple_usize_str_TypeId){ .data = fields, .length = %zu };\n", struct_info->fields.length);
         #line 3130 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 3131 "src/compiler/Generator.pv"
         fprintf(code_file, "}\n");
 
-        #line 3132 "src/compiler/Generator.pv"
-        fprintf(code_file, "void* ");
         #line 3133 "src/compiler/Generator.pv"
+        fprintf(code_file, "void* ");
+        #line 3134 "src/compiler/Generator.pv"
         Generator__write_string(self, code_file, &name);
 
-        #line 3135 "src/compiler/Generator.pv"
+        #line 3136 "src/compiler/Generator.pv"
         fprintf(code_file, "__Struct__get_field(void* __self, uintptr_t index) {\n");
 
-        #line 3137 "src/compiler/Generator.pv"
+        #line 3138 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 3139 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
         #line 3140 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3141 "src/compiler/Generator.pv"
         Generator__write_type(self, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
 
-        #line 3142 "src/compiler/Generator.pv"
+        #line 3143 "src/compiler/Generator.pv"
         if (module->mode_cpp) {
-            #line 3143 "src/compiler/Generator.pv"
-            fprintf(code_file, "* self = (");
             #line 3144 "src/compiler/Generator.pv"
-            Generator__write_type(self, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+            fprintf(code_file, "* self = (");
             #line 3145 "src/compiler/Generator.pv"
+            Generator__write_type(self, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+            #line 3146 "src/compiler/Generator.pv"
             fprintf(code_file, "*)__self;\n");
         } else {
-            #line 3147 "src/compiler/Generator.pv"
+            #line 3148 "src/compiler/Generator.pv"
             fprintf(code_file, "* self = __self;\n");
         }
 
-        #line 3150 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
         #line 3151 "src/compiler/Generator.pv"
-        fprintf(code_file, "switch (index) {\n");
+        Generator__write_indent(self, code_file);
         #line 3152 "src/compiler/Generator.pv"
+        fprintf(code_file, "switch (index) {\n");
+        #line 3153 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 3154 "src/compiler/Generator.pv"
+        #line 3155 "src/compiler/Generator.pv"
         uintptr_t i = 0;
-        #line 3155 "src/compiler/Generator.pv"
+        #line 3156 "src/compiler/Generator.pv"
         { struct HashMapIter_str_StructField __iter = HashMap_str_StructField__iter(&struct_info->fields);
-        #line 3155 "src/compiler/Generator.pv"
+        #line 3156 "src/compiler/Generator.pv"
         while (HashMapIter_str_StructField__next(&__iter)) {
-            #line 3155 "src/compiler/Generator.pv"
+            #line 3156 "src/compiler/Generator.pv"
             struct StructField* field = &HashMapIter_str_StructField__value(&__iter)->_1;
 
-            #line 3156 "src/compiler/Generator.pv"
-            Generator__write_indent(self, code_file);
             #line 3157 "src/compiler/Generator.pv"
+            Generator__write_indent(self, code_file);
+            #line 3158 "src/compiler/Generator.pv"
             fprintf(code_file, "case %zu: return ", i);
 
-            #line 3159 "src/compiler/Generator.pv"
+            #line 3160 "src/compiler/Generator.pv"
             if (Struct__is_newtype(struct_info)) {
-                #line 3160 "src/compiler/Generator.pv"
+                #line 3161 "src/compiler/Generator.pv"
                 fprintf(code_file, "self");
             } else {
-                #line 3162 "src/compiler/Generator.pv"
+                #line 3163 "src/compiler/Generator.pv"
                 if (!Generator__is_reference(&field->type) || Type__is_fat_pointer(&field->type)) {
-                    #line 3163 "src/compiler/Generator.pv"
+                    #line 3164 "src/compiler/Generator.pv"
                     fprintf(code_file, "&");
                 }
 
-                #line 3166 "src/compiler/Generator.pv"
-                fprintf(code_file, "self->");
                 #line 3167 "src/compiler/Generator.pv"
+                fprintf(code_file, "self->");
+                #line 3168 "src/compiler/Generator.pv"
                 Generator__write_token(self, code_file, field->name);
             }
 
-            #line 3170 "src/compiler/Generator.pv"
+            #line 3171 "src/compiler/Generator.pv"
             fprintf(code_file, ";\n");
 
-            #line 3172 "src/compiler/Generator.pv"
+            #line 3173 "src/compiler/Generator.pv"
             i += 1;
         } }
 
-        #line 3175 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 3176 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
+        self->indent -= 1;
         #line 3177 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3178 "src/compiler/Generator.pv"
         fprintf(code_file, "}\n");
 
-        #line 3179 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
         #line 3180 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3181 "src/compiler/Generator.pv"
         fprintf(code_file, "return 0;\n");
 
-        #line 3182 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 3183 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 3184 "src/compiler/Generator.pv"
         fprintf(code_file, "}\n");
 
-        #line 3185 "src/compiler/Generator.pv"
-        fprintf(code_file, "bool ");
         #line 3186 "src/compiler/Generator.pv"
+        fprintf(code_file, "bool ");
+        #line 3187 "src/compiler/Generator.pv"
         Generator__write_string(self, code_file, &name);
 
-        #line 3188 "src/compiler/Generator.pv"
+        #line 3189 "src/compiler/Generator.pv"
         fprintf(code_file, "__Struct__set_field(void* __self, uintptr_t index, void* value) {\n");
 
-        #line 3190 "src/compiler/Generator.pv"
+        #line 3191 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 3192 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
         #line 3193 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3194 "src/compiler/Generator.pv"
         Generator__write_type(self, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
 
-        #line 3195 "src/compiler/Generator.pv"
+        #line 3196 "src/compiler/Generator.pv"
         if (module->mode_cpp) {
-            #line 3196 "src/compiler/Generator.pv"
-            fprintf(code_file, "* self = (");
             #line 3197 "src/compiler/Generator.pv"
-            Generator__write_type(self, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+            fprintf(code_file, "* self = (");
             #line 3198 "src/compiler/Generator.pv"
+            Generator__write_type(self, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+            #line 3199 "src/compiler/Generator.pv"
             fprintf(code_file, "*)__self;\n");
         } else {
-            #line 3200 "src/compiler/Generator.pv"
+            #line 3201 "src/compiler/Generator.pv"
             fprintf(code_file, "* self = __self;\n");
         }
 
-        #line 3203 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
         #line 3204 "src/compiler/Generator.pv"
-        fprintf(code_file, "switch (index) {\n");
+        Generator__write_indent(self, code_file);
         #line 3205 "src/compiler/Generator.pv"
+        fprintf(code_file, "switch (index) {\n");
+        #line 3206 "src/compiler/Generator.pv"
         self->indent += 1;
 
-        #line 3207 "src/compiler/Generator.pv"
+        #line 3208 "src/compiler/Generator.pv"
         i = 0;
-        #line 3208 "src/compiler/Generator.pv"
+        #line 3209 "src/compiler/Generator.pv"
         { struct HashMapIter_str_StructField __iter = HashMap_str_StructField__iter(&struct_info->fields);
-        #line 3208 "src/compiler/Generator.pv"
+        #line 3209 "src/compiler/Generator.pv"
         while (HashMapIter_str_StructField__next(&__iter)) {
-            #line 3208 "src/compiler/Generator.pv"
+            #line 3209 "src/compiler/Generator.pv"
             struct StructField* field = &HashMapIter_str_StructField__value(&__iter)->_1;
 
-            #line 3209 "src/compiler/Generator.pv"
+            #line 3210 "src/compiler/Generator.pv"
             if (Type__is_sequence(&field->type)) {
-                #line 3209 "src/compiler/Generator.pv"
+                #line 3210 "src/compiler/Generator.pv"
                 continue;
             }
 
-            #line 3211 "src/compiler/Generator.pv"
+            #line 3212 "src/compiler/Generator.pv"
             Generator__write_indent(self, code_file);
 
-            #line 3213 "src/compiler/Generator.pv"
+            #line 3214 "src/compiler/Generator.pv"
             if (Struct__is_newtype(struct_info)) {
-                #line 3214 "src/compiler/Generator.pv"
-                fprintf(code_file, "case %zu: *self = *(", i);
                 #line 3215 "src/compiler/Generator.pv"
-                Generator__write_type(self, code_file, &field->type, generics);
+                fprintf(code_file, "case %zu: *self = *(", i);
                 #line 3216 "src/compiler/Generator.pv"
+                Generator__write_type(self, code_file, &field->type, generics);
+                #line 3217 "src/compiler/Generator.pv"
                 fprintf(code_file, "*)");
             } else {
-                #line 3218 "src/compiler/Generator.pv"
-                fprintf(code_file, "case %zu: self->", i);
                 #line 3219 "src/compiler/Generator.pv"
-                Generator__write_token(self, code_file, field->name);
+                fprintf(code_file, "case %zu: self->", i);
                 #line 3220 "src/compiler/Generator.pv"
+                Generator__write_token(self, code_file, field->name);
+                #line 3221 "src/compiler/Generator.pv"
                 fprintf(code_file, " = ");
 
-                #line 3222 "src/compiler/Generator.pv"
+                #line 3223 "src/compiler/Generator.pv"
                 if (!Generator__is_reference(&field->type) || Type__is_fat_pointer(&field->type)) {
-                    #line 3223 "src/compiler/Generator.pv"
-                    fprintf(code_file, "*(");
                     #line 3224 "src/compiler/Generator.pv"
-                    Generator__write_type(self, code_file, &field->type, generics);
+                    fprintf(code_file, "*(");
                     #line 3225 "src/compiler/Generator.pv"
+                    Generator__write_type(self, code_file, &field->type, generics);
+                    #line 3226 "src/compiler/Generator.pv"
                     fprintf(code_file, "*)");
                 } else if (module->mode_cpp) {
-                    #line 3227 "src/compiler/Generator.pv"
-                    fprintf(code_file, "(");
                     #line 3228 "src/compiler/Generator.pv"
-                    Generator__write_type(self, code_file, &field->type, generics);
+                    fprintf(code_file, "(");
                     #line 3229 "src/compiler/Generator.pv"
+                    Generator__write_type(self, code_file, &field->type, generics);
+                    #line 3230 "src/compiler/Generator.pv"
                     fprintf(code_file, ")");
                 }
             }
 
-            #line 3233 "src/compiler/Generator.pv"
-            fprintf(code_file, "value; return true;\n");
             #line 3234 "src/compiler/Generator.pv"
+            fprintf(code_file, "value; return true;\n");
+            #line 3235 "src/compiler/Generator.pv"
             i += 1;
         } }
 
-        #line 3237 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 3238 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
+        self->indent -= 1;
         #line 3239 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3240 "src/compiler/Generator.pv"
         fprintf(code_file, "}\n");
 
-        #line 3241 "src/compiler/Generator.pv"
-        Generator__write_indent(self, code_file);
         #line 3242 "src/compiler/Generator.pv"
+        Generator__write_indent(self, code_file);
+        #line 3243 "src/compiler/Generator.pv"
         fprintf(code_file, "return false;\n");
 
-        #line 3244 "src/compiler/Generator.pv"
-        self->indent -= 1;
         #line 3245 "src/compiler/Generator.pv"
+        self->indent -= 1;
+        #line 3246 "src/compiler/Generator.pv"
         fprintf(code_file, "}\n");
 
-        #line 3247 "src/compiler/Generator.pv"
-        fprintf(code_file, "struct trait_StructVTable ");
         #line 3248 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, code_file, String__as_str(&name));
+        fprintf(code_file, "struct trait_StructVTable ");
         #line 3249 "src/compiler/Generator.pv"
-        fprintf(code_file, "__VTABLE__STRUCT");
+        Generator__write_str_title(self, code_file, String__as_str(&name));
         #line 3250 "src/compiler/Generator.pv"
-        fprintf(code_file, " = { .get_fields = &");
+        fprintf(code_file, "__VTABLE__STRUCT");
         #line 3251 "src/compiler/Generator.pv"
+        fprintf(code_file, " = { .get_fields = &");
+        #line 3252 "src/compiler/Generator.pv"
         Generator__write_string(self, code_file, &name);
 
-        #line 3253 "src/compiler/Generator.pv"
-        fprintf(code_file, "__Struct__get_fields, .get_field = &");
         #line 3254 "src/compiler/Generator.pv"
-        Generator__write_string(self, code_file, &name);
+        fprintf(code_file, "__Struct__get_fields, .get_field = &");
         #line 3255 "src/compiler/Generator.pv"
-        fprintf(code_file, "__Struct__get_field, .set_field = &");
-        #line 3256 "src/compiler/Generator.pv"
         Generator__write_string(self, code_file, &name);
+        #line 3256 "src/compiler/Generator.pv"
+        fprintf(code_file, "__Struct__get_field, .set_field = &");
         #line 3257 "src/compiler/Generator.pv"
+        Generator__write_string(self, code_file, &name);
+        #line 3258 "src/compiler/Generator.pv"
         fprintf(code_file, "__Struct__set_field };\n");
     }
 
-    #line 3260 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 3261 "src/compiler/Generator.pv"
-    fclose(code_file);
+    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 3262 "src/compiler/Generator.pv"
+    fclose(code_file);
+    #line 3263 "src/compiler/Generator.pv"
     remove(code_tmp);
 
-    #line 3264 "src/compiler/Generator.pv"
+    #line 3265 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 3267 "src/compiler/Generator.pv"
+#line 3268 "src/compiler/Generator.pv"
 bool Generator__generate_primitive_loop(struct Generator* self, struct TypeUsage_Primitive* usage) {
-    #line 3268 "src/compiler/Generator.pv"
+    #line 3269 "src/compiler/Generator.pv"
     bool success = true;
 
-    #line 3270 "src/compiler/Generator.pv"
+    #line 3271 "src/compiler/Generator.pv"
     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&usage->usage_contexts);
-    #line 3270 "src/compiler/Generator.pv"
+    #line 3271 "src/compiler/Generator.pv"
     while (Iter_ref_UsageContext__next(&__iter)) {
-        #line 3270 "src/compiler/Generator.pv"
+        #line 3271 "src/compiler/Generator.pv"
         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-        #line 3271 "src/compiler/Generator.pv"
+        #line 3272 "src/compiler/Generator.pv"
         success = Generator__generate_primitive(self, usage, usage_context) && success;
     } }
 
-    #line 3274 "src/compiler/Generator.pv"
+    #line 3275 "src/compiler/Generator.pv"
     return success;
 }
 
-#line 3277 "src/compiler/Generator.pv"
+#line 3278 "src/compiler/Generator.pv"
 bool Generator__generate_primitive(struct Generator* self, struct TypeUsage_Primitive* usage, struct UsageContext* usage_context) {
-    #line 3278 "src/compiler/Generator.pv"
-    struct Primitive* primitive_info = usage->type;
     #line 3279 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
+    struct Primitive* primitive_info = usage->type;
     #line 3280 "src/compiler/Generator.pv"
-    struct str name = primitive_info->name;
+    struct GenericMap* generics = usage_context->generic_map;
     #line 3281 "src/compiler/Generator.pv"
+    struct str name = primitive_info->name;
+    #line 3282 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 3283 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3284 "src/compiler/Generator.pv"
-    char const* header_tmp = tmpnam(0);
+    struct String header = Generator__make_path(self, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3285 "src/compiler/Generator.pv"
-    FILE* header_file = fopen(header_tmp, "w+");
+    char const* header_tmp = tmpnam(0);
     #line 3286 "src/compiler/Generator.pv"
+    FILE* header_file = fopen(header_tmp, "w+");
+    #line 3287 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 3286 "src/compiler/Generator.pv"
+        #line 3287 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 3286 "src/compiler/Generator.pv"
+        #line 3287 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3288 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 3289 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, name);
+    fprintf(header_file, "#ifndef PAVE_");
     #line 3290 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 3291 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, name);
+    #line 3291 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 3292 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, name);
+    #line 3293 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 3294 "src/compiler/Generator.pv"
-    Generator__write_impl_includes_raw(self, header_file, &primitive_info->impls);
     #line 3295 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
+    Generator__write_impl_includes_raw(self, header_file, &primitive_info->impls);
     #line 3296 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
+    #line 3297 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, header_file, self, &usage_context->signature, generics, false);
 
-    #line 3298 "src/compiler/Generator.pv"
+    #line 3299 "src/compiler/Generator.pv"
     if (!Generator__write_primitive_definition(self, header_file, primitive_info, generics)) {
-        #line 3298 "src/compiler/Generator.pv"
+        #line 3299 "src/compiler/Generator.pv"
         fclose(header_file);
-        #line 3298 "src/compiler/Generator.pv"
+        #line 3299 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3300 "src/compiler/Generator.pv"
+    #line 3301 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 3302 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3303 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3304 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 3305 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 3306 "src/compiler/Generator.pv"
+    #line 3307 "src/compiler/Generator.pv"
     if (primitive_info->impls.length == 0) {
-        #line 3307 "src/compiler/Generator.pv"
+        #line 3308 "src/compiler/Generator.pv"
         return true;
     }
 
-    #line 3310 "src/compiler/Generator.pv"
-    struct String code = Generator__make_path(self, 0, name, (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 3311 "src/compiler/Generator.pv"
+    struct String code = Generator__make_path(self, 0, name, (struct str){ .ptr = ".c", .length = strlen(".c") });
+    #line 3312 "src/compiler/Generator.pv"
     Array_String__append(&self->code_files, code);
 
-    #line 3313 "src/compiler/Generator.pv"
-    char const* code_tmp = tmpnam(0);
     #line 3314 "src/compiler/Generator.pv"
-    FILE* code_file = fopen(code_tmp, "w+");
+    char const* code_tmp = tmpnam(0);
     #line 3315 "src/compiler/Generator.pv"
+    FILE* code_file = fopen(code_tmp, "w+");
+    #line 3316 "src/compiler/Generator.pv"
     if (code_file == 0) {
-        #line 3315 "src/compiler/Generator.pv"
+        #line 3316 "src/compiler/Generator.pv"
         perror(String__c_str(&code));
-        #line 3315 "src/compiler/Generator.pv"
+        #line 3316 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3317 "src/compiler/Generator.pv"
-    Generator__write_impl_includes_raw(self, code_file, &primitive_info->impls);
     #line 3318 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
+    Generator__write_impl_includes_raw(self, code_file, &primitive_info->impls);
     #line 3319 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
+    #line 3320 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, code_file, self, &usage_context->body, generics, true);
 
-    #line 3321 "src/compiler/Generator.pv"
-    struct String header_rel = Generator__make_rel_path(self, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3322 "src/compiler/Generator.pv"
-    fprintf(code_file, "#include <");
+    struct String header_rel = Generator__make_rel_path(self, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3323 "src/compiler/Generator.pv"
-    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    fprintf(code_file, "#include <");
     #line 3324 "src/compiler/Generator.pv"
+    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    #line 3325 "src/compiler/Generator.pv"
     fprintf(code_file, ">\n\n");
 
-    #line 3326 "src/compiler/Generator.pv"
+    #line 3327 "src/compiler/Generator.pv"
     if (!Generator__write_impls(self, code_file, 0, &primitive_info->impls, &usage->impl_functions, generics, &include_writer)) {
-        #line 3326 "src/compiler/Generator.pv"
+        #line 3327 "src/compiler/Generator.pv"
         fclose(code_file);
-        #line 3326 "src/compiler/Generator.pv"
+        #line 3327 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3328 "src/compiler/Generator.pv"
+    #line 3329 "src/compiler/Generator.pv"
     { struct HashMapIter_str_ref_Trait __iter = HashMap_str_ref_Trait__iter(&primitive_info->traits);
-    #line 3328 "src/compiler/Generator.pv"
+    #line 3329 "src/compiler/Generator.pv"
     while (HashMapIter_str_ref_Trait__next(&__iter)) {
-        #line 3328 "src/compiler/Generator.pv"
+        #line 3329 "src/compiler/Generator.pv"
         struct Trait* trait_info = HashMapIter_str_ref_Trait__value(&__iter)->_1;
 
-        #line 3329 "src/compiler/Generator.pv"
-        fprintf(code_file, "\nstruct trait_");
         #line 3330 "src/compiler/Generator.pv"
-        Generator__write_token(self, code_file, trait_info->name);
+        fprintf(code_file, "\nstruct trait_");
         #line 3331 "src/compiler/Generator.pv"
-        fprintf(code_file, "VTable ");
+        Generator__write_token(self, code_file, trait_info->name);
         #line 3332 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, code_file, name);
+        fprintf(code_file, "VTable ");
         #line 3333 "src/compiler/Generator.pv"
-        fprintf(code_file, "__VTABLE__");
+        Generator__write_str_title(self, code_file, name);
         #line 3334 "src/compiler/Generator.pv"
-        Generator__write_str_title(self, code_file, trait_info->name->value);
+        fprintf(code_file, "__VTABLE__");
         #line 3335 "src/compiler/Generator.pv"
+        Generator__write_str_title(self, code_file, trait_info->name->value);
+        #line 3336 "src/compiler/Generator.pv"
         fprintf(code_file, " = { ");
 
-        #line 3337 "src/compiler/Generator.pv"
+        #line 3338 "src/compiler/Generator.pv"
         bool first = true;
-        #line 3338 "src/compiler/Generator.pv"
+        #line 3339 "src/compiler/Generator.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-        #line 3338 "src/compiler/Generator.pv"
+        #line 3339 "src/compiler/Generator.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 3338 "src/compiler/Generator.pv"
+            #line 3339 "src/compiler/Generator.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 3339 "src/compiler/Generator.pv"
+            #line 3340 "src/compiler/Generator.pv"
             if (first) {
-                #line 3339 "src/compiler/Generator.pv"
+                #line 3340 "src/compiler/Generator.pv"
                 first = false;
             } else {
-                #line 3340 "src/compiler/Generator.pv"
+                #line 3341 "src/compiler/Generator.pv"
                 fprintf(code_file, ", ");
             }
 
-            #line 3342 "src/compiler/Generator.pv"
-            fprintf(code_file, ".");
             #line 3343 "src/compiler/Generator.pv"
-            Generator__write_token(self, code_file, func_info->name);
+            fprintf(code_file, ".");
             #line 3344 "src/compiler/Generator.pv"
-            fprintf(code_file, " = &");
+            Generator__write_token(self, code_file, func_info->name);
             #line 3345 "src/compiler/Generator.pv"
-            struct String func_name = Generator__get_trait_function_name(self, name, trait_info, func_info, generics);
+            fprintf(code_file, " = &");
             #line 3346 "src/compiler/Generator.pv"
+            struct String func_name = Generator__get_trait_function_name(self, name, trait_info, func_info, generics);
+            #line 3347 "src/compiler/Generator.pv"
             Generator__write_string(self, code_file, &func_name);
         } }
 
-        #line 3349 "src/compiler/Generator.pv"
+        #line 3350 "src/compiler/Generator.pv"
         fprintf(code_file, " };\n");
     } }
 
-    #line 3352 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 3353 "src/compiler/Generator.pv"
-    fclose(code_file);
+    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 3354 "src/compiler/Generator.pv"
+    fclose(code_file);
+    #line 3355 "src/compiler/Generator.pv"
     remove(code_tmp);
 
-    #line 3356 "src/compiler/Generator.pv"
+    #line 3357 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 3359 "src/compiler/Generator.pv"
+#line 3360 "src/compiler/Generator.pv"
 bool Generator__generate_sequence(struct Generator* self, struct TypeUsage_Sequence* usage) {
-    #line 3360 "src/compiler/Generator.pv"
+    #line 3361 "src/compiler/Generator.pv"
     bool success = true;
 
-    #line 3362 "src/compiler/Generator.pv"
+    #line 3363 "src/compiler/Generator.pv"
     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&usage->usage_contexts);
-    #line 3362 "src/compiler/Generator.pv"
+    #line 3363 "src/compiler/Generator.pv"
     while (Iter_ref_UsageContext__next(&__iter)) {
-        #line 3362 "src/compiler/Generator.pv"
+        #line 3363 "src/compiler/Generator.pv"
         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-        #line 3363 "src/compiler/Generator.pv"
+        #line 3364 "src/compiler/Generator.pv"
         switch (usage->type->type.type) {
-            #line 3364 "src/compiler/Generator.pv"
+            #line 3365 "src/compiler/Generator.pv"
             case SEQUENCE_TYPE__SLICE: {
-                #line 3365 "src/compiler/Generator.pv"
+                #line 3366 "src/compiler/Generator.pv"
                 success = Generator__generate_slice(self, usage, usage_context) && success;
             } break;
-            #line 3367 "src/compiler/Generator.pv"
+            #line 3368 "src/compiler/Generator.pv"
             case SEQUENCE_TYPE__FIXED_ARRAY: {
             } break;
         }
     } }
 
-    #line 3371 "src/compiler/Generator.pv"
+    #line 3372 "src/compiler/Generator.pv"
     return success;
 }
 
-#line 3374 "src/compiler/Generator.pv"
+#line 3375 "src/compiler/Generator.pv"
 bool Generator__generate_slice(struct Generator* self, struct TypeUsage_Sequence* usage, struct UsageContext* usage_context) {
-    #line 3375 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 3376 "src/compiler/Generator.pv"
+    struct GenericMap* generics = usage_context->generic_map;
+    #line 3377 "src/compiler/Generator.pv"
     struct Type* element_type = &usage->type->element;
 
-    #line 3378 "src/compiler/Generator.pv"
-    struct Indirect element_indirect = (struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = *element_type };
     #line 3379 "src/compiler/Generator.pv"
+    struct Indirect element_indirect = (struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = *element_type };
+    #line 3380 "src/compiler/Generator.pv"
     struct Type element_reference_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = &element_indirect };
 
-    #line 3381 "src/compiler/Generator.pv"
-    struct Type sequence_type = (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = usage->type };
     #line 3382 "src/compiler/Generator.pv"
+    struct Type sequence_type = (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = usage->type };
+    #line 3383 "src/compiler/Generator.pv"
     struct String name = Naming__get_type_name(&self->naming_ident, &sequence_type, &sequence_type, generics);
 
-    #line 3384 "src/compiler/Generator.pv"
+    #line 3385 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 3386 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3387 "src/compiler/Generator.pv"
-    char const* header_tmp = tmpnam(0);
+    struct String header = Generator__make_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3388 "src/compiler/Generator.pv"
-    FILE* header_file = fopen(header_tmp, "w+");
+    char const* header_tmp = tmpnam(0);
     #line 3389 "src/compiler/Generator.pv"
+    FILE* header_file = fopen(header_tmp, "w+");
+    #line 3390 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 3389 "src/compiler/Generator.pv"
+        #line 3390 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 3389 "src/compiler/Generator.pv"
+        #line 3390 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3391 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 3392 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, String__as_str(&name));
+    fprintf(header_file, "#ifndef PAVE_");
     #line 3393 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 3394 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 3394 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 3395 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 3396 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 3397 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
     #line 3398 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
+    #line 3399 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, header_file, self, &usage_context->layout, generics, false);
 
-    #line 3400 "src/compiler/Generator.pv"
-    fprintf(header_file, "struct ");
     #line 3401 "src/compiler/Generator.pv"
-    Generator__write_string(self, header_file, &name);
+    fprintf(header_file, "struct ");
     #line 3402 "src/compiler/Generator.pv"
+    Generator__write_string(self, header_file, &name);
+    #line 3403 "src/compiler/Generator.pv"
     fprintf(header_file, " { ");
 
-    #line 3404 "src/compiler/Generator.pv"
-    Generator__write_variable_decl(self, header_file, (struct str){ .ptr = "data", .length = strlen("data") }, &element_reference_type, generics);
     #line 3405 "src/compiler/Generator.pv"
-    fprintf(header_file, "; ");
+    Generator__write_variable_decl(self, header_file, (struct str){ .ptr = "data", .length = strlen("data") }, &element_reference_type, generics);
     #line 3406 "src/compiler/Generator.pv"
+    fprintf(header_file, "; ");
+    #line 3407 "src/compiler/Generator.pv"
     Generator__write_variable_decl(self, header_file, (struct str){ .ptr = "length", .length = strlen("length") }, &self->root->type_usize, generics);
 
-    #line 3408 "src/compiler/Generator.pv"
+    #line 3409 "src/compiler/Generator.pv"
     fprintf(header_file, "; };\n");
 
-    #line 3410 "src/compiler/Generator.pv"
+    #line 3411 "src/compiler/Generator.pv"
     Generator__write_impl_definition(self, header_file, String__as_str(&name), self->root->hack_type_impl->impl_info, generics);
 
-    #line 3412 "src/compiler/Generator.pv"
+    #line 3413 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 3414 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3415 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3416 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 3417 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 3418 "src/compiler/Generator.pv"
-    struct String code = Generator__make_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 3419 "src/compiler/Generator.pv"
+    struct String code = Generator__make_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
+    #line 3420 "src/compiler/Generator.pv"
     Array_String__append(&self->code_files, code);
 
-    #line 3421 "src/compiler/Generator.pv"
-    char const* code_tmp = tmpnam(0);
     #line 3422 "src/compiler/Generator.pv"
-    FILE* code_file = fopen(code_tmp, "w+");
+    char const* code_tmp = tmpnam(0);
     #line 3423 "src/compiler/Generator.pv"
+    FILE* code_file = fopen(code_tmp, "w+");
+    #line 3424 "src/compiler/Generator.pv"
     if (code_file == 0) {
-        #line 3423 "src/compiler/Generator.pv"
+        #line 3424 "src/compiler/Generator.pv"
         perror(String__c_str(&code));
-        #line 3423 "src/compiler/Generator.pv"
+        #line 3424 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3425 "src/compiler/Generator.pv"
-    struct String header_rel = Generator__make_rel_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3426 "src/compiler/Generator.pv"
-    fprintf(code_file, "#include <");
+    struct String header_rel = Generator__make_rel_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3427 "src/compiler/Generator.pv"
-    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    fprintf(code_file, "#include <");
     #line 3428 "src/compiler/Generator.pv"
+    Generator__write_str(self, code_file, String__as_str(&header_rel));
+    #line 3429 "src/compiler/Generator.pv"
     fprintf(code_file, ">\n\n");
 
-    #line 3430 "src/compiler/Generator.pv"
-    struct Impl* impls_base[1] = {self->root->hack_type_impl->impl_info};
     #line 3431 "src/compiler/Generator.pv"
-    struct Array_ref_Impl impls = (struct Array_ref_Impl) { .data = impls_base, .length = 1 };
+    struct Impl* impls_base[1] = {self->root->hack_type_impl->impl_info};
     #line 3432 "src/compiler/Generator.pv"
+    struct Array_ref_Impl impls = (struct Array_ref_Impl) { .data = impls_base, .length = 1 };
+    #line 3433 "src/compiler/Generator.pv"
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions = (struct Array_HashMap_usize_TypeFunctionUsage) { .data = 0, .length = 0 };
 
-    #line 3434 "src/compiler/Generator.pv"
+    #line 3435 "src/compiler/Generator.pv"
     if (!Generator__write_impls(self, code_file, 0, &impls, &impl_functions, generics, &include_writer)) {
-        #line 3434 "src/compiler/Generator.pv"
+        #line 3435 "src/compiler/Generator.pv"
         fclose(code_file);
-        #line 3434 "src/compiler/Generator.pv"
+        #line 3435 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3436 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 3437 "src/compiler/Generator.pv"
-    fclose(code_file);
+    Generator__overwrite_if_different(self, String__c_str(&code), code_file);
     #line 3438 "src/compiler/Generator.pv"
+    fclose(code_file);
+    #line 3439 "src/compiler/Generator.pv"
     remove(code_tmp);
 
-    #line 3440 "src/compiler/Generator.pv"
+    #line 3441 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 3443 "src/compiler/Generator.pv"
+#line 3444 "src/compiler/Generator.pv"
 bool Generator__generate_tuple_loop(struct Generator* self, struct TypeUsage_Tuple* usage) {
-    #line 3444 "src/compiler/Generator.pv"
+    #line 3445 "src/compiler/Generator.pv"
     bool success = true;
 
-    #line 3446 "src/compiler/Generator.pv"
+    #line 3447 "src/compiler/Generator.pv"
     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&usage->usage_contexts);
-    #line 3446 "src/compiler/Generator.pv"
+    #line 3447 "src/compiler/Generator.pv"
     while (Iter_ref_UsageContext__next(&__iter)) {
-        #line 3446 "src/compiler/Generator.pv"
+        #line 3447 "src/compiler/Generator.pv"
         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-        #line 3447 "src/compiler/Generator.pv"
+        #line 3448 "src/compiler/Generator.pv"
         success = Generator__generate_tuple(self, usage, usage_context) && success;
     } }
 
-    #line 3450 "src/compiler/Generator.pv"
+    #line 3451 "src/compiler/Generator.pv"
     return success;
 }
 
-#line 3453 "src/compiler/Generator.pv"
+#line 3454 "src/compiler/Generator.pv"
 bool Generator__generate_tuple(struct Generator* self, struct TypeUsage_Tuple* usage, struct UsageContext* usage_context) {
-    #line 3454 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 3455 "src/compiler/Generator.pv"
-    struct Tuple* tuple = usage->type;
+    struct GenericMap* generics = usage_context->generic_map;
     #line 3456 "src/compiler/Generator.pv"
-    struct Array_Type* element_types = &tuple->elements;
+    struct Tuple* tuple = usage->type;
     #line 3457 "src/compiler/Generator.pv"
+    struct Array_Type* element_types = &tuple->elements;
+    #line 3458 "src/compiler/Generator.pv"
     struct Type tuple_type = (struct Type) { .type = TYPE__TUPLE, .tuple_value = tuple };
 
-    #line 3459 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, &tuple_type, &tuple_type, generics);
     #line 3460 "src/compiler/Generator.pv"
+    struct String name = Naming__get_type_name(&self->naming_ident, &tuple_type, &tuple_type, generics);
+    #line 3461 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 3462 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3463 "src/compiler/Generator.pv"
-    char const* header_tmp = tmpnam(0);
+    struct String header = Generator__make_path(self, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 3464 "src/compiler/Generator.pv"
-    FILE* header_file = fopen(header_tmp, "w+");
+    char const* header_tmp = tmpnam(0);
     #line 3465 "src/compiler/Generator.pv"
+    FILE* header_file = fopen(header_tmp, "w+");
+    #line 3466 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 3465 "src/compiler/Generator.pv"
+        #line 3466 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 3465 "src/compiler/Generator.pv"
+        #line 3466 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3467 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 3468 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, String__as_str(&name));
+    fprintf(header_file, "#ifndef PAVE_");
     #line 3469 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 3470 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 3470 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 3471 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 3472 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 3473 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
     #line 3474 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
+    #line 3475 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, header_file, self, &usage_context->layout, generics, false);
 
-    #line 3476 "src/compiler/Generator.pv"
-    fprintf(header_file, "struct ");
     #line 3477 "src/compiler/Generator.pv"
-    Generator__write_string(self, header_file, &name);
+    fprintf(header_file, "struct ");
     #line 3478 "src/compiler/Generator.pv"
-    fprintf(header_file, " {\n");
+    Generator__write_string(self, header_file, &name);
     #line 3479 "src/compiler/Generator.pv"
+    fprintf(header_file, " {\n");
+    #line 3480 "src/compiler/Generator.pv"
     self->indent += 1;
 
-    #line 3481 "src/compiler/Generator.pv"
+    #line 3482 "src/compiler/Generator.pv"
     { struct IterEnumerate_ref_Type __iter = Iter_ref_Type__enumerate(Array_Type__iter(element_types));
-    #line 3481 "src/compiler/Generator.pv"
+    #line 3482 "src/compiler/Generator.pv"
     while (IterEnumerate_ref_Type__next(&__iter)) {
-        #line 3481 "src/compiler/Generator.pv"
+        #line 3482 "src/compiler/Generator.pv"
         uintptr_t i = IterEnumerate_ref_Type__value(&__iter)._0;
-        #line 3481 "src/compiler/Generator.pv"
+        #line 3482 "src/compiler/Generator.pv"
         struct Type* element = IterEnumerate_ref_Type__value(&__iter)._1;
 
-        #line 3482 "src/compiler/Generator.pv"
-        struct String element_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 3483 "src/compiler/Generator.pv"
-        String__append(&element_name, (struct str){ .ptr = "_", .length = strlen("_") });
+        struct String element_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 3484 "src/compiler/Generator.pv"
+        String__append(&element_name, (struct str){ .ptr = "_", .length = strlen("_") });
+        #line 3485 "src/compiler/Generator.pv"
         String__append_usize(&element_name, i);
 
-        #line 3486 "src/compiler/Generator.pv"
-        Generator__write_indent(self, header_file);
         #line 3487 "src/compiler/Generator.pv"
+        Generator__write_indent(self, header_file);
+        #line 3488 "src/compiler/Generator.pv"
         Generator__write_variable_decl(self, header_file, String__as_str(&element_name), element, generics);
 
-        #line 3489 "src/compiler/Generator.pv"
+        #line 3490 "src/compiler/Generator.pv"
         fprintf(header_file, ";\n");
 
-        #line 3491 "src/compiler/Generator.pv"
+        #line 3492 "src/compiler/Generator.pv"
         String__release(&element_name);
     } }
 
-    #line 3494 "src/compiler/Generator.pv"
-    self->indent -= 1;
     #line 3495 "src/compiler/Generator.pv"
+    self->indent -= 1;
+    #line 3496 "src/compiler/Generator.pv"
     fprintf(header_file, "};\n");
 
-    #line 3497 "src/compiler/Generator.pv"
+    #line 3498 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 3499 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3500 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3501 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 3502 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 3503 "src/compiler/Generator.pv"
+    #line 3504 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 3506 "src/compiler/Generator.pv"
+#line 3507 "src/compiler/Generator.pv"
 bool Generator__generate_trait_loop(struct Generator* self, struct TypeUsage_Trait* usage) {
-    #line 3507 "src/compiler/Generator.pv"
+    #line 3508 "src/compiler/Generator.pv"
     bool success = true;
 
-    #line 3509 "src/compiler/Generator.pv"
+    #line 3510 "src/compiler/Generator.pv"
     { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&usage->usage_contexts);
-    #line 3509 "src/compiler/Generator.pv"
+    #line 3510 "src/compiler/Generator.pv"
     while (Iter_ref_UsageContext__next(&__iter)) {
-        #line 3509 "src/compiler/Generator.pv"
+        #line 3510 "src/compiler/Generator.pv"
         struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-        #line 3510 "src/compiler/Generator.pv"
+        #line 3511 "src/compiler/Generator.pv"
         success = Generator__generate_trait(self, usage, usage_context) && success;
     } }
 
-    #line 3513 "src/compiler/Generator.pv"
+    #line 3514 "src/compiler/Generator.pv"
     return success;
 }
 
-#line 3516 "src/compiler/Generator.pv"
+#line 3517 "src/compiler/Generator.pv"
 bool Generator__generate_trait(struct Generator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context) {
-    #line 3517 "src/compiler/Generator.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 3518 "src/compiler/Generator.pv"
+    struct GenericMap* generics = usage_context->generic_map;
+    #line 3519 "src/compiler/Generator.pv"
     struct Trait* trait_info = usage->type;
 
-    #line 3520 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 3521 "src/compiler/Generator.pv"
-    struct String header = Generator__make_path(self, trait_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String name = Naming__get_type_name(&self->naming_ident, generics->self_type, generics->self_type, generics);
     #line 3522 "src/compiler/Generator.pv"
+    struct String header = Generator__make_path(self, trait_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    #line 3523 "src/compiler/Generator.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(self->allocator);
 
-    #line 3524 "src/compiler/Generator.pv"
-    char const* header_tmp = tmpnam(0);
     #line 3525 "src/compiler/Generator.pv"
-    FILE* header_file = fopen(header_tmp, "w+");
+    char const* header_tmp = tmpnam(0);
     #line 3526 "src/compiler/Generator.pv"
+    FILE* header_file = fopen(header_tmp, "w+");
+    #line 3527 "src/compiler/Generator.pv"
     if (header_file == 0) {
-        #line 3526 "src/compiler/Generator.pv"
+        #line 3527 "src/compiler/Generator.pv"
         perror(String__c_str(&header));
-        #line 3526 "src/compiler/Generator.pv"
+        #line 3527 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3528 "src/compiler/Generator.pv"
-    fprintf(header_file, "#ifndef PAVE_");
     #line 3529 "src/compiler/Generator.pv"
-    Generator__write_str_title(self, header_file, String__as_str(&name));
+    fprintf(header_file, "#ifndef PAVE_");
     #line 3530 "src/compiler/Generator.pv"
-    fprintf(header_file, "\n#define PAVE_");
-    #line 3531 "src/compiler/Generator.pv"
     Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 3531 "src/compiler/Generator.pv"
+    fprintf(header_file, "\n#define PAVE_");
     #line 3532 "src/compiler/Generator.pv"
+    Generator__write_str_title(self, header_file, String__as_str(&name));
+    #line 3533 "src/compiler/Generator.pv"
     fprintf(header_file, "\n\n");
 
-    #line 3534 "src/compiler/Generator.pv"
+    #line 3535 "src/compiler/Generator.pv"
     if (trait_info->module->mode_cpp) {
-        #line 3535 "src/compiler/Generator.pv"
-        fprintf(header_file, "#ifdef __cplusplus\n");
         #line 3536 "src/compiler/Generator.pv"
-        fprintf(header_file, "extern \"C\" {\n");
+        fprintf(header_file, "#ifdef __cplusplus\n");
         #line 3537 "src/compiler/Generator.pv"
+        fprintf(header_file, "extern \"C\" {\n");
+        #line 3538 "src/compiler/Generator.pv"
         fprintf(header_file, "#endif\n\n");
     }
 
-    #line 3540 "src/compiler/Generator.pv"
-    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
     #line 3541 "src/compiler/Generator.pv"
+    Generator__write_context_primitives(self, header_file, &usage_context->primitive_header, 0);
+    #line 3542 "src/compiler/Generator.pv"
     IncludeWriter__write(&include_writer, header_file, self, &usage_context->signature, generics, false);
 
-    #line 3543 "src/compiler/Generator.pv"
+    #line 3544 "src/compiler/Generator.pv"
     if (!Generator__write_trait_definition(self, header_file, trait_info, generics)) {
-        #line 3543 "src/compiler/Generator.pv"
+        #line 3544 "src/compiler/Generator.pv"
         fclose(header_file);
-        #line 3543 "src/compiler/Generator.pv"
+        #line 3544 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 3545 "src/compiler/Generator.pv"
+    #line 3546 "src/compiler/Generator.pv"
     if (trait_info->module->mode_cpp) {
-        #line 3546 "src/compiler/Generator.pv"
-        fprintf(header_file, "\n#ifdef __cplusplus\n");
         #line 3547 "src/compiler/Generator.pv"
-        fprintf(header_file, "}\n");
+        fprintf(header_file, "\n#ifdef __cplusplus\n");
         #line 3548 "src/compiler/Generator.pv"
+        fprintf(header_file, "}\n");
+        #line 3549 "src/compiler/Generator.pv"
         fprintf(header_file, "#endif\n");
     }
 
-    #line 3551 "src/compiler/Generator.pv"
+    #line 3552 "src/compiler/Generator.pv"
     fprintf(header_file, "\n#endif\n");
 
-    #line 3553 "src/compiler/Generator.pv"
-    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3554 "src/compiler/Generator.pv"
-    fclose(header_file);
+    Generator__overwrite_if_different(self, String__c_str(&header), header_file);
     #line 3555 "src/compiler/Generator.pv"
+    fclose(header_file);
+    #line 3556 "src/compiler/Generator.pv"
     remove(header_tmp);
 
-    #line 3557 "src/compiler/Generator.pv"
+    #line 3558 "src/compiler/Generator.pv"
     return true;
 }
 
-#line 3560 "src/compiler/Generator.pv"
+#line 3561 "src/compiler/Generator.pv"
 void Generator__create_directories(struct Generator* self, struct str base_path, struct HashMap_str_ref_Namespace* children) {
-    #line 3561 "src/compiler/Generator.pv"
+    #line 3562 "src/compiler/Generator.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(children);
-    #line 3561 "src/compiler/Generator.pv"
+    #line 3562 "src/compiler/Generator.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 3561 "src/compiler/Generator.pv"
+        #line 3562 "src/compiler/Generator.pv"
         struct str name = HashMapIter_str_ref_Namespace__value(&__iter)->_0;
-        #line 3561 "src/compiler/Generator.pv"
+        #line 3562 "src/compiler/Generator.pv"
         struct Namespace* namespace = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 3562 "src/compiler/Generator.pv"
-        struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 3563 "src/compiler/Generator.pv"
-        String__append(&path, base_path);
+        struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
         #line 3564 "src/compiler/Generator.pv"
-        String__append(&path, (struct str){ .ptr = "/", .length = strlen("/") });
+        String__append(&path, base_path);
         #line 3565 "src/compiler/Generator.pv"
-        String__append(&path, name);
+        String__append(&path, (struct str){ .ptr = "/", .length = strlen("/") });
         #line 3566 "src/compiler/Generator.pv"
+        String__append(&path, name);
+        #line 3567 "src/compiler/Generator.pv"
         create_directory(String__c_str(&path));
 
-        #line 3568 "src/compiler/Generator.pv"
+        #line 3569 "src/compiler/Generator.pv"
         Generator__create_directories(self, String__as_str(&path), &namespace->children);
     } }
 }
 
-#line 3572 "src/compiler/Generator.pv"
+#line 3573 "src/compiler/Generator.pv"
 bool Generator__generate(struct ArenaAllocator* allocator, char const* path, bool output_line_directives, char const* output_seperator, struct Root* root) {
-    #line 3573 "src/compiler/Generator.pv"
+    #line 3574 "src/compiler/Generator.pv"
     bool result = true;
 
-    #line 3575 "src/compiler/Generator.pv"
+    #line 3576 "src/compiler/Generator.pv"
     struct Generator self = (struct Generator) {
         .allocator = allocator,
         .path = path,
@@ -7183,173 +7185,173 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
         .naming_ident = Naming__new_ident(allocator),
     };
 
-    #line 3588 "src/compiler/Generator.pv"
+    #line 3589 "src/compiler/Generator.pv"
     self.naming_c99 = Naming__new_c99(allocator, &self.naming_ident);
 
-    #line 3590 "src/compiler/Generator.pv"
-    struct HashMap_str_str* primitives = &self.primitives;
     #line 3591 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "bool", .length = strlen("bool") }, (struct str){ .ptr = "bool", .length = strlen("bool") });
+    struct HashMap_str_str* primitives = &self.primitives;
     #line 3592 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i8", .length = strlen("i8") }, (struct str){ .ptr = "int8_t", .length = strlen("int8_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "bool", .length = strlen("bool") }, (struct str){ .ptr = "bool", .length = strlen("bool") });
     #line 3593 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i16", .length = strlen("i16") }, (struct str){ .ptr = "int16_t", .length = strlen("int16_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i8", .length = strlen("i8") }, (struct str){ .ptr = "int8_t", .length = strlen("int8_t") });
     #line 3594 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i32", .length = strlen("i32") }, (struct str){ .ptr = "int32_t", .length = strlen("int32_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i16", .length = strlen("i16") }, (struct str){ .ptr = "int16_t", .length = strlen("int16_t") });
     #line 3595 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i64", .length = strlen("i64") }, (struct str){ .ptr = "int64_t", .length = strlen("int64_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i32", .length = strlen("i32") }, (struct str){ .ptr = "int32_t", .length = strlen("int32_t") });
     #line 3596 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "isize", .length = strlen("isize") }, (struct str){ .ptr = "intptr_t", .length = strlen("intptr_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "i64", .length = strlen("i64") }, (struct str){ .ptr = "int64_t", .length = strlen("int64_t") });
     #line 3597 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u8", .length = strlen("u8") }, (struct str){ .ptr = "uint8_t", .length = strlen("uint8_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "isize", .length = strlen("isize") }, (struct str){ .ptr = "intptr_t", .length = strlen("intptr_t") });
     #line 3598 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u16", .length = strlen("u16") }, (struct str){ .ptr = "uint16_t", .length = strlen("uint16_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u8", .length = strlen("u8") }, (struct str){ .ptr = "uint8_t", .length = strlen("uint8_t") });
     #line 3599 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u32", .length = strlen("u32") }, (struct str){ .ptr = "uint32_t", .length = strlen("uint32_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u16", .length = strlen("u16") }, (struct str){ .ptr = "uint16_t", .length = strlen("uint16_t") });
     #line 3600 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u64", .length = strlen("u64") }, (struct str){ .ptr = "uint64_t", .length = strlen("uint64_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u32", .length = strlen("u32") }, (struct str){ .ptr = "uint32_t", .length = strlen("uint32_t") });
     #line 3601 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "usize", .length = strlen("usize") }, (struct str){ .ptr = "uintptr_t", .length = strlen("uintptr_t") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "u64", .length = strlen("u64") }, (struct str){ .ptr = "uint64_t", .length = strlen("uint64_t") });
     #line 3602 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "f32", .length = strlen("f32") }, (struct str){ .ptr = "float", .length = strlen("float") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "usize", .length = strlen("usize") }, (struct str){ .ptr = "uintptr_t", .length = strlen("uintptr_t") });
     #line 3603 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "f64", .length = strlen("f64") }, (struct str){ .ptr = "double", .length = strlen("double") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "f32", .length = strlen("f32") }, (struct str){ .ptr = "float", .length = strlen("float") });
     #line 3604 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitives, (struct str){ .ptr = "char", .length = strlen("char") }, (struct str){ .ptr = "char", .length = strlen("char") });
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "f64", .length = strlen("f64") }, (struct str){ .ptr = "double", .length = strlen("double") });
     #line 3605 "src/compiler/Generator.pv"
+    HashMap_str_str__insert(primitives, (struct str){ .ptr = "char", .length = strlen("char") }, (struct str){ .ptr = "char", .length = strlen("char") });
+    #line 3606 "src/compiler/Generator.pv"
     HashMap_str_str__insert(primitives, (struct str){ .ptr = "void", .length = strlen("void") }, (struct str){ .ptr = "void", .length = strlen("void") });
 
-    #line 3607 "src/compiler/Generator.pv"
-    struct HashMap_str_str* primitive_includes = &self.primitive_includes;
     #line 3608 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i8", .length = strlen("i8") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    struct HashMap_str_str* primitive_includes = &self.primitive_includes;
     #line 3609 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u8", .length = strlen("u8") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i8", .length = strlen("i8") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3610 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i16", .length = strlen("i16") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u8", .length = strlen("u8") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3611 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u16", .length = strlen("u16") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i16", .length = strlen("i16") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3612 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i32", .length = strlen("i32") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u16", .length = strlen("u16") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3613 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u32", .length = strlen("u32") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i32", .length = strlen("i32") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3614 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i64", .length = strlen("i64") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u32", .length = strlen("u32") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3615 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u64", .length = strlen("u64") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "i64", .length = strlen("i64") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3616 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "isize", .length = strlen("isize") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "u64", .length = strlen("u64") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3617 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "usize", .length = strlen("usize") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "isize", .length = strlen("isize") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3618 "src/compiler/Generator.pv"
-    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "bool", .length = strlen("bool") }, (struct str){ .ptr = "stdbool", .length = strlen("stdbool") });
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "usize", .length = strlen("usize") }, (struct str){ .ptr = "stdint", .length = strlen("stdint") });
     #line 3619 "src/compiler/Generator.pv"
+    HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "bool", .length = strlen("bool") }, (struct str){ .ptr = "stdbool", .length = strlen("stdbool") });
+    #line 3620 "src/compiler/Generator.pv"
     HashMap_str_str__insert(primitive_includes, (struct str){ .ptr = "str", .length = strlen("str") }, (struct str){ .ptr = "string", .length = strlen("string") });
 
-    #line 3621 "src/compiler/Generator.pv"
+    #line 3622 "src/compiler/Generator.pv"
     Generator__create_directories(&self, (struct str){ .ptr = path, .length = strlen(path) }, &root->children);
 
-    #line 3623 "src/compiler/Generator.pv"
+    #line 3624 "src/compiler/Generator.pv"
     struct Usages usages = Usages__new(&self);
-    #line 3624 "src/compiler/Generator.pv"
+    #line 3625 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Primitive __iter = HashMap_usize_TypeUsage_Primitive__iter(&usages.primitives);
-    #line 3624 "src/compiler/Generator.pv"
+    #line 3625 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Primitive__next(&__iter)) {
-        #line 3624 "src/compiler/Generator.pv"
+        #line 3625 "src/compiler/Generator.pv"
         struct TypeUsage_Primitive* usage = &HashMapIter_usize_TypeUsage_Primitive__value(&__iter)->_1;
 
-        #line 3624 "src/compiler/Generator.pv"
+        #line 3625 "src/compiler/Generator.pv"
         Generator__generate_primitive_loop(&self, usage);
     } }
-    #line 3625 "src/compiler/Generator.pv"
+    #line 3626 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Struct __iter = HashMap_usize_TypeUsage_Struct__iter(&usages.structs);
-    #line 3625 "src/compiler/Generator.pv"
+    #line 3626 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Struct__next(&__iter)) {
-        #line 3625 "src/compiler/Generator.pv"
+        #line 3626 "src/compiler/Generator.pv"
         struct TypeUsage_Struct* usage = &HashMapIter_usize_TypeUsage_Struct__value(&__iter)->_1;
 
-        #line 3625 "src/compiler/Generator.pv"
+        #line 3626 "src/compiler/Generator.pv"
         Generator__generate_struct_loop(&self, usage);
     } }
-    #line 3626 "src/compiler/Generator.pv"
+    #line 3627 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Enum __iter = HashMap_usize_TypeUsage_Enum__iter(&usages.enums);
-    #line 3626 "src/compiler/Generator.pv"
+    #line 3627 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Enum__next(&__iter)) {
-        #line 3626 "src/compiler/Generator.pv"
+        #line 3627 "src/compiler/Generator.pv"
         struct TypeUsage_Enum* usage = &HashMapIter_usize_TypeUsage_Enum__value(&__iter)->_1;
 
-        #line 3626 "src/compiler/Generator.pv"
+        #line 3627 "src/compiler/Generator.pv"
         Generator__generate_enum_loop(&self, usage);
     } }
-    #line 3627 "src/compiler/Generator.pv"
+    #line 3628 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Trait __iter = HashMap_usize_TypeUsage_Trait__iter(&usages.traits);
-    #line 3627 "src/compiler/Generator.pv"
+    #line 3628 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Trait__next(&__iter)) {
-        #line 3627 "src/compiler/Generator.pv"
+        #line 3628 "src/compiler/Generator.pv"
         struct TypeUsage_Trait* usage = &HashMapIter_usize_TypeUsage_Trait__value(&__iter)->_1;
 
-        #line 3627 "src/compiler/Generator.pv"
+        #line 3628 "src/compiler/Generator.pv"
         Generator__generate_trait_loop(&self, usage);
     } }
-    #line 3628 "src/compiler/Generator.pv"
+    #line 3629 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeFunctionUsage __iter = HashMap_usize_TypeFunctionUsage__iter(&usages.functions);
-    #line 3628 "src/compiler/Generator.pv"
+    #line 3629 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeFunctionUsage__next(&__iter)) {
-        #line 3628 "src/compiler/Generator.pv"
+        #line 3629 "src/compiler/Generator.pv"
         struct TypeFunctionUsage* usage = &HashMapIter_usize_TypeFunctionUsage__value(&__iter)->_1;
 
-        #line 3628 "src/compiler/Generator.pv"
+        #line 3629 "src/compiler/Generator.pv"
         Generator__generate_function_loop(&self, usage);
     } }
-    #line 3629 "src/compiler/Generator.pv"
+    #line 3630 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Sequence __iter = HashMap_usize_TypeUsage_Sequence__iter(&usages.sequences);
-    #line 3629 "src/compiler/Generator.pv"
+    #line 3630 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Sequence__next(&__iter)) {
-        #line 3629 "src/compiler/Generator.pv"
+        #line 3630 "src/compiler/Generator.pv"
         struct TypeUsage_Sequence* usage = &HashMapIter_usize_TypeUsage_Sequence__value(&__iter)->_1;
 
-        #line 3629 "src/compiler/Generator.pv"
+        #line 3630 "src/compiler/Generator.pv"
         Generator__generate_sequence(&self, usage);
     } }
-    #line 3630 "src/compiler/Generator.pv"
+    #line 3631 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Tuple __iter = HashMap_usize_TypeUsage_Tuple__iter(&usages.tuples);
-    #line 3630 "src/compiler/Generator.pv"
+    #line 3631 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Tuple__next(&__iter)) {
-        #line 3630 "src/compiler/Generator.pv"
+        #line 3631 "src/compiler/Generator.pv"
         struct TypeUsage_Tuple* usage = &HashMapIter_usize_TypeUsage_Tuple__value(&__iter)->_1;
 
-        #line 3630 "src/compiler/Generator.pv"
+        #line 3631 "src/compiler/Generator.pv"
         Generator__generate_tuple_loop(&self, usage);
     } }
 
-    #line 3632 "src/compiler/Generator.pv"
+    #line 3633 "src/compiler/Generator.pv"
     if (self.code_files.length > 0) {
-        #line 3633 "src/compiler/Generator.pv"
+        #line 3634 "src/compiler/Generator.pv"
         struct String command = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self.allocator });
 
-        #line 3635 "src/compiler/Generator.pv"
+        #line 3636 "src/compiler/Generator.pv"
         { struct Iter_ref_String __iter = Array_String__iter(&self.code_files);
-        #line 3635 "src/compiler/Generator.pv"
+        #line 3636 "src/compiler/Generator.pv"
         while (Iter_ref_String__next(&__iter)) {
-            #line 3635 "src/compiler/Generator.pv"
+            #line 3636 "src/compiler/Generator.pv"
             struct String* code_file = Iter_ref_String__value(&__iter);
 
-            #line 3636 "src/compiler/Generator.pv"
+            #line 3637 "src/compiler/Generator.pv"
             if (command.array.length > 0) {
-                #line 3637 "src/compiler/Generator.pv"
+                #line 3638 "src/compiler/Generator.pv"
                 String__append(&command, (struct str){ .ptr = output_seperator, .length = strlen(output_seperator) });
             }
 
-            #line 3640 "src/compiler/Generator.pv"
+            #line 3641 "src/compiler/Generator.pv"
             String__append(&command, String__as_str(code_file));
         } }
 
-        #line 3643 "src/compiler/Generator.pv"
-        uint32_t length = command.array.length;
         #line 3644 "src/compiler/Generator.pv"
+        uint32_t length = command.array.length;
+        #line 3645 "src/compiler/Generator.pv"
         printf("%.*s\n", length, command.array.data);
     }
 
-    #line 3647 "src/compiler/Generator.pv"
+    #line 3648 "src/compiler/Generator.pv"
     return result;
 }
