@@ -99,6 +99,7 @@ enum Type {
     ClassCpp(&ClassCpp),
     UnknownC(&UnknownC),
     NamespaceCpp(&NamespaceCpp),
+    Const(&ConstVariable),
 }
 
 impl Type {
@@ -123,6 +124,7 @@ impl Type {
             Type::FunctionC(_) => { return "Type::FunctionC"; },
             Type::ClassCpp(_) => { return "Type::ClassCpp"; },
             Type::NamespaceCpp(_) => { return "Type::NamespaceCpp"; },
+            Type::Const(_) => { return "Type::Const"; },
         }
     }
 
@@ -197,6 +199,11 @@ impl Type {
     fn eq(&self, other: &Type) -> bool {
         if self.is_unknown() { return true; }
 
+        match self {
+            Type::Const(cv) => { return cv.type.eq(other); },
+            _ => {},
+        }
+
         match other {
             Type::Indirect(indirect) => { return self.eq_indirect(indirect); },
             Type::Sequence(seq_info) => { return self.eq_sequence(seq_info); },
@@ -217,6 +224,7 @@ impl Type {
             Type::FunctionC(function) => { return self.eq_function_c(function); },
             Type::ClassCpp(class_info) => { return self.eq_class_cpp(class_info); },
             Type::NamespaceCpp(namespace_info) => { return self.eq_namespace_cpp(namespace_info); },
+            Type::Const(cv) => { return self.eq(&cv.type); },
         }
     }
 
@@ -629,6 +637,7 @@ impl Type {
             Type::FunctionC(_) => { return 0; },
             Type::ClassCpp(_) => { return 0; },
             Type::NamespaceCpp(_) => { return 0; },
+            Type::Const(cv) => { return cv.module; },
         }
     }
 }

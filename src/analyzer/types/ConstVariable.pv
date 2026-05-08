@@ -1,0 +1,54 @@
+use std
+use analyzer
+use expression
+
+struct ConstVariable {
+    name: &Token,
+    type: Type,
+    value: &Expression,
+    module: &Module,
+    token_start: usize,
+    token_end: usize,
+}
+
+impl ConstVariable {
+    fn parse_types(&self) -> bool {
+        let context = &self.module.context;
+        let allocator = context.allocator;
+        context.pos = self.token_start;
+
+        let generics = Generics::new(allocator);
+        let type: &Type = 0;
+
+        if context.check_next(TokenType::Symbol, ":") {
+            type = context.parse_type2(&generics);
+            if type == 0 { return false; }
+        }
+
+        if !context.expect_value(TokenType::Symbol, "=") { return false; }
+
+        let expression = Expression::parse(context, &generics);
+        if expression == 0 { return false; }
+
+        if type == 0 {
+            type = &expression.return_type;
+        } else {
+            expression.validate_type(context, type, true);
+        }
+
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
+
+        if type.is_unknown() {
+            context.error_token(self.name, "Const variable is unable to determine its type, manually specify it");
+        }
+
+        if type.is_void() {
+            context.error_token(self.name, "Const variable cannot have void type");
+        }
+
+        self.type = *type;
+        self.value = expression;
+
+        return context.pos == self.token_end;
+    }
+}

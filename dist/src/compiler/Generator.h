@@ -66,6 +66,7 @@ struct TypeUsage_Primitive;
 struct TypeUsage_Sequence;
 struct TypeUsage_Tuple;
 struct TypeUsage_Trait;
+struct ConstVariable;
 struct HashMap_str_ref_Namespace;
 struct ArenaAllocator;
 struct Root;
@@ -266,9 +267,18 @@ bool Generator__generate_trait_loop(struct Generator* self, struct TypeUsage_Tra
 bool Generator__generate_trait(struct Generator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
 #line 3561 "src/compiler/Generator.pv"
+bool Generator__generate_const(struct Generator* self, struct ConstVariable* const_var);
+
+#line 3606 "src/compiler/Generator.pv"
+void Generator__collect_primitive_includes(struct Generator* self, struct Type* type, struct GenericMap* generics, struct HashSet_str* out);
+
+#line 3617 "src/compiler/Generator.pv"
+void Generator__generate_consts_namespace(struct Generator* self, struct HashMap_str_ref_Namespace* children);
+
+#line 3629 "src/compiler/Generator.pv"
 void Generator__create_directories(struct Generator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
-#line 3573 "src/compiler/Generator.pv"
+#line 3641 "src/compiler/Generator.pv"
 bool Generator__generate(struct ArenaAllocator* allocator, char const* path, bool output_line_directives, char const* output_seperator, struct Root* root);
 
 #endif

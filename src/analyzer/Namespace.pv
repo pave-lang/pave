@@ -147,11 +147,23 @@ impl Namespace {
         return true;
     }
 
+    fn parse_consts(&self) -> bool {
+        for (_, module) in self.modules {
+            module.parse_consts();
+        }
+
+        for (_, child) in self.children {
+            child.parse_consts();
+        }
+
+        return true;
+    }
+
     fn parse_functions(&self) -> bool {
         for (_, module) in self.modules {
             module.parse_functions();
         }
-        
+
         for (_, child) in self.children {
             child.parse_functions();
         }

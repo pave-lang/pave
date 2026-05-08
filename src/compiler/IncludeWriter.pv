@@ -96,6 +96,10 @@ impl IncludeWriter {
                         _ => {},
                     }
                 },
+                Type::Const(cv) => {
+                    let path = generator.make_rel_path(cv.module, cv.name.value, "");
+                    if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+                },
                 Type::Function(func_info, func_generic_map) => {
                     match func_info.parent {
                         FunctionParent::None => {

@@ -152,7 +152,7 @@ int32_t main(int32_t argc, char const** argv) {
     }
 
     #line 80 "src/compiler/main.pv"
-    Root__parse_functions(root);
+    Root__parse_consts(root);
     #line 81 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
         #line 82 "src/compiler/main.pv"
@@ -164,24 +164,36 @@ int32_t main(int32_t argc, char const** argv) {
     }
 
     #line 86 "src/compiler/main.pv"
-    if (!Generator__generate(&allocator, output_folder, output_line_directives, output_seperator, root)) {
-        #line 88 "src/compiler/main.pv"
-        __result = -1;
-        ArenaAllocator__destroy(&allocator);
-        return __result;
-    }
-
-    #line 91 "src/compiler/main.pv"
+    Root__parse_functions(root);
+    #line 87 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 92 "src/compiler/main.pv"
+        #line 88 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 93 "src/compiler/main.pv"
+        #line 89 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(&allocator);
         return __result;
     }
 
-    #line 96 "src/compiler/main.pv"
+    #line 92 "src/compiler/main.pv"
+    if (!Generator__generate(&allocator, output_folder, output_line_directives, output_seperator, root)) {
+        #line 94 "src/compiler/main.pv"
+        __result = -1;
+        ArenaAllocator__destroy(&allocator);
+        return __result;
+    }
+
+    #line 97 "src/compiler/main.pv"
+    if (analysis.diagnostics.length > 0) {
+        #line 98 "src/compiler/main.pv"
+        Analysis__print_diagnostics(&analysis);
+        #line 99 "src/compiler/main.pv"
+        __result = -1;
+        ArenaAllocator__destroy(&allocator);
+        return __result;
+    }
+
+    #line 102 "src/compiler/main.pv"
     __result = 0;
     ArenaAllocator__destroy(&allocator);
     return __result;

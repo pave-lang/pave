@@ -21,6 +21,8 @@ struct Module {
     tokens: Array<Token>,
     mode_cpp: bool,
     includes: HashMap<str, &Include>,
+    const_variables: HashMap<str, &ConstVariable>,
+    const_types: HashMap<str, Type>,
 }
 
 impl Module {
@@ -43,6 +45,8 @@ impl Module {
             functions: HashMap<str, Function>::new(allocator),
             type_impls: Array<TypeImpl>::new(allocator),
             includes: HashMap<str, &Include>::new(allocator),
+            const_variables: HashMap<str, &ConstVariable>::new(allocator),
+            const_types: HashMap<str, Type>::new(allocator),
         };
 
         self.context = Context::new(allocator, "", path, 0, analysis, self);
@@ -184,6 +188,27 @@ impl Module {
                 } else {
                     functions.insert(node.name.value, node);
                 }
+            } else if token.eq(TokenType::Keyword, "const") {
+                if !context.expect_value(TokenType::Keyword, "const") { return false; }
+                let const_name = context.expect(TokenType::Identifier);
+                if const_name == 0 { return false; }
+
+                let token_start = context.pos;
+
+                while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
+                    context.next_token();
+                }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
+                let token_end = context.pos;
+
+                let const_var: &ConstVariable = allocator.alloc(sizeof(ConstVariable));
+                *const_var = ConstVariable {
+                    name: const_name,
+                    module: self,
+                    token_start,
+                    token_end,
+                };
+                self.const_variables.insert(const_name.value, const_var);
             } else if token.type == TokenType::Comment {
                 context.next_token();
             } else {
@@ -261,6 +286,10 @@ impl Module {
 
         for (_, &trait_info) in self.traits {
             namespace.traits.insert(trait_info.name.value, trait_info);
+        }
+
+        for (name, const_var) in self.const_variables {
+            self.const_types.insert(name, Type::Const(const_var));
         }
 
         return true;
@@ -400,6 +429,14 @@ impl Module {
         return true;
     }
 
+    fn parse_consts(&self) -> bool {
+        for (_, const_var) in self.const_variables {
+            const_var.parse_types();
+        }
+
+        return true;
+    }
+
     fn parse_functions(&self) -> bool {
         let allocator = self.namespace.root.allocator;
 
@@ -477,8 +514,18 @@ impl Module {
     }
 
     fn find_value(&self, name: str) -> &Type {
+        let type = self.const_types.find(&name);
+        if type != 0 { return type; }
+
+        for *namespace in self.used_namespaces {
+            for (_, module) in namespace.modules {
+                type = module.const_types.find(&name);
+                if type != 0 { return type; }
+            }
+        }
+
         for (_, include) in self.includes {
-            let type = include.values.find(&name);
+            type = include.values.find(&name);
             if type != 0 { return type; }
         }
 
