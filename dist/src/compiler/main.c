@@ -152,7 +152,7 @@ int32_t main(int32_t argc, char const** argv) {
     }
 
     #line 80 "src/compiler/main.pv"
-    Root__parse_consts(root);
+    Root__parse_globals(root);
     #line 81 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
         #line 82 "src/compiler/main.pv"

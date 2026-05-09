@@ -9,7 +9,7 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/GenericMap.h>
 #include <analyzer/Context.h>
-#include <analyzer/types/ConstVariable.h>
+#include <analyzer/types/Global.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/Tuple.h>
 #include <analyzer/types/Primitive.h>
@@ -133,9 +133,9 @@ char const* Type__name(struct Type* self) {
             return "Type::NamespaceCpp";
         } break;
         #line 127 "src/analyzer/types/Type.pv"
-        case TYPE__CONST: {
+        case TYPE__GLOBAL: {
             #line 127 "src/analyzer/types/Type.pv"
-            return "Type::Const";
+            return "Type::Global";
         } break;
     }
 }
@@ -318,11 +318,11 @@ bool Type__eq(struct Type* self, struct Type* other) {
     #line 202 "src/analyzer/types/Type.pv"
     switch (self->type) {
         #line 203 "src/analyzer/types/Type.pv"
-        case TYPE__CONST: {
+        case TYPE__GLOBAL: {
             #line 203 "src/analyzer/types/Type.pv"
-            struct ConstVariable* cv = self->const_value;
+            struct Global* g = self->global_value;
             #line 203 "src/analyzer/types/Type.pv"
-            return Type__eq(&cv->type, other);
+            return Type__eq(&g->type, other);
         } break;
         #line 204 "src/analyzer/types/Type.pv"
         default: {
@@ -467,11 +467,11 @@ bool Type__eq(struct Type* self, struct Type* other) {
             return Type__eq_namespace_cpp(self, namespace_info);
         } break;
         #line 227 "src/analyzer/types/Type.pv"
-        case TYPE__CONST: {
+        case TYPE__GLOBAL: {
             #line 227 "src/analyzer/types/Type.pv"
-            struct ConstVariable* cv = other->const_value;
+            struct Global* g = other->global_value;
             #line 227 "src/analyzer/types/Type.pv"
-            return Type__eq(self, &cv->type);
+            return Type__eq(self, &g->type);
         } break;
     }
 }
@@ -1541,11 +1541,11 @@ struct Module* Type__get_module(struct Type* self) {
             return 0;
         } break;
         #line 640 "src/analyzer/types/Type.pv"
-        case TYPE__CONST: {
+        case TYPE__GLOBAL: {
             #line 640 "src/analyzer/types/Type.pv"
-            struct ConstVariable* cv = self->const_value;
+            struct Global* g = self->global_value;
             #line 640 "src/analyzer/types/Type.pv"
-            return cv->module;
+            return g->module;
         } break;
     }
 }

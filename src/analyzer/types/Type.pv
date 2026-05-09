@@ -99,7 +99,7 @@ enum Type {
     ClassCpp(&ClassCpp),
     UnknownC(&UnknownC),
     NamespaceCpp(&NamespaceCpp),
-    Const(&ConstVariable),
+    Global(&Global),
 }
 
 impl Type {
@@ -124,7 +124,7 @@ impl Type {
             Type::FunctionC(_) => { return "Type::FunctionC"; },
             Type::ClassCpp(_) => { return "Type::ClassCpp"; },
             Type::NamespaceCpp(_) => { return "Type::NamespaceCpp"; },
-            Type::Const(_) => { return "Type::Const"; },
+            Type::Global(_) => { return "Type::Global"; },
         }
     }
 
@@ -200,7 +200,7 @@ impl Type {
         if self.is_unknown() { return true; }
 
         match self {
-            Type::Const(cv) => { return cv.type.eq(other); },
+            Type::Global(g) => { return g.type.eq(other); },
             _ => {},
         }
 
@@ -224,7 +224,7 @@ impl Type {
             Type::FunctionC(function) => { return self.eq_function_c(function); },
             Type::ClassCpp(class_info) => { return self.eq_class_cpp(class_info); },
             Type::NamespaceCpp(namespace_info) => { return self.eq_namespace_cpp(namespace_info); },
-            Type::Const(cv) => { return self.eq(&cv.type); },
+            Type::Global(g) => { return self.eq(&g.type); },
         }
     }
 
@@ -637,7 +637,7 @@ impl Type {
             Type::FunctionC(_) => { return 0; },
             Type::ClassCpp(_) => { return 0; },
             Type::NamespaceCpp(_) => { return 0; },
-            Type::Const(cv) => { return cv.module; },
+            Type::Global(g) => { return g.module; },
         }
     }
 }

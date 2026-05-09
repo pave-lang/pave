@@ -90,7 +90,7 @@ bool Root__prefill_types_impl(struct Root* self);
 bool Root__parse_declarations(struct Root* self);
 
 #line 205 "src/analyzer/Root.pv"
-bool Root__parse_consts(struct Root* self);
+bool Root__parse_globals(struct Root* self);
 
 #line 213 "src/analyzer/Root.pv"
 bool Root__parse_functions(struct Root* self);

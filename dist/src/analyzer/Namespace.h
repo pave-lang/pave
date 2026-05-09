@@ -64,7 +64,7 @@ bool Namespace__prefill_types_impl(struct Namespace* self);
 bool Namespace__parse_declarations(struct Namespace* self);
 
 #line 150 "src/analyzer/Namespace.pv"
-bool Namespace__parse_consts(struct Namespace* self);
+bool Namespace__parse_globals(struct Namespace* self);
 
 #line 162 "src/analyzer/Namespace.pv"
 bool Namespace__parse_functions(struct Namespace* self);

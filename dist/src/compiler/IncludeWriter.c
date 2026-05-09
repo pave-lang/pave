@@ -27,7 +27,7 @@
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/UnknownC.h>
-#include <analyzer/types/ConstVariable.h>
+#include <analyzer/types/Global.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/Function.h>
@@ -230,11 +230,11 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
                 }
             } break;
             #line 99 "src/compiler/IncludeWriter.pv"
-            case TYPE__CONST: {
+            case TYPE__GLOBAL: {
                 #line 99 "src/compiler/IncludeWriter.pv"
-                struct ConstVariable* cv = resolved->const_value;
+                struct Global* g = resolved->global_value;
                 #line 100 "src/compiler/IncludeWriter.pv"
-                struct String path = Generator__make_rel_path(generator, cv->module, cv->name->value, (struct str){ .ptr = "", .length = strlen("") });
+                struct String path = Generator__make_rel_path(generator, g->module, g->name->value, (struct str){ .ptr = "", .length = strlen("") });
                 #line 101 "src/compiler/IncludeWriter.pv"
                 if (HashSet_str__insert(&self->includes, String__as_str(&path))) {
                     #line 101 "src/compiler/IncludeWriter.pv"

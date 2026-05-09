@@ -202,9 +202,9 @@ impl Root {
         return true;
     }
 
-    fn parse_consts(&self) -> bool {
+    fn parse_globals(&self) -> bool {
         for (_, child) in self.children {
-            child.parse_consts();
+            child.parse_globals();
         }
 
         return true;

@@ -21,8 +21,8 @@ struct Module {
     tokens: Array<Token>,
     mode_cpp: bool,
     includes: HashMap<str, &Include>,
-    const_variables: HashMap<str, &ConstVariable>,
-    const_types: HashMap<str, Type>,
+    globals: HashMap<str, &Global>,
+    global_types: HashMap<str, Type>,
 }
 
 impl Module {
@@ -45,8 +45,8 @@ impl Module {
             functions: HashMap<str, Function>::new(allocator),
             type_impls: Array<TypeImpl>::new(allocator),
             includes: HashMap<str, &Include>::new(allocator),
-            const_variables: HashMap<str, &ConstVariable>::new(allocator),
-            const_types: HashMap<str, Type>::new(allocator),
+            globals: HashMap<str, &Global>::new(allocator),
+            global_types: HashMap<str, Type>::new(allocator),
         };
 
         self.context = Context::new(allocator, "", path, 0, analysis, self);
@@ -188,10 +188,11 @@ impl Module {
                 } else {
                     functions.insert(node.name.value, node);
                 }
-            } else if token.eq(TokenType::Keyword, "const") {
-                if !context.expect_value(TokenType::Keyword, "const") { return false; }
-                let const_name = context.expect(TokenType::Identifier);
-                if const_name == 0 { return false; }
+            } else if token.eq(TokenType::Keyword, "const") || token.eq(TokenType::Keyword, "let") {
+                let is_const = token.eq(TokenType::Keyword, "const");
+                context.next_token();
+                let global_name = context.expect(TokenType::Identifier);
+                if global_name == 0 { return false; }
 
                 let token_start = context.pos;
 
@@ -201,14 +202,15 @@ impl Module {
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
                 let token_end = context.pos;
 
-                let const_var: &ConstVariable = allocator.alloc(sizeof(ConstVariable));
-                *const_var = ConstVariable {
-                    name: const_name,
+                let global: &Global = allocator.alloc(sizeof(Global));
+                *global = Global {
+                    name: global_name,
                     module: self,
                     token_start,
                     token_end,
+                    is_const,
                 };
-                self.const_variables.insert(const_name.value, const_var);
+                self.globals.insert(global_name.value, global);
             } else if token.type == TokenType::Comment {
                 context.next_token();
             } else {
@@ -288,8 +290,8 @@ impl Module {
             namespace.traits.insert(trait_info.name.value, trait_info);
         }
 
-        for (name, const_var) in self.const_variables {
-            self.const_types.insert(name, Type::Const(const_var));
+        for (name, global) in self.globals {
+            self.global_types.insert(name, Type::Global(global));
         }
 
         return true;
@@ -429,9 +431,9 @@ impl Module {
         return true;
     }
 
-    fn parse_consts(&self) -> bool {
-        for (_, const_var) in self.const_variables {
-            const_var.parse_types();
+    fn parse_globals(&self) -> bool {
+        for (_, global) in self.globals {
+            global.parse_types();
         }
 
         return true;
@@ -514,12 +516,12 @@ impl Module {
     }
 
     fn find_value(&self, name: str) -> &Type {
-        let type = self.const_types.find(&name);
+        let type = self.global_types.find(&name);
         if type != 0 { return type; }
 
         for *namespace in self.used_namespaces {
             for (_, module) in namespace.modules {
-                type = module.const_types.find(&name);
+                type = module.global_types.find(&name);
                 if type != 0 { return type; }
             }
         }

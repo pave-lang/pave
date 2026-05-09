@@ -1,5 +1,5 @@
-mod ConstVariable
 mod Enum
+mod Global
 mod Function
 mod GenericMap
 mod Generics

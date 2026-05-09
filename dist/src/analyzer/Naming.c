@@ -37,7 +37,7 @@
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/NamespaceCpp.h>
-#include <analyzer/types/ConstVariable.h>
+#include <analyzer/types/Global.h>
 #include <std/Iter_ref_Type.h>
 #include <std/Array_Parameter.h>
 #include <std/Iter_ref_Parameter.h>
@@ -622,13 +622,13 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
             String__append(&result, namespace_info->name);
         } break;
         #line 337 "src/analyzer/Naming.pv"
-        case TYPE__CONST: {
+        case TYPE__GLOBAL: {
             #line 337 "src/analyzer/Naming.pv"
-            struct ConstVariable* cv = type->const_value;
+            struct Global* g = type->global_value;
             #line 338 "src/analyzer/Naming.pv"
             String__release(&result);
             #line 339 "src/analyzer/Naming.pv"
-            return Naming__get_type_name(self, &cv->type, type_self, generics_map);
+            return Naming__get_type_name(self, &g->type, type_self, generics_map);
         } break;
     }
 

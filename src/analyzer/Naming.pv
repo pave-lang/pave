@@ -334,9 +334,9 @@ impl Naming {
             Type::NamespaceCpp(namespace_info) => {
                 result.append(namespace_info.name);
             },
-            Type::Const(cv) => {
+            Type::Global(g) => {
                 result.release();
-                return self.get_type_name(&cv.type, type_self, generics_map);
+                return self.get_type_name(&g.type, type_self, generics_map);
             },
         }
 

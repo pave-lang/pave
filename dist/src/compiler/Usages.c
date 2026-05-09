@@ -58,7 +58,7 @@
 #include <analyzer/Context.h>
 #include <compiler/UsageContext.h>
 #include <std/String.h>
-#include <analyzer/types/ConstVariable.h>
+#include <analyzer/types/Global.h>
 #include <std/HashMap_str_Type.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/types/FunctionParent.h>
@@ -442,11 +442,11 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
     #line 267 "src/compiler/Usages.pv"
     switch (type_deref->type) {
         #line 268 "src/compiler/Usages.pv"
-        case TYPE__CONST: {
+        case TYPE__GLOBAL: {
             #line 268 "src/compiler/Usages.pv"
-            struct ConstVariable* cv = type_deref->const_value;
+            struct Global* g = type_deref->global_value;
             #line 269 "src/compiler/Usages.pv"
-            struct String path = Generator__make_rel_path(self->generator, cv->module, cv->name->value, (struct str){ .ptr = "", .length = strlen("") });
+            struct String path = Generator__make_rel_path(self->generator, g->module, g->name->value, (struct str){ .ptr = "", .length = strlen("") });
             #line 270 "src/compiler/Usages.pv"
             if (self->usage_mode == USAGE_MODE__BODY) {
                 #line 271 "src/compiler/Usages.pv"

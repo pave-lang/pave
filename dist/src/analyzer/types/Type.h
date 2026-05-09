@@ -20,7 +20,7 @@ struct FunctionC;
 struct ClassCpp;
 struct UnknownC;
 struct NamespaceCpp;
-struct ConstVariable;
+struct Global;
 #line 82 "src/analyzer/types/Type.pv"
 struct Type {
     enum {
@@ -43,7 +43,7 @@ struct Type {
         TYPE__CLASS_CPP,
         TYPE__UNKNOWN_C,
         TYPE__NAMESPACE_CPP,
-        TYPE__CONST,
+        TYPE__GLOBAL,
     } type;
 
     union {
@@ -65,7 +65,7 @@ struct Type {
         struct ClassCpp* classcpp_value;
         struct UnknownC* unknownc_value;
         struct NamespaceCpp* namespacecpp_value;
-        struct ConstVariable* const_value;
+        struct Global* global_value;
     };
 };
 

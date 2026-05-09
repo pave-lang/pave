@@ -376,7 +376,7 @@ bool Root__parse_declarations(struct Root* self) {
 }
 
 #line 205 "src/analyzer/Root.pv"
-bool Root__parse_consts(struct Root* self) {
+bool Root__parse_globals(struct Root* self) {
     #line 206 "src/analyzer/Root.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
     #line 206 "src/analyzer/Root.pv"
@@ -385,7 +385,7 @@ bool Root__parse_consts(struct Root* self) {
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
         #line 207 "src/analyzer/Root.pv"
-        Namespace__parse_consts(child);
+        Namespace__parse_globals(child);
     } }
 
     #line 210 "src/analyzer/Root.pv"

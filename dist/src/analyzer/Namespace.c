@@ -274,7 +274,7 @@ bool Namespace__parse_declarations(struct Namespace* self) {
 }
 
 #line 150 "src/analyzer/Namespace.pv"
-bool Namespace__parse_consts(struct Namespace* self) {
+bool Namespace__parse_globals(struct Namespace* self) {
     #line 151 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
     #line 151 "src/analyzer/Namespace.pv"
@@ -283,7 +283,7 @@ bool Namespace__parse_consts(struct Namespace* self) {
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
         #line 152 "src/analyzer/Namespace.pv"
-        Module__parse_consts(module);
+        Module__parse_globals(module);
     } }
 
     #line 155 "src/analyzer/Namespace.pv"
@@ -294,7 +294,7 @@ bool Namespace__parse_consts(struct Namespace* self) {
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
         #line 156 "src/analyzer/Namespace.pv"
-        Namespace__parse_consts(child);
+        Namespace__parse_globals(child);
     } }
 
     #line 159 "src/analyzer/Namespace.pv"
