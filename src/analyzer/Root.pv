@@ -202,6 +202,14 @@ impl Root {
         return true;
     }
 
+    fn parse_globals(&self) -> bool {
+        for (_, child) in self.children {
+            child.parse_globals();
+        }
+
+        return true;
+    }
+
     fn parse_functions(&self) -> bool {
         for (_, child) in self.children {
             child.parse_functions();

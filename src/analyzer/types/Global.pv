@@ -1,0 +1,69 @@
+use std
+use analyzer
+use expression
+
+struct Global {
+    name: &Token,
+    type: Type,
+    value: &Expression,
+    module: &Module,
+    token_start: usize,
+    token_end: usize,
+    is_const: bool,
+}
+
+impl Global {
+    fn parse_types(&self) -> bool {
+        let context = &self.module.context;
+        let allocator = context.allocator;
+        context.pos = self.token_start;
+
+        let generics = Generics::new(allocator);
+        let type: &Type = 0;
+
+        if context.check_next(TokenType::Symbol, ":") {
+            type = context.parse_type2(&generics);
+            if type == 0 { return false; }
+        }
+
+        let expression: &Expression = 0;
+
+        if context.check_next(TokenType::Symbol, "=") {
+            expression = Expression::parse(context, &generics);
+            if expression == 0 { return false; }
+
+            if type == 0 {
+                type = &expression.return_type;
+
+                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+                type_name.prepend(": ");
+                context.inlay_hint(self.name, type_name.c_str(), InlayHintKind::Type, false, false);
+            } else {
+                expression.validate_type(context, type, true);
+            }
+        } else if self.is_const {
+            context.error_token(self.name, "Const declaration requires an initializer");
+            return false;
+        }
+
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
+
+        if type == 0 {
+            context.error_token(self.name, "Global variable requires a type annotation or initializer");
+            return false;
+        }
+
+        if type.is_unknown() {
+            context.error_token(self.name, "Global variable is unable to determine its type, manually specify it");
+        }
+
+        if type.is_void() {
+            context.error_token(self.name, "Global variable cannot have void type");
+        }
+
+        self.type = *type;
+        self.value = expression;
+
+        return context.pos == self.token_end;
+    }
+}

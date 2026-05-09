@@ -21,6 +21,8 @@ struct Module {
     tokens: Array<Token>,
     mode_cpp: bool,
     includes: HashMap<str, &Include>,
+    globals: HashMap<str, &Global>,
+    global_types: HashMap<str, Type>,
 }
 
 impl Module {
@@ -43,6 +45,8 @@ impl Module {
             functions: HashMap<str, Function>::new(allocator),
             type_impls: Array<TypeImpl>::new(allocator),
             includes: HashMap<str, &Include>::new(allocator),
+            globals: HashMap<str, &Global>::new(allocator),
+            global_types: HashMap<str, Type>::new(allocator),
         };
 
         self.context = Context::new(allocator, "", path, 0, analysis, self);
@@ -184,6 +188,29 @@ impl Module {
                 } else {
                     functions.insert(node.name.value, node);
                 }
+            } else if token.eq(TokenType::Keyword, "const") || token.eq(TokenType::Keyword, "let") {
+                let is_const = token.eq(TokenType::Keyword, "const");
+                context.next_token();
+                let global_name = context.expect(TokenType::Identifier);
+                if global_name == 0 { return false; }
+
+                let token_start = context.pos;
+
+                while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
+                    context.next_token();
+                }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
+                let token_end = context.pos;
+
+                let global: &Global = allocator.alloc(sizeof(Global));
+                *global = Global {
+                    name: global_name,
+                    module: self,
+                    token_start,
+                    token_end,
+                    is_const,
+                };
+                self.globals.insert(global_name.value, global);
             } else if token.type == TokenType::Comment {
                 context.next_token();
             } else {
@@ -261,6 +288,10 @@ impl Module {
 
         for (_, &trait_info) in self.traits {
             namespace.traits.insert(trait_info.name.value, trait_info);
+        }
+
+        for (name, global) in self.globals {
+            self.global_types.insert(name, Type::Global(global));
         }
 
         return true;
@@ -400,6 +431,14 @@ impl Module {
         return true;
     }
 
+    fn parse_globals(&self) -> bool {
+        for (_, global) in self.globals {
+            global.parse_types();
+        }
+
+        return true;
+    }
+
     fn parse_functions(&self) -> bool {
         let allocator = self.namespace.root.allocator;
 
@@ -477,8 +516,18 @@ impl Module {
     }
 
     fn find_value(&self, name: str) -> &Type {
+        let type = self.global_types.find(&name);
+        if type != 0 { return type; }
+
+        for *namespace in self.used_namespaces {
+            for (_, module) in namespace.modules {
+                type = module.global_types.find(&name);
+                if type != 0 { return type; }
+            }
+        }
+
         for (_, include) in self.includes {
-            let type = include.values.find(&name);
+            type = include.values.find(&name);
             if type != 0 { return type; }
         }
 

@@ -28,15 +28,18 @@ struct Type;
 struct FunctionContext FunctionContext__new(struct ArenaAllocator* allocator, struct Function* func_info, bool use_scopes);
 
 #line 36 "src/compiler/FunctionContext.pv"
-void FunctionContext__push_scope(struct FunctionContext* self, bool break_target, bool continue_target);
-
-#line 40 "src/compiler/FunctionContext.pv"
-void FunctionContext__pop_scope(struct FunctionContext* self);
+struct FunctionContext FunctionContext__new_const(struct ArenaAllocator* allocator);
 
 #line 44 "src/compiler/FunctionContext.pv"
+void FunctionContext__push_scope(struct FunctionContext* self, bool break_target, bool continue_target);
+
+#line 48 "src/compiler/FunctionContext.pv"
+void FunctionContext__pop_scope(struct FunctionContext* self);
+
+#line 52 "src/compiler/FunctionContext.pv"
 struct str FunctionContext__get_variable_replacement(struct FunctionContext* self, struct str name);
 
-#line 55 "src/compiler/FunctionContext.pv"
+#line 63 "src/compiler/FunctionContext.pv"
 void FunctionContext__add_variable(struct FunctionContext* self, struct str name, struct Type* type);
 
 #endif

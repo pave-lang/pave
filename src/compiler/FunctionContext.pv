@@ -33,6 +33,14 @@ impl FunctionContext {
         return self;
     }
 
+    fn new_const(allocator: &ArenaAllocator) -> Self {
+        return Self {
+            allocator,
+            use_scopes: false,
+            scopes: Array<FunctionScope>::new(allocator),
+        };
+    }
+
     fn push_scope(&self, break_target: bool, continue_target: bool) {
         self.scopes.append(FunctionScope::new(self.allocator, break_target, continue_target));
     }

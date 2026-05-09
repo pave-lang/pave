@@ -91,6 +91,9 @@ impl LanguageServer {
         root.parse_declarations();
         if analysis.diagnostics.length > 0 { return analysis; }
 
+        root.parse_globals();
+        if analysis.diagnostics.length > 0 { return analysis; }
+
         root.parse_functions();
         if analysis.diagnostics.length > 0 { return analysis; }
 

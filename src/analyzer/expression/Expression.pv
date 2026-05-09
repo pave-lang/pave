@@ -1237,6 +1237,10 @@ impl Expression {
                             context.next_token();
                             result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
                         },
+                        Type::Global(_) => {
+                            context.next_token();
+                            result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);
+                        },
                         Type::EnumC(_) => {
                             context.next_token();
                             result = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), return_type);

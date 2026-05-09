@@ -90,24 +90,27 @@ bool Root__prefill_types_impl(struct Root* self);
 bool Root__parse_declarations(struct Root* self);
 
 #line 205 "src/analyzer/Root.pv"
+bool Root__parse_globals(struct Root* self);
+
+#line 213 "src/analyzer/Root.pv"
 bool Root__parse_functions(struct Root* self);
 
-#line 219 "src/analyzer/Root.pv"
+#line 227 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name);
 
-#line 223 "src/analyzer/Root.pv"
+#line 231 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name);
 
-#line 229 "src/analyzer/Root.pv"
+#line 237 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name);
 
-#line 233 "src/analyzer/Root.pv"
+#line 241 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, struct str name);
 
-#line 237 "src/analyzer/Root.pv"
+#line 245 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
 
-#line 257 "src/analyzer/Root.pv"
+#line 265 "src/analyzer/Root.pv"
 struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types);
 
 #endif

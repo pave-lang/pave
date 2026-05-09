@@ -3558,6 +3558,101 @@ impl Generator {
         return true;
     }
 
+    fn generate_global(&self, global: &Global) -> bool {
+        if global.type.is_unknown() { return true; }
+
+        let name = global.name.value;
+
+        let blank_generics = self.allocator.store(&GenericMap {});
+        blank_generics.self_type = Type::Self.to_ptr(self.allocator);
+
+        let func_ctx = FunctionContext::new_const(self.allocator);
+        self.function_context = &func_ctx;
+
+        let primitive_includes = HashSet<str>::new(self.allocator);
+        defer primitive_includes.release();
+        self.collect_primitive_includes(&global.type, blank_generics, &primitive_includes);
+
+        let header = self.make_path(global.module, name, ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: &FILE = fopen(header_tmp, "w+");
+        if header_file == 0 { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        self.write_str_title(header_file, name);
+        fprintf(header_file, "\n#define PAVE_");
+        self.write_str_title(header_file, name);
+        fprintf(header_file, "\n\n");
+
+        for *inc in primitive_includes {
+            fprintf(header_file, "#include <%.*s.h>\n", cast<i32>(inc.length), inc.ptr);
+        }
+
+        fprintf(header_file, "\nextern ");
+        if global.is_const { fprintf(header_file, "const "); }
+        self.write_variable_decl(header_file, name, &global.type, blank_generics);
+        fprintf(header_file, ";\n");
+
+        fprintf(header_file, "\n#endif\n");
+
+        self.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        let code = self.make_path(global.module, name, ".c");
+        let code_tmp: *const char = tmpnam(0);
+        let code_file: &FILE = fopen(code_tmp, "w+");
+        if code_file == 0 { perror(code.c_str()); return false; }
+
+        self.write_includes_raw(code_file, &global.module.includes);
+
+        let header_rel = self.make_rel_path(global.module, name, "");
+        fprintf(code_file, "#include <");
+        self.write_str(code_file, header_rel.as_str());
+        fprintf(code_file, ".h>\n\n");
+
+        if global.is_const { fprintf(code_file, "const "); }
+        self.write_variable_decl(code_file, name, &global.type, blank_generics);
+        if global.value != 0 {
+            fprintf(code_file, " = ");
+            self.write_expression(code_file, global.value, blank_generics);
+        }
+        fprintf(code_file, ";\n");
+
+        self.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        self.code_files.append(code);
+
+        self.function_context = 0;
+
+        return true;
+    }
+
+    fn collect_primitive_includes(&self, type: &Type, generics: &GenericMap, out: &HashSet<str>) {
+        match type {
+            Type::Primitive(primitive_info) => {
+                let inc = self.primitive_includes.find(&primitive_info.name);
+                if inc != 0 { out.insert(*inc); }
+            },
+            Type::Global(g) => { self.collect_primitive_includes(&g.type, generics, out); },
+            _ => {},
+        }
+    }
+
+    fn generate_globals_namespace(&self, children: &HashMap<str, &Namespace>) {
+        for (_, namespace) in children {
+            for (_, module) in namespace.modules {
+                for (_, global) in module.globals {
+                    self.generate_global(global);
+                }
+            }
+
+            self.generate_globals_namespace(&namespace.children);
+        }
+    }
+
     fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {
         for (name, namespace) in children {
             let path = String::new(self.allocator);
@@ -3629,6 +3724,7 @@ impl Generator {
         for (_, &usage) in usages.functions { self.generate_function_loop(usage); }
         for (_, &usage) in usages.sequences { self.generate_sequence(usage); }
         for (_, &usage) in usages.tuples { self.generate_tuple_loop(usage); }
+        self.generate_globals_namespace(&root.children);
 
         if self.code_files.length > 0 {
             let command = String::new(self.allocator);
