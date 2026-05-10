@@ -17,7 +17,6 @@ mod TypeId
 
 mod Ops
 
-// mod DynArg
 mod Co
 mod Fn
 mod Struct
