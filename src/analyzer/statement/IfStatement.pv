@@ -4,6 +4,7 @@ use expression
 use types
 
 struct IfStatement {
+    pattern: &MatchPattern,
     expression: &Expression,
     block: &Block,
     else_statements: Array<ElseStatement>,
@@ -13,38 +14,69 @@ impl IfStatement {
     fn parse(context: &Context, generics: &Generics) -> &IfStatement {
         if !context.expect_value(TokenType::Keyword, "if") { return 0; }
 
-        let expression = Expression::parse(context, generics);
-        if expression == 0 { return 0; }
-
+        let pattern: &MatchPattern = 0;
+        let expression: &Expression = 0;
         let block = Block::new_ptr(context);
-        if !block.parse(context, generics, true) { return 0; }
+
+        if context.check_next(TokenType::Keyword, "let") {
+            context.push_scope(block);
+            let p: MatchPattern = MatchPattern::Default;
+            if !MatchPattern::parse(context, generics, &p) { context.pop_scope(); return 0; }
+            if !context.expect_value(TokenType::Symbol, "=") { context.pop_scope(); return 0; }
+            pattern = context.allocator.store(&p);
+            expression = Expression::parse(context, generics);
+            if expression == 0 { context.pop_scope(); return 0; }
+            if !block.parse(context, generics, false) { context.pop_scope(); return 0; }
+            context.pop_scope();
+        } else {
+            expression = Expression::parse(context, generics);
+            if expression == 0 { return 0; }
+            if !block.parse(context, generics, true) { return 0; }
+        }
 
         let else_statements = Array<ElseStatement>::new(context.allocator);
         let else_expression: &Expression = 0;
+        let else_pattern: &MatchPattern = 0;
         let else_block: &Block = 0;
         let else_end = false;
 
         while !else_end && context.check_next(TokenType::Keyword, "else") {
+            else_expression = 0;
+            else_pattern = 0;
+
             if context.check_next(TokenType::Keyword, "if") {
-                else_expression = Expression::parse(context, generics);
-                if else_expression == 0 { return 0; }
+                if context.check_next(TokenType::Keyword, "let") {
+                    else_block = Block::new_ptr(context);
+                    context.push_scope(else_block);
+                    let ep: MatchPattern = MatchPattern::Default;
+                    if !MatchPattern::parse(context, generics, &ep) { context.pop_scope(); return 0; }
+                    if !context.expect_value(TokenType::Symbol, "=") { context.pop_scope(); return 0; }
+                    else_pattern = context.allocator.store(&ep);
+                    else_expression = Expression::parse(context, generics);
+                    if else_expression == 0 { context.pop_scope(); return 0; }
+                    if !else_block.parse(context, generics, false) { context.pop_scope(); return 0; }
+                    context.pop_scope();
+                } else {
+                    else_expression = Expression::parse(context, generics);
+                    if else_expression == 0 { return 0; }
+                    else_block = Block::new_ptr(context);
+                    if !else_block.parse(context, generics, true) { return 0; }
+                }
             } else {
-                else_expression = 0;
                 else_end = true;
+                else_block = Block::new_ptr(context);
+                if !else_block.parse(context, generics, true) { return 0; }
             }
 
-            else_block = Block::new_ptr(context);
-            if !else_block.parse(context, generics, true) { return 0; }
-
-            let else_statement: ElseStatement = ElseStatement {
+            else_statements.append(ElseStatement {
+                pattern: else_pattern,
                 expression: else_expression,
                 block: else_block,
-            };
-
-            else_statements.append(else_statement);
+            });
         }
 
         return context.allocator.store(&IfStatement {
+            pattern,
             expression,
             block,
             else_statements,

@@ -448,10 +448,11 @@ impl Type {
     }
 
     fn is_void(&self) -> bool {
-        match self {
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
-            _ => { return false; },
+        if let Type::Primitive(primitive_info) = self {
+            return primitive_info.is_void();
         }
+
+        return false;
     }
 
     fn is_unknown(&self) -> bool {

@@ -85,6 +85,10 @@ struct ForStatement;
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* self, struct ForStatement* value);
+struct MatchPattern;
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct MatchPattern* ArenaAllocator__store_MatchPattern(struct ArenaAllocator* self, struct MatchPattern* value);
 struct IfStatement;
 
 #line 165 "src/std/ArenaAllocator.pv"

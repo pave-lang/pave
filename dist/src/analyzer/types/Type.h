@@ -159,49 +159,49 @@ bool Type__is_self(struct Type* self);
 #line 450 "src/analyzer/types/Type.pv"
 bool Type__is_void(struct Type* self);
 
-#line 457 "src/analyzer/types/Type.pv"
+#line 462 "src/analyzer/types/Type.pv"
 bool Type__is_unknown(struct Type* self);
 
-#line 464 "src/analyzer/types/Type.pv"
+#line 469 "src/analyzer/types/Type.pv"
 bool Type__is_enum(struct Type* self);
 
-#line 472 "src/analyzer/types/Type.pv"
+#line 477 "src/analyzer/types/Type.pv"
 bool Type__is_function(struct Type* self);
 
-#line 481 "src/analyzer/types/Type.pv"
+#line 486 "src/analyzer/types/Type.pv"
 bool Type__is_indirect(struct Type* self);
 
-#line 488 "src/analyzer/types/Type.pv"
+#line 493 "src/analyzer/types/Type.pv"
 bool Type__is_trait(struct Type* self);
 
-#line 495 "src/analyzer/types/Type.pv"
+#line 500 "src/analyzer/types/Type.pv"
 bool Type__is_tuple(struct Type* self);
 
-#line 502 "src/analyzer/types/Type.pv"
+#line 507 "src/analyzer/types/Type.pv"
 bool Type__is_sequence(struct Type* self);
 
-#line 509 "src/analyzer/types/Type.pv"
+#line 514 "src/analyzer/types/Type.pv"
 bool Type__is_sequence_fixed_array(struct Type* self);
 
-#line 516 "src/analyzer/types/Type.pv"
+#line 521 "src/analyzer/types/Type.pv"
 struct Type* Type__deref_1(struct Type* self);
 
-#line 523 "src/analyzer/types/Type.pv"
+#line 528 "src/analyzer/types/Type.pv"
 bool Type__is_fat_pointer(struct Type* self);
 
-#line 534 "src/analyzer/types/Type.pv"
+#line 539 "src/analyzer/types/Type.pv"
 bool Type__is_reference_sequence_dynamic(struct Type* self);
 
-#line 544 "src/analyzer/types/Type.pv"
+#line 549 "src/analyzer/types/Type.pv"
 bool Type__is_iterator(struct Type* self);
 
-#line 553 "src/analyzer/types/Type.pv"
+#line 558 "src/analyzer/types/Type.pv"
 bool Type__needs_implicit_cast(struct Type* self, struct Type* other);
 
-#line 604 "src/analyzer/types/Type.pv"
+#line 609 "src/analyzer/types/Type.pv"
 bool Type__is_primitive_or_c_type(struct Type* self);
 
-#line 619 "src/analyzer/types/Type.pv"
+#line 624 "src/analyzer/types/Type.pv"
 struct Module* Type__get_module(struct Type* self);
 
 #endif

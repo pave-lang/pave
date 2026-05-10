@@ -314,6 +314,23 @@ struct ForStatement* ArenaAllocator__store_ForStatement(struct ArenaAllocator* s
     #line 170 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/MatchPattern.h>
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct MatchPattern* ArenaAllocator__store_MatchPattern(struct ArenaAllocator* self, struct MatchPattern* value) {
+    #line 166 "src/std/ArenaAllocator.pv"
+    struct MatchPattern* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct MatchPattern));
+    #line 167 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 167 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 169 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct MatchPattern));
+    #line 170 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/statement/IfStatement.h>
 
 #line 165 "src/std/ArenaAllocator.pv"

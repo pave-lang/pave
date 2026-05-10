@@ -973,578 +973,573 @@ bool Type__is_self(struct Type* self) {
 #line 450 "src/analyzer/types/Type.pv"
 bool Type__is_void(struct Type* self) {
     #line 451 "src/analyzer/types/Type.pv"
-    switch (self->type) {
+    if (self->type == TYPE__PRIMITIVE) {
+        #line 451 "src/analyzer/types/Type.pv"
+        struct Primitive* primitive_info = self->primitive_value;
         #line 452 "src/analyzer/types/Type.pv"
-        case TYPE__PRIMITIVE: {
-            #line 452 "src/analyzer/types/Type.pv"
-            struct Primitive* primitive_info = self->primitive_value;
-            #line 452 "src/analyzer/types/Type.pv"
-            return Primitive__is_void(primitive_info);
-        } break;
-        #line 453 "src/analyzer/types/Type.pv"
-        default: {
-            #line 453 "src/analyzer/types/Type.pv"
-            return false;
-        } break;
+        return Primitive__is_void(primitive_info);
     }
+
+    #line 455 "src/analyzer/types/Type.pv"
+    return false;
 }
 
-#line 457 "src/analyzer/types/Type.pv"
+#line 462 "src/analyzer/types/Type.pv"
 bool Type__is_unknown(struct Type* self) {
-    #line 458 "src/analyzer/types/Type.pv"
+    #line 463 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 459 "src/analyzer/types/Type.pv"
+        #line 464 "src/analyzer/types/Type.pv"
         case TYPE__UNKNOWN_C: {
-            #line 459 "src/analyzer/types/Type.pv"
+            #line 464 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 460 "src/analyzer/types/Type.pv"
+        #line 465 "src/analyzer/types/Type.pv"
         default: {
-            #line 460 "src/analyzer/types/Type.pv"
+            #line 465 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 464 "src/analyzer/types/Type.pv"
+#line 469 "src/analyzer/types/Type.pv"
 bool Type__is_enum(struct Type* self) {
-    #line 465 "src/analyzer/types/Type.pv"
+    #line 470 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 466 "src/analyzer/types/Type.pv"
+        #line 471 "src/analyzer/types/Type.pv"
         case TYPE__ENUM: {
-            #line 466 "src/analyzer/types/Type.pv"
+            #line 471 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 467 "src/analyzer/types/Type.pv"
+        #line 472 "src/analyzer/types/Type.pv"
         case TYPE__ENUM_C: {
-            #line 467 "src/analyzer/types/Type.pv"
+            #line 472 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 468 "src/analyzer/types/Type.pv"
+        #line 473 "src/analyzer/types/Type.pv"
         default: {
-            #line 468 "src/analyzer/types/Type.pv"
+            #line 473 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 472 "src/analyzer/types/Type.pv"
+#line 477 "src/analyzer/types/Type.pv"
 bool Type__is_function(struct Type* self) {
-    #line 473 "src/analyzer/types/Type.pv"
+    #line 478 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 474 "src/analyzer/types/Type.pv"
+        #line 479 "src/analyzer/types/Type.pv"
         case TYPE__FUNCTION: {
-            #line 474 "src/analyzer/types/Type.pv"
+            #line 479 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 475 "src/analyzer/types/Type.pv"
+        #line 480 "src/analyzer/types/Type.pv"
         case TYPE__FUNCTION_C: {
-            #line 475 "src/analyzer/types/Type.pv"
+            #line 480 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 476 "src/analyzer/types/Type.pv"
+        #line 481 "src/analyzer/types/Type.pv"
         case TYPE__UNKNOWN_C: {
-            #line 476 "src/analyzer/types/Type.pv"
+            #line 481 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 477 "src/analyzer/types/Type.pv"
+        #line 482 "src/analyzer/types/Type.pv"
         default: {
-            #line 477 "src/analyzer/types/Type.pv"
+            #line 482 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 481 "src/analyzer/types/Type.pv"
+#line 486 "src/analyzer/types/Type.pv"
 bool Type__is_indirect(struct Type* self) {
-    #line 482 "src/analyzer/types/Type.pv"
+    #line 487 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 483 "src/analyzer/types/Type.pv"
+        #line 488 "src/analyzer/types/Type.pv"
         case TYPE__INDIRECT: {
-            #line 483 "src/analyzer/types/Type.pv"
+            #line 488 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 484 "src/analyzer/types/Type.pv"
+        #line 489 "src/analyzer/types/Type.pv"
         default: {
-            #line 484 "src/analyzer/types/Type.pv"
+            #line 489 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 488 "src/analyzer/types/Type.pv"
+#line 493 "src/analyzer/types/Type.pv"
 bool Type__is_trait(struct Type* self) {
-    #line 489 "src/analyzer/types/Type.pv"
+    #line 494 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 490 "src/analyzer/types/Type.pv"
+        #line 495 "src/analyzer/types/Type.pv"
         case TYPE__TRAIT: {
-            #line 490 "src/analyzer/types/Type.pv"
+            #line 495 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 491 "src/analyzer/types/Type.pv"
+        #line 496 "src/analyzer/types/Type.pv"
         default: {
-            #line 491 "src/analyzer/types/Type.pv"
+            #line 496 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 495 "src/analyzer/types/Type.pv"
+#line 500 "src/analyzer/types/Type.pv"
 bool Type__is_tuple(struct Type* self) {
-    #line 496 "src/analyzer/types/Type.pv"
+    #line 501 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 497 "src/analyzer/types/Type.pv"
+        #line 502 "src/analyzer/types/Type.pv"
         case TYPE__TUPLE: {
-            #line 497 "src/analyzer/types/Type.pv"
+            #line 502 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 498 "src/analyzer/types/Type.pv"
+        #line 503 "src/analyzer/types/Type.pv"
         default: {
-            #line 498 "src/analyzer/types/Type.pv"
+            #line 503 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 502 "src/analyzer/types/Type.pv"
+#line 507 "src/analyzer/types/Type.pv"
 bool Type__is_sequence(struct Type* self) {
-    #line 503 "src/analyzer/types/Type.pv"
+    #line 508 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 504 "src/analyzer/types/Type.pv"
+        #line 509 "src/analyzer/types/Type.pv"
         case TYPE__SEQUENCE: {
-            #line 504 "src/analyzer/types/Type.pv"
+            #line 509 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 505 "src/analyzer/types/Type.pv"
+        #line 510 "src/analyzer/types/Type.pv"
         default: {
-            #line 505 "src/analyzer/types/Type.pv"
+            #line 510 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 509 "src/analyzer/types/Type.pv"
+#line 514 "src/analyzer/types/Type.pv"
 bool Type__is_sequence_fixed_array(struct Type* self) {
-    #line 510 "src/analyzer/types/Type.pv"
+    #line 515 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 511 "src/analyzer/types/Type.pv"
+        #line 516 "src/analyzer/types/Type.pv"
         case TYPE__SEQUENCE: {
-            #line 511 "src/analyzer/types/Type.pv"
+            #line 516 "src/analyzer/types/Type.pv"
             struct Sequence* sequence = self->sequence_value;
-            #line 511 "src/analyzer/types/Type.pv"
+            #line 516 "src/analyzer/types/Type.pv"
             return Sequence__is_fixed_array(sequence);
         } break;
-        #line 512 "src/analyzer/types/Type.pv"
+        #line 517 "src/analyzer/types/Type.pv"
         default: {
-            #line 512 "src/analyzer/types/Type.pv"
+            #line 517 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 516 "src/analyzer/types/Type.pv"
+#line 521 "src/analyzer/types/Type.pv"
 struct Type* Type__deref_1(struct Type* self) {
-    #line 517 "src/analyzer/types/Type.pv"
+    #line 522 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 518 "src/analyzer/types/Type.pv"
+        #line 523 "src/analyzer/types/Type.pv"
         case TYPE__INDIRECT: {
-            #line 518 "src/analyzer/types/Type.pv"
+            #line 523 "src/analyzer/types/Type.pv"
             struct Indirect* indirect = self->indirect_value;
-            #line 518 "src/analyzer/types/Type.pv"
+            #line 523 "src/analyzer/types/Type.pv"
             return &indirect->to;
         } break;
-        #line 519 "src/analyzer/types/Type.pv"
+        #line 524 "src/analyzer/types/Type.pv"
         default: {
-            #line 519 "src/analyzer/types/Type.pv"
+            #line 524 "src/analyzer/types/Type.pv"
             return 0;
         } break;
     }
 }
 
-#line 523 "src/analyzer/types/Type.pv"
+#line 528 "src/analyzer/types/Type.pv"
 bool Type__is_fat_pointer(struct Type* self) {
-    #line 524 "src/analyzer/types/Type.pv"
+    #line 529 "src/analyzer/types/Type.pv"
     struct Type* referenced_type = Type__deref_1(self);
-    #line 525 "src/analyzer/types/Type.pv"
+    #line 530 "src/analyzer/types/Type.pv"
     if (referenced_type == 0) {
-        #line 525 "src/analyzer/types/Type.pv"
+        #line 530 "src/analyzer/types/Type.pv"
         return false;
     }
 
-    #line 527 "src/analyzer/types/Type.pv"
+    #line 532 "src/analyzer/types/Type.pv"
     switch (referenced_type->type) {
-        #line 528 "src/analyzer/types/Type.pv"
+        #line 533 "src/analyzer/types/Type.pv"
         case TYPE__SEQUENCE: {
-            #line 528 "src/analyzer/types/Type.pv"
+            #line 533 "src/analyzer/types/Type.pv"
             struct Sequence* sequence = referenced_type->sequence_value;
-            #line 528 "src/analyzer/types/Type.pv"
+            #line 533 "src/analyzer/types/Type.pv"
             return Sequence__is_slice(sequence);
         } break;
-        #line 529 "src/analyzer/types/Type.pv"
+        #line 534 "src/analyzer/types/Type.pv"
         case TYPE__TRAIT: {
-            #line 529 "src/analyzer/types/Type.pv"
+            #line 534 "src/analyzer/types/Type.pv"
             return true;
         } break;
-        #line 530 "src/analyzer/types/Type.pv"
+        #line 535 "src/analyzer/types/Type.pv"
         default: {
-            #line 530 "src/analyzer/types/Type.pv"
+            #line 535 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 534 "src/analyzer/types/Type.pv"
+#line 539 "src/analyzer/types/Type.pv"
 bool Type__is_reference_sequence_dynamic(struct Type* self) {
-    #line 535 "src/analyzer/types/Type.pv"
+    #line 540 "src/analyzer/types/Type.pv"
     struct Type* referenced_type = Type__deref_1(self);
-    #line 536 "src/analyzer/types/Type.pv"
+    #line 541 "src/analyzer/types/Type.pv"
     if (referenced_type == 0) {
-        #line 536 "src/analyzer/types/Type.pv"
+        #line 541 "src/analyzer/types/Type.pv"
         return false;
     }
 
-    #line 538 "src/analyzer/types/Type.pv"
+    #line 543 "src/analyzer/types/Type.pv"
     switch (referenced_type->type) {
-        #line 539 "src/analyzer/types/Type.pv"
+        #line 544 "src/analyzer/types/Type.pv"
         case TYPE__SEQUENCE: {
-            #line 539 "src/analyzer/types/Type.pv"
+            #line 544 "src/analyzer/types/Type.pv"
             struct Sequence* sequence = referenced_type->sequence_value;
-            #line 539 "src/analyzer/types/Type.pv"
+            #line 544 "src/analyzer/types/Type.pv"
             return Sequence__is_slice(sequence);
         } break;
-        #line 540 "src/analyzer/types/Type.pv"
+        #line 545 "src/analyzer/types/Type.pv"
         default: {
-            #line 540 "src/analyzer/types/Type.pv"
+            #line 545 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 544 "src/analyzer/types/Type.pv"
+#line 549 "src/analyzer/types/Type.pv"
 bool Type__is_iterator(struct Type* self) {
-    #line 545 "src/analyzer/types/Type.pv"
+    #line 550 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 546 "src/analyzer/types/Type.pv"
+        #line 551 "src/analyzer/types/Type.pv"
         case TYPE__TRAIT: {
-            #line 546 "src/analyzer/types/Type.pv"
+            #line 551 "src/analyzer/types/Type.pv"
             struct Trait* trait_info = self->trait_value._0;
-            #line 547 "src/analyzer/types/Type.pv"
+            #line 552 "src/analyzer/types/Type.pv"
             return str__eq(trait_info->name->value, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
         } break;
-        #line 549 "src/analyzer/types/Type.pv"
+        #line 554 "src/analyzer/types/Type.pv"
         default: {
-            #line 549 "src/analyzer/types/Type.pv"
+            #line 554 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 553 "src/analyzer/types/Type.pv"
+#line 558 "src/analyzer/types/Type.pv"
 bool Type__needs_implicit_cast(struct Type* self, struct Type* other) {
-    #line 554 "src/analyzer/types/Type.pv"
+    #line 559 "src/analyzer/types/Type.pv"
     bool sequence_is_slice = false;
-    #line 555 "src/analyzer/types/Type.pv"
+    #line 560 "src/analyzer/types/Type.pv"
     bool str_cast = false;
 
-    #line 557 "src/analyzer/types/Type.pv"
+    #line 562 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 558 "src/analyzer/types/Type.pv"
+        #line 563 "src/analyzer/types/Type.pv"
         case TYPE__STRUCT: {
-            #line 558 "src/analyzer/types/Type.pv"
+            #line 563 "src/analyzer/types/Type.pv"
             struct Struct* struct_info = self->struct_value._0;
-            #line 559 "src/analyzer/types/Type.pv"
+            #line 564 "src/analyzer/types/Type.pv"
             str_cast = str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") });
-            #line 560 "src/analyzer/types/Type.pv"
+            #line 565 "src/analyzer/types/Type.pv"
             if (!str_cast) {
-                #line 560 "src/analyzer/types/Type.pv"
+                #line 565 "src/analyzer/types/Type.pv"
                 return false;
             }
         } break;
-        #line 562 "src/analyzer/types/Type.pv"
+        #line 567 "src/analyzer/types/Type.pv"
         case TYPE__INDIRECT: {
-            #line 562 "src/analyzer/types/Type.pv"
+            #line 567 "src/analyzer/types/Type.pv"
             struct Indirect* indirect = self->indirect_value;
-            #line 563 "src/analyzer/types/Type.pv"
+            #line 568 "src/analyzer/types/Type.pv"
             switch (indirect->to.type) {
-                #line 564 "src/analyzer/types/Type.pv"
+                #line 569 "src/analyzer/types/Type.pv"
                 case TYPE__STRUCT: {
-                    #line 564 "src/analyzer/types/Type.pv"
+                    #line 569 "src/analyzer/types/Type.pv"
                     struct Struct* struct_info = indirect->to.struct_value._0;
-                    #line 565 "src/analyzer/types/Type.pv"
+                    #line 570 "src/analyzer/types/Type.pv"
                     str_cast = str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") });
-                    #line 566 "src/analyzer/types/Type.pv"
+                    #line 571 "src/analyzer/types/Type.pv"
                     if (!str_cast) {
-                        #line 566 "src/analyzer/types/Type.pv"
+                        #line 571 "src/analyzer/types/Type.pv"
                         return false;
                     }
                 } break;
-                #line 568 "src/analyzer/types/Type.pv"
+                #line 573 "src/analyzer/types/Type.pv"
                 case TYPE__TRAIT: {
                 } break;
-                #line 569 "src/analyzer/types/Type.pv"
+                #line 574 "src/analyzer/types/Type.pv"
                 case TYPE__SEQUENCE: {
-                    #line 569 "src/analyzer/types/Type.pv"
+                    #line 574 "src/analyzer/types/Type.pv"
                     struct Sequence* sequence = indirect->to.sequence_value;
-                    #line 569 "src/analyzer/types/Type.pv"
+                    #line 574 "src/analyzer/types/Type.pv"
                     sequence_is_slice = Sequence__is_slice(sequence);
                 } break;
-                #line 570 "src/analyzer/types/Type.pv"
+                #line 575 "src/analyzer/types/Type.pv"
                 default: {
-                    #line 570 "src/analyzer/types/Type.pv"
+                    #line 575 "src/analyzer/types/Type.pv"
                     return false;
                 } break;
             }
         } break;
-        #line 573 "src/analyzer/types/Type.pv"
+        #line 578 "src/analyzer/types/Type.pv"
         default: {
-            #line 573 "src/analyzer/types/Type.pv"
+            #line 578 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 
-    #line 576 "src/analyzer/types/Type.pv"
+    #line 581 "src/analyzer/types/Type.pv"
     if (str_cast) {
-        #line 577 "src/analyzer/types/Type.pv"
+        #line 582 "src/analyzer/types/Type.pv"
         switch (other->type) {
-            #line 578 "src/analyzer/types/Type.pv"
+            #line 583 "src/analyzer/types/Type.pv"
             case TYPE__INDIRECT: {
-                #line 578 "src/analyzer/types/Type.pv"
+                #line 583 "src/analyzer/types/Type.pv"
                 struct Indirect* indirect = other->indirect_value;
-                #line 579 "src/analyzer/types/Type.pv"
+                #line 584 "src/analyzer/types/Type.pv"
                 switch (indirect->to.type) {
-                    #line 580 "src/analyzer/types/Type.pv"
+                    #line 585 "src/analyzer/types/Type.pv"
                     case TYPE__PRIMITIVE: {
-                        #line 580 "src/analyzer/types/Type.pv"
+                        #line 585 "src/analyzer/types/Type.pv"
                         struct Primitive* primitive = indirect->to.primitive_value;
-                        #line 581 "src/analyzer/types/Type.pv"
+                        #line 586 "src/analyzer/types/Type.pv"
                         return primitive != 0 && str__eq(primitive->name, (struct str){ .ptr = "char", .length = strlen("char") });
                     } break;
-                    #line 583 "src/analyzer/types/Type.pv"
+                    #line 588 "src/analyzer/types/Type.pv"
                     default: {
-                        #line 583 "src/analyzer/types/Type.pv"
+                        #line 588 "src/analyzer/types/Type.pv"
                         return false;
                     } break;
                 }
             } break;
-            #line 586 "src/analyzer/types/Type.pv"
+            #line 591 "src/analyzer/types/Type.pv"
             default: {
-                #line 586 "src/analyzer/types/Type.pv"
+                #line 591 "src/analyzer/types/Type.pv"
                 return false;
             } break;
         }
     }
 
-    #line 590 "src/analyzer/types/Type.pv"
+    #line 595 "src/analyzer/types/Type.pv"
     switch (other->type) {
-        #line 591 "src/analyzer/types/Type.pv"
+        #line 596 "src/analyzer/types/Type.pv"
         case TYPE__INDIRECT: {
-            #line 591 "src/analyzer/types/Type.pv"
+            #line 596 "src/analyzer/types/Type.pv"
             struct Indirect* indirect = other->indirect_value;
-            #line 592 "src/analyzer/types/Type.pv"
+            #line 597 "src/analyzer/types/Type.pv"
             switch (indirect->to.type) {
-                #line 593 "src/analyzer/types/Type.pv"
+                #line 598 "src/analyzer/types/Type.pv"
                 case TYPE__TRAIT: {
-                    #line 593 "src/analyzer/types/Type.pv"
+                    #line 598 "src/analyzer/types/Type.pv"
                     return false;
                 } break;
-                #line 594 "src/analyzer/types/Type.pv"
+                #line 599 "src/analyzer/types/Type.pv"
                 case TYPE__SEQUENCE: {
-                    #line 594 "src/analyzer/types/Type.pv"
+                    #line 599 "src/analyzer/types/Type.pv"
                     struct Sequence* sequence = indirect->to.sequence_value;
-                    #line 594 "src/analyzer/types/Type.pv"
+                    #line 599 "src/analyzer/types/Type.pv"
                     return !Sequence__is_slice(sequence) && sequence_is_slice;
                 } break;
-                #line 595 "src/analyzer/types/Type.pv"
+                #line 600 "src/analyzer/types/Type.pv"
                 default: {
-                    #line 595 "src/analyzer/types/Type.pv"
+                    #line 600 "src/analyzer/types/Type.pv"
                     return true;
                 } break;
             }
         } break;
-        #line 598 "src/analyzer/types/Type.pv"
+        #line 603 "src/analyzer/types/Type.pv"
         default: {
-            #line 598 "src/analyzer/types/Type.pv"
+            #line 603 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 
-    #line 601 "src/analyzer/types/Type.pv"
+    #line 606 "src/analyzer/types/Type.pv"
     return false;
 }
 
-#line 604 "src/analyzer/types/Type.pv"
+#line 609 "src/analyzer/types/Type.pv"
 bool Type__is_primitive_or_c_type(struct Type* self) {
-    #line 605 "src/analyzer/types/Type.pv"
+    #line 610 "src/analyzer/types/Type.pv"
     if (self == 0) {
-        #line 605 "src/analyzer/types/Type.pv"
+        #line 610 "src/analyzer/types/Type.pv"
         return false;
     }
 
-    #line 607 "src/analyzer/types/Type.pv"
+    #line 612 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 608 "src/analyzer/types/Type.pv"
-        case TYPE__PRIMITIVE: {
-            #line 608 "src/analyzer/types/Type.pv"
-            return true;
-        } break;
-        #line 609 "src/analyzer/types/Type.pv"
-        case TYPE__TYPEDEF_C: {
-            #line 609 "src/analyzer/types/Type.pv"
-            return true;
-        } break;
-        #line 610 "src/analyzer/types/Type.pv"
-        case TYPE__ENUM_C: {
-            #line 610 "src/analyzer/types/Type.pv"
-            return true;
-        } break;
-        #line 611 "src/analyzer/types/Type.pv"
-        case TYPE__STRUCT_C: {
-            #line 611 "src/analyzer/types/Type.pv"
-            return true;
-        } break;
-        #line 612 "src/analyzer/types/Type.pv"
-        case TYPE__UNION_C: {
-            #line 612 "src/analyzer/types/Type.pv"
-            return true;
-        } break;
         #line 613 "src/analyzer/types/Type.pv"
-        case TYPE__FUNCTION_C: {
+        case TYPE__PRIMITIVE: {
             #line 613 "src/analyzer/types/Type.pv"
             return true;
         } break;
         #line 614 "src/analyzer/types/Type.pv"
-        case TYPE__CLASS_CPP: {
+        case TYPE__TYPEDEF_C: {
             #line 614 "src/analyzer/types/Type.pv"
             return true;
         } break;
         #line 615 "src/analyzer/types/Type.pv"
-        default: {
+        case TYPE__ENUM_C: {
             #line 615 "src/analyzer/types/Type.pv"
+            return true;
+        } break;
+        #line 616 "src/analyzer/types/Type.pv"
+        case TYPE__STRUCT_C: {
+            #line 616 "src/analyzer/types/Type.pv"
+            return true;
+        } break;
+        #line 617 "src/analyzer/types/Type.pv"
+        case TYPE__UNION_C: {
+            #line 617 "src/analyzer/types/Type.pv"
+            return true;
+        } break;
+        #line 618 "src/analyzer/types/Type.pv"
+        case TYPE__FUNCTION_C: {
+            #line 618 "src/analyzer/types/Type.pv"
+            return true;
+        } break;
+        #line 619 "src/analyzer/types/Type.pv"
+        case TYPE__CLASS_CPP: {
+            #line 619 "src/analyzer/types/Type.pv"
+            return true;
+        } break;
+        #line 620 "src/analyzer/types/Type.pv"
+        default: {
+            #line 620 "src/analyzer/types/Type.pv"
             return false;
         } break;
     }
 }
 
-#line 619 "src/analyzer/types/Type.pv"
+#line 624 "src/analyzer/types/Type.pv"
 struct Module* Type__get_module(struct Type* self) {
-    #line 620 "src/analyzer/types/Type.pv"
+    #line 625 "src/analyzer/types/Type.pv"
     switch (self->type) {
-        #line 621 "src/analyzer/types/Type.pv"
-        case TYPE__PRIMITIVE: {
-            #line 621 "src/analyzer/types/Type.pv"
-            return 0;
-        } break;
-        #line 622 "src/analyzer/types/Type.pv"
-        case TYPE__INDIRECT: {
-            #line 622 "src/analyzer/types/Type.pv"
-            return 0;
-        } break;
-        #line 623 "src/analyzer/types/Type.pv"
-        case TYPE__SEQUENCE: {
-            #line 623 "src/analyzer/types/Type.pv"
-            return 0;
-        } break;
-        #line 624 "src/analyzer/types/Type.pv"
-        case TYPE__TUPLE: {
-            #line 624 "src/analyzer/types/Type.pv"
-            return 0;
-        } break;
-        #line 625 "src/analyzer/types/Type.pv"
-        case TYPE__ENUM: {
-            #line 625 "src/analyzer/types/Type.pv"
-            struct Enum* enum_info = self->enum_value._0;
-            #line 625 "src/analyzer/types/Type.pv"
-            return enum_info->context->module;
-        } break;
         #line 626 "src/analyzer/types/Type.pv"
-        case TYPE__STRUCT: {
+        case TYPE__PRIMITIVE: {
             #line 626 "src/analyzer/types/Type.pv"
-            struct Struct* struct_info = self->struct_value._0;
-            #line 626 "src/analyzer/types/Type.pv"
-            return struct_info->module;
+            return 0;
         } break;
         #line 627 "src/analyzer/types/Type.pv"
-        case TYPE__TRAIT: {
+        case TYPE__INDIRECT: {
             #line 627 "src/analyzer/types/Type.pv"
-            struct Trait* trait_info = self->trait_value._0;
-            #line 627 "src/analyzer/types/Type.pv"
-            return trait_info->module;
+            return 0;
         } break;
         #line 628 "src/analyzer/types/Type.pv"
-        case TYPE__GENERIC: {
+        case TYPE__SEQUENCE: {
             #line 628 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 629 "src/analyzer/types/Type.pv"
-        case TYPE__UNKNOWN_C: {
+        case TYPE__TUPLE: {
             #line 629 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 630 "src/analyzer/types/Type.pv"
-        case TYPE__FUNCTION: {
+        case TYPE__ENUM: {
             #line 630 "src/analyzer/types/Type.pv"
-            struct Function* func_info = self->function_value._0;
+            struct Enum* enum_info = self->enum_value._0;
             #line 630 "src/analyzer/types/Type.pv"
-            if (func_info->context != 0) {
-                #line 630 "src/analyzer/types/Type.pv"
-                return func_info->context->module;
-            } else {
-                #line 630 "src/analyzer/types/Type.pv"
-                return 0;
-            }
+            return enum_info->context->module;
         } break;
         #line 631 "src/analyzer/types/Type.pv"
-        case TYPE__COROUTINE_INSTANCE: {
+        case TYPE__STRUCT: {
             #line 631 "src/analyzer/types/Type.pv"
-            struct Function* func_info = self->coroutineinstance_value._0;
+            struct Struct* struct_info = self->struct_value._0;
             #line 631 "src/analyzer/types/Type.pv"
-            return func_info->context->module;
+            return struct_info->module;
         } break;
         #line 632 "src/analyzer/types/Type.pv"
-        case TYPE__SELF: {
+        case TYPE__TRAIT: {
             #line 632 "src/analyzer/types/Type.pv"
-            return 0;
+            struct Trait* trait_info = self->trait_value._0;
+            #line 632 "src/analyzer/types/Type.pv"
+            return trait_info->module;
         } break;
         #line 633 "src/analyzer/types/Type.pv"
-        case TYPE__TYPEDEF_C: {
+        case TYPE__GENERIC: {
             #line 633 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 634 "src/analyzer/types/Type.pv"
-        case TYPE__ENUM_C: {
+        case TYPE__UNKNOWN_C: {
             #line 634 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 635 "src/analyzer/types/Type.pv"
-        case TYPE__STRUCT_C: {
+        case TYPE__FUNCTION: {
             #line 635 "src/analyzer/types/Type.pv"
-            return 0;
+            struct Function* func_info = self->function_value._0;
+            #line 635 "src/analyzer/types/Type.pv"
+            if (func_info->context != 0) {
+                #line 635 "src/analyzer/types/Type.pv"
+                return func_info->context->module;
+            } else {
+                #line 635 "src/analyzer/types/Type.pv"
+                return 0;
+            }
         } break;
         #line 636 "src/analyzer/types/Type.pv"
-        case TYPE__UNION_C: {
+        case TYPE__COROUTINE_INSTANCE: {
             #line 636 "src/analyzer/types/Type.pv"
-            return 0;
+            struct Function* func_info = self->coroutineinstance_value._0;
+            #line 636 "src/analyzer/types/Type.pv"
+            return func_info->context->module;
         } break;
         #line 637 "src/analyzer/types/Type.pv"
-        case TYPE__FUNCTION_C: {
+        case TYPE__SELF: {
             #line 637 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 638 "src/analyzer/types/Type.pv"
-        case TYPE__CLASS_CPP: {
+        case TYPE__TYPEDEF_C: {
             #line 638 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 639 "src/analyzer/types/Type.pv"
-        case TYPE__NAMESPACE_CPP: {
+        case TYPE__ENUM_C: {
             #line 639 "src/analyzer/types/Type.pv"
             return 0;
         } break;
         #line 640 "src/analyzer/types/Type.pv"
+        case TYPE__STRUCT_C: {
+            #line 640 "src/analyzer/types/Type.pv"
+            return 0;
+        } break;
+        #line 641 "src/analyzer/types/Type.pv"
+        case TYPE__UNION_C: {
+            #line 641 "src/analyzer/types/Type.pv"
+            return 0;
+        } break;
+        #line 642 "src/analyzer/types/Type.pv"
+        case TYPE__FUNCTION_C: {
+            #line 642 "src/analyzer/types/Type.pv"
+            return 0;
+        } break;
+        #line 643 "src/analyzer/types/Type.pv"
+        case TYPE__CLASS_CPP: {
+            #line 643 "src/analyzer/types/Type.pv"
+            return 0;
+        } break;
+        #line 644 "src/analyzer/types/Type.pv"
+        case TYPE__NAMESPACE_CPP: {
+            #line 644 "src/analyzer/types/Type.pv"
+            return 0;
+        } break;
+        #line 645 "src/analyzer/types/Type.pv"
         case TYPE__GLOBAL: {
-            #line 640 "src/analyzer/types/Type.pv"
+            #line 645 "src/analyzer/types/Type.pv"
             struct Global* g = self->global_value;
-            #line 640 "src/analyzer/types/Type.pv"
+            #line 645 "src/analyzer/types/Type.pv"
             return g->module;
         } break;
     }

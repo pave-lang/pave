@@ -320,6 +320,73 @@ impl Generator {
         return true;
     }
 
+    fn write_if_let_enum_variant(&self, file: &FILE, return_type: &Type, type: &Type, enum_variant: &EnumVariant, parameters: &Array<EnumVariantParameter>, expression: &Expression, body: &Block, outer_block: &Block, generics: &GenericMap) -> bool {
+        let expr_type = &expression.return_type;
+        let is_discriminated_union = self.type_is_discriminated_union(expr_type, generics);
+
+        fprintf(file, "if (");
+        if is_discriminated_union {
+            self.write_expression(file, expression, generics);
+            self.write_instance_member_accessor(file, expr_type, generics);
+            fprintf(file, "type == ");
+            self.write_enum_variant_name(file, type, enum_variant);
+        } else {
+            self.write_deref_if_needed(file, expr_type, generics);
+            self.write_expression(file, expression, generics);
+            fprintf(file, " == ");
+            self.write_enum_variant_name(file, type, enum_variant);
+        }
+        fprintf(file, ") {\n");
+        self.indent += 1;
+
+        let types = &enum_variant.types;
+        let param_i: usize = 0;
+        for param_iter in parameters {
+            if param_iter.variable.eq(TokenType::Identifier, "_") {
+                param_i += 1;
+                continue;
+            }
+
+            let param_type = types.data + param_i;
+            let variable_expression: &Expression = expression;
+            let accessor = String::new(self.allocator);
+
+            accessor.append_str_lowercase(enum_variant.name.value);
+            accessor.append("_value");
+
+            if types.length > 1 {
+                accessor.append("._");
+                accessor.append_usize(param_i);
+            }
+
+            variable_expression = Expression::make(self.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
+
+            let name = param_iter.variable;
+            self.write_line_directive(file, outer_block.context, name);
+            self.write_indent(file);
+            self.write_type(file, param_type, generics);
+            if param_iter.ref { fprintf(file, "*"); }
+            fprintf(file, " ");
+            self.write_token(file, name);
+            fprintf(file, " = ");
+            if param_iter.ref { fprintf(file, "&"); }
+            self.write_expression(file, variable_expression, generics);
+            fprintf(file, ";\n");
+
+            param_i += 1;
+        }
+
+        self.function_context.push_scope(false, false);
+        if !self.write_block(file, return_type, body, generics, true, true) { return false; }
+        self.function_context.pop_scope();
+
+        self.indent -= 1;
+        self.write_indent(file);
+        fprintf(file, "}");
+
+        return true;
+    }
+
     fn write_deref_if_needed(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
         match type {
             Type::Indirect(indirect) => {
@@ -1241,25 +1308,45 @@ impl Generator {
                 },
                 StatementData::IfStatement(if_stmt) => {
                     self.write_indent(file);
-                    fprintf(file, "if (");
-                    self.write_expression(file, if_stmt.expression, generics);
-                    fprintf(file, ") ");
-                    self.function_context.push_scope(false, false);
-                    if !self.write_block(file, return_type, if_stmt.block, generics, true, false) { return false; }
-                    self.function_context.pop_scope();
+
+                    if if_stmt.pattern != 0 {
+                        match if_stmt.pattern {
+                            MatchPattern::EnumVariant(type, enum_variant, &parameters) => {
+                                if !self.write_if_let_enum_variant(file, return_type, type, enum_variant, parameters, if_stmt.expression, if_stmt.block, block, generics) { return false; }
+                            },
+                            _ => {},
+                        }
+                    } else {
+                        fprintf(file, "if (");
+                        self.write_expression(file, if_stmt.expression, generics);
+                        fprintf(file, ") ");
+                        self.function_context.push_scope(false, false);
+                        if !self.write_block(file, return_type, if_stmt.block, generics, true, false) { return false; }
+                        self.function_context.pop_scope();
+                    }
 
                     for else_statement in if_stmt.else_statements {
                         fprintf(file, " else ");
 
-                        if else_statement.expression != 0 {
+                        if else_statement.pattern != 0 {
+                            match else_statement.pattern {
+                                MatchPattern::EnumVariant(type, enum_variant, &parameters) => {
+                                    if !self.write_if_let_enum_variant(file, return_type, type, enum_variant, parameters, else_statement.expression, else_statement.block, block, generics) { return false; }
+                                },
+                                _ => {},
+                            }
+                        } else if else_statement.expression != 0 {
                             fprintf(file, "if (");
                             self.write_expression(file, else_statement.expression, generics);
                             fprintf(file, ") ");
+                            self.function_context.push_scope(false, false);
+                            if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
+                            self.function_context.pop_scope();
+                        } else {
+                            self.function_context.push_scope(false, false);
+                            if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
+                            self.function_context.pop_scope();
                         }
-
-                        self.function_context.push_scope(false, false);
-                        if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
-                        self.function_context.pop_scope();
                     }
 
                     fprintf(file, "\n");
