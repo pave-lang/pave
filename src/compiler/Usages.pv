@@ -661,6 +661,8 @@ impl Usages {
 
                     match statement.type {
                         ForStatementType::Range(start, end) => {
+                            let variable = &statement.variables.data[0];
+                            self.function_context.add_variable(variable.name.value, variable.type);
                             self.process_expression(start, generic_map);
                             self.process_expression(end, generic_map);
                         },

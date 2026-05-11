@@ -426,7 +426,10 @@ impl Expression {
     fn get_return_type(context: &Context, type: &Type, token: &Token, generic_map: &GenericMap) -> &Type {
         match type {
             Type::Tuple(_) => { return type; },
-            Type::Function(func_info, func_generic_map) => { 
+            Type::Function(func_info, func_generic_map) => {
+                if func_info.type == FunctionType::Coroutine {
+                    return context.allocator.store(&Type::CoroutineInstance(func_info, func_generic_map));
+                }
                 return Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, generic_map);
             },
             Type::FunctionC(func_info) => { return &func_info.return_type; },

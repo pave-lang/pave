@@ -301,8 +301,48 @@ impl Naming {
                     generics = generics2.array;
                 }
             },
-            Type::CoroutineInstance(func_info, _) => {
+            Type::CoroutineInstance(func_info, generics2) => {
                 result.append(self.coroutine_instance_prefix);
+
+                let has_parent = false;
+                let parent_type: Type;
+
+                match func_info.parent {
+                    FunctionParent::Primitive(primitive, _, _) => {
+                        parent_type = Type::Primitive(primitive);
+                        has_parent = true;
+                    },
+                    FunctionParent::Enum(enum_info, _, _) => {
+                        parent_type = Type::Enum(enum_info, generics2);
+                        has_parent = true;
+                    },
+                    FunctionParent::Struct(struct_info, _, _) => {
+                        parent_type = Type::Struct(struct_info, generics2);
+                        has_parent = true;
+                    },
+                    FunctionParent::Type(type, _, _) => {
+                        if type.is_fat_pointer() {
+                            parent_type = *type.deref_1();
+                        } else {
+                            parent_type = *type;
+                        }
+                        has_parent = true;
+                    },
+                    _ => {},
+                }
+
+                if has_parent {
+                    if self.naming_ident != 0 {
+                        let parent_type_name = self.naming_ident.get_type_name(&parent_type, type_self, generics_map);
+                        result.append_string(&parent_type_name);
+                        result.append("__");
+                    } else {
+                        let parent_type_name = self.get_type_name(&parent_type, type_self, generics_map);
+                        result.append_string(&parent_type_name);
+                        result.append("__");
+                    }
+                }
+
                 result.append(func_info.name.value);
             },
             Type::Self => {
