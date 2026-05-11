@@ -511,14 +511,12 @@ impl DefinitionWriter {
             }
 
             for (_, impl_const) in impl_info.consts {
-                fprintf(file, "\nstatic const ");
+                fprintf(file, "\nextern const ");
                 g.write_type(file, &impl_const.type, generics);
                 fprintf(file, " ");
                 g.write_str_title(file, name.as_str());
                 fprintf(file, "_");
                 g.write_str_title(file, impl_const.name.value);
-                fprintf(file, " = ");
-                ExpressionWriter { generator: g }.write_expression(file, impl_const.value, generics);
                 fprintf(file, ";\n");
             }
         }
@@ -1032,6 +1030,18 @@ impl DefinitionWriter {
 
                     g.function_context = 0;
                 }
+            }
+
+            for (_, impl_const) in impl_info.consts {
+                fprintf(file, "\nconst ");
+                g.write_type(file, &impl_const.type, generics);
+                fprintf(file, " ");
+                g.write_str_title(file, name.as_str());
+                fprintf(file, "_");
+                g.write_str_title(file, impl_const.name.value);
+                fprintf(file, " = ");
+                ExpressionWriter { generator: g }.write_expression(file, impl_const.value, generics);
+                fprintf(file, ";\n");
             }
         }
 
