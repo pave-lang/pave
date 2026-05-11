@@ -8,11 +8,12 @@
 #include <analyzer/types/Generics.h>
 #include <std/Array_ImplNode.h>
 #include <std/HashMap_str_Function.h>
+#include <std/HashMap_str_ref_ImplConst.h>
 struct Context;
 struct Token;
 struct Trait;
 
-#line 8 "src/analyzer/Impl.pv"
+#line 60 "src/analyzer/Impl.pv"
 struct Impl {
     struct Type type;
     struct Context* context;
@@ -26,6 +27,7 @@ struct Impl {
     struct Generics generics;
     struct Array_ImplNode nodes;
     struct HashMap_str_Function functions;
+    struct HashMap_str_ref_ImplConst consts;
 };
 
 #include <analyzer/Impl.h>
@@ -35,22 +37,25 @@ struct Context;
 struct Impl;
 struct Function;
 
-#line 24 "src/analyzer/Impl.pv"
+#line 77 "src/analyzer/Impl.pv"
 struct Impl Impl__parse(struct Context* context);
 
-#line 43 "src/analyzer/Impl.pv"
+#line 97 "src/analyzer/Impl.pv"
 bool Impl__skip_to_open_brace(struct Impl* self);
 
-#line 57 "src/analyzer/Impl.pv"
+#line 111 "src/analyzer/Impl.pv"
 bool Impl__prefill_types(struct Impl* self);
 
-#line 87 "src/analyzer/Impl.pv"
+#line 141 "src/analyzer/Impl.pv"
 bool Impl__fill_types(struct Impl* self, struct FunctionParent parent);
 
-#line 114 "src/analyzer/Impl.pv"
+#line 194 "src/analyzer/Impl.pv"
 struct Function* Impl__find_function(struct Impl* self, struct str name);
 
-#line 125 "src/analyzer/Impl.pv"
+#line 205 "src/analyzer/Impl.pv"
+bool Impl__parse_consts(struct Impl* self);
+
+#line 212 "src/analyzer/Impl.pv"
 bool Impl__parse_functions(struct Impl* self);
 
 #endif

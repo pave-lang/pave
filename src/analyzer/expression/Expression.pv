@@ -98,6 +98,14 @@ impl Expression {
                     }
                 }
 
+                for *impl_info in struct_info.impls {
+                    let impl_const_ptr = impl_info.consts.find(&member.value);
+                    if impl_const_ptr != 0 {
+                        let impl_const = *impl_const_ptr;
+                        return context.allocator.store(&impl_const.type);
+                    }
+                }
+
                 if output_error {
                     context.error_token_value(member, "Field or function not found in struct", member.value);
                 }
@@ -564,7 +572,15 @@ impl Expression {
             let generic_map = struct_type.get_generic_map(context);
 
             if !context.check_value(TokenType::Symbol, "(") {
-                return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                match member_type {
+                    Type::Function(_, _) => {
+                        return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                    },
+                    _ => {
+                        let struct_expr = Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+                        return Expression::make(context.allocator, member, ExpressionData::MemberStaticExpression(struct_expr, member.value), member_type);
+                    },
+                }
             } else {
                 if !context.expect_value(TokenType::Symbol, "(") { return 0; }
 

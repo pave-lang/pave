@@ -78,25 +78,25 @@ bool Module__parse_declarations(struct Module* self);
 #line 434 "src/analyzer/Module.pv"
 bool Module__parse_globals(struct Module* self);
 
-#line 442 "src/analyzer/Module.pv"
+#line 446 "src/analyzer/Module.pv"
 bool Module__parse_functions(struct Module* self);
 
-#line 465 "src/analyzer/Module.pv"
+#line 469 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name);
 
-#line 488 "src/analyzer/Module.pv"
+#line 492 "src/analyzer/Module.pv"
 struct Trait* Module__find_trait(struct Module* self, struct str name);
 
-#line 503 "src/analyzer/Module.pv"
+#line 507 "src/analyzer/Module.pv"
 struct Type* Module__find_function(struct Module* self, struct str name);
 
-#line 518 "src/analyzer/Module.pv"
+#line 522 "src/analyzer/Module.pv"
 struct Type* Module__find_value(struct Module* self, struct str name);
 
-#line 537 "src/analyzer/Module.pv"
+#line 541 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
-#line 542 "src/analyzer/Module.pv"
+#line 546 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name);
 
 #endif

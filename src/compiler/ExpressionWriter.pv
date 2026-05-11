@@ -562,6 +562,22 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::MemberStaticExpression(parent, member) => {
+                let parent_type = &parent.return_type;
+                match parent_type {
+                    Type::Struct(struct_info, _) => {
+                        for *impl_info in struct_info.impls {
+                            let impl_const_ptr = impl_info.consts.find(&member);
+                            if impl_const_ptr != 0 {
+                                let parent_name = g.naming_ident.get_type_name(parent_type, parent_type, generics);
+                                g.write_str_title(file, parent_name.as_str());
+                                fprintf(file, "_");
+                                g.write_str_title(file, member);
+                                return true;
+                            }
+                        }
+                    },
+                    _ => {},
+                }
                 self.write_expression(file, parent, generics);
                 g.write_static_member_accessor(file, generics);
                 g.write_str(file, member);

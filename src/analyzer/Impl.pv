@@ -1,8 +1,60 @@
 use std
 use types
+use expression
+
+struct ImplConst {
+    name: &Token,
+    type: Type,
+    value: &Expression,
+    context: &Context,
+    token_start: usize,
+    token_end: usize,
+}
+
+impl ImplConst {
+    fn parse_types(&self) -> bool {
+        let context = self.context;
+        let allocator = context.allocator;
+        context.pos = self.token_start;
+
+        let generics = Generics::new(allocator);
+        let type: &Type = 0;
+
+        if context.check_next(TokenType::Symbol, ":") {
+            type = context.parse_type2(&generics);
+            if type == 0 { return false; }
+        }
+
+        if context.check_next(TokenType::Symbol, "=") {
+            let expression = Expression::parse(context, &generics);
+            if expression == 0 { return false; }
+
+            if type == 0 {
+                type = &expression.return_type;
+            } else {
+                expression.validate_type(context, type, true);
+            }
+            self.value = expression;
+        } else {
+            context.error_token(self.name, "Impl const declaration requires an initializer");
+            return false;
+        }
+
+        if !context.expect_value(TokenType::Symbol, ";") { return false; }
+
+        if type == 0 {
+            context.error_token(self.name, "Impl const requires a type annotation or initializer");
+            return false;
+        }
+
+        self.type = *type;
+        return context.pos == self.token_end;
+    }
+}
 
 enum ImplNode {
     Function(str),
+    Const(str),
 }
 
 struct Impl {
@@ -18,6 +70,7 @@ struct Impl {
     generics: Generics,
     nodes: Array<ImplNode>,
     functions: HashMap<str, Function>,
+    consts: HashMap<str, &ImplConst>,
 }
 
 impl Impl {
@@ -28,6 +81,7 @@ impl Impl {
             generics: Generics::new(context.allocator),
             nodes: Array<ImplNode>::new(context.allocator),
             functions: HashMap<str, Function>::new(context.allocator),
+            consts: HashMap<str, &ImplConst>::new(context.allocator),
         };
 
         if !context.expect_value(TokenType::Keyword, "impl") { return node; }
@@ -88,20 +142,46 @@ impl Impl {
         let context = self.context;
         context.pos = self.token_start;
         let nodes: &Array<ImplNode> = &self.nodes;
+        let allocator = context.allocator;
 
         if !context.expect_value(TokenType::Symbol, "{") { return false; }
 
         context.skip_comments();
 
         while context.pos < self.token_end - 1 {
-            let func_info: Function = Function::parse(context);
-            func_info.parent = parent;
-            if func_info.name == 0 { return false; }
+            if context.check_value(TokenType::Keyword, "const") {
+                context.next_token();
+                let const_name = context.expect(TokenType::Identifier);
+                if const_name == 0 { return false; }
 
-            self.functions.insert(func_info.name.value, func_info);
+                let token_start = context.pos;
+                while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
+                    context.next_token();
+                }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
+                let token_end = context.pos;
 
-            let impl_node: ImplNode = ImplNode::Function(func_info.name.value);
-            nodes.append(impl_node);
+                let impl_const: &ImplConst = allocator.alloc(sizeof(ImplConst));
+                *impl_const = ImplConst {
+                    name: const_name,
+                    context,
+                    token_start,
+                    token_end,
+                };
+                self.consts.insert(const_name.value, impl_const);
+
+                let impl_node = ImplNode::Const(const_name.value);
+                nodes.append(impl_node);
+            } else {
+                let func_info: Function = Function::parse(context);
+                func_info.parent = parent;
+                if func_info.name == 0 { return false; }
+
+                self.functions.insert(func_info.name.value, func_info);
+
+                let impl_node: ImplNode = ImplNode::Function(func_info.name.value);
+                nodes.append(impl_node);
+            }
 
             context.skip_comments();
         }
@@ -120,6 +200,13 @@ impl Impl {
         }
 
         return 0;
+    }
+
+    fn parse_consts(&self) -> bool {
+        for (_, impl_const) in self.consts {
+            if !impl_const.parse_types() { return false; }
+        }
+        return true;
     }
 
     fn parse_functions(&self) -> bool {

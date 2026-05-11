@@ -436,6 +436,10 @@ impl Module {
             global.parse_types();
         }
 
+        for impl_info in self.impls {
+            impl_info.parse_consts();
+        }
+
         return true;
     }
 

@@ -53,4 +53,4 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 build-objs: $(OBJS)
 
--include $(wildcard $(OBJ_DIR)/*.d)
+-include $(shell find $(OBJ_DIR) -name '*.d' 2>/dev/null)
