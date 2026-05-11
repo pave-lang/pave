@@ -1,0 +1,674 @@
+#include "stdio.h"
+
+use std
+use analyzer
+use analyzer::expression
+use analyzer::types
+use analyzer::c
+
+struct ExpressionWriter {
+    generator: &Generator,
+}
+
+impl ExpressionWriter {
+    fn new(generator: &Generator) -> Self {
+        return Self { generator };
+    }
+
+    fn write_str_cast(&self, file: &FILE, inner_expr: &Expression, generics: &GenericMap, reference: bool) {
+        if reference { fprintf(file, "&"); }
+        fprintf(file, "(struct str){ .ptr = ");
+        self.write_expression(file, inner_expr, generics);
+        fprintf(file, ", .length = strlen(");
+        self.write_expression(file, inner_expr, generics);
+        fprintf(file, ") }");
+    }
+
+    fn write_trait_cast(&self, file: &FILE, inner_expr: &Expression, type: &Type, generics: &GenericMap) {
+        let g = self.generator;
+        match inner_expr.return_type.deref() {
+            Type::Function(func_info, func_generics) => {
+                if func_info.type == FunctionType::Coroutine {
+                    fprintf(file, "(struct trait_Co_CoroutineStatus) { .vtable = &");
+
+                    match func_info.parent {
+                        FunctionParent::Struct(struct_info, _, _) => {
+                            g.write_str_title(file, struct_info.name.value);
+                            fprintf(file, "__");
+                        },
+                        _ => {},
+                    }
+
+                    g.write_str_title(file, func_info.name.value);
+                    fprintf(file, "__VTABLE__CO, .instance = &(struct ");
+                    g.write_function_name(file, func_info, func_generics);
+                    fprintf(file, "__Co_CoroutineStatus__Instance) {}");
+                    fprintf(file, " }");
+                } else {
+                    fprintf(file, "(struct trait_Fn) { .vtable = &");
+
+                    match func_info.parent {
+                        FunctionParent::Struct(struct_info, _, _) => {
+                            g.write_str_title(file, struct_info.name.value);
+                            fprintf(file, "__");
+                        },
+                        _ => {},
+                    }
+
+                    g.write_str_title(file, func_info.name.value);
+                    fprintf(file, "__VTABLE__DYN_FN, .instance = &(struct ");
+                    g.write_function_name(file, func_info, func_generics);
+                    fprintf(file, "__Fn__Instance) {}");
+                    fprintf(file, " }");
+                }
+
+                return;
+            },
+            _ => {},
+        }
+
+        match type {
+            Type::Trait(trait_info, _) => {
+                fprintf(file, "(");
+                g.write_type(file, type, generics);
+                fprintf(file, ") { .vtable = &");
+
+                let inner_type = Context::resolve_type(g.allocator, inner_expr.return_type.deref(), generics, 0);
+                let inner_type_name = g.naming_ident.get_type_name(inner_type, generics.array.data, generics);
+                g.write_str_title(file, inner_type_name.as_str());
+
+                fprintf(file, "__VTABLE__");
+                g.write_str_title(file, trait_info.name.value);
+                fprintf(file, ", .instance = ");
+                self.write_expression(file, inner_expr, generics);
+                fprintf(file, " }");
+            },
+            _ => { self.write_expression(file, inner_expr, generics); },
+        }
+    }
+
+    fn write_sequence_cast(&self, file: &FILE, inner_expr: &Expression, sequence: &Sequence, generics: &GenericMap) {
+        let g = self.generator;
+        let inner_sequence: &Sequence = 0;
+
+        match inner_expr.return_type {
+            Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Sequence(inner_sequence_2) => { inner_sequence = inner_sequence_2; },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        if inner_sequence == 0 {
+            fprintf(file, " !!ERROR INVALID SEQUENCE TYPE TO CONVERT INTO SLICE!! ");
+            return;
+        }
+
+        let length: usize = 0;
+        match inner_sequence.type {
+            SequenceType::FixedArray(seq_length) => { length = seq_length; },
+            _ => {
+                fprintf(file, " !!ERROR INVALID SEQUENCE TYPE TO CONVERT INTO SLICE!! ");
+                return;
+            },
+        }
+
+        let sequence_type = Type::Sequence(sequence);
+        let name = g.naming_c99.get_type_name(&sequence_type, &sequence_type, generics);
+        let unary_inner: &Expression = 0;
+
+        match inner_expr.data {
+            ExpressionData::UnaryExpression(expr, inner) => {
+                if expr.eq("&") {
+                    unary_inner = inner;
+                }
+            },
+            _ => {},
+        }
+
+        fprintf(file, "(");
+        g.write_string(file, &name);
+        fprintf(file, ") { .data = ");
+
+        if unary_inner != 0 {
+            self.write_expression(file, unary_inner, generics);
+        } else {
+            fprintf(file, "*");
+            self.write_expression(file, inner_expr, generics);
+        }
+
+        fprintf(file, ", .length = %zu }", length);
+    }
+
+    fn write_struct_construction(&self, file: &FILE, type: &Type, fields: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        if g.is_type_single_value_struct(type, generics) {
+            if fields.length > 1 {
+                fprintf(file, "expected a single field as a value into this struct");
+            } else if fields.length == 1 {
+                let field = fields.data;
+                self.write_expression(file, field.value, generics);
+            } else {
+                fprintf(file, "0");
+            }
+        } else {
+            let compact = (fields.length <= 1) || (fields.data[0].value.token.start_line == fields.data[fields.length - 1].value.token.start_line);
+
+            fprintf(file, "(");
+            g.write_type(file, type, generics);
+
+            if fields.length == 0 {
+                fprintf(file, ") {}");
+            } else {
+                fprintf(file, ") {");
+                if !compact { fprintf(file, "\n"); }
+            }
+
+            g.indent += 1;
+            for (i, field) in fields.iter().enumerate() {
+                if compact {
+                    if i > 0 { fprintf(file, ", ."); }
+                    else { fprintf(file, " ."); }
+                } else {
+                    g.write_indent(file);
+                    fprintf(file, ".");
+                }
+
+                g.write_token(file, field.name);
+                fprintf(file, " = ");
+                self.write_expression(file, field.value, generics);
+                if !compact { fprintf(file, ",\n"); }
+            }
+
+            g.indent -= 1;
+
+            if fields.length != 0 {
+                if compact {
+                    fprintf(file, " }");
+                } else {
+                    g.write_indent(file);
+                    fprintf(file, "}");
+                }
+            }
+        }
+
+        return true;
+    }
+
+    fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let parent = variant.parent;
+
+        if !parent.is_discriminated_union() {
+            g.write_enum_variant_name(file, type, variant);
+            return true;
+        }
+
+        fprintf(file, "(");
+        g.write_type(file, type, generics);
+        fprintf(file, ") { .type = ");
+        g.write_enum_variant_name(file, type, variant);
+
+        if arguments == 0 {
+            fprintf(file, " }");
+            return true;
+        }
+
+        if arguments.length > 0 {
+            fprintf(file, ", .");
+            let name = variant.name;
+            g.write_str_lowercase(file, name.value);
+            fprintf(file, "_value = ");
+        }
+
+        if arguments.length == 1 {
+            self.write_expression(file, arguments.data[0].value, generics);
+        } else if arguments.length > 1 {
+            fprintf(file, "{ ");
+
+            let i: usize = 0;
+            for *arg in arguments {
+                if i > 0 { fprintf(file, ", "); }
+                fprintf(file, "._%zu = ", i);
+                self.write_expression(file, arg.value, generics);
+                i += 1;
+            }
+
+            fprintf(file, "}");
+        }
+
+        fprintf(file, " }");
+        return true;
+    }
+
+    fn write_coroutine_invoke(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let data: &ExpressionData = &expression.data;
+
+        match data {
+            ExpressionData::Type(type) => {
+                match type {
+                    Type::Function(func_info, generic_map) => {
+                        let resolved_generics = generic_map.resolve_types(g.allocator, generics);
+
+                        fprintf(file, "(struct ");
+                        g.write_function_name(file, func_info, &resolved_generics);
+                        fprintf(file, ") {");
+
+                        let i: usize = 0;
+                        for param in func_info.parameters {
+                            if i == 0 { fprintf(file, " ."); }
+                            else { fprintf(file, ", ."); }
+
+                            g.write_token(file, param.name);
+                            fprintf(file, " = ");
+
+                            if i < arguments.length {
+                                self.write_expression(file, arguments.data[i].value, generics);
+                            } else {
+                                fprintf(file, "0");
+                            }
+
+                            i += 1;
+                        }
+
+                        fprintf(file, " }");
+                        return true;
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+
+        fprintf(stderr, "coroutine invoke unsupported expression\n");
+        return false;
+    }
+
+    fn write_builtin_function_invoke(&self, file: &FILE, func_info: &Function, arguments: &Array<InvokeArgument>, func_generics: &GenericMap, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let name = func_info.name.value;
+
+        if name.eq("typeid") {
+            let resolved_generics = func_generics.resolve_types(g.allocator, generics);
+            let type = resolved_generics.get("T");
+            if type == 0 { return false; }
+            return g.write_typeid(file, type, generics);
+        }
+
+        if name.eq("cast") {
+            let resolved_generics = func_generics.resolve_types(g.allocator, generics);
+            let arg = arguments.get(0);
+            if arg == 0 { return false; }
+            let type = resolved_generics.get("T");
+            if type == 0 { return false; }
+            fprintf(file, "(");
+            g.write_type(file, type, generics);
+            fprintf(file, ")(");
+            self.write_expression(file, arg.value, generics);
+            fprintf(file, ")");
+            return true;
+        }
+
+        g.write_token(file, func_info.name);
+        fprintf(file, "(");
+        let first = true;
+        for arg in arguments {
+            if first { first = false; } else { fprintf(file, ", "); }
+            self.write_expression(file, arg.value, generics);
+        }
+        fprintf(file, ")");
+        return true;
+    }
+
+    fn write_invoke(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let data: &ExpressionData = &expression.data;
+        match data {
+            ExpressionData::Variable(name) => {
+                let success = g.write_str(file, name);
+                fprintf(file, "(");
+                let first = true;
+                for arg in arguments {
+                    if first { first = false; } else { fprintf(file, ", "); }
+                    success = self.write_expression(file, arg.value, generics) && success;
+                }
+                fprintf(file, ")");
+                return success;
+            },
+            ExpressionData::MemberStaticExpression(_, _) => {
+                let success = self.write_expression(file, expression, generics);
+                fprintf(file, "(");
+                let first = true;
+                for arg in arguments {
+                    if first { first = false; } else { fprintf(file, ", "); }
+                    success = self.write_expression(file, arg.value, generics) && success;
+                }
+                fprintf(file, ")");
+                return success;
+            },
+            ExpressionData::MemberInstanceExpression(_, _) => {
+                let success = self.write_expression(file, expression, generics);
+                fprintf(file, "(");
+                let first = true;
+                for arg in arguments {
+                    if first { first = false; } else { fprintf(file, ", "); }
+                    success = self.write_expression(file, arg.value, generics) && success;
+                }
+                fprintf(file, ")");
+                return success;
+            },
+            ExpressionData::EnumVariant(variant) => {
+                return self.write_enum_variant(file, variant, &expression.return_type, arguments, generics);
+            },
+            ExpressionData::Type(type) => {
+                match type {
+                    Type::Self => { type = generics.self_type; },
+                    _ => {},
+                }
+
+                match type.resolve_typedef() {
+                    Type::Struct(_, _) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::StructC(_) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::UnionC(_) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::Tuple(_) => {
+                        return self.write_struct_construction(file, type, arguments, generics);
+                    },
+                    Type::Function(func_info, generic_map) => {
+                        match func_info.type {
+                            FunctionType::Coroutine => {
+                                return self.write_coroutine_invoke(file, expression, arguments, generics);
+                            },
+                            FunctionType::Builtin => {
+                                return self.write_builtin_function_invoke(file, func_info, arguments, generic_map, generics);
+                            },
+                            _ => {},
+                        }
+
+                        let name = func_info.name.value;
+                        let resolved_generics = generic_map.resolve_types(g.allocator, generics);
+                        let args = arguments.iter();
+                        let success = true;
+                        let first = true;
+
+                        match func_info.parent {
+                            FunctionParent::Trait(trait_info) => {
+                                if !args.next() {
+                                    fprintf(stderr, "Trait function call missing instance argument\n");
+                                    return false;
+                                }
+
+                                let arg = args.value();
+
+                                if arg.value.return_type.deref().is_trait() {
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    fprintf(file, ".vtable->");
+                                    success = g.write_str(file, name) && success;
+                                    fprintf(file, "(");
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    fprintf(file, ".instance");
+                                    first = false;
+                                } else {
+                                    let parent_name = g.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
+                                    success = g.write_str(file, parent_name.as_str()) && success;
+                                    fprintf(file, "__");
+                                    success = g.write_str(file, trait_info.name.value) && success;
+                                    fprintf(file, "__");
+                                    success = g.write_str(file, func_info.name.value) && success;
+                                    fprintf(file, "(");
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    first = false;
+                                }
+                            },
+                            _ => {
+                                success = g.write_function_name(file, func_info, &resolved_generics) && success;
+                                fprintf(file, "(");
+                            },
+                        }
+
+                        for arg in args {
+                            if first { first = false; } else { fprintf(file, ", "); }
+                            success = self.write_expression(file, arg.value, generics) && success;
+                        }
+
+                        fprintf(file, ")");
+                        return success;
+                    },
+                    Type::FunctionC(func_info) => {
+                        let name = func_info.name;
+                        let success = g.write_str(file, name);
+                        fprintf(file, "(");
+                        let first = true;
+                        for arg in arguments {
+                            if first { first = false; } else { fprintf(file, ", "); }
+                            success = self.write_expression(file, arg.value, generics) && success;
+                        }
+                        fprintf(file, ")");
+                        return success;
+                    },
+                    Type::Sequence(sequence) => {
+                        let success = true;
+                        match sequence.type {
+                            SequenceType::FixedArray(_) => {
+                                fprintf(file, "{");
+                                let first = true;
+                                for arg in arguments {
+                                    if first { first = false; } else { fprintf(file, ", "); }
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                }
+                                fprintf(file, "}");
+                            },
+                            SequenceType::Slice => {
+                                fprintf(file, "(");
+                                g.write_type(file, &expression.return_type, generics);
+                                fprintf(file, ") {");
+                                let first = true;
+                                for arg in arguments {
+                                    if first { first = false; fprintf(file, " ."); } else { fprintf(file, ", ."); }
+                                    success = g.write_str(file, arg.name.value) && success;
+                                    fprintf(file, " = ");
+                                    success = self.write_expression(file, arg.value, generics) && success;
+                                }
+                                fprintf(file, " }");
+                            },
+                        }
+                        return success;
+                    },
+                    Type::ClassCpp(_) => {
+                        let success = g.write_type(file, type, generics);
+                        let function_mode = (arguments.length > 0) && (arguments.data[0].name == 0);
+
+                        if function_mode {
+                            fprintf(file, "(");
+                            let first = true;
+                            for arg in arguments {
+                                if first { first = false; } else { fprintf(file, ", "); }
+                                success = self.write_expression(file, arg.value, generics) && success;
+                            }
+                            fprintf(file, ")");
+                        } else {
+                            fprintf(file, " {");
+                            let first = true;
+                            for arg in arguments {
+                                if first { first = false; fprintf(file, " ."); } else { fprintf(file, ", ."); }
+                                success = g.write_str(file, arg.name.value) && success;
+                                fprintf(file, " = ");
+                                success = self.write_expression(file, arg.value, generics) && success;
+                            }
+                            fprintf(file, " }");
+                        }
+                        return success;
+                    },
+                    _ => {
+                        fprintf(stderr, "Invoke unsupported expression type\n");
+                        return false;
+                    }
+                }
+            },
+            _ => {},
+        }
+
+        fprintf(stderr, "Invoke unsupported expression\n");
+        return false;
+    }
+
+    fn write_expression(&self, file: &FILE, expression: &Expression, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let data: &ExpressionData = &expression.data;
+
+        match data {
+            ExpressionData::Variable(name) => {
+                g.write_variable(file, name);
+                return true;
+            },
+            ExpressionData::Literal(value) => {
+                g.write_literal(file, &expression.return_type, value);
+                return true;
+            },
+            ExpressionData::Invoke(target, &arguments) => {
+                return self.write_invoke(file, target, arguments, generics);
+            },
+            ExpressionData::EnumVariant(variant) => {
+                return self.write_enum_variant(file, variant, &expression.return_type, 0, generics);
+            },
+            ExpressionData::UnaryExpression(operator, inner) => {
+                let skip_operator = operator.eq("&") && expression.return_type.is_fat_pointer();
+                if !skip_operator { g.write_str(file, operator); }
+                self.write_expression(file, inner, generics);
+                return true;
+            },
+            ExpressionData::BinaryExpression(left, operator, right) => {
+                self.write_expression(file, left, generics);
+                fprintf(file, " ");
+                g.write_str(file, operator);
+                fprintf(file, " ");
+                self.write_expression(file, right, generics);
+                return true;
+            },
+            ExpressionData::IfExpression(cond, a, b) => {
+                self.write_expression(file, cond, generics);
+                fprintf(file, " ? ");
+                self.write_expression(file, a, generics);
+                fprintf(file, " : ");
+                self.write_expression(file, b, generics);
+                return true;
+            },
+            ExpressionData::MemberStaticExpression(parent, member) => {
+                self.write_expression(file, parent, generics);
+                g.write_static_member_accessor(file, generics);
+                g.write_str(file, member);
+                return true;
+            },
+            ExpressionData::MemberInstanceExpression(parent, member) => {
+                let parent_type = &parent.return_type;
+
+                if g.is_type_single_value_struct(parent_type, generics) {
+                    let is_ref = Generator::is_reference(parent_type);
+                    if is_ref { fprintf(file, "(*"); }
+                    self.write_expression(file, parent, generics);
+                    if is_ref { fprintf(file, ")"); }
+                    return true;
+                }
+
+                match parent_type {
+                    Type::Sequence(sequence) => {
+                        match sequence.type {
+                            SequenceType::FixedArray(length) => {
+                                if member.eq("length") {
+                                    fprintf(file, "%zu", length);
+                                } else {
+                                    fprintf(file, "!!ERROR NO MEMBER ");
+                                    g.write_str(file, member);
+                                    fprintf(file, "!!");
+                                }
+                            },
+                            SequenceType::Slice => {
+                                fprintf(file, "!!ERROR TODO MEMBERS FOR DYNAMIC SEQUENCES!!");
+                            },
+                        }
+                    },
+                    _ => {
+                        self.write_expression(file, parent, generics);
+                        g.write_instance_member_accessor(file, &parent.return_type, generics);
+                        if member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9' { fprintf(file, "_"); }
+                        g.write_str(file, member);
+                    },
+                }
+
+                return true;
+            },
+            ExpressionData::Type(type) => {
+                g.write_type(file, type, generics);
+                return true;
+            },
+            ExpressionData::IndexExpression(array_expr, index_expr) => {
+                self.write_expression(file, array_expr, generics);
+                if array_expr.return_type.is_reference_sequence_dynamic() {
+                    fprintf(file, ".data");
+                }
+                fprintf(file, "[");
+                self.write_expression(file, index_expr, generics);
+                fprintf(file, "]");
+                return true;
+            },
+            ExpressionData::ParenthesizedExpression(expr) => {
+                fprintf(file, "(");
+                self.write_expression(file, expr, generics);
+                fprintf(file, ")");
+                return true;
+            },
+            ExpressionData::CppExpression(cpp_expression) => {
+                match cpp_expression {
+                    CppExpression::New(placement, new_expression) => {
+                        if placement != 0 {
+                            fprintf(file, "new(");
+                            self.write_expression(file, placement, generics);
+                            fprintf(file, ") ");
+                        } else {
+                            fprintf(file, "new ");
+                        }
+                        self.write_expression(file, new_expression, generics);
+                    },
+                    CppExpression::Delete(delete_expression) => {
+                        fprintf(file, "delete ");
+                        self.write_expression(file, delete_expression, generics);
+                    }
+                }
+                return true;
+            },
+            ExpressionData::ImplicitCast(inner_expr) => {
+                match expression.return_type {
+                    Type::Struct(struct_info, _) => {
+                        if struct_info.name.value.eq("str") {
+                            self.write_str_cast(file, inner_expr, generics, false);
+                        }
+                    },
+                    Type::Indirect(indirect) => {
+                        match indirect.to {
+                            Type::Struct(struct_info, _) => {
+                                if struct_info.name.value.eq("str") {
+                                    self.write_str_cast(file, inner_expr, generics, true);
+                                } else {
+                                    self.write_trait_cast(file, inner_expr, &indirect.to, generics);
+                                }
+                            },
+                            Type::Sequence(sequence) => { self.write_sequence_cast(file, inner_expr, sequence, generics); },
+                            _ => { self.write_trait_cast(file, inner_expr, &indirect.to, generics); },
+                        }
+                    },
+                    _ => { self.write_expression(file, inner_expr, generics); },
+                }
+            },
+        }
+
+        return false;
+    }
+}

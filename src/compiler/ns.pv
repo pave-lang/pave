@@ -5,4 +5,8 @@ mod FunctionCoroutine
 mod FunctionContext
 mod IncludeWriter
 mod Generator
+mod ExpressionWriter
+mod BlockWriter
+mod DefinitionWriter
+mod FileGenerator
 mod Usages

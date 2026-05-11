@@ -1,0 +1,1028 @@
+#include "stdio.h"
+
+use std
+use analyzer
+use analyzer::expression
+use analyzer::statement
+use analyzer::types
+use analyzer::c
+
+struct DefinitionWriter {
+    generator: &Generator,
+}
+
+impl DefinitionWriter {
+    fn new(generator: &Generator) -> Self {
+        return Self { generator };
+    }
+
+    fn write_function_definition(&self, file: &FILE, func_info: &Function, generics: &GenericMap, custom_name: &String) -> bool {
+        let g = self.generator;
+        g.write_line_directive(file, func_info.context, func_info.name);
+
+        if func_info.type == FunctionType::Coroutine {
+            fprintf(file, "bool");
+        } else {
+            if !g.write_type(file, &func_info.return_type, generics) { return false; }
+        }
+
+        fprintf(file, " ");
+        if custom_name != 0 {
+            g.write_string(file, custom_name);
+        } else {
+            if func_info.generics.map.length > 0 {
+                let name = g.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+                g.write_string(file, &name);
+            } else {
+                if !g.write_function_name(file, func_info, generics) { return false; }
+            }
+        }
+
+        if func_info.type == FunctionType::Coroutine {
+            fprintf(file, "__next(void* _ctx)");
+            return true;
+        }
+
+        fprintf(file, "(");
+
+        let success = true;
+        let first = true;
+
+        for parameter_iter in func_info.parameters {
+            if first { first = false; } else { fprintf(file, ", "); }
+
+            if Generator::has_void_self_replacement(parameter_iter, generics) {
+                success = g.write_variable_decl(file, "__self", &parameter_iter.type, generics) && success;
+            } else {
+                success = g.write_variable_decl(file, parameter_iter.name.value, &parameter_iter.type, generics) && success;
+            }
+        }
+
+        fprintf(file, ")");
+        return success;
+    }
+
+    fn write_function_coroutine(&self, file: &FILE, func_info: &Function, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        fprintf(file, "struct ");
+        g.write_function_name(file, func_info, generics);
+        fprintf(file, " {\n");
+        g.indent += 1;
+
+        g.write_indent(file);
+        fprintf(file, "int32_t _state;\n");
+
+        g.write_indent(file);
+        g.write_type(file, &func_info.return_type, generics);
+        fprintf(file, " _value;\n\n");
+
+        for (name, type) in g.function_context.coroutine.variables {
+            g.write_indent(file);
+            g.write_type(file, type, generics);
+            fprintf(file, " ");
+            g.write_str(file, name);
+            fprintf(file, ";\n");
+        }
+
+        g.indent -= 1;
+        fprintf(file, "};\n\n");
+
+        fprintf(file, "#include <std/trait_Iter_");
+
+        let name = g.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+        g.write_string(file, &name);
+
+        fprintf(file, ".h>\n");
+
+        g.write_type(file, &func_info.return_type, generics);
+        fprintf(file, " ");
+        g.write_function_name(file, func_info, generics);
+        fprintf(file, "__value(void* ctx);\n");
+
+        fprintf(file, "extern struct trait_Iter_");
+        g.write_string(file, &name);
+        name.release();
+
+        fprintf(file, "VTable ");
+        g.write_str_title(file, func_info.name.value);
+        fprintf(file, "__VTABLE__ITER;\n");
+
+        return true;
+    }
+
+    fn write_function_block(&self, file: &FILE, name: str, func_info: &Function, generics: &GenericMap, function_usage: &TypeFunctionUsage) -> bool {
+        let g = self.generator;
+        let blocks = BlockWriter { generator: g };
+
+        if func_info.type == FunctionType::Coroutine {
+            fprintf(file, " {\n");
+            g.indent += 1;
+
+            g.write_indent(file);
+            fprintf(file, "struct ");
+            g.write_function_name(file, func_info, generics);
+            fprintf(file, "* ctx = _ctx;\n");
+
+            g.write_indent(file);
+            fprintf(file, "switch (ctx->_state) {\n");
+            fprintf(file, "case 0: break;\n");
+            g.indent += 1;
+
+            for i in 1..function_usage.function_context.coroutine.yield_count + 1 {
+                g.write_indent(file);
+                fprintf(file, "case %zu: goto yield_%zu;\n", i, i);
+            }
+
+            g.write_indent(file);
+            fprintf(file, "default: return false;\n");
+
+            g.indent -= 1;
+            g.write_indent(file);
+            fprintf(file, "}\n\n");
+
+            g.function_context.coroutine.yield_count = 0;
+            if !blocks.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
+                let name_length: u32 = name.length;
+                fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+                fclose(file);
+                return false;
+            }
+
+            g.write_indent(file);
+            fprintf(file, "ctx->_state = -1; return false;\n");
+
+            g.indent -= 1;
+            fprintf(file, "}\n");
+
+            g.write_type(file, &func_info.return_type, generics);
+            fprintf(file, " ");
+            g.write_function_name(file, func_info, generics);
+            fprintf(file, "__value(void* ctx) { return ((struct ");
+            g.write_function_name(file, func_info, generics);
+            fprintf(file, "*)ctx)->_value; }\n");
+
+            fprintf(file, "struct trait_Iter_");
+
+            let name = g.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+            g.write_string(file, &name);
+            name.release();
+
+            fprintf(file, "VTable ");
+
+            match func_info.parent {
+                FunctionParent::Struct(struct_info, _, _) => {
+                    g.write_str_title(file, struct_info.name.value);
+                    fprintf(file, "__");
+                },
+                _ => {},
+            }
+
+            g.write_str_title(file, func_info.name.value);
+
+            fprintf(file, "__VTABLE__ITER = { .next = ");
+            g.write_function_name(file, func_info, generics);
+            fprintf(file, "__next, .value = ");
+            g.write_function_name(file, func_info, generics);
+            fprintf(file, "__value };\n\n");
+
+            return true;
+        }
+
+        fprintf(file, " ");
+        if !blocks.write_block(file, &func_info.return_type, func_info.body, generics, false, false) {
+            let name_length: u32 = name.length;
+            fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+            fclose(file);
+            return false;
+        }
+
+        return true;
+    }
+
+    fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage: &TypeUsage<Enum>, usage_context: &UsageContext, include_writer: &IncludeWriter) -> bool {
+        let g = self.generator;
+        let generics = usage_context.generic_map;
+        let enum_name = enum_info.name;
+        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_length: u32 = name.array.length;
+        let is_discriminated_union = enum_info.is_discriminated_union();
+
+        g.write_line_directive(file, enum_info.context, enum_info.name);
+
+        if !is_discriminated_union {
+            fprintf(file, "enum ");
+            g.write_str(file, enum_name.value);
+            fprintf(file, " {\n");
+            g.indent += 1;
+
+            for (_, &variant) in enum_info.variants {
+                g.write_indent(file);
+                g.write_enum_variant_name(file, generics.self_type, variant);
+
+                if variant.value != 0 {
+                    fprintf(file, " = ");
+                    ExpressionWriter { generator: g }.write_expression(file, variant.value, generics);
+                }
+
+                fprintf(file, ",\n");
+            }
+
+            g.indent -= 1;
+            fprintf(file, "};\n");
+        } else {
+            let has_generics = enum_info.generics.array.length > 0;
+
+            if has_generics {
+                fprintf(file, "#ifndef PAVE_");
+                g.write_str_title(file, enum_info.name.value);
+                g.write_str_title(file, g.naming_ident.enum_generic_type_suffix);
+                fprintf(file, "\n#define PAVE_");
+                g.write_str_title(file, enum_info.name.value);
+                g.write_str_title(file, g.naming_ident.enum_generic_type_suffix);
+                fprintf(file, "\n");
+
+                fprintf(file, "enum ");
+                g.write_token(file, enum_info.name);
+                g.write_str(file, g.naming_ident.enum_generic_type_suffix);
+                fprintf(file, " {\n");
+
+                g.indent += 1;
+
+                for (_, &variant) in enum_info.variants {
+                    g.write_indent(file);
+                    g.write_enum_variant_name(file, generics.self_type, variant);
+
+                    if variant.value != 0 {
+                        fprintf(file, " = ");
+                        ExpressionWriter { generator: g }.write_expression(file, variant.value, generics);
+                    }
+
+                    fprintf(file, ",\n");
+                }
+
+                g.indent -= 1;
+                fprintf(file, "};\n");
+                fprintf(file, "#endif\n");
+                fprintf(file, "\n");
+            }
+
+            fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+            g.indent += 1;
+
+            if !has_generics {
+                g.write_indent(file);
+                fprintf(file, "enum {\n");
+                g.indent += 1;
+
+                for (_, &variant) in enum_info.variants {
+                    g.write_indent(file);
+                    g.write_enum_variant_name(file, generics.self_type, variant);
+                    fprintf(file, ",\n");
+                }
+
+                g.indent -= 1;
+                g.write_indent(file);
+                fprintf(file, "} type;\n");
+                fprintf(file, "\n");
+            } else {
+                g.write_indent(file);
+                fprintf(file, "enum ");
+                g.write_token(file, enum_info.name);
+                g.write_str(file, g.naming_ident.enum_generic_type_suffix);
+                fprintf(file, " type;\n");
+            }
+
+            let variants_with_data: usize = 0;
+            for (_, &variant) in enum_info.variants {
+                variants_with_data += cast<usize>(variant.types.length > 0);
+            }
+
+            if variants_with_data > 1 {
+                g.write_indent(file);
+                fprintf(file, "union {\n");
+                g.indent += 1;
+            }
+
+            for (_, &variant) in enum_info.variants {
+                if variant.types.length == 1 {
+                    g.write_indent(file);
+                    g.write_type(file, variant.types.data, generics);
+                    fprintf(file, " ");
+                    let name = variant.name;
+                    g.write_str_lowercase(file, name.value);
+                    fprintf(file, "_value;\n");
+                } else if variant.types.length > 1 {
+                    g.write_indent(file);
+                    fprintf(file, "struct { ");
+
+                    for type in variant.types {
+                        g.write_type(file, type, generics);
+                        fprintf(file, " _%zu; ", type - variant.types.data);
+                    }
+
+                    fprintf(file, "} ");
+                    let name = variant.name;
+                    g.write_str_lowercase(file, name.value);
+                    fprintf(file, "_value;\n");
+                }
+            }
+
+            if variants_with_data > 1 {
+                g.indent -= 1;
+                g.write_indent(file);
+                fprintf(file, "};\n");
+            }
+
+            g.indent -= 1;
+            fprintf(file, "};\n");
+        }
+
+        fprintf(file, "\n");
+        include_writer.write(file, g, &usage_context.signature, generics, false);
+
+        for (impl_index, *impl_info) in enum_info.impls.iter().enumerate() {
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if usage != 0 { impl_functions_for_impl = usage.impl_functions.get(impl_index); }
+
+            for (_, &func_info) in impl_info.functions {
+                let func_ptr = cast<usize>(func_info);
+                let function_usage: &TypeFunctionUsage = 0;
+                if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                if func_info.generics.array.length == 0 {
+                    fprintf(file, "\n");
+                    if !self.write_function_definition(file, func_info, generics, 0) { return false; }
+                    fprintf(file, ";\n");
+                }
+
+                if impl_functions_for_impl != 0 && function_usage != 0 {
+                    for usage_context in function_usage.usage_contexts {
+                        include_writer.write(file, g, &usage_context.signature, usage_context.generic_map, false);
+                        usage_context.generic_map.self_type = generics.self_type;
+                        fprintf(file, "\n");
+                        if !self.write_function_definition(file, func_info, usage_context.generic_map, 0) { return false; }
+                        fprintf(file, ";\n");
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    fn write_struct_definition(&self, file: &FILE, struct_info: &Struct, usage: &TypeUsage<Struct>, usage_context: &UsageContext) -> bool {
+        let g = self.generator;
+        let generics = usage_context.generic_map;
+        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_length: i32 = name.array.length;
+        let impl_functions = &usage.impl_functions;
+        let include_writer = IncludeWriter::new(g.allocator);
+
+        g.write_line_directive(file, &struct_info.module.context, struct_info.name);
+
+        if struct_info.type == StructType::Incomplete {
+            fprintf(file, "struct %.*s;\n", name_length, name.array.data);
+        } else if struct_info.is_newtype() {
+            let field = &struct_info.fields.data[0].value;
+            fprintf(file, "typedef ");
+            g.write_type(file, &field.type, generics);
+            fprintf(file, " %.*s;\n", name_length, name.array.data);
+        } else {
+            fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+            g.indent += 1;
+
+            for (_, &field) in struct_info.fields {
+                g.write_indent(file);
+                g.write_variable_decl(file, field.name.value, &field.type, generics);
+                fprintf(file, ";\n");
+            }
+
+            g.indent -= 1;
+            fprintf(file, "};\n");
+        }
+
+        if usage_context.signature.length > 0 { fprintf(file, "\n"); }
+        include_writer.write(file, g, &usage_context.signature, generics, false);
+
+        for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
+
+            for (_, &func_info) in impl_info.functions {
+                let func_ptr = cast<usize>(func_info);
+                let function_usage: &TypeFunctionUsage = 0;
+                if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                if func_info.generics.array.length == 0 {
+                    if trait_info == 0 {
+                        if func_info.type == FunctionType::Coroutine && function_usage != 0 {
+                            g.function_context = &function_usage.function_context;
+                            self.write_function_coroutine(file, func_info, generics);
+                            g.function_context = 0;
+                        }
+
+                        fprintf(file, "\n");
+                        if !self.write_function_definition(file, func_info, generics, 0) { return false; }
+                    } else {
+                        let generics_void = *generics;
+                        generics_void.self_type = &g.root.type_void;
+
+                        let func_name = g.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                        fprintf(file, "\n");
+                        if !self.write_function_definition(file, func_info, &generics_void, &func_name) { return false; }
+                    }
+
+                    fprintf(file, ";\n");
+                }
+
+                if impl_functions_for_impl != 0 {
+                    let function_usage = impl_functions_for_impl.find(&func_ptr);
+                    if function_usage != 0 {
+                        for usage_context in function_usage.usage_contexts {
+                            include_writer.write(file, g, &usage_context.signature, usage_context.generic_map, false);
+
+                            // TODO: Test if this is actually needed
+                            usage_context.generic_map.self_type = generics.self_type;
+                            fprintf(file, "\n");
+                            if !self.write_function_definition(file, func_info, usage_context.generic_map, 0) { return false; }
+                            fprintf(file, ";\n");
+                        }
+
+                        if function_usage.impl_dynamic_function {
+                            if func_info.type == FunctionType::Coroutine {
+                                fprintf(file, "#include <std/trait_Co_CoroutineStatus.h>\n");
+                                fprintf(file, "struct ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Co_CoroutineStatus__Instance { ");
+                                g.indent += 1;
+                                for param in func_info.parameters {
+                                    g.write_type(file, &param.type, generics);
+                                    fprintf(file, " ");
+                                    g.write_token(file, param.name);
+                                    fprintf(file, "; ");
+                                }
+                                g.indent -= 1;
+                                fprintf(file, "};\n");
+
+                                fprintf(file, "extern struct trait_Co_CoroutineStatusVTable ");
+                                g.write_str_title(file, struct_info.name.value);
+                                fprintf(file, "__");
+                                g.write_str_title(file, func_info.name.value);
+                                fprintf(file, "__VTABLE__CO;\n");
+                            } else {
+                                fprintf(file, "#include <std/trait_Fn.h>\n");
+                                fprintf(file, "struct ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Fn__Instance { ");
+                                g.indent += 1;
+                                for param in func_info.parameters {
+                                    g.write_type(file, &param.type, generics);
+                                    fprintf(file, " ");
+                                    g.write_token(file, param.name);
+                                    fprintf(file, "; ");
+                                }
+                                g.indent -= 1;
+                                fprintf(file, "};\n");
+
+                                fprintf(file, "extern struct trait_FnVTable ");
+                                g.write_str_title(file, struct_info.name.value);
+                                fprintf(file, "__");
+                                g.write_str_title(file, func_info.name.value);
+                                fprintf(file, "__VTABLE__DYN_FN;\n");
+                            }
+                        }
+                    }
+                }
+            }
+
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+
+                    fprintf(file, "\n");
+                    let generics_void = *generics;
+                    generics_void.self_type = &g.root.type_void;
+
+                    let func_name = g.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                    if !self.write_function_definition(file, func_info, &generics_void, &func_name) { return false; }
+                    fprintf(file, ";\n");
+                }
+            }
+        }
+
+        if struct_info.traits.length > 0 { fprintf(file, "\n"); }
+
+        for (_, trait_entry) in struct_info.traits {
+            let trait_info = trait_entry.0;
+            fprintf(file, "extern struct ");
+            g.write_type_name(file, trait_entry.1, generics);
+            fprintf(file, "VTable ");
+            g.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__");
+            g.write_str_title(file, trait_info.name.value);
+            fprintf(file, ";\n");
+        }
+
+        if usage.impl_dynamic_usage {
+            fprintf(file, "#include <std/trait_Struct.h>\n");
+            fprintf(file, "extern struct trait_StructVTable ");
+            g.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__STRUCT;\n");
+        }
+
+        return true;
+    }
+
+    fn write_impl_definition(&self, file: &FILE, name: str, impl_info: &Impl, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let trait_info = impl_info.trait_;
+
+        fprintf(file, "\n");
+
+        for (_, &func_info) in impl_info.functions {
+            if func_info.generics.array.length == 0 {
+                if trait_info == 0 {
+                    if !self.write_function_definition(file, func_info, generics, 0) { return false; }
+                } else {
+                    let generics_void = *generics;
+                    generics_void.self_type = &g.root.type_void;
+
+                    let func_name = g.get_trait_function_name(name, trait_info, func_info, generics);
+                    if !self.write_function_definition(file, func_info, &generics_void, &func_name) { return false; }
+                }
+
+                fprintf(file, ";\n");
+            }
+        }
+
+        if trait_info != 0 {
+            for (func_base_name, &func_info) in trait_info.functions {
+                if impl_info.functions.find(&func_base_name) != 0 { continue; }
+
+                fprintf(file, "\n");
+                let generics_void = *generics;
+                generics_void.self_type = &g.root.type_void;
+
+                let func_name = g.get_trait_function_name(name, trait_info, func_info, generics);
+                if !self.write_function_definition(file, func_info, &generics_void, &func_name) { return false; }
+                fprintf(file, ";\n");
+            }
+        }
+
+        return true;
+    }
+
+    fn write_primitive_definition(&self, file: &FILE, primitive_info: &Primitive, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+
+        for *impl_info in primitive_info.impls {
+            self.write_impl_definition(file, name.as_str(), impl_info, generics);
+        }
+
+        if primitive_info.traits.length > 0 { fprintf(file, "\n"); }
+
+        for (_, trait_info) in primitive_info.traits {
+            fprintf(file, "extern struct trait_");
+            g.write_token(file, trait_info.name);
+            fprintf(file, "VTable ");
+            g.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__");
+            g.write_str_title(file, trait_info.name.value);
+            fprintf(file, ";\n");
+        }
+
+        return true;
+    }
+
+    fn write_trait_definition(&self, file: &FILE, trait_info: &Trait, generics: &GenericMap) -> bool {
+        let g = self.generator;
+        let void_self_generics = *generics;
+        void_self_generics.self_type = &g.root.type_void;
+
+        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name_length: i32 = name.array.length;
+
+        fprintf(file, "\n");
+        g.write_line_directive(file, &trait_info.module.context, trait_info.name);
+
+        fprintf(file, "struct %.*sVTable {\n", name_length, name.array.data);
+        g.indent += 1;
+
+        for (_, &func_info) in trait_info.functions {
+            if func_info.generics.array.length == 0 {
+                let func_name = String::new(g.allocator);
+                func_name.append("(*");
+                func_name.append(func_info.name.value);
+                func_name.append(")");
+
+                g.write_indent(file);
+                if !self.write_function_definition(file, func_info, &void_self_generics, &func_name) { return false; }
+                fprintf(file, ";\n");
+            }
+        }
+
+        g.indent -= 1;
+        fprintf(file, "};\n\n");
+
+        g.write_line_directive(file, &trait_info.module.context, trait_info.name);
+
+        fprintf(file, "struct %.*s {\n", name_length, name.array.data);
+        g.indent += 1;
+
+        g.write_indent(file);
+        fprintf(file, "const struct %.*sVTable* vtable;\n", name_length, name.array.data);
+        g.write_indent(file);
+        fprintf(file, "void* instance;\n");
+
+        g.indent -= 1;
+        fprintf(file, "};\n");
+
+        return true;
+    }
+
+    fn write_impls(&self, file: &FILE, module: &Module, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap, include_writer: &IncludeWriter) -> bool {
+        let g = self.generator;
+        let name = g.naming_ident.get_type_name(generics.self_type.deref(), generics.self_type, generics);
+        let name_length: i32 = name.array.length;
+        let path = g.make_rel_path(module, name.as_str(), ".h");
+
+        fprintf(file, "#include <%.*s>\n", cast<i32>(path.array.length), path.array.data);
+
+        for (impl_index, *impl_info) in impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
+            let impl_functions_for_impl: &HashMap<usize, TypeFunctionUsage> = 0;
+            if impl_functions != 0 { impl_functions_for_impl = impl_functions.get(impl_index); }
+
+            for (_, &func_info) in impl_info.functions {
+                let func_ptr = cast<usize>(func_info);
+                let function_usage: &TypeFunctionUsage = 0;
+                if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                if func_info.generics.array.length == 0 {
+                    fprintf(file, "\n");
+                    if trait_info != 0 {
+                        let generics_void = *generics;
+                        generics_void.self_type = &g.root.type_void;
+
+                        let func_name = g.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                        if !self.write_function_definition(file, func_info, &generics_void, &func_name) {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        fprintf(file, " {\n");
+                        g.indent += 1;
+
+                        g.write_indent(file);
+                        g.write_type(file, generics.self_type, generics);
+                        fprintf(file, "* self = ");
+
+                        if module != 0 && module.mode_cpp {
+                            fprintf(file, "(");
+                            g.write_type(file, generics.self_type, generics);
+                            fprintf(file, "*)");
+                        }
+
+                        fprintf(file, "__self");
+                        fprintf(file, "; (void)self;\n");
+
+                        let func_context = FunctionContext::new(g.allocator, func_info, true);
+                        if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
+                        g.function_context = &func_context;
+
+                        if !BlockWriter { generator: g }.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        g.indent -= 1;
+                        g.write_indent(file);
+                        fprintf(file, "}\n");
+
+                        g.function_context = 0;
+                    } else {
+                        if !self.write_function_definition(file, func_info, generics, 0) {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        let func_context = FunctionContext::new(g.allocator, func_info, true);
+                        if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
+                        g.function_context = &func_context;
+
+                        if !self.write_function_block(file, name.as_str(), func_info, generics, function_usage) {
+                            let func_name_length: u32 = func_info.name.value.length;
+                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            return false;
+                        }
+
+                        let function_usage: &TypeFunctionUsage = 0;
+                        if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
+
+                        if function_usage != 0 && function_usage.impl_dynamic_function {
+                            fprintf(file, "\n");
+                            if g.is_coroutine() {
+                                fprintf(file, "#include <std/trait_Allocator.h>\n");
+                            }
+
+                            fprintf(file, "#include <std/Array_TypeId.h>\n");
+                            fprintf(file, "struct Array_TypeId* ");
+                            g.write_function_name(file, func_info, generics);
+
+                            if g.is_coroutine() {
+                                fprintf(file, "__Co__get_params(void* __self) {\n");
+                            } else {
+                                fprintf(file, "__Fn__get_params(void* __self) {\n");
+                            }
+
+                            g.indent += 1;
+                            g.write_indent(file);
+                            fprintf(file, "static TypeId type_ids[] = { ");
+
+                            let first = true;
+                            for param in func_info.parameters {
+                                if first { first = false; } else { fprintf(file, ", "); }
+                                g.write_typeid(file, &param.type, generics);
+                            }
+
+                            fprintf(file, " };\n");
+                            g.write_indent(file);
+                            fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info.parameters.length);
+                            g.write_indent(file);
+                            fprintf(file, "return &result;\n");
+                            g.indent -= 1;
+                            fprintf(file, "}\n");
+
+                            fprintf(file, "bool ");
+                            g.write_function_name(file, func_info, generics);
+
+                            if g.is_coroutine() {
+                                fprintf(file, "__Co__set_arg(void* __self, uintptr_t index, void* value) {\n");
+                            } else {
+                                fprintf(file, "__Fn__set_arg(void* __self, uintptr_t index, void* value) {\n");
+                            }
+
+                            g.indent += 1;
+
+                            g.write_indent(file);
+                            fprintf(file, "struct ");
+                            g.write_function_name(file, func_info, generics);
+
+                            if g.is_coroutine() {
+                                fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
+                            } else {
+                                if module.mode_cpp {
+                                    fprintf(file, "__Fn__Instance* self = (struct ");
+                                    g.write_function_name(file, func_info, generics);
+                                    fprintf(file, "__Fn__Instance*)__self;\n");
+                                } else {
+                                    fprintf(file, "__Fn__Instance* self = __self;\n");
+                                }
+                            }
+
+                            g.write_indent(file);
+                            fprintf(file, "switch (index) {\n");
+                            g.indent += 1;
+
+                            let i: usize = 0;
+                            for param in func_info.parameters {
+                                g.write_indent(file);
+                                fprintf(file, "case %zu: self->", i);
+                                g.write_token(file, param.name);
+                                fprintf(file, " = ");
+
+                                if !Generator::is_reference(&param.type) {
+                                    fprintf(file, "*(");
+                                    g.write_type(file, &param.type, generics);
+                                    fprintf(file, "*)");
+                                } else {
+                                    if module.mode_cpp {
+                                        fprintf(file, "(");
+                                        g.write_type(file, &param.type, generics);
+                                        fprintf(file, ")");
+                                    }
+                                }
+
+                                fprintf(file, "value; return true;\n");
+                                i += 1;
+                            }
+
+                            g.indent -= 1;
+                            g.write_indent(file);
+                            fprintf(file, "}\n");
+
+                            g.write_indent(file);
+                            fprintf(file, "return false;\n");
+
+                            g.indent -= 1;
+                            fprintf(file, "}\n");
+
+                            if g.is_coroutine() {
+                                fprintf(file, "struct Iter_CoroutineStatus ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
+
+                                g.indent += 1;
+
+                                g.write_indent(file);
+                                fprintf(file, "struct ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
+
+                                g.write_indent(file);
+                                fprintf(file, "struct ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "));\n");
+
+                                for param in func_info.parameters {
+                                    g.write_indent(file);
+                                    fprintf(file, "instance->");
+                                    g.write_token(file, param.name);
+                                    fprintf(file, " = ");
+                                    fprintf(file, "self->");
+                                    g.write_token(file, param.name);
+                                    fprintf(file, ";\n");
+                                }
+
+                                g.write_indent(file);
+                                fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
+
+                                match func_info.parent {
+                                    FunctionParent::Struct(struct_info, _, _) => {
+                                        g.write_str_title(file, struct_info.name.value);
+                                        fprintf(file, "__");
+                                    },
+                                    _ => {},
+                                }
+                                g.write_str_title(file, func_info.name.value);
+
+                                fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
+
+                                g.indent -= 1;
+                                fprintf(file, "}\n");
+                            } else {
+                                fprintf(file, "void ");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Fn__execute(void* __self) {\n");
+
+                                g.indent += 1;
+
+                                g.write_indent(file);
+                                fprintf(file, "struct ");
+                                g.write_function_name(file, func_info, generics);
+                                if module.mode_cpp {
+                                    fprintf(file, "__Fn__Instance* self = (struct ");
+                                    g.write_function_name(file, func_info, generics);
+                                    fprintf(file, "__Fn__Instance*)__self;\n");
+                                } else {
+                                    fprintf(file, "__Fn__Instance* self = __self;\n");
+                                }
+
+                                g.write_indent(file);
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "(");
+
+                                first = true;
+                                for param in func_info.parameters {
+                                    if first { first = false; } else { fprintf(file, ", "); }
+                                    fprintf(file, "self->");
+                                    g.write_token(file, param.name);
+                                }
+
+                                fprintf(file, ");\n");
+
+                                g.indent -= 1;
+                                fprintf(file, "}\n");
+                            }
+
+                            if g.is_coroutine() {
+                                fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
+                            } else {
+                                fprintf(file, "struct trait_FnVTable ");
+                            }
+
+                            match func_info.parent {
+                                FunctionParent::Struct(struct_info, _, _) => {
+                                    g.write_str_title(file, struct_info.name.value);
+                                    fprintf(file, "__");
+                                },
+                                _ => {},
+                            }
+                            g.write_str_title(file, func_info.name.value);
+
+                            if g.is_coroutine() {
+                                fprintf(file, "__VTABLE__CO");
+                            } else {
+                                fprintf(file, "__VTABLE__DYN_FN");
+                            }
+
+                            fprintf(file, " = { .get_params = &");
+                            g.write_function_name(file, func_info, generics);
+
+                            if g.is_coroutine() {
+                                fprintf(file, "__Co__get_params, .set_arg = &");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Co__set_arg, .init = &");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Co__init };\n");
+                            } else {
+                                fprintf(file, "__Fn__get_params, .set_arg = &");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Fn__set_arg, .execute = &");
+                                g.write_function_name(file, func_info, generics);
+                                fprintf(file, "__Fn__execute };\n");
+                            }
+                        }
+
+                        g.function_context = 0;
+                    }
+                } else if impl_functions_for_impl != 0 {
+                    if function_usage != 0 {
+                        let func2: &Function = g.allocator.alloc(sizeof(Function));
+                        *func2 = *func_info;
+
+                        for usage_context in function_usage.usage_contexts {
+                            let generics3 = usage_context.generic_map;
+
+                            // TODO: Is this needed?
+                            generics3.self_type = generics.self_type;
+
+                            include_writer.write(file, g, &usage_context.body, generics3, true);
+                            fprintf(file, "\n");
+                            if !self.write_function_definition(file, func_info, generics3, 0) {
+                                let func_name_length: u32 = func_info.name.value.length;
+                                fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                                return false;
+                            }
+
+                            let func_context = FunctionContext::new(g.allocator, func_info, true);
+                            func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count;
+                            g.function_context = &func_context;
+
+                            self.write_function_block(file, name.as_str(), func_info, generics3, function_usage);
+
+                            g.function_context = 0;
+                        }
+                    }
+                }
+            }
+
+            if trait_info != 0 {
+                for (func_base_name, &func_info) in trait_info.functions {
+                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+
+                    fprintf(file, "\n");
+                    let generics_void = *generics;
+                    generics_void.self_type = &g.root.type_void;
+
+                    let func_name = g.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                    if !self.write_function_definition(file, func_info, &generics_void, &func_name) {
+                        let func_name_length: u32 = func_info.name.value.length;
+                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                        return false;
+                    }
+
+                    fprintf(file, " {\n");
+                    g.indent += 1;
+
+                    g.write_indent(file);
+                    g.write_type(file, generics.self_type, generics);
+
+                    fprintf(file, "* self = ");
+
+                    if module != 0 && module.mode_cpp {
+                        fprintf(file, "(");
+                        g.write_type(file, generics.self_type, generics);
+                        fprintf(file, "*)");
+                    }
+
+                    fprintf(file, "__self; (void)self;\n");
+
+                    let func_context = FunctionContext::new(g.allocator, func_info, true);
+                    g.function_context = &func_context;
+
+                    if !BlockWriter { generator: g }.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
+                        let func_name_length: u32 = func_info.name.value.length;
+                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                        return false;
+                    }
+
+                    g.indent -= 1;
+                    g.write_indent(file);
+                    fprintf(file, "}\n");
+
+                    g.function_context = 0;
+                }
+            }
+        }
+
+        return true;
+    }
+}
