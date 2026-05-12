@@ -98,22 +98,22 @@ struct str Expression__number_primitive(struct str value);
 #line 1113 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 1449 "src/analyzer/expression/Expression.pv"
+#line 1450 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1496 "src/analyzer/expression/Expression.pv"
+#line 1497 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 1503 "src/analyzer/expression/Expression.pv"
+#line 1504 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 1549 "src/analyzer/expression/Expression.pv"
+#line 1550 "src/analyzer/expression/Expression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
-#line 1566 "src/analyzer/expression/Expression.pv"
+#line 1567 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 1577 "src/analyzer/expression/Expression.pv"
+#line 1578 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #endif

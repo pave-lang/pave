@@ -1413,6 +1413,7 @@ impl Expression {
                     
                     context.expect_value(TokenType::Symbol, "]");
 
+                    if element_type == 0 { element_type = &context.root.type_void; }
                     let parent_sequence = context.allocator.store(&Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type });
                     let parent_type = context.allocator.store(&Type::Sequence(parent_sequence));
                     let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(parent_type), parent_type);
