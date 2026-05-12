@@ -133,6 +133,27 @@ impl ExpressionWriter {
         fprintf(file, ") { .data = ");
 
         if unary_inner != 0 {
+            let is_array_literal = false;
+            match unary_inner.data {
+                ExpressionData::Invoke(target, _) => {
+                    match target.return_type {
+                        Type::Sequence(seq) => {
+                            match seq.type {
+                                SequenceType::FixedArray(_) => { is_array_literal = true; },
+                                _ => {},
+                            }
+                        },
+                        _ => {},
+                    }
+                },
+                _ => {},
+            }
+
+            if is_array_literal {
+                fprintf(file, "(");
+                g.write_type(file, &sequence.element, generics);
+                fprintf(file, "[])");
+            }
             self.write_expression(file, unary_inner, generics);
         } else {
             fprintf(file, "*");
