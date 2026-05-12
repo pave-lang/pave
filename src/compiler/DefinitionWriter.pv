@@ -651,6 +651,272 @@ impl DefinitionWriter {
         return true;
     }
 
+    fn write_trait_function_with_body(&self, file: &FILE, name: str, func_info: &Function, trait_info: &Trait, generics: &GenericMap, module: &Module, function_usage: &TypeFunctionUsage) -> bool {
+        let generator = self.generator;
+        if !self.write_trait_function_decl(file, name, trait_info, func_info, generics) {
+            let name_length: u32 = name.length;
+            let func_name_length: u32 = func_info.name.value.length;
+            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info.name.value.ptr);
+            return false;
+        }
+
+        fprintf(file, " {\n");
+        generator.indent += 1;
+
+        self.write_self_cast(file, module, generics);
+
+        let func_context = FunctionContext::new(generator.allocator, func_info, true);
+        if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
+        generator.function_context = &func_context;
+
+        if !BlockWriter { generator }.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
+            let name_length: u32 = name.length;
+            let func_name_length: u32 = func_info.name.value.length;
+            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info.name.value.ptr);
+            return false;
+        }
+
+        generator.indent -= 1;
+        generator.write_indent(file);
+        fprintf(file, "}\n");
+
+        generator.function_context = 0;
+        return true;
+    }
+
+    fn write_dynamic_get_params(&self, file: &FILE, func_info: &Function, generics: &GenericMap) {
+        let generator = self.generator;
+        fprintf(file, "#include <std/Array_TypeId.h>\n");
+        fprintf(file, "struct Array_TypeId* ");
+        generator.write_function_name(file, func_info, generics);
+
+        if generator.is_coroutine() {
+            fprintf(file, "__Co__get_params(void* __self) {\n");
+        } else {
+            fprintf(file, "__Fn__get_params(void* __self) {\n");
+        }
+
+        generator.indent += 1;
+        generator.write_indent(file);
+        fprintf(file, "static TypeId type_ids[] = { ");
+
+        let first = true;
+        for param in func_info.parameters {
+            if first { first = false; } else { fprintf(file, ", "); }
+            generator.write_typeid(file, &param.type, generics);
+        }
+
+        fprintf(file, " };\n");
+        generator.write_indent(file);
+        fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info.parameters.length);
+        generator.write_indent(file);
+        fprintf(file, "return &result;\n");
+        generator.indent -= 1;
+        fprintf(file, "}\n");
+    }
+
+    fn write_dynamic_set_arg(&self, file: &FILE, func_info: &Function, generics: &GenericMap, module: &Module) {
+        let generator = self.generator;
+        fprintf(file, "bool ");
+        generator.write_function_name(file, func_info, generics);
+
+        if generator.is_coroutine() {
+            fprintf(file, "__Co__set_arg(void* __self, uintptr_t index, void* value) {\n");
+        } else {
+            fprintf(file, "__Fn__set_arg(void* __self, uintptr_t index, void* value) {\n");
+        }
+
+        generator.indent += 1;
+
+        generator.write_indent(file);
+        fprintf(file, "struct ");
+        generator.write_function_name(file, func_info, generics);
+
+        if generator.is_coroutine() {
+            fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
+        } else {
+            if module.mode_cpp {
+                fprintf(file, "__Fn__Instance* self = (struct ");
+                generator.write_function_name(file, func_info, generics);
+                fprintf(file, "__Fn__Instance*)__self;\n");
+            } else {
+                fprintf(file, "__Fn__Instance* self = __self;\n");
+            }
+        }
+
+        generator.write_indent(file);
+        fprintf(file, "switch (index) {\n");
+        generator.indent += 1;
+
+        let i: usize = 0;
+        for param in func_info.parameters {
+            generator.write_indent(file);
+            fprintf(file, "case %zu: self->", i);
+            generator.write_token(file, param.name);
+            fprintf(file, " = ");
+
+            if !Generator::is_reference(&param.type) {
+                fprintf(file, "*(");
+                generator.write_type(file, &param.type, generics);
+                fprintf(file, "*)");
+            } else {
+                if module.mode_cpp {
+                    fprintf(file, "(");
+                    generator.write_type(file, &param.type, generics);
+                    fprintf(file, ")");
+                }
+            }
+
+            fprintf(file, "value; return true;\n");
+            i += 1;
+        }
+
+        generator.indent -= 1;
+        generator.write_indent(file);
+        fprintf(file, "}\n");
+
+        generator.write_indent(file);
+        fprintf(file, "return false;\n");
+
+        generator.indent -= 1;
+        fprintf(file, "}\n");
+    }
+
+    fn write_dynamic_execute_or_init(&self, file: &FILE, func_info: &Function, generics: &GenericMap, module: &Module) {
+        let generator = self.generator;
+        if generator.is_coroutine() {
+            fprintf(file, "struct Iter_CoroutineStatus ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
+
+            generator.indent += 1;
+
+            generator.write_indent(file);
+            fprintf(file, "struct ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
+
+            generator.write_indent(file);
+            fprintf(file, "struct ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "));\n");
+
+            for param in func_info.parameters {
+                generator.write_indent(file);
+                fprintf(file, "instance->");
+                generator.write_token(file, param.name);
+                fprintf(file, " = self->");
+                generator.write_token(file, param.name);
+                fprintf(file, ";\n");
+            }
+
+            generator.write_indent(file);
+            fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
+
+            match func_info.parent {
+                FunctionParent::Struct(struct_info, _, _) => {
+                    generator.write_str_title(file, struct_info.name.value);
+                    fprintf(file, "__");
+                },
+                _ => {},
+            }
+            generator.write_str_title(file, func_info.name.value);
+
+            fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
+
+            generator.indent -= 1;
+            fprintf(file, "}\n");
+        } else {
+            fprintf(file, "void ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Fn__execute(void* __self) {\n");
+
+            generator.indent += 1;
+
+            generator.write_indent(file);
+            fprintf(file, "struct ");
+            generator.write_function_name(file, func_info, generics);
+            if module.mode_cpp {
+                fprintf(file, "__Fn__Instance* self = (struct ");
+                generator.write_function_name(file, func_info, generics);
+                fprintf(file, "__Fn__Instance*)__self;\n");
+            } else {
+                fprintf(file, "__Fn__Instance* self = __self;\n");
+            }
+
+            generator.write_indent(file);
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "(");
+
+            let first = true;
+            for param in func_info.parameters {
+                if first { first = false; } else { fprintf(file, ", "); }
+                fprintf(file, "self->");
+                generator.write_token(file, param.name);
+            }
+
+            fprintf(file, ");\n");
+
+            generator.indent -= 1;
+            fprintf(file, "}\n");
+        }
+    }
+
+    fn write_dynamic_vtable(&self, file: &FILE, func_info: &Function, generics: &GenericMap) {
+        let generator = self.generator;
+        if generator.is_coroutine() {
+            fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
+        } else {
+            fprintf(file, "struct trait_FnVTable ");
+        }
+
+        match func_info.parent {
+            FunctionParent::Struct(struct_info, _, _) => {
+                generator.write_str_title(file, struct_info.name.value);
+                fprintf(file, "__");
+            },
+            _ => {},
+        }
+        generator.write_str_title(file, func_info.name.value);
+
+        if generator.is_coroutine() {
+            fprintf(file, "__VTABLE__CO");
+        } else {
+            fprintf(file, "__VTABLE__DYN_FN");
+        }
+
+        fprintf(file, " = { .get_params = &");
+        generator.write_function_name(file, func_info, generics);
+
+        if generator.is_coroutine() {
+            fprintf(file, "__Co__get_params, .set_arg = &");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Co__set_arg, .init = &");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Co__init };\n");
+        } else {
+            fprintf(file, "__Fn__get_params, .set_arg = &");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Fn__set_arg, .execute = &");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Fn__execute };\n");
+        }
+    }
+
+    fn write_dynamic_function_impl(&self, file: &FILE, func_info: &Function, generics: &GenericMap, module: &Module) {
+        let generator = self.generator;
+        fprintf(file, "\n");
+        if generator.is_coroutine() {
+            fprintf(file, "#include <std/trait_Allocator.h>\n");
+        }
+        self.write_dynamic_get_params(file, func_info, generics);
+        self.write_dynamic_set_arg(file, func_info, generics, module);
+        self.write_dynamic_execute_or_init(file, func_info, generics, module);
+        self.write_dynamic_vtable(file, func_info, generics);
+    }
+
     fn write_impls(&self, file: &FILE, module: &Module, impls: &Array<&Impl>, impl_functions: &Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap, include_writer: &IncludeWriter) -> bool {
         let generator = self.generator;
         let name = generator.naming_ident.get_type_name(generics.self_type.deref(), generics.self_type, generics);
@@ -672,32 +938,7 @@ impl DefinitionWriter {
                 if func_info.generics.array.length == 0 {
                     fprintf(file, "\n");
                     if trait_info != 0 {
-                        if !self.write_trait_function_decl(file, name.as_str(), trait_info, func_info, generics) {
-                            let func_name_length: u32 = func_info.name.value.length;
-                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
-                            return false;
-                        }
-
-                        fprintf(file, " {\n");
-                        generator.indent += 1;
-
-                        self.write_self_cast(file, module, generics);
-
-                        let func_context = FunctionContext::new(generator.allocator, func_info, true);
-                        if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }
-                        generator.function_context = &func_context;
-
-                        if !BlockWriter { generator }.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
-                            let func_name_length: u32 = func_info.name.value.length;
-                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
-                            return false;
-                        }
-
-                        generator.indent -= 1;
-                        generator.write_indent(file);
-                        fprintf(file, "}\n");
-
-                        generator.function_context = 0;
+                        if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, generics, module, function_usage) { return false; }
                     } else {
                         if !self.write_function_definition(file, func_info, generics, 0) {
                             let func_name_length: u32 = func_info.name.value.length;
@@ -719,220 +960,7 @@ impl DefinitionWriter {
                         if impl_functions_for_impl != 0 { function_usage = impl_functions_for_impl.find(&func_ptr); }
 
                         if function_usage != 0 && function_usage.impl_dynamic_function {
-                            fprintf(file, "\n");
-                            if generator.is_coroutine() {
-                                fprintf(file, "#include <std/trait_Allocator.h>\n");
-                            }
-
-                            fprintf(file, "#include <std/Array_TypeId.h>\n");
-                            fprintf(file, "struct Array_TypeId* ");
-                            generator.write_function_name(file, func_info, generics);
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "__Co__get_params(void* __self) {\n");
-                            } else {
-                                fprintf(file, "__Fn__get_params(void* __self) {\n");
-                            }
-
-                            generator.indent += 1;
-                            generator.write_indent(file);
-                            fprintf(file, "static TypeId type_ids[] = { ");
-
-                            let first = true;
-                            for param in func_info.parameters {
-                                if first { first = false; } else { fprintf(file, ", "); }
-                                generator.write_typeid(file, &param.type, generics);
-                            }
-
-                            fprintf(file, " };\n");
-                            generator.write_indent(file);
-                            fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info.parameters.length);
-                            generator.write_indent(file);
-                            fprintf(file, "return &result;\n");
-                            generator.indent -= 1;
-                            fprintf(file, "}\n");
-
-                            fprintf(file, "bool ");
-                            generator.write_function_name(file, func_info, generics);
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "__Co__set_arg(void* __self, uintptr_t index, void* value) {\n");
-                            } else {
-                                fprintf(file, "__Fn__set_arg(void* __self, uintptr_t index, void* value) {\n");
-                            }
-
-                            generator.indent += 1;
-
-                            generator.write_indent(file);
-                            fprintf(file, "struct ");
-                            generator.write_function_name(file, func_info, generics);
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
-                            } else {
-                                if module.mode_cpp {
-                                    fprintf(file, "__Fn__Instance* self = (struct ");
-                                    generator.write_function_name(file, func_info, generics);
-                                    fprintf(file, "__Fn__Instance*)__self;\n");
-                                } else {
-                                    fprintf(file, "__Fn__Instance* self = __self;\n");
-                                }
-                            }
-
-                            generator.write_indent(file);
-                            fprintf(file, "switch (index) {\n");
-                            generator.indent += 1;
-
-                            let i: usize = 0;
-                            for param in func_info.parameters {
-                                generator.write_indent(file);
-                                fprintf(file, "case %zu: self->", i);
-                                generator.write_token(file, param.name);
-                                fprintf(file, " = ");
-
-                                if !Generator::is_reference(&param.type) {
-                                    fprintf(file, "*(");
-                                    generator.write_type(file, &param.type, generics);
-                                    fprintf(file, "*)");
-                                } else {
-                                    if module.mode_cpp {
-                                        fprintf(file, "(");
-                                        generator.write_type(file, &param.type, generics);
-                                        fprintf(file, ")");
-                                    }
-                                }
-
-                                fprintf(file, "value; return true;\n");
-                                i += 1;
-                            }
-
-                            generator.indent -= 1;
-                            generator.write_indent(file);
-                            fprintf(file, "}\n");
-
-                            generator.write_indent(file);
-                            fprintf(file, "return false;\n");
-
-                            generator.indent -= 1;
-                            fprintf(file, "}\n");
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "struct Iter_CoroutineStatus ");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
-
-                                generator.indent += 1;
-
-                                generator.write_indent(file);
-                                fprintf(file, "struct ");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
-
-                                generator.write_indent(file);
-                                fprintf(file, "struct ");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "));\n");
-
-                                for param in func_info.parameters {
-                                    generator.write_indent(file);
-                                    fprintf(file, "instance->");
-                                    generator.write_token(file, param.name);
-                                    fprintf(file, " = ");
-                                    fprintf(file, "self->");
-                                    generator.write_token(file, param.name);
-                                    fprintf(file, ";\n");
-                                }
-
-                                generator.write_indent(file);
-                                fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
-
-                                match func_info.parent {
-                                    FunctionParent::Struct(struct_info, _, _) => {
-                                        generator.write_str_title(file, struct_info.name.value);
-                                        fprintf(file, "__");
-                                    },
-                                    _ => {},
-                                }
-                                generator.write_str_title(file, func_info.name.value);
-
-                                fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
-
-                                generator.indent -= 1;
-                                fprintf(file, "}\n");
-                            } else {
-                                fprintf(file, "void ");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Fn__execute(void* __self) {\n");
-
-                                generator.indent += 1;
-
-                                generator.write_indent(file);
-                                fprintf(file, "struct ");
-                                generator.write_function_name(file, func_info, generics);
-                                if module.mode_cpp {
-                                    fprintf(file, "__Fn__Instance* self = (struct ");
-                                    generator.write_function_name(file, func_info, generics);
-                                    fprintf(file, "__Fn__Instance*)__self;\n");
-                                } else {
-                                    fprintf(file, "__Fn__Instance* self = __self;\n");
-                                }
-
-                                generator.write_indent(file);
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "(");
-
-                                first = true;
-                                for param in func_info.parameters {
-                                    if first { first = false; } else { fprintf(file, ", "); }
-                                    fprintf(file, "self->");
-                                    generator.write_token(file, param.name);
-                                }
-
-                                fprintf(file, ");\n");
-
-                                generator.indent -= 1;
-                                fprintf(file, "}\n");
-                            }
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
-                            } else {
-                                fprintf(file, "struct trait_FnVTable ");
-                            }
-
-                            match func_info.parent {
-                                FunctionParent::Struct(struct_info, _, _) => {
-                                    generator.write_str_title(file, struct_info.name.value);
-                                    fprintf(file, "__");
-                                },
-                                _ => {},
-                            }
-                            generator.write_str_title(file, func_info.name.value);
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "__VTABLE__CO");
-                            } else {
-                                fprintf(file, "__VTABLE__DYN_FN");
-                            }
-
-                            fprintf(file, " = { .get_params = &");
-                            generator.write_function_name(file, func_info, generics);
-
-                            if generator.is_coroutine() {
-                                fprintf(file, "__Co__get_params, .set_arg = &");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Co__set_arg, .init = &");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Co__init };\n");
-                            } else {
-                                fprintf(file, "__Fn__get_params, .set_arg = &");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Fn__set_arg, .execute = &");
-                                generator.write_function_name(file, func_info, generics);
-                                fprintf(file, "__Fn__execute };\n");
-                            }
+                            self.write_dynamic_function_impl(file, func_info, generics, module);
                         }
 
                         generator.function_context = 0;
@@ -973,31 +1001,7 @@ impl DefinitionWriter {
                     if impl_info.functions.find(&func_base_name) != 0 { continue; }
 
                     fprintf(file, "\n");
-                    if !self.write_trait_function_decl(file, name.as_str(), trait_info, func_info, generics) {
-                        let func_name_length: u32 = func_info.name.value.length;
-                        fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
-                        return false;
-                    }
-
-                    fprintf(file, " {\n");
-                    generator.indent += 1;
-
-                    self.write_self_cast(file, module, generics);
-
-                    let func_context = FunctionContext::new(generator.allocator, func_info, true);
-                    generator.function_context = &func_context;
-
-                    if !BlockWriter { generator }.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
-                        let func_name_length: u32 = func_info.name.value.length;
-                        fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
-                        return false;
-                    }
-
-                    generator.indent -= 1;
-                    generator.write_indent(file);
-                    fprintf(file, "}\n");
-
-                    generator.function_context = 0;
+                    if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, generics, module, 0) { return false; }
                 }
             }
 

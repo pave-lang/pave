@@ -75,6 +75,24 @@ bool DefinitionWriter__write_primitive_definition(struct DefinitionWriter* self,
 bool DefinitionWriter__write_trait_definition(struct DefinitionWriter* self, FILE* file, struct Trait* trait_info, struct GenericMap* generics);
 
 #line 654 "src/compiler/DefinitionWriter.pv"
+bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage);
+
+#line 687 "src/compiler/DefinitionWriter.pv"
+void DefinitionWriter__write_dynamic_get_params(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics);
+
+#line 718 "src/compiler/DefinitionWriter.pv"
+void DefinitionWriter__write_dynamic_set_arg(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module);
+
+#line 785 "src/compiler/DefinitionWriter.pv"
+void DefinitionWriter__write_dynamic_execute_or_init(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module);
+
+#line 867 "src/compiler/DefinitionWriter.pv"
+void DefinitionWriter__write_dynamic_vtable(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics);
+
+#line 908 "src/compiler/DefinitionWriter.pv"
+void DefinitionWriter__write_dynamic_function_impl(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module);
+
+#line 920 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, struct Module* module, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics, struct IncludeWriter* include_writer);
 
 #endif
