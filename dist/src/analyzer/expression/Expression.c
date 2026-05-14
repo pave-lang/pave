@@ -82,11 +82,11 @@
 #line 15 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make(struct ArenaAllocator* allocator, struct Token* token, struct ExpressionData data, struct Type* return_type) {
     #line 16 "src/analyzer/expression/Expression.pv"
-    return ArenaAllocator__store_Expression(allocator, &(struct Expression) {
+    return ArenaAllocator__store_Expression(allocator, (struct Expression[]){(struct Expression) {
         .token = token,
         .data = data,
         .return_type = *return_type,
-    });
+    }});
 }
 
 #line 23 "src/analyzer/expression/Expression.pv"
@@ -210,7 +210,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 #line 80 "src/analyzer/expression/Expression.pv"
                 if (function != 0) {
                     #line 81 "src/analyzer/expression/Expression.pv"
-                    return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, &(struct GenericMap) { .self_type = type })} });
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = type }})} }});
                 }
             } }
 
@@ -250,7 +250,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                     #line 97 "src/analyzer/expression/Expression.pv"
                     if (impl_info->typedefs.length == 0) {
                         #line 98 "src/analyzer/expression/Expression.pv"
-                        return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} });
+                        return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
                     }
                     #line 100 "src/analyzer/expression/Expression.pv"
                     struct GenericMap aug_map_val = GenericMap__clone(generic_map, context->allocator);
@@ -269,7 +269,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                         GenericMap__insert(aug_map, name, *typedef_type);
                     } }
                     #line 105 "src/analyzer/expression/Expression.pv"
-                    return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = aug_map} });
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = aug_map} }});
                 }
             } }
 
@@ -312,7 +312,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 #line 125 "src/analyzer/expression/Expression.pv"
                 func_next->parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = type, ._1 = 0, ._2 = 0} };
                 #line 126 "src/analyzer/expression/Expression.pv"
-                return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_next, ._1 = generic_map} });
+                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_next, ._1 = generic_map} }});
             }
 
             #line 129 "src/analyzer/expression/Expression.pv"
@@ -324,7 +324,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 #line 132 "src/analyzer/expression/Expression.pv"
                 func_value->return_type = func_info->return_type;
                 #line 133 "src/analyzer/expression/Expression.pv"
-                return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_value, ._1 = generic_map} });
+                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_value, ._1 = generic_map} }});
             }
 
             #line 136 "src/analyzer/expression/Expression.pv"
@@ -353,7 +353,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                 #line 142 "src/analyzer/expression/Expression.pv"
                 if (function != 0) {
                     #line 143 "src/analyzer/expression/Expression.pv"
-                    return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} });
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
                 }
             } }
 
@@ -374,7 +374,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             #line 151 "src/analyzer/expression/Expression.pv"
             if (str__eq(member->value, (struct str){ .ptr = "instance", .length = strlen("instance") })) {
                 #line 152 "src/analyzer/expression/Expression.pv"
-                return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_void) });
+                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_void) }});
             }
 
             #line 155 "src/analyzer/expression/Expression.pv"
@@ -391,7 +391,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             }
 
             #line 161 "src/analyzer/expression/Expression.pv"
-            return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} });
+            return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
         } break;
         #line 163 "src/analyzer/expression/Expression.pv"
         case TYPE__TYPEDEF_C: {
@@ -511,12 +511,12 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
                         struct str typedef_name = HashMapIter_str_usize__value(&__iter)->_0;
 
                         #line 202 "src/analyzer/expression/Expression.pv"
-                        struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(context->allocator, &(struct GenericTypedef) { .generic = generic, .typedef_name = typedef_name });
+                        struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(context->allocator, (struct GenericTypedef[]){(struct GenericTypedef) { .generic = generic, .typedef_name = typedef_name }});
                         #line 203 "src/analyzer/expression/Expression.pv"
                         GenericMap__insert(generic_map, typedef_name, (struct Type) { .type = TYPE__GENERIC_TYPEDEF, .generictypedef_value = gt });
                     } }
                     #line 205 "src/analyzer/expression/Expression.pv"
-                    return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} });
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
                 }
             } }
 
@@ -552,14 +552,14 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
             #line 224 "src/analyzer/expression/Expression.pv"
             if (function != 0) {
                 #line 225 "src/analyzer/expression/Expression.pv"
-                struct GenericMap generic_map = GenericMap__new(context->allocator, &(struct Generics) {}, &(struct Array_Type) {});
+                struct GenericMap generic_map = GenericMap__new(context->allocator, (struct Generics[]){(struct Generics) {}}, (struct Array_Type[]){(struct Array_Type) {}});
                 #line 226 "src/analyzer/expression/Expression.pv"
                 GenericMap__insert(&generic_map, (struct str){ .ptr = "T", .length = strlen("T") }, sequence->element);
                 #line 227 "src/analyzer/expression/Expression.pv"
-                generic_map.self_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }) });
+                generic_map.self_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }) }});
 
                 #line 229 "src/analyzer/expression/Expression.pv"
-                return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, &generic_map)} });
+                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, &generic_map)} }});
             }
 
             #line 232 "src/analyzer/expression/Expression.pv"
@@ -942,7 +942,7 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
                 #line 401 "src/analyzer/expression/Expression.pv"
                 if (Type__is_indirect(param_type) && !Type__is_indirect(&arg->value->return_type)) {
                     #line 402 "src/analyzer/expression/Expression.pv"
-                    struct Type* new_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arg->value->return_type) });
+                    struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arg->value->return_type) }});
                     #line 403 "src/analyzer/expression/Expression.pv"
                     arg->value = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = (struct str){ .ptr = "&", .length = strlen("&") }, ._1 = arg->value} }, new_type);
                 }
@@ -1090,7 +1090,7 @@ struct Type* Expression__get_return_type(struct Context* context, struct Type* t
             #line 481 "src/analyzer/expression/Expression.pv"
             if (func_info->type == FUNCTION_TYPE__COROUTINE) {
                 #line 482 "src/analyzer/expression/Expression.pv"
-                return ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__COROUTINE_INSTANCE, .coroutineinstance_value = { ._0 = func_info, ._1 = func_generic_map} });
+                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__COROUTINE_INSTANCE, .coroutineinstance_value = { ._0 = func_info, ._1 = func_generic_map} }});
             }
             #line 484 "src/analyzer/expression/Expression.pv"
             return Context__resolve_type(context->allocator, &func_info->return_type, func_generic_map, generic_map);
@@ -1191,7 +1191,7 @@ struct Expression* Expression__parse_enum(struct Context* context, struct Token*
                 #line 525 "src/analyzer/expression/Expression.pv"
                 struct GenericMap* generic_map = variant_result.function_value._1;
                 #line 526 "src/analyzer/expression/Expression.pv"
-                struct Type* member_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} });
+                struct Type* member_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
 
                 #line 528 "src/analyzer/expression/Expression.pv"
                 if (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "(")) {
@@ -1705,7 +1705,7 @@ struct Expression* Expression__parse_cpp(struct Context* context, struct Generic
         #line 802 "src/analyzer/expression/Expression.pv"
         struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, expression->return_type);
         #line 803 "src/analyzer/expression/Expression.pv"
-        return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__NEW, .new_value = { ._0 = placement, ._1 = expression} } }, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
+        return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__NEW, .new_value = { ._0 = placement, ._1 = expression} } }, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
     } else if (Context__check_next(context, TOKEN_TYPE__IDENTIFIER, "delete")) {
         #line 805 "src/analyzer/expression/Expression.pv"
         struct Expression* expression = Expression__parse(context, generics);
@@ -1957,11 +1957,11 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
                     #line 924 "src/analyzer/expression/Expression.pv"
                     if (str__eq(enum_info->name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
                         #line 925 "src/analyzer/expression/Expression.pv"
-                        struct Sequence* sequence = ArenaAllocator__store_Sequence(context->allocator, &(struct Sequence) {
+                        struct Sequence* sequence = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) {
                             .type = (struct SequenceType) { .type = SEQUENCE_TYPE__SLICE },
                             .element = *Type__deref(&inner->return_type),
                             .element_pointer = inner->return_type,
-                        });
+                        }});
 
                         #line 931 "src/analyzer/expression/Expression.pv"
                         struct Expression* start = args.data[0].value;
@@ -2004,7 +2004,7 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
                         }
 
                         #line 958 "src/analyzer/expression/Expression.pv"
-                        struct Type* sequence_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence });
+                        struct Type* sequence_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }});
                         #line 959 "src/analyzer/expression/Expression.pv"
                         struct Expression* sequence_expr = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = sequence_type }, sequence_type);
                         #line 960 "src/analyzer/expression/Expression.pv"
@@ -2067,9 +2067,9 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
     #line 991 "src/analyzer/expression/Expression.pv"
     if (element_type == 0 && context->module->mode_cpp) {
         #line 992 "src/analyzer/expression/Expression.pv"
-        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(context->allocator, &(struct UnknownC) { .include = 0, .name = (struct str){ .ptr = "", .length = strlen("") }, .generics = (struct Array_Type) {} });
+        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(context->allocator, (struct UnknownC[]){(struct UnknownC) { .include = 0, .name = (struct str){ .ptr = "", .length = strlen("") }, .generics = (struct Array_Type) {} }});
         #line 993 "src/analyzer/expression/Expression.pv"
-        element_type = Type__to_ptr(&(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c }, context->allocator);
+        element_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c }}, context->allocator);
     }
 
     #line 996 "src/analyzer/expression/Expression.pv"
@@ -2470,7 +2470,7 @@ struct Expression* Expression__find_operator_trait_call(struct Context* context,
                 }
 
                 #line 1193 "src/analyzer/expression/Expression.pv"
-                struct Type* func_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func, ._1 = func_map} });
+                struct Type* func_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func, ._1 = func_map} }});
 
                 #line 1195 "src/analyzer/expression/Expression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
@@ -2682,7 +2682,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                                     #line 1295 "src/analyzer/expression/Expression.pv"
                                     case FUNCTION_TYPE__COROUTINE: {
                                         #line 1296 "src/analyzer/expression/Expression.pv"
-                                        func_return_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__COROUTINE_INSTANCE, .coroutineinstance_value = { ._0 = func_info, ._1 = func_generic_map} });
+                                        func_return_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__COROUTINE_INSTANCE, .coroutineinstance_value = { ._0 = func_info, ._1 = func_generic_map} }});
                                     } break;
                                     #line 1298 "src/analyzer/expression/Expression.pv"
                                     default: {
@@ -2922,7 +2922,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                                 #line 1431 "src/analyzer/expression/Expression.pv"
                                 struct Type* type = child->data.type_value;
                                 #line 1432 "src/analyzer/expression/Expression.pv"
-                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type) });
+                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type) }});
                                 #line 1433 "src/analyzer/expression/Expression.pv"
                                 result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
                             } break;
@@ -2944,7 +2944,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                                 #line 1443 "src/analyzer/expression/Expression.pv"
                                 struct Indirect* new_indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type);
                                 #line 1444 "src/analyzer/expression/Expression.pv"
-                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = new_indirect });
+                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = new_indirect }});
                                 #line 1445 "src/analyzer/expression/Expression.pv"
                                 result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
                             } break;
@@ -3022,7 +3022,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                     }
 
                     #line 1486 "src/analyzer/expression/Expression.pv"
-                    struct Tuple* tuple = ArenaAllocator__store_Tuple(context->allocator, &(struct Tuple) {});
+                    struct Tuple* tuple = ArenaAllocator__store_Tuple(context->allocator, (struct Tuple[]){(struct Tuple) {}});
                     #line 1487 "src/analyzer/expression/Expression.pv"
                     tuple->elements = Array_Type__new_with_length((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arguments.length);
                     #line 1488 "src/analyzer/expression/Expression.pv"
@@ -3039,7 +3039,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                     } }
 
                     #line 1492 "src/analyzer/expression/Expression.pv"
-                    result = Expression__make_type_function_call(context, token, ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__TUPLE, .tuple_value = tuple }), arguments, 0);
+                    result = Expression__make_type_function_call(context, token, ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__TUPLE, .tuple_value = tuple }}), arguments, 0);
                 } else {
                     #line 1494 "src/analyzer/expression/Expression.pv"
                     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
@@ -3099,9 +3099,9 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                     element_type = &context->root->type_void;
                 }
                 #line 1523 "src/analyzer/expression/Expression.pv"
-                struct Sequence* parent_sequence = ArenaAllocator__store_Sequence(context->allocator, &(struct Sequence) { .type = (struct SequenceType) { .type = SEQUENCE_TYPE__FIXED_ARRAY, .fixedarray_value = elements.length }, .element = *element_type });
+                struct Sequence* parent_sequence = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) { .type = (struct SequenceType) { .type = SEQUENCE_TYPE__FIXED_ARRAY, .fixedarray_value = elements.length }, .element = *element_type }});
                 #line 1524 "src/analyzer/expression/Expression.pv"
-                struct Type* parent_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = parent_sequence });
+                struct Type* parent_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = parent_sequence }});
                 #line 1525 "src/analyzer/expression/Expression.pv"
                 struct Expression* parent_expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = parent_type }, parent_type);
 
@@ -3181,7 +3181,7 @@ struct Expression* Expression__parse(struct Context* context, struct Generics* g
         }
 
         #line 1570 "src/analyzer/expression/Expression.pv"
-        struct Type* enum_type = Module__find_make_type(context->module, (struct str){ .ptr = "Range", .length = strlen("Range") }, &(struct Array_Type) { .data = &range_end->return_type, .length = 1 });
+        struct Type* enum_type = Module__find_make_type(context->module, (struct str){ .ptr = "Range", .length = strlen("Range") }, (struct Array_Type[]){(struct Array_Type) { .data = &range_end->return_type, .length = 1 }});
         #line 1571 "src/analyzer/expression/Expression.pv"
         if (enum_type == 0) {
             #line 1572 "src/analyzer/expression/Expression.pv"
@@ -3369,9 +3369,9 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
                                 #line 1656 "src/analyzer/expression/Expression.pv"
                                 struct Sequence* self_seq = self->return_type.sequence_value;
                                 #line 1657 "src/analyzer/expression/Expression.pv"
-                                struct Sequence* new_seq = ArenaAllocator__store_Sequence(context->allocator, &(struct Sequence) { .type = self_seq->type, .element = sequence->element, .element_pointer = self_seq->element_pointer });
+                                struct Sequence* new_seq = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) { .type = self_seq->type, .element = sequence->element, .element_pointer = self_seq->element_pointer }});
                                 #line 1658 "src/analyzer/expression/Expression.pv"
-                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = new_seq });
+                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = new_seq }});
                                 #line 1659 "src/analyzer/expression/Expression.pv"
                                 invoke->data = (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type };
                                 #line 1660 "src/analyzer/expression/Expression.pv"

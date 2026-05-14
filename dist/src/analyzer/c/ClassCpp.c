@@ -15,7 +15,7 @@ struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 19 "src/analyzer/c/ClassCpp.pv"
-    return ArenaAllocator__store_ClassCpp(allocator, &(struct ClassCpp) {
+    return ArenaAllocator__store_ClassCpp(allocator, (struct ClassCpp[]){(struct ClassCpp) {
         .include = include,
         .is_struct = is_struct,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
@@ -24,5 +24,5 @@ struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct
         .values = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .bases = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-    });
+    }});
 }

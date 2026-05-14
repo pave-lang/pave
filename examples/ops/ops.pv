@@ -37,10 +37,12 @@ fn main(argc: i32, argv: **const char) -> i32 {
     let scaled = pos * 2.0f;
     let sum = pos + scaled;
     let hadamard = pos * scaled;
+    let chained = pos * 2.0f * 2.0f;
 
     printf("scaled: %.1f %.1f %.1f\n", scaled.x, scaled.y, scaled.z);
     printf("sum: %.1f %.1f %.1f\n", sum.x, sum.y, sum.z);
     printf("hadamard: %.1f %.1f %.1f\n", hadamard.x, hadamard.y, hadamard.z);
+    printf("chained: %.1f %.1f %.1f\n", chained.x, chained.y, chained.z);
 
     return 0;
 }

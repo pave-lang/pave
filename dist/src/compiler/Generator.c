@@ -339,7 +339,7 @@ bool Generator__write_function_name(struct Generator* self, FILE* file, struct F
     bool __result;
 
     #line 167 "src/compiler/Generator.pv"
-    struct String name = Naming__get_type_name(&self->naming_ident, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }, generics->self_type, generics);
+    struct String name = Naming__get_type_name(&self->naming_ident, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }}, generics->self_type, generics);
 
     #line 170 "src/compiler/Generator.pv"
     Generator__write_str(self, file, String__as_str(&name));

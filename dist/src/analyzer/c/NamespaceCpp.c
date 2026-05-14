@@ -15,11 +15,11 @@ struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 16 "src/analyzer/c/NamespaceCpp.pv"
-    return ArenaAllocator__store_NamespaceCpp(allocator, &(struct NamespaceCpp) {
+    return ArenaAllocator__store_NamespaceCpp(allocator, (struct NamespaceCpp[]){(struct NamespaceCpp) {
         .include = include,
         .name = (struct str){ .ptr = name, .length = strlen(name) },
         .parent = parent,
         .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .values = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-    });
+    }});
 }

@@ -1,7 +1,5 @@
 #include <structs/KeyValue_i32_f32.h>
-#include <stdint.h>
 #include <structs/KeyValue_f32_i32.h>
-
 #include <structs/main.h>
 
 int32_t main(int32_t argc, char const** argv) {

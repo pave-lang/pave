@@ -482,9 +482,9 @@ bool Module__fill_namespace(struct Module* self) {
     #line 269 "src/analyzer/Module.pv"
     struct ArenaAllocator* allocator = namespace->root->allocator;
     #line 270 "src/analyzer/Module.pv"
-    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(allocator, &(struct GenericMap) {});
+    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(allocator, (struct GenericMap[]){(struct GenericMap) {}});
     #line 271 "src/analyzer/Module.pv"
-    blank_generics->self_type = Type__to_ptr(&(struct Type) { .type = TYPE__SELF }, allocator);
+    blank_generics->self_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SELF }}, allocator);
 
     #line 273 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
@@ -571,10 +571,10 @@ bool Module__prefill_types(struct Module* self) {
             #line 305 "src/analyzer/Module.pv"
             struct Generic t = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
             #line 306 "src/analyzer/Module.pv"
-            t.name = ArenaAllocator__store_Token(self->context.allocator, &(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "T", .length = strlen("T") } });
+            t.name = ArenaAllocator__store_Token(self->context.allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "T", .length = strlen("T") } }});
 
             #line 308 "src/analyzer/Module.pv"
-            struct Token* param_name = ArenaAllocator__store_Token(self->context.allocator, &(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "type", .length = strlen("type") } });
+            struct Token* param_name = ArenaAllocator__store_Token(self->context.allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "type", .length = strlen("type") } }});
 
             #line 310 "src/analyzer/Module.pv"
             struct Array_Generic generics = Array_Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });

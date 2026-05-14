@@ -113,7 +113,7 @@ void DefinitionWriter__write_enum_variants(struct DefinitionWriter* self, FILE* 
             #line 26 "src/compiler/DefinitionWriter.pv"
             fprintf(file, " = ");
             #line 27 "src/compiler/DefinitionWriter.pv"
-            ExpressionWriter__write_expression(&(struct ExpressionWriter) { .generator = generator }, file, variant->value, generics);
+            ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = generator }}, file, variant->value, generics);
         }
 
         #line 30 "src/compiler/DefinitionWriter.pv"
@@ -291,7 +291,7 @@ bool DefinitionWriter__write_function_definition(struct DefinitionWriter* self, 
         #line 121 "src/compiler/DefinitionWriter.pv"
         if (func_info->generics.map.length > 0) {
             #line 122 "src/compiler/DefinitionWriter.pv"
-            struct String name = Naming__get_type_name(&generator->naming_ident, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }, generics->self_type, generics);
+            struct String name = Naming__get_type_name(&generator->naming_ident, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }}, generics->self_type, generics);
             #line 123 "src/compiler/DefinitionWriter.pv"
             Generator__write_string(generator, file, &name);
         } else {
@@ -1374,7 +1374,7 @@ bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* s
     generator->function_context = &func_context;
 
     #line 672 "src/compiler/DefinitionWriter.pv"
-    if (!BlockWriter__write_block(&(struct BlockWriter) { .generator = generator }, file, &func_info->return_type, func_info->body, generics, false, true)) {
+    if (!BlockWriter__write_block((struct BlockWriter[]){(struct BlockWriter) { .generator = generator }}, file, &func_info->return_type, func_info->body, generics, false, true)) {
         #line 673 "src/compiler/DefinitionWriter.pv"
         uint32_t name_length = name.length;
         #line 674 "src/compiler/DefinitionWriter.pv"
@@ -2038,7 +2038,7 @@ bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, st
             #line 1015 "src/compiler/DefinitionWriter.pv"
             fprintf(file, " = ");
             #line 1016 "src/compiler/DefinitionWriter.pv"
-            ExpressionWriter__write_expression(&(struct ExpressionWriter) { .generator = generator }, file, impl_const->value, generics);
+            ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = generator }}, file, impl_const->value, generics);
             #line 1017 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }

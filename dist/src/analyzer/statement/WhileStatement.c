@@ -39,8 +39,8 @@ struct WhileStatement* WhileStatement__parse(struct Context* context, struct Gen
     }
 
     #line 21 "src/analyzer/statement/WhileStatement.pv"
-    return ArenaAllocator__store_WhileStatement(context->allocator, &(struct WhileStatement) {
+    return ArenaAllocator__store_WhileStatement(context->allocator, (struct WhileStatement[]){(struct WhileStatement) {
         .expression = expression,
         .block = block,
-    });
+    }});
 }

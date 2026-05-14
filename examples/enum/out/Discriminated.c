@@ -1,7 +1,8 @@
 #include <stdio.h>
 
+#include <stdio.h>
 #include <enum/Discriminated.h>
-#include <stdint.h>
+#include <enum/Discriminated.h>
 
 #include <enum/Discriminated.h>
 

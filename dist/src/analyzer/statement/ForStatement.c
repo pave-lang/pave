@@ -317,7 +317,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
             #line 158 "src/analyzer/statement/ForStatement.pv"
             if (variable->ref) {
                 #line 159 "src/analyzer/statement/ForStatement.pv"
-                variable->type = Type__to_ptr(&(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *variable->type) }, context->allocator);
+                variable->type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *variable->type) }}, context->allocator);
             }
 
             #line 162 "src/analyzer/statement/ForStatement.pv"

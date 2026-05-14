@@ -98,7 +98,7 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
     self.pointer_const_char = (struct Indirect) { .type = INDIRECT_TYPE__CONST_POINTER, .to = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(module, (struct str){ .ptr = "char", .length = strlen("char") }) } };
 
     #line 49 "src/analyzer/Context.pv"
-    struct Token* param_name = ArenaAllocator__store_Token(allocator, &(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "value", .length = strlen("value") } });
+    struct Token* param_name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "value", .length = strlen("value") } }});
 
     #line 51 "src/analyzer/Context.pv"
     Context__push_scope(&self, 0);
@@ -106,12 +106,12 @@ struct Context Context__new(struct ArenaAllocator* allocator, struct str base_pa
     #line 53 "src/analyzer/Context.pv"
     struct Generic t = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 54 "src/analyzer/Context.pv"
-    t.name = ArenaAllocator__store_Token(allocator, &(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "T", .length = strlen("T") } });
+    t.name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "T", .length = strlen("T") } }});
 
     #line 56 "src/analyzer/Context.pv"
     struct Generic u = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 57 "src/analyzer/Context.pv"
-    u.name = ArenaAllocator__store_Token(allocator, &(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "U", .length = strlen("U") } });
+    u.name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = "U", .length = strlen("U") } }});
 
     #line 59 "src/analyzer/Context.pv"
     struct Array_Generic generics = Array_Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
@@ -174,7 +174,7 @@ bool Context__insert_builtin_function(struct Context* self, char const* name, st
     #line 92 "src/analyzer/Context.pv"
     struct Function func_info = Function__new(self);
     #line 93 "src/analyzer/Context.pv"
-    func_info.name = ArenaAllocator__store_Token(self->allocator, &(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = name, .length = strlen(name) } });
+    func_info.name = ArenaAllocator__store_Token(self->allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__STRING, .value = (struct str){ .ptr = name, .length = strlen(name) } }});
     #line 94 "src/analyzer/Context.pv"
     func_info.type = FUNCTION_TYPE__BUILTIN;
     #line 95 "src/analyzer/Context.pv"
@@ -673,7 +673,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         }
 
         #line 401 "src/analyzer/Context.pv"
-        struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, &(struct Indirect) { .type = indirect_type });
+        struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, (struct Indirect[]){(struct Indirect) { .type = indirect_type }});
 
         #line 403 "src/analyzer/Context.pv"
         if (!Context__parse_type(self, &indirect->to, generics)) {
@@ -695,7 +695,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
             return false;
         }
         #line 413 "src/analyzer/Context.pv"
-        sequence->element_pointer = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = ArenaAllocator__store_Indirect(self->allocator, &(struct Indirect) { .type = INDIRECT_TYPE__POINTER, .to = sequence->element }) };
+        sequence->element_pointer = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = ArenaAllocator__store_Indirect(self->allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__POINTER, .to = sequence->element }}) };
 
         #line 415 "src/analyzer/Context.pv"
         if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ";")) {
@@ -803,7 +803,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 473 "src/analyzer/Context.pv"
         struct Function* func_info = ArenaAllocator__store_Function(self->allocator, &func_info_val);
         #line 474 "src/analyzer/Context.pv"
-        struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &(struct GenericMap) { .self_type = self->type_self });
+        struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = self->type_self }});
 
         #line 476 "src/analyzer/Context.pv"
         if (!Function__parse_parameters(func_info, &func_info->generics) || !Function__parse_return_type(func_info, &func_info->generics)) {
@@ -902,7 +902,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
             }
 
             #line 526 "src/analyzer/Context.pv"
-            struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(self->allocator, &(struct GenericTypedef) { .generic = generic_ref, .typedef_name = typedef_name->value });
+            struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(self->allocator, (struct GenericTypedef[]){(struct GenericTypedef) { .generic = generic_ref, .typedef_name = typedef_name->value }});
             #line 527 "src/analyzer/Context.pv"
             struct Type new_type = (struct Type) { .type = TYPE__GENERIC_TYPEDEF, .generictypedef_value = gt };
             #line 528 "src/analyzer/Context.pv"
@@ -936,7 +936,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 545 "src/analyzer/Context.pv"
         Context__error_token(self, name, "Unknown type");
         #line 546 "src/analyzer/Context.pv"
-        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(self->allocator, &(struct UnknownC) { .include = 0, .name = name->value, .generics = generics_ });
+        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(self->allocator, (struct UnknownC[]){(struct UnknownC) { .include = 0, .name = name->value, .generics = generics_ }});
         #line 547 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c };
         #line 548 "src/analyzer/Context.pv"
@@ -1162,7 +1162,7 @@ bool Context__parse_type_trait(struct Context* self, struct Type* type, struct G
     }
 
     #line 663 "src/analyzer/Context.pv"
-    *type = *Root__make_type_usage(self->root, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = 0} }, &generics_);
+    *type = *Root__make_type_usage(self->root, (struct Type[]){(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = 0} }}, &generics_);
 
     #line 665 "src/analyzer/Context.pv"
     return true;
@@ -1194,28 +1194,28 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             #line 681 "src/analyzer/Context.pv"
             struct Indirect* indirect = type->indirect_value;
             #line 682 "src/analyzer/Context.pv"
-            struct Indirect* resolved = ArenaAllocator__store_Indirect(allocator, &(struct Indirect) {
+            struct Indirect* resolved = ArenaAllocator__store_Indirect(allocator, (struct Indirect[]){(struct Indirect) {
                 .type = indirect->type,
                 .to = *Context__resolve_type(allocator, &indirect->to, generics_map, fallback_generics_map),
-            });
+            }});
 
             #line 687 "src/analyzer/Context.pv"
-            return Type__to_ptr(&(struct Type) { .type = TYPE__INDIRECT, .indirect_value = resolved }, allocator);
+            return Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = resolved }}, allocator);
         } break;
         #line 689 "src/analyzer/Context.pv"
         case TYPE__SEQUENCE: {
             #line 689 "src/analyzer/Context.pv"
             struct Sequence* sequence = type->sequence_value;
             #line 690 "src/analyzer/Context.pv"
-            struct Sequence* resolved = ArenaAllocator__store_Sequence(allocator, &(struct Sequence) {
+            struct Sequence* resolved = ArenaAllocator__store_Sequence(allocator, (struct Sequence[]){(struct Sequence) {
                 .type = sequence->type,
                 .element = *Context__resolve_type(allocator, &sequence->element, generics_map, fallback_generics_map),
-            });
+            }});
             #line 694 "src/analyzer/Context.pv"
-            resolved->element_pointer = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = ArenaAllocator__store_Indirect(allocator, &(struct Indirect) { .type = INDIRECT_TYPE__POINTER, .to = resolved->element }) };
+            resolved->element_pointer = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = ArenaAllocator__store_Indirect(allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__POINTER, .to = resolved->element }}) };
 
             #line 696 "src/analyzer/Context.pv"
-            return Type__to_ptr(&(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = resolved }, allocator);
+            return Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = resolved }}, allocator);
         } break;
         #line 698 "src/analyzer/Context.pv"
         case TYPE__TUPLE: {
@@ -1236,7 +1236,7 @@ struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type
             } }
 
             #line 705 "src/analyzer/Context.pv"
-            return Type__to_ptr(&(struct Type) { .type = TYPE__TUPLE, .tuple_value = ArenaAllocator__store_Tuple(allocator, &resolved) }, allocator);
+            return Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__TUPLE, .tuple_value = ArenaAllocator__store_Tuple(allocator, &resolved) }}, allocator);
         } break;
         #line 707 "src/analyzer/Context.pv"
         case TYPE__PRIMITIVE: {

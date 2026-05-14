@@ -67,7 +67,7 @@ void IncludeContext__add_function(struct IncludeContext* self, char const* name,
     #line 36 "src/analyzer/c/IncludeContext.pv"
     if (return_type == 0) {
         #line 36 "src/analyzer/c/IncludeContext.pv"
-        return_type = ArenaAllocator__store_Type(include->root->allocator, &(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") });
+        return_type = ArenaAllocator__store_Type(include->root->allocator, (struct Type[]){(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }});
     }
 
     #line 38 "src/analyzer/c/IncludeContext.pv"
@@ -79,7 +79,7 @@ void IncludeContext__add_basic_function(struct IncludeContext* self, char const*
     #line 42 "src/analyzer/c/IncludeContext.pv"
     struct Include* include = self->include;
     #line 43 "src/analyzer/c/IncludeContext.pv"
-    IncludeContext__insert_function(self, name, ArenaAllocator__store_Type(include->root->allocator, &(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }));
+    IncludeContext__insert_function(self, name, ArenaAllocator__store_Type(include->root->allocator, (struct Type[]){(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }}));
 }
 
 #line 46 "src/analyzer/c/IncludeContext.pv"
@@ -138,13 +138,13 @@ struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self
                 #line 76 "src/analyzer/c/IncludeContext.pv"
                 struct NamespaceCpp* ns_info = existing->namespacecpp_value;
                 #line 77 "src/analyzer/c/IncludeContext.pv"
-                return ArenaAllocator__store_IncludeContext(allocator, &(struct IncludeContext) {
+                return ArenaAllocator__store_IncludeContext(allocator, (struct IncludeContext[]){(struct IncludeContext) {
                     .include = include,
                     .parent_context = self,
                     .types = &ns_info->types,
                     .values = &ns_info->values,
                     .parent = (struct ParentCpp) { .type = PARENT_CPP__NAMESPACE, .namespace_value = ns_info },
-                });
+                }});
             } break;
             #line 85 "src/analyzer/c/IncludeContext.pv"
             default: {
@@ -158,13 +158,13 @@ struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self
     IncludeContext__insert_type(self, name, (struct Type) { .type = TYPE__NAMESPACE_CPP, .namespacecpp_value = ns_info });
 
     #line 92 "src/analyzer/c/IncludeContext.pv"
-    return ArenaAllocator__store_IncludeContext(allocator, &(struct IncludeContext) {
+    return ArenaAllocator__store_IncludeContext(allocator, (struct IncludeContext[]){(struct IncludeContext) {
         .include = include,
         .parent_context = self,
         .types = &ns_info->types,
         .values = &ns_info->values,
         .parent = (struct ParentCpp) { .type = PARENT_CPP__NAMESPACE, .namespace_value = ns_info },
-    });
+    }});
 }
 
 #line 101 "src/analyzer/c/IncludeContext.pv"
@@ -276,7 +276,7 @@ struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeCon
     #line 165 "src/analyzer/c/IncludeContext.pv"
     struct Include* include = self->include;
     #line 166 "src/analyzer/c/IncludeContext.pv"
-    struct FunctionC* func_info = FunctionC__new(include, name, ArenaAllocator__store_Type(include->root->allocator, &(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }));
+    struct FunctionC* func_info = FunctionC__new(include, name, ArenaAllocator__store_Type(include->root->allocator, (struct Type[]){(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, "") }}));
     #line 167 "src/analyzer/c/IncludeContext.pv"
     struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator }, (struct Type) { .type = TYPE__FUNCTION_C, .functionc_value = func_info });
     #line 168 "src/analyzer/c/IncludeContext.pv"
@@ -361,7 +361,7 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
         #line 213 "src/analyzer/c/IncludeContext.pv"
         struct EnumC* enum_info = IncludeContext__add_enum(self, name);
         #line 214 "src/analyzer/c/IncludeContext.pv"
-        clang_visitChildren(cursor, IncludeObjectContext__visitor_enum, &(struct IncludeObjectContext) { .context = self, .object = enum_info });
+        clang_visitChildren(cursor, IncludeObjectContext__visitor_enum, (struct IncludeObjectContext[]){(struct IncludeObjectContext) { .context = self, .object = enum_info }});
         #line 215 "src/analyzer/c/IncludeContext.pv"
         return CXChildVisit_Continue;
     } else if (kind == CXCursor_StructDecl || kind == CXCursor_ClassDecl) {
@@ -407,10 +407,10 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
             }
 
             #line 241 "src/analyzer/c/IncludeContext.pv"
-            clang_visitChildren(cursor, IncludeObjectContext__visitor_class, &(struct IncludeObjectContext) {
+            clang_visitChildren(cursor, IncludeObjectContext__visitor_class, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                 .context = self,
                 .object = class_info,
-            });
+            }});
 
             #line 246 "src/analyzer/c/IncludeContext.pv"
             __result = CXChildVisit_Continue;
@@ -423,10 +423,10 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
                 struct StructC* struct_info = IncludeContext__add_struct(self, name);
 
                 #line 251 "src/analyzer/c/IncludeContext.pv"
-                clang_visitChildren(cursor, IncludeObjectContext__visitor_struct, &(struct IncludeObjectContext) {
+                clang_visitChildren(cursor, IncludeObjectContext__visitor_struct, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                     .context = self,
                     .object = struct_info,
-                });
+                }});
 
                 #line 256 "src/analyzer/c/IncludeContext.pv"
                 __result = CXChildVisit_Continue;
@@ -440,10 +440,10 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
                 struct StructC* union_info = IncludeContext__add_union(self, name);
 
                 #line 262 "src/analyzer/c/IncludeContext.pv"
-                clang_visitChildren(cursor, IncludeObjectContext__visitor_struct, &(struct IncludeObjectContext) {
+                clang_visitChildren(cursor, IncludeObjectContext__visitor_struct, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                     .context = self,
                     .object = union_info,
-                });
+                }});
 
                 #line 267 "src/analyzer/c/IncludeContext.pv"
                 __result = CXChildVisit_Continue;
@@ -468,10 +468,10 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
             struct StructC* struct_info = IncludeContext__add_typedef_struct(self, name);
 
             #line 279 "src/analyzer/c/IncludeContext.pv"
-            clang_visitChildren(canonical_decl, IncludeObjectContext__visitor_struct, &(struct IncludeObjectContext) {
+            clang_visitChildren(canonical_decl, IncludeObjectContext__visitor_struct, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                 .context = self,
                 .object = struct_info,
-            });
+            }});
             #line 283 "src/analyzer/c/IncludeContext.pv"
             return CXChildVisit_Continue;
         } else if (canonical_kind == CXCursor_UnionDecl) {
@@ -479,10 +479,10 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
             struct StructC* union_info = IncludeContext__add_typedef_union(self, name);
 
             #line 287 "src/analyzer/c/IncludeContext.pv"
-            clang_visitChildren(canonical_decl, IncludeObjectContext__visitor_struct, &(struct IncludeObjectContext) {
+            clang_visitChildren(canonical_decl, IncludeObjectContext__visitor_struct, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                 .context = self,
                 .object = union_info,
-            });
+            }});
             #line 291 "src/analyzer/c/IncludeContext.pv"
             return CXChildVisit_Continue;
         } else if (canonical_type.kind == CXType_Pointer) {
@@ -502,10 +502,10 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
                 struct StructC* struct_info = IncludeContext__add_typedef_struct_pointer(self, name);
 
                 #line 302 "src/analyzer/c/IncludeContext.pv"
-                clang_visitChildren(canonical_decl, IncludeObjectContext__visitor_struct, &(struct IncludeObjectContext) {
+                clang_visitChildren(canonical_decl, IncludeObjectContext__visitor_struct, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                     .context = self,
                     .object = struct_info,
-                });
+                }});
             } else if (pointee_type.kind == CXType_FunctionProto) {
                 #line 307 "src/analyzer/c/IncludeContext.pv"
                 IncludeContext__add_typedef_function_pointer(self, name);

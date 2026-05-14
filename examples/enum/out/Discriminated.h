@@ -1,8 +1,6 @@
 #ifndef PAVE_DISCRIMINATED
 #define PAVE_DISCRIMINATED
 
-#include <stdio.h>
-
 #include <stdint.h>
 
 struct Discriminated {
@@ -17,6 +15,8 @@ struct Discriminated {
         struct { int32_t _0; int32_t _1; } dual_value;
     };
 };
+
+struct Discriminated;
 
 void Discriminated__print(struct Discriminated* self);
 

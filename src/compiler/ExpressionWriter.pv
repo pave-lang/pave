@@ -562,7 +562,31 @@ impl ExpressionWriter {
             },
             ExpressionData::UnaryExpression(operator, inner) => {
                 let skip_operator = operator.eq("&") && expression.return_type.is_fat_pointer();
-                if !skip_operator { g.write_str(file, operator); }
+                if skip_operator {
+                    self.write_expression(file, inner, generics);
+                    return true;
+                }
+
+                if operator.eq("&") {
+                    let is_invoke = false;
+                    match inner.data {
+                        ExpressionData::Invoke(_, _) => { is_invoke = true; },
+                        _ => {},
+                    }
+
+                    if is_invoke {
+                        // Array compound literal is an lvalue in C99 and decays to a pointer,
+                        // avoiding "cannot take address of rvalue" when chaining trait calls.
+                        fprintf(file, "(");
+                        g.write_type(file, &inner.return_type, generics);
+                        fprintf(file, "[]){");
+                        self.write_expression(file, inner, generics);
+                        fprintf(file, "}");
+                        return true;
+                    }
+                }
+
+                g.write_str(file, operator);
                 self.write_expression(file, inner, generics);
                 return true;
             },

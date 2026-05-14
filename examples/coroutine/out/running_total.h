@@ -1,8 +1,6 @@
 #ifndef PAVE_RUNNING_TOTAL
 #define PAVE_RUNNING_TOTAL
 
-#include <stdio.h>
-
 #include <stdint.h>
 
 struct running_total {
@@ -15,9 +13,9 @@ struct running_total {
     uintptr_t i;
 };
 
-#include <std/Iter_f32.h>
+#include <std/trait_Iter_f32.h>
 float running_total__value(void* ctx);
-extern struct Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER;
+extern struct trait_Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER;
 bool running_total__next(void* _ctx);
 
 #endif

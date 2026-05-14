@@ -289,9 +289,9 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         #line 197 "src/compiler/Usages.pv"
         if (func_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, func_info->name->value)) {
             #line 198 "src/compiler/Usages.pv"
-            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &(struct GenericMap) {});
+            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) {}});
             #line 199 "src/compiler/Usages.pv"
-            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generic_map} });
+            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generic_map} }});
             #line 200 "src/compiler/Usages.pv"
             generic_map->self_type = self_type;
             #line 201 "src/compiler/Usages.pv"
@@ -335,9 +335,9 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         #line 216 "src/compiler/Usages.pv"
         if (enum_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, enum_info->name->value)) {
             #line 217 "src/compiler/Usages.pv"
-            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &(struct GenericMap) {});
+            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) {}});
             #line 218 "src/compiler/Usages.pv"
-            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = generic_map} });
+            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = generic_map} }});
             #line 219 "src/compiler/Usages.pv"
             generic_map->self_type = self_type;
             #line 220 "src/compiler/Usages.pv"
@@ -381,9 +381,9 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         #line 235 "src/compiler/Usages.pv"
         if (struct_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, struct_info->name->value)) {
             #line 236 "src/compiler/Usages.pv"
-            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &(struct GenericMap) {});
+            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) {}});
             #line 237 "src/compiler/Usages.pv"
-            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = generic_map} });
+            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = generic_map} }});
             #line 238 "src/compiler/Usages.pv"
             generic_map->self_type = self_type;
             #line 239 "src/compiler/Usages.pv"
@@ -415,9 +415,9 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
         #line 250 "src/compiler/Usages.pv"
         if (trait_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_traits, trait_info->name->value)) {
             #line 251 "src/compiler/Usages.pv"
-            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &(struct GenericMap) {});
+            struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) {}});
             #line 252 "src/compiler/Usages.pv"
-            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = generic_map} });
+            struct Type* self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = generic_map} }});
             #line 253 "src/compiler/Usages.pv"
             generic_map->self_type = self_type;
             #line 254 "src/compiler/Usages.pv"
@@ -531,28 +531,28 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
                     #line 306 "src/compiler/Usages.pv"
                     struct Primitive* primitive_info = func_info->parent.primitive_value._0;
                     #line 307 "src/compiler/Usages.pv"
-                    Usages__add_type(self, &(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }, generic_map);
+                    Usages__add_type(self, (struct Type[]){(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }}, generic_map);
                 } break;
                 #line 309 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__STRUCT: {
                     #line 309 "src/compiler/Usages.pv"
                     struct Struct* struct_info = func_info->parent.struct_value._0;
                     #line 310 "src/compiler/Usages.pv"
-                    Usages__add_type(self, &(struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = type_generic_map} }, generic_map);
+                    Usages__add_type(self, (struct Type[]){(struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = type_generic_map} }}, generic_map);
                 } break;
                 #line 312 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__ENUM: {
                     #line 312 "src/compiler/Usages.pv"
                     struct Enum* enum_info = func_info->parent.enum_value._0;
                     #line 313 "src/compiler/Usages.pv"
-                    Usages__add_type(self, &(struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = type_generic_map} }, generic_map);
+                    Usages__add_type(self, (struct Type[]){(struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = type_generic_map} }}, generic_map);
                 } break;
                 #line 315 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__TRAIT: {
                     #line 315 "src/compiler/Usages.pv"
                     struct Trait* trait_info = func_info->parent.trait_value;
                     #line 316 "src/compiler/Usages.pv"
-                    Usages__add_type(self, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = type_generic_map} }, generic_map);
+                    Usages__add_type(self, (struct Type[]){(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = type_generic_map} }}, generic_map);
                 } break;
                 #line 318 "src/compiler/Usages.pv"
                 case FUNCTION_PARENT__TYPE: {
@@ -755,9 +755,9 @@ void Usages__process_impls(struct Usages* self, struct Array_ref_Impl* impls, st
 #line 392 "src/compiler/Usages.pv"
 void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_info) {
     #line 393 "src/compiler/Usages.pv"
-    struct Type* self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info });
+    struct Type* self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }});
     #line 394 "src/compiler/Usages.pv"
-    struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &(struct GenericMap) { .self_type = self_type });
+    struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = self_type }});
 
     #line 396 "src/compiler/Usages.pv"
     uintptr_t parent_ptr = (uintptr_t)(primitive_info);
@@ -776,7 +776,7 @@ void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_
 #line 405 "src/compiler/Usages.pv"
 void Usages__process_sequence(struct Usages* self, struct Sequence* sequence) {
     #line 406 "src/compiler/Usages.pv"
-    struct GenericMap generic_map_val = GenericMap__new(self->allocator, &(struct Generics) {}, &(struct Array_Type) {});
+    struct GenericMap generic_map_val = GenericMap__new(self->allocator, (struct Generics[]){(struct Generics) {}}, (struct Array_Type[]){(struct Array_Type) {}});
     #line 407 "src/compiler/Usages.pv"
     struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &generic_map_val);
     #line 408 "src/compiler/Usages.pv"
@@ -784,9 +784,9 @@ void Usages__process_sequence(struct Usages* self, struct Sequence* sequence) {
     #line 409 "src/compiler/Usages.pv"
     struct Type sequence_type = (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence };
     #line 410 "src/compiler/Usages.pv"
-    struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, &(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = sequence_type });
+    struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = sequence_type }});
     #line 411 "src/compiler/Usages.pv"
-    generic_map->self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
+    generic_map->self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
 
     #line 413 "src/compiler/Usages.pv"
     uintptr_t parent_ptr = (uintptr_t)(sequence);
@@ -810,7 +810,7 @@ void Usages__process_sequence(struct Usages* self, struct Sequence* sequence) {
         #line 424 "src/compiler/Usages.pv"
         struct Type element_reference = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, sequence->element) };
         #line 425 "src/compiler/Usages.pv"
-        struct Type* sequence_iter = Root__make_type_usage(self->root, iter_type, &(struct Array_Type) { .data = &element_reference, .length = 1 });
+        struct Type* sequence_iter = Root__make_type_usage(self->root, iter_type, (struct Array_Type[]){(struct Array_Type) { .data = &element_reference, .length = 1 }});
         #line 426 "src/compiler/Usages.pv"
         Usages__add_type(self, sequence_iter, generic_map);
     }
@@ -833,7 +833,7 @@ void Usages__process_sequence(struct Usages* self, struct Sequence* sequence) {
 #line 436 "src/compiler/Usages.pv"
 void Usages__process_tuple(struct Usages* self, struct Tuple* tuple) {
     #line 437 "src/compiler/Usages.pv"
-    struct GenericMap generic_map_val = GenericMap__new(self->allocator, &(struct Generics) {}, &(struct Array_Type) {});
+    struct GenericMap generic_map_val = GenericMap__new(self->allocator, (struct Generics[]){(struct Generics) {}}, (struct Array_Type[]){(struct Array_Type) {}});
     #line 438 "src/compiler/Usages.pv"
     struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, &generic_map_val);
     #line 439 "src/compiler/Usages.pv"
@@ -854,9 +854,9 @@ void Usages__process_tuple(struct Usages* self, struct Tuple* tuple) {
     self->usage_mode = USAGE_MODE__LAYOUT;
 
     #line 449 "src/compiler/Usages.pv"
-    struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, &(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = tuple_type });
+    struct Indirect* indirect = ArenaAllocator__store_Indirect(self->allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = tuple_type }});
     #line 450 "src/compiler/Usages.pv"
-    generic_map->self_type = ArenaAllocator__store_Type(self->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
+    generic_map->self_type = ArenaAllocator__store_Type(self->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
 
     #line 452 "src/compiler/Usages.pv"
     { struct Iter_ref_Type __iter = Array_Type__iter(&tuple->elements);
@@ -1135,7 +1135,7 @@ void Usages__process_function(struct Usages* self, struct Function* func_info, s
         #line 586 "src/compiler/Usages.pv"
         struct Trait* iter_trait = Namespace__find_trait(self->std_namespace, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
         #line 587 "src/compiler/Usages.pv"
-        struct Type* sequence_iter = Root__make_type_usage(self->root, &(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = iter_trait, ._1 = 0} }, &(struct Array_Type) { .data = &func_info->return_type, .length = 1 });
+        struct Type* sequence_iter = Root__make_type_usage(self->root, (struct Type[]){(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = iter_trait, ._1 = 0} }}, (struct Array_Type[]){(struct Array_Type) { .data = &func_info->return_type, .length = 1 }});
         #line 588 "src/compiler/Usages.pv"
         Usages__add_type(self, sequence_iter, generic_map);
     }
@@ -1459,7 +1459,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                         #line 730 "src/compiler/Usages.pv"
                                         struct TypedefC* typedef_c = type->typedefc_value;
                                         #line 731 "src/compiler/Usages.pv"
-                                        struct Primitive* primitive_info = ArenaAllocator__store_Primitive(allocator, &(struct Primitive) { .name = typedef_c->name });
+                                        struct Primitive* primitive_info = ArenaAllocator__store_Primitive(allocator, (struct Primitive[]){(struct Primitive) { .name = typedef_c->name }});
                                         #line 732 "src/compiler/Usages.pv"
                                         switch (self->usage_mode) {
                                             #line 733 "src/compiler/Usages.pv"

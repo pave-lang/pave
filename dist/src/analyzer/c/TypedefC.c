@@ -13,9 +13,9 @@ struct TypedefC* TypedefC__new(struct Include* include, struct str name, struct 
     struct ArenaAllocator* allocator = include->root->allocator;
 
     #line 14 "src/analyzer/c/TypedefC.pv"
-    return ArenaAllocator__store_TypedefC(allocator, &(struct TypedefC) {
+    return ArenaAllocator__store_TypedefC(allocator, (struct TypedefC[]){(struct TypedefC) {
         .include = include,
         .name = name,
         .type = type,
-    });
+    }});
 }

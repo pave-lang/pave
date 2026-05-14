@@ -29,7 +29,7 @@
 #line 20 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp) {
     #line 21 "src/analyzer/c/Include.pv"
-    struct Include* self = ArenaAllocator__store_Include(root->allocator, &(struct Include) {
+    struct Include* self = ArenaAllocator__store_Include(root->allocator, (struct Include[]){(struct Include) {
         .root = root,
         .mode_cpp = mode_cpp,
         .path = path,
@@ -37,7 +37,7 @@ struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp) 
         .typedef_to_type = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
         .types = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
         .values = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
-    });
+    }});
 
     #line 31 "src/analyzer/c/Include.pv"
     Include__add_cxtype_primitive(self, CXType_Void, "void");
@@ -267,7 +267,7 @@ bool Include__process(struct Include* self) {
     #line 173 "src/analyzer/c/Include.pv"
     CXCursor cursor = clang_getTranslationUnitCursor(unit);
     #line 174 "src/analyzer/c/Include.pv"
-    clang_visitChildren(cursor, IncludeContext__visitor, &(struct IncludeContext) { .include = self, .parent_context = 0, .types = &self->types, .values = &self->values, .parent = (struct ParentCpp) { .type = PARENT_CPP__NONE } });
+    clang_visitChildren(cursor, IncludeContext__visitor, (struct IncludeContext[]){(struct IncludeContext) { .include = self, .parent_context = 0, .types = &self->types, .values = &self->values, .parent = (struct ParentCpp) { .type = PARENT_CPP__NONE } }});
 
     #line 176 "src/analyzer/c/Include.pv"
     clang_disposeTranslationUnit(unit);
@@ -312,7 +312,7 @@ struct Type* Include__parse_type(struct Include* self, CXType type) {
         }
 
         #line 202 "src/analyzer/c/Include.pv"
-        return ArenaAllocator__store_Type(self->root->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
+        return ArenaAllocator__store_Type(self->root->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
     }
 
     #line 205 "src/analyzer/c/Include.pv"

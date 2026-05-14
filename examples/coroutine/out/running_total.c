@@ -1,15 +1,17 @@
-#include <stdio.h>
-
 #include <stdint.h>
 
+#include <stdio.h>
+
+#include <std/Range_usize.h>
 #include <coroutine/running_total.h>
 
 bool running_total__next(void* _ctx) {
     struct running_total* ctx = _ctx;
     switch (ctx->_state) {
-        case -1: return false;
+case 0: break;
         case 1: goto yield_1;
         case 2: goto yield_2;
+        default: return false;
     }
 
     ctx->total = 0.0f;
@@ -24,5 +26,5 @@ bool running_total__next(void* _ctx) {
     ctx->_state = -1; return false;
 }
 float running_total__value(void* ctx) { return ((struct running_total*)ctx)->_value; }
-struct Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER = { .next = running_total__next, .value = running_total__value };
+struct trait_Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER = { .next = running_total__next, .value = running_total__value };
 

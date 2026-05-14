@@ -1,7 +1,9 @@
+#include <stdint.h>
+
 #include <stdio.h>
 
+#include <stdio.h>
 #include <enum/Standard.h>
-#include <stdint.h>
 
 #include <enum/Standard.h>
 

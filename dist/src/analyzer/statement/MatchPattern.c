@@ -243,9 +243,9 @@ bool MatchPattern__parse(struct Context* context, struct Generics* generics, str
                     #line 120 "src/analyzer/statement/MatchPattern.pv"
                     if (ref) {
                         #line 121 "src/analyzer/statement/MatchPattern.pv"
-                        struct Indirect* indirect = ArenaAllocator__store_Indirect(context->allocator, &(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = *variable_type });
+                        struct Indirect* indirect = ArenaAllocator__store_Indirect(context->allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = *variable_type }});
                         #line 122 "src/analyzer/statement/MatchPattern.pv"
-                        variable_type = ArenaAllocator__store_Type(context->allocator, &(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect });
+                        variable_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
                     }
 
                     #line 125 "src/analyzer/statement/MatchPattern.pv"

@@ -1,8 +1,7 @@
 #include <stdio.h>
 
-#include <stdint.h>
+#include <stdio.h>
 #include <coroutine/running_total.h>
-
 #include <coroutine/main.h>
 
 int32_t main(int32_t argc, char const** argv) {

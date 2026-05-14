@@ -668,7 +668,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                 #line 309 "src/compiler/BlockWriter.pv"
                                 if (!ParentCpp__is_none(&enum_info->parent)) {
                                     #line 310 "src/compiler/BlockWriter.pv"
-                                    struct String type_name = Naming__get_type_name(g->naming_decl, &(struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info }, generics->self_type, generics);
+                                    struct String type_name = Naming__get_type_name(g->naming_decl, (struct Type[]){(struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info }}, generics->self_type, generics);
                                     #line 311 "src/compiler/BlockWriter.pv"
                                     Generator__write_str(g, file, String__as_str(&type_name));
                                     #line 312 "src/compiler/BlockWriter.pv"

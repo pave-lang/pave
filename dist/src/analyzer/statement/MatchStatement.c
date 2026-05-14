@@ -69,8 +69,8 @@ struct MatchStatement* MatchStatement__parse(struct Context* context, struct Gen
     }
 
     #line 38 "src/analyzer/statement/MatchStatement.pv"
-    return ArenaAllocator__store_MatchStatement(context->allocator, &(struct MatchStatement) {
+    return ArenaAllocator__store_MatchStatement(context->allocator, (struct MatchStatement[]){(struct MatchStatement) {
         .expression = expression,
         .cases = cases,
-    });
+    }});
 }

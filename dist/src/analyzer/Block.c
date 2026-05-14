@@ -78,7 +78,7 @@ bool Block__parse_expression_statement(struct Block* self, struct Context* conte
         Expression__validate_type(value, context, &expression->return_type, true);
 
         #line 43 "src/analyzer/Block.pv"
-        struct AssignmentStatement* assignment = ArenaAllocator__store_AssignmentStatement(context->allocator, &(struct AssignmentStatement) { .left = expression, .operator = operator, .right = value });
+        struct AssignmentStatement* assignment = ArenaAllocator__store_AssignmentStatement(context->allocator, (struct AssignmentStatement[]){(struct AssignmentStatement) { .left = expression, .operator = operator, .right = value }});
         #line 44 "src/analyzer/Block.pv"
         *data = (struct StatementData) { .type = STATEMENT_DATA__ASSIGNMENT_STATEMENT, .assignmentstatement_value = assignment };
     } else {

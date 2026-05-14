@@ -150,7 +150,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             #line 77 "src/analyzer/c/IncludeObjectContext.pv"
             struct Function func_info = Function__new_allocator((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator });
             #line 78 "src/analyzer/c/IncludeObjectContext.pv"
-            func_info.name = ArenaAllocator__store_Token(allocator, &(struct Token) { .value = (struct str){ .ptr = method_name, .length = strlen(method_name) } });
+            func_info.name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .value = (struct str){ .ptr = method_name, .length = strlen(method_name) } }});
             #line 79 "src/analyzer/c/IncludeObjectContext.pv"
             func_info.return_type = *return_type_resolved;
             #line 80 "src/analyzer/c/IncludeObjectContext.pv"
@@ -176,10 +176,10 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info });
 
             #line 93 "src/analyzer/c/IncludeObjectContext.pv"
-            clang_visitChildren(cursor, IncludeObjectContext__visitor_enum_into_class, &(struct IncludeObjectContext) {
+            clang_visitChildren(cursor, IncludeObjectContext__visitor_enum_into_class, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                 .context = self->context,
-                .object = &(struct IncludeObjectEnumClass) { .enum_info = enum_info, .class_info = class_info },
-            });
+                .object = (struct IncludeObjectEnumClass[]){(struct IncludeObjectEnumClass) { .enum_info = enum_info, .class_info = class_info }},
+            }});
         } break;
         #line 98 "src/analyzer/c/IncludeObjectContext.pv"
         case CXCursor_StructDecl: {
@@ -208,10 +208,10 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
                 HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = nested_class });
 
                 #line 113 "src/analyzer/c/IncludeObjectContext.pv"
-                clang_visitChildren(cursor, IncludeObjectContext__visitor_class, &(struct IncludeObjectContext) {
+                clang_visitChildren(cursor, IncludeObjectContext__visitor_class, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                     .context = self->context,
                     .object = nested_class,
-                });
+                }});
             }
         } break;
         #line 119 "src/analyzer/c/IncludeObjectContext.pv"
@@ -241,10 +241,10 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
                 HashMap_str_Type__insert(&class_info->types, (struct str){ .ptr = name, .length = strlen(name) }, (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = nested_class });
 
                 #line 134 "src/analyzer/c/IncludeObjectContext.pv"
-                clang_visitChildren(cursor, IncludeObjectContext__visitor_class, &(struct IncludeObjectContext) {
+                clang_visitChildren(cursor, IncludeObjectContext__visitor_class, (struct IncludeObjectContext[]){(struct IncludeObjectContext) {
                     .context = self->context,
                     .object = nested_class,
-                });
+                }});
             }
         } break;
         #line 140 "src/analyzer/c/IncludeObjectContext.pv"

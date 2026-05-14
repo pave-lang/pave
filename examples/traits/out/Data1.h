@@ -2,17 +2,17 @@
 #define PAVE_DATA1
 
 #include <stdint.h>
-#include <traits/Print.h>
-
-#include <stdio.h>
 
 struct Data1 {
     float a;
     int32_t b;
 };
 
+#include <traits/trait_Print.h>
+struct Data1;
+
 void Data1__Print__print(void* __self);
 
-extern struct PrintVTable DATA1__VTABLE__PRINT;
+extern struct trait_PrintVTable DATA1__VTABLE__PRINT;
 
 #endif

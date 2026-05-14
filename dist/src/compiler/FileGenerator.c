@@ -778,14 +778,14 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 347 "src/compiler/FileGenerator.pv"
         Generator__write_indent(g, code_file);
         #line 348 "src/compiler/FileGenerator.pv"
-        Generator__write_type(g, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+        Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
 
         #line 350 "src/compiler/FileGenerator.pv"
         if (module->mode_cpp) {
             #line 351 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "* self = (");
             #line 352 "src/compiler/FileGenerator.pv"
-            Generator__write_type(g, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+            Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
             #line 353 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "*)__self;\n");
         } else {
@@ -867,14 +867,14 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 398 "src/compiler/FileGenerator.pv"
         Generator__write_indent(g, code_file);
         #line 399 "src/compiler/FileGenerator.pv"
-        Generator__write_type(g, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+        Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
 
         #line 401 "src/compiler/FileGenerator.pv"
         if (module->mode_cpp) {
             #line 402 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "* self = (");
             #line 403 "src/compiler/FileGenerator.pv"
-            Generator__write_type(g, code_file, &(struct Type) { .type = TYPE__SELF }, generics);
+            Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
             #line 404 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "*)__self;\n");
         } else {
@@ -1598,9 +1598,9 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     struct str name = global->name->value;
 
     #line 767 "src/compiler/FileGenerator.pv"
-    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(g->allocator, &(struct GenericMap) {});
+    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(g->allocator, (struct GenericMap[]){(struct GenericMap) {}});
     #line 768 "src/compiler/FileGenerator.pv"
-    blank_generics->self_type = Type__to_ptr(&(struct Type) { .type = TYPE__SELF }, g->allocator);
+    blank_generics->self_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SELF }}, g->allocator);
 
     #line 770 "src/compiler/FileGenerator.pv"
     struct FunctionContext func_ctx = FunctionContext__new_const(g->allocator);
@@ -1713,7 +1713,7 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
         #line 818 "src/compiler/FileGenerator.pv"
         fprintf(code_file, " = ");
         #line 819 "src/compiler/FileGenerator.pv"
-        ExpressionWriter__write_expression(&(struct ExpressionWriter) { .generator = g }, code_file, global->value, blank_generics);
+        ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = g }}, code_file, global->value, blank_generics);
     }
     #line 821 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ";\n");
