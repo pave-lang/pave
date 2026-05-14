@@ -361,7 +361,9 @@ impl Module {
                 },
                 Type::Primitive(primitive_info) => {
                     if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
-                    primitive_info.impls.append(impl_info);
+                    let impl_index = primitive_info.impls.append(impl_info);
+                    let parent = FunctionParent::Primitive(primitive_info, impl_index, impl_info.trait_);
+                    impl_info.fill_types(parent);
                 },
                 Type::StructC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);

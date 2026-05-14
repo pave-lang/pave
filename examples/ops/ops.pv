@@ -32,17 +32,28 @@ impl Add<Vec3> for Vec3 {
     }
 }
 
+impl Mul<Vec3> for f32 {
+    typedef Output = Vec3;
+
+    fn mul(&self, other: Vec3) -> Vec3 {
+        let value = *self;
+        return Vec3 { x: other.x * value, y: other.y * value, z: other.z * value };
+    }
+}
+
 fn main(argc: i32, argv: **const char) -> i32 {
     let pos = Vec3 { x: 1.0f, y: 0.5f, z: 2.0f };
     let scaled = pos * 2.0f;
     let sum = pos + scaled;
     let hadamard = pos * scaled;
     let chained = pos * 2.0f * 2.0f;
+    let scalar_mul = 2.0f * pos;
 
     printf("scaled: %.1f %.1f %.1f\n", scaled.x, scaled.y, scaled.z);
     printf("sum: %.1f %.1f %.1f\n", sum.x, sum.y, sum.z);
     printf("hadamard: %.1f %.1f %.1f\n", hadamard.x, hadamard.y, hadamard.z);
     printf("chained: %.1f %.1f %.1f\n", chained.x, chained.y, chained.z);
+    printf("scalar_mul: %.1f %.1f %.1f\n", scalar_mul.x, scalar_mul.y, scalar_mul.z);
 
     return 0;
 }

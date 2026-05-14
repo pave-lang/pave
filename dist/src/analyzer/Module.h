@@ -72,31 +72,31 @@ bool Module__prefill_types(struct Module* self);
 #line 341 "src/analyzer/Module.pv"
 bool Module__prefill_types_impl(struct Module* self);
 
-#line 392 "src/analyzer/Module.pv"
+#line 394 "src/analyzer/Module.pv"
 bool Module__parse_declarations(struct Module* self);
 
-#line 434 "src/analyzer/Module.pv"
+#line 436 "src/analyzer/Module.pv"
 bool Module__parse_globals(struct Module* self);
 
-#line 450 "src/analyzer/Module.pv"
+#line 452 "src/analyzer/Module.pv"
 bool Module__parse_functions(struct Module* self);
 
-#line 473 "src/analyzer/Module.pv"
+#line 475 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name);
 
-#line 496 "src/analyzer/Module.pv"
+#line 498 "src/analyzer/Module.pv"
 struct Trait* Module__find_trait(struct Module* self, struct str name);
 
-#line 511 "src/analyzer/Module.pv"
+#line 513 "src/analyzer/Module.pv"
 struct Type* Module__find_function(struct Module* self, struct str name);
 
-#line 526 "src/analyzer/Module.pv"
+#line 528 "src/analyzer/Module.pv"
 struct Type* Module__find_value(struct Module* self, struct str name);
 
-#line 545 "src/analyzer/Module.pv"
+#line 547 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
-#line 550 "src/analyzer/Module.pv"
+#line 552 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name);
 
 #endif
