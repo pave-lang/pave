@@ -92,28 +92,31 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
 #line 1105 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
 
-#line 1145 "src/analyzer/expression/Expression.pv"
+#line 1157 "src/analyzer/expression/Expression.pv"
+struct Expression* Expression__find_operator_trait_call(struct Context* context, struct Token* token, struct Expression* lhs, struct Type* lhs_type, struct str operator, struct Expression* rhs);
+
+#line 1208 "src/analyzer/expression/Expression.pv"
 struct str Expression__number_primitive(struct str value);
 
-#line 1156 "src/analyzer/expression/Expression.pv"
+#line 1219 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 1493 "src/analyzer/expression/Expression.pv"
+#line 1556 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 1540 "src/analyzer/expression/Expression.pv"
+#line 1603 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 1547 "src/analyzer/expression/Expression.pv"
+#line 1610 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 1635 "src/analyzer/expression/Expression.pv"
+#line 1698 "src/analyzer/expression/Expression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
-#line 1652 "src/analyzer/expression/Expression.pv"
+#line 1715 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 1669 "src/analyzer/expression/Expression.pv"
+#line 1732 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #endif

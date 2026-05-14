@@ -514,12 +514,31 @@ impl Generator {
         }
     }
 
-    fn get_trait_function_name(&self, struct_name: str, trait_info: &Trait, func_info: &Function, generics: &GenericMap) -> String {
+    fn get_trait_function_name(&self, struct_name: str, trait_info: &Trait, impl_trait_type: &Type, func_info: &Function, generics: &GenericMap) -> String {
         let trait_name = String::new(self.allocator);
 
         trait_name.append(struct_name);
         trait_name.append("__");
         trait_name.append(trait_info.name.value);
+
+        if impl_trait_type != 0 {
+            match impl_trait_type {
+                Type::Trait(ti, tmap) => {
+                    for (gname, _) in ti.generics.map {
+                        if ti.typedefs.find(&gname) == 0 {
+                            let gtype = tmap.get(gname);
+                            if gtype != 0 {
+                                trait_name.append("_");
+                                let type_name = self.naming_ident.get_type_name(gtype, generics.self_type, generics);
+                                trait_name.append_string(&type_name);
+                            }
+                        }
+                    }
+                },
+                _ => {},
+            }
+        }
+
         trait_name.append("__");
         trait_name.append(func_info.name.value);
 

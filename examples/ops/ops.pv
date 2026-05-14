@@ -1,0 +1,46 @@
+#include "stdio.h"
+
+use std
+
+struct Vec3 {
+    x: f32,
+    y: f32,
+    z: f32,
+}
+
+impl Mul<f32> for Vec3 {
+    typedef Output = Vec3;
+
+    fn mul(&self, other: f32) -> Vec3 {
+        return Vec3 { x: self.x * other, y: self.y * other, z: self.z * other };
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    typedef Output = Vec3;
+
+    fn mul(&self, other: Vec3) -> Vec3 {
+        return Vec3 { x: self.x * other.x, y: self.y * other.y, z: self.z * other.z };
+    }
+}
+
+impl Add<Vec3> for Vec3 {
+    typedef Output = Vec3;
+
+    fn add(&self, other: Vec3) -> Vec3 {
+        return Vec3 { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z };
+    }
+}
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    let pos = Vec3 { x: 1.0f, y: 0.5f, z: 2.0f };
+    let scaled = pos * 2.0f;
+    let sum = pos + scaled;
+    let hadamard = pos * scaled;
+
+    printf("scaled: %.1f %.1f %.1f\n", scaled.x, scaled.y, scaled.z);
+    printf("sum: %.1f %.1f %.1f\n", sum.x, sum.y, sum.z);
+    printf("hadamard: %.1f %.1f %.1f\n", hadamard.x, hadamard.y, hadamard.z);
+
+    return 0;
+}

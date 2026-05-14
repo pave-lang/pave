@@ -1119,6 +1119,18 @@ impl Expression {
             let rhs_final = Expression::parse_binary(context, rhs, prec + 1, generics);
             if rhs_final == 0 { return 0; }
 
+            let is_arithmetic =
+                operator.value.eq("*") || operator.value.eq("+") ||
+                operator.value.eq("-") || operator.value.eq("/");
+
+            if is_arithmetic {
+                let trait_result = Expression::find_operator_trait_call(context, token, result, &result.return_type, operator.value, rhs_final);
+                if trait_result != 0 {
+                    result = trait_result;
+                    continue;
+                }
+            }
+
             let is_comparison =
                 operator.value.eq("==") || operator.value.eq("!=") ||
                 operator.value.eq("<=") || operator.value.eq(">=") ||
@@ -1140,6 +1152,57 @@ impl Expression {
         }
 
         return result;
+    }
+
+    fn find_operator_trait_call(context: &Context, token: &Token, lhs: &Expression, lhs_type: &Type, operator: str, rhs: &Expression) -> &Expression {
+        let trait_name: str = "";
+        let func_name: str = "";
+
+        if operator.eq("*") { trait_name = "Mul"; func_name = "mul"; }
+        else if operator.eq("+") { trait_name = "Add"; func_name = "add"; }
+        else if operator.eq("-") { trait_name = "Sub"; func_name = "sub"; }
+        else if operator.eq("/") { trait_name = "Div"; func_name = "div"; }
+        else { return 0; }
+
+        match lhs_type {
+            Type::Indirect(indirect) => {
+                return Expression::find_operator_trait_call(context, token, lhs, &indirect.to, operator, rhs);
+            },
+            Type::Struct(struct_info, generic_map) => {
+                for *impl_info in struct_info.impls {
+                    if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+                    if !impl_info.trait_.name.value.eq(trait_name) { continue; }
+
+                    let func: &Function = impl_info.functions.find(&func_name);
+                    if func == 0 { continue; }
+                    if func.parameters.length < 2 { continue; }
+
+                    let other_param = func.parameters.get(1);
+                    if !other_param.type.eq(&rhs.return_type) { continue; }
+
+                    let func_map: *GenericMap = generic_map;
+                    if impl_info.typedefs.length > 0 {
+                        let aug_map_val = generic_map.clone(context.allocator);
+                        let aug_map = context.allocator.store(&aug_map_val);
+                        for (name, &typedef_type) in impl_info.typedefs {
+                            aug_map.insert(name, *typedef_type);
+                        }
+                        func_map = aug_map;
+                    }
+
+                    let func_type = context.allocator.store(&Type::Function(func, func_map));
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+                    arguments.append(InvokeArgument { value: lhs });
+                    arguments.append(InvokeArgument { value: rhs });
+
+                    return Expression::make_type_function_call(context, token, func_type, arguments, 0);
+                }
+            },
+            _ => {},
+        }
+
+        return 0;
     }
 
     fn number_primitive(value: str) -> str {

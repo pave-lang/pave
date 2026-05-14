@@ -277,23 +277,33 @@ impl Naming {
                 let has_parent = false;
                 let parent_type: Type;
                 let trait_info: &Trait = 0;
+                let trait_impl_info: &Impl = 0;
 
                 match func_info.parent {
                     FunctionParent::None => {},
-                    FunctionParent::Primitive(primitive, _, trait_info2) => {
+                    FunctionParent::Primitive(primitive, impl_index, trait_info2) => {
                         parent_type = Type::Primitive(primitive);
                         trait_info = trait_info2;
                         has_parent = true;
+                        if primitive.impls.length > impl_index {
+                            trait_impl_info = primitive.impls.data[impl_index];
+                        }
                     },
-                    FunctionParent::Enum(enum_info, _, trait_info2) => {
+                    FunctionParent::Enum(enum_info, impl_index, trait_info2) => {
                         parent_type = Type::Enum(enum_info, generics2);
                         trait_info = trait_info2;
                         has_parent = true;
+                        if enum_info.impls.length > impl_index {
+                            trait_impl_info = enum_info.impls.data[impl_index];
+                        }
                     },
-                    FunctionParent::Struct(struct_info, _, trait_info2) => {
+                    FunctionParent::Struct(struct_info, impl_index, trait_info2) => {
                         parent_type = Type::Struct(struct_info, generics2);
                         trait_info = trait_info2;
                         has_parent = true;
+                        if struct_info.impls.length > impl_index {
+                            trait_impl_info = struct_info.impls.data[impl_index];
+                        }
                     },
                     FunctionParent::Trait(_) => {},
                     FunctionParent::Type(type, _, _) => {
@@ -321,6 +331,23 @@ impl Naming {
 
                 if trait_info != 0 {
                     result.append(trait_info.name.value);
+                    if trait_impl_info != 0 {
+                        match trait_impl_info.trait_type {
+                            Type::Trait(ti, tmap) => {
+                                for (gname, _) in ti.generics.map {
+                                    if ti.typedefs.find(&gname) == 0 {
+                                        let gtype = tmap.get(gname);
+                                        if gtype != 0 {
+                                            result.append("_");
+                                            let gtype_name = self.get_type_name(gtype, type_self, generics_map);
+                                            result.append_string(&gtype_name);
+                                        }
+                                    }
+                                }
+                            },
+                            _ => {},
+                        }
+                    }
                     result.append("__");
                 }
 

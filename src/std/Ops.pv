@@ -1,15 +1,23 @@
 trait Add<T> {
-    fn add(&self, other: T) -> void;
+    typedef Output;
+
+    fn add(&self, other: T) -> Output;
 }
 
 trait Sub<T> {
-    fn sub(&self, other: T) -> void;
+    typedef Output;
+
+    fn sub(&self, other: T) -> Output;
 }
 
 trait Mul<T> {
-    fn mul(&self, other: T) -> void;
+    typedef Output;
+
+    fn mul(&self, other: T) -> Output;
 }
 
 trait Div<T> {
-    fn div(&self, other: T) -> void;
+    typedef Output;
+
+    fn div(&self, other: T) -> Output;
 }

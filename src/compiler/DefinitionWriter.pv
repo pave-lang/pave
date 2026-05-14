@@ -46,11 +46,11 @@ impl DefinitionWriter {
         fprintf(file, "__self; (void)self;\n");
     }
 
-    fn write_trait_function_decl(&self, file: &FILE, name: str, trait_info: &Trait, func_info: &Function, generics: &GenericMap) -> bool {
+    fn write_trait_function_decl(&self, file: &FILE, name: str, trait_info: &Trait, impl_trait_type: &Type, func_info: &Function, generics: &GenericMap) -> bool {
         let generator = self.generator;
         let generics_void = *generics;
         generics_void.self_type = &generator.root.type_void;
-        let func_name = generator.get_trait_function_name(name, trait_info, func_info, generics);
+        let func_name = generator.get_trait_function_name(name, trait_info, impl_trait_type, func_info, generics);
         return self.write_function_definition(file, func_info, &generics_void, &func_name);
     }
 
@@ -59,7 +59,7 @@ impl DefinitionWriter {
             if impl_info.functions.find(&func_base_name) != 0 { continue; }
 
             fprintf(file, "\n");
-            if !self.write_trait_function_decl(file, name, trait_info, func_info, generics) { return false; }
+            if !self.write_trait_function_decl(file, name, trait_info, &impl_info.trait_type, func_info, generics) { return false; }
             fprintf(file, ";\n");
         }
         return true;
@@ -494,7 +494,7 @@ impl DefinitionWriter {
                         if !self.write_function_definition(file, func_info, generics, 0) { return false; }
                     } else {
                         fprintf(file, "\n");
-                        if !self.write_trait_function_decl(file, name.as_str(), trait_info, func_info, generics) { return false; }
+                        if !self.write_trait_function_decl(file, name.as_str(), trait_info, &impl_info.trait_type, func_info, generics) { return false; }
                     }
 
                     fprintf(file, ";\n");
@@ -568,7 +568,7 @@ impl DefinitionWriter {
                 if trait_info == 0 {
                     if !self.write_function_definition(file, func_info, generics, 0) { return false; }
                 } else {
-                    if !self.write_trait_function_decl(file, name, trait_info, func_info, generics) { return false; }
+                    if !self.write_trait_function_decl(file, name, trait_info, &impl_info.trait_type, func_info, generics) { return false; }
                 }
 
                 fprintf(file, ";\n");
@@ -651,9 +651,9 @@ impl DefinitionWriter {
         return true;
     }
 
-    fn write_trait_function_with_body(&self, file: &FILE, name: str, func_info: &Function, trait_info: &Trait, generics: &GenericMap, module: &Module, function_usage: &TypeFunctionUsage) -> bool {
+    fn write_trait_function_with_body(&self, file: &FILE, name: str, func_info: &Function, trait_info: &Trait, impl_trait_type: &Type, generics: &GenericMap, module: &Module, function_usage: &TypeFunctionUsage) -> bool {
         let generator = self.generator;
-        if !self.write_trait_function_decl(file, name, trait_info, func_info, generics) {
+        if !self.write_trait_function_decl(file, name, trait_info, impl_trait_type, func_info, generics) {
             let name_length: u32 = name.length;
             let func_name_length: u32 = func_info.name.value.length;
             fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info.name.value.ptr);
@@ -938,7 +938,7 @@ impl DefinitionWriter {
                 if func_info.generics.array.length == 0 {
                     fprintf(file, "\n");
                     if trait_info != 0 {
-                        if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, generics, module, function_usage) { return false; }
+                        if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, &impl_info.trait_type, generics, module, function_usage) { return false; }
                     } else {
                         if !self.write_function_definition(file, func_info, generics, 0) {
                             let func_name_length: u32 = func_info.name.value.length;
@@ -1001,7 +1001,7 @@ impl DefinitionWriter {
                     if impl_info.functions.find(&func_base_name) != 0 { continue; }
 
                     fprintf(file, "\n");
-                    if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, generics, module, 0) { return false; }
+                    if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, &impl_info.trait_type, generics, module, 0) { return false; }
                 }
             }
 

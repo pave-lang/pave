@@ -19,6 +19,7 @@ struct Enum;
 struct GenericMap;
 struct Module;
 struct Trait;
+struct Type;
 struct Function;
 struct Impl;
 struct String;
@@ -42,7 +43,7 @@ void DefinitionWriter__write_enum_variants(struct DefinitionWriter* self, FILE* 
 void DefinitionWriter__write_self_cast(struct DefinitionWriter* self, FILE* file, struct Module* module, struct GenericMap* generics);
 
 #line 49 "src/compiler/DefinitionWriter.pv"
-bool DefinitionWriter__write_trait_function_decl(struct DefinitionWriter* self, FILE* file, struct str name, struct Trait* trait_info, struct Function* func_info, struct GenericMap* generics);
+bool DefinitionWriter__write_trait_function_decl(struct DefinitionWriter* self, FILE* file, struct str name, struct Trait* trait_info, struct Type* impl_trait_type, struct Function* func_info, struct GenericMap* generics);
 
 #line 57 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_trait_default_decls(struct DefinitionWriter* self, FILE* file, struct str name, struct Impl* impl_info, struct Trait* trait_info, struct GenericMap* generics);
@@ -75,7 +76,7 @@ bool DefinitionWriter__write_primitive_definition(struct DefinitionWriter* self,
 bool DefinitionWriter__write_trait_definition(struct DefinitionWriter* self, FILE* file, struct Trait* trait_info, struct GenericMap* generics);
 
 #line 654 "src/compiler/DefinitionWriter.pv"
-bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage);
+bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct Type* impl_trait_type, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage);
 
 #line 687 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_get_params(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics);

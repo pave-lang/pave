@@ -694,7 +694,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
             #line 303 "src/compiler/FileGenerator.pv"
             fprintf(code_file, " = &");
             #line 304 "src/compiler/FileGenerator.pv"
-            struct String func_name = Generator__get_trait_function_name(g, String__as_str(&name), trait_info, func_info, generics);
+            struct String func_name = Generator__get_trait_function_name(g, String__as_str(&name), trait_info, trait_entry._1, func_info, generics);
             #line 305 "src/compiler/FileGenerator.pv"
             Generator__write_string(g, code_file, &func_name);
         } }
@@ -1174,7 +1174,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
             #line 549 "src/compiler/FileGenerator.pv"
             fprintf(code_file, " = &");
             #line 550 "src/compiler/FileGenerator.pv"
-            struct String func_name = Generator__get_trait_function_name(g, name, trait_info, func_info, generics);
+            struct String func_name = Generator__get_trait_function_name(g, name, trait_info, 0, func_info, generics);
             #line 551 "src/compiler/FileGenerator.pv"
             Generator__write_string(g, code_file, &func_name);
         } }

@@ -147,7 +147,7 @@ void DefinitionWriter__write_self_cast(struct DefinitionWriter* self, FILE* file
 }
 
 #line 49 "src/compiler/DefinitionWriter.pv"
-bool DefinitionWriter__write_trait_function_decl(struct DefinitionWriter* self, FILE* file, struct str name, struct Trait* trait_info, struct Function* func_info, struct GenericMap* generics) {
+bool DefinitionWriter__write_trait_function_decl(struct DefinitionWriter* self, FILE* file, struct str name, struct Trait* trait_info, struct Type* impl_trait_type, struct Function* func_info, struct GenericMap* generics) {
     #line 50 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
     #line 51 "src/compiler/DefinitionWriter.pv"
@@ -155,7 +155,7 @@ bool DefinitionWriter__write_trait_function_decl(struct DefinitionWriter* self, 
     #line 52 "src/compiler/DefinitionWriter.pv"
     generics_void.self_type = &generator->root->type_void;
     #line 53 "src/compiler/DefinitionWriter.pv"
-    struct String func_name = Generator__get_trait_function_name(generator, name, trait_info, func_info, generics);
+    struct String func_name = Generator__get_trait_function_name(generator, name, trait_info, impl_trait_type, func_info, generics);
     #line 54 "src/compiler/DefinitionWriter.pv"
     return DefinitionWriter__write_function_definition(self, file, func_info, &generics_void, &func_name);
 }
@@ -180,7 +180,7 @@ bool DefinitionWriter__write_trait_default_decls(struct DefinitionWriter* self, 
         #line 61 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "\n");
         #line 62 "src/compiler/DefinitionWriter.pv"
-        if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, func_info, generics)) {
+        if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, &impl_info->trait_type, func_info, generics)) {
             #line 62 "src/compiler/DefinitionWriter.pv"
             return false;
         }
@@ -1026,7 +1026,7 @@ bool DefinitionWriter__write_struct_definition(struct DefinitionWriter* self, FI
                     #line 496 "src/compiler/DefinitionWriter.pv"
                     fprintf(file, "\n");
                     #line 497 "src/compiler/DefinitionWriter.pv"
-                    if (!DefinitionWriter__write_trait_function_decl(self, file, String__as_str(&name), trait_info, func_info, generics)) {
+                    if (!DefinitionWriter__write_trait_function_decl(self, file, String__as_str(&name), trait_info, &impl_info->trait_type, func_info, generics)) {
                         #line 497 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
@@ -1179,7 +1179,7 @@ bool DefinitionWriter__write_impl_definition(struct DefinitionWriter* self, FILE
                 }
             } else {
                 #line 571 "src/compiler/DefinitionWriter.pv"
-                if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, func_info, generics)) {
+                if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, &impl_info->trait_type, func_info, generics)) {
                     #line 571 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }
@@ -1340,11 +1340,11 @@ bool DefinitionWriter__write_trait_definition(struct DefinitionWriter* self, FIL
 }
 
 #line 654 "src/compiler/DefinitionWriter.pv"
-bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage) {
+bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct Type* impl_trait_type, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage) {
     #line 655 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
     #line 656 "src/compiler/DefinitionWriter.pv"
-    if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, func_info, generics)) {
+    if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, impl_trait_type, func_info, generics)) {
         #line 657 "src/compiler/DefinitionWriter.pv"
         uint32_t name_length = name.length;
         #line 658 "src/compiler/DefinitionWriter.pv"
@@ -1886,7 +1886,7 @@ bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, st
                 #line 940 "src/compiler/DefinitionWriter.pv"
                 if (trait_info != 0) {
                     #line 941 "src/compiler/DefinitionWriter.pv"
-                    if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, generics, module, function_usage)) {
+                    if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, function_usage)) {
                         #line 941 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
@@ -2009,7 +2009,7 @@ bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, st
                 #line 1003 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
                 #line 1004 "src/compiler/DefinitionWriter.pv"
-                if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, generics, module, 0)) {
+                if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, 0)) {
                     #line 1004 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }

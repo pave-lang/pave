@@ -301,7 +301,7 @@ impl FileGenerator {
                 fprintf(code_file, ".");
                 g.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
-                let func_name = g.get_trait_function_name(name.as_str(), trait_info, func_info, generics);
+                let func_name = g.get_trait_function_name(name.as_str(), trait_info, trait_entry.1, func_info, generics);
                 g.write_string(code_file, &func_name);
             }
 
@@ -547,7 +547,7 @@ impl FileGenerator {
                 fprintf(code_file, ".");
                 g.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
-                let func_name = g.get_trait_function_name(name, trait_info, func_info, generics);
+                let func_name = g.get_trait_function_name(name, trait_info, 0, func_info, generics);
                 g.write_string(code_file, &func_name);
             }
 
