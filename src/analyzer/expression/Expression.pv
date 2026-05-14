@@ -94,7 +94,15 @@ impl Expression {
                 for *impl_info in struct_info.impls {
                     let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
-                        return context.allocator.store(&Type::Function(function, generic_map));
+                        if impl_info.typedefs.length == 0 {
+                            return context.allocator.store(&Type::Function(function, generic_map));
+                        }
+                        let aug_map_val = generic_map.clone(context.allocator);
+                        let aug_map = context.allocator.store(&aug_map_val);
+                        for (name, &typedef_type) in impl_info.typedefs {
+                            aug_map.insert(name, *typedef_type);
+                        }
+                        return context.allocator.store(&Type::Function(function, aug_map));
                     }
                 }
 
@@ -188,7 +196,13 @@ impl Expression {
                 for *trait_info in generic.traits {
                     let function: &Function = trait_info.functions.find(&member.value);
                     if function != 0 {
-                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap {})));
+                        let generic_map_val: GenericMap = GenericMap { array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
+                        let generic_map = context.allocator.store(&generic_map_val);
+                        for (typedef_name, _) in trait_info.typedefs {
+                            let gt = context.allocator.store(&GenericTypedef { generic, typedef_name });
+                            generic_map.insert(typedef_name, Type::GenericTypedef(gt));
+                        }
+                        return context.allocator.store(&Type::Function(function, generic_map));
                     }
                 }
 
@@ -272,6 +286,28 @@ impl Expression {
             let arg_type = &args.value().value.return_type;
             
             Expression::resolve_generic_type(context, param_type, arg_type, &generic_map);
+        }
+
+        for generic in func_info.generics.array {
+            let concrete_type = generic_map.get(generic.name.value);
+            if concrete_type == 0 { continue; }
+
+            for *trait_info in generic.traits {
+                for (typedef_name, _) in trait_info.typedefs {
+                    match concrete_type {
+                        Type::Struct(struct_info, _) => {
+                            for *impl_info in struct_info.impls {
+                                if impl_info.trait_ != trait_info { continue; }
+                                let typedef_type = impl_info.typedefs.find(&typedef_name);
+                                if typedef_type != 0 {
+                                    generic_map.insert(typedef_name, *typedef_type);
+                                }
+                            }
+                        },
+                        _ => {},
+                    }
+                }
+            }
         }
 
         return context.allocator.store(&generic_map);
@@ -385,6 +421,13 @@ impl Expression {
                     }
 
                     arg.value.validate_type(context, param_type, true);
+
+                    if arg.name == 0 && param.name != 0 && !param.name.value.eq("self") && !param.name.value.eq(arg.value.token.value) {
+                        let label = String::new(context.allocator);
+                        label.append(param.name.value);
+                        label.append(": ");
+                        context.inlay_hint_before(arg.value.token, label.c_str(), InlayHintKind::Parameter, false, true);
+                    }
                 }
 
                 return true;
@@ -1505,7 +1548,29 @@ impl Expression {
         let success = true;
 
         match self.data {
-            ExpressionData::Invoke(invoke, &arguments) => {
+            ExpressionData::UnaryExpression(operator, child) => {
+            if operator.eq("&") {
+                match type {
+                    Type::Indirect(indirect) => {
+                        match indirect.to {
+                            Type::Sequence(_) => {
+                                match child.data {
+                                    ExpressionData::Invoke(_, _) => {
+                                        if child.return_type.is_sequence_fixed_array() {
+                                            child.validate_type(context, &indirect.to, apply_implicit_cast);
+                                        }
+                                    },
+                                    _ => {},
+                                }
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
+            }
+        },
+        ExpressionData::Invoke(invoke, &arguments) => {
                 match type {
                     Type::Tuple(tuple) => {
                         for (i, argument) in arguments.iter().enumerate() {
@@ -1517,6 +1582,26 @@ impl Expression {
                         self.return_type = *type;
 
                         return success;
+                    },
+                    Type::Sequence(sequence) => {
+                        if self.return_type.is_sequence_fixed_array() {
+                            for (_, argument) in arguments.iter().enumerate() {
+                                success = argument.value.validate_type(context, &sequence.element, apply_implicit_cast) && success;
+                            }
+
+                            match self.return_type {
+                                Type::Sequence(self_seq) => {
+                                    let new_seq = context.allocator.store(&Sequence { type: self_seq.type, element: sequence.element, element_pointer: self_seq.element_pointer });
+                                    let new_type = context.allocator.store(&Type::Sequence(new_seq));
+                                    invoke.data = ExpressionData::Type(new_type);
+                                    invoke.return_type = *new_type;
+                                    self.return_type = *new_type;
+                                },
+                                _ => {},
+                            }
+
+                            return success;
+                        }
                     },
                     _ => {},
                 }
@@ -1570,6 +1655,12 @@ impl Expression {
             let next = Expression::parse_postfix(context, result, generics);
             if next == result { break; }
             if next == 0 { return 0; }
+
+            let expanded_token = context.allocator.store(next.token);
+            expanded_token.start_line = result.token.start_line;
+            expanded_token.start_column = result.token.start_column;
+            next.token = expanded_token;
+
             result = next;
         }
         return result;

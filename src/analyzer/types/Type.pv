@@ -73,6 +73,11 @@ struct Tuple {
     elements: Array<Type>,
 }
 
+struct GenericTypedef {
+    generic: &Generic,
+    typedef_name: str,
+}
+
 impl Tuple {
     fn clone(&self, allocator: &dyn Allocator) -> Self {
         return Self { elements: self.elements.clone(allocator) };
@@ -88,6 +93,7 @@ enum Type {
     Struct(&Struct, &GenericMap),
     Trait(&Trait, &GenericMap),
     Generic(&Generic),
+    GenericTypedef(&GenericTypedef),
     Function(&Function, &GenericMap),
     CoroutineInstance(&Function, &GenericMap),
     Self,
@@ -113,6 +119,7 @@ impl Type {
             Type::Struct(_, _) => { return "Type::Struct"; },
             Type::Trait(_, _) => { return "Type::Trait"; },
             Type::Generic(_) => { return "Type::Generic"; },
+            Type::GenericTypedef(_) => { return "Type::GenericTypedef"; },
             Type::UnknownC(_) => { return "Type::UnknownC"; },
             Type::Function(_, _) => { return "Type::Function"; },
             Type::CoroutineInstance(_, _) => { return "Type::CoroutineInstance"; },
@@ -213,6 +220,7 @@ impl Type {
             Type::Struct(struct_info, generics) => { return self.eq_struct(struct_info, generics.array); },
             Type::Trait(trait_info, generics) => { return self.eq_trait(trait_info, generics.array); },
             Type::Generic(generic) => { return self.eq_generic(generic); },
+            Type::GenericTypedef(gt) => { return self.eq_generic_typedef(gt); },
             Type::UnknownC(_) => { return true; },
             Type::Function(function, _) => { return self.eq_function(function); },
             Type::CoroutineInstance(function, _) => { return self.eq_coroutine_instance(function); },
@@ -341,6 +349,17 @@ impl Type {
         match self {
             Type::Generic(generic) => { return generic.name.value.eq(other_generic.name.value); },
             Type::Self => { return true; },
+            _ => { return false; },
+        }
+
+        return false;
+    }
+
+    fn eq_generic_typedef(&self, other: &GenericTypedef) -> bool {
+        match self {
+            Type::GenericTypedef(gt) => {
+                return gt.generic == other.generic && gt.typedef_name.eq(other.typedef_name);
+            },
             _ => { return false; },
         }
 

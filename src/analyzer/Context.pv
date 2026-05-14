@@ -218,6 +218,23 @@ impl Context {
         });
     }
 
+    fn inlay_hint_before(&self, token: &Token, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        let inlay_hints = &self.analysis.inlay_hints;
+        let file_inlay_hints: &Array<InlayHint> = inlay_hints.find(&self.path);
+        if file_inlay_hints == 0 { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
+
+        file_inlay_hints.append(InlayHint {
+            position: Position {
+                line: token.start_line,
+                character: token.start_column,
+            },
+            label: label,
+            kind,
+            padding_left,
+            padding_right,
+        });
+    }
+
     fn next_token(&self) -> bool {
         self.pos += 1;
 
@@ -491,7 +508,28 @@ impl Context {
         }
 
         if generics != 0 && generics.has(name.value) {
-            let new_type: Type = Type::Generic(generics.find(name.value));
+            let generic_ref = generics.find(name.value);
+
+            if self.check_next(TokenType::Symbol, "::") {
+                let typedef_name = self.expect(TokenType::Identifier);
+                if typedef_name == 0 { return false; }
+
+                let found = false;
+                for *trait_info in generic_ref.traits {
+                    if trait_info.typedefs.find(&typedef_name.value) != 0 { found = true; }
+                }
+                if !found {
+                    self.error_token(typedef_name, "Unknown typedef in trait bound");
+                    return false;
+                }
+
+                let gt = self.allocator.store(&GenericTypedef { generic: generic_ref, typedef_name: typedef_name.value });
+                let new_type: Type = Type::GenericTypedef(gt);
+                memcpy(type, &new_type, sizeof(Type));
+                return true;
+            }
+
+            let new_type: Type = Type::Generic(generic_ref);
             memcpy(type, &new_type, sizeof(Type));
             return true;
         }
@@ -724,6 +762,29 @@ impl Context {
                 *self_type = Type::Function(func_info, resolved_generics);
 
                 return self_type;
+            },
+            Type::GenericTypedef(gt) => {
+                let name = gt.generic.name.value;
+                let concrete_type: &Type = 0;
+
+                if generics_map != 0 { concrete_type = generics_map.get(name); }
+                if concrete_type == 0 && fallback_generics_map != 0 { concrete_type = fallback_generics_map.get(name); }
+
+                if concrete_type != 0 {
+                    match concrete_type {
+                        Type::Struct(struct_info, _) => {
+                            for *impl_info in struct_info.impls {
+                                if impl_info.trait_ == 0 { continue; }
+                                if impl_info.trait_.typedefs.find(&gt.typedef_name) == 0 { continue; }
+                                let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
+                                if typedef_type != 0 { return typedef_type; }
+                            }
+                        },
+                        _ => {},
+                    }
+                }
+
+                return type;
             },
             Type::Generic(generic) => {
                 let name = generic.name.value;

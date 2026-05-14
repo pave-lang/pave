@@ -69,13 +69,13 @@ bool Tokenizer__is_in_array(struct Array_ptrc_char* array, char const* s, uintpt
 #line 146 "src/analyzer/Tokenizer.pv"
 struct Array_ptrc_char Tokenizer__make_keywords(struct ArenaAllocator* allocator);
 
-#line 184 "src/analyzer/Tokenizer.pv"
+#line 185 "src/analyzer/Tokenizer.pv"
 struct Array_ptrc_char Tokenizer__make_symbols(struct ArenaAllocator* allocator);
 
-#line 207 "src/analyzer/Tokenizer.pv"
+#line 208 "src/analyzer/Tokenizer.pv"
 struct str Tokenizer__read_file_into_string(struct ArenaAllocator* allocator, char const* filename);
 
-#line 244 "src/analyzer/Tokenizer.pv"
+#line 245 "src/analyzer/Tokenizer.pv"
 struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char const* path);
 
 #endif

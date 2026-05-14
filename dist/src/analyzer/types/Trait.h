@@ -6,6 +6,7 @@
 
 #include <analyzer/types/Generics.h>
 #include <std/HashMap_str_Function.h>
+#include <std/HashMap_str_usize.h>
 #include <analyzer/types/Type.h>
 struct Token;
 struct Module;
@@ -18,6 +19,7 @@ struct Trait {
     uintptr_t token_end;
     struct Generics generics;
     struct HashMap_str_Function functions;
+    struct HashMap_str_usize typedefs;
     struct Type type_self;
 };
 
@@ -26,16 +28,16 @@ struct Trait {
 struct Module;
 struct Trait;
 
-#line 15 "src/analyzer/types/Trait.pv"
+#line 16 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);
 
-#line 25 "src/analyzer/types/Trait.pv"
+#line 27 "src/analyzer/types/Trait.pv"
 struct Trait Trait__parse(struct Module* module);
 
-#line 46 "src/analyzer/types/Trait.pv"
+#line 48 "src/analyzer/types/Trait.pv"
 bool Trait__fill_types(struct Trait* self, struct FunctionParent parent);
 
-#line 66 "src/analyzer/types/Trait.pv"
+#line 81 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self);
 
 #endif

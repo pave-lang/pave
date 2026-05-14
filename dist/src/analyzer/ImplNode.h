@@ -7,11 +7,13 @@ struct ImplNode {
     enum {
         IMPL_NODE__FUNCTION,
         IMPL_NODE__CONST,
+        IMPL_NODE__TYPEDEF,
     } type;
 
     union {
         struct str function_value;
         struct str const_value;
+        struct str typedef_value;
     };
 };
 

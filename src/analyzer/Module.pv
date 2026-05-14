@@ -440,6 +440,10 @@ impl Module {
             impl_info.parse_consts();
         }
 
+        for impl_info in self.impls {
+            impl_info.parse_typedefs();
+        }
+
         return true;
     }
 

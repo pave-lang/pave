@@ -238,8 +238,36 @@ impl Naming {
                     let len: u32 = name.length;
                     fprintf(stderr, "Naming.get_type_name: Attempt to retrieve generic %.*s but it does not exist in generics\n", len, name.ptr);
                 }
-                
+
                 return self.get_type_name(generic_type, type_self, generics_map);
+            },
+            Type::GenericTypedef(gt) => {
+                if generics_map != 0 {
+                    let direct_type = generics_map.get(gt.typedef_name);
+                    if direct_type != 0 {
+                        return self.get_type_name(direct_type, type_self, generics_map);
+                    }
+
+                    let concrete_type = generics_map.get(gt.generic.name.value);
+                    if concrete_type != 0 {
+                        match concrete_type {
+                            Type::Struct(struct_info, _) => {
+                                for *impl_info in struct_info.impls {
+                                    if impl_info.trait_ == 0 { continue; }
+                                    if impl_info.trait_.typedefs.find(&gt.typedef_name) == 0 { continue; }
+                                    let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
+                                    if typedef_type != 0 {
+                                        return self.get_type_name(typedef_type, type_self, generics_map);
+                                    }
+                                }
+                            },
+                            _ => {},
+                        }
+                    }
+                }
+
+                result.append(gt.typedef_name);
+                return result;
             },
             Type::UnknownC(info) => {
                 result.append(info.name);

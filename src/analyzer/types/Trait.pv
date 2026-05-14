@@ -8,6 +8,7 @@ struct Trait {
     token_end: usize,
     generics: Generics,
     functions: HashMap<str, Function>,
+    typedefs: HashMap<str, usize>,
     type_self: Type,
 }
 
@@ -19,6 +20,7 @@ impl Trait {
             module,
             generics: Generics::new(context.allocator),
             functions: HashMap<str, Function>::new(context.allocator),
+            typedefs: HashMap<str, usize>::new(context.allocator),
         };
     }
 
@@ -50,12 +52,25 @@ impl Trait {
         if !context.expect_value(TokenType::Symbol, "{") { return false; }
 
         while context.pos < self.token_end - 1 {
-            let func_info: Function = Function::parse_optional_body(context);
-            if func_info.name == 0 { return false; }
+            if context.check_value(TokenType::Keyword, "typedef") {
+                context.next_token();
+                let typedef_name = context.expect(TokenType::Identifier);
+                if typedef_name == 0 { return false; }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
-            func_info.parent = parent;
+                let generic: Generic = Generic::new(context.allocator);
+                generic.name = typedef_name;
+                let index = self.generics.array.append(generic);
+                self.generics.map.insert(typedef_name.value, index);
+                self.typedefs.insert(typedef_name.value, index);
+            } else {
+                let func_info: Function = Function::parse_optional_body(context);
+                if func_info.name == 0 { return false; }
 
-            self.functions.insert(func_info.name.value, func_info);
+                func_info.parent = parent;
+
+                self.functions.insert(func_info.name.value, func_info);
+            }
         }
 
         if !context.expect_value(TokenType::Symbol, "}") { return false; }

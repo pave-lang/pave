@@ -57,6 +57,10 @@ struct Token;
 
 #line 165 "src/std/ArenaAllocator.pv"
 struct Token* ArenaAllocator__store_Token(struct ArenaAllocator* self, struct Token* value);
+struct GenericTypedef;
+
+#line 165 "src/std/ArenaAllocator.pv"
+struct GenericTypedef* ArenaAllocator__store_GenericTypedef(struct ArenaAllocator* self, struct GenericTypedef* value);
 struct UnknownC;
 
 #line 165 "src/std/ArenaAllocator.pv"

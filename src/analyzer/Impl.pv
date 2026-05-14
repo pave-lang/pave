@@ -55,6 +55,7 @@ impl ImplConst {
 enum ImplNode {
     Function(str),
     Const(str),
+    Typedef(str),
 }
 
 struct Impl {
@@ -71,6 +72,8 @@ struct Impl {
     nodes: Array<ImplNode>,
     functions: HashMap<str, Function>,
     consts: HashMap<str, &ImplConst>,
+    typedef_starts: HashMap<str, usize>,
+    typedefs: HashMap<str, Type>,
 }
 
 impl Impl {
@@ -82,6 +85,8 @@ impl Impl {
             nodes: Array<ImplNode>::new(context.allocator),
             functions: HashMap<str, Function>::new(context.allocator),
             consts: HashMap<str, &ImplConst>::new(context.allocator),
+            typedef_starts: HashMap<str, usize>::new(context.allocator),
+            typedefs: HashMap<str, Type>::new(context.allocator),
         };
 
         if !context.expect_value(TokenType::Keyword, "impl") { return node; }
@@ -149,7 +154,19 @@ impl Impl {
         context.skip_comments();
 
         while context.pos < self.token_end - 1 {
-            if context.check_value(TokenType::Keyword, "const") {
+            if context.check_value(TokenType::Keyword, "typedef") {
+                context.next_token();
+                let typedef_name = context.expect(TokenType::Identifier);
+                if typedef_name == 0 { return false; }
+                if !context.expect_value(TokenType::Symbol, "=") { return false; }
+                let token_start = context.pos;
+                while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
+                    context.next_token();
+                }
+                if !context.expect_value(TokenType::Symbol, ";") { return false; }
+                self.typedef_starts.insert(typedef_name.value, token_start);
+                nodes.append(ImplNode::Typedef(typedef_name.value));
+            } else if context.check_value(TokenType::Keyword, "const") {
                 context.next_token();
                 let const_name = context.expect(TokenType::Identifier);
                 if const_name == 0 { return false; }
@@ -209,6 +226,45 @@ impl Impl {
         return true;
     }
 
+    fn parse_typedefs(&self) -> bool {
+        let context = self.context;
+        for (name, &token_start) in self.typedef_starts {
+            context.pos = *token_start;
+            let typedef_type = context.parse_type2(&self.generics);
+            if typedef_type == 0 { return false; }
+            if !context.expect_value(TokenType::Symbol, ";") { return false; }
+            self.typedefs.insert(name, *typedef_type);
+        }
+
+        if self.has_trait && self.trait_ != 0 {
+            for (name, _) in self.trait_.typedefs {
+                if self.typedefs.find(&name) == 0 {
+                    let message = String::new(self.context.allocator);
+                    message.append("Implementation is missing trait typedef '");
+                    message.append(name);
+                    message.append("'");
+                    self.context.error_token(self.token, message.c_str());
+                }
+            }
+
+            if self.typedefs.length > 0 {
+                match self.trait_type {
+                    Type::Trait(trait_info, generic_map) => {
+                        let new_map_val = generic_map.clone(self.context.allocator);
+                        let new_map = self.context.allocator.store(&new_map_val);
+                        for (name, &typedef_type) in self.typedefs {
+                            new_map.insert(name, *typedef_type);
+                        }
+                        self.trait_type = Type::Trait(trait_info, new_map);
+                    },
+                    _ => {},
+                }
+            }
+        }
+
+        return true;
+    }
+
     fn parse_functions(&self) -> bool {
         let context = self.context;
         context.type_self = &self.type;
@@ -235,6 +291,14 @@ impl Impl {
                 }
 
                 let generic_map = self.trait_type.get_generic_map(context);
+                if self.typedefs.length > 0 {
+                    let aug_map_val = generic_map.clone(context.allocator);
+                    let aug_map = context.allocator.store(&aug_map_val);
+                    for (name, &typedef_type) in self.typedefs {
+                        aug_map.insert(name, *typedef_type);
+                    }
+                    generic_map = aug_map;
+                }
 
                 if impl_func.parameters.length != trait_func.parameters.length {
                     let message = String::new(self.context.allocator);
