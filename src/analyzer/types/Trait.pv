@@ -78,8 +78,8 @@ impl Trait {
         return true;
     }
 
-    fn has_typedefs(&self) -> bool {
-        return self.typedefs.length > 0;
+    fn has_dynamic_dispatch(&self) -> bool {
+        return self.typedefs.length == 0;
     }
 
     fn parse_functions(&self) -> bool {

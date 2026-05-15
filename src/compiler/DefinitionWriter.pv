@@ -545,7 +545,7 @@ impl DefinitionWriter {
 
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
-            if trait_info.has_typedefs() { continue; }
+            if !trait_info.has_dynamic_dispatch() { continue; }
             fprintf(file, "extern struct ");
             generator.write_type_name(file, trait_entry.1, generics);
             fprintf(file, "VTable ");
@@ -602,7 +602,7 @@ impl DefinitionWriter {
         for *impl_info in primitive_info.impls {
             if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
             let trait_info = impl_info.trait_;
-            if trait_info.has_typedefs() { continue; }
+            if !trait_info.has_dynamic_dispatch() { continue; }
             fprintf(file, "extern struct ");
             generator.write_type_name(file, &impl_info.trait_type, generics);
             fprintf(file, "VTable ");

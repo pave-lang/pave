@@ -1128,7 +1128,7 @@ bool DefinitionWriter__write_struct_definition(struct DefinitionWriter* self, FI
         #line 547 "src/compiler/DefinitionWriter.pv"
         struct Trait* trait_info = trait_entry._0;
         #line 548 "src/compiler/DefinitionWriter.pv"
-        if (Trait__has_typedefs(trait_info)) {
+        if (!Trait__has_dynamic_dispatch(trait_info)) {
             #line 548 "src/compiler/DefinitionWriter.pv"
             continue;
         }
@@ -1253,7 +1253,7 @@ bool DefinitionWriter__write_primitive_definition(struct DefinitionWriter* self,
         #line 604 "src/compiler/DefinitionWriter.pv"
         struct Trait* trait_info = impl_info->trait_;
         #line 605 "src/compiler/DefinitionWriter.pv"
-        if (Trait__has_typedefs(trait_info)) {
+        if (!Trait__has_dynamic_dispatch(trait_info)) {
             #line 605 "src/compiler/DefinitionWriter.pv"
             continue;
         }

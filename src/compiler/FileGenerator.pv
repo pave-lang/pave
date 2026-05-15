@@ -285,7 +285,7 @@ impl FileGenerator {
 
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
-            if trait_info.has_typedefs() { continue; }
+            if !trait_info.has_dynamic_dispatch() { continue; }
             fprintf(code_file, "struct ");
             g.write_type_name(code_file, trait_entry.1, generics);
             fprintf(code_file, "VTable ");
@@ -534,7 +534,7 @@ impl FileGenerator {
         for *impl_info in primitive_info.impls {
             if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
             let trait_info = impl_info.trait_;
-            if trait_info.has_typedefs() { continue; }
+            if !trait_info.has_dynamic_dispatch() { continue; }
 
             fprintf(code_file, "\nstruct ");
             g.write_type_name(code_file, &impl_info.trait_type, generics);
@@ -723,7 +723,7 @@ impl FileGenerator {
         let generics = usage_context.generic_map;
         let trait_info = usage.type;
 
-        if trait_info.has_typedefs() { return true; }
+        if !trait_info.has_dynamic_dispatch() { return true; }
 
         let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let header = g.make_path(trait_info.module, name.as_str(), ".h");

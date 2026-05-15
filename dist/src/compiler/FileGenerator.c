@@ -653,7 +653,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 287 "src/compiler/FileGenerator.pv"
         struct Trait* trait_info = trait_entry._0;
         #line 288 "src/compiler/FileGenerator.pv"
-        if (Trait__has_typedefs(trait_info)) {
+        if (!Trait__has_dynamic_dispatch(trait_info)) {
             #line 288 "src/compiler/FileGenerator.pv"
             continue;
         }
@@ -1145,7 +1145,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
         #line 536 "src/compiler/FileGenerator.pv"
         struct Trait* trait_info = impl_info->trait_;
         #line 537 "src/compiler/FileGenerator.pv"
-        if (Trait__has_typedefs(trait_info)) {
+        if (!Trait__has_dynamic_dispatch(trait_info)) {
             #line 537 "src/compiler/FileGenerator.pv"
             continue;
         }
@@ -1522,7 +1522,7 @@ bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_
     struct Trait* trait_info = usage->type;
 
     #line 726 "src/compiler/FileGenerator.pv"
-    if (Trait__has_typedefs(trait_info)) {
+    if (!Trait__has_dynamic_dispatch(trait_info)) {
         #line 726 "src/compiler/FileGenerator.pv"
         return true;
     }

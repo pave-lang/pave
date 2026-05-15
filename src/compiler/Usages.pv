@@ -291,7 +291,7 @@ impl Usages {
 
                         return;
                     },
-                    Type::Trait(_, _) => { is_trait = true; },
+                    Type::Trait(trait_info, _) => { is_trait = trait_info.has_dynamic_dispatch(); },
                     _ => {},
                 }
             },
@@ -329,7 +329,7 @@ impl Usages {
                     },
                 }
             },
-            Type::Trait(_, _) => { is_trait = true; },
+            Type::Trait(trait_info, _) => { is_trait = trait_info.has_dynamic_dispatch(); },
             Type::Sequence(sequence) => {
                 is_type = sequence.is_slice();
                 type = type.deref();
@@ -381,6 +381,15 @@ impl Usages {
         for *impl_info in impls {
             if impl_info.has_trait {
                 self.add_type(&impl_info.trait_type, generic_map);
+
+                if impl_info.trait_ != 0 && !impl_info.trait_.has_dynamic_dispatch() {
+                    for (_, &func_info) in impl_info.functions {
+                        for param in func_info.parameters {
+                            self.add_type(&param.type, generic_map);
+                        }
+                        self.add_type(&func_info.return_type, generic_map);
+                    }
+                }
             }
 
             for (_, &func_info) in impl_info.functions {

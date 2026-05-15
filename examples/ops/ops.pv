@@ -3,6 +3,7 @@
 use std
 
 struct Vec3 { x: f32, y: f32, z: f32 }
+struct Quat { w: f32, x: f32, y: f32, z: f32 }
 
 impl Mul<f32> for Vec3 {
     typedef Output = Vec3;
@@ -28,6 +29,42 @@ impl Add<Vec3> for Vec3 {
     }
 }
 
+impl Mul<Quat> for Quat {
+    typedef Output = Quat;
+
+    fn mul(self, other: Quat) -> Quat {
+        return Quat {
+            w: self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z,
+            x: self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
+            y: self.w * other.y - self.x * other.z + self.y * other.w + self.z * other.x,
+            z: self.w * other.z + self.x * other.y - self.y * other.x + self.z * other.w,
+        };
+    }
+}
+
+impl Mul<Vec3> for Quat {
+    typedef Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Vec3 {
+        let tx = 2.0f * (self.y * other.z - self.z * other.y);
+        let ty = 2.0f * (self.z * other.x - self.x * other.z);
+        let tz = 2.0f * (self.x * other.y - self.y * other.x);
+        return Vec3 {
+            x: other.x + self.w * tx + self.y * tz - self.z * ty,
+            y: other.y + self.w * ty + self.z * tx - self.x * tz,
+            z: other.z + self.w * tz + self.x * ty - self.y * tx,
+        };
+    }
+}
+
+impl Add<Quat> for Quat {
+    typedef Output = Quat;
+
+    fn add(self, other: Quat) -> Quat {
+        return Quat { w: self.w + other.w, x: self.x + other.x, y: self.y + other.y, z: self.z + other.z };
+    }
+}
+
 impl Mul<Vec3> for f32 {
     typedef Output = Vec3;
 
@@ -50,6 +87,19 @@ fn main(argc: i32, argv: **const char) -> i32 {
     printf("hadamard: %.1f %.1f %.1f\n", hadamard.x, hadamard.y, hadamard.z);
     printf("chained: %.1f %.1f %.1f\n", chained.x, chained.y, chained.z);
     printf("scalar_mul: %.1f %.1f %.1f\n", scalar_mul.x, scalar_mul.y, scalar_mul.z);
+
+    // 90 degrees around Y axis: (cos(45°), 0, sin(45°), 0)
+    let rot_y90 = Quat { w: 0.7071f, x: 0.0f, y: 0.7071f, z: 0.0f };
+    let rotated = rot_y90 * pos;
+    let chained_rot = rot_y90 * (rot_y90 * pos);
+    let double_rot = rot_y90 * rot_y90;
+    let double_rotated = double_rot * pos;
+    let quat_sum = rot_y90 + rot_y90;
+
+    printf("rotated (90 around Y): %.2f %.2f %.2f\n", rotated.x, rotated.y, rotated.z);
+    printf("chained_rot (180 around Y): %.2f %.2f %.2f\n", chained_rot.x, chained_rot.y, chained_rot.z);
+    printf("double_rotated (180 around Y): %.2f %.2f %.2f\n", double_rotated.x, double_rotated.y, double_rotated.z);
+    printf("quat_sum: %.2f %.2f %.2f %.2f\n", quat_sum.w, quat_sum.x, quat_sum.y, quat_sum.z);
 
     return 0;
 }

@@ -146,9 +146,9 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent) {
 }
 
 #line 81 "src/analyzer/types/Trait.pv"
-bool Trait__has_typedefs(struct Trait* self) {
+bool Trait__has_dynamic_dispatch(struct Trait* self) {
     #line 82 "src/analyzer/types/Trait.pv"
-    return self->typedefs.length > 0;
+    return self->typedefs.length == 0;
 }
 
 #line 85 "src/analyzer/types/Trait.pv"

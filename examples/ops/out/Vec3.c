@@ -1,8 +1,6 @@
 #include <stdio.h>
 
 #include <ops/Vec3.h>
-#include <std/trait_Mul_Vec3_Vec3.h>
-#include <std/trait_Add_Vec3_Vec3.h>
 #include <ops/Vec3.h>
 
 #include <ops/Vec3.h>

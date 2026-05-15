@@ -7,7 +7,6 @@ struct Vec3 {
     float z;
 };
 
-#include <std/trait_Mul_f32_Vec3.h>
 #include <ops/Vec3.h>
 
 struct Vec3 Vec3__Mul_f32__mul(struct Vec3 self, float other);
