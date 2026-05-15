@@ -1,4 +1,5 @@
 #include "string.h"
+#include "stdlib.h"
 
 struct str {
     ptr: *const char,
@@ -112,4 +113,68 @@ impl str {
 
 impl Hash for str {
     fn hash(&self) -> Hashed { return Fnv1a::hash(self.ptr, self.length); }
+}
+
+test "eq - equal strings" {
+    let a: str = "hello";
+    let b: str = "hello";
+    if !a.eq(b) { abort(); }
+}
+
+test "eq - different content" {
+    let a: str = "hello";
+    let b: str = "world";
+    if a.eq(b) { abort(); }
+}
+
+test "eq - different lengths" {
+    let a: str = "hello";
+    let b: str = "hell";
+    if a.eq(b) { abort(); }
+}
+
+test "slice" {
+    let s: str = "hello world";
+    if !s.slice(6, 11).eq("world") { abort(); }
+    if !s.slice(0, 5).eq("hello") { abort(); }
+}
+
+test "starts_with" {
+    let s: str = "hello world";
+    if !s.starts_with("hello") { abort(); }
+    if s.starts_with("world") { abort(); }
+}
+
+test "ends_with" {
+    let s: str = "hello world";
+    if !s.ends_with("world") { abort(); }
+    if s.ends_with("hello") { abort(); }
+}
+
+test "contains" {
+    let s: str = "hello world";
+    if !s.contains("lo wo") { abort(); }
+    if s.contains("xyz") { abort(); }
+}
+
+test "trim" {
+    let s: str = "  hello  ";
+    if !s.trim().eq("hello") { abort(); }
+}
+
+test "trim - no whitespace" {
+    let s: str = "hello";
+    if !s.trim().eq("hello") { abort(); }
+}
+
+test "index_of" {
+    let s: str = "hello";
+    if s.index_of('l') != 2 { abort(); }
+    if s.index_of('z') != -1 { abort(); }
+}
+
+test "index_of_last" {
+    let s: str = "hello";
+    if s.index_of_last('l') != 3 { abort(); }
+    if s.index_of_last('z') != -1 { abort(); }
 }

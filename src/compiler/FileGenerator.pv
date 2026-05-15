@@ -850,8 +850,88 @@ impl FileGenerator {
         }
     }
 
+    fn collect_tests(&self, children: &HashMap<str, &Namespace>, func_names: &Array<str>, descriptions: &Array<str>, header_paths: &Array<str>) {
+        let g = self.generator;
+
+        for (_, namespace) in children {
+            for (_, module) in namespace.modules {
+                for test_info in module.tests {
+                    let desc = test_info.description.value;
+                    descriptions.append(desc.slice(1, desc.length - 1));
+                    func_names.append(test_info.func_name);
+
+                    let header_path = g.make_rel_path(module, test_info.func_name, ".h");
+                    header_paths.append(header_path.as_str());
+                }
+            }
+
+            self.collect_tests(&namespace.children, func_names, descriptions, header_paths);
+        }
+    }
+
+    fn generate_test_runner(&self, children: &HashMap<str, &Namespace>) {
+        let g = self.generator;
+        let allocator = g.allocator;
+
+        let func_names = Array<str>::new(allocator);
+        let descriptions = Array<str>::new(allocator);
+        let header_paths = Array<str>::new(allocator);
+
+        self.collect_tests(children, &func_names, &descriptions, &header_paths);
+
+        if func_names.length == 0 { return; }
+
+        let runner_path = String::new(allocator);
+        runner_path.append(g.path);
+        runner_path.append("/test_runner.c");
+
+        let runner_tmp: *const char = tmpnam(0);
+        let runner_file: &FILE = fopen(runner_tmp, "w+");
+        if runner_file == 0 { return; }
+
+        fprintf(runner_file, "#include <stdio.h>\n\n");
+
+        let i: usize = 0;
+        while i < header_paths.length {
+            let hp = header_paths.data[i];
+            fprintf(runner_file, "#include <");
+            g.write_str(runner_file, hp);
+            fprintf(runner_file, ">\n");
+            i += 1;
+        }
+
+        fprintf(runner_file, "\nint main(void) {\n");
+        fprintf(runner_file, "    int passed = 0;\n");
+        fprintf(runner_file, "    int failed = 0;\n\n");
+
+        i = 0;
+        while i < func_names.length {
+            let desc = descriptions.data[i];
+            let func_name = func_names.data[i];
+
+            fprintf(runner_file, "    fputs(\"[TEST] ");
+            g.write_str(runner_file, desc);
+            fprintf(runner_file, "\\n\", stdout);\n");
+            fprintf(runner_file, "    ");
+            g.write_str(runner_file, func_name);
+            fprintf(runner_file, "();\n");
+            fprintf(runner_file, "    passed++;\n\n");
+
+            i += 1;
+        }
+
+        fprintf(runner_file, "    printf(\"[RESULT] %%d passed, %%d failed\\n\", passed, failed);\n");
+        fprintf(runner_file, "    return failed > 0 ? 1 : 0;\n");
+        fprintf(runner_file, "}\n");
+
+        g.overwrite_if_different(runner_path.c_str(), runner_file);
+        fclose(runner_file);
+        remove(runner_tmp);
+    }
+
     fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {
         let g = self.generator;
+
         for (name, namespace) in children {
             let path = String::new(g.allocator);
             path.append(base_path);

@@ -4,6 +4,11 @@ use std
 use types
 use c
 
+struct TestInfo {
+    description: &Token,
+    func_name: str,
+}
+
 struct Module {
     root: &Root,
     namespace: &Namespace,
@@ -23,6 +28,7 @@ struct Module {
     includes: HashMap<str, &Include>,
     globals: HashMap<str, &Global>,
     global_types: HashMap<str, Type>,
+    tests: Array<TestInfo>,
 }
 
 impl Module {
@@ -47,6 +53,7 @@ impl Module {
             includes: HashMap<str, &Include>::new(allocator),
             globals: HashMap<str, &Global>::new(allocator),
             global_types: HashMap<str, Type>::new(allocator),
+            tests: Array<TestInfo>::new(allocator),
         };
 
         self.context = Context::new(allocator, "", path, 0, analysis, self);
@@ -188,6 +195,40 @@ impl Module {
                 } else {
                     functions.insert(node.name.value, node);
                 }
+            } else if token.eq(TokenType::Keyword, "test") {
+                if !context.expect_value(TokenType::Keyword, "test") { return false; }
+
+                let description = context.expect(TokenType::String);
+                if description == 0 { return false; }
+
+                let test_index = self.tests.length;
+                let name_str = String::new(allocator);
+                name_str.append("__pave_test_");
+                name_str.append_usize(test_index);
+
+                let name_token_val = Token {
+                    type: TokenType::Identifier,
+                    value: name_str.as_str(),
+                };
+                let name_token = allocator.store(&name_token_val);
+
+                if !context.check_value(TokenType::Symbol, "{") {
+                    context.error_token(description, "Expected { after test description");
+                    return false;
+                }
+
+                let node: Function = Function::new(context);
+                node.name = name_token;
+                node.is_test = true;
+                node.declaration_start = context.pos;
+                node.declaration_end = context.pos;
+                node.token_start = context.pos;
+
+                if !context.skip_brackets("{", "}") { return false; }
+                node.token_end = context.pos;
+
+                self.tests.append(TestInfo { description, func_name: name_str.as_str() });
+                functions.insert(name_token.value, node);
             } else if token.eq(TokenType::Keyword, "const") || token.eq(TokenType::Keyword, "let") {
                 let is_const = token.eq(TokenType::Keyword, "const");
                 context.next_token();

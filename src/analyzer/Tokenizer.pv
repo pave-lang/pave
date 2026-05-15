@@ -173,6 +173,7 @@ impl Tokenizer {
         keywords.append("static");
         keywords.append("dyn");
         keywords.append("typedef");
+        keywords.append("test");
 
         // unused for now
         keywords.append("export");

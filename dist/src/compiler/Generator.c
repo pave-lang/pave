@@ -1252,35 +1252,37 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
     } }
     #line 609 "src/compiler/Generator.pv"
     FileGenerator__generate_globals_namespace(&file_gen, &root->children);
+    #line 610 "src/compiler/Generator.pv"
+    FileGenerator__generate_test_runner(&file_gen, &root->children);
 
-    #line 611 "src/compiler/Generator.pv"
+    #line 612 "src/compiler/Generator.pv"
     if (self.code_files.length > 0) {
-        #line 612 "src/compiler/Generator.pv"
+        #line 613 "src/compiler/Generator.pv"
         struct String command = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
-        #line 614 "src/compiler/Generator.pv"
+        #line 615 "src/compiler/Generator.pv"
         { struct Iter_ref_String __iter = Array_String__iter(&self.code_files);
-        #line 614 "src/compiler/Generator.pv"
+        #line 615 "src/compiler/Generator.pv"
         while (Iter_ref_String__next(&__iter)) {
-            #line 614 "src/compiler/Generator.pv"
+            #line 615 "src/compiler/Generator.pv"
             struct String* code_file = Iter_ref_String__value(&__iter);
 
-            #line 615 "src/compiler/Generator.pv"
+            #line 616 "src/compiler/Generator.pv"
             if (command.array.length > 0) {
-                #line 616 "src/compiler/Generator.pv"
+                #line 617 "src/compiler/Generator.pv"
                 String__append(&command, (struct str){ .ptr = output_seperator, .length = strlen(output_seperator) });
             }
 
-            #line 619 "src/compiler/Generator.pv"
+            #line 620 "src/compiler/Generator.pv"
             String__append(&command, String__as_str(code_file));
         } }
 
-        #line 622 "src/compiler/Generator.pv"
-        uint32_t length = command.array.length;
         #line 623 "src/compiler/Generator.pv"
+        uint32_t length = command.array.length;
+        #line 624 "src/compiler/Generator.pv"
         printf("%.*s\n", length, command.array.data);
     }
 
-    #line 626 "src/compiler/Generator.pv"
+    #line 627 "src/compiler/Generator.pv"
     return result;
 }

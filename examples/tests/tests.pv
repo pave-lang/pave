@@ -1,0 +1,11 @@
+#include "stdio.h"
+#include "assert.h"
+
+test "basic arithmetic" {
+    let x: i32 = 1 + 2;
+    assert(x == 3);
+}
+
+test "string output" {
+    fprintf(stderr, "hello from test\n");
+}

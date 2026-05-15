@@ -37,6 +37,7 @@ struct Function {
     parameters: Array<Parameter>,
     return_type: Type,
     body: &Block,
+    is_test: bool,
 }
 
 impl Function {
@@ -173,6 +174,11 @@ impl Function {
 
     fn fill_types(&self, generics: &Generics) -> bool {
         self.generics.parent = generics;
+
+        if self.is_test {
+            self.return_type = self.context.root.type_void;
+            return true;
+        }
 
         let context = self.context;
         context.pos = self.declaration_start;

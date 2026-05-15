@@ -24,6 +24,7 @@ struct TypeUsage_Tuple;
 struct TypeUsage_Trait;
 struct Global;
 struct HashMap_str_ref_Namespace;
+struct Array_str;
 
 #line 16 "src/compiler/FileGenerator.pv"
 struct FileGenerator FileGenerator__new(struct Generator* generator);
@@ -77,6 +78,12 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
 void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
 #line 853 "src/compiler/FileGenerator.pv"
+void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths);
+
+#line 872 "src/compiler/FileGenerator.pv"
+void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
+
+#line 932 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif

@@ -27,6 +27,7 @@ struct Function {
     struct Array_Parameter parameters;
     struct Type return_type;
     struct Block* body;
+    bool is_test;
 };
 
 #include <analyzer/types/Function.h>
@@ -35,31 +36,31 @@ struct Context;
 struct Function;
 struct Generics;
 
-#line 43 "src/analyzer/types/Function.pv"
+#line 44 "src/analyzer/types/Function.pv"
 struct Function Function__new(struct Context* context);
 
-#line 51 "src/analyzer/types/Function.pv"
+#line 52 "src/analyzer/types/Function.pv"
 struct Function Function__new_allocator(struct trait_Allocator allocator);
 
-#line 58 "src/analyzer/types/Function.pv"
+#line 59 "src/analyzer/types/Function.pv"
 struct Function Function__parse(struct Context* context);
 
-#line 62 "src/analyzer/types/Function.pv"
+#line 63 "src/analyzer/types/Function.pv"
 struct Function Function__parse_optional_body(struct Context* context);
 
-#line 66 "src/analyzer/types/Function.pv"
+#line 67 "src/analyzer/types/Function.pv"
 struct Function Function__parse_inner(struct Context* context, bool body_optional);
 
-#line 102 "src/analyzer/types/Function.pv"
+#line 103 "src/analyzer/types/Function.pv"
 bool Function__parse_parameters(struct Function* self, struct Generics* generics);
 
-#line 163 "src/analyzer/types/Function.pv"
+#line 164 "src/analyzer/types/Function.pv"
 bool Function__parse_return_type(struct Function* self, struct Generics* generics);
 
-#line 174 "src/analyzer/types/Function.pv"
+#line 175 "src/analyzer/types/Function.pv"
 bool Function__fill_types(struct Function* self, struct Generics* generics);
 
-#line 192 "src/analyzer/types/Function.pv"
+#line 198 "src/analyzer/types/Function.pv"
 bool Function__parse_function(struct Function* self, struct Generics* generics);
 
 #endif

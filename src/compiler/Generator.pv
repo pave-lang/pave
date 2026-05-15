@@ -607,6 +607,7 @@ impl Generator {
         for (_, &usage) in usages.sequences { file_gen.generate_sequence(usage); }
         for (_, &usage) in usages.tuples { file_gen.generate_tuple_loop(usage); }
         file_gen.generate_globals_namespace(&root.children);
+        file_gen.generate_test_runner(&root.children);
 
         if self.code_files.length > 0 {
             let command = String::new(allocator);
