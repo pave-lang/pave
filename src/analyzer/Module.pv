@@ -343,8 +343,11 @@ impl Module {
         let allocator = self.namespace.root.allocator;
 
         for impl_info in self.impls {
-            success = impl_info.prefill_types() && success;
-            
+            if !impl_info.prefill_types() {
+                success = false;
+                continue;
+            }
+
             match impl_info.type {
                 Type::Enum(enum_info, _) => {
                     if impl_info.trait_ != 0 { enum_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
