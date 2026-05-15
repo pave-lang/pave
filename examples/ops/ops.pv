@@ -2,16 +2,12 @@
 
 use std
 
-struct Vec3 {
-    x: f32,
-    y: f32,
-    z: f32,
-}
+struct Vec3 { x: f32, y: f32, z: f32 }
 
 impl Mul<f32> for Vec3 {
     typedef Output = Vec3;
 
-    fn mul(&self, other: f32) -> Vec3 {
+    fn mul(self, other: f32) -> Vec3 {
         return Vec3 { x: self.x * other, y: self.y * other, z: self.z * other };
     }
 }
@@ -19,7 +15,7 @@ impl Mul<f32> for Vec3 {
 impl Mul<Vec3> for Vec3 {
     typedef Output = Vec3;
 
-    fn mul(&self, other: Vec3) -> Vec3 {
+    fn mul(self, other: Vec3) -> Vec3 {
         return Vec3 { x: self.x * other.x, y: self.y * other.y, z: self.z * other.z };
     }
 }
@@ -27,7 +23,7 @@ impl Mul<Vec3> for Vec3 {
 impl Add<Vec3> for Vec3 {
     typedef Output = Vec3;
 
-    fn add(&self, other: Vec3) -> Vec3 {
+    fn add(self, other: Vec3) -> Vec3 {
         return Vec3 { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z };
     }
 }
@@ -35,7 +31,7 @@ impl Add<Vec3> for Vec3 {
 impl Mul<Vec3> for f32 {
     typedef Output = Vec3;
 
-    fn mul(&self, other: Vec3) -> Vec3 {
+    fn mul(self, other: Vec3) -> Vec3 {
         let value = *self;
         return Vec3 { x: other.x * value, y: other.y * value, z: other.z * value };
     }

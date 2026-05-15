@@ -46,37 +46,37 @@ bool FileGenerator__generate_struct_loop(struct FileGenerator* self, struct Type
 #line 181 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context);
 
-#line 472 "src/compiler/FileGenerator.pv"
+#line 473 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive_loop(struct FileGenerator* self, struct TypeUsage_Primitive* usage);
 
-#line 480 "src/compiler/FileGenerator.pv"
+#line 481 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUsage_Primitive* usage, struct UsageContext* usage_context);
 
-#line 564 "src/compiler/FileGenerator.pv"
+#line 569 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_sequence(struct FileGenerator* self, struct TypeUsage_Sequence* usage);
 
-#line 577 "src/compiler/FileGenerator.pv"
+#line 582 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_Sequence* usage, struct UsageContext* usage_context);
 
-#line 647 "src/compiler/FileGenerator.pv"
+#line 652 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple_loop(struct FileGenerator* self, struct TypeUsage_Tuple* usage);
 
-#line 655 "src/compiler/FileGenerator.pv"
+#line 660 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_Tuple* usage, struct UsageContext* usage_context);
 
-#line 707 "src/compiler/FileGenerator.pv"
+#line 712 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait_loop(struct FileGenerator* self, struct TypeUsage_Trait* usage);
 
-#line 715 "src/compiler/FileGenerator.pv"
+#line 720 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
-#line 761 "src/compiler/FileGenerator.pv"
+#line 768 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* global);
 
-#line 834 "src/compiler/FileGenerator.pv"
+#line 841 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 846 "src/compiler/FileGenerator.pv"
+#line 853 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif

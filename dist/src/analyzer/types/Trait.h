@@ -38,6 +38,9 @@ struct Trait Trait__parse(struct Module* module);
 bool Trait__fill_types(struct Trait* self, struct FunctionParent parent);
 
 #line 81 "src/analyzer/types/Trait.pv"
+bool Trait__has_typedefs(struct Trait* self);
+
+#line 85 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self);
 
 #endif

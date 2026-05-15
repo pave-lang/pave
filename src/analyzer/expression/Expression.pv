@@ -1164,6 +1164,8 @@ impl Expression {
         else if operator.eq("/") { trait_name = "Div"; func_name = "div"; }
         else { return 0; }
 
+        if lhs_type.is_unknown() || rhs.return_type.is_unknown() { return 0; }
+
         match lhs_type {
             Type::Indirect(indirect) => {
                 return Expression::find_operator_trait_call(context, token, lhs, &indirect.to, operator, rhs);
@@ -1189,6 +1191,30 @@ impl Expression {
                         }
                         func_map = aug_map;
                     }
+
+                    let func_type = context.allocator.store(&Type::Function(func, func_map));
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+                    arguments.append(InvokeArgument { value: lhs });
+                    arguments.append(InvokeArgument { value: rhs });
+
+                    return Expression::make_type_function_call(context, token, func_type, arguments, 0);
+                }
+            },
+            Type::Primitive(primitive_info) => {
+                for *impl_info in primitive_info.impls {
+                    if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+                    if !impl_info.trait_.name.value.eq(trait_name) { continue; }
+
+                    let func: &Function = impl_info.functions.find(&func_name);
+                    if func == 0 { continue; }
+                    if func.parameters.length < 2 { continue; }
+
+                    let other_param = func.parameters.get(1);
+                    if rhs.return_type.is_self() { continue; }
+                    if !other_param.type.eq(&rhs.return_type) { continue; }
+
+                    let func_map: *GenericMap = impl_info.trait_type.get_generic_map(context);
 
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
 

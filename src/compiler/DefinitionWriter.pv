@@ -48,9 +48,15 @@ impl DefinitionWriter {
 
     fn write_trait_function_decl(&self, file: &FILE, name: str, trait_info: &Trait, impl_trait_type: &Type, func_info: &Function, generics: &GenericMap) -> bool {
         let generator = self.generator;
+        let func_name = generator.get_trait_function_name(name, trait_info, impl_trait_type, func_info, generics);
+
+        let is_value_self = func_info.parameters.length > 0 && func_info.parameters.data[0].type.is_self();
+        if is_value_self {
+            return self.write_function_definition(file, func_info, generics, &func_name);
+        }
+
         let generics_void = *generics;
         generics_void.self_type = &generator.root.type_void;
-        let func_name = generator.get_trait_function_name(name, trait_info, impl_trait_type, func_info, generics);
         return self.write_function_definition(file, func_info, &generics_void, &func_name);
     }
 
@@ -539,6 +545,7 @@ impl DefinitionWriter {
 
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
+            if trait_info.has_typedefs() { continue; }
             fprintf(file, "extern struct ");
             generator.write_type_name(file, trait_entry.1, generics);
             fprintf(file, "VTable ");
@@ -590,11 +597,14 @@ impl DefinitionWriter {
             self.write_impl_definition(file, name.as_str(), impl_info, generics);
         }
 
-        if primitive_info.traits.length > 0 { fprintf(file, "\n"); }
+        if primitive_info.impls.length > 0 { fprintf(file, "\n"); }
 
-        for (_, trait_info) in primitive_info.traits {
-            fprintf(file, "extern struct trait_");
-            generator.write_token(file, trait_info.name);
+        for *impl_info in primitive_info.impls {
+            if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+            let trait_info = impl_info.trait_;
+            if trait_info.has_typedefs() { continue; }
+            fprintf(file, "extern struct ");
+            generator.write_type_name(file, &impl_info.trait_type, generics);
             fprintf(file, "VTable ");
             generator.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__");
@@ -663,7 +673,10 @@ impl DefinitionWriter {
         fprintf(file, " {\n");
         generator.indent += 1;
 
-        self.write_self_cast(file, module, generics);
+        let is_value_self = func_info.parameters.length > 0 && func_info.parameters.data[0].type.is_self();
+        if !is_value_self {
+            self.write_self_cast(file, module, generics);
+        }
 
         let func_context = FunctionContext::new(generator.allocator, func_info, true);
         if function_usage != 0 { func_context.coroutine.yield_count = function_usage.function_context.coroutine.yield_count; }

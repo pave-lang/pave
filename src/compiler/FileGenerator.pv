@@ -285,6 +285,7 @@ impl FileGenerator {
 
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
+            if trait_info.has_typedefs() { continue; }
             fprintf(code_file, "struct ");
             g.write_type_name(code_file, trait_entry.1, generics);
             fprintf(code_file, "VTable ");
@@ -530,9 +531,13 @@ impl FileGenerator {
 
         if !defs.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
-        for (_, trait_info) in primitive_info.traits {
-            fprintf(code_file, "\nstruct trait_");
-            g.write_token(code_file, trait_info.name);
+        for *impl_info in primitive_info.impls {
+            if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+            let trait_info = impl_info.trait_;
+            if trait_info.has_typedefs() { continue; }
+
+            fprintf(code_file, "\nstruct ");
+            g.write_type_name(code_file, &impl_info.trait_type, generics);
             fprintf(code_file, "VTable ");
             g.write_str_title(code_file, name);
             fprintf(code_file, "__VTABLE__");
@@ -547,7 +552,7 @@ impl FileGenerator {
                 fprintf(code_file, ".");
                 g.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
-                let func_name = g.get_trait_function_name(name, trait_info, 0, func_info, generics);
+                let func_name = g.get_trait_function_name(name, trait_info, &impl_info.trait_type, func_info, generics);
                 g.write_string(code_file, &func_name);
             }
 
@@ -717,6 +722,8 @@ impl FileGenerator {
         let defs = DefinitionWriter { generator: g };
         let generics = usage_context.generic_map;
         let trait_info = usage.type;
+
+        if trait_info.has_typedefs() { return true; }
 
         let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let header = g.make_path(trait_info.module, name.as_str(), ".h");

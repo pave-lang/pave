@@ -6,8 +6,7 @@ extern "C" {
 #else
 #endif
 
-struct CppTest {
-};
+struct CppTest;
 
 void CppTest__run();
 

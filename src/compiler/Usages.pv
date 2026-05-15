@@ -149,8 +149,16 @@ impl Usages {
         for (_, &info) in self.root.primitives {
             if info.impls.length > 0 {
                 let primitive_ptr = cast<usize>(info);
-                self.primitives.insert(primitive_ptr, TypeUsage<Primitive>::new(self.allocator, info, info.impls.length));
+                let usage = self.primitives.insert(primitive_ptr, TypeUsage<Primitive>::new(self.allocator, info, info.impls.length));
                 self.usages.append(Type::Primitive(info));
+
+                let i: usize = 0;
+                for *impl_info in info.impls {
+                    for (_, &func_info) in impl_info.functions {
+                        usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                    }
+                    i += 1;
+                }
             }
         }
 
@@ -305,6 +313,7 @@ impl Usages {
                     },
                     FunctionParent::Primitive(primitive_info, _, _) => {
                         self.add_type(&Type::Primitive(primitive_info), generic_map);
+                        is_type = true;
                     },
                     FunctionParent::Struct(struct_info, _, _) => {
                         self.add_type(&Type::Struct(struct_info, type_generic_map), generic_map);
@@ -541,10 +550,7 @@ impl Usages {
 
                 let func_usage = parent_usage.impl_functions.get(impl_index).find(&func_ptr);
                 self.function_context = &func_usage.function_context;
-
-                if func_info.generics.array.length > 0 {
-                    self.usage_context = func_usage.add_usage(generic_map);
-                }
+                self.usage_context = func_usage.add_usage(generic_map);
             },
             FunctionParent::Struct(struct_info, impl_index, _) => {
                 let parent_ptr = cast<usize>(struct_info);

@@ -1,5 +1,7 @@
 #include <dynamic_fn/Position.h>
 #include <dynamic_fn/Time.h>
+#include <dynamic_fn/Physics.h>
+#include <dynamic_fn/Physics.h>
 
 #include <dynamic_fn/Physics.h>
 
@@ -26,4 +28,4 @@ void Physics__apply_physics__Fn__execute(void* __self) {
     struct Physics__apply_physics__Fn__Instance* self = __self;
     Physics__apply_physics(self->self, self->data, self->time);
 }
-struct FnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN = { .get_params = &Physics__apply_physics__Fn__get_params, .set_arg = &Physics__apply_physics__Fn__set_arg, .execute = &Physics__apply_physics__Fn__execute };
+struct trait_FnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN = { .get_params = &Physics__apply_physics__Fn__get_params, .set_arg = &Physics__apply_physics__Fn__set_arg, .execute = &Physics__apply_physics__Fn__execute };

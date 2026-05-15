@@ -1,7 +1,7 @@
 #cpp
 #include "cpp.hpp"
 
-struct CppTest {}
+struct CppTest;
 impl CppTest {
     fn run() {
         let a = TestCpp::Vec4();
@@ -14,4 +14,10 @@ impl CppTest {
 
         TestCpp::print_vec(b);
     }
+}
+
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    CppTest::run();
+    return 0;
 }

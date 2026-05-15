@@ -53,7 +53,7 @@ define build_example
 	dist/pavec std=src/std $(1)=examples/$(1) -o examples --no-line-directives -- -I"C:/Program Files/LLVM/include" -Iexamples/$(1)
 	rm -rf examples/$(1)/out
 	mkdir -p examples/$(1)/out
-	mv examples/$(1)/*.c examples/$(1)/*.h examples/$(1)/out/
+	mv examples/$(1)/*.c examples/$(1)/*.cpp examples/$(1)/*.h examples/$(1)/out/
 endef
 
 examples:
@@ -65,6 +65,7 @@ examples:
 	$(call build_example,traits)
 	$(call build_example,dynamic_fn)
 	$(call build_example,cpp)
+	$(call build_example,ops)
 	rm -rf examples/*.c examples/*.h examples/std
 
 clean:

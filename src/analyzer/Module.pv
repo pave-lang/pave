@@ -361,9 +361,7 @@ impl Module {
                 },
                 Type::Primitive(primitive_info) => {
                     if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
-                    let impl_index = primitive_info.impls.append(impl_info);
-                    let parent = FunctionParent::Primitive(primitive_info, impl_index, impl_info.trait_);
-                    impl_info.fill_types(parent);
+                    primitive_info.impls.append(impl_info);
                 },
                 Type::StructC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
@@ -416,6 +414,10 @@ impl Module {
         }
 
         for impl_info in self.impls {
+            match impl_info.type {
+                Type::Primitive(_) => { continue; },
+                _ => {},
+            }
             for (_, &func_info) in impl_info.functions {
                 func_info.fill_types(&impl_info.generics);
             }
@@ -458,6 +460,10 @@ impl Module {
         }
 
         for impl_info in self.impls {
+            match impl_info.type {
+                Type::Primitive(_) => { continue; },
+                _ => {},
+            }
             impl_info.parse_functions();
         }
 

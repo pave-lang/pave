@@ -568,15 +568,17 @@ impl ExpressionWriter {
                 }
 
                 if operator.eq("&") {
-                    let is_invoke = false;
+                    let is_rvalue = false;
                     match inner.data {
-                        ExpressionData::Invoke(_, _) => { is_invoke = true; },
+                        ExpressionData::Invoke(_, _) => { is_rvalue = true; },
+                        ExpressionData::Literal(_) => { is_rvalue = true; },
+                        ExpressionData::BinaryExpression(_, _, _) => { is_rvalue = true; },
                         _ => {},
                     }
 
-                    if is_invoke {
+                    if is_rvalue {
                         // Array compound literal is an lvalue in C99 and decays to a pointer,
-                        // avoiding "cannot take address of rvalue" when chaining trait calls.
+                        // avoiding "cannot take address of rvalue" for non-addressable expressions.
                         fprintf(file, "(");
                         g.write_type(file, &inner.return_type, generics);
                         fprintf(file, "[]){");

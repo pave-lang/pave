@@ -18,7 +18,7 @@ fn run(func: &dyn Fn, objects: &[Object], time: Time, physics: Physics) {
     let params = func.get_params();
 
     for obj in objects {
-        for (i, param) in params.iter().enumerate() {
+        for (i, *param) in params.iter().enumerate() {
             if param == typeid(Physics) {
                 func.set_arg(i, &physics);
             } else if param == typeid(Time) {

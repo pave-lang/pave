@@ -78,6 +78,10 @@ impl Trait {
         return true;
     }
 
+    fn has_typedefs(&self) -> bool {
+        return self.typedefs.length > 0;
+    }
+
     fn parse_functions(&self) -> bool {
         let context = &self.module.context;
         context.type_self = &self.type_self;
