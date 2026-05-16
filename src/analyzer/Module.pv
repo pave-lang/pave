@@ -201,10 +201,49 @@ impl Module {
                 let description = context.expect(TokenType::String);
                 if description == 0 { return false; }
 
-                let test_index = self.tests.length;
                 let name_str = String::new(allocator);
-                name_str.append("__pave_test_");
-                name_str.append_usize(test_index);
+
+                // Build namespace prefix by walking up the hierarchy
+                let ns_prefix = String::new(allocator);
+                let cur_ns: *Namespace = self.namespace;
+                while cur_ns.parent != 0 {
+                    ns_prefix.prepend("__");
+                    ns_prefix.prepend(cur_ns.name);
+                    cur_ns = cur_ns.parent;
+                }
+                name_str.append("test_");
+                name_str.append_string(&ns_prefix);
+
+                // Extract module stem from path (e.g., "src/std/str.pv" -> "str")
+                let mod_path = self.path;
+                let last_sep: isize = -1;
+                let pi: usize = 0;
+                while pi < mod_path.length {
+                    let pch = mod_path.ptr[pi];
+                    if pch == '/' || pch == '\\' { last_sep = cast<isize>(pi); }
+                    pi += 1;
+                }
+                let stem_start: usize = 0;
+                if last_sep >= 0 { stem_start = cast<usize>(last_sep) + 1; }
+                let stem_end = mod_path.length;
+                if stem_end >= 3 && mod_path.slice(stem_end - 3, stem_end).eq(".pv") {
+                    stem_end = stem_end - 3;
+                }
+                name_str.append(mod_path.slice(stem_start, stem_end));
+                name_str.append("__");
+
+                // Sanitize description (strip quotes, replace non-alphanumeric with _)
+                let desc_raw = description.value.slice(1, description.value.length - 1);
+                let di: usize = 0;
+                while di < desc_raw.length {
+                    let dch = desc_raw.ptr[di];
+                    if (dch >= 'a' && dch <= 'z') || (dch >= 'A' && dch <= 'Z') || (dch >= '0' && dch <= '9') {
+                        name_str.append(desc_raw.slice(di, di + 1));
+                    } else {
+                        name_str.append("_");
+                    }
+                    di += 1;
+                }
 
                 let name_token_val = Token {
                     type: TokenType::Identifier,
@@ -219,7 +258,7 @@ impl Module {
 
                 let node: Function = Function::new(context);
                 node.name = name_token;
-                node.is_test = true;
+                node.type = FunctionType::Test;
                 node.declaration_start = context.pos;
                 node.declaration_end = context.pos;
                 node.token_start = context.pos;

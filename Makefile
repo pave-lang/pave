@@ -37,6 +37,9 @@ all:
 		exit 1; \
 	fi
 	@echo ""
+	@echo "=== Building and running tests ==="
+	@$(MAKE) -f Makefile.build BUILD_DIR=build/2 CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' tests --no-print-directory
+	@echo ""
 	@echo "=== Copying final build to dist ==="
 	rm -rf dist/src
 	cp -r $(DIST_COPY) build/2/src dist/

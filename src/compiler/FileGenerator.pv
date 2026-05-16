@@ -39,7 +39,14 @@ impl FileGenerator {
         let func_context = FunctionContext::new(g.allocator, func_info, true);
         g.function_context = &func_context;
 
-        let code = g.make_path(func_info.context.module, name_str, ".c");
+        let code_ext: str = ".c";
+        let header_ext: str = ".h";
+        if func_info.type == FunctionType::Test {
+            code_ext = ".test.c";
+            header_ext = ".test.h";
+        }
+
+        let code = g.make_path(func_info.context.module, name_str, code_ext);
         let code_file: &FILE = 0;
         let code_tmp: *const char = 0;
 
@@ -54,7 +61,7 @@ impl FileGenerator {
         g.write_includes_raw(code_file, &func_info.context.module.includes);
         include_writer.write(code_file, g, &usage_context.body, generics, true);
 
-        let header_rel = g.make_rel_path(func_info.context.module, name_str, ".h");
+        let header_rel = g.make_rel_path(func_info.context.module, name_str, header_ext);
         fprintf(code_file, "#include <");
         g.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
@@ -69,7 +76,7 @@ impl FileGenerator {
 
         include_writer = IncludeWriter::new(g.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
-        let header = g.make_path(func_info.context.module, name_str, ".h");
+        let header = g.make_path(func_info.context.module, name_str, header_ext);
         let header_file: &FILE = 0;
         let header_tmp: *const char = 0;
         header_tmp = tmpnam(0);
@@ -850,22 +857,25 @@ impl FileGenerator {
         }
     }
 
-    fn collect_tests(&self, children: &HashMap<str, &Namespace>, func_names: &Array<str>, descriptions: &Array<str>, header_paths: &Array<str>) {
+    fn collect_tests(&self, children: &HashMap<str, &Namespace>, func_names: &Array<str>, descriptions: &Array<str>, header_paths: &Array<str>, module_paths: &Array<str>) {
         let g = self.generator;
 
         for (_, namespace) in children {
-            for (_, module) in namespace.modules {
+            for (module_name, module) in namespace.modules {
                 for test_info in module.tests {
                     let desc = test_info.description.value;
                     descriptions.append(desc.slice(1, desc.length - 1));
                     func_names.append(test_info.func_name);
 
-                    let header_path = g.make_rel_path(module, test_info.func_name, ".h");
+                    let header_path = g.make_rel_path(module, test_info.func_name, ".test.h");
                     header_paths.append(header_path.as_str());
+
+                    let module_path = g.make_rel_path(module, module_name, "");
+                    module_paths.append(module_path.as_str());
                 }
             }
 
-            self.collect_tests(&namespace.children, func_names, descriptions, header_paths);
+            self.collect_tests(&namespace.children, func_names, descriptions, header_paths, module_paths);
         }
     }
 
@@ -876,14 +886,15 @@ impl FileGenerator {
         let func_names = Array<str>::new(allocator);
         let descriptions = Array<str>::new(allocator);
         let header_paths = Array<str>::new(allocator);
+        let module_paths = Array<str>::new(allocator);
 
-        self.collect_tests(children, &func_names, &descriptions, &header_paths);
+        self.collect_tests(children, &func_names, &descriptions, &header_paths, &module_paths);
 
         if func_names.length == 0 { return; }
 
         let runner_path = String::new(allocator);
         runner_path.append(g.path);
-        runner_path.append("/test_runner.c");
+        runner_path.append("/main.test.c");
 
         let runner_tmp: *const char = tmpnam(0);
         let runner_file: &FILE = fopen(runner_tmp, "w+");
@@ -908,8 +919,11 @@ impl FileGenerator {
         while i < func_names.length {
             let desc = descriptions.data[i];
             let func_name = func_names.data[i];
+            let module_path = module_paths.data[i];
 
             fprintf(runner_file, "    fputs(\"[TEST] ");
+            g.write_str(runner_file, module_path);
+            fprintf(runner_file, ": ");
             g.write_str(runner_file, desc);
             fprintf(runner_file, "\\n\", stdout);\n");
             fprintf(runner_file, "    ");
@@ -927,6 +941,8 @@ impl FileGenerator {
         g.overwrite_if_different(runner_path.c_str(), runner_file);
         fclose(runner_file);
         remove(runner_tmp);
+
+        g.code_files.append(runner_path);
     }
 
     fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {

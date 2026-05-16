@@ -19,16 +19,22 @@ endif
 ifneq ($(wildcard $(SRCS_LST)),)
     FILE_LIST := $(shell cat $(SRCS_LST))
 
-    OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(FILE_LIST))) \
+    OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(FILE_LIST)))) \
             $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(FILE_LIST)))
+
+    TEST_SRCS := $(filter %.test.c,$(FILE_LIST))
+    TEST_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(TEST_SRCS))
+    TEST_LINK_OBJS := $(filter-out %/main.o,$(OBJS)) $(TEST_OBJS)
 endif
 
-.PHONY: all build-objs generate
+TEST_TARGET := $(BUILD_DIR)/tests$(EXE)
+
+.PHONY: all build-objs generate tests build-test-objs
 
 all: generate
 	@echo "Compiling generated files..."
 	$(eval GEN_FILES := $(shell cat $(SRCS_LST)))
-	$(eval CURRENT_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(GEN_FILES))) \
+	$(eval CURRENT_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(GEN_FILES)))) \
                            $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(GEN_FILES))))
 
 	@$(MAKE) -f Makefile.build build-objs
@@ -52,5 +58,20 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) -MMD -MP -c $< -o $@
 
 build-objs: $(OBJS)
+
+build-test-objs: $(TEST_OBJS)
+
+tests:
+ifeq ($(TEST_SRCS),)
+	@echo "No tests found, skipping."
+else
+	@echo "Compiling test files..."
+	@$(MAKE) -f Makefile.build build-test-objs
+	@echo "Linking test runner..."
+	$(file >$(BUILD_DIR)/test_objs.lst,$(TEST_LINK_OBJS))
+	$(CC) @$(BUILD_DIR)/test_objs.lst $(LDFLAGS) -o $(TEST_TARGET)
+	@echo "Running tests..."
+	$(TEST_TARGET)
+endif
 
 -include $(shell find $(OBJ_DIR) -name '*.d' 2>/dev/null)

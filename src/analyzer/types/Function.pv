@@ -22,6 +22,7 @@ enum FunctionType {
     Coroutine,
     Builtin,
     MethodCpp,
+    Test,
 }
 
 struct Function {
@@ -37,7 +38,6 @@ struct Function {
     parameters: Array<Parameter>,
     return_type: Type,
     body: &Block,
-    is_test: bool,
 }
 
 impl Function {
@@ -175,7 +175,7 @@ impl Function {
     fn fill_types(&self, generics: &Generics) -> bool {
         self.generics.parent = generics;
 
-        if self.is_test {
+        if self.type == FunctionType::Test {
             self.return_type = self.context.root.type_void;
             return true;
         }

@@ -239,7 +239,7 @@ bool Function__fill_types(struct Function* self, struct Generics* generics) {
     self->generics.parent = generics;
 
     #line 178 "src/analyzer/types/Function.pv"
-    if (self->is_test) {
+    if (self->type == FUNCTION_TYPE__TEST) {
         #line 179 "src/analyzer/types/Function.pv"
         self->return_type = self->context->root->type_void;
         #line 180 "src/analyzer/types/Function.pv"

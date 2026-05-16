@@ -13,7 +13,7 @@ struct Token;
 struct Context;
 struct Block;
 
-#line 27 "src/analyzer/types/Function.pv"
+#line 28 "src/analyzer/types/Function.pv"
 struct Function {
     struct Token* name;
     struct Context* context;
@@ -27,7 +27,6 @@ struct Function {
     struct Array_Parameter parameters;
     struct Type return_type;
     struct Block* body;
-    bool is_test;
 };
 
 #include <analyzer/types/Function.h>
