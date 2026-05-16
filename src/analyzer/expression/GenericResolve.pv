@@ -1,0 +1,72 @@
+use std
+use analyzer
+use types
+
+impl Expression {
+    fn resolve_function_generics(context: &Context, func_info: &Function, generics: &Array<Type>, arguments: &Array<InvokeArgument>) -> &GenericMap {
+        let generic_map = GenericMap::from_generics(context.allocator, &func_info.generics);
+
+        let i: usize = 0;
+        for generic in generics {
+            let target = generic_map.array.get(i);
+            if target != 0 { *target = *generic; }
+            i += 1;
+        }
+
+        if i == generic_map.array.length {
+            return context.allocator.store(&generic_map);
+        }
+
+        let params = func_info.parameters.iter();
+        let args = arguments.iter();
+
+        while params.next() && args.next() {
+            let param_type = &params.value().type;
+            let arg_type = &args.value().value.return_type;
+
+            Expression::resolve_generic_type(context, param_type, arg_type, &generic_map);
+        }
+
+        for generic in func_info.generics.array {
+            let concrete_type = generic_map.get(generic.name.value);
+            if concrete_type == 0 { continue; }
+
+            for *trait_info in generic.traits {
+                for (typedef_name, _) in trait_info.typedefs {
+                    match concrete_type {
+                        Type::Struct(struct_info, _) => {
+                            for *impl_info in struct_info.impls {
+                                if impl_info.trait_ != trait_info { continue; }
+                                let typedef_type = impl_info.typedefs.find(&typedef_name);
+                                if typedef_type != 0 {
+                                    generic_map.insert(typedef_name, *typedef_type);
+                                }
+                            }
+                        },
+                        _ => {},
+                    }
+                }
+            }
+        }
+
+        return context.allocator.store(&generic_map);
+    }
+
+    fn resolve_generic_type(context: &Context, param_type: &Type, arg_type: &Type, generic_map: &GenericMap) {
+        match param_type {
+            Type::Generic(generic) => {
+                let generic_type = generic_map.get(generic.name.value);
+                if generic_type != 0 { *generic_type = *arg_type; }
+            },
+            Type::Indirect(indirect_type) => {
+                match arg_type {
+                    Type::Indirect(indirect) => {
+                        Expression::resolve_generic_type(context, &indirect_type.to, &indirect.to, generic_map);
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+    }
+}

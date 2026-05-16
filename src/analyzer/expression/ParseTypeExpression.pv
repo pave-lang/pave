@@ -1,0 +1,308 @@
+use std
+use analyzer
+use types
+use c
+
+impl Expression {
+    fn parse_enum(context: &Context, token: &Token, enum_type: &Type, generics: &Generics) -> &Expression {
+        if context.check_next(TokenType::Symbol, "::") {
+            let variant_name = context.expect(TokenType::Identifier);
+            if variant_name == 0 { return 0; }
+
+            let variant_result = Expression::get_enum_variant(context, enum_type, variant_name);
+
+            match variant_result {
+                EnumVariantResult::None => {
+                    context.error_token(variant_name, "Unable to find enum variant or function");
+                    return 0;
+                },
+                EnumVariantResult::Function(function, generic_map) => {
+                    let member_type = context.allocator.store(&Type::Function(function, generic_map));
+
+                    if !context.check_value(TokenType::Symbol, "(") {
+                        return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                    }
+
+                    if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                    while !context.check_value(TokenType::Symbol, ")") {
+                        let argument = Expression::parse(context, generics);
+                        if argument == 0 { return 0; }
+
+                        arguments.append(InvokeArgument { value: argument });
+
+                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                            context.expect_value(TokenType::Symbol, ")");
+                            return 0;
+                        }
+                    }
+
+                    if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                    if !Expression::validate_arguments(context, token, member_type, &arguments, generic_map, false) { return 0; }
+
+                    let func_return_type = Expression::get_return_type(context, member_type, token, generic_map);
+                    if func_return_type == 0 { return 0; }
+
+                    let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                    return Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
+                },
+                EnumVariantResult::EnumVariant(variant) => {
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                    if context.check_value(TokenType::Symbol, "(") {
+                        if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+
+                        while !context.check_value(TokenType::Symbol, ")") {
+                            let argument = Expression::parse(context, generics);
+                            if argument == 0 { return 0; }
+
+                            arguments.append(InvokeArgument { value: argument });
+
+                            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                                context.expect_value(TokenType::Symbol, ")");
+                                return 0;
+                            }
+                        }
+
+                        if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                    }
+
+                    let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
+
+                    let generic_map = enum_type.get_generic_map(context);
+                    if !Expression::validate_enum_arguments(context, token, variant, &arguments, generic_map) { return 0; }
+
+                    return Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
+                },
+                EnumVariantResult::EnumCValue(_ /*variant*/) => {
+                    let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+                    return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), enum_type);
+                    // let enum_info = variant.parent;
+                    // match enum_info.parent {
+                    //     ParentCpp::None => {
+                    //         return Expression::make(context.allocator, variant_name, ExpressionData::Literal(variant_name.value), enum_type);
+                    //     },
+                    //     _ => {
+                    //         let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+                    //         return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), enum_type);
+                    //     },
+                    // }
+                }
+            }
+        }
+
+        return Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+    }
+
+    fn parse_struct(context: &Context, token: &Token, struct_type: &Type, generics: &Generics) -> &Expression {
+        if context.check_next(TokenType::Symbol, "::") {
+            let member = context.expect(TokenType::Identifier);
+            if member == 0 { return 0; }
+
+            let member_type = Expression::get_member_type(context, struct_type, member, true);
+            if member_type == 0 { return 0; }
+
+            let generic_map = struct_type.get_generic_map(context);
+
+            if !context.check_value(TokenType::Symbol, "(") {
+                match member_type {
+                    Type::Function(_, _) => {
+                        return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                    },
+                    _ => {
+                        let struct_expr = Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+                        return Expression::make(context.allocator, member, ExpressionData::MemberStaticExpression(struct_expr, member.value), member_type);
+                    },
+                }
+            } else {
+                if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+
+                let arguments = Array<InvokeArgument>::new(context.allocator);
+
+                while !context.check_value(TokenType::Symbol, ")") {
+                    let argument = Expression::parse(context, generics);
+                    if argument == 0 { return 0; }
+
+                    arguments.append(InvokeArgument { value: argument });
+
+                    if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                        context.expect_value(TokenType::Symbol, ")");
+                        return 0;
+                    }
+                }
+
+                if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+                if !Expression::validate_arguments(context, token, member_type, &arguments, generic_map, false) { return 0; }
+
+                let func_return_type = Expression::get_return_type(context, member_type, token, generic_map);
+                if func_return_type == 0 { return 0; }
+
+                let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
+                return Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
+            }
+        } else if context.check_next(TokenType::Symbol, "{") {
+            let fields: Array<InvokeArgument> = Array<InvokeArgument>::new(context.allocator);
+
+            while !context.check_value(TokenType::Symbol, "}") {
+                let name = context.expect(TokenType::Identifier);
+                if name == 0 { return 0; }
+
+                let value: &Expression = 0;
+                if context.check_next(TokenType::Symbol, ":") {
+                    value = Expression::parse(context, generics);
+                } else {
+                    let return_type = context.get_value(name.value);
+                    if return_type == 0 {
+                        context.error_token(name, "Unable to find variable with this name");
+                        return 0;
+                    }
+
+                    value = Expression::make(context.allocator, name, ExpressionData::Variable(name.value), return_type);
+                }
+
+                if value == 0 { return 0; }
+
+                fields.append(InvokeArgument { name, value });
+
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                    context.expect_value(TokenType::Symbol, "}");
+                    return 0;
+                }
+            }
+
+            if !context.expect_value(TokenType::Symbol, "}") { return 0; }
+
+            let generic_map = struct_type.get_generic_map(context);
+            if !Expression::validate_arguments(context, token, struct_type, &fields, generic_map, false) { return 0; }
+
+            let struct_expression = Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(struct_expression, fields), struct_type);
+        } else if context.check_next(TokenType::Symbol, "(") {
+            let fields: Array<InvokeArgument> = Array<InvokeArgument>::new(context.allocator);
+
+            let field_index: usize = 0;
+            while !context.check_value(TokenType::Symbol, ")") {
+                let name = String::new(context.allocator);
+                name.append("_");
+                name.append_usize(field_index);
+                let name_str = name.as_str();
+
+                let name_token = *context.current();
+                name_token.value = name_str;
+
+                let value = Expression::parse(context, generics);
+                if value == 0 { return 0; }
+
+                fields.append(InvokeArgument {
+                    name: context.allocator.store(&name_token),
+                    value,
+                });
+
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                    context.expect_value(TokenType::Symbol, ")");
+                    return 0;
+                }
+
+                field_index += 1;
+            }
+
+            if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+            let struct_expression = Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(struct_expression, fields), struct_type);
+        }
+
+        return Expression::make(context.allocator, token, ExpressionData::Type(struct_type), struct_type);
+    }
+
+    fn parse_class(context: &Context, token: &Token, parent: &Expression, generics: &Generics) -> &Expression {
+        if context.check_next(TokenType::Symbol, "{") {
+            let fields: Array<InvokeArgument> = Array<InvokeArgument>::new(context.allocator);
+
+            while !context.check_value(TokenType::Symbol, "}") {
+                let name = context.expect(TokenType::Identifier);
+                if name == 0 { return 0; }
+
+                let value: &Expression = 0;
+                if context.check_next(TokenType::Symbol, ":") {
+                    value = Expression::parse(context, generics);
+                } else {
+                    let return_type = context.get_value(name.value);
+                    if return_type == 0 {
+                        context.error_token(name, "Unable to find variable with this name");
+                        return 0;
+                    }
+
+                    value = Expression::make(context.allocator, name, ExpressionData::Variable(name.value), return_type);
+                }
+
+                if value == 0 { return 0; }
+
+                fields.append(InvokeArgument { name, value });
+
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                    context.expect_value(TokenType::Symbol, "}");
+                    return 0;
+                }
+            }
+
+            if !context.expect_value(TokenType::Symbol, "}") { return 0; }
+
+            if !Expression::validate_arguments(context, token, &parent.return_type, &fields, 0, false) { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(parent, fields), &parent.return_type);
+        } else if context.check_next(TokenType::Symbol, "(") {
+            let arguments = Array<InvokeArgument>::new(context.allocator);
+
+            while !context.check_value(TokenType::Symbol, ")") {
+                let argument = Expression::parse(context, generics);
+                if argument == 0 { return 0; }
+
+                arguments.append(InvokeArgument { value: argument });
+
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                    context.expect_value(TokenType::Symbol, ")");
+                    return 0;
+                }
+            }
+
+            if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::Invoke(parent, arguments), &parent.return_type);
+        }
+
+        return parent;
+    }
+
+    fn parse_cpp(context: &Context, generics: &Generics) -> &Expression {
+        let token = &context.tokens[context.pos];
+
+        if context.check_next(TokenType::Identifier, "new") {
+            let placement: &Expression = 0;
+            if context.check_next(TokenType::Symbol, "(") {
+                placement = Expression::parse(context, generics);
+                if placement == 0 { return 0; }
+                if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+            }
+
+            let expression = Expression::parse(context, generics);
+            if expression == 0 { return 0; }
+
+            let indirect = Indirect::new_pointer(context.allocator, expression.return_type);
+            return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::New(placement, expression)), &Type::Indirect(indirect));
+        } else if context.check_next(TokenType::Identifier, "delete") {
+            let expression = Expression::parse(context, generics);
+            if expression == 0 { return 0; }
+
+            return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::Delete(expression)), &context.root.type_unknown);
+        }
+
+        context.error("Expected new or delete in cpp expression");
+        return 0;
+    }
+}

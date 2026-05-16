@@ -1,0 +1,185 @@
+use std
+use analyzer
+use types
+use c
+
+impl Expression {
+    fn validate_arguments(context: &Context, token: &Token, type: &Type, arguments: &Array<InvokeArgument>, generic_map: *GenericMap, is_member_call: bool) -> bool {
+        let arguments_length = arguments.length;
+
+        match type {
+            Type::Self => { { type = context.type_self; } },
+            _ => {},
+        }
+
+        match type {
+            Type::TypedefC(_) => { return true; },
+            Type::UnionC(_) => { return true; },
+            Type::StructC(_) => { return true; },
+            Type::Tuple(_) => { return true; },
+            Type::Struct(struct_info, generic_map2) => {
+                for arg in arguments {
+                    let param = struct_info.fields.find(&arg.name.value);
+
+                    if param == 0 {
+                        context.error_token(arg.name, "Unable to find field in struct");
+                        return false;
+                    }
+
+                    let param_type = &param.type;
+
+                    if generic_map2.map.length > 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
+                    } else if generic_map != 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                    }
+
+                    if param_type == 0 {
+                        context.error_token(arg.value.token, "Unable to resolve field type");
+                        return false;
+                    }
+
+                    arg.value.validate_type(context, param_type, true);
+                }
+
+                return true;
+            },
+            Type::Function(function, generic_map2) => {
+                if function == 0 || function.type == FunctionType::MethodCpp { return true; }
+
+                if function.parameters.length != arguments_length {
+                    let message = String::new(context.allocator);
+                    message.append("Number of arguments does not match, expected ");
+
+                    if is_member_call {
+                        message.append_usize(function.parameters.length - 1);
+                    } else {
+                        message.append_usize(function.parameters.length);
+                    }
+
+                    context.error_token(token, message.c_str());
+                    return false;
+                }
+
+                let param_iter = function.parameters.iter();
+                let args_iter = arguments.iter();
+
+                if is_member_call {
+                    param_iter.next();
+                    args_iter.next();
+
+                    let arg = args_iter.value();
+                    let param_type = &param_iter.value().type;
+
+                    if param_type.is_indirect() && !arg.value.return_type.is_indirect() {
+                        let new_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, arg.value.return_type)));
+                        arg.value = Expression::make(context.allocator, token, ExpressionData::UnaryExpression("&", arg.value), new_type);
+                    }
+                }
+
+                while param_iter.next() && args_iter.next() {
+                    let arg = args_iter.value();
+                    let param = param_iter.value();
+                    let param_type = &param.type;
+
+                    if generic_map2.map.length > 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
+                    } else if generic_map != 0 {
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                    }
+
+                    if param_type == 0 {
+                        context.error_token(arg.value.token, "Unable to resolve parameter type");
+                        return false;
+                    }
+
+                    arg.value.validate_type(context, param_type, true);
+
+                    if arg.name == 0 && param.name != 0 && !param.name.value.eq("self") && !param.name.value.eq(arg.value.token.value) {
+                        let label = String::new(context.allocator);
+                        label.append(param.name.value);
+                        label.append(": ");
+                        context.inlay_hint_before(arg.value.token, label.c_str(), InlayHintKind::Parameter, false, true);
+                    }
+                }
+
+                return true;
+            },
+            Type::FunctionC(_) => { return true; },
+            Type::ClassCpp(_) => { return true; },
+            Type::UnknownC(_) => { return true; },
+            _ => { context.error_token(token, "Type can't be called"); },
+        }
+
+        return false;
+    }
+
+    fn validate_enum_arguments(context: &Context, token: &Token, variant: &EnumVariant, arguments: &Array<InvokeArgument>, generic_map: *GenericMap) -> bool {
+        let arguments_length = arguments.length;
+
+        if variant.types.length != arguments_length {
+            let message = String::new(context.allocator);
+            message.append("Number of arguments does not match, expected ");
+            message.append_usize(variant.types.length);
+            context.error_token(token, message.c_str());
+            return false;
+        }
+
+        let param_iter = variant.types.iter();
+        let args_iter = arguments.iter();
+
+        while param_iter.next() && args_iter.next() {
+            let arg = args_iter.value();
+            let param_type = param_iter.value();
+
+            if generic_map != 0 {
+                param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+            }
+
+            if param_type == 0 {
+                context.error_token(arg.value.token, "Unable to resolve parameter type");
+                return false;
+            }
+
+            arg.value.validate_type(context, param_type, true);
+        }
+
+        return true;
+    }
+
+    fn get_return_type(context: &Context, type: &Type, token: &Token, generic_map: &GenericMap) -> &Type {
+        match type {
+            Type::Tuple(_) => { return type; },
+            Type::Function(func_info, func_generic_map) => {
+                if func_info.type == FunctionType::Coroutine {
+                    return context.allocator.store(&Type::CoroutineInstance(func_info, func_generic_map));
+                }
+                return Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, generic_map);
+            },
+            Type::FunctionC(func_info) => { return &func_info.return_type; },
+            Type::UnknownC(_) => { return type; },
+            _ => { context.error_token(token, "Type can't be called"); },
+        }
+
+        return 0;
+    }
+
+    fn make_type_function_call(context: &Context, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> &Expression {
+        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return 0; }
+
+        let func_return_type = Expression::get_return_type(context, type, token, generic_map);
+        if func_return_type == 0 { return 0; }
+
+        let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(type), type);
+        return Expression::make(context.allocator, token, ExpressionData::Invoke(parent_expression, arguments), func_return_type);
+    }
+
+    fn make_member_function_call(context: &Context, inner: &Expression, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> &Expression {
+        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return 0; }
+
+        let func_return_type = Expression::get_return_type(context, type, token, generic_map);
+        if func_return_type == 0 { return 0; }
+
+        return Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), func_return_type);
+    }
+}

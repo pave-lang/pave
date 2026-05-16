@@ -3,3 +3,9 @@ mod EnumVariantResult
 mod Expression
 mod ExpressionData
 mod InvokeArgument
+mod MemberLookup
+mod GenericResolve
+mod ExpressionValidate
+mod ParseTypeExpression
+mod PostfixExpression
+mod BinaryExpression
