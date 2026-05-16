@@ -54,6 +54,31 @@ impl MatchPattern {
         let token = context.current();
         if token == 0 { return false; }
 
+        if token.type == TokenType::Number {
+            context.next_token();
+            let primitive = Expression::number_primitive(token.value);
+            let primitive_info = context.module.find_primitive(primitive);
+            let expression = Expression::make(context.allocator, token, ExpressionData::Literal(token.value), &Type::Primitive(primitive_info));
+            *pattern = MatchPattern::StaticValue(expression);
+            return true;
+        }
+
+        if token.eq(TokenType::Symbol, "-") {
+            context.next_token();
+            let num_token = context.current();
+            if num_token == 0 || num_token.type != TokenType::Number {
+                context.error_token(token, "Expected a number after '-'");
+                return false;
+            }
+            context.next_token();
+            let primitive = Expression::number_primitive(num_token.value);
+            let primitive_info = context.module.find_primitive(primitive);
+            let num_expr = Expression::make(context.allocator, num_token, ExpressionData::Literal(num_token.value), &Type::Primitive(primitive_info));
+            let neg_expr = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(token.value, num_expr), &Type::Primitive(primitive_info));
+            *pattern = MatchPattern::StaticValue(neg_expr);
+            return true;
+        }
+
         let type = context.get_value(token.value);
 
         if type != 0 {

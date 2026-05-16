@@ -8,6 +8,8 @@
 #include <analyzer/Token.h>
 #include <std/str.h>
 #include <analyzer/expression/Expression.h>
+#include <analyzer/types/Primitive.h>
+#include <analyzer/Module.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/types/GenericMap.h>
@@ -113,14 +115,15 @@ bool MatchPattern__parse(struct Context* context, struct Generics* generics, str
     }
 
     #line 57 "src/analyzer/statement/MatchPattern.pv"
-    struct Type* type = Context__get_value(context, token->value);
-
-    #line 59 "src/analyzer/statement/MatchPattern.pv"
-    if (type != 0) {
-        #line 60 "src/analyzer/statement/MatchPattern.pv"
+    if (token->type == TOKEN_TYPE__NUMBER) {
+        #line 58 "src/analyzer/statement/MatchPattern.pv"
         Context__next_token(context);
+        #line 59 "src/analyzer/statement/MatchPattern.pv"
+        struct str primitive = Expression__number_primitive(token->value);
+        #line 60 "src/analyzer/statement/MatchPattern.pv"
+        struct Primitive* primitive_info = Module__find_primitive(context->module, primitive);
         #line 61 "src/analyzer/statement/MatchPattern.pv"
-        struct Expression* expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, type);
+        struct Expression* expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__LITERAL, .literal_value = token->value }, (struct Type[]){(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }});
         #line 62 "src/analyzer/statement/MatchPattern.pv"
         *pattern = (struct MatchPattern) { .type = MATCH_PATTERN__STATIC_VALUE, .staticvalue_value = expression };
         #line 63 "src/analyzer/statement/MatchPattern.pv"
@@ -128,214 +131,258 @@ bool MatchPattern__parse(struct Context* context, struct Generics* generics, str
     }
 
     #line 66 "src/analyzer/statement/MatchPattern.pv"
-    type = Context__parse_type2(context, generics);
-    #line 67 "src/analyzer/statement/MatchPattern.pv"
-    if (type == 0) {
+    if (Token__eq(token, TOKEN_TYPE__SYMBOL, "-")) {
+        #line 67 "src/analyzer/statement/MatchPattern.pv"
+        Context__next_token(context);
         #line 68 "src/analyzer/statement/MatchPattern.pv"
+        struct Token* num_token = Context__current(context);
+        #line 69 "src/analyzer/statement/MatchPattern.pv"
+        if (num_token == 0 || num_token->type != TOKEN_TYPE__NUMBER) {
+            #line 70 "src/analyzer/statement/MatchPattern.pv"
+            Context__error_token(context, token, "Expected a number after '-'");
+            #line 71 "src/analyzer/statement/MatchPattern.pv"
+            return false;
+        }
+        #line 73 "src/analyzer/statement/MatchPattern.pv"
+        Context__next_token(context);
+        #line 74 "src/analyzer/statement/MatchPattern.pv"
+        struct str primitive = Expression__number_primitive(num_token->value);
+        #line 75 "src/analyzer/statement/MatchPattern.pv"
+        struct Primitive* primitive_info = Module__find_primitive(context->module, primitive);
+        #line 76 "src/analyzer/statement/MatchPattern.pv"
+        struct Expression* num_expr = Expression__make(context->allocator, num_token, (struct ExpressionData) { .type = EXPRESSION_DATA__LITERAL, .literal_value = num_token->value }, (struct Type[]){(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }});
+        #line 77 "src/analyzer/statement/MatchPattern.pv"
+        struct Expression* neg_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = token->value, ._1 = num_expr} }, (struct Type[]){(struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive_info }});
+        #line 78 "src/analyzer/statement/MatchPattern.pv"
+        *pattern = (struct MatchPattern) { .type = MATCH_PATTERN__STATIC_VALUE, .staticvalue_value = neg_expr };
+        #line 79 "src/analyzer/statement/MatchPattern.pv"
+        return true;
+    }
+
+    #line 82 "src/analyzer/statement/MatchPattern.pv"
+    struct Type* type = Context__get_value(context, token->value);
+
+    #line 84 "src/analyzer/statement/MatchPattern.pv"
+    if (type != 0) {
+        #line 85 "src/analyzer/statement/MatchPattern.pv"
+        Context__next_token(context);
+        #line 86 "src/analyzer/statement/MatchPattern.pv"
+        struct Expression* expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, type);
+        #line 87 "src/analyzer/statement/MatchPattern.pv"
+        *pattern = (struct MatchPattern) { .type = MATCH_PATTERN__STATIC_VALUE, .staticvalue_value = expression };
+        #line 88 "src/analyzer/statement/MatchPattern.pv"
+        return true;
+    }
+
+    #line 91 "src/analyzer/statement/MatchPattern.pv"
+    type = Context__parse_type2(context, generics);
+    #line 92 "src/analyzer/statement/MatchPattern.pv"
+    if (type == 0) {
+        #line 93 "src/analyzer/statement/MatchPattern.pv"
         return false;
     } else if (!Type__is_enum(type)) {
-        #line 70 "src/analyzer/statement/MatchPattern.pv"
+        #line 95 "src/analyzer/statement/MatchPattern.pv"
         Context__error_token(context, token, "Type is not an enum");
-        #line 71 "src/analyzer/statement/MatchPattern.pv"
+        #line 96 "src/analyzer/statement/MatchPattern.pv"
         return false;
     }
 
-    #line 74 "src/analyzer/statement/MatchPattern.pv"
+    #line 99 "src/analyzer/statement/MatchPattern.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 74 "src/analyzer/statement/MatchPattern.pv"
+        #line 99 "src/analyzer/statement/MatchPattern.pv"
         return false;
     }
 
-    #line 76 "src/analyzer/statement/MatchPattern.pv"
+    #line 101 "src/analyzer/statement/MatchPattern.pv"
     struct Token* enum_variant_token = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-    #line 77 "src/analyzer/statement/MatchPattern.pv"
+    #line 102 "src/analyzer/statement/MatchPattern.pv"
     if (enum_variant_token == 0) {
-        #line 77 "src/analyzer/statement/MatchPattern.pv"
+        #line 102 "src/analyzer/statement/MatchPattern.pv"
         return false;
     }
 
-    #line 79 "src/analyzer/statement/MatchPattern.pv"
+    #line 104 "src/analyzer/statement/MatchPattern.pv"
     struct GenericMap* generic_map = 0;
 
-    #line 81 "src/analyzer/statement/MatchPattern.pv"
+    #line 106 "src/analyzer/statement/MatchPattern.pv"
     switch (type->type) {
-        #line 82 "src/analyzer/statement/MatchPattern.pv"
+        #line 107 "src/analyzer/statement/MatchPattern.pv"
         case TYPE__SELF: {
-            #line 83 "src/analyzer/statement/MatchPattern.pv"
+            #line 108 "src/analyzer/statement/MatchPattern.pv"
             type = context->type_self;
         } break;
-        #line 85 "src/analyzer/statement/MatchPattern.pv"
+        #line 110 "src/analyzer/statement/MatchPattern.pv"
         default: {
         } break;
     }
 
-    #line 88 "src/analyzer/statement/MatchPattern.pv"
+    #line 113 "src/analyzer/statement/MatchPattern.pv"
     switch (type->type) {
-        #line 89 "src/analyzer/statement/MatchPattern.pv"
+        #line 114 "src/analyzer/statement/MatchPattern.pv"
         case TYPE__ENUM: {
-            #line 89 "src/analyzer/statement/MatchPattern.pv"
+            #line 114 "src/analyzer/statement/MatchPattern.pv"
             struct GenericMap* generics = type->enum_value._1;
-            #line 89 "src/analyzer/statement/MatchPattern.pv"
+            #line 114 "src/analyzer/statement/MatchPattern.pv"
             generic_map = generics;
         } break;
-        #line 90 "src/analyzer/statement/MatchPattern.pv"
+        #line 115 "src/analyzer/statement/MatchPattern.pv"
         case TYPE__ENUM_C: {
         } break;
-        #line 91 "src/analyzer/statement/MatchPattern.pv"
+        #line 116 "src/analyzer/statement/MatchPattern.pv"
         default: {
-            #line 92 "src/analyzer/statement/MatchPattern.pv"
+            #line 117 "src/analyzer/statement/MatchPattern.pv"
             Context__pop_scope(context);
-            #line 93 "src/analyzer/statement/MatchPattern.pv"
+            #line 118 "src/analyzer/statement/MatchPattern.pv"
             Context__error(context, "Not an enum type");
-            #line 94 "src/analyzer/statement/MatchPattern.pv"
+            #line 119 "src/analyzer/statement/MatchPattern.pv"
             return false;
         } break;
     }
 
-    #line 98 "src/analyzer/statement/MatchPattern.pv"
+    #line 123 "src/analyzer/statement/MatchPattern.pv"
     struct EnumVariantResult enum_variant_result = Expression__get_enum_variant(context, type, enum_variant_token);
-    #line 99 "src/analyzer/statement/MatchPattern.pv"
+    #line 124 "src/analyzer/statement/MatchPattern.pv"
     switch (enum_variant_result.type) {
-        #line 100 "src/analyzer/statement/MatchPattern.pv"
+        #line 125 "src/analyzer/statement/MatchPattern.pv"
         case ENUM_VARIANT_RESULT__NONE: {
-            #line 101 "src/analyzer/statement/MatchPattern.pv"
+            #line 126 "src/analyzer/statement/MatchPattern.pv"
             Context__error(context, "Could not find enum variant");
-            #line 102 "src/analyzer/statement/MatchPattern.pv"
+            #line 127 "src/analyzer/statement/MatchPattern.pv"
             return false;
         } break;
-        #line 104 "src/analyzer/statement/MatchPattern.pv"
+        #line 129 "src/analyzer/statement/MatchPattern.pv"
         case ENUM_VARIANT_RESULT__ENUM_VARIANT: {
-            #line 104 "src/analyzer/statement/MatchPattern.pv"
+            #line 129 "src/analyzer/statement/MatchPattern.pv"
             struct EnumVariant* enum_variant = enum_variant_result.enumvariant_value;
-            #line 105 "src/analyzer/statement/MatchPattern.pv"
+            #line 130 "src/analyzer/statement/MatchPattern.pv"
             struct Array_EnumVariantParameter parameters = Array_EnumVariantParameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-            #line 107 "src/analyzer/statement/MatchPattern.pv"
+            #line 132 "src/analyzer/statement/MatchPattern.pv"
             if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
-                #line 108 "src/analyzer/statement/MatchPattern.pv"
+                #line 133 "src/analyzer/statement/MatchPattern.pv"
                 uintptr_t variable_i = 0;
 
-                #line 110 "src/analyzer/statement/MatchPattern.pv"
+                #line 135 "src/analyzer/statement/MatchPattern.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 111 "src/analyzer/statement/MatchPattern.pv"
+                    #line 136 "src/analyzer/statement/MatchPattern.pv"
                     bool ref = Context__check_next(context, TOKEN_TYPE__SYMBOL, "&");
-                    #line 112 "src/analyzer/statement/MatchPattern.pv"
+                    #line 137 "src/analyzer/statement/MatchPattern.pv"
                     struct Token* variable = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-                    #line 113 "src/analyzer/statement/MatchPattern.pv"
+                    #line 138 "src/analyzer/statement/MatchPattern.pv"
                     if (variable == 0) {
-                        #line 113 "src/analyzer/statement/MatchPattern.pv"
+                        #line 138 "src/analyzer/statement/MatchPattern.pv"
                         Context__pop_scope(context);
-                        #line 113 "src/analyzer/statement/MatchPattern.pv"
-                        return false;
-                    }
-
-                    #line 115 "src/analyzer/statement/MatchPattern.pv"
-                    Array_EnumVariantParameter__append(&parameters, (struct EnumVariantParameter) { .ref = ref, .variable = variable });
-
-                    #line 117 "src/analyzer/statement/MatchPattern.pv"
-                    struct Type* variable_type = Context__resolve_type(context->allocator, enum_variant->types.data + variable_i, generic_map, 0);
-                    #line 118 "src/analyzer/statement/MatchPattern.pv"
-                    if (variable_type == 0) {
-                        #line 118 "src/analyzer/statement/MatchPattern.pv"
-                        return false;
-                    }
-
-                    #line 120 "src/analyzer/statement/MatchPattern.pv"
-                    if (ref) {
-                        #line 121 "src/analyzer/statement/MatchPattern.pv"
-                        struct Indirect* indirect = ArenaAllocator__store_Indirect(context->allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = *variable_type }});
-                        #line 122 "src/analyzer/statement/MatchPattern.pv"
-                        variable_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
-                    }
-
-                    #line 125 "src/analyzer/statement/MatchPattern.pv"
-                    struct String variable_type_name = Naming__get_type_decl(&context->root->naming_decl, variable_type, context->type_self, 0);
-                    #line 126 "src/analyzer/statement/MatchPattern.pv"
-                    String__prepend(&variable_type_name, (struct str){ .ptr = ": ", .length = strlen(": ") });
-                    #line 127 "src/analyzer/statement/MatchPattern.pv"
-                    Context__inlay_hint(context, variable, String__c_str(&variable_type_name), INLAY_HINT_KIND__TYPE, false, false);
-
-                    #line 129 "src/analyzer/statement/MatchPattern.pv"
-                    if (!Token__eq(variable, TOKEN_TYPE__IDENTIFIER, "_")) {
-                        #line 130 "src/analyzer/statement/MatchPattern.pv"
-                        if (!Context__set_value(context, variable, variable_type)) {
-                            #line 130 "src/analyzer/statement/MatchPattern.pv"
-                            Context__pop_scope(context);
-                            #line 130 "src/analyzer/statement/MatchPattern.pv"
-                            return false;
-                        }
-                    }
-
-                    #line 133 "src/analyzer/statement/MatchPattern.pv"
-                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 134 "src/analyzer/statement/MatchPattern.pv"
-                        Context__pop_scope(context);
-                        #line 135 "src/analyzer/statement/MatchPattern.pv"
-                        Context__pop_scope(context);
-                        #line 136 "src/analyzer/statement/MatchPattern.pv"
-                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 137 "src/analyzer/statement/MatchPattern.pv"
+                        #line 138 "src/analyzer/statement/MatchPattern.pv"
                         return false;
                     }
 
                     #line 140 "src/analyzer/statement/MatchPattern.pv"
+                    Array_EnumVariantParameter__append(&parameters, (struct EnumVariantParameter) { .ref = ref, .variable = variable });
+
+                    #line 142 "src/analyzer/statement/MatchPattern.pv"
+                    struct Type* variable_type = Context__resolve_type(context->allocator, enum_variant->types.data + variable_i, generic_map, 0);
+                    #line 143 "src/analyzer/statement/MatchPattern.pv"
+                    if (variable_type == 0) {
+                        #line 143 "src/analyzer/statement/MatchPattern.pv"
+                        return false;
+                    }
+
+                    #line 145 "src/analyzer/statement/MatchPattern.pv"
+                    if (ref) {
+                        #line 146 "src/analyzer/statement/MatchPattern.pv"
+                        struct Indirect* indirect = ArenaAllocator__store_Indirect(context->allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__REFERENCE, .to = *variable_type }});
+                        #line 147 "src/analyzer/statement/MatchPattern.pv"
+                        variable_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
+                    }
+
+                    #line 150 "src/analyzer/statement/MatchPattern.pv"
+                    struct String variable_type_name = Naming__get_type_decl(&context->root->naming_decl, variable_type, context->type_self, 0);
+                    #line 151 "src/analyzer/statement/MatchPattern.pv"
+                    String__prepend(&variable_type_name, (struct str){ .ptr = ": ", .length = strlen(": ") });
+                    #line 152 "src/analyzer/statement/MatchPattern.pv"
+                    Context__inlay_hint(context, variable, String__c_str(&variable_type_name), INLAY_HINT_KIND__TYPE, false, false);
+
+                    #line 154 "src/analyzer/statement/MatchPattern.pv"
+                    if (!Token__eq(variable, TOKEN_TYPE__IDENTIFIER, "_")) {
+                        #line 155 "src/analyzer/statement/MatchPattern.pv"
+                        if (!Context__set_value(context, variable, variable_type)) {
+                            #line 155 "src/analyzer/statement/MatchPattern.pv"
+                            Context__pop_scope(context);
+                            #line 155 "src/analyzer/statement/MatchPattern.pv"
+                            return false;
+                        }
+                    }
+
+                    #line 158 "src/analyzer/statement/MatchPattern.pv"
+                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                        #line 159 "src/analyzer/statement/MatchPattern.pv"
+                        Context__pop_scope(context);
+                        #line 160 "src/analyzer/statement/MatchPattern.pv"
+                        Context__pop_scope(context);
+                        #line 161 "src/analyzer/statement/MatchPattern.pv"
+                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
+                        #line 162 "src/analyzer/statement/MatchPattern.pv"
+                        return false;
+                    }
+
+                    #line 165 "src/analyzer/statement/MatchPattern.pv"
                     variable_i += 1;
                 }
 
-                #line 143 "src/analyzer/statement/MatchPattern.pv"
+                #line 168 "src/analyzer/statement/MatchPattern.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 143 "src/analyzer/statement/MatchPattern.pv"
+                    #line 168 "src/analyzer/statement/MatchPattern.pv"
                     Context__pop_scope(context);
-                    #line 143 "src/analyzer/statement/MatchPattern.pv"
+                    #line 168 "src/analyzer/statement/MatchPattern.pv"
                     return false;
                 }
 
-                #line 145 "src/analyzer/statement/MatchPattern.pv"
+                #line 170 "src/analyzer/statement/MatchPattern.pv"
                 if (parameters.length != enum_variant->types.length) {
-                    #line 146 "src/analyzer/statement/MatchPattern.pv"
+                    #line 171 "src/analyzer/statement/MatchPattern.pv"
                     struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                    #line 147 "src/analyzer/statement/MatchPattern.pv"
+                    #line 172 "src/analyzer/statement/MatchPattern.pv"
                     String__append(&message, (struct str){ .ptr = "Number of parameters does not match, expected ", .length = strlen("Number of parameters does not match, expected ") });
-                    #line 148 "src/analyzer/statement/MatchPattern.pv"
+                    #line 173 "src/analyzer/statement/MatchPattern.pv"
                     String__append_usize(&message, enum_variant->types.length);
-                    #line 149 "src/analyzer/statement/MatchPattern.pv"
+                    #line 174 "src/analyzer/statement/MatchPattern.pv"
                     Context__error_token(context, enum_variant_token, String__c_str(&message));
                 }
             } else {
-                #line 152 "src/analyzer/statement/MatchPattern.pv"
+                #line 177 "src/analyzer/statement/MatchPattern.pv"
                 if (enum_variant->types.length > 0) {
-                    #line 153 "src/analyzer/statement/MatchPattern.pv"
+                    #line 178 "src/analyzer/statement/MatchPattern.pv"
                     struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                    #line 154 "src/analyzer/statement/MatchPattern.pv"
+                    #line 179 "src/analyzer/statement/MatchPattern.pv"
                     String__append(&message, (struct str){ .ptr = "Expected ", .length = strlen("Expected ") });
-                    #line 155 "src/analyzer/statement/MatchPattern.pv"
+                    #line 180 "src/analyzer/statement/MatchPattern.pv"
                     String__append_usize(&message, enum_variant->types.length);
-                    #line 156 "src/analyzer/statement/MatchPattern.pv"
+                    #line 181 "src/analyzer/statement/MatchPattern.pv"
                     String__append(&message, (struct str){ .ptr = " parameters", .length = strlen(" parameters") });
-                    #line 157 "src/analyzer/statement/MatchPattern.pv"
+                    #line 182 "src/analyzer/statement/MatchPattern.pv"
                     Context__error_token(context, enum_variant_token, String__c_str(&message));
                 }
             }
 
-            #line 161 "src/analyzer/statement/MatchPattern.pv"
+            #line 186 "src/analyzer/statement/MatchPattern.pv"
             *pattern = (struct MatchPattern) { .type = MATCH_PATTERN__ENUM_VARIANT, .enumvariant_value = { ._0 = type, ._1 = enum_variant, ._2 = parameters} };
-            #line 162 "src/analyzer/statement/MatchPattern.pv"
+            #line 187 "src/analyzer/statement/MatchPattern.pv"
             return true;
         } break;
-        #line 164 "src/analyzer/statement/MatchPattern.pv"
+        #line 189 "src/analyzer/statement/MatchPattern.pv"
         case ENUM_VARIANT_RESULT__ENUM_CVALUE: {
-            #line 164 "src/analyzer/statement/MatchPattern.pv"
+            #line 189 "src/analyzer/statement/MatchPattern.pv"
             struct EnumCValue* enum_variant = enum_variant_result.enumcvalue_value;
-            #line 165 "src/analyzer/statement/MatchPattern.pv"
+            #line 190 "src/analyzer/statement/MatchPattern.pv"
             *pattern = (struct MatchPattern) { .type = MATCH_PATTERN__ENUM_CVALUE, .enumcvalue_value = enum_variant };
-            #line 166 "src/analyzer/statement/MatchPattern.pv"
+            #line 191 "src/analyzer/statement/MatchPattern.pv"
             return true;
         } break;
-        #line 168 "src/analyzer/statement/MatchPattern.pv"
+        #line 193 "src/analyzer/statement/MatchPattern.pv"
         case ENUM_VARIANT_RESULT__FUNCTION: {
-            #line 169 "src/analyzer/statement/MatchPattern.pv"
+            #line 194 "src/analyzer/statement/MatchPattern.pv"
             Context__error(context, "Expected an enum variant, not a function");
-            #line 170 "src/analyzer/statement/MatchPattern.pv"
+            #line 195 "src/analyzer/statement/MatchPattern.pv"
             return false;
         } break;
     }
