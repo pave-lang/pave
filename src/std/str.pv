@@ -79,8 +79,6 @@ impl str {
     }
 
     fn index_of_last(self, ch: char) -> isize {
-        let s = self.ptr;
-
         for i in 0..self.length {
             let ptr = self.ptr + self.length - 1 - i;
             if *ptr == ch {
