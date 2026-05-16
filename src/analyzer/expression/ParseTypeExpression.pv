@@ -206,7 +206,13 @@ impl Expression {
 
             if !context.expect_value(TokenType::Symbol, "}") { return 0; }
 
+            let resolved_struct_type = struct_type;
             match struct_type {
+                Type::Self => { resolved_struct_type = context.type_self; },
+                _ => {},
+            }
+
+            match resolved_struct_type {
                 Type::Struct(struct_info, _) => {
                     let field_i: usize = 0;
                     while field_i < struct_info.fields.length {

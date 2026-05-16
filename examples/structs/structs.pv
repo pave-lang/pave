@@ -3,6 +3,25 @@ struct KeyValue<K, V> {
   value: V,
 }
 
+struct Counter {
+    value: i32 = 0,
+    step: i32 = 1,
+}
+
+impl Counter {
+    fn new() -> Self {
+        return Self {};
+    }
+
+    fn new_with_step(step: i32) -> Self {
+        return Self { step };
+    }
+
+    fn advance(&self) {
+        self.value += self.step;
+    }
+}
+
 fn main(argc: i32, argv: **const char) -> i32 {
     let a = KeyValue<i32, f32> { key: 1, value: 20.0f };
 
@@ -10,6 +29,12 @@ fn main(argc: i32, argv: **const char) -> i32 {
     let value = 2;
 
     let b = KeyValue<f32, i32> { key, value };
+
+    let c = Counter::new();
+    let d = Counter::new_with_step(5);
+
+    c.advance();
+    d.advance();
 
     return 0;
 }
