@@ -27,6 +27,13 @@ impl Expression {
                     }
                 }
 
+                for *impl_info in enum_info.impls {
+                    let impl_const_ptr = impl_info.consts.find(&token.value);
+                    if impl_const_ptr != 0 {
+                        return EnumVariantResult::Const(*impl_const_ptr);
+                    }
+                }
+
                 return EnumVariantResult::None;
             },
             Type::EnumC(enum_info) => {

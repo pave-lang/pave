@@ -59,7 +59,7 @@ struct Expression* Expression__parse_if_expression(struct Context* context, stru
 #line 9 "src/analyzer/expression/MemberLookup.pv"
 struct EnumVariantResult Expression__get_enum_variant(struct Context* context, struct Type* type, struct Token* token);
 
-#line 47 "src/analyzer/expression/MemberLookup.pv"
+#line 54 "src/analyzer/expression/MemberLookup.pv"
 struct Type* Expression__get_member_type(struct Context* context, struct Type* type, struct Token* member, bool output_error);
 
 #line 6 "src/analyzer/expression/GenericResolve.pv"
@@ -86,13 +86,13 @@ struct Expression* Expression__make_member_function_call(struct Context* context
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_enum(struct Context* context, struct Token* token, struct Type* enum_type, struct Generics* generics);
 
-#line 130 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 134 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_struct(struct Context* context, struct Token* token, struct Type* struct_type, struct Generics* generics);
 
-#line 292 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 296 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_class(struct Context* context, struct Token* token, struct Expression* parent, struct Generics* generics);
 
-#line 351 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 355 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_cpp(struct Context* context, struct Generics* generics);
 
 #line 7 "src/analyzer/expression/PostfixExpression.pv"

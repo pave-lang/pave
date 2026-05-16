@@ -457,6 +457,16 @@ impl DefinitionWriter {
                     }
                 }
             }
+
+            for (_, impl_const) in impl_info.consts {
+                fprintf(file, "\nextern const ");
+                generator.write_type(file, &impl_const.type, generics);
+                fprintf(file, " ");
+                generator.write_str_title(file, name.as_str());
+                fprintf(file, "_");
+                generator.write_str_title(file, impl_const.name.value);
+                fprintf(file, ";\n");
+            }
         }
 
         return true;

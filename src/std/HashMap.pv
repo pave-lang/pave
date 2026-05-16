@@ -33,7 +33,10 @@ struct HashMap<K: Hash, V> {
 
 impl<K: Hash, V> HashMap<K, V> {
     fn new(allocator: &dyn Allocator) -> Self {
-        let initial_capacity = 16;
+        return Self::with_capacity(allocator, 16);
+    }
+
+    fn with_capacity(allocator: &dyn Allocator, capacity: usize) -> Self {
         let self = Self {
             allocator,
             buckets: 0,
@@ -42,7 +45,7 @@ impl<K: Hash, V> HashMap<K, V> {
             length: 0,
         };
 
-        self.resize(initial_capacity);
+        self.resize(capacity);
 
         return self;
     }

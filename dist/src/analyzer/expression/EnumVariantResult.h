@@ -5,6 +5,7 @@ struct EnumVariant;
 struct EnumCValue;
 struct Function;
 struct GenericMap;
+struct ImplConst;
 #line 5 "src/analyzer/expression/EnumVariantResult.pv"
 struct EnumVariantResult {
     enum {
@@ -12,12 +13,14 @@ struct EnumVariantResult {
         ENUM_VARIANT_RESULT__ENUM_VARIANT,
         ENUM_VARIANT_RESULT__ENUM_CVALUE,
         ENUM_VARIANT_RESULT__FUNCTION,
+        ENUM_VARIANT_RESULT__CONST,
     } type;
 
     union {
         struct EnumVariant* enumvariant_value;
         struct EnumCValue* enumcvalue_value;
         struct { struct Function* _0; struct GenericMap* _1; } function_value;
+        struct ImplConst* const_value;
     };
 };
 

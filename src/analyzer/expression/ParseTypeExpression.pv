@@ -107,6 +107,10 @@ impl Expression {
 
                     return Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
                 },
+                EnumVariantResult::Const(impl_const) => {
+                    let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
+                    return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), context.allocator.store(&impl_const.type));
+                },
                 EnumVariantResult::EnumCValue(_ /*variant*/) => {
                     let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
                     return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), enum_type);

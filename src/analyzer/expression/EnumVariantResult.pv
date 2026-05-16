@@ -7,4 +7,5 @@ enum EnumVariantResult {
     EnumVariant(&EnumVariant),
     EnumCValue(&EnumCValue),
     Function(&Function, &GenericMap),
+    Const(&ImplConst),
 }
