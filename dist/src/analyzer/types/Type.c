@@ -1577,5 +1577,10 @@ struct Module* Type__get_module(struct Type* self) {
             #line 660 "src/analyzer/types/Type.pv"
             return g->module;
         } break;
+        #line 661 "src/analyzer/types/Type.pv"
+        case TYPE__GENERIC_TYPEDEF: {
+            #line 661 "src/analyzer/types/Type.pv"
+            return 0;
+        } break;
     }
 }

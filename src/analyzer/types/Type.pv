@@ -658,6 +658,7 @@ impl Type {
             Type::ClassCpp(_) => { return 0; },
             Type::NamespaceCpp(_) => { return 0; },
             Type::Global(g) => { return g.module; },
+            Type::GenericTypedef(_) => { return 0; },
         }
     }
 }
