@@ -206,6 +206,40 @@ impl Expression {
 
             if !context.expect_value(TokenType::Symbol, "}") { return 0; }
 
+            match struct_type {
+                Type::Struct(struct_info, _) => {
+                    let field_i: usize = 0;
+                    while field_i < struct_info.fields.length {
+                        let bucket = struct_info.fields.data + field_i;
+                        if bucket.value.default_token_start != 0 {
+                            let already_provided = false;
+                            let arg_i: usize = 0;
+                            while arg_i < fields.length {
+                                if fields.data[arg_i].name.value.eq(bucket.key) {
+                                    already_provided = true;
+                                    break;
+                                }
+                                arg_i += 1;
+                            }
+
+                            if !already_provided {
+                                let struct_context = &struct_info.module.context;
+                                let saved_pos = struct_context.pos;
+                                struct_context.pos = bucket.value.default_token_start;
+                                let default_expr = Expression::parse(struct_context, &struct_info.generics);
+                                struct_context.pos = saved_pos;
+
+                                if default_expr != 0 {
+                                    fields.append(InvokeArgument { name: bucket.value.name, value: default_expr });
+                                }
+                            }
+                        }
+                        field_i += 1;
+                    }
+                },
+                _ => {},
+            }
+
             let generic_map = struct_type.get_generic_map(context);
             if !Expression::validate_arguments(context, token, struct_type, &fields, generic_map, false) { return 0; }
 

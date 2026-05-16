@@ -89,10 +89,10 @@ struct Expression* Expression__parse_enum(struct Context* context, struct Token*
 #line 130 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_struct(struct Context* context, struct Token* token, struct Type* struct_type, struct Generics* generics);
 
-#line 252 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 286 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_class(struct Context* context, struct Token* token, struct Expression* parent, struct Generics* generics);
 
-#line 311 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 345 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_cpp(struct Context* context, struct Generics* generics);
 
 #line 7 "src/analyzer/expression/PostfixExpression.pv"

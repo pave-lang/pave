@@ -12,7 +12,7 @@
 struct Token;
 struct Module;
 
-#line 15 "src/analyzer/types/Struct.pv"
+#line 16 "src/analyzer/types/Struct.pv"
 struct Struct {
     struct Token* name;
     struct Module* module;
@@ -29,25 +29,25 @@ struct Struct {
 struct Module;
 struct Struct;
 
-#line 28 "src/analyzer/types/Struct.pv"
+#line 29 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);
 
-#line 40 "src/analyzer/types/Struct.pv"
+#line 41 "src/analyzer/types/Struct.pv"
 struct Struct Struct__parse(struct Module* module);
 
-#line 69 "src/analyzer/types/Struct.pv"
+#line 70 "src/analyzer/types/Struct.pv"
 bool Struct__prefill_types(struct Struct* self);
 
-#line 82 "src/analyzer/types/Struct.pv"
+#line 83 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types(struct Struct* self);
 
-#line 95 "src/analyzer/types/Struct.pv"
+#line 96 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_field(struct Struct* self);
 
-#line 140 "src/analyzer/types/Struct.pv"
+#line 163 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_tuple(struct Struct* self);
 
-#line 183 "src/analyzer/types/Struct.pv"
+#line 207 "src/analyzer/types/Struct.pv"
 bool Struct__is_newtype(struct Struct* self);
 
 #endif
