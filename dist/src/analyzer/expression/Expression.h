@@ -74,25 +74,25 @@ bool Expression__validate_arguments(struct Context* context, struct Token* token
 #line 117 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map);
 
-#line 150 "src/analyzer/expression/ExpressionValidate.pv"
+#line 188 "src/analyzer/expression/ExpressionValidate.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map);
 
-#line 167 "src/analyzer/expression/ExpressionValidate.pv"
+#line 205 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 177 "src/analyzer/expression/ExpressionValidate.pv"
+#line 215 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_enum(struct Context* context, struct Token* token, struct Type* enum_type, struct Generics* generics);
 
-#line 101 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 130 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_struct(struct Context* context, struct Token* token, struct Type* struct_type, struct Generics* generics);
 
-#line 223 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 252 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_class(struct Context* context, struct Token* token, struct Expression* parent, struct Generics* generics);
 
-#line 282 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 311 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_cpp(struct Context* context, struct Generics* generics);
 
 #line 7 "src/analyzer/expression/PostfixExpression.pv"

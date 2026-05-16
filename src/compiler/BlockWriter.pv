@@ -46,18 +46,29 @@ impl BlockWriter {
                 continue;
             }
 
-            let param_type = types.data + param_i;
-            let variable_expression: &Expression = expression;
+            let param_type: &Type;
             let accessor = String::new(g.allocator);
-
             accessor.append_str_lowercase(enum_variant.name.value);
             accessor.append("_value");
 
-            if types.length > 1 {
-                accessor.append("._");
-                accessor.append_usize(param_i);
+            if enum_variant.names.length > 0 {
+                let field_i: usize = 0;
+                while field_i < enum_variant.names.length {
+                    if enum_variant.names.data[field_i].eq(param_iter.field_name) { break; }
+                    field_i += 1;
+                }
+                param_type = types.data + field_i;
+                accessor.append(".");
+                accessor.append(param_iter.field_name);
+            } else {
+                param_type = types.data + param_i;
+                if types.length > 1 {
+                    accessor.append("._");
+                    accessor.append_usize(param_i);
+                }
             }
 
+            let variable_expression: &Expression = expression;
             variable_expression = Expression::make(g.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
 
             let name = param_iter.variable;
@@ -384,18 +395,29 @@ impl BlockWriter {
                                             continue;
                                         }
 
-                                        let param_type = types.data + param_i;
-                                        let variable_expression: &Expression = expression;
+                                        let param_type: &Type;
                                         let accessor = String::new(g.allocator);
-
                                         accessor.append_str_lowercase(enum_variant.name.value);
                                         accessor.append("_value");
 
-                                        if types.length > 1 {
-                                            accessor.append("._");
-                                            accessor.append_usize(param_i);
+                                        if enum_variant.names.length > 0 {
+                                            let field_i: usize = 0;
+                                            while field_i < enum_variant.names.length {
+                                                if enum_variant.names.data[field_i].eq(param_iter.field_name) { break; }
+                                                field_i += 1;
+                                            }
+                                            param_type = types.data + field_i;
+                                            accessor.append(".");
+                                            accessor.append(param_iter.field_name);
+                                        } else {
+                                            param_type = types.data + param_i;
+                                            if types.length > 1 {
+                                                accessor.append("._");
+                                                accessor.append_usize(param_i);
+                                            }
                                         }
 
+                                        let variable_expression: &Expression = expression;
                                         variable_expression = Expression::make(g.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
 
                                         let name = param_iter.variable;

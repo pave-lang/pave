@@ -29,3 +29,66 @@ impl Discriminated {
         }
     }
 }
+
+enum Shape {
+    Circle { radius: f32 },
+    Rect { width: f32, height: f32 },
+    Point,
+}
+
+impl Shape {
+    fn area(&self) -> f32 {
+        match self {
+            Shape::Circle { radius } => {
+                return radius * radius * 3.14159f;
+            },
+            Shape::Rect { width, height } => {
+                return width * height;
+            },
+            Shape::Point => {
+                return 0.0f;
+            },
+        }
+    }
+
+    fn print(&self) {
+        match self {
+            Shape::Circle { radius } => { printf("Circle(r=%f)\n", radius); },
+            Shape::Rect { width, height } => { printf("Rect(%f x %f)\n", width, height); },
+            Shape::Point => { printf("Point\n"); },
+        }
+    }
+}
+
+fn main() -> i32 {
+    let one = Standard::One;
+    let two = Standard::Two;
+    one.print();
+    two.print();
+
+    let none = Discriminated::None;
+    let single = Discriminated::Single(42);
+    let dual = Discriminated::Dual(1, 2);
+    none.print();
+    single.print();
+    dual.print();
+
+    let c = Shape::Circle { radius: 2.0f };
+    let r = Shape::Rect { width: 3.0f, height: 4.0f };
+    let p = Shape::Point;
+    c.print();
+    r.print();
+    p.print();
+    printf("circle area: %f\n", c.area());
+    printf("rect area: %f\n", r.area());
+
+    if let Shape::Circle { radius } = c {
+        printf("circle radius via if-let: %f\n", radius);
+    }
+
+    if let Shape::Rect { width: w, height: h } = r {
+        printf("rect via if-let: %f x %f\n", w, h);
+    }
+
+    return 0;
+}

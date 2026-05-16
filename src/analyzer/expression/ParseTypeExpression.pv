@@ -68,7 +68,36 @@ impl Expression {
                         }
 
                         if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+                    } else if context.check_value(TokenType::Symbol, "{") && variant.names.length > 0 {
+                        if !context.expect_value(TokenType::Symbol, "{") { return 0; }
 
+                        while !context.check_value(TokenType::Symbol, "}") {
+                            let name = context.expect(TokenType::Identifier);
+                            if name == 0 { return 0; }
+
+                            let value: &Expression = 0;
+                            if context.check_next(TokenType::Symbol, ":") {
+                                value = Expression::parse(context, generics);
+                            } else {
+                                let return_type = context.get_value(name.value);
+                                if return_type == 0 {
+                                    context.error_token(name, "Unable to find variable with this name");
+                                    return 0;
+                                }
+                                value = Expression::make(context.allocator, name, ExpressionData::Variable(name.value), return_type);
+                            }
+
+                            if value == 0 { return 0; }
+
+                            arguments.append(InvokeArgument { name, value });
+
+                            if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                                context.expect_value(TokenType::Symbol, "}");
+                                return 0;
+                            }
+                        }
+
+                        if !context.expect_value(TokenType::Symbol, "}") { return 0; }
                     }
 
                     let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);

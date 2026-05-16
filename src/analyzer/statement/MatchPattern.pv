@@ -173,6 +173,64 @@ impl MatchPattern {
                         message.append_usize(enum_variant.types.length);
                         context.error_token(enum_variant_token, message.c_str());
                     }
+                } else if context.check_next(TokenType::Symbol, "{") && enum_variant.names.length > 0 {
+                    while !context.check_value(TokenType::Symbol, "}") {
+                        let ref = context.check_next(TokenType::Symbol, "&");
+                        let field_name_token = context.expect(TokenType::Identifier);
+                        if field_name_token == 0 { context.pop_scope(); return false; }
+
+                        let variable = field_name_token;
+                        let field_name = field_name_token.value;
+
+                        if context.check_next(TokenType::Symbol, ":") {
+                            if ref { ref = false; ref = context.check_next(TokenType::Symbol, "&"); }
+                            variable = context.expect(TokenType::Identifier);
+                            if variable == 0 { context.pop_scope(); return false; }
+                        }
+
+                        let field_i: usize = 0;
+                        let found = false;
+                        while field_i < enum_variant.names.length {
+                            if enum_variant.names.data[field_i].eq(field_name) {
+                                found = true;
+                                break;
+                            }
+                            field_i += 1;
+                        }
+
+                        if !found {
+                            context.error_token(field_name_token, "Field not found in enum variant");
+                            context.pop_scope();
+                            return false;
+                        }
+
+                        let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + field_i, generic_map, 0);
+                        if variable_type == 0 { return false; }
+
+                        if ref {
+                            let indirect = context.allocator.store(&Indirect { type: IndirectType::Reference, to: *variable_type });
+                            variable_type = context.allocator.store(&Type::Indirect(indirect));
+                        }
+
+                        let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);
+                        variable_type_name.prepend(": ");
+                        context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
+
+                        if !variable.eq(TokenType::Identifier, "_") {
+                            if !context.set_value(variable, variable_type) { context.pop_scope(); return false; }
+                        }
+
+                        parameters.append(EnumVariantParameter { ref, variable, field_name });
+
+                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                            context.pop_scope();
+                            context.pop_scope();
+                            context.expect_value(TokenType::Symbol, "}");
+                            return false;
+                        }
+                    }
+
+                    if !context.expect_value(TokenType::Symbol, "}") { context.pop_scope(); return false; }
                 } else {
                     if enum_variant.types.length > 0 {
                         let message = String::new(context.allocator);

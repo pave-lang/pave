@@ -2,14 +2,16 @@
 #define PAVE_ENUM_VARIANT
 
 #include <std/Array_Type.h>
+#include <std/Array_str.h>
 struct Token;
 struct Enum;
 struct Expression;
 
-#line 10 "src/analyzer/types/Enum.pv"
+#line 11 "src/analyzer/types/Enum.pv"
 struct EnumVariant {
     struct Token* name;
     struct Array_Type types;
+    struct Array_str names;
     struct Enum* parent;
     struct Expression* value;
 };

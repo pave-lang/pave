@@ -5,11 +5,13 @@ use expression
 struct EnumVariantParameter {
     ref: bool,
     variable: &Token,
+    field_name: str,
 }
 
 struct EnumVariant {
     name: &Token,
     types: Array<Type>,
+    names: Array<str>,
     parent: &Enum,
     value: *Expression,
 }
@@ -96,6 +98,7 @@ impl Enum {
         if name == 0 { return false; }
 
         let types = Array<Type>::new(self.context.allocator);
+        let names = Array<str>::new(self.context.allocator);
 
         if context.check_next(TokenType::Symbol, "(") {
             while !context.check_next(TokenType::Symbol, ")") {
@@ -106,6 +109,24 @@ impl Enum {
 
                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                     context.expect_value(TokenType::Symbol, ")");
+                    return false;
+                }
+            }
+        } else if context.check_next(TokenType::Symbol, "{") {
+            while !context.check_next(TokenType::Symbol, "}") {
+                let field_name = context.expect(TokenType::Identifier);
+                if field_name == 0 { return false; }
+
+                if !context.expect_value(TokenType::Symbol, ":") { return false; }
+
+                let type: Type;
+                if !context.parse_type(&type, &self.generics) { return false; }
+
+                types.append(type);
+                names.append(field_name.value);
+
+                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
+                    context.expect_value(TokenType::Symbol, "}");
                     return false;
                 }
             }
@@ -125,6 +146,7 @@ impl Enum {
         let variant: EnumVariant = EnumVariant {
             name,
             types,
+            names,
             parent: self,
             value,
         };

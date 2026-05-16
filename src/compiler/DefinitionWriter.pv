@@ -380,7 +380,23 @@ impl DefinitionWriter {
             }
 
             for (_, &variant) in enum_info.variants {
-                if variant.types.length == 1 {
+                if variant.names.length > 0 {
+                    generator.write_indent(file);
+                    fprintf(file, "struct { ");
+
+                    let i: usize = 0;
+                    for type in variant.types {
+                        generator.write_type(file, type, generics);
+                        fprintf(file, " ");
+                        generator.write_str(file, variant.names.data[i]);
+                        fprintf(file, "; ");
+                        i += 1;
+                    }
+
+                    fprintf(file, "} ");
+                    generator.write_str_lowercase(file, variant.name.value);
+                    fprintf(file, "_value;\n");
+                } else if variant.types.length == 1 {
                     generator.write_indent(file);
                     generator.write_type(file, variant.types.data, generics);
                     fprintf(file, " ");

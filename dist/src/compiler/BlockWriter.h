@@ -28,10 +28,10 @@ struct BlockWriter BlockWriter__new(struct Generator* generator);
 #line 20 "src/compiler/BlockWriter.pv"
 bool BlockWriter__write_if_let_enum_variant(struct BlockWriter* self, FILE* file, struct Type* return_type, struct Type* type, struct EnumVariant* enum_variant, struct Array_EnumVariantParameter* parameters, struct Expression* expression, struct Block* body, struct Block* outer_block, struct GenericMap* generics);
 
-#line 89 "src/compiler/BlockWriter.pv"
+#line 100 "src/compiler/BlockWriter.pv"
 bool BlockWriter__write_defer_statements(struct BlockWriter* self, FILE* file, struct Type* return_type, struct Array_DeferStatement* defer_statements, struct GenericMap* generics);
 
-#line 111 "src/compiler/BlockWriter.pv"
+#line 122 "src/compiler/BlockWriter.pv"
 bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type* return_type, struct Block* block, struct GenericMap* generics, bool inline_, bool no_brackets);
 
 #endif

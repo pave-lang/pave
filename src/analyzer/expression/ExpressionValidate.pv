@@ -125,6 +125,44 @@ impl Expression {
             return false;
         }
 
+        if variant.names.length > 0 {
+            for arg in arguments {
+                if arg.name == 0 {
+                    context.error_token(token, "Expected named field argument");
+                    return false;
+                }
+
+                let field_i: usize = 0;
+                let found = false;
+                while field_i < variant.names.length {
+                    if variant.names.data[field_i].eq(arg.name.value) {
+                        found = true;
+                        break;
+                    }
+                    field_i += 1;
+                }
+
+                if !found {
+                    context.error_token(arg.name, "Field not found in enum variant");
+                    return false;
+                }
+
+                let param_type = variant.types.data + field_i;
+                if generic_map != 0 {
+                    param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                }
+
+                if param_type == 0 {
+                    context.error_token(arg.value.token, "Unable to resolve field type");
+                    return false;
+                }
+
+                arg.value.validate_type(context, param_type, true);
+            }
+
+            return true;
+        }
+
         let param_iter = variant.types.iter();
         let args_iter = arguments.iter();
 

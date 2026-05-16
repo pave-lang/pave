@@ -244,7 +244,18 @@ impl ExpressionWriter {
             fprintf(file, "_value = ");
         }
 
-        if arguments.length == 1 {
+        if variant.names.length > 0 {
+            fprintf(file, "{ ");
+            let first = true;
+            for *arg in arguments {
+                if first { first = false; } else { fprintf(file, ", "); }
+                fprintf(file, ".");
+                g.write_token(file, arg.name);
+                fprintf(file, " = ");
+                self.write_expression(file, arg.value, generics);
+            }
+            fprintf(file, " }");
+        } else if arguments.length == 1 {
             self.write_expression(file, arguments.data[0].value, generics);
         } else if arguments.length > 1 {
             fprintf(file, "{ ");
