@@ -5,7 +5,7 @@
 
 #include <std/HashMap_str_ref_Type.h>
 
-#line 4 "src/compiler/FunctionCoroutine.pv"
+#line 6 "src/compiler/FunctionCoroutine.pv"
 struct FunctionCoroutine {
     uintptr_t yield_count;
     struct HashMap_str_ref_Type variables;
@@ -14,7 +14,7 @@ struct FunctionCoroutine {
 #include <compiler/FunctionCoroutine.h>
 struct ArenaAllocator;
 
-#line 10 "src/compiler/FunctionCoroutine.pv"
+#line 12 "src/compiler/FunctionCoroutine.pv"
 struct FunctionCoroutine FunctionCoroutine__new(struct ArenaAllocator* allocator);
 
 #endif

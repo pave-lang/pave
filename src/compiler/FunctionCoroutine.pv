@@ -1,3 +1,5 @@
+#include "assert.h"
+
 use std
 use analyzer::types
 
@@ -12,4 +14,27 @@ impl FunctionCoroutine {
             variables: HashMap<str, &Type>::new(allocator),
         };
     }
+}
+
+co fibonacci(n: usize) -> u64 {
+    let a: u64 = 0;
+    let b: u64 = 1;
+
+    for i in 0..n {
+        let value = a;
+        let tmp = a + b;
+        a = b;
+        b = tmp;
+        yield value;
+    }
+}
+
+test "fibonacci" {
+    let expected = [0u, 1u, 1u, 2u, 3u, 5u, 8u, 13u];
+    let i: usize = 0;
+    for fib in fibonacci(8) {
+        assert(fib == expected[i]);
+        i += 1;
+    }
+    assert(i == 8);
 }

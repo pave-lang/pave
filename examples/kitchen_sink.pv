@@ -1,0 +1,474 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include "assert.h"
+
+use std
+
+// =============================================================================
+// 1. Plain structs + impl methods
+// =============================================================================
+
+struct Point {
+    x: f32,
+    y: f32,
+}
+
+impl Point {
+    fn new(x: f32, y: f32) -> Self {
+        return Self { x, y };
+    }
+
+    fn distance_sq(&self, other: &Point) -> f32 {
+        let dx = self.x - other.x;
+        let dy = self.y - other.y;
+        return dx * dx + dy * dy;
+    }
+
+    fn print(&self) {
+        printf("Point(%.2f, %.2f)\n", self.x, self.y);
+    }
+}
+
+// =============================================================================
+// 2. Tuple struct
+// =============================================================================
+
+struct Meters(f32);
+
+impl Meters {
+    fn value(self) -> f32 { return self._0; }
+}
+
+// =============================================================================
+// 3. Generic struct
+// =============================================================================
+
+struct Pair<A, B> {
+    first: A,
+    second: B,
+}
+
+impl<A, B> Pair<A, B> {
+    fn new(first: A, second: B) -> Self {
+        return Self { first, second };
+    }
+}
+
+// =============================================================================
+// 4. Standard enum + match
+// =============================================================================
+
+enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+impl Direction {
+    fn label(&self) -> *const char {
+        match self {
+            Direction::North => { return "North"; },
+            Direction::South => { return "South"; },
+            Direction::East  => { return "East";  },
+            Direction::West  => { return "West";  },
+        }
+    }
+}
+
+// =============================================================================
+// 5. Discriminated enum + match with bindings
+// =============================================================================
+
+enum Shape {
+    Circle(f32),
+    Rectangle(f32, f32),
+    Triangle(f32, f32, f32),
+}
+
+impl Shape {
+    fn area(&self) -> f32 {
+        match self {
+            Shape::Circle(r)          => { return 3.14159f * r * r; },
+            Shape::Rectangle(w, h)    => { return w * h; },
+            Shape::Triangle(a, b, c)  => {
+                let s = (a + b + c) * 0.5f;
+                return s * (s - a) * (s - b) * (s - c);
+            },
+        }
+    }
+}
+
+// =============================================================================
+// 6. Traits — &self (dynamic-dispatch compatible) and value self
+// =============================================================================
+
+trait Printable {
+    fn print(&self);
+}
+
+trait Scalable {
+    typedef Output;
+    fn scale(self, factor: f32) -> Output;
+}
+
+impl Printable for Point {
+    fn print(&self) {
+        self.print();
+    }
+}
+
+impl Printable for Direction {
+    fn print(&self) {
+        printf("%s\n", self.label());
+    }
+}
+
+// =============================================================================
+// 7. Operator traits (Add, Mul)
+// =============================================================================
+
+impl Add<Point> for Point {
+    typedef Output = Point;
+
+    fn add(self, other: Point) -> Point {
+        return Point { x: self.x + other.x, y: self.y + other.y };
+    }
+}
+
+impl Mul<f32> for Point {
+    typedef Output = Point;
+
+    fn mul(self, scale: f32) -> Point {
+        return Point { x: self.x * scale, y: self.y * scale };
+    }
+}
+
+impl Sub<Point> for Point {
+    typedef Output = Point;
+
+    fn sub(self, other: Point) -> Point {
+        return Point { x: self.x - other.x, y: self.y - other.y };
+    }
+}
+
+// =============================================================================
+// 8. Generic functions with trait bounds
+// =============================================================================
+
+fn print_all<T: Printable>(items: &[T]) {
+    for item in items {
+        item.print();
+    }
+}
+
+// =============================================================================
+// 9. Dynamic dispatch (&dyn Trait)
+// =============================================================================
+
+fn print_dynamic(item: &dyn Printable) {
+    item.print();
+}
+
+// =============================================================================
+// 10. Custom Hash implementation
+// =============================================================================
+
+struct Color {
+    r: u8,
+    g: u8,
+    b: u8,
+}
+
+impl Hash for Color {
+    fn hash(&self) -> Hashed {
+        return Fnv1a::hash(self, sizeof(Color));
+    }
+}
+
+// =============================================================================
+// 11. Coroutines (co + yield)
+// =============================================================================
+
+co fibonacci(n: usize) -> u64 {
+    let a: u64 = 0;
+    let b: u64 = 1;
+
+    for i in 0..n {
+        yield a;
+        let tmp = a + b;
+        a = b;
+        b = tmp;
+    }
+}
+
+co running_sum(values: &[f32]) -> f32 {
+    let total = 0.0f;
+    for v in values {
+        total += v;
+        yield total;
+    }
+}
+
+// =============================================================================
+// 12. Static local variables
+// =============================================================================
+
+fn next_id() -> u32 {
+    let static counter: u32 = 0;
+    counter += 1;
+    return counter;
+}
+
+// =============================================================================
+// 13. Slice helper
+// =============================================================================
+
+fn sum_slice(values: &[f32]) -> f32 {
+    let total = 0.0f;
+    for v in values {
+        total += v;
+    }
+    return total;
+}
+
+// =============================================================================
+// 14. Dynamic function dispatch (Fn trait + typeid)
+// =============================================================================
+
+struct Particle {
+    pos: Point,
+    mass: f32,
+}
+
+struct Gravity {
+    g: f32,
+}
+
+impl Gravity {
+    fn apply(&self, p: &Point, mass: f32) {
+        p.y += self.g * mass;
+    }
+}
+
+fn simulate(func: &dyn Fn, particles: &[Particle], gravity: Gravity) {
+    let params = func.get_params();
+
+    for particle in particles {
+        for (i, *param) in params.iter().enumerate() {
+            if param == typeid(Gravity) {
+                func.set_arg(i, &gravity);
+            } else if param == typeid(&Point) {
+                func.set_arg(i, &particle.pos);
+            } else if param == typeid(f32) {
+                func.set_arg(i, &particle.mass);
+            }
+        }
+        func.execute();
+    }
+}
+
+// =============================================================================
+// main — exercises everything above
+// =============================================================================
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    // --- Struct methods ---
+    let p1 = Point::new(1.0f, 2.0f);
+    let p2 = Point::new(4.0f, 6.0f);
+    p1.print();
+    printf("distance_sq: %.2f\n", p1.distance_sq(&p2));
+
+    // --- Operator overloading ---
+    let sum   = p1 + p2;
+    let diff  = p2 - p1;
+    let scaled = p1 * 3.0f;
+    printf("sum:    %.2f, %.2f\n", sum.x, sum.y);
+    printf("diff:   %.2f, %.2f\n", diff.x, diff.y);
+    printf("scaled: %.2f, %.2f\n", scaled.x, scaled.y);
+
+    // --- Tuple struct ---
+    let dist = Meters(5.5f);
+    printf("meters: %.2f\n", dist.value());
+
+    // --- Generic struct ---
+    let pair = Pair<i32, f32>::new(42, 3.14f);
+    printf("pair: %d %.2f\n", pair.first, pair.second);
+
+    // --- Enum label + print ---
+    let dir = Direction::North;
+    printf("direction: %s\n", dir.label());
+
+    // --- Discriminated enum + area ---
+    let circle = Shape::Circle(3.0f);
+    let rect   = Shape::Rectangle(4.0f, 5.0f);
+    printf("circle area: %.4f\n", circle.area());
+    printf("rect area:   %.2f\n", rect.area());
+
+    // --- Dynamic dispatch ---
+    print_dynamic(&p1);
+    print_dynamic(&dir);
+
+    // --- Range-based for loop ---
+    let acc: i32 = 0;
+    for i in 1..6 {
+        acc += i;
+    }
+    printf("sum 1..5: %d\n", acc);
+
+    // --- while loop ---
+    let n: i32 = 1;
+    while n < 32 {
+        n = n * 2;
+    }
+    printf("next power of 2 >= 32: %d\n", n);
+
+    // --- Array<T> + for *v in ---
+    let arr = Array<i32>::new(GeneralPurposeAllocator::default());
+    arr.append(10);
+    arr.append(20);
+    arr.append(30);
+    arr.append(40);
+    printf("array: ");
+    for *v in arr {
+        printf("%d ", v);
+    }
+    printf("\n");
+
+    // --- enumerate ---
+    for (i, *v) in arr.iter().enumerate() {
+        printf("arr[%zu] = %d\n", i, v);
+    }
+
+    // --- str methods ---
+    let greeting: str = "  hello, world  ";
+    let trimmed = greeting.trim();
+    printf("trimmed: %.*s\n", cast<i32>(trimmed.length), trimmed.ptr);
+    printf("starts_with 'hello': %d\n", trimmed.starts_with("hello"));
+    printf("index of ',': %zd\n", trimmed.index_of(','));
+
+    // --- String builder ---
+    let sb = String::new(GeneralPurposeAllocator::default());
+    sb.append("result = ");
+    sb.append_u64(cast<u64>(acc));
+    printf("%s\n", sb.c_str());
+    sb.release();
+
+    // --- Fixed array + slice ---
+    let fixed = [1.0f, 2.5f, 3.5f, 4.0f];
+    printf("slice sum: %.1f\n", sum_slice(&fixed));
+
+    // --- HashMap ---
+    let map = HashMap<str, i32>::new(GeneralPurposeAllocator::default());
+    map.insert("alpha", 1);
+    map.insert("beta",  2);
+    map.insert("gamma", 3);
+    let found = map.find(&"beta");
+    if found != 0 {
+        printf("beta => %d\n", *found);
+    }
+    for (key, value) in map {
+        printf("map: %.*s = %d\n", cast<i32>(key.length), key.ptr, value);
+    }
+
+    // --- Coroutines ---
+    printf("fibonacci(8): ");
+    for fib in fibonacci(8) {
+        printf("%llu ", fib);
+    }
+    printf("\n");
+
+    let seeds = [1.0f, 2.0f, 3.0f];
+    printf("running sums: ");
+    for s in running_sum(&seeds) {
+        printf("%.1f ", s);
+    }
+    printf("\n");
+
+    // --- Static counter ---
+    printf("ids: %u %u %u\n", next_id(), next_id(), next_id());
+
+    // --- Dynamic Fn dispatch ---
+    let particles = Array<Particle>::new(GeneralPurposeAllocator::default());
+    particles.append(Particle { pos: Point { x: 0.0f, y: 10.0f }, mass: 1.0f });
+    particles.append(Particle { pos: Point { x: 1.0f, y: 5.0f  }, mass: 2.0f });
+    simulate(&Gravity::apply, particles.as_slice(), Gravity { g: -9.81f });
+    for *part in particles {
+        printf("particle y: %.4f\n", part.pos.y);
+    }
+
+    // --- Cleanup ---
+    arr.release();
+    map.release();
+    particles.release();
+
+    return 0;
+}
+
+// =============================================================================
+// Tests
+// =============================================================================
+
+test "point distance squared" {
+    let a = Point::new(0.0f, 0.0f);
+    let b = Point::new(3.0f, 4.0f);
+    assert(a.distance_sq(&b) == 25.0f);
+}
+
+test "operator overloading add" {
+    let a = Point::new(1.0f, 2.0f);
+    let b = Point::new(3.0f, 4.0f);
+    let c = a + b;
+    assert(c.x == 4.0f);
+    assert(c.y == 6.0f);
+}
+
+test "operator overloading mul" {
+    let p = Point::new(2.0f, 3.0f);
+    let q = p * 2.0f;
+    assert(q.x == 4.0f);
+    assert(q.y == 6.0f);
+}
+
+test "tuple struct" {
+    let m = Meters(7.5f);
+    assert(m.value() == 7.5f);
+}
+
+test "enum match" {
+    let d = Direction::East;
+    let label = d.label();
+    assert(label[0] == 'E');
+}
+
+test "shape area circle" {
+    let c = Shape::Circle(1.0f);
+    let area = c.area();
+    assert(area > 3.14f && area < 3.15f);
+}
+
+test "static counter increments" {
+    let a = next_id();
+    let b = next_id();
+    assert(b == a + 1);
+}
+
+test "sum slice" {
+    let values = [1.0f, 2.0f, 3.0f];
+    assert(sum_slice(&values) == 6.0f);
+}
+
+test "str trim and eq" {
+    let s: str = "  hello  ";
+    let t = s.trim();
+    assert(t.eq("hello"));
+}
+
+test "fibonacci first values" {
+    let expected = [0u, 1u, 1u, 2u, 3u, 5u, 8u, 13u];
+    let i: usize = 0;
+    for fib in fibonacci(8) {
+        assert(fib == expected[i]);
+        i += 1;
+    }
+}

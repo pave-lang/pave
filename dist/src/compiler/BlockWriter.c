@@ -401,7 +401,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                 #line 189 "src/compiler/BlockWriter.pv"
                 ExpressionWriter__write_expression(&expr, file, yield_stmt->expression, generics);
                 #line 190 "src/compiler/BlockWriter.pv"
-                fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:\n", yield_number, yield_number);
+                fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:;\n", yield_number, yield_number);
             } break;
             #line 192 "src/compiler/BlockWriter.pv"
             case STATEMENT_DATA__RETURN_STATEMENT: {

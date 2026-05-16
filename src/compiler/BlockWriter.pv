@@ -187,7 +187,7 @@ impl BlockWriter {
                     let yield_number = g.function_context.coroutine.yield_count;
                     fprintf(file, "ctx->_value = ");
                     expr.write_expression(file, yield_stmt.expression, generics);
-                    fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:\n", yield_number, yield_number);
+                    fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:;\n", yield_number, yield_number);
                 },
                 StatementData::ReturnStatement(ret) => {
                     let value = ret.expression;

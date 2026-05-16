@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include <compiler/test_FunctionCoroutine__fibonacci.test.h>
 #include <std/test_str__eq___equal_strings.test.h>
 #include <std/test_str__eq___different_content.test.h>
 #include <std/test_str__eq___different_lengths.test.h>
@@ -15,6 +16,10 @@
 int main(void) {
     int passed = 0;
     int failed = 0;
+
+    fputs("[TEST] compiler/FunctionCoroutine: fibonacci\n", stdout);
+    test_FunctionCoroutine__fibonacci();
+    passed++;
 
     fputs("[TEST] std/str: eq - equal strings\n", stdout);
     test_str__eq___equal_strings();

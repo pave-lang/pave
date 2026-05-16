@@ -219,6 +219,8 @@ impl DefinitionWriter {
 
             generator.write_indent(file);
             fprintf(file, "switch (ctx->_state) {\n");
+
+            generator.write_indent(file);
             fprintf(file, "case 0: break;\n");
             generator.indent += 1;
 
