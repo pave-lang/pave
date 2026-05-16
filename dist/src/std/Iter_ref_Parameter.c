@@ -64,5 +64,5 @@ struct Parameter* Iter_ref_Parameter__value(struct Iter_ref_Parameter* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_Parameter Iter_ref_Parameter__enumerate(struct Iter_ref_Parameter self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_Parameter) { .iter = self };
+    return (struct IterEnumerate_ref_Parameter) { .index = 0, .iter = self };
 }

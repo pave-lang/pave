@@ -64,5 +64,5 @@ struct HashMap_usize_TypeFunctionUsage* Iter_ref_HashMap_usize_TypeFunctionUsage
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage Iter_ref_HashMap_usize_TypeFunctionUsage__enumerate(struct Iter_ref_HashMap_usize_TypeFunctionUsage self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage) { .iter = self };
+    return (struct IterEnumerate_ref_HashMap_usize_TypeFunctionUsage) { .index = 0, .iter = self };
 }

@@ -64,5 +64,5 @@ struct MatchCase* Iter_ref_MatchCase__value(struct Iter_ref_MatchCase* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_MatchCase Iter_ref_MatchCase__enumerate(struct Iter_ref_MatchCase self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_MatchCase) { .iter = self };
+    return (struct IterEnumerate_ref_MatchCase) { .index = 0, .iter = self };
 }

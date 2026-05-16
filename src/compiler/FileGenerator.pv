@@ -644,8 +644,8 @@ impl FileGenerator {
         fprintf(code_file, ">\n\n");
 
         let impls_base = [g.root.hack_type_impl.impl_info];
-        let impls = Array<&Impl> { data: impls_base, length: impls_base.length };
-        let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: 0, length: 0 };
+        let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: self.generator.allocator, capacity: 0 };
+        let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: 0, length: 0, allocator: self.generator.allocator, capacity: 0 };
 
         if !defs.write_impls(code_file, 0, &impls, &impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
@@ -778,7 +778,7 @@ impl FileGenerator {
 
         let name = global.name.value;
 
-        let blank_generics = g.allocator.store(&GenericMap {});
+        let blank_generics = g.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: g.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: g.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
         blank_generics.self_type = Type::Self.to_ptr(g.allocator);
 
         let func_ctx = FunctionContext::new_const(g.allocator);

@@ -44,25 +44,25 @@ struct Function;
 #line 80 "src/analyzer/Impl.pv"
 struct Impl Impl__parse(struct Context* context);
 
-#line 102 "src/analyzer/Impl.pv"
+#line 109 "src/analyzer/Impl.pv"
 bool Impl__skip_to_open_brace(struct Impl* self);
 
-#line 116 "src/analyzer/Impl.pv"
+#line 123 "src/analyzer/Impl.pv"
 bool Impl__prefill_types(struct Impl* self);
 
-#line 146 "src/analyzer/Impl.pv"
+#line 153 "src/analyzer/Impl.pv"
 bool Impl__fill_types(struct Impl* self, struct FunctionParent parent);
 
-#line 211 "src/analyzer/Impl.pv"
+#line 220 "src/analyzer/Impl.pv"
 struct Function* Impl__find_function(struct Impl* self, struct str name);
 
-#line 222 "src/analyzer/Impl.pv"
+#line 231 "src/analyzer/Impl.pv"
 bool Impl__parse_consts(struct Impl* self);
 
-#line 229 "src/analyzer/Impl.pv"
+#line 238 "src/analyzer/Impl.pv"
 bool Impl__parse_typedefs(struct Impl* self);
 
-#line 268 "src/analyzer/Impl.pv"
+#line 277 "src/analyzer/Impl.pv"
 bool Impl__parse_functions(struct Impl* self);
 
 #endif

@@ -41,7 +41,7 @@ impl Expression {
         if member_type == 0 { return 0; }
 
         let generic_map = inner.return_type.get_generic_map(context);
-        let parsed_generics = Array<Type> {};
+        let parsed_generics = Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 };
         let func_info: &Function = 0;
 
         let is_function = false;
@@ -65,13 +65,13 @@ impl Expression {
             let arguments = Array<InvokeArgument>::new(context.allocator);
 
             if func_info != 0 && func_info.parameters.length > 0 && func_info.parameters.data[0].name.value.eq("self") {
-                arguments.append(InvokeArgument { value: inner });
+                arguments.append(InvokeArgument { name: 0, value: inner });
             }
 
             while !context.check_value(TokenType::Symbol, ")"){
                 let argument = Expression::parse(context, generics);
                 if argument == 0 { return 0; }
-                arguments.append(InvokeArgument { value: argument });
+                arguments.append(InvokeArgument { name: 0, value: argument });
 
                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                     context.expect_value(TokenType::Symbol, ")");
@@ -181,7 +181,7 @@ impl Expression {
         }
 
         if element_type == 0 && context.module.mode_cpp {
-            let unknown_c = context.allocator.store(&UnknownC { include: 0, name: "", generics: Array<Type> {} });
+            let unknown_c = context.allocator.store(&UnknownC { include: 0, name: "", generics: Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 } });
             element_type = Type::UnknownC(unknown_c).to_ptr(context.allocator);
         }
 
@@ -205,7 +205,7 @@ impl Expression {
         } else if inner.return_type.resolve_typedef_function().is_function() && (token.eq(TokenType::Symbol, "<") || token.eq(TokenType::Symbol, "(")) {
             match inner.return_type.resolve_typedef_function() {
                 Type::Function(func_info, _) => {
-                    let parsed_generics = Array<Type> {};
+                    let parsed_generics = Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 };
 
                     if context.check_value(TokenType::Symbol, "<") {
                         parsed_generics = context.parse_generics(generics);
@@ -217,7 +217,7 @@ impl Expression {
 
                     while !context.check_value(TokenType::Symbol, ")") {
                         let argument = Expression::parse(context, generics);
-                        arguments.append(InvokeArgument { value: argument });
+                        arguments.append(InvokeArgument { name: 0, value: argument });
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                             context.expect_value(TokenType::Symbol, ")");
@@ -250,7 +250,7 @@ impl Expression {
 
                     while !context.check_value(TokenType::Symbol, ")") {
                         let argument = Expression::parse(context, generics);
-                        arguments.append(InvokeArgument { value: argument });
+                        arguments.append(InvokeArgument { name: 0, value: argument });
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                             context.expect_value(TokenType::Symbol, ")");
@@ -272,7 +272,7 @@ impl Expression {
 
                     while !context.check_value(TokenType::Symbol, ")") {
                         let argument = Expression::parse(context, generics);
-                        arguments.append(InvokeArgument { value: argument });
+                        arguments.append(InvokeArgument { name: 0, value: argument });
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                             context.expect_value(TokenType::Symbol, ")");

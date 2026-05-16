@@ -16,6 +16,7 @@ impl FunctionContext {
             func_info,
             use_scopes,
             scopes: Array<FunctionScope>::new(allocator),
+            coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
         };
 
         if self.use_scopes {
@@ -36,8 +37,10 @@ impl FunctionContext {
     fn new_const(allocator: &ArenaAllocator) -> Self {
         return Self {
             allocator,
+            func_info: 0,
             use_scopes: false,
             scopes: Array<FunctionScope>::new(allocator),
+            coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
         };
     }
 

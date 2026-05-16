@@ -35,6 +35,10 @@ impl Struct {
             fields: HashMap<str, StructField>::new(context.allocator),
             traits: HashMap<str, (&Trait, &Type)>::new(context.allocator),
             impls: Array<&Impl>::new(context.allocator),
+            name: 0,
+            token_start: 0,
+            token_end: 0,
+            type: StructType::Incomplete,
         };
     }
 

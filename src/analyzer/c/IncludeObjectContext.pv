@@ -75,7 +75,7 @@ impl IncludeObjectContext {
                 let return_type_resolved = include.parse_type(return_type);
 
                 let func_info = Function::new_allocator(include.root.allocator);
-                func_info.name = allocator.store(&Token { value: method_name });
+                func_info.name = allocator.store(&Token { type: TokenType::Identifier, value: method_name, start_line: 0, start_column: 0, end_line: 0, end_column: 0 });
                 func_info.return_type = *return_type_resolved;
                 func_info.type = FunctionType::MethodCpp;
 

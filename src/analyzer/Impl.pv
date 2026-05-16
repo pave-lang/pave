@@ -87,6 +87,13 @@ impl Impl {
             consts: HashMap<str, &ImplConst>::new(context.allocator),
             typedef_starts: HashMap<str, usize>::new(context.allocator),
             typedefs: HashMap<str, Type>::new(context.allocator),
+            type: Type::Primitive(0),
+            token_start: 0,
+            token_end: 0,
+            has_trait: false,
+            trait_: 0,
+            trait_name: 0,
+            trait_type: Type::Primitive(0),
         };
 
         if !context.expect_value(TokenType::Keyword, "impl") { return node; }
@@ -184,6 +191,8 @@ impl Impl {
                     context,
                     token_start,
                     token_end,
+                    type: Type::Primitive(0),
+                    value: 0,
                 };
                 self.consts.insert(const_name.value, impl_const);
 

@@ -19,6 +19,8 @@ impl Block {
             context,
             statements: Array<Statement>::new(context.allocator),
             defer_statements: Array<DeferStatement>::new(context.allocator),
+            is_top_level_and_has_defer_statements_inside: false,
+            is_loop: false,
         };
     }
 

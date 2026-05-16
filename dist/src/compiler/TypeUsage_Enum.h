@@ -28,7 +28,7 @@ struct UsageContext;
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Enum TypeUsage_Enum__new(struct ArenaAllocator* allocator, struct Enum* type, uintptr_t impl_count);
 
-#line 92 "src/compiler/Usages.pv"
+#line 94 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Enum__add_usage(struct TypeUsage_Enum* self, struct GenericMap* generic_map);
 
 #endif

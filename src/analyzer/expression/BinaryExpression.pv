@@ -101,8 +101,8 @@ impl Expression {
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
-                    arguments.append(InvokeArgument { value: lhs });
-                    arguments.append(InvokeArgument { value: rhs });
+                    arguments.append(InvokeArgument { name: 0, value: lhs });
+                    arguments.append(InvokeArgument { name: 0, value: rhs });
 
                     return Expression::make_type_function_call(context, token, func_type, arguments, 0);
                 }
@@ -125,8 +125,8 @@ impl Expression {
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
-                    arguments.append(InvokeArgument { value: lhs });
-                    arguments.append(InvokeArgument { value: rhs });
+                    arguments.append(InvokeArgument { name: 0, value: lhs });
+                    arguments.append(InvokeArgument { name: 0, value: rhs });
 
                     return Expression::make_type_function_call(context, token, func_type, arguments, 0);
                 }

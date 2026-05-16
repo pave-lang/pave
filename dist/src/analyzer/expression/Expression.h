@@ -44,16 +44,16 @@ struct str Expression__number_primitive(struct str value);
 #line 40 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 376 "src/analyzer/expression/Expression.pv"
+#line 377 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 423 "src/analyzer/expression/Expression.pv"
+#line 424 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 430 "src/analyzer/expression/Expression.pv"
+#line 431 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 518 "src/analyzer/expression/Expression.pv"
+#line 519 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
@@ -71,16 +71,16 @@ void Expression__resolve_generic_type(struct Context* context, struct Type* para
 #line 7 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call);
 
-#line 117 "src/analyzer/expression/ExpressionValidate.pv"
+#line 140 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map);
 
-#line 188 "src/analyzer/expression/ExpressionValidate.pv"
+#line 211 "src/analyzer/expression/ExpressionValidate.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map);
 
-#line 205 "src/analyzer/expression/ExpressionValidate.pv"
+#line 228 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 215 "src/analyzer/expression/ExpressionValidate.pv"
+#line 238 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"

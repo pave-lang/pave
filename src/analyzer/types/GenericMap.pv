@@ -12,6 +12,7 @@ impl GenericMap {
         let self: Self = Self {
             array: Array<Type>::new(allocator),
             map: HashMap<str, usize>::new(allocator),
+            self_type: 0,
         };
 
         let i: usize = 0;
@@ -30,6 +31,7 @@ impl GenericMap {
         let self = Self {
             array: Array<Type>::new(allocator),
             map: HashMap<str, usize>::new(allocator),
+            self_type: 0,
         };
 
         for generic in generics.array {

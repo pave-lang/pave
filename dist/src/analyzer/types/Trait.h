@@ -31,16 +31,16 @@ struct Trait;
 #line 16 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);
 
-#line 27 "src/analyzer/types/Trait.pv"
+#line 31 "src/analyzer/types/Trait.pv"
 struct Trait Trait__parse(struct Module* module);
 
-#line 48 "src/analyzer/types/Trait.pv"
+#line 52 "src/analyzer/types/Trait.pv"
 bool Trait__fill_types(struct Trait* self, struct FunctionParent parent);
 
-#line 81 "src/analyzer/types/Trait.pv"
+#line 85 "src/analyzer/types/Trait.pv"
 bool Trait__has_dynamic_dispatch(struct Trait* self);
 
-#line 85 "src/analyzer/types/Trait.pv"
+#line 89 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self);
 
 #endif

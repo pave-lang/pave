@@ -63,5 +63,5 @@ struct Trait** Iter_ref_ref_Trait__value(struct Iter_ref_ref_Trait* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_ref_Trait Iter_ref_ref_Trait__enumerate(struct Iter_ref_ref_Trait self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_ref_Trait) { .iter = self };
+    return (struct IterEnumerate_ref_ref_Trait) { .index = 0, .iter = self };
 }

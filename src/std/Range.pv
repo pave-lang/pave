@@ -26,7 +26,7 @@ impl<T> Range<T> {
         match self {
             Range<T>::End(end) => { return Iter<T>::new(cast<T>(0), end); },
             Range<T>::StartEnd(start, end) => { return Iter<T>::new(start, end); },
-            _ => { return Iter<T> {}; }
+            _ => { return Iter<T> { step: 0, iter: cast<T>(0), start: cast<T>(0), end: cast<T>(0) }; }
         }
     }
 }

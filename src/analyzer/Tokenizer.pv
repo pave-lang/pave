@@ -212,7 +212,7 @@ impl Tokenizer {
         if file == 0 {
             fprintf(stderr, "Unable to open file: %s\n", filename);
             perror("fopen");
-            return str {};
+            return str { ptr: 0, length: 0 };
         }
 
         fseek(file, 0, SEEK_END);
@@ -224,7 +224,7 @@ impl Tokenizer {
         if buffer == 0 {
             perror("Memory allocation failed");
             fclose(file);
-            return str {};
+            return str { ptr: 0, length: 0 };
         }
 
         let read_length: usize = fread(buffer, 1, length, file);
@@ -233,7 +233,7 @@ impl Tokenizer {
             perror("Error reading file");
             allocator.free(buffer);
             fclose(file);
-            return str {};
+            return str { ptr: 0, length: 0 };
         }
 
         buffer[length] = '\0';
@@ -247,11 +247,14 @@ impl Tokenizer {
         let data = Tokenizer::read_file_into_string(allocator, path);
 
         if data.length == 0 {
-            return Array<Token> {};
+            return Array<Token> { allocator, data: 0, length: 0, capacity: 0 };
         }
 
         let tokenizer: Tokenizer = Tokenizer {
             data,
+            pos: 0,
+            line: 0,
+            column: 0,
             keywords: Tokenizer::make_keywords(allocator),
             symbols: Tokenizer::make_symbols(allocator),
         };
@@ -270,11 +273,15 @@ impl Tokenizer {
             let start_pos: usize = tokenizer.pos;
 
             let token: Token = Token {
+                type: TokenType::Symbol,
                 value: str {
                     ptr: tokenizer.data.ptr + start_pos,
+                    length: 0,
                 },
                 start_line: tokenizer.line,
                 start_column: tokenizer.column,
+                end_line: 0,
+                end_column: 0,
             };
     
             if is_raw_identifier || tokenizer.is_letter() || tokenizer.data.ptr[tokenizer.pos] == '#' {

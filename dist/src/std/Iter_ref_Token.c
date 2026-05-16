@@ -64,5 +64,5 @@ struct Token* Iter_ref_Token__value(struct Iter_ref_Token* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_Token Iter_ref_Token__enumerate(struct Iter_ref_Token self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_Token) { .iter = self };
+    return (struct IterEnumerate_ref_Token) { .index = 0, .iter = self };
 }

@@ -8,7 +8,7 @@ struct Generic {
 
 impl Generic {
     fn new(allocator: &dyn Allocator) -> Self {
-        return Self { traits: Array<&Trait>::new(allocator) };
+        return Self { name: 0, traits: Array<&Trait>::new(allocator) };
     }
 
     fn parse(&self, context: &Context) -> bool {
@@ -48,6 +48,7 @@ struct Generics {
 impl Generics {
     fn new(allocator: &dyn Allocator) -> Self {
         return Self {
+            parent: 0,
             array: Array<Generic>::new(allocator),
             map: HashMap<str, usize>::new(allocator),
         };

@@ -28,7 +28,7 @@ struct UsageContext;
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Primitive TypeUsage_Primitive__new(struct ArenaAllocator* allocator, struct Primitive* type, uintptr_t impl_count);
 
-#line 92 "src/compiler/Usages.pv"
+#line 94 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Primitive__add_usage(struct TypeUsage_Primitive* self, struct GenericMap* generic_map);
 
 #endif

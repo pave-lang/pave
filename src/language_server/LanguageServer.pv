@@ -24,6 +24,16 @@ impl LanguageServer {
             allocator,
             args: Array<*const char>::new(allocator),
             clang_args: Array<*const char>::new(allocator),
+            root: 0,
+            analysis_alloc: ArenaAllocator { allocator, block_size: 0, last_block: 0, last_oversize: 0 },
+            analysis: Analysis {
+                files: HashMap<str, bool> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
+                diagnostics: HashMap<str, Array<Diagnostic>> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
+                inlay_hints: HashMap<str, Array<InlayHint>> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
+            },
+            file_map: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
+            pipe_read: 0,
+            pipe_write: 0,
         });
 
         let use_stdio = true;

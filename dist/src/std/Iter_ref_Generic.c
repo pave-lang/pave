@@ -64,5 +64,5 @@ struct Generic* Iter_ref_Generic__value(struct Iter_ref_Generic* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_Generic Iter_ref_Generic__enumerate(struct Iter_ref_Generic self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_Generic) { .iter = self };
+    return (struct IterEnumerate_ref_Generic) { .index = 0, .iter = self };
 }

@@ -24,13 +24,13 @@ struct Context;
 #line 49 "src/analyzer/types/Generics.pv"
 struct Generics Generics__new(struct trait_Allocator allocator);
 
-#line 56 "src/analyzer/types/Generics.pv"
+#line 57 "src/analyzer/types/Generics.pv"
 bool Generics__has(struct Generics* self, struct str name);
 
-#line 63 "src/analyzer/types/Generics.pv"
+#line 64 "src/analyzer/types/Generics.pv"
 struct Generic* Generics__find(struct Generics* self, struct str name);
 
-#line 75 "src/analyzer/types/Generics.pv"
+#line 76 "src/analyzer/types/Generics.pv"
 bool Generics__parse(struct Generics* self, struct Context* context);
 
 #endif

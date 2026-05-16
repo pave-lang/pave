@@ -27,7 +27,7 @@ struct Iter_usize Range_usize__iter(struct Range_usize self) {
         #line 29 "src/std/Range.pv"
         default: {
             #line 29 "src/std/Range.pv"
-            return (struct Iter_usize) {};
+            return (struct Iter_usize) { .step = 0, .iter = (uintptr_t)(0), .start = (uintptr_t)(0), .end = (uintptr_t)(0) };
         } break;
     }
 }

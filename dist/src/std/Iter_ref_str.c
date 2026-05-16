@@ -64,5 +64,5 @@ struct str* Iter_ref_str__value(struct Iter_ref_str* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_str Iter_ref_str__enumerate(struct Iter_ref_str self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_str) { .iter = self };
+    return (struct IterEnumerate_ref_str) { .index = 0, .iter = self };
 }

@@ -64,5 +64,5 @@ struct InvokeArgument* Iter_ref_InvokeArgument__value(struct Iter_ref_InvokeArgu
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_InvokeArgument Iter_ref_InvokeArgument__enumerate(struct Iter_ref_InvokeArgument self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_InvokeArgument) { .iter = self };
+    return (struct IterEnumerate_ref_InvokeArgument) { .index = 0, .iter = self };
 }

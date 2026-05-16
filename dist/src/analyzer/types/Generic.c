@@ -15,7 +15,7 @@
 #line 10 "src/analyzer/types/Generics.pv"
 struct Generic Generic__new(struct trait_Allocator allocator) {
     #line 11 "src/analyzer/types/Generics.pv"
-    return (struct Generic) { .traits = Array_ref_Trait__new(allocator) };
+    return (struct Generic) { .name = 0, .traits = Array_ref_Trait__new(allocator) };
 }
 
 #line 14 "src/analyzer/types/Generics.pv"

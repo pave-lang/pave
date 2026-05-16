@@ -67,6 +67,7 @@ impl Expression {
                         result = Expression::make_next(context, Expression {
                             token,
                             return_type: Type::Generic(generic),
+                            data: ExpressionData::Variable(str { ptr: 0, length: 0 }),
                         });
 
                         result.data = ExpressionData::Type(&result.return_type);
@@ -79,7 +80,7 @@ impl Expression {
                         Type::Function(func_info, _) => {
                             context.next_token();
                             let func_type = return_type;
-                            let parsed_generics = Array<Type> {};
+                            let parsed_generics = Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 };
 
                             if context.check_value(TokenType::Symbol, "<") {
                                 parsed_generics = context.parse_generics(generics);
@@ -92,7 +93,7 @@ impl Expression {
                             while !context.check_value(TokenType::Symbol, ")") {
                                 let argument = Expression::parse(context, generics);
                                 if argument == 0 { return 0; }
-                                arguments.append(InvokeArgument { value: argument });
+                                arguments.append(InvokeArgument { name: 0, value: argument });
 
                                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
@@ -199,7 +200,7 @@ impl Expression {
 
                             while !context.check_value(TokenType::Symbol, ")") {
                                 let argument = Expression::parse(context, generics);
-                                arguments.append(InvokeArgument { value: argument });
+                                arguments.append(InvokeArgument { name: 0, value: argument });
 
                                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
@@ -304,7 +305,7 @@ impl Expression {
                             }
                         }
 
-                        let tuple = context.allocator.store(&Tuple {});
+                        let tuple = context.allocator.store(&Tuple { elements: Array<Type>::new(context.allocator) });
                         tuple.elements = Array<Type>::new_with_length(context.allocator, arguments.length);
                         for (i, *expr) in arguments.iter().enumerate() {
                             tuple.elements.data[i] = expr.value.return_type;
@@ -326,7 +327,7 @@ impl Expression {
                         let element = Expression::parse(context, generics);
                         if element == 0 { return 0; }
 
-                        elements.append(InvokeArgument { value: element });
+                        elements.append(InvokeArgument { name: 0, value: element });
 
                         if element_type == 0 {
                             element_type = &element.return_type;
@@ -341,7 +342,7 @@ impl Expression {
                     context.expect_value(TokenType::Symbol, "]");
 
                     if element_type == 0 { element_type = &context.root.type_void; }
-                    let parent_sequence = context.allocator.store(&Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type });
+                    let parent_sequence = context.allocator.store(&Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type, element_pointer: Type::Primitive(0) });
                     let parent_type = context.allocator.store(&Type::Sequence(parent_sequence));
                     let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(parent_type), parent_type);
 
@@ -387,7 +388,7 @@ impl Expression {
             let range_end = Expression::parse(context, generics);
             if range_end == 0 { return 0; }
 
-            let enum_type = context.module.find_make_type("Range", &Array<Type> { data: &range_end.return_type, length: 1 });
+            let enum_type = context.module.find_make_type("Range", &Array<Type> { data: &range_end.return_type, length: 1, allocator: context.allocator, capacity: 0 });
             if enum_type == 0 {
                 context.error_token(token, "Could not find Range type, include std library");
                 return 0;
@@ -409,8 +410,8 @@ impl Expression {
             }
 
             let arguments = Array<InvokeArgument>::new(context.allocator);
-            arguments.append(InvokeArgument { value: range_start });
-            arguments.append(InvokeArgument { value: range_end });
+            arguments.append(InvokeArgument { name: 0, value: range_start });
+            arguments.append(InvokeArgument { name: 0, value: range_end });
 
             let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
 

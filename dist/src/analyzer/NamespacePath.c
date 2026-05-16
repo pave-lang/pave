@@ -12,7 +12,7 @@
 #line 9 "src/analyzer/NamespacePath.pv"
 struct NamespacePath NamespacePath__new(struct trait_Allocator allocator) {
     #line 10 "src/analyzer/NamespacePath.pv"
-    return (struct NamespacePath) { .parts = Array_ref_Token__new(allocator) };
+    return (struct NamespacePath) { .root = false, .parts = Array_ref_Token__new(allocator) };
 }
 
 #line 13 "src/analyzer/NamespacePath.pv"

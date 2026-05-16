@@ -17,7 +17,7 @@ struct test_FunctionCoroutine_fibonacci_2 {
 #include <std/trait_Iter_u64.h>
 uint64_t test_FunctionCoroutine_fibonacci_2__value(void* ctx);
 extern struct trait_Iter_u64VTable TEST_FUNCTION_COROUTINE_FIBONACCI_2__VTABLE__ITER;
-#line 31 "src/compiler/FunctionCoroutine.pv"
+#line 32 "src/compiler/FunctionCoroutine.pv"
 bool test_FunctionCoroutine_fibonacci_2__next(void* _ctx);
 
 #endif

@@ -41,6 +41,10 @@ impl Enum {
             variants: HashMap<str, EnumVariant>::new(context.allocator),
             traits: HashMap<str, &Trait>::new(context.allocator),
             impls: Array<&Impl>::new(context.allocator),
+            name: 0,
+            token_start: 0,
+            token_end: 0,
+            type: EnumType::Standard,
         };
     }
 

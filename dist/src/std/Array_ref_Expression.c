@@ -15,13 +15,13 @@
 #line 77 "src/std/Array.pv"
 struct Array_ref_Expression Array_ref_Expression__new(struct trait_Allocator allocator) {
     #line 78 "src/std/Array.pv"
-    return (struct Array_ref_Expression) { .allocator = allocator };
+    return (struct Array_ref_Expression) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
 }
 
 #line 81 "src/std/Array.pv"
 struct Array_ref_Expression Array_ref_Expression__new_with_length(struct trait_Allocator allocator, uintptr_t length) {
     #line 82 "src/std/Array.pv"
-    struct Array_ref_Expression self = (struct Array_ref_Expression) { .allocator = allocator };
+    struct Array_ref_Expression self = (struct Array_ref_Expression) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
     #line 83 "src/std/Array.pv"
     Array_ref_Expression__reserve(&self, length);
     #line 84 "src/std/Array.pv"
@@ -33,7 +33,7 @@ struct Array_ref_Expression Array_ref_Expression__new_with_length(struct trait_A
 #line 88 "src/std/Array.pv"
 struct Array_ref_Expression Array_ref_Expression__new_with_capacity(struct trait_Allocator allocator, uintptr_t length) {
     #line 89 "src/std/Array.pv"
-    struct Array_ref_Expression self = (struct Array_ref_Expression) { .allocator = allocator };
+    struct Array_ref_Expression self = (struct Array_ref_Expression) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
     #line 90 "src/std/Array.pv"
     Array_ref_Expression__reserve(&self, length);
     #line 91 "src/std/Array.pv"

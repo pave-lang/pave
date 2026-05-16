@@ -559,6 +559,9 @@ impl Generator {
             output_line_directives,
             naming_decl: &root.naming_decl,
             naming_ident: Naming::new_ident(allocator),
+            indent: 0,
+            naming_c99: Naming { allocator, type: NamingType::Ident, generic_start: "", generic_seperator: "", generic_end: "", pointer_prefix: "", pointer_suffix: "", pointer_const_prefix: "", pointer_const_suffix: "", reference_prefix: "", reference_suffix: "", sequence_slice_prefix: "", sequence_open: "", sequence_fixed_delimiter: "", sequence_close: "", tuple_prefix: "", tuple_open: "", tuple_close: "", enum_generic_type_suffix: "", enum_prefix: "", struct_prefix: "", trait_prefix: "", union_prefix: "", coroutine_instance_prefix: "", primitives: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, naming_ident: 0 },
+            function_context: 0,
         };
 
         self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);

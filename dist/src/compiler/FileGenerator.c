@@ -63,15 +63,16 @@
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/IndirectType.h>
 #include <analyzer/types/TypeImpl.h>
+#include <std/trait_Allocator.h>
 #include <compiler/TypeUsage_Tuple.h>
 #include <analyzer/types/Tuple.h>
 #include <std/Array_Type.h>
 #include <std/IterEnumerate_ref_Type.h>
 #include <std/Iter_ref_Type.h>
 #include <tuple_usize_ref_Type.h>
-#include <std/trait_Allocator.h>
 #include <compiler/TypeUsage_Trait.h>
 #include <analyzer/types/Global.h>
+#include <std/HashMap_str_usize.h>
 #include <std/HashSetIter_str.h>
 #include <analyzer/expression/Expression.h>
 #include <compiler/ExpressionWriter.h>
@@ -1365,9 +1366,9 @@ bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_
     #line 646 "src/compiler/FileGenerator.pv"
     struct Impl* impls_base[1] = {g->root->hack_type_impl->impl_info};
     #line 647 "src/compiler/FileGenerator.pv"
-    struct Array_ref_Impl impls = (struct Array_ref_Impl) { .data = impls_base, .length = 1 };
+    struct Array_ref_Impl impls = (struct Array_ref_Impl) { .data = impls_base, .length = 1, .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->generator->allocator }, .capacity = 0 };
     #line 648 "src/compiler/FileGenerator.pv"
-    struct Array_HashMap_usize_TypeFunctionUsage impl_functions = (struct Array_HashMap_usize_TypeFunctionUsage) { .data = 0, .length = 0 };
+    struct Array_HashMap_usize_TypeFunctionUsage impl_functions = (struct Array_HashMap_usize_TypeFunctionUsage) { .data = 0, .length = 0, .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->generator->allocator }, .capacity = 0 };
 
     #line 650 "src/compiler/FileGenerator.pv"
     if (!DefinitionWriter__write_impls(&defs, code_file, 0, &impls, &impl_functions, generics, &include_writer)) {
@@ -1636,7 +1637,7 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     struct str name = global->name->value;
 
     #line 781 "src/compiler/FileGenerator.pv"
-    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(g->allocator, (struct GenericMap[]){(struct GenericMap) {}});
+    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(g->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = 0, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = g->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = g->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
     #line 782 "src/compiler/FileGenerator.pv"
     blank_generics->self_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SELF }}, g->allocator);
 

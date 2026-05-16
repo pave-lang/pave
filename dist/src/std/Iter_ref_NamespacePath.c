@@ -64,5 +64,5 @@ struct NamespacePath* Iter_ref_NamespacePath__value(struct Iter_ref_NamespacePat
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_NamespacePath Iter_ref_NamespacePath__enumerate(struct Iter_ref_NamespacePath self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_NamespacePath) { .iter = self };
+    return (struct IterEnumerate_ref_NamespacePath) { .index = 0, .iter = self };
 }

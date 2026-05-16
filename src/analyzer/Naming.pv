@@ -55,6 +55,19 @@ impl Naming {
             sequence_close: "]",
             tuple_open: "(",
             tuple_close: ")",
+            pointer_suffix: "",
+            pointer_const_suffix: "",
+            reference_suffix: "",
+            sequence_slice_prefix: "",
+            tuple_prefix: "",
+            enum_generic_type_suffix: "",
+            enum_prefix: "",
+            struct_prefix: "",
+            trait_prefix: "",
+            union_prefix: "",
+            coroutine_instance_prefix: "",
+            primitives: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
+            naming_ident: 0,
         };
     }
 
@@ -71,6 +84,21 @@ impl Naming {
             enum_generic_type_suffix: "__Type",
             trait_prefix: "trait_",
             tuple_prefix: "tuple_",
+            generic_end: "",
+            pointer_suffix: "",
+            pointer_const_suffix: "",
+            reference_suffix: "",
+            sequence_open: "",
+            sequence_fixed_delimiter: "",
+            sequence_close: "",
+            tuple_open: "",
+            tuple_close: "",
+            enum_prefix: "",
+            struct_prefix: "",
+            union_prefix: "",
+            coroutine_instance_prefix: "",
+            primitives: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
+            naming_ident: 0,
         };
     }
 
@@ -111,12 +139,20 @@ impl Naming {
             coroutine_instance_prefix: "struct ",
             primitives,
             naming_ident,
+            generic_end: "",
+            pointer_prefix: "",
+            pointer_const_prefix: "",
+            reference_prefix: "",
+            sequence_fixed_delimiter: "",
+            tuple_open: "",
+            tuple_close: "",
+            enum_generic_type_suffix: "",
         };
     }
 
     fn get_type_name(&self, type: &Type, type_self: &Type, generics_map: *GenericMap) -> String {
         let result = String::new(self.allocator);
-        let generics = Array<Type> {};
+        let generics = Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 };
         let generic_start = self.generic_start;
         let generic_end = self.generic_end;
 

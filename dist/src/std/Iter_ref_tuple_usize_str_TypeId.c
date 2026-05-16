@@ -64,5 +64,5 @@ struct tuple_usize_str_TypeId* Iter_ref_tuple_usize_str_TypeId__value(struct Ite
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_tuple_usize_str_TypeId Iter_ref_tuple_usize_str_TypeId__enumerate(struct Iter_ref_tuple_usize_str_TypeId self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_tuple_usize_str_TypeId) { .iter = self };
+    return (struct IterEnumerate_ref_tuple_usize_str_TypeId) { .index = 0, .iter = self };
 }

@@ -64,5 +64,5 @@ struct Type* Iter_ref_Type__value(struct Iter_ref_Type* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_Type Iter_ref_Type__enumerate(struct Iter_ref_Type self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_Type) { .iter = self };
+    return (struct IterEnumerate_ref_Type) { .index = 0, .iter = self };
 }

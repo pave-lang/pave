@@ -137,7 +137,7 @@ impl MatchPattern {
                         let variable = context.expect(TokenType::Identifier);
                         if variable == 0 { context.pop_scope(); return false; }
 
-                        parameters.append(EnumVariantParameter { ref, variable });
+                        parameters.append(EnumVariantParameter { ref, variable, field_name: str { ptr: 0, length: 0 } });
 
                         let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, 0);
                         if variable_type == 0 { return false; }

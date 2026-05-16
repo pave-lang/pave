@@ -64,5 +64,5 @@ struct Statement* Iter_ref_Statement__value(struct Iter_ref_Statement* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_Statement Iter_ref_Statement__enumerate(struct Iter_ref_Statement self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_Statement) { .iter = self };
+    return (struct IterEnumerate_ref_Statement) { .index = 0, .iter = self };
 }

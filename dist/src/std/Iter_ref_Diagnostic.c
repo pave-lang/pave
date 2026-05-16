@@ -64,5 +64,5 @@ struct Diagnostic* Iter_ref_Diagnostic__value(struct Iter_ref_Diagnostic* self) 
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_Diagnostic Iter_ref_Diagnostic__enumerate(struct Iter_ref_Diagnostic self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_Diagnostic) { .iter = self };
+    return (struct IterEnumerate_ref_Diagnostic) { .index = 0, .iter = self };
 }

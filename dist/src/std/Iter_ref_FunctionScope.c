@@ -64,5 +64,5 @@ struct FunctionScope* Iter_ref_FunctionScope__value(struct Iter_ref_FunctionScop
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_FunctionScope Iter_ref_FunctionScope__enumerate(struct Iter_ref_FunctionScope self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_FunctionScope) { .iter = self };
+    return (struct IterEnumerate_ref_FunctionScope) { .index = 0, .iter = self };
 }

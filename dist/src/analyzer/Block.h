@@ -26,16 +26,16 @@ struct Token;
 #line 17 "src/analyzer/Block.pv"
 struct Block Block__new(struct Context* context);
 
-#line 25 "src/analyzer/Block.pv"
+#line 27 "src/analyzer/Block.pv"
 struct Block* Block__new_ptr(struct Context* context);
 
-#line 30 "src/analyzer/Block.pv"
+#line 32 "src/analyzer/Block.pv"
 bool Block__parse_expression_statement(struct Block* self, struct Context* context, struct Generics* generics, struct StatementData* data);
 
-#line 54 "src/analyzer/Block.pv"
+#line 56 "src/analyzer/Block.pv"
 bool Block__parse_keyword(struct Block* self, struct Context* context, struct Generics* generics, struct Token* first_token, struct StatementData* data);
 
-#line 108 "src/analyzer/Block.pv"
+#line 110 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif

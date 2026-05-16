@@ -10,7 +10,7 @@ struct FileWriter {
 
 impl FileWriter {
     fn new(file: &FILE) -> Self {
-        return Self { file };
+        return Self { file, indent: 0 };
     }
 
     fn add_indent(&self) {

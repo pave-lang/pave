@@ -15,13 +15,13 @@
 #line 77 "src/std/Array.pv"
 struct Array_Token Array_Token__new(struct trait_Allocator allocator) {
     #line 78 "src/std/Array.pv"
-    return (struct Array_Token) { .allocator = allocator };
+    return (struct Array_Token) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
 }
 
 #line 81 "src/std/Array.pv"
 struct Array_Token Array_Token__new_with_length(struct trait_Allocator allocator, uintptr_t length) {
     #line 82 "src/std/Array.pv"
-    struct Array_Token self = (struct Array_Token) { .allocator = allocator };
+    struct Array_Token self = (struct Array_Token) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
     #line 83 "src/std/Array.pv"
     Array_Token__reserve(&self, length);
     #line 84 "src/std/Array.pv"
@@ -33,7 +33,7 @@ struct Array_Token Array_Token__new_with_length(struct trait_Allocator allocator
 #line 88 "src/std/Array.pv"
 struct Array_Token Array_Token__new_with_capacity(struct trait_Allocator allocator, uintptr_t length) {
     #line 89 "src/std/Array.pv"
-    struct Array_Token self = (struct Array_Token) { .allocator = allocator };
+    struct Array_Token self = (struct Array_Token) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
     #line 90 "src/std/Array.pv"
     Array_Token__reserve(&self, length);
     #line 91 "src/std/Array.pv"

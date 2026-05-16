@@ -32,22 +32,22 @@ struct Struct;
 #line 29 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);
 
-#line 41 "src/analyzer/types/Struct.pv"
+#line 45 "src/analyzer/types/Struct.pv"
 struct Struct Struct__parse(struct Module* module);
 
-#line 70 "src/analyzer/types/Struct.pv"
+#line 74 "src/analyzer/types/Struct.pv"
 bool Struct__prefill_types(struct Struct* self);
 
-#line 83 "src/analyzer/types/Struct.pv"
+#line 87 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types(struct Struct* self);
 
-#line 96 "src/analyzer/types/Struct.pv"
+#line 100 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_field(struct Struct* self);
 
-#line 163 "src/analyzer/types/Struct.pv"
+#line 167 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_tuple(struct Struct* self);
 
-#line 207 "src/analyzer/types/Struct.pv"
+#line 211 "src/analyzer/types/Struct.pv"
 bool Struct__is_newtype(struct Struct* self);
 
 #endif

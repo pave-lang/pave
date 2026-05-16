@@ -49,7 +49,7 @@ impl IncludeWriter {
                             let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
 
                             if struct_info.is_newtype() {
-                                let typedef_info = TypedefC { name: name.as_str(), type: &struct_info.fields.data[0].value.type };
+                                let typedef_info = TypedefC { include: 0, name: name.as_str(), type: &struct_info.fields.data[0].value.type };
                                 let typedef_type = Type::TypedefC(&typedef_info);
                                 let type_declaration = generator.naming_c99.get_type_decl(&typedef_type, generics.self_type, generics);
                                 if self.type_declarations.insert(type_declaration.as_str()) { type_declarations.insert(type_declaration.as_str()); }

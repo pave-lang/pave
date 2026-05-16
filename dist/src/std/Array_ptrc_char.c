@@ -14,13 +14,13 @@
 #line 77 "src/std/Array.pv"
 struct Array_ptrc_char Array_ptrc_char__new(struct trait_Allocator allocator) {
     #line 78 "src/std/Array.pv"
-    return (struct Array_ptrc_char) { .allocator = allocator };
+    return (struct Array_ptrc_char) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
 }
 
 #line 81 "src/std/Array.pv"
 struct Array_ptrc_char Array_ptrc_char__new_with_length(struct trait_Allocator allocator, uintptr_t length) {
     #line 82 "src/std/Array.pv"
-    struct Array_ptrc_char self = (struct Array_ptrc_char) { .allocator = allocator };
+    struct Array_ptrc_char self = (struct Array_ptrc_char) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
     #line 83 "src/std/Array.pv"
     Array_ptrc_char__reserve(&self, length);
     #line 84 "src/std/Array.pv"
@@ -32,7 +32,7 @@ struct Array_ptrc_char Array_ptrc_char__new_with_length(struct trait_Allocator a
 #line 88 "src/std/Array.pv"
 struct Array_ptrc_char Array_ptrc_char__new_with_capacity(struct trait_Allocator allocator, uintptr_t length) {
     #line 89 "src/std/Array.pv"
-    struct Array_ptrc_char self = (struct Array_ptrc_char) { .allocator = allocator };
+    struct Array_ptrc_char self = (struct Array_ptrc_char) { .allocator = allocator, .data = 0, .length = 0, .capacity = 0 };
     #line 90 "src/std/Array.pv"
     Array_ptrc_char__reserve(&self, length);
     #line 91 "src/std/Array.pv"

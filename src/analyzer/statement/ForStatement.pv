@@ -14,7 +14,7 @@ struct ForStatement {
 
 impl ForStatement {
     fn new(allocator: &ArenaAllocator) -> Self {
-        return Self { variables: Array<ForVariable>::new(allocator) };
+        return Self { variables: Array<ForVariable>::new(allocator), expression: 0, type: ForStatementType::Range(0, 0), iter_type: 0, value_type: 0, block: 0 };
     }
 
     fn parse_for_variable(context: &Context, variables: &Array<ForVariable>) -> bool {
@@ -24,7 +24,7 @@ impl ForStatement {
 
         if name == 0 { return false; }
 
-        variables.append(ForVariable { deref, ref, name });
+        variables.append(ForVariable { deref, ref, name, type: 0 });
 
         return true;
     }
@@ -123,7 +123,7 @@ impl ForStatement {
                     for_statement.iter_type = &for_statement.expression.return_type;
                 } else {
                     let args = Array<InvokeArgument>::new(context.allocator);
-                    args.append(InvokeArgument { value: for_statement.expression });
+                    args.append(InvokeArgument { name: 0, value: for_statement.expression });
 
                     for_statement.type = ForStatementType::Iter(Expression::make_type_function_call(context, iter_member, iter_member_type, args, generic_map));
                     for_statement.iter_type = Expression::get_return_type(context, iter_member_type, iter_member, generic_map);

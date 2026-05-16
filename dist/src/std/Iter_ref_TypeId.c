@@ -64,5 +64,5 @@ TypeId* Iter_ref_TypeId__value(struct Iter_ref_TypeId* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_TypeId Iter_ref_TypeId__enumerate(struct Iter_ref_TypeId self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_TypeId) { .iter = self };
+    return (struct IterEnumerate_ref_TypeId) { .index = 0, .iter = self };
 }

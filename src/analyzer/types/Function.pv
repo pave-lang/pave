@@ -46,6 +46,15 @@ impl Function {
             context,
             generics: Generics::new(context.allocator),
             parameters: Array<Parameter>::new(context.allocator),
+            name: 0,
+            declaration_start: 0,
+            declaration_end: 0,
+            token_start: 0,
+            token_end: 0,
+            parent: FunctionParent::None,
+            type: FunctionType::Standard,
+            return_type: Type::Primitive(0),
+            body: 0,
         };
     }
 
@@ -53,6 +62,16 @@ impl Function {
         return Self {
             generics: Generics::new(allocator),
             parameters: Array<Parameter>::new(allocator),
+            name: 0,
+            context: 0,
+            declaration_start: 0,
+            declaration_end: 0,
+            token_start: 0,
+            token_end: 0,
+            parent: FunctionParent::None,
+            type: FunctionType::Standard,
+            return_type: Type::Primitive(0),
+            body: 0,
         };
     }
 
@@ -125,6 +144,7 @@ impl Function {
             } else {
                 let parameter: Parameter = Parameter {
                     name: context.expect(TokenType::Identifier),
+                    type: Type::Primitive(0),
                 };
     
                 if parameter.name == 0 {

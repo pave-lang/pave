@@ -109,7 +109,7 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
                         #line 51 "src/compiler/IncludeWriter.pv"
                         if (Struct__is_newtype(struct_info)) {
                             #line 52 "src/compiler/IncludeWriter.pv"
-                            struct TypedefC typedef_info = (struct TypedefC) { .name = String__as_str(&name), .type = &struct_info->fields.data[0].value.type };
+                            struct TypedefC typedef_info = (struct TypedefC) { .include = 0, .name = String__as_str(&name), .type = &struct_info->fields.data[0].value.type };
                             #line 53 "src/compiler/IncludeWriter.pv"
                             struct Type typedef_type = (struct Type) { .type = TYPE__TYPEDEF_C, .typedefc_value = &typedef_info };
                             #line 54 "src/compiler/IncludeWriter.pv"

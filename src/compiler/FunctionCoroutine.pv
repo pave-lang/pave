@@ -11,6 +11,7 @@ struct FunctionCoroutine {
 impl FunctionCoroutine {
     fn new(allocator: &ArenaAllocator) -> Self {
         return Self {
+            yield_count: 0,
             variables: HashMap<str, &Type>::new(allocator),
         };
     }

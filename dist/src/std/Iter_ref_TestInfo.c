@@ -64,5 +64,5 @@ struct TestInfo* Iter_ref_TestInfo__value(struct Iter_ref_TestInfo* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_TestInfo Iter_ref_TestInfo__enumerate(struct Iter_ref_TestInfo self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_TestInfo) { .iter = self };
+    return (struct IterEnumerate_ref_TestInfo) { .index = 0, .iter = self };
 }

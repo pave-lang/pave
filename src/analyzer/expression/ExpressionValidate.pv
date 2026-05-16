@@ -42,7 +42,30 @@ impl Expression {
                     arg.value.validate_type(context, param_type, true);
                 }
 
-                return true;
+                let success = true;
+                let field_i: usize = 0;
+                while field_i < struct_info.fields.length {
+                    let bucket = struct_info.fields.data + field_i;
+                    let provided = false;
+                    let arg_i: usize = 0;
+                    while arg_i < arguments.length {
+                        if arguments.data[arg_i].name.value.eq(bucket.key) {
+                            provided = true;
+                            break;
+                        }
+                        arg_i += 1;
+                    }
+                    if !provided {
+                        let message = String::new(context.allocator);
+                        message.append("Missing field in struct construction: ");
+                        message.append(bucket.key);
+                        context.error_token(token, message.c_str());
+                        success = false;
+                    }
+                    field_i += 1;
+                }
+
+                return success;
             },
             Type::Function(function, generic_map2) => {
                 if function == 0 || function.type == FunctionType::MethodCpp { return true; }

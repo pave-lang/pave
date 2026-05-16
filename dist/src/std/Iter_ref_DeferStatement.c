@@ -64,5 +64,5 @@ struct DeferStatement* Iter_ref_DeferStatement__value(struct Iter_ref_DeferState
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_DeferStatement Iter_ref_DeferStatement__enumerate(struct Iter_ref_DeferStatement self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_DeferStatement) { .iter = self };
+    return (struct IterEnumerate_ref_DeferStatement) { .index = 0, .iter = self };
 }

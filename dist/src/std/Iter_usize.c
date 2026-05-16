@@ -63,5 +63,5 @@ uintptr_t Iter_usize__value(struct Iter_usize* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_usize Iter_usize__enumerate(struct Iter_usize self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_usize) { .iter = self };
+    return (struct IterEnumerate_usize) { .index = 0, .iter = self };
 }

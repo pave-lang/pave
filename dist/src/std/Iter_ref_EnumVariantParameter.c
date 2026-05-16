@@ -64,5 +64,5 @@ struct EnumVariantParameter* Iter_ref_EnumVariantParameter__value(struct Iter_re
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_EnumVariantParameter Iter_ref_EnumVariantParameter__enumerate(struct Iter_ref_EnumVariantParameter self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_EnumVariantParameter) { .iter = self };
+    return (struct IterEnumerate_ref_EnumVariantParameter) { .index = 0, .iter = self };
 }

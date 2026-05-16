@@ -26,7 +26,7 @@ struct ArenaBlock* ArenaBlock__new(struct trait_Allocator allocator, uintptr_t c
     }
 
     #line 32 "src/std/ArenaAllocator.pv"
-    struct ArenaBlock self = (struct ArenaBlock) { .buffer = buffer, .capacity = capacity, .prev = prev };
+    struct ArenaBlock self = (struct ArenaBlock) { .buffer = buffer, .capacity = capacity, .prev = prev, .offset = 0 };
     #line 33 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* self_ptr = ArenaBlock__alloc(&self, sizeof(struct ArenaBlock));
     #line 34 "src/std/ArenaAllocator.pv"

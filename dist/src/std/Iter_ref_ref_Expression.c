@@ -63,5 +63,5 @@ struct Expression** Iter_ref_ref_Expression__value(struct Iter_ref_ref_Expressio
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_ref_Expression Iter_ref_ref_Expression__enumerate(struct Iter_ref_ref_Expression self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_ref_Expression) { .iter = self };
+    return (struct IterEnumerate_ref_ref_Expression) { .index = 0, .iter = self };
 }

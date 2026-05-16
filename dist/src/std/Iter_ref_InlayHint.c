@@ -64,5 +64,5 @@ struct InlayHint* Iter_ref_InlayHint__value(struct Iter_ref_InlayHint* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_InlayHint Iter_ref_InlayHint__enumerate(struct Iter_ref_InlayHint self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_InlayHint) { .iter = self };
+    return (struct IterEnumerate_ref_InlayHint) { .index = 0, .iter = self };
 }

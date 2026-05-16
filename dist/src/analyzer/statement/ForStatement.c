@@ -33,7 +33,7 @@
 #line 16 "src/analyzer/statement/ForStatement.pv"
 struct ForStatement ForStatement__new(struct ArenaAllocator* allocator) {
     #line 17 "src/analyzer/statement/ForStatement.pv"
-    return (struct ForStatement) { .variables = Array_ForVariable__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }) };
+    return (struct ForStatement) { .variables = Array_ForVariable__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }), .expression = 0, .type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__RANGE, .range_value = { ._0 = 0, ._1 = 0} }, .iter_type = 0, .value_type = 0, .block = 0 };
 }
 
 #line 20 "src/analyzer/statement/ForStatement.pv"
@@ -52,7 +52,7 @@ bool ForStatement__parse_for_variable(struct Context* context, struct Array_ForV
     }
 
     #line 27 "src/analyzer/statement/ForStatement.pv"
-    Array_ForVariable__append(variables, (struct ForVariable) { .deref = deref, .ref = ref, .name = name });
+    Array_ForVariable__append(variables, (struct ForVariable) { .deref = deref, .ref = ref, .name = name, .type = 0 });
 
     #line 29 "src/analyzer/statement/ForStatement.pv"
     return true;
@@ -255,7 +255,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
                 #line 125 "src/analyzer/statement/ForStatement.pv"
                 struct Array_InvokeArgument args = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                 #line 126 "src/analyzer/statement/ForStatement.pv"
-                Array_InvokeArgument__append(&args, (struct InvokeArgument) { .value = for_statement.expression });
+                Array_InvokeArgument__append(&args, (struct InvokeArgument) { .name = 0, .value = for_statement.expression });
 
                 #line 128 "src/analyzer/statement/ForStatement.pv"
                 for_statement.type = (struct ForStatementType) { .type = FOR_STATEMENT_TYPE__ITER, .iter_value = Expression__make_type_function_call(context, iter_member, iter_member_type, args, generic_map) };

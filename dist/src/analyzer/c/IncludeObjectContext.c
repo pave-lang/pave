@@ -23,6 +23,7 @@
 #include <analyzer/types/Function.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/Token.h>
+#include <analyzer/TokenType.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/ParentCpp.h>
@@ -150,7 +151,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             #line 77 "src/analyzer/c/IncludeObjectContext.pv"
             struct Function func_info = Function__new_allocator((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = include->root->allocator });
             #line 78 "src/analyzer/c/IncludeObjectContext.pv"
-            func_info.name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .value = (struct str){ .ptr = method_name, .length = strlen(method_name) } }});
+            func_info.name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__IDENTIFIER, .value = (struct str){ .ptr = method_name, .length = strlen(method_name) }, .start_line = 0, .start_column = 0, .end_line = 0, .end_column = 0 }});
             #line 79 "src/analyzer/c/IncludeObjectContext.pv"
             func_info.return_type = *return_type_resolved;
             #line 80 "src/analyzer/c/IncludeObjectContext.pv"

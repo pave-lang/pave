@@ -7,7 +7,7 @@ struct NamespacePath {
 
 impl NamespacePath {
     fn new(allocator: &dyn Allocator) -> Self {
-        return Self { parts: Array<&Token>::new(allocator) };
+        return Self { root: false, parts: Array<&Token>::new(allocator) };
     }
 
     fn parse(&self, context: &Context) -> bool {

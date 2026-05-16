@@ -27,7 +27,7 @@ struct Iter_ptrc_char Range_ptrc_char__iter(struct Range_ptrc_char self) {
         #line 29 "src/std/Range.pv"
         default: {
             #line 29 "src/std/Range.pv"
-            return (struct Iter_ptrc_char) {};
+            return (struct Iter_ptrc_char) { .step = 0, .iter = (char const*)(0), .start = (char const*)(0), .end = (char const*)(0) };
         } break;
     }
 }

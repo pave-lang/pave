@@ -74,6 +74,8 @@ impl<T> TypeUsage<T> {
             allocator,
             type,
             usage_contexts: Array<UsageContext>::new(allocator),
+            impl_functions: Array<HashMap<usize, TypeFunctionUsage>> { allocator, data: 0, length: 0, capacity: 0 },
+            impl_dynamic_usage: false,
         };
 
         if impl_count > 0 {
@@ -144,6 +146,9 @@ impl Usages {
             tuples: HashMap<usize, TypeUsage<Tuple>>::new(allocator),
 
             std_namespace: generator.root.find_namespace("std"),
+            usage_mode: UsageMode::Layout,
+            usage_context: 0,
+            function_context: 0,
         };
 
         for (_, &info) in self.root.primitives {
@@ -203,7 +208,7 @@ impl Usages {
             self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
             
             if func_info.generics.array.length == 0 && self.usage_types.insert(func_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap {});
+                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Function(func_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Function(func_info, generic_map));
@@ -222,7 +227,7 @@ impl Usages {
             }
 
             if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap {});
+                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Enum(enum_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Enum(enum_info, generic_map));
@@ -241,7 +246,7 @@ impl Usages {
             }
 
             if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap {});
+                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Struct(struct_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Struct(struct_info, generic_map));
@@ -256,7 +261,7 @@ impl Usages {
             }
 
             if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap {});
+                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Trait(trait_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Trait(trait_info, generic_map));
@@ -409,7 +414,7 @@ impl Usages {
 
     fn process_primitive(&self, primitive_info: &Primitive) {
         let self_type = self.allocator.store(&Type::Primitive(primitive_info));
-        let generic_map = self.allocator.store(&GenericMap { self_type });
+        let generic_map = self.allocator.store(&GenericMap { self_type, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
 
         let parent_ptr = cast<usize>(primitive_info);
         let parent_usage = self.primitives.find(&parent_ptr);
@@ -421,7 +426,7 @@ impl Usages {
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
-        let generic_map_val = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: 0, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
@@ -440,7 +445,7 @@ impl Usages {
         if self.std_namespace {
             let iter_type = self.std_namespace.find_type("Iter");
             let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
-            let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1 });
+            let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1, allocator: self.allocator, capacity: 0 });
             self.add_type(sequence_iter, generic_map);
         }
 
@@ -452,7 +457,7 @@ impl Usages {
     }
 
     fn process_tuple(&self, tuple: &Tuple) {
-        let generic_map_val = GenericMap::new(self.allocator, &Generics {}, &Array<Type> {});
+        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: 0, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         let tuple_type = Type::Tuple(tuple);
 
@@ -599,7 +604,7 @@ impl Usages {
 
         if self.std_namespace && func_info.type == FunctionType::Coroutine {
             let iter_trait = self.std_namespace.find_trait("Iter");
-            let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, 0), &Array<Type> { data: &func_info.return_type, length: 1 });
+            let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, 0), &Array<Type> { data: &func_info.return_type, length: 1, allocator: self.allocator, capacity: 0 });
             self.add_type(sequence_iter, generic_map);
         }
 
@@ -743,7 +748,7 @@ impl Usages {
                                             }
                                         },
                                         Type::TypedefC(typedef_c) => {
-                                            let primitive_info = allocator.store(&Primitive { name: typedef_c.name });
+                                            let primitive_info = allocator.store(&Primitive { name: typedef_c.name, traits: HashMap<str, &Trait> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, impls: Array<&Impl> { allocator: self.allocator, data: 0, length: 0, capacity: 0 } });
                                             match self.usage_mode {
                                                 UsageMode::Layout => { usage_context.layout.insert(typedef_c.name, Type::Primitive(primitive_info)); },
                                                 UsageMode::Signature => { usage_context.signature.insert(typedef_c.name, Type::Primitive(primitive_info)); },

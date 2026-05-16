@@ -54,6 +54,9 @@ impl Module {
             globals: HashMap<str, &Global>::new(allocator),
             global_types: HashMap<str, Type>::new(allocator),
             tests: Array<TestInfo>::new(allocator),
+            context: Context { allocator, base_path: str { ptr: 0, length: 0 }, path: str { ptr: 0, length: 0 }, pos: 0, tokens: 0, length: 0, offset: 0, analysis: 0, type_self: 0, pointer_const_char: Indirect { type: IndirectType::Reference, to: Type::Primitive(0) }, types: HashMap<str, Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, scopes: Array<Scope> { allocator, data: 0, length: 0, capacity: 0 }, module: 0, root: 0, function: 0 },
+            tokens: Array<Token> { allocator, data: 0, length: 0, capacity: 0 },
+            mode_cpp: false,
         };
 
         self.context = Context::new(allocator, "", path, 0, analysis, self);
@@ -248,6 +251,10 @@ impl Module {
                 let name_token_val = Token {
                     type: TokenType::Identifier,
                     value: name_str.as_str(),
+                    start_line: 0,
+                    start_column: 0,
+                    end_line: 0,
+                    end_column: 0,
                 };
                 let name_token = allocator.store(&name_token_val);
 
@@ -289,6 +296,8 @@ impl Module {
                     token_start,
                     token_end,
                     is_const,
+                    type: Type::Primitive(0),
+                    value: 0,
                 };
                 self.globals.insert(global_name.value, global);
             } else if token.type == TokenType::Comment {
@@ -347,7 +356,7 @@ impl Module {
     fn fill_namespace(&self) -> bool {
         let namespace = self.namespace;
         let allocator = namespace.root.allocator;
-        let blank_generics = allocator.store(&GenericMap {});
+        let blank_generics = allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
         blank_generics.self_type = Type::Self.to_ptr(allocator);
 
         for (_, &func_info) in self.functions {
@@ -383,9 +392,9 @@ impl Module {
         for *namespace in self.used_namespaces {
             if namespace.name.eq("std") {
                 let t = Generic::new(self.context.allocator);
-                t.name = self.context.allocator.store(&Token { type: TokenType::String, value: "T" });
+                t.name = self.context.allocator.store(&Token { type: TokenType::String, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 });
 
-                let param_name = self.context.allocator.store(&Token { type: TokenType::String, value: "type" });
+                let param_name = self.context.allocator.store(&Token { type: TokenType::String, value: "type", start_line: 0, start_column: 0, end_line: 0, end_column: 0 });
 
                 let generics = Array<Generic>::new(self.context.allocator);
                 generics.append(t);

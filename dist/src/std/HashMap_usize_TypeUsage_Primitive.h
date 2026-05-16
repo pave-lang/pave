@@ -26,31 +26,31 @@ struct TypeUsage_Primitive;
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__new(struct trait_Allocator allocator);
 
-#line 46 "src/std/HashMap.pv"
+#line 50 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Primitive__resize(struct HashMap_usize_TypeUsage_Primitive* self, uintptr_t new_capacity);
 
-#line 53 "src/std/HashMap.pv"
+#line 57 "src/std/HashMap.pv"
 struct TypeUsage_Primitive* HashMap_usize_TypeUsage_Primitive__find(struct HashMap_usize_TypeUsage_Primitive* self, uintptr_t* key);
 
-#line 70 "src/std/HashMap.pv"
+#line 74 "src/std/HashMap.pv"
 struct TypeUsage_Primitive* HashMap_usize_TypeUsage_Primitive__insert(struct HashMap_usize_TypeUsage_Primitive* self, uintptr_t key, struct TypeUsage_Primitive value);
 
-#line 98 "src/std/HashMap.pv"
+#line 102 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Primitive__remove(struct HashMap_usize_TypeUsage_Primitive* self, uintptr_t* key);
 
-#line 122 "src/std/HashMap.pv"
+#line 126 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Primitive__release(struct HashMap_usize_TypeUsage_Primitive* self);
 
-#line 131 "src/std/HashMap.pv"
+#line 135 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Primitive__fill_buckets(struct HashMap_usize_TypeUsage_Primitive* self);
 
-#line 149 "src/std/HashMap.pv"
+#line 153 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__clone(struct HashMap_usize_TypeUsage_Primitive* self, struct trait_Allocator allocator);
 
-#line 163 "src/std/HashMap.pv"
+#line 167 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Primitive HashMap_usize_TypeUsage_Primitive__iter(struct HashMap_usize_TypeUsage_Primitive* self);
 
-#line 170 "src/std/HashMap.pv"
+#line 174 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Primitive__clear(struct HashMap_usize_TypeUsage_Primitive* self);
 
 #endif

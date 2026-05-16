@@ -25,7 +25,7 @@ struct Iter_i32 Range_i32__iter(struct Range_i32 self) {
         #line 29 "src/std/Range.pv"
         default: {
             #line 29 "src/std/Range.pv"
-            return (struct Iter_i32) {};
+            return (struct Iter_i32) { .step = 0, .iter = (int32_t)(0), .start = (int32_t)(0), .end = (int32_t)(0) };
         } break;
     }
 }

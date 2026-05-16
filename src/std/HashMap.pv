@@ -36,6 +36,10 @@ impl<K: Hash, V> HashMap<K, V> {
         let initial_capacity = 16;
         let self = Self {
             allocator,
+            buckets: 0,
+            data: 0,
+            capacity: 0,
+            length: 0,
         };
 
         self.resize(initial_capacity);
@@ -86,7 +90,7 @@ impl<K: Hash, V> HashMap<K, V> {
             current_bucket_node = &(*current_bucket_node).next;
         }
 
-        self.data[self.length] = HashMapBucket<K, V> { key, value };
+        self.data[self.length] = HashMapBucket<K, V> { key, value, next: 0 };
         let data = self.data + self.length;
         self.length += 1;
 

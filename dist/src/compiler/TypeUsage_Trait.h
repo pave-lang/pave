@@ -28,7 +28,7 @@ struct UsageContext;
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Trait TypeUsage_Trait__new(struct ArenaAllocator* allocator, struct Trait* type, uintptr_t impl_count);
 
-#line 92 "src/compiler/Usages.pv"
+#line 94 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Trait__add_usage(struct TypeUsage_Trait* self, struct GenericMap* generic_map);
 
 #endif

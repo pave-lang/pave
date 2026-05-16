@@ -21,6 +21,10 @@ impl Trait {
             generics: Generics::new(context.allocator),
             functions: HashMap<str, Function>::new(context.allocator),
             typedefs: HashMap<str, usize>::new(context.allocator),
+            name: 0,
+            token_start: 0,
+            token_end: 0,
+            type_self: Type::Primitive(0),
         };
     }
 

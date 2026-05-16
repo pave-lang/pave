@@ -286,6 +286,7 @@ impl Type {
                 return (primitive_info.is_void() && other.is_void()) || (primitive_info.is_number() && other.is_number()) || (primitive_info && other && primitive_info.name.eq(other.name));
             },
             Type::Indirect(_) => { return true; },
+            Type::TypedefC(_) => { return self.resolve_typedef().eq_primitive(other); },
             _ => { return false; },
         }
     }

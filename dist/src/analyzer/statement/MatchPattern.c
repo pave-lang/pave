@@ -278,7 +278,7 @@ bool MatchPattern__parse(struct Context* context, struct Generics* generics, str
                     }
 
                     #line 140 "src/analyzer/statement/MatchPattern.pv"
-                    Array_EnumVariantParameter__append(&parameters, (struct EnumVariantParameter) { .ref = ref, .variable = variable });
+                    Array_EnumVariantParameter__append(&parameters, (struct EnumVariantParameter) { .ref = ref, .variable = variable, .field_name = (struct str) { .ptr = 0, .length = 0 } });
 
                     #line 142 "src/analyzer/statement/MatchPattern.pv"
                     struct Type* variable_type = Context__resolve_type(context->allocator, enum_variant->types.data + variable_i, generic_map, 0);

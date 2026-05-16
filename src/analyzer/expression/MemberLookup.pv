@@ -56,7 +56,7 @@ impl Expression {
                 for *impl_info in primitive_info.impls {
                     let function: &Function = impl_info.find_function(member.value);
                     if function != 0 {
-                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap { self_type: type })));
+                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap { self_type: type, array: Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } })));
                     }
                 }
 
@@ -174,7 +174,7 @@ impl Expression {
                 for *trait_info in generic.traits {
                     let function: &Function = trait_info.functions.find(&member.value);
                     if function != 0 {
-                        let generic_map_val: GenericMap = GenericMap { array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
+                        let generic_map_val: GenericMap = GenericMap { self_type: 0, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
                         let generic_map = context.allocator.store(&generic_map_val);
                         for (typedef_name, _) in trait_info.typedefs {
                             let gt = context.allocator.store(&GenericTypedef { generic, typedef_name });
@@ -200,7 +200,7 @@ impl Expression {
 
                 let function: &Function = impl_info.find_function(member.value);
                 if function != 0 {
-                    let generic_map = GenericMap::new(context.allocator, &Generics {}, &Array<Type> {});
+                    let generic_map = GenericMap::new(context.allocator, &Generics { parent: 0, array: Array<Generic> { allocator: context.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 });
                     generic_map.insert("T", sequence.element);
                     generic_map.self_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, Type::Sequence(sequence))));
 

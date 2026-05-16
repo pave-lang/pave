@@ -61,5 +61,5 @@ int32_t Iter_i32__value(struct Iter_i32* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_i32 Iter_i32__enumerate(struct Iter_i32 self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_i32) { .iter = self };
+    return (struct IterEnumerate_i32) { .index = 0, .iter = self };
 }

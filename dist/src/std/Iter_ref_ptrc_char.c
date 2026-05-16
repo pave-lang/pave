@@ -63,5 +63,5 @@ char const** Iter_ref_ptrc_char__value(struct Iter_ref_ptrc_char* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_ptrc_char Iter_ref_ptrc_char__enumerate(struct Iter_ref_ptrc_char self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_ptrc_char) { .iter = self };
+    return (struct IterEnumerate_ref_ptrc_char) { .index = 0, .iter = self };
 }

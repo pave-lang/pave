@@ -27,213 +27,217 @@ struct Enum Enum__new(struct Context* context) {
         .variants = HashMap_str_EnumVariant__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
         .traits = HashMap_str_ref_Trait__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
         .impls = Array_ref_Impl__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        .name = 0,
+        .token_start = 0,
+        .token_end = 0,
+        .type = ENUM_TYPE__STANDARD,
     };
 }
 
-#line 47 "src/analyzer/types/Enum.pv"
+#line 51 "src/analyzer/types/Enum.pv"
 struct Enum Enum__parse(struct Context* context) {
-    #line 48 "src/analyzer/types/Enum.pv"
+    #line 52 "src/analyzer/types/Enum.pv"
     struct Enum node = Enum__new(context);
 
-    #line 50 "src/analyzer/types/Enum.pv"
+    #line 54 "src/analyzer/types/Enum.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "enum")) {
-        #line 50 "src/analyzer/types/Enum.pv"
+        #line 54 "src/analyzer/types/Enum.pv"
         return node;
     }
 
-    #line 52 "src/analyzer/types/Enum.pv"
+    #line 56 "src/analyzer/types/Enum.pv"
     struct Token* name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-    #line 53 "src/analyzer/types/Enum.pv"
-    if (name == 0) {
-        #line 53 "src/analyzer/types/Enum.pv"
-        return node;
-    }
-
-    #line 55 "src/analyzer/types/Enum.pv"
-    node.token_start = context->pos;
-
     #line 57 "src/analyzer/types/Enum.pv"
-    if (!Context__skip_to_symbol(context, "{")) {
+    if (name == 0) {
         #line 57 "src/analyzer/types/Enum.pv"
         return node;
     }
-    #line 58 "src/analyzer/types/Enum.pv"
+
+    #line 59 "src/analyzer/types/Enum.pv"
+    node.token_start = context->pos;
+
+    #line 61 "src/analyzer/types/Enum.pv"
+    if (!Context__skip_to_symbol(context, "{")) {
+        #line 61 "src/analyzer/types/Enum.pv"
+        return node;
+    }
+    #line 62 "src/analyzer/types/Enum.pv"
     if (!Context__skip_brackets(context, "{", "}")) {
-        #line 58 "src/analyzer/types/Enum.pv"
+        #line 62 "src/analyzer/types/Enum.pv"
         return node;
     }
 
-    #line 60 "src/analyzer/types/Enum.pv"
+    #line 64 "src/analyzer/types/Enum.pv"
     node.token_end = context->pos;
 
-    #line 62 "src/analyzer/types/Enum.pv"
+    #line 66 "src/analyzer/types/Enum.pv"
     node.name = name;
-    #line 63 "src/analyzer/types/Enum.pv"
+    #line 67 "src/analyzer/types/Enum.pv"
     return node;
 }
 
-#line 66 "src/analyzer/types/Enum.pv"
+#line 70 "src/analyzer/types/Enum.pv"
 bool Enum__prefill_types(struct Enum* self) {
-    #line 67 "src/analyzer/types/Enum.pv"
+    #line 71 "src/analyzer/types/Enum.pv"
     struct Context* context = self->context;
-    #line 68 "src/analyzer/types/Enum.pv"
+    #line 72 "src/analyzer/types/Enum.pv"
     context->pos = self->token_start;
 
-    #line 70 "src/analyzer/types/Enum.pv"
+    #line 74 "src/analyzer/types/Enum.pv"
     if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "<") && !Generics__parse(&self->generics, context)) {
-        #line 70 "src/analyzer/types/Enum.pv"
+        #line 74 "src/analyzer/types/Enum.pv"
         return false;
     }
-    #line 71 "src/analyzer/types/Enum.pv"
+    #line 75 "src/analyzer/types/Enum.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 71 "src/analyzer/types/Enum.pv"
+        #line 75 "src/analyzer/types/Enum.pv"
         return false;
     }
 
-    #line 73 "src/analyzer/types/Enum.pv"
+    #line 77 "src/analyzer/types/Enum.pv"
     return true;
 }
 
-#line 76 "src/analyzer/types/Enum.pv"
+#line 80 "src/analyzer/types/Enum.pv"
 bool Enum__fill_variants(struct Enum* self) {
-    #line 77 "src/analyzer/types/Enum.pv"
+    #line 81 "src/analyzer/types/Enum.pv"
     struct Context* context = self->context;
-    #line 78 "src/analyzer/types/Enum.pv"
+    #line 82 "src/analyzer/types/Enum.pv"
     context->pos = self->token_start;
 
-    #line 80 "src/analyzer/types/Enum.pv"
+    #line 84 "src/analyzer/types/Enum.pv"
     if (!Context__skip_to_symbol(context, "{")) {
-        #line 80 "src/analyzer/types/Enum.pv"
-        return false;
-    }
-    #line 81 "src/analyzer/types/Enum.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 81 "src/analyzer/types/Enum.pv"
-        return false;
-    }
-
-    #line 83 "src/analyzer/types/Enum.pv"
-    while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 84 "src/analyzer/types/Enum.pv"
-        if (!Enum__parse_variant(self)) {
-            #line 84 "src/analyzer/types/Enum.pv"
-            return false;
-        }
+        return false;
+    }
+    #line 85 "src/analyzer/types/Enum.pv"
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
+        #line 85 "src/analyzer/types/Enum.pv"
+        return false;
+    }
 
-        #line 86 "src/analyzer/types/Enum.pv"
-        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-            #line 87 "src/analyzer/types/Enum.pv"
-            Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
+    #line 87 "src/analyzer/types/Enum.pv"
+    while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, "}")) {
+        #line 88 "src/analyzer/types/Enum.pv"
+        if (!Enum__parse_variant(self)) {
             #line 88 "src/analyzer/types/Enum.pv"
             return false;
         }
+
+        #line 90 "src/analyzer/types/Enum.pv"
+        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+            #line 91 "src/analyzer/types/Enum.pv"
+            Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
+            #line 92 "src/analyzer/types/Enum.pv"
+            return false;
+        }
     }
 
-    #line 92 "src/analyzer/types/Enum.pv"
+    #line 96 "src/analyzer/types/Enum.pv"
     return true;
 }
 
-#line 95 "src/analyzer/types/Enum.pv"
+#line 99 "src/analyzer/types/Enum.pv"
 bool Enum__parse_variant(struct Enum* self) {
-    #line 96 "src/analyzer/types/Enum.pv"
+    #line 100 "src/analyzer/types/Enum.pv"
     struct Context* context = self->context;
-    #line 97 "src/analyzer/types/Enum.pv"
+    #line 101 "src/analyzer/types/Enum.pv"
     struct Token* name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-    #line 98 "src/analyzer/types/Enum.pv"
+    #line 102 "src/analyzer/types/Enum.pv"
     if (name == 0) {
-        #line 98 "src/analyzer/types/Enum.pv"
+        #line 102 "src/analyzer/types/Enum.pv"
         return false;
     }
 
-    #line 100 "src/analyzer/types/Enum.pv"
+    #line 104 "src/analyzer/types/Enum.pv"
     struct Array_Type types = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-    #line 101 "src/analyzer/types/Enum.pv"
+    #line 105 "src/analyzer/types/Enum.pv"
     struct Array_str names = Array_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
 
-    #line 103 "src/analyzer/types/Enum.pv"
+    #line 107 "src/analyzer/types/Enum.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
-        #line 104 "src/analyzer/types/Enum.pv"
+        #line 108 "src/analyzer/types/Enum.pv"
         while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 105 "src/analyzer/types/Enum.pv"
+            #line 109 "src/analyzer/types/Enum.pv"
             struct Type type;
 
-            #line 107 "src/analyzer/types/Enum.pv"
+            #line 111 "src/analyzer/types/Enum.pv"
             if (!Context__parse_type(context, &type, &self->generics)) {
-                #line 107 "src/analyzer/types/Enum.pv"
+                #line 111 "src/analyzer/types/Enum.pv"
                 return false;
             }
-            #line 108 "src/analyzer/types/Enum.pv"
+            #line 112 "src/analyzer/types/Enum.pv"
             Array_Type__append(&types, type);
 
-            #line 110 "src/analyzer/types/Enum.pv"
+            #line 114 "src/analyzer/types/Enum.pv"
             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 111 "src/analyzer/types/Enum.pv"
+                #line 115 "src/analyzer/types/Enum.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                #line 112 "src/analyzer/types/Enum.pv"
+                #line 116 "src/analyzer/types/Enum.pv"
                 return false;
             }
         }
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 116 "src/analyzer/types/Enum.pv"
+        #line 120 "src/analyzer/types/Enum.pv"
         while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, "}")) {
-            #line 117 "src/analyzer/types/Enum.pv"
+            #line 121 "src/analyzer/types/Enum.pv"
             struct Token* field_name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-            #line 118 "src/analyzer/types/Enum.pv"
-            if (field_name == 0) {
-                #line 118 "src/analyzer/types/Enum.pv"
-                return false;
-            }
-
-            #line 120 "src/analyzer/types/Enum.pv"
-            if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ":")) {
-                #line 120 "src/analyzer/types/Enum.pv"
-                return false;
-            }
-
             #line 122 "src/analyzer/types/Enum.pv"
-            struct Type type;
-            #line 123 "src/analyzer/types/Enum.pv"
-            if (!Context__parse_type(context, &type, &self->generics)) {
-                #line 123 "src/analyzer/types/Enum.pv"
+            if (field_name == 0) {
+                #line 122 "src/analyzer/types/Enum.pv"
                 return false;
             }
 
-            #line 125 "src/analyzer/types/Enum.pv"
-            Array_Type__append(&types, type);
+            #line 124 "src/analyzer/types/Enum.pv"
+            if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ":")) {
+                #line 124 "src/analyzer/types/Enum.pv"
+                return false;
+            }
+
             #line 126 "src/analyzer/types/Enum.pv"
+            struct Type type;
+            #line 127 "src/analyzer/types/Enum.pv"
+            if (!Context__parse_type(context, &type, &self->generics)) {
+                #line 127 "src/analyzer/types/Enum.pv"
+                return false;
+            }
+
+            #line 129 "src/analyzer/types/Enum.pv"
+            Array_Type__append(&types, type);
+            #line 130 "src/analyzer/types/Enum.pv"
             Array_str__append(&names, field_name->value);
 
-            #line 128 "src/analyzer/types/Enum.pv"
+            #line 132 "src/analyzer/types/Enum.pv"
             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-                #line 129 "src/analyzer/types/Enum.pv"
+                #line 133 "src/analyzer/types/Enum.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
-                #line 130 "src/analyzer/types/Enum.pv"
+                #line 134 "src/analyzer/types/Enum.pv"
                 return false;
             }
         }
     }
 
-    #line 135 "src/analyzer/types/Enum.pv"
+    #line 139 "src/analyzer/types/Enum.pv"
     struct Expression* value = 0;
 
-    #line 137 "src/analyzer/types/Enum.pv"
+    #line 141 "src/analyzer/types/Enum.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "=")) {
-        #line 138 "src/analyzer/types/Enum.pv"
+        #line 142 "src/analyzer/types/Enum.pv"
         value = Expression__parse(context, 0);
-        #line 139 "src/analyzer/types/Enum.pv"
+        #line 143 "src/analyzer/types/Enum.pv"
         if (value == 0) {
-            #line 139 "src/analyzer/types/Enum.pv"
+            #line 143 "src/analyzer/types/Enum.pv"
             return false;
         }
     }
 
-    #line 142 "src/analyzer/types/Enum.pv"
+    #line 146 "src/analyzer/types/Enum.pv"
     if (types.length > 0) {
-        #line 143 "src/analyzer/types/Enum.pv"
+        #line 147 "src/analyzer/types/Enum.pv"
         self->type = ENUM_TYPE__DISCRIMINATED_UNION;
     }
 
-    #line 146 "src/analyzer/types/Enum.pv"
+    #line 150 "src/analyzer/types/Enum.pv"
     struct EnumVariant variant = (struct EnumVariant) {
         .name = name,
         .types = types,
@@ -242,32 +246,32 @@ bool Enum__parse_variant(struct Enum* self) {
         .value = value,
     };
 
-    #line 154 "src/analyzer/types/Enum.pv"
+    #line 158 "src/analyzer/types/Enum.pv"
     if (HashMap_str_EnumVariant__insert(&self->variants, variant.name->value, variant) == 0) {
-        #line 154 "src/analyzer/types/Enum.pv"
+        #line 158 "src/analyzer/types/Enum.pv"
         return false;
     }
 
-    #line 156 "src/analyzer/types/Enum.pv"
+    #line 160 "src/analyzer/types/Enum.pv"
     return true;
 }
 
-#line 159 "src/analyzer/types/Enum.pv"
+#line 163 "src/analyzer/types/Enum.pv"
 bool Enum__is_discriminated_union(struct Enum* self) {
-    #line 160 "src/analyzer/types/Enum.pv"
+    #line 164 "src/analyzer/types/Enum.pv"
     { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&self->variants);
-    #line 160 "src/analyzer/types/Enum.pv"
+    #line 164 "src/analyzer/types/Enum.pv"
     while (HashMapIter_str_EnumVariant__next(&__iter)) {
-        #line 160 "src/analyzer/types/Enum.pv"
+        #line 164 "src/analyzer/types/Enum.pv"
         struct EnumVariant* variant_info = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-        #line 161 "src/analyzer/types/Enum.pv"
+        #line 165 "src/analyzer/types/Enum.pv"
         if (variant_info->types.length > 0) {
-            #line 162 "src/analyzer/types/Enum.pv"
+            #line 166 "src/analyzer/types/Enum.pv"
             return true;
         }
     } }
 
-    #line 166 "src/analyzer/types/Enum.pv"
+    #line 170 "src/analyzer/types/Enum.pv"
     return false;
 }

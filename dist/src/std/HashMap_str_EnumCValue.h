@@ -28,31 +28,31 @@ struct EnumCValue;
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_EnumCValue HashMap_str_EnumCValue__new(struct trait_Allocator allocator);
 
-#line 46 "src/std/HashMap.pv"
+#line 50 "src/std/HashMap.pv"
 void HashMap_str_EnumCValue__resize(struct HashMap_str_EnumCValue* self, uintptr_t new_capacity);
 
-#line 53 "src/std/HashMap.pv"
+#line 57 "src/std/HashMap.pv"
 struct EnumCValue* HashMap_str_EnumCValue__find(struct HashMap_str_EnumCValue* self, struct str* key);
 
-#line 70 "src/std/HashMap.pv"
+#line 74 "src/std/HashMap.pv"
 struct EnumCValue* HashMap_str_EnumCValue__insert(struct HashMap_str_EnumCValue* self, struct str key, struct EnumCValue value);
 
-#line 98 "src/std/HashMap.pv"
+#line 102 "src/std/HashMap.pv"
 bool HashMap_str_EnumCValue__remove(struct HashMap_str_EnumCValue* self, struct str* key);
 
-#line 122 "src/std/HashMap.pv"
+#line 126 "src/std/HashMap.pv"
 void HashMap_str_EnumCValue__release(struct HashMap_str_EnumCValue* self);
 
-#line 131 "src/std/HashMap.pv"
+#line 135 "src/std/HashMap.pv"
 void HashMap_str_EnumCValue__fill_buckets(struct HashMap_str_EnumCValue* self);
 
-#line 149 "src/std/HashMap.pv"
+#line 153 "src/std/HashMap.pv"
 struct HashMap_str_EnumCValue HashMap_str_EnumCValue__clone(struct HashMap_str_EnumCValue* self, struct trait_Allocator allocator);
 
-#line 163 "src/std/HashMap.pv"
+#line 167 "src/std/HashMap.pv"
 struct HashMapIter_str_EnumCValue HashMap_str_EnumCValue__iter(struct HashMap_str_EnumCValue* self);
 
-#line 170 "src/std/HashMap.pv"
+#line 174 "src/std/HashMap.pv"
 void HashMap_str_EnumCValue__clear(struct HashMap_str_EnumCValue* self);
 
 #endif

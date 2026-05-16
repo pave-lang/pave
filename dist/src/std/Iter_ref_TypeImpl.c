@@ -64,5 +64,5 @@ struct TypeImpl* Iter_ref_TypeImpl__value(struct Iter_ref_TypeImpl* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_TypeImpl Iter_ref_TypeImpl__enumerate(struct Iter_ref_TypeImpl self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_TypeImpl) { .iter = self };
+    return (struct IterEnumerate_ref_TypeImpl) { .index = 0, .iter = self };
 }

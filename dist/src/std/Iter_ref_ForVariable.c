@@ -64,5 +64,5 @@ struct ForVariable* Iter_ref_ForVariable__value(struct Iter_ref_ForVariable* sel
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_ForVariable Iter_ref_ForVariable__enumerate(struct Iter_ref_ForVariable self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_ForVariable) { .iter = self };
+    return (struct IterEnumerate_ref_ForVariable) { .index = 0, .iter = self };
 }

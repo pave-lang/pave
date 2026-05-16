@@ -64,5 +64,5 @@ struct ImplNode* Iter_ref_ImplNode__value(struct Iter_ref_ImplNode* self) {
 #line 47 "src/std/Array.pv"
 struct IterEnumerate_ref_ImplNode Iter_ref_ImplNode__enumerate(struct Iter_ref_ImplNode self) {
     #line 48 "src/std/Array.pv"
-    return (struct IterEnumerate_ref_ImplNode) { .iter = self };
+    return (struct IterEnumerate_ref_ImplNode) { .index = 0, .iter = self };
 }

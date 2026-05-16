@@ -28,7 +28,7 @@ struct UsageContext;
 #line 72 "src/compiler/Usages.pv"
 struct TypeUsage_Sequence TypeUsage_Sequence__new(struct ArenaAllocator* allocator, struct Sequence* type, uintptr_t impl_count);
 
-#line 92 "src/compiler/Usages.pv"
+#line 94 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Sequence__add_usage(struct TypeUsage_Sequence* self, struct GenericMap* generic_map);
 
 #endif

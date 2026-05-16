@@ -29,7 +29,7 @@ impl ArenaBlock {
             return 0;
         }
 
-        let self = Self { buffer, capacity, prev };
+        let self = Self { buffer, capacity, prev, offset: 0 };
         let self_ptr: &Self = self.alloc(sizeof(Self));
         *self_ptr = self;
 
@@ -135,12 +135,13 @@ struct ArenaAllocation {
 impl ArenaAllocator {
     fn new(allocator: &dyn Allocator, block_size: usize) -> Self {
         let block = ArenaBlock::new(allocator, block_size, 0);
-        if block == 0 { return Self {}; }
+        if block == 0 { return Self { allocator, block_size: 0, last_block: 0, last_oversize: 0 }; }
         
         return Self {
             allocator,
             block_size,
             last_block: block,
+            last_oversize: 0,
         };
     }
 

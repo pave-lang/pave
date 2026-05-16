@@ -12,7 +12,7 @@
 #line 12 "src/compiler/FileWriter.pv"
 struct FileWriter FileWriter__new(FILE* file) {
     #line 13 "src/compiler/FileWriter.pv"
-    return (struct FileWriter) { .file = file };
+    return (struct FileWriter) { .file = file, .indent = 0 };
 }
 
 #line 16 "src/compiler/FileWriter.pv"
