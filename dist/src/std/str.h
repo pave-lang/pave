@@ -48,13 +48,13 @@ intptr_t str__index_of_start(struct str self, char ch, uintptr_t start);
 #line 81 "src/std/str.pv"
 intptr_t str__index_of_last(struct str self, char ch);
 
-#line 94 "src/std/str.pv"
+#line 92 "src/std/str.pv"
 bool str__is_whitespace(char ch);
 
-#line 98 "src/std/str.pv"
+#line 96 "src/std/str.pv"
 struct str str__trim(struct str self);
 
-#line 115 "src/std/str.pv"
+#line 113 "src/std/str.pv"
 Hashed str__Hash__hash(void* __self);
 
 extern struct trait_HashVTable STR__VTABLE__HASH;

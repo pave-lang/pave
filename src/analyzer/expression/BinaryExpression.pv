@@ -68,6 +68,11 @@ impl Expression {
         if lhs_type.is_unknown() || rhs.return_type.is_unknown() { return 0; }
 
         match lhs_type {
+            Type::Self => {
+                if context.type_self != 0 {
+                    return Expression::find_operator_trait_call(context, token, lhs, context.type_self, operator, rhs);
+                }
+            },
             Type::Indirect(indirect) => {
                 return Expression::find_operator_trait_call(context, token, lhs, &indirect.to, operator, rhs);
             },

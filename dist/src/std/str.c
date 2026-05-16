@@ -142,56 +142,53 @@ intptr_t str__index_of_start(struct str self, char ch, uintptr_t start) {
 #line 81 "src/std/str.pv"
 intptr_t str__index_of_last(struct str self, char ch) {
     #line 82 "src/std/str.pv"
-    char const* s = self.ptr;
-
-    #line 84 "src/std/str.pv"
     for (uintptr_t i = 0; i < self.length; i++) {
-        #line 85 "src/std/str.pv"
+        #line 83 "src/std/str.pv"
         char const* ptr = self.ptr + self.length - 1 - i;
-        #line 86 "src/std/str.pv"
+        #line 84 "src/std/str.pv"
         if (*ptr == ch) {
-            #line 87 "src/std/str.pv"
+            #line 85 "src/std/str.pv"
             return ptr - self.ptr;
         }
     }
 
-    #line 91 "src/std/str.pv"
+    #line 89 "src/std/str.pv"
     return -1;
 }
 
-#line 94 "src/std/str.pv"
+#line 92 "src/std/str.pv"
 bool str__is_whitespace(char ch) {
-    #line 95 "src/std/str.pv"
+    #line 93 "src/std/str.pv"
     return (ch == ' ') || (ch == '\r') || (ch == '\n') || (ch == '\t');
 }
 
-#line 98 "src/std/str.pv"
+#line 96 "src/std/str.pv"
 struct str str__trim(struct str self) {
-    #line 99 "src/std/str.pv"
+    #line 97 "src/std/str.pv"
     uintptr_t start = 0;
-    #line 100 "src/std/str.pv"
+    #line 98 "src/std/str.pv"
     uintptr_t end = self.length;
 
-    #line 102 "src/std/str.pv"
+    #line 100 "src/std/str.pv"
     while (start < end && str__is_whitespace(self.ptr[start])) {
-        #line 103 "src/std/str.pv"
+        #line 101 "src/std/str.pv"
         start = start + 1;
     }
 
-    #line 106 "src/std/str.pv"
+    #line 104 "src/std/str.pv"
     while (end > start && str__is_whitespace(self.ptr[end - 1])) {
-        #line 107 "src/std/str.pv"
+        #line 105 "src/std/str.pv"
         end = end - 1;
     }
 
-    #line 110 "src/std/str.pv"
+    #line 108 "src/std/str.pv"
     return str__slice(self, start, end);
 }
 
-#line 115 "src/std/str.pv"
+#line 113 "src/std/str.pv"
 Hashed str__Hash__hash(void* __self) {
     struct str* self = __self; (void)self;
-    #line 115 "src/std/str.pv"
+    #line 113 "src/std/str.pv"
     return Fnv1a__hash(self->ptr, self->length);
 }
 

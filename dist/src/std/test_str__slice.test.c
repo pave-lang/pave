@@ -11,16 +11,16 @@
 
 #line 1 "src/std/str.pv"
 void test_str__slice() {
-    #line 137 "src/std/str.pv"
+    #line 135 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "hello world", .length = strlen("hello world") };
-    #line 138 "src/std/str.pv"
+    #line 136 "src/std/str.pv"
     if (!str__eq(str__slice(s, 6, 11), (struct str){ .ptr = "world", .length = strlen("world") })) {
-        #line 138 "src/std/str.pv"
+        #line 136 "src/std/str.pv"
         abort();
     }
-    #line 139 "src/std/str.pv"
+    #line 137 "src/std/str.pv"
     if (!str__eq(str__slice(s, 0, 5), (struct str){ .ptr = "hello", .length = strlen("hello") })) {
-        #line 139 "src/std/str.pv"
+        #line 137 "src/std/str.pv"
         abort();
     }
 }

@@ -10,16 +10,16 @@
 
 #line 1 "src/std/str.pv"
 void test_str__starts_with() {
-    #line 143 "src/std/str.pv"
+    #line 141 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "hello world", .length = strlen("hello world") };
-    #line 144 "src/std/str.pv"
+    #line 142 "src/std/str.pv"
     if (!str__starts_with(s, "hello")) {
-        #line 144 "src/std/str.pv"
+        #line 142 "src/std/str.pv"
         abort();
     }
-    #line 145 "src/std/str.pv"
+    #line 143 "src/std/str.pv"
     if (str__starts_with(s, "world")) {
-        #line 145 "src/std/str.pv"
+        #line 143 "src/std/str.pv"
         abort();
     }
 }
