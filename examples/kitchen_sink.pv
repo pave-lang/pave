@@ -187,7 +187,85 @@ impl Hash for Color {
 }
 
 // =============================================================================
-// 11. Coroutines (co + yield)
+// 11. Null pointers (*T uses null, not 0)
+// =============================================================================
+
+struct Node {
+    value: i32,
+    next: *Node,
+}
+
+fn make_node(value: i32) -> *Node {
+    let n: *Node = cast<*Node>(malloc(sizeof(Node)));
+    *n = Node { value, next: null };
+    return n;
+}
+
+fn chain_nodes(a: *Node, b: *Node) {
+    a.next = b;
+}
+
+// =============================================================================
+// 12. Struct default field values
+// =============================================================================
+
+struct Config {
+    width: i32 = 800,
+    height: i32 = 600,
+    title: *const char = "Untitled",
+}
+
+// =============================================================================
+// 13. Enum struct variants (named fields)
+// =============================================================================
+
+enum Event {
+    KeyPress { key: i32, shift: bool },
+    MouseMove { x: f32, y: f32 },
+    Quit,
+}
+
+impl Event {
+    fn describe(&self) -> *const char {
+        match self {
+            Event::KeyPress { key, shift } => {
+                if shift { return "shift+key"; }
+                return "key";
+            },
+            Event::MouseMove { x, y } => { return "mouse"; },
+            Event::Quit => { return "quit"; },
+        }
+    }
+}
+
+// =============================================================================
+// 14. Impl const values
+// =============================================================================
+
+struct Limits {
+    value: i32,
+}
+
+impl Limits {
+    const MAX: i32 = 1000;
+    const MIN: i32 = -1000;
+}
+
+// =============================================================================
+// 15. Numeric match patterns
+// =============================================================================
+
+fn classify(n: i32) -> *const char {
+    match n {
+        0  => { return "zero"; },
+        1  => { return "one"; },
+        -1 => { return "negative one"; },
+        _  => { return "other"; },
+    }
+}
+
+// =============================================================================
+// 16. Coroutines (co + yield)
 // =============================================================================
 
 co fibonacci(n: usize) -> u64 {
@@ -211,7 +289,7 @@ co running_sum(values: &[f32]) -> f32 {
 }
 
 // =============================================================================
-// 12. Static local variables
+// 17. Static local variables
 // =============================================================================
 
 fn next_id() -> u32 {
@@ -221,7 +299,7 @@ fn next_id() -> u32 {
 }
 
 // =============================================================================
-// 13. Slice helper
+// 18. Slice helper
 // =============================================================================
 
 fn sum_slice(values: &[f32]) -> f32 {
@@ -233,7 +311,7 @@ fn sum_slice(values: &[f32]) -> f32 {
 }
 
 // =============================================================================
-// 14. Dynamic function dispatch (Fn trait + typeid)
+// 19. Dynamic function dispatch (Fn trait + typeid)
 // =============================================================================
 
 struct Particle {
@@ -371,6 +449,34 @@ fn main(argc: i32, argv: **const char) -> i32 {
         printf("map: %.*s = %d\n", cast<i32>(key.length), key.ptr, value);
     }
 
+    // --- Null pointers ---
+    let na = make_node(1);
+    let nb = make_node(2);
+    chain_nodes(na, nb);
+    printf("node chain: %d -> %d\n", na.value, na.next.value);
+    free(cast<*void>(na));
+    free(cast<*void>(nb));
+
+    // --- Struct defaults ---
+    let cfg = Config { };
+    printf("config: %dx%d %s\n", cfg.width, cfg.height, cfg.title);
+    let cfg2 = Config { width: 1920, height: 1080 };
+    printf("config2: %dx%d\n", cfg2.width, cfg2.height);
+
+    // --- Enum struct variants ---
+    let ev = Event::KeyPress { key: 65, shift: true };
+    printf("event: %s\n", ev.describe());
+    let mv = Event::MouseMove { x: 1.5f, y: 2.5f };
+    printf("event: %s\n", mv.describe());
+
+    // --- Impl consts ---
+    printf("limits: %d .. %d\n", Limits::MIN, Limits::MAX);
+
+    // --- Numeric match patterns ---
+    printf("classify 0: %s\n", classify(0));
+    printf("classify -1: %s\n", classify(-1));
+    printf("classify 42: %s\n", classify(42));
+
     // --- Coroutines ---
     printf("fibonacci(8): ");
     for fib in fibonacci(8) {
@@ -462,6 +568,43 @@ test "str trim and eq" {
     let s: str = "  hello  ";
     let t = s.trim();
     assert(t.eq("hello"));
+}
+
+test "null pointer chain" {
+    let a = make_node(10);
+    let b = make_node(20);
+    chain_nodes(a, b);
+    assert(a.next != null);
+    assert(a.next.value == 20);
+    assert(b.next == null);
+    free(cast<*void>(a));
+    free(cast<*void>(b));
+}
+
+test "struct defaults" {
+    let cfg = Config { };
+    assert(cfg.width == 800);
+    assert(cfg.height == 600);
+    let cfg2 = Config { width: 1280 };
+    assert(cfg2.width == 1280);
+    assert(cfg2.height == 600);
+}
+
+test "enum struct variant" {
+    let ev = Event::KeyPress { key: 13, shift: false };
+    assert(ev.describe()[0] == 'k');
+}
+
+test "impl const" {
+    assert(Limits::MAX == 1000);
+    assert(Limits::MIN == -1000);
+}
+
+test "numeric match pattern" {
+    assert(classify(0)[0] == 'z');
+    assert(classify(1)[0] == 'o');
+    assert(classify(-1)[0] == 'n');
+    assert(classify(99)[0] == 'o');
 }
 
 test "fibonacci first values" {
