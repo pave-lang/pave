@@ -48,7 +48,7 @@ struct Generics {
 impl Generics {
     fn new(allocator: &dyn Allocator) -> Self {
         return Self {
-            parent: 0,
+            parent: null,
             array: Array<Generic>::new(allocator),
             map: HashMap<str, usize>::new(allocator),
         };
@@ -56,19 +56,19 @@ impl Generics {
 
     fn has(&self, name: str) -> bool {
         if self.map.find(&name) { return true; }
-        if self.parent != 0 && self.parent.has(name) { return true; }
+        if self.parent != null && self.parent.has(name) { return true; }
 
         return false;
     }
 
     fn find(&self, name: str) -> &Generic {
         let index_ptr = self.map.find(&name);
-        if index_ptr != 0 {
+        if index_ptr != null {
             let index = *index_ptr;
             return self.array.data + index;
         }
 
-        if self.parent != 0 { return self.parent.find(name); }
+        if self.parent != null { return self.parent.find(name); }
 
         return 0;
     }

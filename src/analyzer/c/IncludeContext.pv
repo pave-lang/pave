@@ -71,7 +71,7 @@ impl IncludeContext {
         let allocator = include.root.allocator;
 
         let existing = self.types.find(name);
-        if existing != 0 {
+        if existing != null {
             match existing {
                 Type::NamespaceCpp(ns_info) => {
                     return allocator.store(&IncludeContext {
@@ -101,7 +101,7 @@ impl IncludeContext {
     fn add_typedef(&self, name: *const char, cursor: CXCursor) {
         let include = self.include;
 
-        if self.types.find(name) != 0 { return; }
+        if self.types.find(name) != null { return; }
 
         let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
         let type = include.parse_type(underlying_type);
@@ -126,7 +126,7 @@ impl IncludeContext {
         let struct_info = StructC::new(include, "");
         let struct_type = Type::StructC(struct_info);
 
-        if self.types.find(name) == 0 {
+        if self.types.find(name) == null {
             let typedef_ = TypedefC::new(include, name, struct_type.to_ptr(include.root.allocator));
             self.insert_type(name, Type::TypedefC(typedef_));
         }
@@ -139,7 +139,7 @@ impl IncludeContext {
         let struct_info = StructC::new(include, "");
         let struct_type = Type::UnionC(struct_info);
 
-        if self.types.find(name) == 0 {
+        if self.types.find(name) == null {
             let typedef_ = TypedefC::new(include, name, struct_type.to_ptr(include.root.allocator));
             self.insert_type(name, Type::TypedefC(typedef_));
         }
@@ -152,7 +152,7 @@ impl IncludeContext {
         let struct_info: &StructC = StructC::new(include, "");
         let indirect = Indirect::new_pointer(include.root.allocator, Type::StructC(struct_info));
 
-        if self.types.find(name) == 0 {
+        if self.types.find(name) == null {
             let indirect_type: Type = Type::Indirect(indirect);
             let typedef_ = TypedefC::new(include, name, indirect_type.to_ptr(include.root.allocator));
             self.insert_type(name, Type::TypedefC(typedef_));
@@ -167,7 +167,7 @@ impl IncludeContext {
         let indirect = Indirect::new_pointer(include.root.allocator, Type::FunctionC(func_info));
         let indirect_type: Type = Type::Indirect(indirect);
 
-        if self.types.find(name) == 0 {
+        if self.types.find(name) == null {
             let typedef_ = TypedefC::new(include, name, indirect_type.to_ptr(include.root.allocator));
             self.insert_type(name, Type::TypedefC(typedef_));
         }
@@ -178,7 +178,7 @@ impl IncludeContext {
     fn add_typedef_pointer(&self, name: *const char) {
         let include = self.include;
 
-        if self.types.find(name) != 0 { return; }
+        if self.types.find(name) != null { return; }
 
         let indirect: &Indirect = include.root.allocator.alloc(sizeof(Indirect));
         indirect.to = include.root.type_void;
@@ -221,10 +221,10 @@ impl IncludeContext {
             defer include.root.allocator.free(type_name);
 
             if language == CXLanguage_CPlusPlus {
-                let class_info: *ClassCpp = 0;
+                let class_info: *ClassCpp = null;
                 let class_type = self.types.find(name);
 
-                if class_type != 0 {
+                if class_type != null {
                     match class_type {
                         Type::ClassCpp(class_info2) => {
                             class_info = class_info2;
@@ -233,7 +233,7 @@ impl IncludeContext {
                     }
                 }
 
-                if class_info == 0 {
+                if class_info == null {
                     class_info = ClassCpp::new(include, name, self.parent, kind == CXCursor_StructDecl);
                     self.insert_type(name, Type::ClassCpp(class_info));
                 }
@@ -324,7 +324,7 @@ impl IncludeContext {
 
             return CXChildVisit_Continue;
         } else if kind == CXCursor_MacroDefinition {
-            if include.root.primitives.find(name) != 0 { return CXChildVisit_Continue; }
+            if include.root.primitives.find(name) != null { return CXChildVisit_Continue; }
 
             if include.is_function_like_macro(cursor) {
                 self.add_basic_function(name);

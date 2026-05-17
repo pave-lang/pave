@@ -106,7 +106,7 @@ impl IncludeObjectContext {
                 }
 
                 let existing = class_info.types.find(name);
-                if existing == 0 {
+                if existing == null {
                     let nested_class = ClassCpp::new(include, name, ParentCpp::Class(class_info), kind == CXCursor_StructDecl);
                     class_info.types.insert(name, Type::ClassCpp(nested_class));
 
@@ -127,7 +127,7 @@ impl IncludeObjectContext {
                 }
 
                 let existing = class_info.types.find(name);
-                if existing == 0 {
+                if existing == null {
                     let nested_class = ClassCpp::new(include, name, ParentCpp::Class(class_info), kind == CXCursor_StructDecl);
                     class_info.types.insert(name, Type::ClassCpp(nested_class));
 
@@ -142,7 +142,7 @@ impl IncludeObjectContext {
                 let name = include.make_string(spelling);
                 clang_disposeString(spelling);
 
-                if class_info.types.find(name) == 0 {
+                if class_info.types.find(name) == null {
                     let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
                     let resolved = include.parse_type(underlying_type);
 

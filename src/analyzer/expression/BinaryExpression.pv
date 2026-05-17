@@ -42,6 +42,19 @@ impl Expression {
             if is_comparison {
                 if !operator.value.eq("||") && !operator.value.eq("&&") {
                     if !result.validate_type(context, &rhs_final.return_type, false) { return 0; }
+
+                    // Also validate RHS null/0 literal against LHS type (catches `ptr == 0` / `ptr == null`)
+                    match rhs_final.data {
+                        ExpressionData::NullLiteral => {
+                            rhs_final.validate_type(context, &result.return_type, false);
+                        },
+                        ExpressionData::Literal(value) => {
+                            if value.eq("0") {
+                                rhs_final.validate_type(context, &result.return_type, false);
+                            }
+                        },
+                        _ => {},
+                    }
                 }
 
                 return_type = &context.root.type_bool;
@@ -104,7 +117,7 @@ impl Expression {
                     arguments.append(InvokeArgument { name: 0, value: lhs });
                     arguments.append(InvokeArgument { name: 0, value: rhs });
 
-                    return Expression::make_type_function_call(context, token, func_type, arguments, 0);
+                    return Expression::make_type_function_call(context, token, func_type, arguments, null);
                 }
             },
             Type::Primitive(primitive_info) => {
@@ -128,7 +141,7 @@ impl Expression {
                     arguments.append(InvokeArgument { name: 0, value: lhs });
                     arguments.append(InvokeArgument { name: 0, value: rhs });
 
-                    return Expression::make_type_function_call(context, token, func_type, arguments, 0);
+                    return Expression::make_type_function_call(context, token, func_type, arguments, null);
                 }
             },
             _ => {},

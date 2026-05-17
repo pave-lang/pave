@@ -8,7 +8,7 @@
 #include <analyzer/types/Type.h>
 struct Token;
 
-#line 6 "src/analyzer/expression/Expression.pv"
+#line 8 "src/analyzer/expression/Expression.pv"
 struct Expression {
     struct Token* token;
     struct ExpressionData data;
@@ -32,28 +32,28 @@ struct Array_InvokeArgument;
 struct GenericMap;
 struct EnumVariant;
 
-#line 13 "src/analyzer/expression/Expression.pv"
+#line 15 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make(struct ArenaAllocator* allocator, struct Token* token, struct ExpressionData data, struct Type* return_type);
 
-#line 21 "src/analyzer/expression/Expression.pv"
+#line 23 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make_next(struct Context* context, struct Expression node);
 
-#line 29 "src/analyzer/expression/Expression.pv"
+#line 31 "src/analyzer/expression/Expression.pv"
 struct str Expression__number_primitive(struct str value);
 
-#line 40 "src/analyzer/expression/Expression.pv"
+#line 42 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 383 "src/analyzer/expression/Expression.pv"
+#line 397 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 430 "src/analyzer/expression/Expression.pv"
+#line 444 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 437 "src/analyzer/expression/Expression.pv"
+#line 451 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 525 "src/analyzer/expression/Expression.pv"
+#line 581 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
@@ -113,10 +113,10 @@ struct Expression* Expression__parse_postfix_chain(struct Context* context, stru
 #line 6 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
 
-#line 58 "src/analyzer/expression/BinaryExpression.pv"
+#line 71 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_operator_trait_call(struct Context* context, struct Token* token, struct Expression* lhs, struct Type* lhs_type, struct str operator, struct Expression* rhs);
 
-#line 140 "src/analyzer/expression/BinaryExpression.pv"
+#line 153 "src/analyzer/expression/BinaryExpression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
 #endif

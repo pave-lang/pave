@@ -9,14 +9,14 @@ struct WhileStatement {
 
 impl WhileStatement {
     fn parse(context: &Context, generics: &Generics) -> *WhileStatement {
-        if !context.expect_value(TokenType::Keyword, "while") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "while") { return null; }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return 0; }
+        if expression == 0 { return null; }
 
         let block = Block::new_ptr(context);
         block.is_loop = true;
-        if !block.parse(context, generics, true) { return 0; }
+        if !block.parse(context, generics, true) { return null; }
 
         return context.allocator.store(&WhileStatement {
             expression,

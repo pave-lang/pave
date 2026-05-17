@@ -94,21 +94,21 @@ impl Context {
         let scope = self.scopes.back();
         let values = &scope.values;
 
-        if values.find(name) != 0 { return true; }
+        if values.find(name) != null { return true; }
         
         let func_info = Function::new(self);
         func_info.name = self.allocator.store(&Token { type: TokenType::String, value: name, start_line: 0, start_column: 0, end_line: 0, end_column: 0 });
         func_info.type = FunctionType::Builtin;
         func_info.return_type = return_type;
 
-        if generics != 0 {
+        if generics != null {
             for *generic in generics {
                 let index = func_info.generics.array.append(generic);
                 func_info.generics.map.insert(generic.name.value, index);
             }
         }
 
-        if parameters != 0 {
+        if parameters != null {
             for *param in parameters {
                 func_info.parameters.append(param);
             }
@@ -128,7 +128,7 @@ impl Context {
 
         file_diagnostics.append(Diagnostic {
             message: message,
-            code: str { ptr: 0, length: 0 },
+            code: str { ptr: null, length: 0 },
             range: Range {
                 start: Position {
                     line: token.start_line,
@@ -255,7 +255,7 @@ impl Context {
 
     fn current(&self) -> *Token {
         if self.pos >= self.length {
-            return 0;
+            return null;
         }
 
         return self.tokens + self.pos;
@@ -263,7 +263,7 @@ impl Context {
 
     fn prev(&self) -> *Token {
         if self.pos == 0 {
-            return 0;
+            return null;
         }
 
         return self.tokens + self.pos - 1;
@@ -524,7 +524,7 @@ impl Context {
 
                 let found = false;
                 for *trait_info in generic_ref.traits {
-                    if trait_info.typedefs.find(&typedef_name.value) != 0 { found = true; }
+                    if trait_info.typedefs.find(&typedef_name.value) != null { found = true; }
                 }
                 if !found {
                     self.error_token(typedef_name, "Unknown typedef in trait bound");
@@ -543,7 +543,7 @@ impl Context {
         }
 
         let context_type = self.types.find(&name.value);
-        if context_type != 0 {
+        if context_type != null {
             memcpy(type, context_type, sizeof(Type));
             return true;
         }
@@ -589,7 +589,7 @@ impl Context {
         if name == 0 { return false; }
 
         let find_type = parent.types.find(&name.value);
-        if find_type == 0 {
+        if find_type == null {
             self.pos = start_pos;
             *type = Type::NamespaceCpp(parent);
             return true;
@@ -622,7 +622,7 @@ impl Context {
         if name == 0 { return false; }
 
         let find_type = parent.types.find(&name.value);
-        if find_type == 0 {
+        if find_type == null {
             self.pos = start_pos;
             *type = Type::ClassCpp(parent);
             return true;
@@ -784,9 +784,9 @@ impl Context {
                         Type::Struct(struct_info, _) => {
                             for *impl_info in struct_info.impls {
                                 if impl_info.trait_ == 0 { continue; }
-                                if impl_info.trait_.typedefs.find(&gt.typedef_name) == 0 { continue; }
+                                if impl_info.trait_.typedefs.find(&gt.typedef_name) == null { continue; }
                                 let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
-                                if typedef_type != 0 { return typedef_type; }
+                                if typedef_type != null { return typedef_type; }
                             }
                         },
                         _ => {},
@@ -834,7 +834,7 @@ impl Context {
         let scope = self.scopes.back();
         let values: &HashMap<str, Type> = &scope.values;
 
-        if values.find(&name.value) != 0 {
+        if values.find(&name.value) != null {
             let message = String::new(self.allocator);
             message.append("Variable name already in use: ");
             message.append(name.value);
@@ -853,7 +853,7 @@ impl Context {
 
         while scope >= scope_front {
             let type = scope.values.find(&name);
-            if type != 0 { return type; }
+            if type != null { return type; }
 
             scope -= 1;
         }
@@ -929,7 +929,7 @@ impl Context {
                 let implements = false;
                 match usage_type {
                     Type::Struct(struct_info, _) => {
-                        implements = struct_info.traits.find(&required_trait.name.value) != 0;
+                        implements = struct_info.traits.find(&required_trait.name.value) != null;
                     },
                     Type::Generic(generic_info) => {
                         for *generic_trait in generic_info.traits {

@@ -136,11 +136,11 @@ impl Enum {
             }
         }
 
-        let value: *Expression = 0;
+        let value: *Expression = null;
 
         if context.check_next(TokenType::Symbol, "=") {
             value = Expression::parse(context, 0);
-            if value == 0 { return false; }
+            if value == null { return false; }
         }
 
         if types.length > 0 {

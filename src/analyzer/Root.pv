@@ -59,8 +59,8 @@ impl Root {
             type_self: Type::Primitive(0),
             type_ref_self: Type::Primitive(0),
             type_usize: Type::Primitive(0),
-            func_next: Function { name: 0, context: 0, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: 0, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: 0, length: 0, capacity: 0 }, return_type: Type::Primitive(0), body: 0 },
-            func_value: Function { name: 0, context: 0, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: 0, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: 0, length: 0, capacity: 0 }, return_type: Type::Primitive(0), body: 0 },
+            func_next: Function { name: 0, context: 0, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: 0, length: 0, capacity: 0 }, return_type: Type::Primitive(0), body: 0 },
+            func_value: Function { name: 0, context: 0, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: 0, length: 0, capacity: 0 }, return_type: Type::Primitive(0), body: 0 },
             hack_type_impl: 0,
             mode_cpp: false,
         };
@@ -98,7 +98,7 @@ impl Root {
             token_start: 0,
             token_end: 0,
             parent: FunctionParent::None,
-            generics: Generics { parent: 0, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
+            generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
             body: 0,
         };
         self.func_next.parameters.append(Parameter { name: allocator.store(&Token { type: TokenType::Identifier, value: "self", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), type: self.type_ref_self });
@@ -114,7 +114,7 @@ impl Root {
             token_start: 0,
             token_end: 0,
             parent: FunctionParent::None,
-            generics: Generics { parent: 0, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
+            generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
             body: 0,
         };
         self.func_value.parameters.append(Parameter { name: allocator.store(&Token { type: TokenType::Identifier, value: "self", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), type: self.type_ref_self });
@@ -126,7 +126,7 @@ impl Root {
         for *arg in args {
             let pos: *const char = strchr(arg, '=');
 
-            if pos == 0 {
+            if pos == null {
                 fprintf(stderr, "Unknown arg \"%s\"\n", arg);
             } else {
                 let arg_str: str = arg;
@@ -154,15 +154,15 @@ impl Root {
 
     fn add_ctype(&self, name: *const char) -> &Primitive {
         let existing = self.primitives.find(name);
-        if existing != 0 { return existing; }
+        if existing != null { return existing; }
 
         return self.primitives.insert(name, Primitive::new(self.allocator, name));
     }
 
     fn add_namespace(&self, name: str, path: str) -> bool {
-        let child = Namespace::new(self, 0, name, path);
+        let child = Namespace::new(self, null, name, path);
     
-        if self.children.find(&name) != 0 {
+        if self.children.find(&name) != null {
             let name_length: u32 = name.length;
             fprintf(stderr, "Duplicate namespace %.*s\n", name_length, name.ptr);
 
@@ -175,7 +175,7 @@ impl Root {
 
     fn find_namespace(&self, name: str) -> *Namespace {
         let result = self.children.find(&name);
-        if result == 0 { return 0; }
+        if result == null { return null; }
 
         return *result;
     }
@@ -259,7 +259,7 @@ impl Root {
 
     fn find_trait(&self, name: str) -> &Trait {
         let trait_info = self.traits.find(&name);
-        if trait_info == 0 { return 0; }
+        if trait_info == null { return 0; }
         return *trait_info;
     }
 
@@ -278,7 +278,7 @@ impl Root {
 
         file_diagnostics.append(Diagnostic {
             message: message,
-            code: str { ptr: 0, length: 0 },
+            code: str { ptr: null, length: 0 },
             range: Range {
                 start: Position {
                     line: start_line,

@@ -184,7 +184,7 @@ impl Processor {
         let clang_args = settings.key("clang_args").array();
 
         ls.args.clear();
-        if args != 0 {
+        if args != null {
             for *arg in args {
                 let arg_string = arg.string();
                 let copy: *char = ls.allocator.alloc(arg_string.length + 1);
@@ -194,7 +194,7 @@ impl Processor {
         }
 
         ls.clang_args.clear();
-        if clang_args != 0 {
+        if clang_args != null {
             for *arg in clang_args {
                 let arg_string = arg.string();
                 let copy: *char = ls.allocator.alloc(arg_string.length + 1);
@@ -214,7 +214,7 @@ impl Processor {
         let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 };
 
         for (filename, _) in analysis.files {
-            if analysis.diagnostics.find(&filename) == 0 {
+            if analysis.diagnostics.find(&filename) == null {
                 self.publish_diagnostics_file(filename, &blank_diagnostics);
             }
         }
@@ -265,13 +265,13 @@ impl Processor {
         if uri.length == 0 { return; }
 
         let filename = ls.file_map.find(&uri);
-        if filename == 0 { return; }
+        if filename == null { return; }
 
         let diagnostics = ls.analysis.diagnostics.find(filename);
         let inlay_hints = ls.analysis.inlay_hints.find(filename);
 
         let content_changes = params.key("contentChanges").array();
-        if content_changes == 0 { return; }
+        if content_changes == null { return; }
 
         for change in content_changes {
             let range = change.key("range");
@@ -292,7 +292,7 @@ impl Processor {
 
             change_characters -= range_length;
 
-            if diagnostics != 0 {
+            if diagnostics != null {
                 for diagnostic in diagnostics {
                     if start_line == diagnostic.range.start.line && start_character <= diagnostic.range.start.character {
                         diagnostic.range.start.character += change_characters;
@@ -310,7 +310,7 @@ impl Processor {
                 }
             }
 
-            if inlay_hints != 0 {
+            if inlay_hints != null {
                 for inlay_hint in inlay_hints {
                     if start_line == inlay_hint.position.line && start_character <= inlay_hint.position.character {
                         inlay_hint.position.character += change_characters;
@@ -322,7 +322,7 @@ impl Processor {
             }
         }
 
-        if diagnostics != 0 {
+        if diagnostics != null {
             self.publish_diagnostics_file(*filename, diagnostics);
         }
     }
@@ -332,10 +332,10 @@ impl Processor {
         if uri.length == 0 { return; }
 
         let filename = ls.file_map.find(&uri);
-        if filename == 0 { return; }
+        if filename == null { return; }
 
         let inlay_hints = ls.analysis.inlay_hints.find(filename);
-        if inlay_hints == 0 { return; }
+        if inlay_hints == null { return; }
 
         let result = Array<JsonNode>::new(self.allocator);
 

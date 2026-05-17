@@ -229,7 +229,7 @@ impl Naming {
                 } else {
                     let translation = self.primitives.find(&primitive_info.name);
 
-                    if translation != 0 {
+                    if translation != null {
                         result.append(*translation);
                     } else {
                         result.append(primitive_info.name);
@@ -264,7 +264,7 @@ impl Naming {
             Type::Generic(generic) => {
                 let name = generic.name.value;
 
-                if generics_map == 0 {
+                if generics_map == null {
                     result.append(name);
                     return result;
                 }
@@ -278,7 +278,7 @@ impl Naming {
                 return self.get_type_name(generic_type, type_self, generics_map);
             },
             Type::GenericTypedef(gt) => {
-                if generics_map != 0 {
+                if generics_map != null {
                     let direct_type = generics_map.get(gt.typedef_name);
                     if direct_type != 0 {
                         return self.get_type_name(direct_type, type_self, generics_map);
@@ -290,9 +290,9 @@ impl Naming {
                             Type::Struct(struct_info, _) => {
                                 for *impl_info in struct_info.impls {
                                     if impl_info.trait_ == 0 { continue; }
-                                    if impl_info.trait_.typedefs.find(&gt.typedef_name) == 0 { continue; }
+                                    if impl_info.trait_.typedefs.find(&gt.typedef_name) == null { continue; }
                                     let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
-                                    if typedef_type != 0 {
+                                    if typedef_type != null {
                                         return self.get_type_name(typedef_type, type_self, generics_map);
                                     }
                                 }
@@ -371,7 +371,7 @@ impl Naming {
                         match trait_impl_info.trait_type {
                             Type::Trait(ti, tmap) => {
                                 for (gname, _) in ti.generics.map {
-                                    if ti.typedefs.find(&gname) == 0 {
+                                    if ti.typedefs.find(&gname) == null {
                                         let gtype = tmap.get(gname);
                                         if gtype != 0 {
                                             result.append("_");

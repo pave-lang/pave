@@ -292,7 +292,7 @@ impl Generator {
 
                 let func_info = trait_info.functions.find(&func_name);
 
-                if func_info == 0 {
+                if func_info == null {
                     let name_length: i32 = trait_info.name.value.length;
                     let func_name_length: i32 = func_name.length;
                     fprintf(stderr, "Could not find traits %.*s function %.*s for get_function\n", name_length, trait_info.name.value.ptr, func_name_length, func_name.ptr);
@@ -428,7 +428,7 @@ impl Generator {
         for primitive in primitives {
             if exclude_primitives && exclude_primitives.has(primitive) { continue; }
             let include = self.primitive_includes.find(primitive);
-            if include == 0 { continue; }
+            if include == null { continue; }
             includes.insert(*include);
         }
 
@@ -488,10 +488,10 @@ impl Generator {
 
     fn make_rel_path(&self, module: *Module, name: str, ext: str) -> String {
         let result = String::new(self.allocator);
-        let namespace: *Namespace = 0;
-        if module != 0 { namespace = module.namespace; }
+        let namespace: *Namespace = null;
+        if module != null { namespace = module.namespace; }
 
-        while namespace != 0 {
+        while namespace != null {
             result.prepend("/");
             result.prepend(namespace.name);
             namespace = namespace.parent;
@@ -507,7 +507,7 @@ impl Generator {
         match type {
             Type::Primitive(primitive_info) => {
                 let inc = self.primitive_includes.find(&primitive_info.name);
-                if inc != 0 { out.insert(*inc); }
+                if inc != null { out.insert(*inc); }
             },
             Type::Global(g) => { self.collect_primitive_includes(&g.type, generics, out); },
             _ => {},
@@ -525,7 +525,7 @@ impl Generator {
             match impl_trait_type {
                 Type::Trait(ti, tmap) => {
                     for (gname, _) in ti.generics.map {
-                        if ti.typedefs.find(&gname) == 0 {
+                        if ti.typedefs.find(&gname) == null {
                             let gtype = tmap.get(gname);
                             if gtype != 0 {
                                 trait_name.append("_");

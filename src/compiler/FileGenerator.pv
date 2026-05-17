@@ -48,7 +48,7 @@ impl FileGenerator {
 
         let code = g.make_path(func_info.context.module, name_str, code_ext);
         let code_file: &FILE = 0;
-        let code_tmp: *const char = 0;
+        let code_tmp: *const char = null;
 
         code_tmp = tmpnam(0);
         code_file = fopen(code_tmp, "w+");
@@ -78,7 +78,7 @@ impl FileGenerator {
 
         let header = g.make_path(func_info.context.module, name_str, header_ext);
         let header_file: &FILE = 0;
-        let header_tmp: *const char = 0;
+        let header_tmp: *const char = null;
         header_tmp = tmpnam(0);
         header_file = fopen(header_tmp, "w+");
 
@@ -90,7 +90,7 @@ impl FileGenerator {
         g.write_str_title(header_file, name_str);
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_code, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_code, null);
         include_writer.write(header_file, g, &usage_context.signature, generics, false);
 
         if g.is_coroutine() {
@@ -139,7 +139,7 @@ impl FileGenerator {
         g.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, g, &usage_context.layout, generics, false);
 
         if !defs.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) { fclose(header_file); return false; }
@@ -239,7 +239,7 @@ impl FileGenerator {
             fprintf(header_file, "#endif\n\n");
         }
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, g, &usage_context.layout, generics, false);
         if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
 
@@ -493,7 +493,7 @@ impl FileGenerator {
         let name = primitive_info.name;
         let include_writer = IncludeWriter::new(g.allocator);
 
-        let header = g.make_path(0, name, ".h");
+        let header = g.make_path(null, name, ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
         if header_file == 0 { perror(header.c_str()); return false; }
@@ -505,7 +505,7 @@ impl FileGenerator {
         fprintf(header_file, "\n\n");
 
         g.write_impl_includes_raw(header_file, &primitive_info.impls);
-        g.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, g, &usage_context.signature, generics, false);
 
         if !defs.write_primitive_definition(header_file, primitive_info, generics) { fclose(header_file); return false; }
@@ -520,7 +520,7 @@ impl FileGenerator {
             return true;
         }
 
-        let code = g.make_path(0, name, ".c");
+        let code = g.make_path(null, name, ".c");
         g.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
@@ -531,7 +531,7 @@ impl FileGenerator {
         g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
         include_writer.write(code_file, g, &usage_context.body, generics, true);
 
-        let header_rel = g.make_rel_path(0, name, ".h");
+        let header_rel = g.make_rel_path(null, name, ".h");
         fprintf(code_file, "#include <");
         g.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
@@ -599,7 +599,7 @@ impl FileGenerator {
         let name = g.naming_ident.get_type_name(&sequence_type, &sequence_type, generics);
         let include_writer = IncludeWriter::new(g.allocator);
 
-        let header = g.make_path(0, name.as_str(), ".h");
+        let header = g.make_path(null, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
         if header_file == 0 { perror(header.c_str()); return false; }
@@ -610,7 +610,7 @@ impl FileGenerator {
         g.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, g, &usage_context.layout, generics, false);
 
         fprintf(header_file, "struct ");
@@ -631,14 +631,14 @@ impl FileGenerator {
         fclose(header_file);
         remove(header_tmp);
 
-        let code = g.make_path(0, name.as_str(), ".c");
+        let code = g.make_path(null, name.as_str(), ".c");
         g.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: &FILE = fopen(code_tmp, "w+");
         if code_file == 0 { perror(code.c_str()); return false; }
 
-        let header_rel = g.make_rel_path(0, name.as_str(), ".h");
+        let header_rel = g.make_rel_path(null, name.as_str(), ".h");
         fprintf(code_file, "#include <");
         g.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
@@ -674,7 +674,7 @@ impl FileGenerator {
         let name = g.naming_ident.get_type_name(&tuple_type, &tuple_type, generics);
         let include_writer = IncludeWriter::new(g.allocator);
 
-        let header = g.make_path(0, name.as_str(), ".h");
+        let header = g.make_path(null, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: &FILE = fopen(header_tmp, "w+");
         if header_file == 0 { perror(header.c_str()); return false; }
@@ -685,7 +685,7 @@ impl FileGenerator {
         g.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, g, &usage_context.layout, generics, false);
 
         fprintf(header_file, "struct ");
@@ -752,7 +752,7 @@ impl FileGenerator {
             fprintf(header_file, "#endif\n\n");
         }
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, 0);
+        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, g, &usage_context.signature, generics, false);
 
         if !defs.write_trait_definition(header_file, trait_info, generics) { fclose(header_file); return false; }

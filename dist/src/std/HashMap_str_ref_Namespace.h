@@ -27,31 +27,34 @@ struct Namespace;
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__new(struct trait_Allocator allocator);
 
-#line 50 "src/std/HashMap.pv"
+#line 39 "src/std/HashMap.pv"
+struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__with_capacity(struct trait_Allocator allocator, uintptr_t capacity);
+
+#line 53 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__resize(struct HashMap_str_ref_Namespace* self, uintptr_t new_capacity);
 
-#line 57 "src/std/HashMap.pv"
+#line 60 "src/std/HashMap.pv"
 struct Namespace** HashMap_str_ref_Namespace__find(struct HashMap_str_ref_Namespace* self, struct str* key);
 
-#line 74 "src/std/HashMap.pv"
+#line 77 "src/std/HashMap.pv"
 struct Namespace** HashMap_str_ref_Namespace__insert(struct HashMap_str_ref_Namespace* self, struct str key, struct Namespace* value);
 
-#line 102 "src/std/HashMap.pv"
+#line 105 "src/std/HashMap.pv"
 bool HashMap_str_ref_Namespace__remove(struct HashMap_str_ref_Namespace* self, struct str* key);
 
-#line 126 "src/std/HashMap.pv"
+#line 129 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__release(struct HashMap_str_ref_Namespace* self);
 
-#line 135 "src/std/HashMap.pv"
+#line 138 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__fill_buckets(struct HashMap_str_ref_Namespace* self);
 
-#line 153 "src/std/HashMap.pv"
+#line 156 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__clone(struct HashMap_str_ref_Namespace* self, struct trait_Allocator allocator);
 
-#line 167 "src/std/HashMap.pv"
+#line 170 "src/std/HashMap.pv"
 struct HashMapIter_str_ref_Namespace HashMap_str_ref_Namespace__iter(struct HashMap_str_ref_Namespace* self);
 
-#line 174 "src/std/HashMap.pv"
+#line 177 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__clear(struct HashMap_str_ref_Namespace* self);
 
 #endif

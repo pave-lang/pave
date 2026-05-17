@@ -23,16 +23,16 @@ impl DeferStatement {
 
         if !top_block_found { context.error("could not find top_block for defer statements"); }
 
-        if !context.expect_value(TokenType::Keyword, "defer") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "defer") { return null; }
 
         if context.check_value(TokenType::Symbol, "{") {
             let defer_block = Block::new_ptr(context);
-            if !defer_block.parse(context, generics, true) { return 0; }
+            if !defer_block.parse(context, generics, true) { return null; }
             return context.allocator.store(&DeferStatement::Block(defer_block));
         } else {
             let expression = Expression::parse(context, generics);
-            if expression == 0 { return 0; }
-            if !context.expect_value(TokenType::Symbol, ";") { return 0; }
+            if expression == 0 { return null; }
+            if !context.expect_value(TokenType::Symbol, ";") { return null; }
             return context.allocator.store(&DeferStatement::Expression(expression));
         }
     }

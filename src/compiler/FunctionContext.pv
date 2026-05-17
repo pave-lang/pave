@@ -55,7 +55,7 @@ impl FunctionContext {
     fn get_variable_replacement(&self, name: str) -> str {
         for scope in self.scopes.iter().reverse() {
             let variable = scope.variable_replacements.find(&name);
-            if variable != 0 {
+            if variable != null {
                 return *variable;
             }
         }
@@ -71,7 +71,7 @@ impl FunctionContext {
         let new_name = String::new(self.allocator);
         new_name.append(name);
 
-        if self.coroutine.variables.find(&name) == 0 {
+        if self.coroutine.variables.find(&name) == null {
             self.coroutine.variables.insert(name, type);
 
             if self.use_scopes {
@@ -95,7 +95,7 @@ impl FunctionContext {
             }
 
             let new_name_str = new_name.as_str();
-            if self.coroutine.variables.find(&new_name_str) == 0 {
+            if self.coroutine.variables.find(&new_name_str) == null {
                 new_name.prepend("ctx->");
                 new_name_str = new_name.as_str();
                 self.coroutine.variables.insert(new_name_str.slice(5, new_name_str.length), type);

@@ -54,7 +54,7 @@ impl Module {
             globals: HashMap<str, &Global>::new(allocator),
             global_types: HashMap<str, Type>::new(allocator),
             tests: Array<TestInfo>::new(allocator),
-            context: Context { allocator, base_path: str { ptr: 0, length: 0 }, path: str { ptr: 0, length: 0 }, pos: 0, tokens: 0, length: 0, offset: 0, analysis: 0, type_self: 0, pointer_const_char: Indirect { type: IndirectType::Reference, to: Type::Primitive(0) }, types: HashMap<str, Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, scopes: Array<Scope> { allocator, data: 0, length: 0, capacity: 0 }, module: 0, root: 0, function: 0 },
+            context: Context { allocator, base_path: str { ptr: null, length: 0 }, path: str { ptr: null, length: 0 }, pos: 0, tokens: 0, length: 0, offset: 0, analysis: 0, type_self: 0, pointer_const_char: Indirect { type: IndirectType::Reference, to: Type::Primitive(0) }, types: HashMap<str, Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, scopes: Array<Scope> { allocator, data: 0, length: 0, capacity: 0 }, module: 0, root: 0, function: 0 },
             tokens: Array<Token> { allocator, data: 0, length: 0, capacity: 0 },
             mode_cpp: false,
         };
@@ -147,7 +147,7 @@ impl Module {
 
                 let include_ptr = includes.find(&path.value);
                 let include: &Include = 0;
-                if include_ptr != 0 { include = *include_ptr;}
+                if include_ptr != null { include = *include_ptr;}
 
                 if include == 0 {
                     include = Include::new(self.root, path.value, self.mode_cpp);
@@ -155,7 +155,7 @@ impl Module {
                     includes.insert(path.value, include);
                 }
 
-                if self.includes.find(&path.value) == 0 {
+                if self.includes.find(&path.value) == null {
                     self.includes.insert(path.value, include);
                 }
             } else if token.eq(TokenType::Keyword, "enum") {
@@ -209,7 +209,7 @@ impl Module {
                 // Build namespace prefix by walking up the hierarchy
                 let ns_prefix = String::new(allocator);
                 let cur_ns: *Namespace = self.namespace;
-                while cur_ns.parent != 0 {
+                while cur_ns.parent != null {
                     ns_prefix.prepend("__");
                     ns_prefix.prepend(cur_ns.name);
                     cur_ns = cur_ns.parent;
@@ -325,7 +325,7 @@ impl Module {
         let parts_iter = path.parts.iter();
         parts_iter.next();
         let first_part = *parts_iter.value();
-        let namespace: *Namespace = 0;
+        let namespace: *Namespace = null;
 
         if path.root {
             namespace = self.root.find_namespace(first_part.value);
@@ -333,14 +333,14 @@ impl Module {
             namespace = self.namespace.find_namespace(first_part.value);
         }
 
-        if namespace == 0 {
+        if namespace == null {
             self.context.error_token(first_part, "Unable to find namespace");
             return false;
         }
 
         for *part in parts_iter {
             let child = namespace.children.find(&part.value);
-            if child == 0 {
+            if child == null {
                 self.context.error_token(part, "Unable to find namespace");
                 return false;
             }
@@ -572,25 +572,25 @@ impl Module {
 
     fn find_type(&self, name: str) -> *Type {
         let type: *Type = self.types.find(&name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         type = self.namespace.find_type(name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         for *namespace in self.used_namespaces {
             type = namespace.find_type(name);
-            if type != 0 { return type; }
+            if type != null { return type; }
         }
 
         type = self.namespace.root.find_type(name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         for (_, include) in self.includes {
             type = include.types.find(&name);
-            if type != 0 { return type; }
+            if type != null { return type; }
         }
 
-        return 0;
+        return null;
     }
 
     fn find_trait(&self, name: str) -> &Trait {
@@ -625,18 +625,18 @@ impl Module {
 
     fn find_value(&self, name: str) -> &Type {
         let type = self.global_types.find(&name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         for *namespace in self.used_namespaces {
             for (_, module) in namespace.modules {
                 type = module.global_types.find(&name);
-                if type != 0 { return type; }
+                if type != null { return type; }
             }
         }
 
         for (_, include) in self.includes {
             type = include.values.find(&name);
-            if type != 0 { return type; }
+            if type != null { return type; }
         }
 
         return 0;

@@ -213,7 +213,7 @@ impl Tokenizer {
         if file == 0 {
             fprintf(stderr, "Unable to open file: %s\n", filename);
             perror("fopen");
-            return str { ptr: 0, length: 0 };
+            return str { ptr: null, length: 0 };
         }
 
         fseek(file, 0, SEEK_END);
@@ -222,10 +222,10 @@ impl Tokenizer {
 
         let buffer: *char = allocator.alloc(length + 1);
 
-        if buffer == 0 {
+        if buffer == null {
             perror("Memory allocation failed");
             fclose(file);
-            return str { ptr: 0, length: 0 };
+            return str { ptr: null, length: 0 };
         }
 
         let read_length: usize = fread(buffer, 1, length, file);
@@ -234,7 +234,7 @@ impl Tokenizer {
             perror("Error reading file");
             allocator.free(buffer);
             fclose(file);
-            return str { ptr: 0, length: 0 };
+            return str { ptr: null, length: 0 };
         }
 
         buffer[length] = '\0';

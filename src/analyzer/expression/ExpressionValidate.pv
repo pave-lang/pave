@@ -21,7 +21,7 @@ impl Expression {
                 for arg in arguments {
                     let param = struct_info.fields.find(&arg.name.value);
 
-                    if param == 0 {
+                    if param == null {
                         context.error_token(arg.name, "Unable to find field in struct");
                         return false;
                     }
@@ -30,7 +30,7 @@ impl Expression {
 
                     if generic_map2.map.length > 0 {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
-                    } else if generic_map != 0 {
+                    } else if generic_map != null {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
                     }
 
@@ -107,7 +107,7 @@ impl Expression {
 
                     if generic_map2.map.length > 0 {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
-                    } else if generic_map != 0 {
+                    } else if generic_map != null {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
                     }
 
@@ -171,7 +171,7 @@ impl Expression {
                 }
 
                 let param_type = variant.types.data + field_i;
-                if generic_map != 0 {
+                if generic_map != null {
                     param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
                 }
 
@@ -193,7 +193,7 @@ impl Expression {
             let arg = args_iter.value();
             let param_type = param_iter.value();
 
-            if generic_map != 0 {
+            if generic_map != null {
                 param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
             }
 

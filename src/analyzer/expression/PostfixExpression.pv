@@ -29,7 +29,7 @@ impl Expression {
         if !context.expect_value(TokenType::Symbol, ".") { return false; }
 
         let member_name = context.current();
-        if member_name == 0 { return 0; }
+        if member_name == null { return 0; }
 
         if member_name.type != TokenType::Number && member_name.type != TokenType::Identifier {
             context.error("Unexpected token, expected Identifier or Number");
@@ -93,7 +93,7 @@ impl Expression {
                 return Expression::make_type_function_call(context, member_name, member_type, arguments, generic_map);
             }
         } else {
-            if generic_map != 0 {
+            if generic_map != null {
                 member_type = Context::resolve_type(context.allocator, member_type, generic_map, 0);
             }
 
@@ -239,7 +239,7 @@ impl Expression {
                         }
                     }
 
-                    if !Expression::validate_arguments(context, token, &inner.return_type, &arguments, 0, false) { return 0; }
+                    if !Expression::validate_arguments(context, token, &inner.return_type, &arguments, null, false) { return 0; }
 
                     return Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), &func_info.return_type);
                 },

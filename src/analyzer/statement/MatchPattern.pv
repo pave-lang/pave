@@ -36,7 +36,7 @@ impl MatchPattern {
             if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
             let token = context.current();
-            if token == 0 { return false; }
+            if token == null { return false; }
 
             if token.type != TokenType::String && token.type != TokenType::Number {
                 context.error_token(token, "Expected a string or number literal");
@@ -52,7 +52,7 @@ impl MatchPattern {
         }
 
         let token = context.current();
-        if token == 0 { return false; }
+        if token == null { return false; }
 
         if token.type == TokenType::Number {
             context.next_token();
@@ -66,7 +66,7 @@ impl MatchPattern {
         if token.eq(TokenType::Symbol, "-") {
             context.next_token();
             let num_token = context.current();
-            if num_token == 0 || num_token.type != TokenType::Number {
+            if num_token == null || num_token.type != TokenType::Number {
                 context.error_token(token, "Expected a number after '-'");
                 return false;
             }
@@ -137,7 +137,7 @@ impl MatchPattern {
                         let variable = context.expect(TokenType::Identifier);
                         if variable == 0 { context.pop_scope(); return false; }
 
-                        parameters.append(EnumVariantParameter { ref, variable, field_name: str { ptr: 0, length: 0 } });
+                        parameters.append(EnumVariantParameter { ref, variable, field_name: str { ptr: null, length: 0 } });
 
                         let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, 0);
                         if variable_type == 0 { return false; }

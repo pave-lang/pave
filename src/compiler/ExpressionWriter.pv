@@ -565,6 +565,10 @@ impl ExpressionWriter {
                 g.write_literal(file, &expression.return_type, value);
                 return true;
             },
+            ExpressionData::NullLiteral => {
+                fprintf(file, "0");
+                return true;
+            },
             ExpressionData::Invoke(target, &arguments) => {
                 return self.write_invoke(file, target, arguments, generics);
             },
@@ -625,7 +629,7 @@ impl ExpressionWriter {
                     Type::Struct(struct_info, _) => {
                         for *impl_info in struct_info.impls {
                             let impl_const_ptr = impl_info.consts.find(&member);
-                            if impl_const_ptr != 0 {
+                            if impl_const_ptr != null {
                                 let parent_name = g.naming_ident.get_type_name(parent_type, parent_type, generics);
                                 g.write_str_title(file, parent_name.as_str());
                                 fprintf(file, "_");
@@ -637,7 +641,7 @@ impl ExpressionWriter {
                     Type::Enum(enum_info, _) => {
                         for *impl_info in enum_info.impls {
                             let impl_const_ptr = impl_info.consts.find(&member);
-                            if impl_const_ptr != 0 {
+                            if impl_const_ptr != null {
                                 let parent_name = g.naming_ident.get_type_name(parent_type, parent_type, generics);
                                 g.write_str_title(file, parent_name.as_str());
                                 fprintf(file, "_");

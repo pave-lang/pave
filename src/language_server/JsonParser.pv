@@ -4,170 +4,160 @@
 use std
 
 struct JsonParser {
-  allocator: &ArenaAllocator,
-  data: str,
-  pos: usize,
+    allocator: &ArenaAllocator,
+    data: str,
+    pos: usize,
 }
 
 impl JsonParser {
-  fn undefined() -> &JsonNode {
-    let static value = JsonNode::Undefined;
-    return &value;
-  }
+    fn parse(allocator: &ArenaAllocator, root: &JsonNode, data: str) -> bool {
+        if data.ptr == null || data.length == 0 { return false; }
 
-  fn null() -> &JsonNode {
-    let static value = JsonNode::Null;
-    return &value;
-  }
+        let self = JsonParser { allocator, data, pos: 0 };
 
-  fn parse(allocator: &ArenaAllocator, root: &JsonNode, data: str) -> bool {
-    if data.ptr == 0 || data.length == 0 { return false; }
+        if self.check("[") {
+            return self.parse_array(root);
+        } else if self.check("{") {
+            return self.parse_object(root);
+        }
 
-    let self = JsonParser { allocator, data, pos: 0 };
-
-    if self.check("[") {
-      return self.parse_array(root);
-    } else if self.check("{") {
-      return self.parse_object(root);
+        return false;
     }
 
-    return false;
-  }
+    fn parse_array(&self, node: &JsonNode) -> bool {
+        let data = Array<JsonNode>::new(self.allocator);
 
-  fn parse_array(&self, node: &JsonNode) -> bool {
-    let data = Array<JsonNode>::new(self.allocator);
+        if !self.expect("[") { return false; }
+        if self.expect("]") {
+            *node = JsonNode::Array(data);
+            return true;
+        }
 
-    if !self.expect("[") { return false; }
-    if self.expect("]") {
-      *node = JsonNode::Array(data);
-      return true;
+        let first = true;
+        while first || self.expect(",") {
+            first = false;
+            let element = JsonNode::Undefined;
+            if !self.parse_any(&element) { return false; }
+            data.append(element);
+        }
+
+        if !self.expect("]") { return false; }
+
+        *node = JsonNode::Array(data);
+        return true;
     }
 
-    let first = true;
-    while first || self.expect(",") {
-      first = false;
-      let element = JsonNode::Undefined;
-      if !self.parse_any(&element) { return false; }
-      data.append(element);
+    fn parse_object(&self, node: &JsonNode) -> bool {
+        let data = HashMap<str, JsonNode>::new(self.allocator);
+
+        if !self.expect("{") { return false; }
+        if self.expect("}") {
+            *node = JsonNode::Object(data);
+            return true;
+        }
+
+        let first = true;
+        while first || self.expect(",") {
+            first = false;
+            let key = String::new(self.allocator);
+            if !self.parse_string(&key) { return false; }
+
+            if !self.expect(":") { return false; }
+
+            let value = JsonNode::Undefined;
+            if !self.parse_any(&value) { return false; }
+
+            data.insert(key.as_str(), value);
+        }
+
+        if !self.expect("}") { return false; }
+
+        *node = JsonNode::Object(data);
+        return true;
     }
 
-    if !self.expect("]") { return false; }
+    fn parse_string(&self, value: &String) -> bool {
+        if !self.expect("\"") { return false; }
 
-    *node = JsonNode::Array(data);
-    return true;
-  }
+        let start = self.pos;
+        while self.pos < self.data.length && self.data.ptr[self.pos] != '\"' {
+            let c = self.data.ptr[self.pos];
+            
+            if c == '\\' {
+                value.append(self.data.slice(start, self.pos));
+                self.pos += 1;
+                if self.pos >= self.data.length { return false; }
 
-  fn parse_object(&self, node: &JsonNode) -> bool {
-    let data = HashMap<str, JsonNode>::new(self.allocator);
+                c = self.data.ptr[self.pos];
 
-    if !self.expect("{") { return false; }
-    if self.expect("}") {
-      *node = JsonNode::Object(data);
-      return true;
+                if c == '"' { value.append("\""); }
+                if c == 'r' { value.append("\r"); }
+                if c == 'n' { value.append("\n"); }
+
+                self.pos += 1;
+                start = self.pos;
+                continue;
+            }
+
+            self.pos += 1;
+        }
+
+        if !self.expect("\"") { return false; }
+
+        value.append(self.data.slice(start, self.pos - 1));
+        return true;
     }
 
-    let first = true;
-    while first || self.expect(",") {
-      first = false;
-      let key = String::new(self.allocator);
-      if !self.parse_string(&key) { return false; }
+    fn parse_number(&self, node: &JsonNode) -> bool {
+        let start = self.data.ptr + self.pos;
+        let end: *char = null;
 
-      if !self.expect(":") { return false; }
+        let value: f64 = strtod(start, &end);
+        if start == end { return false; }
+        self.pos += end - start;
 
-      let value = JsonNode::Undefined;
-      if !self.parse_any(&value) { return false; }
-
-      data.insert(key.as_str(), value);
+        *node = JsonNode::Number(value);
+        return true;
     }
 
-    if !self.expect("}") { return false; }
+    fn parse_any(&self, node: &JsonNode) -> bool {
+        if self.check("[") {
+            return self.parse_array(node);
+        } else if self.check("{") {
+            return self.parse_object(node);
+        } else if self.check("\"") {
+            let value = String::new(self.allocator);
+            if !self.parse_string(&value) { return false; }
+            *node = JsonNode::String(value.as_str());
+            return true;
+        } else if '0' <= self.data.ptr[self.pos] && self.data.ptr[self.pos] <= '9' {
+            return self.parse_number(node);
+        } else if self.expect("true") {
+            *node = JsonNode::Boolean(true);
+            return true;
+        } else if self.expect("false") {
+            *node = JsonNode::Boolean(false);
+            return true;
+        } else if self.expect("null") {
+            *node = JsonNode::Null;
+            return true;
+        }
 
-    *node = JsonNode::Object(data);
-    return true;
-  }
-
-  fn parse_string(&self, value: &String) -> bool {
-    if !self.expect("\"") { return false; }
-
-    let start = self.pos;
-    while self.pos < self.data.length && self.data.ptr[self.pos] != '\"' {
-      let c = self.data.ptr[self.pos];
-      
-      if c == '\\' {
-        value.append(self.data.slice(start, self.pos));
-        self.pos += 1;
-        if self.pos >= self.data.length { return false; }
-
-        c = self.data.ptr[self.pos];
-
-        if c == '"' { value.append("\""); }
-        if c == 'r' { value.append("\r"); }
-        if c == 'n' { value.append("\n"); }
-
-        self.pos += 1;
-        start = self.pos;
-        continue;
-      }
-
-      self.pos += 1;
+        return false;
     }
 
-    if !self.expect("\"") { return false; }
-
-    value.append(self.data.slice(start, self.pos - 1));
-    return true;
-  }
-
-  fn parse_number(&self, node: &JsonNode) -> bool {
-    let start = self.data.ptr + self.pos;
-    let end: *char = 0;
-
-    let value: f64 = strtod(start, &end);
-    if start == end { return false; }
-    self.pos += end - start;
-
-    *node = JsonNode::Number(value);
-    return true;
-  }
-
-  fn parse_any(&self, node: &JsonNode) -> bool {
-    if self.check("[") {
-      return self.parse_array(node);
-    } else if self.check("{") {
-      return self.parse_object(node);
-    } else if self.check("\"") {
-      let value = String::new(self.allocator);
-      if !self.parse_string(&value) { return false; }
-      *node = JsonNode::String(value.as_str());
-      return true;
-    } else if '0' <= self.data.ptr[self.pos] && self.data.ptr[self.pos] <= '9' {
-      return self.parse_number(node);
-    } else if self.expect("true") {
-      *node = JsonNode::Boolean(true);
-      return true;
-    } else if self.expect("false") {
-      *node = JsonNode::Boolean(false);
-      return true;
-    } else if self.expect("null") {
-      *node = JsonNode::Null;
-      return true;
+    fn check(&self, value: *const char) -> bool {
+        let len: usize = strlen(value);
+        let slice = self.data.slice(self.pos, self.pos + len);
+        return slice.eq_len(value, len);
     }
 
-    return false;
-  }
+    fn expect(&self, value: *const char) -> bool {
+        let len: usize = strlen(value);
+        let slice = self.data.slice(self.pos, self.pos + len);
 
-  fn check(&self, value: *const char) -> bool {
-    let len: usize = strlen(value);
-    let slice = self.data.slice(self.pos, self.pos + len);
-    return slice.eq_len(value, len);
-  }
-
-  fn expect(&self, value: *const char) -> bool {
-    let len: usize = strlen(value);
-    let slice = self.data.slice(self.pos, self.pos + len);
-
-    let eq = slice.eq_len(value, len);
-    if eq { self.pos += len; }
-    return eq;
-  }
+        let eq = slice.eq_len(value, len);
+        if eq { self.pos += len; }
+        return eq;
+    }
 }

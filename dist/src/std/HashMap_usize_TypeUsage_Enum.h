@@ -26,31 +26,34 @@ struct TypeUsage_Enum;
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__new(struct trait_Allocator allocator);
 
-#line 50 "src/std/HashMap.pv"
+#line 39 "src/std/HashMap.pv"
+struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__with_capacity(struct trait_Allocator allocator, uintptr_t capacity);
+
+#line 53 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Enum__resize(struct HashMap_usize_TypeUsage_Enum* self, uintptr_t new_capacity);
 
-#line 57 "src/std/HashMap.pv"
+#line 60 "src/std/HashMap.pv"
 struct TypeUsage_Enum* HashMap_usize_TypeUsage_Enum__find(struct HashMap_usize_TypeUsage_Enum* self, uintptr_t* key);
 
-#line 74 "src/std/HashMap.pv"
+#line 77 "src/std/HashMap.pv"
 struct TypeUsage_Enum* HashMap_usize_TypeUsage_Enum__insert(struct HashMap_usize_TypeUsage_Enum* self, uintptr_t key, struct TypeUsage_Enum value);
 
-#line 102 "src/std/HashMap.pv"
+#line 105 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Enum__remove(struct HashMap_usize_TypeUsage_Enum* self, uintptr_t* key);
 
-#line 126 "src/std/HashMap.pv"
+#line 129 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Enum__release(struct HashMap_usize_TypeUsage_Enum* self);
 
-#line 135 "src/std/HashMap.pv"
+#line 138 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Enum__fill_buckets(struct HashMap_usize_TypeUsage_Enum* self);
 
-#line 153 "src/std/HashMap.pv"
+#line 156 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__clone(struct HashMap_usize_TypeUsage_Enum* self, struct trait_Allocator allocator);
 
-#line 167 "src/std/HashMap.pv"
+#line 170 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__iter(struct HashMap_usize_TypeUsage_Enum* self);
 
-#line 174 "src/std/HashMap.pv"
+#line 177 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Enum__clear(struct HashMap_usize_TypeUsage_Enum* self);
 
 #endif

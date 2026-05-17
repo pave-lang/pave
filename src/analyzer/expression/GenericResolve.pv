@@ -38,7 +38,7 @@ impl Expression {
                             for *impl_info in struct_info.impls {
                                 if impl_info.trait_ != trait_info { continue; }
                                 let typedef_type = impl_info.typedefs.find(&typedef_name);
-                                if typedef_type != 0 {
+                                if typedef_type != null {
                                     generic_map.insert(typedef_name, *typedef_type);
                                 }
                             }

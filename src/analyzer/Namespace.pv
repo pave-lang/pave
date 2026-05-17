@@ -55,9 +55,9 @@ impl Namespace {
 
     fn find_namespace(&self, name: str) -> *Namespace {
         let child = self.children.find(&name);
-        if child != 0 { return *child; }
+        if child != null { return *child; }
 
-        if self.parent != 0 {
+        if self.parent != null {
             return self.parent.find_namespace(name);
         } else {
             return self.root.find_namespace(name);
@@ -65,7 +65,7 @@ impl Namespace {
     }
 
     fn add_module(&self, name: str) -> bool {
-        if self.modules.find(&name) != 0 {
+        if self.modules.find(&name) != null {
             return true;
         }
 
@@ -177,7 +177,7 @@ impl Namespace {
 
     fn find_trait(&self, name: str) -> &Trait {
         let trait_info = self.traits.find(&name);
-        if trait_info == 0 { return 0; }
+        if trait_info == null { return 0; }
         return *trait_info;
     }
 

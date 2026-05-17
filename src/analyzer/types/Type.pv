@@ -184,7 +184,7 @@ impl Type {
 
     fn to_ptr(&self, allocator: &ArenaAllocator) -> *Type {
         let type: &Type = allocator.alloc(sizeof(Type));
-        if type == 0 { return 0; }
+        if type == 0 { return null; }
 
         *type = *self;
         return type;
@@ -200,7 +200,7 @@ impl Type {
             _ => {},
         }
 
-        return 0;
+        return null;
     }
 
     fn eq(&self, other: &Type) -> bool {
@@ -321,7 +321,7 @@ impl Type {
             },
             Type::Trait(trait_info, _) => {
                 let trait_name: &Token = trait_info.name;
-                return other_struct.traits.find(&trait_name.value) != 0;
+                return other_struct.traits.find(&trait_name.value) != null;
             },
             Type::Self => { return true; },
             _ => { return false; },
@@ -639,27 +639,27 @@ impl Type {
 
     fn get_module(&self) -> *Module {
         match self {
-            Type::Primitive(_) => { return 0; },
-            Type::Indirect(_) => { return 0; },
-            Type::Sequence(_) => { return 0; },
-            Type::Tuple(_) => { return 0; },
+            Type::Primitive(_) => { return null; },
+            Type::Indirect(_) => { return null; },
+            Type::Sequence(_) => { return null; },
+            Type::Tuple(_) => { return null; },
             Type::Enum(enum_info, _) => { return enum_info.context.module; },
             Type::Struct(struct_info, _) => { return struct_info.module; },
             Type::Trait(trait_info, _) => { return trait_info.module; },
-            Type::Generic(_) => { return 0; },
-            Type::UnknownC(_) => { return 0; },
-            Type::Function(func_info, _) => { if func_info.context != 0 { return func_info.context.module; } else { return 0; } },
+            Type::Generic(_) => { return null; },
+            Type::UnknownC(_) => { return null; },
+            Type::Function(func_info, _) => { if func_info.context != 0 { return func_info.context.module; } else { return null; } },
             Type::CoroutineInstance(func_info, _) => { return func_info.context.module; },
-            Type::Self => { return 0; },
-            Type::TypedefC(_) => { return 0; },
-            Type::EnumC(_) => { return 0; },
-            Type::StructC(_) => { return 0; },
-            Type::UnionC(_) => { return 0; },
-            Type::FunctionC(_) => { return 0; },
-            Type::ClassCpp(_) => { return 0; },
-            Type::NamespaceCpp(_) => { return 0; },
+            Type::Self => { return null; },
+            Type::TypedefC(_) => { return null; },
+            Type::EnumC(_) => { return null; },
+            Type::StructC(_) => { return null; },
+            Type::UnionC(_) => { return null; },
+            Type::FunctionC(_) => { return null; },
+            Type::ClassCpp(_) => { return null; },
+            Type::NamespaceCpp(_) => { return null; },
             Type::Global(g) => { return g.module; },
-            Type::GenericTypedef(_) => { return 0; },
+            Type::GenericTypedef(_) => { return null; },
         }
     }
 }

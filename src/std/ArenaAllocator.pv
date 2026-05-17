@@ -42,7 +42,7 @@ impl ArenaBlock {
         let total_size: usize = header_size + size;
 
         if self.offset + total_size > self.capacity {
-            return 0;
+            return null;
         }
 
         let header_ptr: &void = self.buffer + self.offset;
@@ -107,7 +107,7 @@ impl ArenaBlock {
         if data + header.size == self.buffer + self.offset {
             if self.offset - header.size + size > self.capacity {
                 // self.free(ptr);
-                return 0;
+                return null;
             }
 
             self.offset = self.offset - header.size + size;
@@ -116,9 +116,9 @@ impl ArenaBlock {
         }
 
         let new_ptr: *void = self.alloc(size);
-        if new_ptr == 0 {
+        if new_ptr == null {
             // self.free(ptr);
-            return 0;
+            return null;
         }
 
         memcpy(new_ptr, ptr, header.size);
@@ -165,7 +165,7 @@ impl ArenaAllocator {
 
     fn store<T>(&self, value: *T) -> *T {
         let new_memory: *T = self.alloc(sizeof(T));
-        if new_memory == 0 { return 0; }
+        if new_memory == null { return null; }
 
         memcpy(new_memory, value, sizeof(T));
         return new_memory;
@@ -184,10 +184,10 @@ impl Allocator for ArenaAllocator {
         }
 
         let ptr = self.last_block.alloc(size);
-        if ptr != 0 { return ptr; }
+        if ptr != null { return ptr; }
 
         let block = ArenaBlock::new(self.allocator, self.block_size, self.last_block);
-        if block == 0 { return 0; }
+        if block == 0 { return null; }
 
         self.last_block = block;
         return self.last_block.alloc(size);
@@ -204,7 +204,7 @@ impl Allocator for ArenaAllocator {
                 let old_size = oversize.size;
 
                 let new_ptr = self.alloc(new_size);
-                if new_ptr == 0 { return 0; }
+                if new_ptr == null { return null; }
 
                 if new_size < old_size {
                     memcpy(new_ptr, ptr, new_size);
@@ -225,7 +225,7 @@ impl Allocator for ArenaAllocator {
         while current_block == 0 && block != 0 {
             if block.is_in_block(ptr) {
                 let realloc_ptr = block.realloc(ptr, new_size);
-                if realloc_ptr != 0 { return realloc_ptr; }
+                if realloc_ptr != null { return realloc_ptr; }
                 current_block = block;
             }
 
@@ -234,13 +234,13 @@ impl Allocator for ArenaAllocator {
 
         if current_block == 0 {
             fprintf(stderr, "ArenaAllocator.realloc: No block found to reallocate from\n");
-            return 0;
+            return null;
         }
 
         let old_size = current_block.size(ptr);
 
         let new_ptr = self.alloc(new_size);
-        if new_ptr == 0 { return 0; }
+        if new_ptr == null { return null; }
 
         memcpy(new_ptr, ptr, if new_size < old_size { new_size } else { old_size });
         current_block.free(ptr);

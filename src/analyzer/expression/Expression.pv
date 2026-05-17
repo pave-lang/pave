@@ -1,3 +1,5 @@
+#include "stdlib.h"
+
 use std
 use analyzer
 use types
@@ -67,7 +69,7 @@ impl Expression {
                         result = Expression::make_next(context, Expression {
                             token,
                             return_type: Type::Generic(generic),
-                            data: ExpressionData::Variable(str { ptr: 0, length: 0 }),
+                            data: ExpressionData::Variable(str { ptr: null, length: 0 }),
                         });
 
                         result.data = ExpressionData::Type(&result.return_type);
@@ -108,7 +110,7 @@ impl Expression {
                                 func_type = context.root.make_type_usage(func_type, &func_generics.array);
                             }
 
-                            if !Expression::validate_arguments(context, token, func_type, &arguments, 0, false) { return 0; }
+                            if !Expression::validate_arguments(context, token, func_type, &arguments, null, false) { return 0; }
 
                             let func_return_type: &Type = 0;
                             match func_type {
@@ -311,7 +313,7 @@ impl Expression {
                             tuple.elements.data[i] = expr.value.return_type;
                         }
 
-                        result = Expression::make_type_function_call(context, token, context.allocator.store(&Type::Tuple(tuple)), arguments, 0);
+                        result = Expression::make_type_function_call(context, token, context.allocator.store(&Type::Tuple(tuple)), arguments, null);
                     } else {
                         if !context.expect_value(TokenType::Symbol, ")") { return 0; }
 
@@ -331,6 +333,18 @@ impl Expression {
 
                         if element_type == 0 {
                             element_type = &element.return_type;
+                        }
+
+                        if context.check_next(TokenType::Symbol, ";") {
+                            let count_token = context.expect(TokenType::Number);
+                            if count_token == 0 { return 0; }
+                            let count: usize = strtoul(count_token.value.ptr, 0, 10);
+                            let i: usize = 1;
+                            while i < count {
+                                elements.append(InvokeArgument { name: 0, value: element });
+                                i += 1;
+                            }
+                            break;
                         }
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "]") {
@@ -361,7 +375,7 @@ impl Expression {
                 } else if token.value.eq("null") {
                     result = Expression::make_next(context, Expression {
                         token,
-                        data: ExpressionData::Literal(str { ptr: "0", length: 1 }),
+                        data: ExpressionData::NullLiteral,
                         return_type: Type::Primitive(context.module.find_primitive("i32")),
                     });
                 } else if token.value.eq("if") {
@@ -436,6 +450,48 @@ impl Expression {
 
     fn validate_type(&self, context: &Context, type: &Type, apply_implicit_cast: bool) -> bool {
         let success = true;
+
+        match self.data {
+            ExpressionData::NullLiteral => {
+                match type {
+                    Type::Indirect(indirect) => {
+                        match indirect.type {
+                            IndirectType::Reference => {
+                                context.error_token(self.token, "null can only be used with * types, not & types");
+                                return false;
+                            },
+                            IndirectType::DynamicDispatch => {
+                                context.error_token(self.token, "null can only be used with * types, not & types");
+                                return false;
+                            },
+                            _ => { return true; },
+                        }
+                    },
+                    _ => {},
+                }
+            },
+            ExpressionData::Literal(value) => {
+                if value.eq("0") {
+                    match type {
+                        Type::Indirect(indirect) => {
+                            match indirect.type {
+                                IndirectType::Pointer => {
+                                    context.error_token(self.token, "use null instead of 0 for pointer types");
+                                    return false;
+                                },
+                                IndirectType::ConstPointer => {
+                                    context.error_token(self.token, "use null instead of 0 for pointer types");
+                                    return false;
+                                },
+                                _ => {},
+                            }
+                        },
+                        _ => {},
+                    }
+                }
+            },
+            _ => {},
+        }
 
         match self.data {
             ExpressionData::UnaryExpression(operator, child) => {

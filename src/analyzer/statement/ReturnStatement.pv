@@ -13,7 +13,7 @@ impl ReturnStatement {
         let defer_statements: Array<DeferStatement> = context.get_defer_statements();
 
         let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "return") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "return") { return null; }
 
         if context.check_next(TokenType::Symbol, ";") {
             if !context.function.return_type.is_void() {
@@ -27,8 +27,8 @@ impl ReturnStatement {
         }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return 0; }
-        if !context.expect_value(TokenType::Symbol, ";") { return 0; }
+        if expression == 0 { return null; }
+        if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
         expression.validate_type(context, &context.function.return_type, true);
 

@@ -50,7 +50,7 @@ impl GenericMap {
     }
 
     fn has(&self, name: str) -> bool {
-        return self.map.find(&name) != 0;
+        return self.map.find(&name) != null;
     }
 
     fn insert(&self, name: str, type: Type) -> bool {

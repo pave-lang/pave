@@ -58,7 +58,7 @@ impl<K: Hash, V> HashMap<K, V> {
     }
 
     fn find(&self, key: &K) -> *V {
-        if self.capacity == 0 { return 0; }
+        if self.capacity == 0 { return null; }
 
         let hash = (*key).hash();
         let bucket_index: usize = hash._0 % self.capacity;
@@ -71,12 +71,12 @@ impl<K: Hash, V> HashMap<K, V> {
             current_bucket_node = current_bucket_node.next;
         }
 
-        return 0;
+        return null;
     }
 
     fn insert(&self, key: K, value: V) -> &V {
         let existing_value = self.find(&key);
-        if existing_value != 0 {
+        if existing_value != null {
             *existing_value = value;
             return existing_value;
         }

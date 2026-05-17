@@ -22,7 +22,7 @@ impl DefinitionWriter {
             generator.write_indent(file);
             generator.write_enum_variant_name(file, generics.self_type, variant);
 
-            if variant.value != 0 {
+            if variant.value != null {
                 fprintf(file, " = ");
                 ExpressionWriter { generator }.write_expression(file, variant.value, generics);
             }
@@ -62,7 +62,7 @@ impl DefinitionWriter {
 
     fn write_trait_default_decls(&self, file: &FILE, name: str, impl_info: &Impl, trait_info: &Trait, generics: &GenericMap) -> bool {
         for (func_base_name, &func_info) in trait_info.functions {
-            if impl_info.functions.find(&func_base_name) != 0 { continue; }
+            if impl_info.functions.find(&func_base_name) != null { continue; }
 
             fprintf(file, "\n");
             if !self.write_trait_function_decl(file, name, trait_info, &impl_info.trait_type, func_info, generics) { return false; }
@@ -536,7 +536,7 @@ impl DefinitionWriter {
 
                 if impl_functions_for_impl != 0 {
                     let function_usage = impl_functions_for_impl.find(&func_ptr);
-                    if function_usage != 0 {
+                    if function_usage != null {
                         for usage_context in function_usage.usage_contexts {
                             include_writer.write(file, generator, &usage_context.signature, usage_context.generic_map, false);
 
@@ -1039,7 +1039,7 @@ impl DefinitionWriter {
 
             if trait_info != 0 {
                 for (func_base_name, &func_info) in trait_info.functions {
-                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    if impl_info.functions.find(&func_base_name) != null { continue; }
 
                     fprintf(file, "\n");
                     if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, &impl_info.trait_type, generics, module, 0) { return false; }

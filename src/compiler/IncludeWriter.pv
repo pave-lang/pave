@@ -110,7 +110,7 @@ impl IncludeWriter {
                         },
                         FunctionParent::Primitive(primitive_info, _, _) => {
                             let name = primitive_info.name;
-                            let path = generator.make_rel_path(0, name, "");
+                            let path = generator.make_rel_path(null, name, "");
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                         },
                         FunctionParent::Trait(_) => {},

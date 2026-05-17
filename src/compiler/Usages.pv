@@ -405,7 +405,7 @@ impl Usages {
             let trait_info = impl_info.trait_;
             if trait_info != 0 {
                 for (func_base_name, &func_info) in trait_info.functions {
-                    if impl_info.functions.find(&func_base_name) != 0 { continue; }
+                    if impl_info.functions.find(&func_base_name) != null { continue; }
                     self.process_function(func_info, generic_map);
                 }
             }
@@ -426,7 +426,7 @@ impl Usages {
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
-        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: 0, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
+        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
@@ -435,7 +435,7 @@ impl Usages {
 
         let parent_ptr = cast<usize>(sequence);
         let parent_usage = self.sequences.find(&parent_ptr);
-        if parent_usage == 0 {
+        if parent_usage == null {
             parent_usage = self.sequences.insert(parent_ptr, TypeUsage<Sequence>::new(self.allocator, sequence, 0));
         }
         self.usage_context = parent_usage.add_usage(generic_map);
@@ -457,13 +457,13 @@ impl Usages {
     }
 
     fn process_tuple(&self, tuple: &Tuple) {
-        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: 0, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
+        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         let tuple_type = Type::Tuple(tuple);
 
         let parent_ptr = cast<usize>(tuple);
         let parent_usage = self.tuples.find(&parent_ptr);
-        if parent_usage == 0 {
+        if parent_usage == null {
             parent_usage = self.tuples.insert(parent_ptr, TypeUsage<Tuple>::new(self.allocator, tuple, 0));
         }
         self.usage_context = parent_usage.add_usage(generic_map);
@@ -767,6 +767,7 @@ impl Usages {
             },
             ExpressionData::Type(type) => { self.add_type(type, generic_map); },
             ExpressionData::Literal(_) => {},
+            ExpressionData::NullLiteral => {},
             ExpressionData::Variable(_) => {},
             ExpressionData::UnaryExpression(_, inner) => {
                 self.process_expression(inner, generic_map);

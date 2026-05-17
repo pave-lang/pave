@@ -183,10 +183,10 @@ impl Include {
         let type_u32 = cast<u32>(type.kind);
         let lookup = self.cxtype_to_type.find(&type_u32);
 
-        if lookup != 0 {
+        if lookup != null {
             return lookup;
         }
-        
+
         if type.kind == CXType_Pointer {
             let pointee_type = clang_getPointeeType(type);
             let is_pointee_const = clang_isConstQualifiedType(pointee_type) != 0;
@@ -223,7 +223,7 @@ impl Include {
                     let ns_type = current_types.find(ns_name);
                     clang_disposeString(ns_spelling);
 
-                    if ns_type == 0 { return &self.root.type_unknown; }
+                    if ns_type == null { return &self.root.type_unknown; }
 
                     match ns_type {
                         Type::NamespaceCpp(ns_info) => { current_types = &ns_info.types; },
@@ -237,7 +237,7 @@ impl Include {
                 let lookup = current_types.find(name);
                 clang_disposeString(name_spelling);
 
-                if lookup != 0 { return lookup; }
+                if lookup != null { return lookup; }
                 return &self.root.type_unknown;
             }
 
@@ -245,7 +245,7 @@ impl Include {
             let name = clang_getCString(name_spelling);
 
             let resolve = self.typedef_to_type.find(name);
-            if resolve != 0 {
+            if resolve != null {
                 clang_disposeString(name_spelling);
                 return resolve;
             }
@@ -253,7 +253,7 @@ impl Include {
             let lookup = self.types.find(name);
             clang_disposeString(name_spelling);
 
-            if lookup == 0 { return &self.root.type_unknown; }
+            if lookup == null { return &self.root.type_unknown; }
             return lookup;
         }
 
@@ -289,7 +289,7 @@ impl Include {
         let range: CXSourceRange = clang_getCursorExtent(cursor);
         let tu: CXTranslationUnit = clang_Cursor_getTranslationUnit(cursor);
 
-        let tokens: *CXToken = 0;
+        let tokens: *CXToken = null;
         let num_tokens: u32 = 0;
         clang_tokenize(tu, range, &tokens, &num_tokens);
 

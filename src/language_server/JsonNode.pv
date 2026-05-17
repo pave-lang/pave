@@ -13,6 +13,9 @@ enum JsonNode {
 }
 
 impl JsonNode {
+    const UNDEFINED = JsonNode::Undefined;
+    const NULL = JsonNode::Null;
+
     fn is_array(&self) -> bool {
         match self {
             JsonNode::Array(_) => { return true; },
@@ -31,12 +34,12 @@ impl JsonNode {
         match self {
             JsonNode::Object(&object) => {
                 let result = object.find(&key);
-                if result != 0 { return result; }
+                if result != null { return result; }
             },
             _ => {},
         }
 
-        return JsonParser::undefined();
+        return &JsonNode::UNDEFINED;
     }
 
     fn index(&self, i: usize) -> &JsonNode {
@@ -46,27 +49,27 @@ impl JsonNode {
             },
             _ => {},
         }
-        return JsonParser::undefined();
+        return &JsonNode::UNDEFINED;
     }
 
-    fn array(&self) -> &Array<JsonNode> {
+    fn array(&self) -> *Array<JsonNode> {
         match self {
             JsonNode::Array(&value) => {
                 return value;
             },
             _ => {},
         }
-        return 0;
+        return null;
     }
 
-    fn object(&self) -> &HashMap<str, JsonNode> {
+    fn object(&self) -> *HashMap<str, JsonNode> {
         match self {
             JsonNode::Object(&value) => {
                 return value;
             },
             _ => {},
         }
-        return 0;
+        return null;
     }
 
     fn string(&self) -> str {
@@ -76,7 +79,7 @@ impl JsonNode {
             },
             _ => {},
         }
-        return str { ptr: 0, length: 0 };
+        return str { ptr: null, length: 0 };
     }
 
     fn number(&self) -> f64 {

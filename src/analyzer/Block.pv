@@ -63,12 +63,12 @@ impl Block {
             hash("return") => {
                 let ret = ReturnStatement::parse(context, generics);
                 *data = StatementData::ReturnStatement(ret);
-                return ret != 0;
+                return ret != null;
             },
             hash("yield") => {
                 let yield_stmt = YieldStatement::parse(context, generics);
                 *data = StatementData::YieldStatement(yield_stmt);
-                return yield_stmt != 0;
+                return yield_stmt != null;
             },
             hash("if") => {
                 let if_stmt = IfStatement::parse(context, generics);
@@ -83,7 +83,7 @@ impl Block {
             hash("while") => {
                 let while_stmt = WhileStatement::parse(context, generics);
                 *data = StatementData::WhileStatement(while_stmt);
-                return while_stmt != 0;
+                return while_stmt != null;
             },
             hash("for") => {
                 let for_statement = ForStatement::parse(self, context, generics);
@@ -122,7 +122,7 @@ impl Block {
                 data = StatementData::BlockStatement(block);
             } else if first_token.eq(TokenType::Keyword, "defer") {
                 let defer_stmt = DeferStatement::parse(self, context, generics);
-                if defer_stmt == 0 {
+                if defer_stmt == null {
                     if new_scope { context.pop_scope(); }
                     return false;
                 }

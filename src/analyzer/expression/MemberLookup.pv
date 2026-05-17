@@ -16,7 +16,7 @@ impl Expression {
             },
             Type::Enum(enum_info, generic_map) => {
                 let variant = enum_info.variants.find(&token.value);
-                if variant != 0 {
+                if variant != null {
                     return EnumVariantResult::EnumVariant(variant);
                 }
 
@@ -29,7 +29,7 @@ impl Expression {
 
                 for *impl_info in enum_info.impls {
                     let impl_const_ptr = impl_info.consts.find(&token.value);
-                    if impl_const_ptr != 0 {
+                    if impl_const_ptr != null {
                         return EnumVariantResult::Const(*impl_const_ptr);
                     }
                 }
@@ -38,7 +38,7 @@ impl Expression {
             },
             Type::EnumC(enum_info) => {
                 let variant = enum_info.values.find(&token.value);
-                if variant == 0 {
+                if variant == null {
                     context.error_token(token, "Variant not found in enum");
                     return EnumVariantResult::None;
                 }
@@ -93,7 +93,7 @@ impl Expression {
 
                 for *impl_info in struct_info.impls {
                     let impl_const_ptr = impl_info.consts.find(&member.value);
-                    if impl_const_ptr != 0 {
+                    if impl_const_ptr != null {
                         let impl_const = *impl_const_ptr;
                         return context.allocator.store(&impl_const.type);
                     }
@@ -150,24 +150,24 @@ impl Expression {
             },
             Type::StructC(struct_info) => {
                 let field = struct_info.fields.find(&member.value);
-                if field != 0 { return &field.type; }
+                if field != null { return &field.type; }
 
                 if output_error { context.error_token(member, "Field not found in C struct"); }
                 return 0;
             },
             Type::UnionC(union_info) => {
                 let field = union_info.fields.find(&member.value);
-                if field != 0 { return &field.type; }
+                if field != null { return &field.type; }
 
                 if output_error { context.error_token(member, "Field not found in C union"); }
                 return 0;
             },
             Type::ClassCpp(class_info) => {
                 let field_type = class_info.fields.find(&member.value);
-                if field_type != 0 { return field_type; }
+                if field_type != null { return field_type; }
 
                 let value_type = class_info.values.find(&member.value);
-                if value_type != 0 { return value_type; }
+                if value_type != null { return value_type; }
 
                 for base in class_info.bases {
                     let base_type = Expression::get_member_type(context, base, member, output_error);
@@ -207,7 +207,7 @@ impl Expression {
 
                 let function: &Function = impl_info.find_function(member.value);
                 if function != 0 {
-                    let generic_map = GenericMap::new(context.allocator, &Generics { parent: 0, array: Array<Generic> { allocator: context.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 });
+                    let generic_map = GenericMap::new(context.allocator, &Generics { parent: null, array: Array<Generic> { allocator: context.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 });
                     generic_map.insert("T", sequence.element);
                     generic_map.self_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, Type::Sequence(sequence))));
 
@@ -233,10 +233,10 @@ impl Expression {
             },
             Type::NamespaceCpp(ns_info) => {
                 let type = ns_info.types.find(&member.value);
-                if type != 0 { return type; }
+                if type != null { return type; }
 
                 let value = ns_info.values.find(&member.value);
-                if value != 0 { return value; }
+                if value != null { return value; }
 
                 if output_error { context.error_token(member, "Namespace does not have this member"); }
 

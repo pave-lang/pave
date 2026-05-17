@@ -8,15 +8,15 @@ struct YieldStatement {
 
 impl YieldStatement {
     fn parse(context: &Context, generics: &Generics) -> *YieldStatement {
-        if !context.expect_value(TokenType::Keyword, "yield") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "yield") { return null; }
 
         if context.check_next(TokenType::Symbol, ";") {
             return context.allocator.store(&YieldStatement { expression: 0 });
         }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return 0; }
-        if !context.expect_value(TokenType::Symbol, ";") { return 0; }
+        if expression == 0 { return null; }
+        if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
         expression.validate_type(context, &context.function.return_type, true);
 

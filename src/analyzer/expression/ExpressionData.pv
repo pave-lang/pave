@@ -6,6 +6,7 @@ enum ExpressionData {
     EnumVariant(&EnumVariant),
     Type(&Type),
     Literal(str),
+    NullLiteral,
     Variable(str),
     BinaryExpression(&Expression, str, &Expression),
     UnaryExpression(str, &Expression),
