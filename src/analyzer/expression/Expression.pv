@@ -455,7 +455,7 @@ impl Expression {
 
         match self.data {
             ExpressionData::NullLiteral => {
-                match type {
+                match type.resolve_typedef() {
                     Type::Indirect(indirect) => {
                         match indirect.type {
                             IndirectType::Reference => {
@@ -484,7 +484,7 @@ impl Expression {
                                 IndirectType::ConstPointer => {
                                     context.error_token(self.token, "use null instead of 0 for pointer types");
                                     return false;
-                                },
+                                },does not match expression return type of
                                 _ => {},
                             }
                         },

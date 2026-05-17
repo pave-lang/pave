@@ -916,11 +916,11 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
         #line 457 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__NULL_LITERAL: {
             #line 458 "src/analyzer/expression/Expression.pv"
-            switch (type->type) {
+            switch (Type__resolve_typedef(type)->type) {
                 #line 459 "src/analyzer/expression/Expression.pv"
                 case TYPE__INDIRECT: {
                     #line 459 "src/analyzer/expression/Expression.pv"
-                    struct Indirect* indirect = type->indirect_value;
+                    struct Indirect* indirect = Type__resolve_typedef(type)->indirect_value;
                     #line 460 "src/analyzer/expression/Expression.pv"
                     switch (indirect->type) {
                         #line 461 "src/analyzer/expression/Expression.pv"
