@@ -40,7 +40,11 @@ impl Block {
             let value = Expression::parse(context, generics);
             if value == null { return false; }
 
-            value.validate_type(context, &expression.return_type, true);
+            let is_pointer_arithmetic = (operator.eq(TokenType::Symbol, "+=") || operator.eq(TokenType::Symbol, "-=")) && expression.return_type.is_pointer() && value.return_type.is_number();
+
+            if !is_pointer_arithmetic {
+                value.validate_type(context, &expression.return_type, true);
+            }
 
             let assignment = context.allocator.store(&AssignmentStatement { left: expression, operator, right: value });
             *data = StatementData::AssignmentStatement(assignment);

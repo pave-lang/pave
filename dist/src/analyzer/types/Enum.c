@@ -247,10 +247,7 @@ bool Enum__parse_variant(struct Enum* self) {
     };
 
     #line 158 "src/analyzer/types/Enum.pv"
-    if (HashMap_str_EnumVariant__insert(&self->variants, variant.name->value, variant) == 0) {
-        #line 158 "src/analyzer/types/Enum.pv"
-        return false;
-    }
+    HashMap_str_EnumVariant__insert(&self->variants, variant.name->value, variant);
 
     #line 160 "src/analyzer/types/Enum.pv"
     return true;

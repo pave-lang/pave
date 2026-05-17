@@ -32,10 +32,10 @@ struct Block* Block__new_ptr(struct Context* context);
 #line 32 "src/analyzer/Block.pv"
 bool Block__parse_expression_statement(struct Block* self, struct Context* context, struct Generics* generics, struct StatementData* data);
 
-#line 56 "src/analyzer/Block.pv"
+#line 60 "src/analyzer/Block.pv"
 bool Block__parse_keyword(struct Block* self, struct Context* context, struct Generics* generics, struct Token* first_token, struct StatementData* data);
 
-#line 110 "src/analyzer/Block.pv"
+#line 114 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif

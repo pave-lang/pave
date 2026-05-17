@@ -44,16 +44,16 @@ struct str Expression__number_primitive(struct str value);
 #line 42 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 397 "src/analyzer/expression/Expression.pv"
+#line 399 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 444 "src/analyzer/expression/Expression.pv"
+#line 446 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 451 "src/analyzer/expression/Expression.pv"
+#line 453 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 581 "src/analyzer/expression/Expression.pv"
+#line 583 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

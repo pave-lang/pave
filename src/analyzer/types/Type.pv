@@ -513,6 +513,13 @@ impl Type {
         }
     }
 
+    fn is_pointer(&self) -> bool {
+        match self {
+            Type::Indirect(indirect) => { return indirect.type == IndirectType::Pointer || indirect.type == IndirectType::ConstPointer; },
+            _ => { return false; },
+        }
+    }
+
     fn is_trait(&self) -> bool {
         match self {
             Type::Trait(_, _) => { return true; },
@@ -624,6 +631,14 @@ impl Type {
                 }
             },
             _ => { return false; },
+        }
+
+        return false;
+    }
+
+    fn is_number(&self) -> bool {
+        if let Type::Primitive(primitive_info) = self {
+            return primitive_info.is_number();
         }
 
         return false;

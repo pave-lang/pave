@@ -181,36 +181,42 @@ bool Type__is_function(struct Type* self);
 bool Type__is_indirect(struct Type* self);
 
 #line 516 "src/analyzer/types/Type.pv"
-bool Type__is_trait(struct Type* self);
+bool Type__is_pointer(struct Type* self);
 
 #line 523 "src/analyzer/types/Type.pv"
-bool Type__is_tuple(struct Type* self);
+bool Type__is_trait(struct Type* self);
 
 #line 530 "src/analyzer/types/Type.pv"
-bool Type__is_sequence(struct Type* self);
+bool Type__is_tuple(struct Type* self);
 
 #line 537 "src/analyzer/types/Type.pv"
-bool Type__is_sequence_fixed_array(struct Type* self);
+bool Type__is_sequence(struct Type* self);
 
 #line 544 "src/analyzer/types/Type.pv"
-struct Type* Type__deref_1(struct Type* self);
+bool Type__is_sequence_fixed_array(struct Type* self);
 
 #line 551 "src/analyzer/types/Type.pv"
+struct Type* Type__deref_1(struct Type* self);
+
+#line 558 "src/analyzer/types/Type.pv"
 bool Type__is_fat_pointer(struct Type* self);
 
-#line 562 "src/analyzer/types/Type.pv"
+#line 569 "src/analyzer/types/Type.pv"
 bool Type__is_reference_sequence_dynamic(struct Type* self);
 
-#line 572 "src/analyzer/types/Type.pv"
+#line 579 "src/analyzer/types/Type.pv"
 bool Type__is_iterator(struct Type* self);
 
-#line 581 "src/analyzer/types/Type.pv"
+#line 588 "src/analyzer/types/Type.pv"
 bool Type__needs_implicit_cast(struct Type* self, struct Type* other);
 
-#line 632 "src/analyzer/types/Type.pv"
-bool Type__is_primitive_or_c_type(struct Type* self);
+#line 639 "src/analyzer/types/Type.pv"
+bool Type__is_number(struct Type* self);
 
 #line 647 "src/analyzer/types/Type.pv"
+bool Type__is_primitive_or_c_type(struct Type* self);
+
+#line 660 "src/analyzer/types/Type.pv"
 struct Module* Type__get_module(struct Type* self);
 
 #endif

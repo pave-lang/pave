@@ -95,58 +95,58 @@ bool Generator__is_type_single_value_struct(struct Generator* self, struct Type*
 #line 191 "src/compiler/Generator.pv"
 struct Function* Generator__get_function(struct Generator* self, struct Type* type, struct str func_name, struct GenericMap* generic_map);
 
-#line 311 "src/compiler/Generator.pv"
+#line 293 "src/compiler/Generator.pv"
 bool Generator__write_enum_variant_name(struct Generator* self, FILE* file, struct Type* type, struct EnumVariant* variant);
 
-#line 322 "src/compiler/Generator.pv"
+#line 304 "src/compiler/Generator.pv"
 bool Generator__write_deref_if_needed(struct Generator* self, FILE* file, struct Type* type, struct GenericMap* generics);
 
-#line 337 "src/compiler/Generator.pv"
+#line 319 "src/compiler/Generator.pv"
 bool Generator__write_static_member_accessor(struct Generator* self, FILE* file, struct GenericMap* generics);
 
-#line 342 "src/compiler/Generator.pv"
+#line 324 "src/compiler/Generator.pv"
 bool Generator__write_instance_member_accessor(struct Generator* self, FILE* file, struct Type* type, struct GenericMap* generics);
 
-#line 363 "src/compiler/Generator.pv"
+#line 345 "src/compiler/Generator.pv"
 bool Generator__write_literal(struct Generator* self, FILE* file, struct Type* type, struct str value);
 
-#line 378 "src/compiler/Generator.pv"
+#line 360 "src/compiler/Generator.pv"
 bool Generator__write_typeid(struct Generator* self, FILE* file, struct Type* type, struct GenericMap* generics);
 
-#line 389 "src/compiler/Generator.pv"
+#line 371 "src/compiler/Generator.pv"
 void Generator__write_line_directive(struct Generator* self, FILE* file, struct Context* context, struct Token* token);
 
-#line 398 "src/compiler/Generator.pv"
+#line 380 "src/compiler/Generator.pv"
 void Generator__write_includes_raw(struct Generator* self, FILE* file, struct HashMap_str_ref_Include* includes);
 
-#line 411 "src/compiler/Generator.pv"
+#line 393 "src/compiler/Generator.pv"
 void Generator__write_impl_includes_raw(struct Generator* self, FILE* file, struct Array_ref_Impl* impls);
 
-#line 425 "src/compiler/Generator.pv"
+#line 407 "src/compiler/Generator.pv"
 void Generator__write_context_primitives(struct Generator* self, FILE* file, struct HashSet_str* primitives, struct HashSet_str* exclude_primitives);
 
-#line 444 "src/compiler/Generator.pv"
+#line 426 "src/compiler/Generator.pv"
 bool Generator__has_void_self_replacement(struct Parameter* parameter, struct GenericMap* generics);
 
-#line 473 "src/compiler/Generator.pv"
+#line 455 "src/compiler/Generator.pv"
 bool Generator__is_coroutine(struct Generator* self);
 
-#line 477 "src/compiler/Generator.pv"
+#line 459 "src/compiler/Generator.pv"
 void Generator__write_variable(struct Generator* self, FILE* file, struct str name);
 
-#line 482 "src/compiler/Generator.pv"
+#line 464 "src/compiler/Generator.pv"
 struct String Generator__make_path(struct Generator* self, struct Module* module, struct str name, struct str ext);
 
-#line 489 "src/compiler/Generator.pv"
+#line 471 "src/compiler/Generator.pv"
 struct String Generator__make_rel_path(struct Generator* self, struct Module* module, struct str name, struct str ext);
 
-#line 506 "src/compiler/Generator.pv"
+#line 488 "src/compiler/Generator.pv"
 void Generator__collect_primitive_includes(struct Generator* self, struct Type* type, struct GenericMap* generics, struct HashSet_str* out);
 
-#line 517 "src/compiler/Generator.pv"
+#line 499 "src/compiler/Generator.pv"
 struct String Generator__get_trait_function_name(struct Generator* self, struct str struct_name, struct Trait* trait_info, struct Type* impl_trait_type, struct Function* func_info, struct GenericMap* generics);
 
-#line 548 "src/compiler/Generator.pv"
+#line 530 "src/compiler/Generator.pv"
 bool Generator__generate(struct ArenaAllocator* allocator, char const* path, bool output_line_directives, char const* output_seperator, struct Root* root);
 
 #endif

@@ -1576,9 +1576,9 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                 #line 720 "src/compiler/ExpressionWriter.pv"
                 case CPP_EXPRESSION__NEW: {
                     #line 720 "src/compiler/ExpressionWriter.pv"
-                    struct Expression* placement = cpp_expression.new_value._0;
+                    struct Expression* placement = cpp_expression.new_value.placement;
                     #line 720 "src/compiler/ExpressionWriter.pv"
-                    struct Expression* new_expression = cpp_expression.new_value._1;
+                    struct Expression* new_expression = cpp_expression.new_value.expression;
                     #line 721 "src/compiler/ExpressionWriter.pv"
                     if (placement != 0) {
                         #line 722 "src/compiler/ExpressionWriter.pv"

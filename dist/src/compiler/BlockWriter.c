@@ -991,457 +991,462 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                 #line 470 "src/compiler/BlockWriter.pv"
                 switch (for_statement->type.type) {
                     #line 471 "src/compiler/BlockWriter.pv"
-                    case FOR_STATEMENT_TYPE__RANGE: {
-                        #line 471 "src/compiler/BlockWriter.pv"
-                        struct Expression* start = for_statement->type.range_value._0;
-                        #line 471 "src/compiler/BlockWriter.pv"
-                        struct Expression* end = for_statement->type.range_value._1;
+                    case FOR_STATEMENT_TYPE__ERROR: {
                         #line 472 "src/compiler/BlockWriter.pv"
-                        is_iterator = true;
-                        #line 473 "src/compiler/BlockWriter.pv"
-                        struct ForVariable* variable = &for_statement->variables.data[0];
+                        fprintf(file, "/* ERROR: Invalid for loop type */\n");
+                    } break;
+                    #line 474 "src/compiler/BlockWriter.pv"
+                    case FOR_STATEMENT_TYPE__RANGE: {
                         #line 474 "src/compiler/BlockWriter.pv"
+                        struct Expression* start = for_statement->type.range_value._0;
+                        #line 474 "src/compiler/BlockWriter.pv"
+                        struct Expression* end = for_statement->type.range_value._1;
+                        #line 475 "src/compiler/BlockWriter.pv"
+                        is_iterator = true;
+                        #line 476 "src/compiler/BlockWriter.pv"
+                        struct ForVariable* variable = &for_statement->variables.data[0];
+                        #line 477 "src/compiler/BlockWriter.pv"
                         struct str variable_name = variable->name->value;
 
-                        #line 476 "src/compiler/BlockWriter.pv"
+                        #line 479 "src/compiler/BlockWriter.pv"
                         Generator__write_indent(g, file);
-                        #line 477 "src/compiler/BlockWriter.pv"
+                        #line 480 "src/compiler/BlockWriter.pv"
                         fprintf(file, "for (");
 
-                        #line 479 "src/compiler/BlockWriter.pv"
+                        #line 482 "src/compiler/BlockWriter.pv"
                         FunctionContext__add_variable(g->function_context, variable_name, variable->type);
 
-                        #line 481 "src/compiler/BlockWriter.pv"
+                        #line 484 "src/compiler/BlockWriter.pv"
                         if (Generator__is_coroutine(g)) {
-                            #line 482 "src/compiler/BlockWriter.pv"
+                            #line 485 "src/compiler/BlockWriter.pv"
                             Generator__write_variable(g, file, variable_name);
                         } else {
-                            #line 484 "src/compiler/BlockWriter.pv"
+                            #line 487 "src/compiler/BlockWriter.pv"
                             Generator__write_variable_decl(g, file, variable_name, variable->type, generics);
                         }
 
-                        #line 487 "src/compiler/BlockWriter.pv"
-                        fprintf(file, " = ");
-                        #line 488 "src/compiler/BlockWriter.pv"
-                        ExpressionWriter__write_expression(&expr, file, start, generics);
-                        #line 489 "src/compiler/BlockWriter.pv"
-                        fprintf(file, "; ");
                         #line 490 "src/compiler/BlockWriter.pv"
-                        Generator__write_variable(g, file, variable_name);
+                        fprintf(file, " = ");
                         #line 491 "src/compiler/BlockWriter.pv"
-                        fprintf(file, " < ");
+                        ExpressionWriter__write_expression(&expr, file, start, generics);
                         #line 492 "src/compiler/BlockWriter.pv"
-                        ExpressionWriter__write_expression(&expr, file, end, generics);
-                        #line 493 "src/compiler/BlockWriter.pv"
                         fprintf(file, "; ");
-                        #line 494 "src/compiler/BlockWriter.pv"
+                        #line 493 "src/compiler/BlockWriter.pv"
                         Generator__write_variable(g, file, variable_name);
+                        #line 494 "src/compiler/BlockWriter.pv"
+                        fprintf(file, " < ");
                         #line 495 "src/compiler/BlockWriter.pv"
-                        fprintf(file, "++) {");
+                        ExpressionWriter__write_expression(&expr, file, end, generics);
                         #line 496 "src/compiler/BlockWriter.pv"
+                        fprintf(file, "; ");
+                        #line 497 "src/compiler/BlockWriter.pv"
+                        Generator__write_variable(g, file, variable_name);
+                        #line 498 "src/compiler/BlockWriter.pv"
+                        fprintf(file, "++) {");
+                        #line 499 "src/compiler/BlockWriter.pv"
                         g->indent += 1;
                     } break;
-                    #line 498 "src/compiler/BlockWriter.pv"
+                    #line 501 "src/compiler/BlockWriter.pv"
                     case FOR_STATEMENT_TYPE__SEQUENCE: {
-                        #line 498 "src/compiler/BlockWriter.pv"
-                        struct Expression* iter_expression = for_statement->type.sequence_value;
-                        #line 499 "src/compiler/BlockWriter.pv"
-                        is_iterator = true;
-                        #line 500 "src/compiler/BlockWriter.pv"
-                        Generator__write_indent(g, file);
                         #line 501 "src/compiler/BlockWriter.pv"
+                        struct Expression* iter_expression = for_statement->type.sequence_value;
+                        #line 502 "src/compiler/BlockWriter.pv"
+                        is_iterator = true;
+                        #line 503 "src/compiler/BlockWriter.pv"
+                        Generator__write_indent(g, file);
+                        #line 504 "src/compiler/BlockWriter.pv"
                         switch (Type__deref(for_statement->iter_type)->type) {
-                            #line 502 "src/compiler/BlockWriter.pv"
+                            #line 505 "src/compiler/BlockWriter.pv"
                             case TYPE__SEQUENCE: {
-                                #line 502 "src/compiler/BlockWriter.pv"
+                                #line 505 "src/compiler/BlockWriter.pv"
                                 struct Sequence* sequence = Type__deref(for_statement->iter_type)->sequence_value;
-                                #line 503 "src/compiler/BlockWriter.pv"
+                                #line 506 "src/compiler/BlockWriter.pv"
                                 switch (sequence->type.type) {
-                                    #line 504 "src/compiler/BlockWriter.pv"
+                                    #line 507 "src/compiler/BlockWriter.pv"
                                     case SEQUENCE_TYPE__FIXED_ARRAY: {
-                                        #line 504 "src/compiler/BlockWriter.pv"
+                                        #line 507 "src/compiler/BlockWriter.pv"
                                         uintptr_t size = sequence->type.fixedarray_value;
-                                        #line 505 "src/compiler/BlockWriter.pv"
+                                        #line 508 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "for (size_t __iter = 0; __iter < %zu; __iter++) {\n", size);
                                     } break;
-                                    #line 507 "src/compiler/BlockWriter.pv"
+                                    #line 510 "src/compiler/BlockWriter.pv"
                                     case SEQUENCE_TYPE__SLICE: {
-                                        #line 508 "src/compiler/BlockWriter.pv"
+                                        #line 511 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "for (size_t __iter = 0; __iter < ");
-                                        #line 509 "src/compiler/BlockWriter.pv"
+                                        #line 512 "src/compiler/BlockWriter.pv"
                                         ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
-                                        #line 510 "src/compiler/BlockWriter.pv"
+                                        #line 513 "src/compiler/BlockWriter.pv"
                                         fprintf(file, ".length; __iter++) {\n");
                                     } break;
                                 }
                             } break;
-                            #line 514 "src/compiler/BlockWriter.pv"
+                            #line 517 "src/compiler/BlockWriter.pv"
                             default: {
-                                #line 514 "src/compiler/BlockWriter.pv"
+                                #line 517 "src/compiler/BlockWriter.pv"
                                 fprintf(file, "/* ERROR: Sequence for loop on non-sequence type */");
                             } break;
                         }
 
-                        #line 517 "src/compiler/BlockWriter.pv"
+                        #line 520 "src/compiler/BlockWriter.pv"
                         g->indent += 1;
 
-                        #line 519 "src/compiler/BlockWriter.pv"
+                        #line 522 "src/compiler/BlockWriter.pv"
                         uintptr_t i = 0;
-                        #line 520 "src/compiler/BlockWriter.pv"
+                        #line 523 "src/compiler/BlockWriter.pv"
                         { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
-                        #line 520 "src/compiler/BlockWriter.pv"
+                        #line 523 "src/compiler/BlockWriter.pv"
                         while (Iter_ref_ForVariable__next(&__iter)) {
-                            #line 520 "src/compiler/BlockWriter.pv"
+                            #line 523 "src/compiler/BlockWriter.pv"
                             struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
-                            #line 521 "src/compiler/BlockWriter.pv"
+                            #line 524 "src/compiler/BlockWriter.pv"
                             if (!str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
-                                #line 522 "src/compiler/BlockWriter.pv"
-                                Generator__write_line_directive(g, file, block->context, variable->name);
-                                #line 523 "src/compiler/BlockWriter.pv"
-                                Generator__write_indent(g, file);
-                                #line 524 "src/compiler/BlockWriter.pv"
-                                Generator__write_type(g, file, variable->type, generics);
                                 #line 525 "src/compiler/BlockWriter.pv"
-                                fprintf(file, " ");
+                                Generator__write_line_directive(g, file, block->context, variable->name);
                                 #line 526 "src/compiler/BlockWriter.pv"
-                                Generator__write_token(g, file, variable->name);
+                                Generator__write_indent(g, file);
                                 #line 527 "src/compiler/BlockWriter.pv"
-                                fprintf(file, " = ");
+                                Generator__write_type(g, file, variable->type, generics);
                                 #line 528 "src/compiler/BlockWriter.pv"
+                                fprintf(file, " ");
+                                #line 529 "src/compiler/BlockWriter.pv"
+                                Generator__write_token(g, file, variable->name);
+                                #line 530 "src/compiler/BlockWriter.pv"
+                                fprintf(file, " = ");
+                                #line 531 "src/compiler/BlockWriter.pv"
                                 if (variable->ref) {
-                                    #line 528 "src/compiler/BlockWriter.pv"
+                                    #line 531 "src/compiler/BlockWriter.pv"
                                     fprintf(file, "&");
                                 }
-                                #line 529 "src/compiler/BlockWriter.pv"
+                                #line 532 "src/compiler/BlockWriter.pv"
                                 if (variable->deref) {
-                                    #line 529 "src/compiler/BlockWriter.pv"
+                                    #line 532 "src/compiler/BlockWriter.pv"
                                     fprintf(file, "*");
                                 }
-                                #line 530 "src/compiler/BlockWriter.pv"
+                                #line 533 "src/compiler/BlockWriter.pv"
                                 switch (Type__deref(for_statement->iter_type)->type) {
-                                    #line 531 "src/compiler/BlockWriter.pv"
+                                    #line 534 "src/compiler/BlockWriter.pv"
                                     case TYPE__SEQUENCE: {
-                                        #line 531 "src/compiler/BlockWriter.pv"
+                                        #line 534 "src/compiler/BlockWriter.pv"
                                         struct Sequence* sequence = Type__deref(for_statement->iter_type)->sequence_value;
-                                        #line 532 "src/compiler/BlockWriter.pv"
+                                        #line 535 "src/compiler/BlockWriter.pv"
                                         switch (sequence->type.type) {
-                                            #line 533 "src/compiler/BlockWriter.pv"
+                                            #line 536 "src/compiler/BlockWriter.pv"
                                             case SEQUENCE_TYPE__FIXED_ARRAY: {
-                                                #line 534 "src/compiler/BlockWriter.pv"
+                                                #line 537 "src/compiler/BlockWriter.pv"
                                                 ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
-                                                #line 535 "src/compiler/BlockWriter.pv"
+                                                #line 538 "src/compiler/BlockWriter.pv"
                                                 fprintf(file, "[__iter]");
                                             } break;
-                                            #line 537 "src/compiler/BlockWriter.pv"
+                                            #line 540 "src/compiler/BlockWriter.pv"
                                             case SEQUENCE_TYPE__SLICE: {
-                                                #line 538 "src/compiler/BlockWriter.pv"
+                                                #line 541 "src/compiler/BlockWriter.pv"
                                                 ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
-                                                #line 539 "src/compiler/BlockWriter.pv"
+                                                #line 542 "src/compiler/BlockWriter.pv"
                                                 fprintf(file, ".data[__iter]");
                                             } break;
                                         }
                                     } break;
-                                    #line 543 "src/compiler/BlockWriter.pv"
+                                    #line 546 "src/compiler/BlockWriter.pv"
                                     default: {
-                                        #line 543 "src/compiler/BlockWriter.pv"
+                                        #line 546 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "/* ERROR */");
                                     } break;
                                 }
 
-                                #line 546 "src/compiler/BlockWriter.pv"
+                                #line 549 "src/compiler/BlockWriter.pv"
                                 if (for_statement->variables.length > 1) {
-                                    #line 547 "src/compiler/BlockWriter.pv"
+                                    #line 550 "src/compiler/BlockWriter.pv"
                                     Generator__write_instance_member_accessor(g, file, for_statement->value_type, generics);
-                                    #line 548 "src/compiler/BlockWriter.pv"
+                                    #line 551 "src/compiler/BlockWriter.pv"
                                     fprintf(file, "_%zu", i);
                                 }
 
-                                #line 551 "src/compiler/BlockWriter.pv"
+                                #line 554 "src/compiler/BlockWriter.pv"
                                 fprintf(file, ";\n");
                             }
 
-                            #line 554 "src/compiler/BlockWriter.pv"
+                            #line 557 "src/compiler/BlockWriter.pv"
                             i += 1;
                         } }
                     } break;
-                    #line 557 "src/compiler/BlockWriter.pv"
+                    #line 560 "src/compiler/BlockWriter.pv"
                     case FOR_STATEMENT_TYPE__ITER: {
-                        #line 557 "src/compiler/BlockWriter.pv"
+                        #line 560 "src/compiler/BlockWriter.pv"
                         struct Expression* iter_expression = for_statement->type.iter_value;
-                        #line 558 "src/compiler/BlockWriter.pv"
+                        #line 561 "src/compiler/BlockWriter.pv"
                         is_iterator = Type__is_iterator(Type__deref(for_statement->iter_type));
-                        #line 559 "src/compiler/BlockWriter.pv"
+                        #line 562 "src/compiler/BlockWriter.pv"
                         if (is_iterator) {
-                            #line 560 "src/compiler/BlockWriter.pv"
-                            Generator__write_indent(g, file);
-                            #line 561 "src/compiler/BlockWriter.pv"
-                            fprintf(file, "while (");
-                            #line 562 "src/compiler/BlockWriter.pv"
-                            ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
                             #line 563 "src/compiler/BlockWriter.pv"
-                            fprintf(file, ".vtable->next(");
+                            Generator__write_indent(g, file);
                             #line 564 "src/compiler/BlockWriter.pv"
-                            ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
+                            fprintf(file, "while (");
                             #line 565 "src/compiler/BlockWriter.pv"
+                            ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
+                            #line 566 "src/compiler/BlockWriter.pv"
+                            fprintf(file, ".vtable->next(");
+                            #line 567 "src/compiler/BlockWriter.pv"
+                            ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
+                            #line 568 "src/compiler/BlockWriter.pv"
                             fprintf(file, ".instance)) {");
 
-                            #line 567 "src/compiler/BlockWriter.pv"
+                            #line 570 "src/compiler/BlockWriter.pv"
                             g->indent += 1;
 
-                            #line 569 "src/compiler/BlockWriter.pv"
+                            #line 572 "src/compiler/BlockWriter.pv"
                             uintptr_t i = 0;
-                            #line 570 "src/compiler/BlockWriter.pv"
+                            #line 573 "src/compiler/BlockWriter.pv"
                             { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
-                            #line 570 "src/compiler/BlockWriter.pv"
+                            #line 573 "src/compiler/BlockWriter.pv"
                             while (Iter_ref_ForVariable__next(&__iter)) {
-                                #line 570 "src/compiler/BlockWriter.pv"
+                                #line 573 "src/compiler/BlockWriter.pv"
                                 struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
-                                #line 571 "src/compiler/BlockWriter.pv"
+                                #line 574 "src/compiler/BlockWriter.pv"
                                 if (!str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
-                                    #line 572 "src/compiler/BlockWriter.pv"
-                                    Generator__write_line_directive(g, file, block->context, variable->name);
-                                    #line 573 "src/compiler/BlockWriter.pv"
-                                    Generator__write_indent(g, file);
-                                    #line 574 "src/compiler/BlockWriter.pv"
-                                    Generator__write_type(g, file, variable->type, generics);
                                     #line 575 "src/compiler/BlockWriter.pv"
-                                    fprintf(file, " ");
+                                    Generator__write_line_directive(g, file, block->context, variable->name);
                                     #line 576 "src/compiler/BlockWriter.pv"
-                                    Generator__write_token(g, file, variable->name);
+                                    Generator__write_indent(g, file);
                                     #line 577 "src/compiler/BlockWriter.pv"
-                                    fprintf(file, " = ");
+                                    Generator__write_type(g, file, variable->type, generics);
                                     #line 578 "src/compiler/BlockWriter.pv"
+                                    fprintf(file, " ");
+                                    #line 579 "src/compiler/BlockWriter.pv"
+                                    Generator__write_token(g, file, variable->name);
+                                    #line 580 "src/compiler/BlockWriter.pv"
+                                    fprintf(file, " = ");
+                                    #line 581 "src/compiler/BlockWriter.pv"
                                     if (variable->ref) {
-                                        #line 578 "src/compiler/BlockWriter.pv"
+                                        #line 581 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "&");
                                     }
-                                    #line 579 "src/compiler/BlockWriter.pv"
+                                    #line 582 "src/compiler/BlockWriter.pv"
                                     if (variable->deref) {
-                                        #line 579 "src/compiler/BlockWriter.pv"
+                                        #line 582 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "*");
                                     }
-                                    #line 580 "src/compiler/BlockWriter.pv"
+                                    #line 583 "src/compiler/BlockWriter.pv"
                                     ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
-                                    #line 581 "src/compiler/BlockWriter.pv"
+                                    #line 584 "src/compiler/BlockWriter.pv"
                                     fprintf(file, ".vtable->value");
-                                    #line 582 "src/compiler/BlockWriter.pv"
+                                    #line 585 "src/compiler/BlockWriter.pv"
                                     if (for_statement->variables.length > 1) {
-                                        #line 582 "src/compiler/BlockWriter.pv"
+                                        #line 585 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "_%zu", i);
                                     }
-                                    #line 583 "src/compiler/BlockWriter.pv"
+                                    #line 586 "src/compiler/BlockWriter.pv"
                                     fprintf(file, "(");
-                                    #line 584 "src/compiler/BlockWriter.pv"
+                                    #line 587 "src/compiler/BlockWriter.pv"
                                     ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
-                                    #line 585 "src/compiler/BlockWriter.pv"
+                                    #line 588 "src/compiler/BlockWriter.pv"
                                     fprintf(file, ".instance);\n");
                                 }
 
-                                #line 588 "src/compiler/BlockWriter.pv"
+                                #line 591 "src/compiler/BlockWriter.pv"
                                 i += 1;
                             } }
                         } else {
-                            #line 591 "src/compiler/BlockWriter.pv"
+                            #line 594 "src/compiler/BlockWriter.pv"
                             struct String iter_type_name = Naming__get_type_name(&g->naming_ident, for_statement->iter_type, generics->self_type, generics);
 
-                            #line 593 "src/compiler/BlockWriter.pv"
-                            Generator__write_indent(g, file);
-                            #line 594 "src/compiler/BlockWriter.pv"
-                            fprintf(file, "{ ");
-                            #line 595 "src/compiler/BlockWriter.pv"
-                            Generator__write_type(g, file, for_statement->iter_type, generics);
                             #line 596 "src/compiler/BlockWriter.pv"
-                            fprintf(file, " __iter = ");
+                            Generator__write_indent(g, file);
                             #line 597 "src/compiler/BlockWriter.pv"
-                            ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
+                            fprintf(file, "{ ");
                             #line 598 "src/compiler/BlockWriter.pv"
+                            Generator__write_type(g, file, for_statement->iter_type, generics);
+                            #line 599 "src/compiler/BlockWriter.pv"
+                            fprintf(file, " __iter = ");
+                            #line 600 "src/compiler/BlockWriter.pv"
+                            ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
+                            #line 601 "src/compiler/BlockWriter.pv"
                             fprintf(file, ";\n");
 
-                            #line 600 "src/compiler/BlockWriter.pv"
+                            #line 603 "src/compiler/BlockWriter.pv"
                             Generator__write_line_directive(g, file, block->context, iter_expression->token);
 
-                            #line 602 "src/compiler/BlockWriter.pv"
-                            Generator__write_indent(g, file);
-                            #line 603 "src/compiler/BlockWriter.pv"
-                            fprintf(file, "while (");
-                            #line 604 "src/compiler/BlockWriter.pv"
-                            Generator__write_string(g, file, &iter_type_name);
                             #line 605 "src/compiler/BlockWriter.pv"
+                            Generator__write_indent(g, file);
+                            #line 606 "src/compiler/BlockWriter.pv"
+                            fprintf(file, "while (");
+                            #line 607 "src/compiler/BlockWriter.pv"
+                            Generator__write_string(g, file, &iter_type_name);
+                            #line 608 "src/compiler/BlockWriter.pv"
                             fprintf(file, "__next(&__iter)) {\n");
 
-                            #line 607 "src/compiler/BlockWriter.pv"
+                            #line 610 "src/compiler/BlockWriter.pv"
                             g->indent += 1;
 
-                            #line 609 "src/compiler/BlockWriter.pv"
+                            #line 612 "src/compiler/BlockWriter.pv"
                             uintptr_t i = 0;
-                            #line 610 "src/compiler/BlockWriter.pv"
+                            #line 613 "src/compiler/BlockWriter.pv"
                             { struct Iter_ref_ForVariable __iter = Array_ForVariable__iter(&for_statement->variables);
-                            #line 610 "src/compiler/BlockWriter.pv"
+                            #line 613 "src/compiler/BlockWriter.pv"
                             while (Iter_ref_ForVariable__next(&__iter)) {
-                                #line 610 "src/compiler/BlockWriter.pv"
+                                #line 613 "src/compiler/BlockWriter.pv"
                                 struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
-                                #line 611 "src/compiler/BlockWriter.pv"
+                                #line 614 "src/compiler/BlockWriter.pv"
                                 if (!str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
-                                    #line 612 "src/compiler/BlockWriter.pv"
-                                    Generator__write_line_directive(g, file, block->context, variable->name);
-                                    #line 613 "src/compiler/BlockWriter.pv"
-                                    Generator__write_indent(g, file);
-                                    #line 614 "src/compiler/BlockWriter.pv"
-                                    Generator__write_type(g, file, variable->type, generics);
                                     #line 615 "src/compiler/BlockWriter.pv"
-                                    fprintf(file, " ");
+                                    Generator__write_line_directive(g, file, block->context, variable->name);
                                     #line 616 "src/compiler/BlockWriter.pv"
-                                    Generator__write_token(g, file, variable->name);
+                                    Generator__write_indent(g, file);
                                     #line 617 "src/compiler/BlockWriter.pv"
-                                    fprintf(file, " = ");
+                                    Generator__write_type(g, file, variable->type, generics);
                                     #line 618 "src/compiler/BlockWriter.pv"
+                                    fprintf(file, " ");
+                                    #line 619 "src/compiler/BlockWriter.pv"
+                                    Generator__write_token(g, file, variable->name);
+                                    #line 620 "src/compiler/BlockWriter.pv"
+                                    fprintf(file, " = ");
+                                    #line 621 "src/compiler/BlockWriter.pv"
                                     if (variable->ref) {
-                                        #line 618 "src/compiler/BlockWriter.pv"
+                                        #line 621 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "&");
                                     }
-                                    #line 619 "src/compiler/BlockWriter.pv"
+                                    #line 622 "src/compiler/BlockWriter.pv"
                                     if (variable->deref) {
-                                        #line 619 "src/compiler/BlockWriter.pv"
+                                        #line 622 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "*");
                                     }
-                                    #line 620 "src/compiler/BlockWriter.pv"
+                                    #line 623 "src/compiler/BlockWriter.pv"
                                     Generator__write_string(g, file, &iter_type_name);
-                                    #line 621 "src/compiler/BlockWriter.pv"
+                                    #line 624 "src/compiler/BlockWriter.pv"
                                     fprintf(file, "__value");
-                                    #line 622 "src/compiler/BlockWriter.pv"
+                                    #line 625 "src/compiler/BlockWriter.pv"
                                     if (!Type__is_tuple(Type__deref(for_statement->value_type)) && for_statement->variables.length > 1) {
-                                        #line 623 "src/compiler/BlockWriter.pv"
+                                        #line 626 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "_%zu", i);
                                     }
-                                    #line 625 "src/compiler/BlockWriter.pv"
+                                    #line 628 "src/compiler/BlockWriter.pv"
                                     fprintf(file, "(&__iter)");
 
-                                    #line 627 "src/compiler/BlockWriter.pv"
+                                    #line 630 "src/compiler/BlockWriter.pv"
                                     if (Type__is_tuple(Type__deref(for_statement->value_type)) && for_statement->variables.length > 1) {
-                                        #line 628 "src/compiler/BlockWriter.pv"
+                                        #line 631 "src/compiler/BlockWriter.pv"
                                         Generator__write_instance_member_accessor(g, file, for_statement->value_type, generics);
-                                        #line 629 "src/compiler/BlockWriter.pv"
+                                        #line 632 "src/compiler/BlockWriter.pv"
                                         fprintf(file, "_%zu", i);
                                     }
 
-                                    #line 632 "src/compiler/BlockWriter.pv"
+                                    #line 635 "src/compiler/BlockWriter.pv"
                                     fprintf(file, ";\n");
                                 }
 
-                                #line 635 "src/compiler/BlockWriter.pv"
+                                #line 638 "src/compiler/BlockWriter.pv"
                                 i += 1;
                             } }
                         }
                     } break;
                 }
 
-                #line 641 "src/compiler/BlockWriter.pv"
+                #line 644 "src/compiler/BlockWriter.pv"
                 fprintf(file, "\n");
 
-                #line 643 "src/compiler/BlockWriter.pv"
+                #line 646 "src/compiler/BlockWriter.pv"
                 FunctionContext__push_scope(g->function_context, true, true);
-                #line 644 "src/compiler/BlockWriter.pv"
+                #line 647 "src/compiler/BlockWriter.pv"
                 if (!BlockWriter__write_block(self, file, return_type, for_statement->block, generics, false, true)) {
-                    #line 644 "src/compiler/BlockWriter.pv"
+                    #line 647 "src/compiler/BlockWriter.pv"
                     return false;
                 }
-                #line 645 "src/compiler/BlockWriter.pv"
+                #line 648 "src/compiler/BlockWriter.pv"
                 FunctionContext__pop_scope(g->function_context);
 
-                #line 647 "src/compiler/BlockWriter.pv"
+                #line 650 "src/compiler/BlockWriter.pv"
                 g->indent -= 1;
-                #line 648 "src/compiler/BlockWriter.pv"
+                #line 651 "src/compiler/BlockWriter.pv"
                 Generator__write_indent(g, file);
-                #line 649 "src/compiler/BlockWriter.pv"
+                #line 652 "src/compiler/BlockWriter.pv"
                 if (is_iterator) {
-                    #line 650 "src/compiler/BlockWriter.pv"
+                    #line 653 "src/compiler/BlockWriter.pv"
                     fprintf(file, "}\n");
                 } else {
-                    #line 652 "src/compiler/BlockWriter.pv"
+                    #line 655 "src/compiler/BlockWriter.pv"
                     fprintf(file, "} }\n");
                 }
             } break;
-            #line 655 "src/compiler/BlockWriter.pv"
+            #line 658 "src/compiler/BlockWriter.pv"
             case STATEMENT_DATA__ASSIGNMENT_STATEMENT: {
-                #line 655 "src/compiler/BlockWriter.pv"
-                struct AssignmentStatement* assignment = statement->data.assignmentstatement_value;
-                #line 656 "src/compiler/BlockWriter.pv"
-                Generator__write_indent(g, file);
-                #line 657 "src/compiler/BlockWriter.pv"
-                ExpressionWriter__write_expression(&expr, file, assignment->left, generics);
                 #line 658 "src/compiler/BlockWriter.pv"
-                fprintf(file, " ");
+                struct AssignmentStatement* assignment = statement->data.assignmentstatement_value;
                 #line 659 "src/compiler/BlockWriter.pv"
-                Generator__write_str(g, file, assignment->operator->value);
+                Generator__write_indent(g, file);
                 #line 660 "src/compiler/BlockWriter.pv"
-                fprintf(file, " ");
+                ExpressionWriter__write_expression(&expr, file, assignment->left, generics);
                 #line 661 "src/compiler/BlockWriter.pv"
-                ExpressionWriter__write_expression(&expr, file, assignment->right, generics);
+                fprintf(file, " ");
                 #line 662 "src/compiler/BlockWriter.pv"
-                fprintf(file, ";\n");
-            } break;
-            #line 664 "src/compiler/BlockWriter.pv"
-            case STATEMENT_DATA__EXPRESSION_STATEMENT: {
+                Generator__write_str(g, file, assignment->operator->value);
+                #line 663 "src/compiler/BlockWriter.pv"
+                fprintf(file, " ");
                 #line 664 "src/compiler/BlockWriter.pv"
-                struct Expression* expression = statement->data.expressionstatement_value;
+                ExpressionWriter__write_expression(&expr, file, assignment->right, generics);
                 #line 665 "src/compiler/BlockWriter.pv"
-                Generator__write_indent(g, file);
-                #line 666 "src/compiler/BlockWriter.pv"
-                ExpressionWriter__write_expression(&expr, file, expression, generics);
-                #line 667 "src/compiler/BlockWriter.pv"
                 fprintf(file, ";\n");
             } break;
-            #line 669 "src/compiler/BlockWriter.pv"
-            case STATEMENT_DATA__CONTINUE_STATEMENT: {
-                #line 669 "src/compiler/BlockWriter.pv"
-                struct Array_DeferStatement* defer_statements = &statement->data.continuestatement_value;
-                #line 670 "src/compiler/BlockWriter.pv"
-                BlockWriter__write_defer_statements(self, file, return_type, defer_statements, generics);
-                #line 671 "src/compiler/BlockWriter.pv"
+            #line 667 "src/compiler/BlockWriter.pv"
+            case STATEMENT_DATA__EXPRESSION_STATEMENT: {
+                #line 667 "src/compiler/BlockWriter.pv"
+                struct Expression* expression = statement->data.expressionstatement_value;
+                #line 668 "src/compiler/BlockWriter.pv"
                 Generator__write_indent(g, file);
+                #line 669 "src/compiler/BlockWriter.pv"
+                ExpressionWriter__write_expression(&expr, file, expression, generics);
+                #line 670 "src/compiler/BlockWriter.pv"
+                fprintf(file, ";\n");
+            } break;
+            #line 672 "src/compiler/BlockWriter.pv"
+            case STATEMENT_DATA__CONTINUE_STATEMENT: {
                 #line 672 "src/compiler/BlockWriter.pv"
+                struct Array_DeferStatement* defer_statements = &statement->data.continuestatement_value;
+                #line 673 "src/compiler/BlockWriter.pv"
+                BlockWriter__write_defer_statements(self, file, return_type, defer_statements, generics);
+                #line 674 "src/compiler/BlockWriter.pv"
+                Generator__write_indent(g, file);
+                #line 675 "src/compiler/BlockWriter.pv"
                 fprintf(file, "continue;\n");
             } break;
-            #line 674 "src/compiler/BlockWriter.pv"
+            #line 677 "src/compiler/BlockWriter.pv"
             case STATEMENT_DATA__BREAK_STATEMENT: {
-                #line 674 "src/compiler/BlockWriter.pv"
-                struct Array_DeferStatement* defer_statements = &statement->data.breakstatement_value;
-                #line 675 "src/compiler/BlockWriter.pv"
-                BlockWriter__write_defer_statements(self, file, return_type, defer_statements, generics);
-                #line 676 "src/compiler/BlockWriter.pv"
-                Generator__write_indent(g, file);
                 #line 677 "src/compiler/BlockWriter.pv"
+                struct Array_DeferStatement* defer_statements = &statement->data.breakstatement_value;
+                #line 678 "src/compiler/BlockWriter.pv"
+                BlockWriter__write_defer_statements(self, file, return_type, defer_statements, generics);
+                #line 679 "src/compiler/BlockWriter.pv"
+                Generator__write_indent(g, file);
+                #line 680 "src/compiler/BlockWriter.pv"
                 fprintf(file, "break;\n");
             } break;
         }
     } }
 
-    #line 682 "src/compiler/BlockWriter.pv"
+    #line 685 "src/compiler/BlockWriter.pv"
     if (!last_statement_is_return) {
-        #line 683 "src/compiler/BlockWriter.pv"
+        #line 686 "src/compiler/BlockWriter.pv"
         BlockWriter__write_defer_statements(self, file, return_type, &block->defer_statements, generics);
     }
 
-    #line 686 "src/compiler/BlockWriter.pv"
+    #line 689 "src/compiler/BlockWriter.pv"
     if (!no_brackets) {
-        #line 687 "src/compiler/BlockWriter.pv"
+        #line 690 "src/compiler/BlockWriter.pv"
         g->indent -= 1;
-        #line 688 "src/compiler/BlockWriter.pv"
+        #line 691 "src/compiler/BlockWriter.pv"
         Generator__write_indent(g, file);
 
-        #line 690 "src/compiler/BlockWriter.pv"
+        #line 693 "src/compiler/BlockWriter.pv"
         if (inline_) {
-            #line 691 "src/compiler/BlockWriter.pv"
+            #line 694 "src/compiler/BlockWriter.pv"
             fprintf(file, "}");
         } else {
-            #line 693 "src/compiler/BlockWriter.pv"
+            #line 696 "src/compiler/BlockWriter.pv"
             fprintf(file, "}\n");
         }
     }
 
-    #line 697 "src/compiler/BlockWriter.pv"
+    #line 700 "src/compiler/BlockWriter.pv"
     return true;
 }

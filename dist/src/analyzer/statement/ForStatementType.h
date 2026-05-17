@@ -5,6 +5,7 @@ struct Expression;
 #line 4 "src/analyzer/statement/ForStatementType.pv"
 struct ForStatementType {
     enum {
+        FOR_STATEMENT_TYPE__ERROR,
         FOR_STATEMENT_TYPE__RANGE,
         FOR_STATEMENT_TYPE__ITER,
         FOR_STATEMENT_TYPE__SEQUENCE,

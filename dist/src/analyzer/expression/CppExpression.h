@@ -10,7 +10,7 @@ struct CppExpression {
     } type;
 
     union {
-        struct { struct Expression* _0; struct Expression* _1; } new_value;
+        struct { struct Expression* placement; struct Expression* expression; } new_value;
         struct Expression* delete_value;
     };
 };
