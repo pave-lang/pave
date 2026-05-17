@@ -139,6 +139,16 @@ impl Generator {
         return false;
     }
 
+    fn type_is_discriminated_union_no_indirect(&self, type: &Type, generics: &GenericMap) -> bool {
+        match type {
+            Type::Enum(enum_info, _) => { return enum_info.is_discriminated_union(); },
+            Type::Self => { return self.type_is_discriminated_union(generics.self_type, generics); },
+            _ => {},
+        }
+
+        return false;
+    }
+
     fn write_type(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
         let type_name = self.naming_c99.get_type_name(type, generics.self_type, generics);
         self.write_str(file, type_name.as_str());

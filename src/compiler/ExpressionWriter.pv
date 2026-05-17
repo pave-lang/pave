@@ -608,11 +608,25 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::BinaryExpression(left, operator, right) => {
-                self.write_expression(file, left, generics);
-                fprintf(file, " ");
-                g.write_str(file, operator);
-                fprintf(file, " ");
-                self.write_expression(file, right, generics);
+                let is_eq_or_ne = operator.eq("==") || operator.eq("!=");
+                if is_eq_or_ne && g.type_is_discriminated_union_no_indirect(&left.return_type, generics) {
+                    fprintf(file, "(");
+                    self.write_expression(file, left, generics);
+                    fprintf(file, ").type");
+                } else {
+                    self.write_expression(file, left, generics);
+                }
+
+                fprintf(file, " %.*s ", cast<i32>(operator.length), operator.ptr);
+
+                if is_eq_or_ne && g.type_is_discriminated_union_no_indirect(&right.return_type, generics) {
+                    fprintf(file, "(");
+                    self.write_expression(file, right, generics);
+                    fprintf(file, ").type");
+                } else {
+                    self.write_expression(file, right, generics);
+                }
+
                 return true;
             },
             ExpressionData::IfExpression(cond, a, b) => {

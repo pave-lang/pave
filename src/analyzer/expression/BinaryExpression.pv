@@ -86,9 +86,9 @@ impl Expression {
                     return Expression::find_operator_trait_call(context, token, lhs, context.type_self, operator, rhs);
                 }
             },
-            Type::Indirect(indirect) => {
-                return Expression::find_operator_trait_call(context, token, lhs, &indirect.to, operator, rhs);
-            },
+            // Type::Indirect(indirect) => {
+            //     return Expression::find_operator_trait_call(context, token, lhs, &indirect.to, operator, rhs);
+            // },
             Type::Struct(struct_info, generic_map) => {
                 for *impl_info in struct_info.impls {
                     if !impl_info.has_trait || impl_info.trait_ == null { continue; }

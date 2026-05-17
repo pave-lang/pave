@@ -461,10 +461,13 @@ impl Type {
     }
 
     fn is_self(&self) -> bool {
-        match self {
-            Type::Self => { return true; },
-            _ => { return false; },
-        }
+        // match self {
+        //     Type::Self => { return true; },
+        //     _ => { return false; },
+        // }
+
+        // return (*self) == Type::Self;
+        return Type::Self == (*self);
     }
 
     fn is_void(&self) -> bool {

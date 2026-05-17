@@ -211,7 +211,7 @@ impl Processor {
     }
 
     fn publish_diagnostics(&self, analysis: &Analysis) {
-        let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 };
+        let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
 
         for (filename, _) in analysis.files {
             if analysis.diagnostics.find(&filename) == null {

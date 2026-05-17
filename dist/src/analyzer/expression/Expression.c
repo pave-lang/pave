@@ -3893,13 +3893,6 @@ struct Expression* Expression__find_operator_trait_call(struct Context* context,
                 return Expression__find_operator_trait_call(context, token, lhs, context->type_self, operator, rhs);
             }
         } break;
-        #line 89 "src/analyzer/expression/BinaryExpression.pv"
-        case TYPE__INDIRECT: {
-            #line 89 "src/analyzer/expression/BinaryExpression.pv"
-            struct Indirect* indirect = lhs_type->indirect_value;
-            #line 90 "src/analyzer/expression/BinaryExpression.pv"
-            return Expression__find_operator_trait_call(context, token, lhs, &indirect->to, operator, rhs);
-        } break;
         #line 92 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__STRUCT: {
             #line 92 "src/analyzer/expression/BinaryExpression.pv"

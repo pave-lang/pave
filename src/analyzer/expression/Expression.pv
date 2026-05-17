@@ -484,7 +484,7 @@ impl Expression {
                                 IndirectType::ConstPointer => {
                                     context.error_token(self.token, "use null instead of 0 for pointer types");
                                     return false;
-                                },does not match expression return type of
+                                },
                                 _ => {},
                             }
                         },
