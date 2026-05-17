@@ -26,15 +26,15 @@ impl Expression {
                         return false;
                     }
 
-                    let param_type = &param.type;
+                    let param_type: *Type = &param.type;
 
                     if generic_map2.map.length > 0 {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
                     } else if generic_map != null {
-                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, null);
                     }
 
-                    if param_type == 0 {
+                    if param_type == null {
                         context.error_token(arg.value.token, "Unable to resolve field type");
                         return false;
                     }
@@ -68,7 +68,7 @@ impl Expression {
                 return success;
             },
             Type::Function(function, generic_map2) => {
-                if function == 0 || function.type == FunctionType::MethodCpp { return true; }
+                if cast<*Function>(function) == null || function.type == FunctionType::MethodCpp { return true; }
 
                 if function.parameters.length != arguments_length {
                     let message = String::new(context.allocator);
@@ -103,22 +103,22 @@ impl Expression {
                 while param_iter.next() && args_iter.next() {
                     let arg = args_iter.value();
                     let param = param_iter.value();
-                    let param_type = &param.type;
+                    let param_type: *Type = &param.type;
 
                     if generic_map2.map.length > 0 {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
                     } else if generic_map != null {
-                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                        param_type = Context::resolve_type(context.allocator, param_type, generic_map, null);
                     }
 
-                    if param_type == 0 {
+                    if param_type == null {
                         context.error_token(arg.value.token, "Unable to resolve parameter type");
                         return false;
                     }
 
                     arg.value.validate_type(context, param_type, true);
 
-                    if arg.name == null && param.name != 0 && !param.name.value.eq("self") && !param.name.value.eq(arg.value.token.value) {
+                    if arg.name == null && param.name != null && !param.name.value.eq("self") && !param.name.value.eq(arg.value.token.value) {
                         let label = String::new(context.allocator);
                         label.append(param.name.value);
                         label.append(": ");
@@ -172,10 +172,10 @@ impl Expression {
 
                 let param_type = variant.types.data + field_i;
                 if generic_map != null {
-                    param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                    param_type = Context::resolve_type(context.allocator, param_type, generic_map, null);
                 }
 
-                if param_type == 0 {
+                if param_type == null {
                     context.error_token(arg.value.token, "Unable to resolve field type");
                     return false;
                 }
@@ -191,13 +191,13 @@ impl Expression {
 
         while param_iter.next() && args_iter.next() {
             let arg = args_iter.value();
-            let param_type = param_iter.value();
+            let param_type: *Type = param_iter.value();
 
             if generic_map != null {
-                param_type = Context::resolve_type(context.allocator, param_type, generic_map, 0);
+                param_type = Context::resolve_type(context.allocator, param_type, generic_map, null);
             }
 
-            if param_type == 0 {
+            if param_type == null {
                 context.error_token(arg.value.token, "Unable to resolve parameter type");
                 return false;
             }
@@ -208,7 +208,7 @@ impl Expression {
         return true;
     }
 
-    fn get_return_type(context: &Context, type: &Type, token: &Token, generic_map: &GenericMap) -> &Type {
+    fn get_return_type(context: &Context, type: &Type, token: &Token, generic_map: *GenericMap) -> *Type {
         match type {
             Type::Tuple(_) => { return type; },
             Type::Function(func_info, func_generic_map) => {
@@ -222,24 +222,24 @@ impl Expression {
             _ => { context.error_token(token, "Type can't be called"); },
         }
 
-        return 0;
+        return null;
     }
 
-    fn make_type_function_call(context: &Context, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> &Expression {
-        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return 0; }
+    fn make_type_function_call(context: &Context, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> *Expression {
+        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return null; }
 
         let func_return_type = Expression::get_return_type(context, type, token, generic_map);
-        if func_return_type == 0 { return 0; }
+        if func_return_type == null { return null; }
 
         let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(type), type);
         return Expression::make(context.allocator, token, ExpressionData::Invoke(parent_expression, arguments), func_return_type);
     }
 
-    fn make_member_function_call(context: &Context, inner: &Expression, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> &Expression {
-        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return 0; }
+    fn make_member_function_call(context: &Context, inner: &Expression, token: &Token, type: &Type, arguments: Array<InvokeArgument>, generic_map: *GenericMap) -> *Expression {
+        if !Expression::validate_arguments(context, token, type, &arguments, generic_map, true) { return null; }
 
         let func_return_type = Expression::get_return_type(context, type, token, generic_map);
-        if func_return_type == 0 { return 0; }
+        if func_return_type == null { return null; }
 
         return Expression::make(context.allocator, token, ExpressionData::Invoke(inner, arguments), func_return_type);
     }

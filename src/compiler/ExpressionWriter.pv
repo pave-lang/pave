@@ -73,7 +73,7 @@ impl ExpressionWriter {
                 g.write_type(file, type, generics);
                 fprintf(file, ") { .vtable = &");
 
-                let inner_type = Context::resolve_type(g.allocator, inner_expr.return_type.deref(), generics, 0);
+                let inner_type = Context::resolve_type(g.allocator, inner_expr.return_type.deref(), generics, null);
                 let inner_type_name = g.naming_ident.get_type_name(inner_type, generics.array.data, generics);
                 g.write_str_title(file, inner_type_name.as_str());
 
@@ -89,7 +89,7 @@ impl ExpressionWriter {
 
     fn write_sequence_cast(&self, file: &FILE, inner_expr: &Expression, sequence: &Sequence, generics: &GenericMap) {
         let g = self.generator;
-        let inner_sequence: &Sequence = 0;
+        let inner_sequence: *Sequence = null;
 
         match inner_expr.return_type {
             Type::Indirect(indirect) => {
@@ -101,7 +101,7 @@ impl ExpressionWriter {
             _ => {},
         }
 
-        if inner_sequence == 0 {
+        if inner_sequence == null {
             fprintf(file, " !!ERROR INVALID SEQUENCE TYPE TO CONVERT INTO SLICE!! ");
             return;
         }
@@ -117,7 +117,7 @@ impl ExpressionWriter {
 
         let sequence_type = Type::Sequence(sequence);
         let name = g.naming_c99.get_type_name(&sequence_type, &sequence_type, generics);
-        let unary_inner: &Expression = 0;
+        let unary_inner: *Expression = null;
 
         match inner_expr.data {
             ExpressionData::UnaryExpression(expr, inner) => {
@@ -132,7 +132,7 @@ impl ExpressionWriter {
         g.write_string(file, &name);
         fprintf(file, ") { .data = ");
 
-        if unary_inner != 0 {
+        if unary_inner != null {
             let is_array_literal = false;
             match unary_inner.data {
                 ExpressionData::Invoke(target, _) => {
@@ -218,7 +218,7 @@ impl ExpressionWriter {
         return true;
     }
 
-    fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+    fn write_enum_variant(&self, file: &FILE, variant: &EnumVariant, type: &Type, arguments: *Array<InvokeArgument>, generics: &GenericMap) -> bool {
         let g = self.generator;
         let parent = variant.parent;
 
@@ -232,7 +232,7 @@ impl ExpressionWriter {
         fprintf(file, ") { .type = ");
         g.write_enum_variant_name(file, type, variant);
 
-        if arguments == 0 {
+        if arguments == null {
             fprintf(file, " }");
             return true;
         }
@@ -326,16 +326,16 @@ impl ExpressionWriter {
         if name.eq("typeid") {
             let resolved_generics = func_generics.resolve_types(g.allocator, generics);
             let type = resolved_generics.get("T");
-            if type == 0 { return false; }
+            if type == null { return false; }
             return g.write_typeid(file, type, generics);
         }
 
         if name.eq("cast") {
             let resolved_generics = func_generics.resolve_types(g.allocator, generics);
             let arg = arguments.get(0);
-            if arg == 0 { return false; }
+            if arg == null { return false; }
             let type = resolved_generics.get("T");
-            if type == 0 { return false; }
+            if type == null { return false; }
             fprintf(file, "(");
             g.write_type(file, type, generics);
             fprintf(file, ")(");
@@ -573,7 +573,7 @@ impl ExpressionWriter {
                 return self.write_invoke(file, target, arguments, generics);
             },
             ExpressionData::EnumVariant(variant) => {
-                return self.write_enum_variant(file, variant, &expression.return_type, 0, generics);
+                return self.write_enum_variant(file, variant, &expression.return_type, null, generics);
             },
             ExpressionData::UnaryExpression(operator, inner) => {
                 let skip_operator = operator.eq("&") && expression.return_type.is_fat_pointer();
@@ -717,8 +717,8 @@ impl ExpressionWriter {
             },
             ExpressionData::CppExpression(cpp_expression) => {
                 match cpp_expression {
-                    CppExpression::New(placement, new_expression) => {
-                        if placement != 0 {
+                    CppExpression::New { placement, expression: new_expression } => {
+                        if placement != null {
                             fprintf(file, "new(");
                             self.write_expression(file, placement, generics);
                             fprintf(file, ") ");

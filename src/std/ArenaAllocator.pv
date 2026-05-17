@@ -5,32 +5,32 @@
 struct ArenaAllocator {
     allocator: &dyn Allocator,
     block_size: usize,
-    last_block: &ArenaBlock,
-    last_oversize: &ArenaOversize,
+    last_block: *ArenaBlock,
+    last_oversize: *ArenaOversize,
 }
 
 struct ArenaBlock {
-    buffer: &u8,
+    buffer: *u8,
     capacity: usize,
     offset: usize,
-    prev: &ArenaBlock,
+    prev: *ArenaBlock,
 }
 
 struct ArenaOversize {
     size: usize,
-    prev: &ArenaOversize,
+    prev: *ArenaOversize,
 }
 
 impl ArenaBlock {
-    fn new(allocator: &dyn Allocator, capacity: usize, prev: &ArenaBlock) -> &Self {
-        let buffer: &u8 = allocator.alloc(capacity);
-        if buffer == 0 {
+    fn new(allocator: &dyn Allocator, capacity: usize, prev: *ArenaBlock) -> *Self {
+        let buffer: *u8 = allocator.alloc(capacity);
+        if buffer == null {
             fprintf(stderr, "ArenaBlock::new: failed to allocate capacity %zu\n", capacity);
-            return 0;
+            return null;
         }
 
         let self = Self { buffer, capacity, prev, offset: 0 };
-        let self_ptr: &Self = self.alloc(sizeof(Self));
+        let self_ptr: *Self = self.alloc(sizeof(Self));
         *self_ptr = self;
 
         return self_ptr;
@@ -61,19 +61,19 @@ impl ArenaBlock {
         return buffer_start < ptr && ptr < buffer_end;
     }
 
-    fn size(&self, ptr: &void) -> usize {
+    fn size(&self, ptr: *void) -> usize {
         if !self.is_in_block(ptr) { return 0; }
 
-        let header: &ArenaAllocation = ptr;
+        let header: *ArenaAllocation = ptr;
         header -= 1;
 
         return header.size;
     }
 
-    fn free(&self, ptr: &void) -> bool {
-        if ptr == 0 { return false; }
+    fn free(&self, ptr: *void) -> bool {
+        if ptr == null { return false; }
 
-        let header: &ArenaAllocation = ptr;
+        let header: *ArenaAllocation = ptr;
         header -= 1;
 
         let data: &u8 = ptr;
@@ -92,8 +92,8 @@ impl ArenaBlock {
         allocator.free(self.buffer);
     }
 
-    fn realloc(&self, ptr: &void, size: usize) -> *void {
-        let header: &ArenaAllocation = ptr;
+    fn realloc(&self, ptr: *void, size: usize) -> *void {
+        let header: *ArenaAllocation = ptr;
         header -= 1;
 
         let data: &u8 = ptr;
@@ -134,21 +134,21 @@ struct ArenaAllocation {
 
 impl ArenaAllocator {
     fn new(allocator: &dyn Allocator, block_size: usize) -> Self {
-        let block = ArenaBlock::new(allocator, block_size, 0);
-        if block == 0 { return Self { allocator, block_size: 0, last_block: 0, last_oversize: 0 }; }
-        
+        let block = ArenaBlock::new(allocator, block_size, null);
+        if block == null { return Self { allocator, block_size: 0, last_block: null, last_oversize: null }; }
+
         return Self {
             allocator,
             block_size,
             last_block: block,
-            last_oversize: 0,
+            last_oversize: null,
         };
     }
 
     fn destroy(&self) {
         let block = self.last_block;
 
-        while block != 0 {
+        while block != null {
             if block.is_in_block(self) {
                 block.destroy(self.allocator);
                 return;
@@ -160,7 +160,7 @@ impl ArenaAllocator {
         }
 
         self.block_size = 0;
-        self.last_block = 0;
+        self.last_block = null;
     }
 
     fn store<T>(&self, value: *T) -> *T {
@@ -176,7 +176,7 @@ impl Allocator for ArenaAllocator {
     fn alloc(&self, size: usize) -> *void {
         if size > self.block_size / 4 {
             let total_size = sizeof(ArenaOversize) + size;
-            let oversize: &ArenaOversize = self.allocator.alloc(total_size);
+            let oversize: *ArenaOversize = self.allocator.alloc(total_size);
             oversize.size = size;
             oversize.prev = self.last_oversize;
             self.last_oversize = oversize;
@@ -187,17 +187,17 @@ impl Allocator for ArenaAllocator {
         if ptr != null { return ptr; }
 
         let block = ArenaBlock::new(self.allocator, self.block_size, self.last_block);
-        if block == 0 { return null; }
+        if block == null { return null; }
 
         self.last_block = block;
         return self.last_block.alloc(size);
     }
-    
-    fn realloc(&self, ptr: &void, new_size: usize) -> *void {
-        if ptr == 0 { return self.alloc(new_size); }
+
+    fn realloc(&self, ptr: *void, new_size: usize) -> *void {
+        if ptr == null { return self.alloc(new_size); }
 
         let oversize = self.last_oversize;
-        while oversize != 0 {
+        while oversize != null {
             let prev = oversize.prev;
 
             if ptr == oversize + 1 {
@@ -220,9 +220,9 @@ impl Allocator for ArenaAllocator {
             oversize = prev;
         }
 
-        let current_block: &ArenaBlock = 0;
+        let current_block: *ArenaBlock = null;
         let block = self.last_block;
-        while current_block == 0 && block != 0 {
+        while current_block == null && block != null {
             if block.is_in_block(ptr) {
                 let realloc_ptr = block.realloc(ptr, new_size);
                 if realloc_ptr != null { return realloc_ptr; }
@@ -232,7 +232,7 @@ impl Allocator for ArenaAllocator {
             block = block.prev;
         }
 
-        if current_block == 0 {
+        if current_block == null {
             fprintf(stderr, "ArenaAllocator.realloc: No block found to reallocate from\n");
             return null;
         }
@@ -248,17 +248,17 @@ impl Allocator for ArenaAllocator {
         return new_ptr;
     }
 
-    fn free(&self, ptr: &void) -> bool {
-        if ptr == 0 { return false; }
+    fn free(&self, ptr: *void) -> bool {
+        if ptr == null { return false; }
 
         let oversize = self.last_oversize;
-        let next: &ArenaOversize = 0;
-        while oversize != 0 {
+        let next: *ArenaOversize = null;
+        while oversize != null {
             let prev = oversize.prev;
 
             if ptr == oversize + 1 {
                 if self.last_oversize == oversize { self.last_oversize = prev; }
-                if next != 0 { next.prev = prev; }
+                if next != null { next.prev = prev; }
 
                 return self.allocator.free(oversize);
             }
@@ -268,7 +268,7 @@ impl Allocator for ArenaAllocator {
         }
 
         let block = self.last_block;
-        while block != 0 {
+        while block != null {
             let prev = block.prev;
             
             if block.is_in_block(ptr) {

@@ -41,7 +41,7 @@ impl IncludeObjectContext {
             CXCursor_CXXBaseSpecifier => {
                 let base_cx_type = clang_getCursorType(cursor);
                 let base_type = include.parse_type(base_cx_type);
-                if base_type != 0 { class_info.bases.append(*base_type); }
+                if base_type != null { class_info.bases.append(*base_type); }
             },
             CXCursor_FieldDecl => {
                 let field_spelling: CXString = clang_getCursorSpelling(cursor);
@@ -79,7 +79,7 @@ impl IncludeObjectContext {
                 func_info.return_type = *return_type_resolved;
                 func_info.type = FunctionType::MethodCpp;
 
-                let func_type = Type::Function(allocator.store(&func_info), 0);
+                let func_type = Type::Function(allocator.store(&func_info), null);
                 class_info.fields.insert(method_name, func_type);
             },
             CXCursor_EnumDecl => {
@@ -146,7 +146,7 @@ impl IncludeObjectContext {
                     let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
                     let resolved = include.parse_type(underlying_type);
 
-                    if resolved != 0 {
+                    if resolved != null {
                         let typedef_ = TypedefC::new(include, name, resolved);
                         class_info.types.insert(name, Type::TypedefC(typedef_));
                     } else {

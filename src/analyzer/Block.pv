@@ -58,7 +58,7 @@ impl Block {
             hash("let") => {
                 let let_statement = LetStatement::parse(context, generics);
                 *data = StatementData::LetStatement(let_statement);
-                return let_statement != 0;
+                return let_statement != null;
             },
             hash("return") => {
                 let ret = ReturnStatement::parse(context, generics);
@@ -73,12 +73,12 @@ impl Block {
             hash("if") => {
                 let if_stmt = IfStatement::parse(context, generics);
                 *data = StatementData::IfStatement(if_stmt);
-                return if_stmt != 0;
+                return if_stmt != null;
             },
             hash("match") => {
                 let match_stmt = MatchStatement::parse(context, generics);
                 *data = StatementData::MatchStatement(match_stmt);
-                return match_stmt != 0;
+                return match_stmt != null;
             },
             hash("while") => {
                 let while_stmt = WhileStatement::parse(context, generics);
@@ -88,7 +88,7 @@ impl Block {
             hash("for") => {
                 let for_statement = ForStatement::parse(self, context, generics);
                 *data = StatementData::ForStatement(for_statement);
-                return for_statement != 0;
+                return for_statement != null;
             },
             hash("continue") => {
                 context.next_token();
@@ -113,7 +113,7 @@ impl Block {
 
         while !context.check_value(TokenType::Symbol, "}") {
             let first_token = context.current();
-            let data = StatementData::ExpressionStatement(0);
+            let data: StatementData;
             let result = true;
 
             if first_token.eq(TokenType::Symbol, "{") {

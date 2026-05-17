@@ -74,7 +74,7 @@ impl<T> TypeUsage<T> {
             allocator,
             type,
             usage_contexts: Array<UsageContext>::new(allocator),
-            impl_functions: Array<HashMap<usize, TypeFunctionUsage>> { allocator, data: 0, length: 0, capacity: 0 },
+            impl_functions: Array<HashMap<usize, TypeFunctionUsage>> { allocator, data: null, length: 0, capacity: 0 },
             impl_dynamic_usage: false,
         };
 
@@ -117,8 +117,8 @@ struct Usages {
     tuples: HashMap<usize, TypeUsage<Tuple>>,
 
     usage_mode: UsageMode,
-    usage_context: &UsageContext,
-    function_context: &FunctionContext,
+    usage_context: *UsageContext,
+    function_context: *FunctionContext,
 
     std_namespace: *Namespace,
 }
@@ -147,8 +147,8 @@ impl Usages {
 
             std_namespace: generator.root.find_namespace("std"),
             usage_mode: UsageMode::Layout,
-            usage_context: 0,
-            function_context: 0,
+            usage_context: null,
+            function_context: null,
         };
 
         for (_, &info) in self.root.primitives {
@@ -208,7 +208,7 @@ impl Usages {
             self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
             
             if func_info.generics.array.length == 0 && self.usage_types.insert(func_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Function(func_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Function(func_info, generic_map));
@@ -227,7 +227,7 @@ impl Usages {
             }
 
             if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Enum(enum_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Enum(enum_info, generic_map));
@@ -246,7 +246,7 @@ impl Usages {
             }
 
             if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Struct(struct_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Struct(struct_info, generic_map));
@@ -261,7 +261,7 @@ impl Usages {
             }
 
             if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                 let self_type = self.allocator.store(&Type::Trait(trait_info, generic_map));
                 generic_map.self_type = self_type;
                 self.usages.append(Type::Trait(trait_info, generic_map));
@@ -270,7 +270,7 @@ impl Usages {
     }
 
     fn add_type(&self, type: &Type, generic_map: &GenericMap) {
-        let resolved_type = Context::resolve_type(self.allocator, type, generic_map, 0);
+        let resolved_type = Context::resolve_type(self.allocator, type, generic_map, null);
         let type_deref = resolved_type.deref();
         let type_deref_all = resolved_type.deref_all();
         let is_type = false;
@@ -344,7 +344,7 @@ impl Usages {
             Type::StructC(struct_c) => { is_type = !struct_c.include.mode_cpp; },
             Type::UnionC(union_c) => { is_type = !union_c.include.mode_cpp; },
             Type::EnumC(enum_c) => { is_type = !enum_c.include.mode_cpp; },
-            Type::UnknownC(unknown_c) => { is_type = unknown_c.include != 0; },
+            Type::UnknownC(unknown_c) => { is_type = unknown_c.include != null; },
             Type::FunctionC(_) => { is_type = true; },
             Type::TypedefC(typedef_c) => { is_type = !typedef_c.include.mode_cpp; },
             Type::ClassCpp(class_info) => {
@@ -387,7 +387,7 @@ impl Usages {
             if impl_info.has_trait {
                 self.add_type(&impl_info.trait_type, generic_map);
 
-                if impl_info.trait_ != 0 && !impl_info.trait_.has_dynamic_dispatch() {
+                if impl_info.trait_ != null && !impl_info.trait_.has_dynamic_dispatch() {
                     for (_, &func_info) in impl_info.functions {
                         for param in func_info.parameters {
                             self.add_type(&param.type, generic_map);
@@ -403,7 +403,7 @@ impl Usages {
             }
 
             let trait_info = impl_info.trait_;
-            if trait_info != 0 {
+            if trait_info != null {
                 for (func_base_name, &func_info) in trait_info.functions {
                     if impl_info.functions.find(&func_base_name) != null { continue; }
                     self.process_function(func_info, generic_map);
@@ -414,7 +414,7 @@ impl Usages {
 
     fn process_primitive(&self, primitive_info: &Primitive) {
         let self_type = self.allocator.store(&Type::Primitive(primitive_info));
-        let generic_map = self.allocator.store(&GenericMap { self_type, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+        let generic_map = self.allocator.store(&GenericMap { self_type, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
 
         let parent_ptr = cast<usize>(primitive_info);
         let parent_usage = self.primitives.find(&parent_ptr);
@@ -422,11 +422,11 @@ impl Usages {
 
         self.process_impls(&primitive_info.impls, generic_map);
 
-        self.usage_context = 0;
+        self.usage_context = null;
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
-        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
+        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
@@ -457,7 +457,7 @@ impl Usages {
     }
 
     fn process_tuple(&self, tuple: &Tuple) {
-        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 });
+        let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         let tuple_type = Type::Tuple(tuple);
 
@@ -512,7 +512,7 @@ impl Usages {
 
         self.process_impls(&struct_info.impls, generic_map);
 
-        self.usage_context = 0;
+        self.usage_context = null;
     }
 
     fn process_enum(&self, enum_info: &Enum, generic_map: &GenericMap) {
@@ -530,7 +530,7 @@ impl Usages {
 
         self.process_impls(&enum_info.impls, generic_map);
 
-        self.usage_context = 0;
+        self.usage_context = null;
     }
 
     fn process_trait(&self, trait_info: &Trait, generic_map: &GenericMap) {
@@ -542,7 +542,7 @@ impl Usages {
             self.process_function(func_info, generic_map);
         }
 
-        self.usage_context = 0;
+        self.usage_context = null;
     }
 
     fn process_function(&self, func_info: &Function, generic_map: &GenericMap) {
@@ -604,7 +604,7 @@ impl Usages {
 
         if self.std_namespace && func_info.type == FunctionType::Coroutine {
             let iter_trait = self.std_namespace.find_trait("Iter");
-            let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, 0), &Array<Type> { data: &func_info.return_type, length: 1, allocator: self.allocator, capacity: 0 });
+            let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, null), &Array<Type> { data: &func_info.return_type, length: 1, allocator: self.allocator, capacity: 0 });
             self.add_type(sequence_iter, generic_map);
         }
 
@@ -621,11 +621,11 @@ impl Usages {
         self.process_block(func_info.body, generic_map);
 
         self.usage_context = parent_usage_context;
-        self.function_context = 0;
+        self.function_context = null;
     }
 
-    fn process_block(&self, block: &Block, generic_map: &GenericMap) {
-        if block == 0 { return; }
+    fn process_block(&self, block: *Block, generic_map: &GenericMap) {
+        if block == null { return; }
 
         for statement_iter in block.statements {
             match statement_iter.data {
@@ -639,12 +639,12 @@ impl Usages {
 
                     self.add_type(statement.type, generic_map);
 
-                    if statement.value != 0 {
+                    if statement.value != null {
                         self.process_expression(statement.value, generic_map);
                     }
                 },
                 StatementData::ReturnStatement(statement) => {
-                    if statement.expression != 0 {
+                    if statement.expression != null {
                         self.process_expression(statement.expression, generic_map);
                     }
                 },
@@ -657,7 +657,7 @@ impl Usages {
                     self.process_block(statement.block, generic_map);
 
                     for else_statement in statement.else_statements {
-                        if else_statement.expression != 0 { self.process_expression(else_statement.expression, generic_map); }
+                        if else_statement.expression != null { self.process_expression(else_statement.expression, generic_map); }
                         self.process_block(else_statement.block, generic_map);
                     }
                 },
@@ -675,7 +675,7 @@ impl Usages {
                 StatementData::ForStatement(statement) => {
                     self.process_expression(statement.expression, generic_map);
                     self.add_type(statement.iter_type, generic_map);
-                    if statement.value_type != 0 {
+                    if statement.value_type != null {
                         self.add_type(statement.value_type, generic_map);
                     }
 
@@ -691,7 +691,8 @@ impl Usages {
                         },
                         ForStatementType::Iter(iter_expression) => {
                             self.process_expression(iter_expression, generic_map);
-                        }
+                        },
+                        ForStatementType::Error => {},
                     }
 
                     self.process_block(statement.block, generic_map);
@@ -731,7 +732,7 @@ impl Usages {
                                         Type::Generic(generic) => {
                                             let name = generic.name.value;
                                             let resolved_type = generic_map.get(name);
-                                            if resolved_type != 0 { type = resolved_type; }
+                                            if resolved_type != null { type = resolved_type; }
                                         },
                                         _ => {},
                                     }
@@ -748,7 +749,7 @@ impl Usages {
                                             }
                                         },
                                         Type::TypedefC(typedef_c) => {
-                                            let primitive_info = allocator.store(&Primitive { name: typedef_c.name, traits: HashMap<str, &Trait> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, impls: Array<&Impl> { allocator: self.allocator, data: 0, length: 0, capacity: 0 } });
+                                            let primitive_info = allocator.store(&Primitive { name: typedef_c.name, traits: HashMap<str, &Trait> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 }, impls: Array<&Impl> { allocator: self.allocator, data: null, length: 0, capacity: 0 } });
                                             match self.usage_mode {
                                                 UsageMode::Layout => { usage_context.layout.insert(typedef_c.name, Type::Primitive(primitive_info)); },
                                                 UsageMode::Signature => { usage_context.signature.insert(typedef_c.name, Type::Primitive(primitive_info)); },
@@ -798,8 +799,8 @@ impl Usages {
             },
             ExpressionData::CppExpression(cpp_expression) => {
                 match cpp_expression {
-                    CppExpression::New(placement, new_expression) => {
-                        if placement != 0 { self.process_expression(placement, generic_map); }
+                    CppExpression::New { placement, expression: new_expression } => {
+                        if placement != null { self.process_expression(placement, generic_map); }
                         self.process_expression(new_expression, generic_map);
                     },
                     CppExpression::Delete(delete_expression) => {
@@ -819,7 +820,7 @@ impl Usages {
                     _ => {},
                 }
 
-                let return_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, 0).deref();
+                let return_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, null).deref();
                 match return_type {
                     Type::Function(func_info, _) => {
                         let func_ptr = cast<usize>(func_info);

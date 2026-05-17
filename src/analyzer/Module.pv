@@ -54,12 +54,12 @@ impl Module {
             globals: HashMap<str, &Global>::new(allocator),
             global_types: HashMap<str, Type>::new(allocator),
             tests: Array<TestInfo>::new(allocator),
-            context: Context { allocator, base_path: str { ptr: null, length: 0 }, path: str { ptr: null, length: 0 }, pos: 0, tokens: 0, length: 0, offset: 0, analysis: 0, type_self: 0, pointer_const_char: Indirect { type: IndirectType::Reference, to: Type::Primitive(0) }, types: HashMap<str, Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, scopes: Array<Scope> { allocator, data: 0, length: 0, capacity: 0 }, module: 0, root: 0, function: 0 },
-            tokens: Array<Token> { allocator, data: 0, length: 0, capacity: 0 },
+            context: Context { allocator, base_path: str { ptr: null, length: 0 }, path: str { ptr: null, length: 0 }, pos: 0, tokens: null, length: 0, offset: 0, analysis, type_self: null, type_char: Type::Primitive(null), pointer_const_char: Indirect { type: IndirectType::Reference, to: Type::Primitive(null) }, types: HashMap<str, Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 }, scopes: Array<Scope> { allocator, data: null, length: 0, capacity: 0 }, module: cast<&Module>(null), root: cast<&Root>(null), function: null },
+            tokens: Array<Token> { allocator, data: null, length: 0, capacity: 0 },
             mode_cpp: false,
         };
 
-        self.context = Context::new(allocator, "", path, 0, analysis, self);
+        self.context = Context::new(allocator, "", path, null, analysis, self);
 
         return self;
     }
@@ -161,7 +161,7 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "enum") {
                 let node: Enum = Enum::parse(context);
 
-                if node.name == 0 {
+                if node.name == null {
                     result = false;
                 } else {
                     enums.insert(node.name.value, node);
@@ -169,7 +169,7 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "struct") {
                 let node: Struct = Struct::parse(self);
 
-                if node.name == 0 {
+                if node.name == null {
                     result = false;
                 } else {
                     structs.insert(node.name.value, node);
@@ -296,8 +296,8 @@ impl Module {
                     token_start,
                     token_end,
                     is_const,
-                    type: Type::Primitive(0),
-                    value: 0,
+                    type: Type::Primitive(null),
+                    value: null,
                 };
                 self.globals.insert(global_name.value, global);
             } else if token.type == TokenType::Comment {
@@ -356,7 +356,7 @@ impl Module {
     fn fill_namespace(&self) -> bool {
         let namespace = self.namespace;
         let allocator = namespace.root.allocator;
-        let blank_generics = allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+        let blank_generics = allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } });
         blank_generics.self_type = Type::Self.to_ptr(allocator);
 
         for (_, &func_info) in self.functions {
@@ -404,7 +404,7 @@ impl Module {
                 params.append(Parameter { name: param_name, type: Type::Generic(generic_t) });
 
                 let type_id_type = namespace.find_type("TypeId");
-                if type_id_type != 0 {
+                if type_id_type != null {
                     self.context.insert_builtin_function("typeid", &generics, &params, *type_id_type);
                 }
                 else {
@@ -439,35 +439,35 @@ impl Module {
 
             match impl_info.type {
                 Type::Enum(enum_info, _) => {
-                    if impl_info.trait_ != 0 { enum_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    if impl_info.trait_ != null { enum_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     let impl_index = enum_info.impls.append(impl_info);
 
                     let parent = FunctionParent::Enum(enum_info, impl_index, impl_info.trait_);
                     impl_info.fill_types(parent);
                 },
                 Type::Struct(struct_info, _) => {
-                    if impl_info.trait_ != 0 { struct_info.traits.insert(impl_info.trait_.name.value, (impl_info.trait_, &impl_info.trait_type)); }
+                    if impl_info.trait_ != null { struct_info.traits.insert(impl_info.trait_.name.value, (impl_info.trait_, &impl_info.trait_type)); }
                     let impl_index = struct_info.impls.append(impl_info);
                     let parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
                     impl_info.fill_types(parent);
                 },
                 Type::Primitive(primitive_info) => {
-                    if impl_info.trait_ != 0 { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    if impl_info.trait_ != null { primitive_info.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     primitive_info.impls.append(impl_info);
                 },
                 Type::StructC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    if impl_info.trait_ != null { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     ctype.impls.append(impl_info);
                 },
                 Type::EnumC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    if impl_info.trait_ != null { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     ctype.impls.append(impl_info);
                 },
                 Type::TypedefC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    if impl_info.trait_ != 0 { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
+                    if impl_info.trait_ != null { ctype.traits.insert(impl_info.trait_.name.value, impl_info.trait_); }
                     ctype.impls.append(impl_info);
                 },
                 Type::Indirect(_) => {
@@ -483,7 +483,7 @@ impl Module {
 
     fn parse_declarations(&self) -> bool {
         for (_, &func_info) in self.functions {
-            func_info.fill_types(0);
+            func_info.fill_types(null);
         }
         
 
@@ -516,7 +516,7 @@ impl Module {
         }
 
         for type_impl in self.type_impls {
-            let parent = FunctionParent::Type(&type_impl.type, 0, 0);
+            let parent = FunctionParent::Type(&type_impl.type, 0, null);
             type_impl.impl_info.fill_types(parent);
 
             for (_, &func_info) in type_impl.impl_info.functions {
@@ -593,37 +593,37 @@ impl Module {
         return null;
     }
 
-    fn find_trait(&self, name: str) -> &Trait {
+    fn find_trait(&self, name: str) -> *Trait {
         let type = self.namespace.root.find_trait(name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         type = self.namespace.find_trait(name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         for *namespace in self.used_namespaces {
             type = namespace.find_trait(name);
-            if type != 0 { return type; }
+            if type != null { return type; }
         }
 
-        return 0;
+        return null;
     }
 
-    fn find_function(&self, name: str) -> &Type {
+    fn find_function(&self, name: str) -> *Type {
         let type = self.namespace.root.find_function(name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         type = self.namespace.find_function(name);
-        if type != 0 { return type; }
+        if type != null { return type; }
 
         for *namespace in self.used_namespaces {
             type = namespace.find_function(name);
-            if type != 0 { return type; }
+            if type != null { return type; }
         }
 
-        return 0;
+        return null;
     }
 
-    fn find_value(&self, name: str) -> &Type {
+    fn find_value(&self, name: str) -> *Type {
         let type = self.global_types.find(&name);
         if type != null { return type; }
 
@@ -639,10 +639,10 @@ impl Module {
             if type != null { return type; }
         }
 
-        return 0;
+        return null;
     }
 
-    fn find_make_type(&self, name: str, usage_types: &Array<Type>) -> &Type {
+    fn find_make_type(&self, name: str, usage_types: &Array<Type>) -> *Type {
         let type = self.find_type(name);
         return self.root.make_type_usage(type, usage_types);
     }

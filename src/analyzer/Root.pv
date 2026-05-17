@@ -15,9 +15,9 @@ struct Root {
     functions: HashMap<str, Type>,
     clang_args: Array<*const char>,
     analysis: &Analysis,
-    primitive_bool: &Primitive,
-    primitive_usize: &Primitive,
-    primitive_void: &Primitive,
+    primitive_bool: *Primitive,
+    primitive_usize: *Primitive,
+    primitive_void: *Primitive,
     type_void: Type,
     type_bool: Type,
     type_unknown: Type,
@@ -27,7 +27,7 @@ struct Root {
     func_next: Function,
     func_value: Function,
     naming_decl: Naming,
-    hack_type_impl: &TypeImpl,
+    hack_type_impl: *TypeImpl,
     includes_c: HashMap<str, &Include>,
     includes_cpp: HashMap<str, &Include>,
     mode_cpp: bool,
@@ -50,18 +50,18 @@ impl Root {
             naming_decl: Naming::new_decl(allocator),
             includes_c: HashMap<str, &Include>::new(allocator),
             includes_cpp: HashMap<str, &Include>::new(allocator),
-            primitive_bool: 0,
-            primitive_usize: 0,
-            primitive_void: 0,
-            type_void: Type::Primitive(0),
-            type_bool: Type::Primitive(0),
-            type_unknown: Type::Primitive(0),
-            type_self: Type::Primitive(0),
-            type_ref_self: Type::Primitive(0),
-            type_usize: Type::Primitive(0),
-            func_next: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: 0, length: 0, capacity: 0 }, return_type: Type::Primitive(0), body: 0 },
-            func_value: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: 0, length: 0, capacity: 0 }, return_type: Type::Primitive(0), body: 0 },
-            hack_type_impl: 0,
+            primitive_bool: null,
+            primitive_usize: null,
+            primitive_void: null,
+            type_void: Type::Primitive(null),
+            type_bool: Type::Primitive(null),
+            type_unknown: Type::Primitive(null),
+            type_self: Type::Primitive(null),
+            type_ref_self: Type::Primitive(null),
+            type_usize: Type::Primitive(null),
+            func_next: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
+            func_value: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
+            hack_type_impl: null,
             mode_cpp: false,
         };
 
@@ -82,7 +82,7 @@ impl Root {
         self.primitive_void = self.add_primitive("void");
         self.type_void = Type::Primitive(self.primitive_void);
         self.type_bool = Type::Primitive(self.primitive_bool);
-        let unknown_c = allocator.store(&UnknownC { include: 0, name: "unknown", generics: Array<Type> { allocator, data: 0, length: 0, capacity: 0 } });
+        let unknown_c = allocator.store(&UnknownC { include: null, name: "unknown", generics: Array<Type> { allocator, data: null, length: 0, capacity: 0 } });
         self.type_unknown = Type::UnknownC(unknown_c);
         self.type_self = Type::Self;
         self.type_ref_self = Type::Indirect(Indirect::new_reference(self.allocator, self.type_self));
@@ -98,8 +98,8 @@ impl Root {
             token_start: 0,
             token_end: 0,
             parent: FunctionParent::None,
-            generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
-            body: 0,
+            generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
+            body: null,
         };
         self.func_next.parameters.append(Parameter { name: allocator.store(&Token { type: TokenType::Identifier, value: "self", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), type: self.type_ref_self });
 
@@ -107,15 +107,15 @@ impl Root {
             type: FunctionType::Standard,
             name: allocator.store(&Token { type: TokenType::Identifier, value: "value", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }),
             parameters: Array<Parameter>::new(allocator),
-            return_type: Type::Generic(allocator.store(&Generic { name: allocator.store(&Token { type: TokenType::Identifier, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), traits: Array<&Trait> { allocator, data: 0, length: 0, capacity: 0 } })),
+            return_type: Type::Generic(allocator.store(&Generic { name: allocator.store(&Token { type: TokenType::Identifier, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), traits: Array<&Trait> { allocator, data: null, length: 0, capacity: 0 } })),
             context: null,
             declaration_start: 0,
             declaration_end: 0,
             token_start: 0,
             token_end: 0,
             parent: FunctionParent::None,
-            generics: Generics { parent: null, array: Array<Generic> { allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
-            body: 0,
+            generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
+            body: null,
         };
         self.func_value.parameters.append(Parameter { name: allocator.store(&Token { type: TokenType::Identifier, value: "self", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), type: self.type_ref_self });
 
@@ -253,17 +253,17 @@ impl Root {
         return true;
     }
 
-    fn find_type(&self, name: str) -> &Type {
+    fn find_type(&self, name: str) -> *Type {
         return self.types.find(&name);
     }
 
-    fn find_trait(&self, name: str) -> &Trait {
+    fn find_trait(&self, name: str) -> *Trait {
         let trait_info = self.traits.find(&name);
-        if trait_info == null { return 0; }
+        if trait_info == null { return null; }
         return *trait_info;
     }
 
-    fn find_function(&self, name: str) -> &Type {
+    fn find_function(&self, name: str) -> *Type {
         return self.functions.find(&name);
     }
 
@@ -273,8 +273,8 @@ impl Root {
 
     fn error(&self, path: str, start_line: usize, start_column: usize, end_line: usize, end_column: usize, message: *const char) {
         let diagnostics = &self.analysis.diagnostics;
-        let file_diagnostics: &Array<Diagnostic> = diagnostics.find(&path);
-        if file_diagnostics == 0 { file_diagnostics = diagnostics.insert(path, Array<Diagnostic>::new(self.allocator)); }
+        let file_diagnostics = diagnostics.find(&path);
+        if file_diagnostics == null { file_diagnostics = diagnostics.insert(path, Array<Diagnostic>::new(self.allocator)); }
 
         file_diagnostics.append(Diagnostic {
             message: message,
@@ -292,8 +292,8 @@ impl Root {
         });
     }
 
-    fn make_type_usage(&self, type: &Type, usage_types: &Array<Type>) -> &Type {
-        if type == 0 { return 0; }
+    fn make_type_usage(&self, type: *Type, usage_types: &Array<Type>) -> *Type {
+        if type == null { return null; }
         let allocator = self.allocator;
 
         match type {

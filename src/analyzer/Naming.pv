@@ -36,7 +36,7 @@ struct Naming {
     union_prefix: str,
     coroutine_instance_prefix: str,
     primitives: HashMap<str, str>,
-    naming_ident: &Naming,
+    naming_ident: *Naming,
 }
 
 impl Naming {
@@ -66,8 +66,8 @@ impl Naming {
             trait_prefix: "",
             union_prefix: "",
             coroutine_instance_prefix: "",
-            primitives: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
-            naming_ident: 0,
+            primitives: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+            naming_ident: null,
         };
     }
 
@@ -97,8 +97,8 @@ impl Naming {
             struct_prefix: "",
             union_prefix: "",
             coroutine_instance_prefix: "",
-            primitives: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 },
-            naming_ident: 0,
+            primitives: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+            naming_ident: null,
         };
     }
 
@@ -152,7 +152,7 @@ impl Naming {
 
     fn get_type_name(&self, type: &Type, type_self: &Type, generics_map: *GenericMap) -> String {
         let result = String::new(self.allocator);
-        let generics = Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 };
+        let generics = Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
         let generic_start = self.generic_start;
         let generic_end = self.generic_end;
 
@@ -188,7 +188,7 @@ impl Naming {
 
                 match sequence.type {
                     SequenceType::Slice => {
-                        if self.naming_ident != 0 {
+                        if self.naming_ident != null {
                             element_name.release();
                             element_name = self.naming_ident.get_type_name(&sequence.element, type_self, generics_map);
                         }
@@ -224,7 +224,7 @@ impl Naming {
                 generics = tuple.elements;
             },
             Type::Primitive(primitive_info) => {
-                if primitive_info == 0 {
+                if primitive_info == null {
                     result.append("void");
                 } else {
                     let translation = self.primitives.find(&primitive_info.name);
@@ -270,7 +270,7 @@ impl Naming {
                 }
 
                 let generic_type = generics_map.get(name);
-                if generic_type == 0 {
+                if generic_type == null {
                     let len: u32 = name.length;
                     fprintf(stderr, "Naming.get_type_name: Attempt to retrieve generic %.*s but it does not exist in generics\n", len, name.ptr);
                 }
@@ -280,16 +280,16 @@ impl Naming {
             Type::GenericTypedef(gt) => {
                 if generics_map != null {
                     let direct_type = generics_map.get(gt.typedef_name);
-                    if direct_type != 0 {
+                    if direct_type != null {
                         return self.get_type_name(direct_type, type_self, generics_map);
                     }
 
                     let concrete_type = generics_map.get(gt.generic.name.value);
-                    if concrete_type != 0 {
+                    if concrete_type != null {
                         match concrete_type {
                             Type::Struct(struct_info, _) => {
                                 for *impl_info in struct_info.impls {
-                                    if impl_info.trait_ == 0 { continue; }
+                                    if impl_info.trait_ == null { continue; }
                                     if impl_info.trait_.typedefs.find(&gt.typedef_name) == null { continue; }
                                     let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
                                     if typedef_type != null {
@@ -312,8 +312,8 @@ impl Naming {
             Type::Function(func_info, generics2) => {
                 let has_parent = false;
                 let parent_type: Type;
-                let trait_info: &Trait = 0;
-                let trait_impl_info: &Impl = 0;
+                let trait_info: *Trait = null;
+                let trait_impl_info: *Impl = null;
 
                 match func_info.parent {
                     FunctionParent::None => {},
@@ -354,7 +354,7 @@ impl Naming {
                 }
 
                 if has_parent {
-                    if self.naming_ident != 0 {
+                    if self.naming_ident != null {
                         let parent_type_name = self.naming_ident.get_type_name(&parent_type, type_self, generics_map);
                         result.append_string(&parent_type_name);
                         result.append("__");
@@ -365,15 +365,15 @@ impl Naming {
                     }
                 }
 
-                if trait_info != 0 {
+                if trait_info != null {
                     result.append(trait_info.name.value);
-                    if trait_impl_info != 0 {
+                    if trait_impl_info != null {
                         match trait_impl_info.trait_type {
                             Type::Trait(ti, tmap) => {
                                 for (gname, _) in ti.generics.map {
                                     if ti.typedefs.find(&gname) == null {
                                         let gtype = tmap.get(gname);
-                                        if gtype != 0 {
+                                        if gtype != null {
                                             result.append("_");
                                             let gtype_name = self.get_type_name(gtype, type_self, generics_map);
                                             result.append_string(&gtype_name);
@@ -423,7 +423,7 @@ impl Naming {
                 }
 
                 if has_parent {
-                    if self.naming_ident != 0 {
+                    if self.naming_ident != null {
                         let parent_type_name = self.naming_ident.get_type_name(&parent_type, type_self, generics_map);
                         result.append_string(&parent_type_name);
                         result.append("__");
@@ -478,7 +478,7 @@ impl Naming {
             for generic in generics {
                 if first { first = false; } else { result.append(self.generic_seperator); }
 
-                if self.naming_ident != 0 {
+                if self.naming_ident != null {
                     let generic_name = self.naming_ident.get_type_name(generic, type_self, generics_map);            
                     result.append(generic_name.as_str());
                 } else {
@@ -493,7 +493,7 @@ impl Naming {
         return result;
     }
     
-    fn get_type_decl(&self, type: &Type, type_self: &Type, generics_map: &GenericMap) -> String {
+    fn get_type_decl(&self, type: &Type, type_self: &Type, generics_map: *GenericMap) -> String {
         match type {
             Type::Function(func_info, _) => {
                 let result = String::new(self.allocator);

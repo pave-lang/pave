@@ -68,25 +68,25 @@ impl<T> IterEnumerate<T> {
 
 struct Array<T> {
     allocator: &dyn Allocator,
-    data: &T,
+    data: *T,
     length: usize,
     capacity: usize,
 }
 
 impl<T> Array<T> {
     fn new(allocator: &dyn Allocator) -> Self {
-        return Self { allocator, data: 0, length: 0, capacity: 0 };
+        return Self { allocator, data: null, length: 0, capacity: 0 };
     }
 
     fn new_with_length(allocator: &dyn Allocator, length: usize) -> Self {
-        let self = Self { allocator, data: 0, length: 0, capacity: 0 };
+        let self = Self { allocator, data: null, length: 0, capacity: 0 };
         self.reserve(length);
         self.length = length;
         return self;
     }
 
     fn new_with_capacity(allocator: &dyn Allocator, length: usize) -> Self {
-        let self = Self { allocator, data: 0, length: 0, capacity: 0 };
+        let self = Self { allocator, data: null, length: 0, capacity: 0 };
         self.reserve(length);
         return self;
     }
@@ -100,8 +100,8 @@ impl<T> Array<T> {
         self.capacity = capacity;
     }
 
-    fn get(&self, index: usize) -> &T {
-        if index >= self.length { return 0; }
+    fn get(&self, index: usize) -> *T {
+        if index >= self.length { return null; }
         return self.data + index;
     }
 
@@ -164,7 +164,7 @@ impl<T> Array<T> {
 
     fn release(&self) {
         self.allocator.free(self.data);
-        self.data = 0;
+        self.data = null;
         self.length = 0;
         self.capacity = 0;
     }

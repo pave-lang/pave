@@ -22,15 +22,15 @@ struct Generator {
     naming_decl: &Naming,
     naming_ident: Naming,
     naming_c99: Naming,
-    function_context: &FunctionContext,
+    function_context: *FunctionContext,
 }
 
 impl Generator {
     fn overwrite_if_different(&self, file_name: *const char, source: &FILE) -> bool {
-        let orig: &FILE = fopen(file_name, "r");
+        let orig: *FILE = fopen(file_name, "r");
         let different = true;
 
-        if orig != 0 {
+        if orig != null {
             rewind(source);
             let c1: i32 = 0;
             let c2: i32 = 0;
@@ -153,9 +153,9 @@ impl Generator {
         return true;
     }
 
-    fn write_variable_decl(&self, file: &FILE, name: str, type: &Type, generics: &GenericMap) -> bool {
+    fn write_variable_decl(&self, file: &FILE, name: str, type: &Type, generics: *GenericMap) -> bool {
         let self_type = type;
-        if generics != 0 { self_type = generics.self_type; }
+        if generics != null { self_type = generics.self_type; }
 
         let variable_decl = self.naming_c99.get_variable_decl(name, type, self_type, generics);
         self.write_str(file, variable_decl.as_str());
@@ -188,40 +188,34 @@ impl Generator {
         }
     }
 
-    fn get_function(&self, type: &Type, func_name: str, generic_map: &GenericMap) -> &Function {
+    fn get_function(&self, type: &Type, func_name: str, generic_map: *GenericMap) -> *Function {
         match type {
             Type::Self => { return self.get_function(generic_map.self_type, func_name, generic_map); },
             Type::Indirect(indirect) => { return self.get_function(&indirect.to, func_name, generic_map); },
             Type::Generic(generic) => {
-                if generic_map == 0 {
+                if generic_map == null {
                     fprintf(stderr, "Getting generic for function, but no generic map input\n");
-                    return 0;
+                    return null;
                 }
 
                 let generic_type = generic_map.get(generic.name.value);
-                if generic_type == 0 {
+                if generic_type == null {
                     fprintf(stderr, "Getting generic for function, no item in generic map found\n");
-                    return 0;
+                    return null;
                 }
 
                 return self.get_function(generic_type, func_name, generic_map);
             },
             Type::Primitive(primitive_info) => {
-                if primitive_info == 0 {
-                    let name_length: i32 = primitive_info.name.length;
-                    fprintf(stderr, "Could not find primitive_info %.*s for get_function\n", name_length, primitive_info.name.ptr);
-                    return 0;
-                }
-
-                let func_info: &Function = 0;
+                let func_info: *Function = null;
 
                 let impl_iter = primitive_info.impls.iter();
-                while func_info == 0 && impl_iter.next() {
+                while func_info == null && impl_iter.next() {
                     let impl_info = *impl_iter.value();
                     func_info = impl_info.find_function(func_name);
                 }
 
-                if func_info == 0 {
+                if func_info == null {
                     let name_length: i32 = primitive_info.name.length;
                     let func_name_length: i32 = func_name.length;
                     fprintf(stderr, "Could not find primitives %.*s function %.*s for get_function\n", name_length, primitive_info.name.ptr, func_name_length, func_name.ptr);
@@ -230,21 +224,15 @@ impl Generator {
                 return func_info;
             },
             Type::Enum(enum_info, _) => {
-                if enum_info == 0 {
-                    let name_length: i32 = enum_info.name.value.length;
-                    fprintf(stderr, "Could not find enum %.*s for get_function\n", name_length, enum_info.name.value.ptr);
-                    return 0;
-                }
-
-                let func_info: &Function = 0;
+                let func_info: *Function = null;
 
                 let impl_iter = enum_info.impls.iter();
-                while func_info == 0 && impl_iter.next() {
+                while func_info == null && impl_iter.next() {
                     let impl_info = *impl_iter.value();
                     func_info = impl_info.find_function(func_name);
                 }
 
-                if func_info == 0 {
+                if func_info == null {
                     let name_length: i32 = enum_info.name.value.length;
                     let func_name_length: i32 = func_name.length;
                     fprintf(stderr, "Could not find enums %.*s function %.*s for get_function\n", name_length, enum_info.name.value.ptr, func_name_length, func_name.ptr);
@@ -253,29 +241,23 @@ impl Generator {
                 return func_info;
             },
             Type::Struct(struct_info, _) => {
-                if struct_info == 0 {
-                    let name_length: i32 = struct_info.name.value.length;
-                    fprintf(stderr, "Could not find struct %.*s for get_function\n", name_length, struct_info.name.value.ptr);
-                    return 0;
-                }
-
-                let func_info: &Function = 0;
+                let func_info: *Function = null;
 
                 for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
                     func_info = impl_info.find_function(func_name);
 
-                    if func_info != 0 { break; }
+                    if func_info != null { break; }
 
                     func_info = impl_info.trait_.functions.find(&func_name);
 
-                    if func_info != 0 {
+                    if func_info != null {
                         func_info = self.allocator.store(func_info);
                         func_info.parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
                         break;
                     }
                 }
 
-                if func_info == 0 {
+                if func_info == null {
                     let name_length: i32 = struct_info.name.value.length;
                     let func_name_length: i32 = func_name.length;
                     fprintf(stderr, "Could not find structs %.*s function %.*s for get_function\n", name_length, struct_info.name.value.ptr, func_name_length, func_name.ptr);
@@ -284,11 +266,11 @@ impl Generator {
                 return func_info;
             },
             Type::Trait(trait_info, _) => {
-                if trait_info == 0 {
-                    let name_length: i32 = trait_info.name.value.length;
-                    fprintf(stderr, "Could not find trait %.*s for get_function\n", name_length, trait_info.name.value.ptr);
-                    return 0;
-                }
+                // if trait_info == 0 {
+                //     let name_length: i32 = trait_info.name.value.length;
+                //     fprintf(stderr, "Could not find trait %.*s for get_function\n", name_length, trait_info.name.value.ptr);
+                //     return 0;
+                // }
 
                 let func_info = trait_info.functions.find(&func_name);
 
@@ -305,7 +287,7 @@ impl Generator {
             },
         }
 
-        return 0;
+        return null;
     }
 
     fn write_enum_variant_name(&self, file: &FILE, type: &Type, variant: &EnumVariant) -> bool {
@@ -441,19 +423,19 @@ impl Generator {
         }
     }
 
-    fn has_void_self_replacement(parameter: &Parameter, generics: &GenericMap) -> bool {
-        if generics == 0 || generics.self_type == 0 { return false; }
+    fn has_void_self_replacement(parameter: &Parameter, generics: *GenericMap) -> bool {
+        if generics == null || generics.self_type == null { return false; }
 
         match generics.self_type {
             Type::Primitive(primitive_info) => {
-                if primitive_info != 0 && !primitive_info.name.eq("void") {
+                if !primitive_info.name.eq("void") {
                     return false;
                 }
             },
             _ => { return false; },
         }
 
-        let ref: &Type = 0;
+        let ref: *Type = null;
 
         match parameter.type {
             Type::Indirect(indirect) => {
@@ -462,7 +444,7 @@ impl Generator {
             _ => { return false; },
         }
 
-        if ref == 0 { return false; }
+        if ref == null { return false; }
 
         match ref {
             Type::Self => { return true; },
@@ -514,20 +496,20 @@ impl Generator {
         }
     }
 
-    fn get_trait_function_name(&self, struct_name: str, trait_info: &Trait, impl_trait_type: &Type, func_info: &Function, generics: &GenericMap) -> String {
+    fn get_trait_function_name(&self, struct_name: str, trait_info: &Trait, impl_trait_type: *Type, func_info: &Function, generics: &GenericMap) -> String {
         let trait_name = String::new(self.allocator);
 
         trait_name.append(struct_name);
         trait_name.append("__");
         trait_name.append(trait_info.name.value);
 
-        if impl_trait_type != 0 {
+        if impl_trait_type != null {
             match impl_trait_type {
                 Type::Trait(ti, tmap) => {
                     for (gname, _) in ti.generics.map {
                         if ti.typedefs.find(&gname) == null {
                             let gtype = tmap.get(gname);
-                            if gtype != 0 {
+                            if gtype != null {
                                 trait_name.append("_");
                                 let type_name = self.naming_ident.get_type_name(gtype, generics.self_type, generics);
                                 trait_name.append_string(&type_name);
@@ -560,8 +542,8 @@ impl Generator {
             naming_decl: &root.naming_decl,
             naming_ident: Naming::new_ident(allocator),
             indent: 0,
-            naming_c99: Naming { allocator, type: NamingType::Ident, generic_start: "", generic_seperator: "", generic_end: "", pointer_prefix: "", pointer_suffix: "", pointer_const_prefix: "", pointer_const_suffix: "", reference_prefix: "", reference_suffix: "", sequence_slice_prefix: "", sequence_open: "", sequence_fixed_delimiter: "", sequence_close: "", tuple_prefix: "", tuple_open: "", tuple_close: "", enum_generic_type_suffix: "", enum_prefix: "", struct_prefix: "", trait_prefix: "", union_prefix: "", coroutine_instance_prefix: "", primitives: HashMap<str, str> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 }, naming_ident: 0 },
-            function_context: 0,
+            naming_c99: Naming { allocator, type: NamingType::Ident, generic_start: "", generic_seperator: "", generic_end: "", pointer_prefix: "", pointer_suffix: "", pointer_const_prefix: "", pointer_const_suffix: "", reference_prefix: "", reference_suffix: "", sequence_slice_prefix: "", sequence_open: "", sequence_fixed_delimiter: "", sequence_close: "", tuple_prefix: "", tuple_open: "", tuple_close: "", enum_generic_type_suffix: "", enum_prefix: "", struct_prefix: "", trait_prefix: "", union_prefix: "", coroutine_instance_prefix: "", primitives: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 }, naming_ident: null },
+            function_context: null,
         };
 
         self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);

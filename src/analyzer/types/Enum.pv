@@ -22,7 +22,7 @@ enum EnumType {
 }
 
 struct Enum {
-    name: &Token,
+    name: *Token,
     context: &Context,
     token_start: usize,
     token_end: usize,
@@ -41,7 +41,7 @@ impl Enum {
             variants: HashMap<str, EnumVariant>::new(context.allocator),
             traits: HashMap<str, &Trait>::new(context.allocator),
             impls: Array<&Impl>::new(context.allocator),
-            name: 0,
+            name: null,
             token_start: 0,
             token_end: 0,
             type: EnumType::Standard,
@@ -139,7 +139,7 @@ impl Enum {
         let value: *Expression = null;
 
         if context.check_next(TokenType::Symbol, "=") {
-            value = Expression::parse(context, 0);
+            value = Expression::parse(context, null);
             if value == null { return false; }
         }
 
@@ -155,7 +155,7 @@ impl Enum {
             value,
         };
 
-        if self.variants.insert(variant.name.value, variant) == 0 { return false; }
+        self.variants.insert(variant.name.value, variant);
 
         return true;
     }

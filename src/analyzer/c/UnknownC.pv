@@ -2,7 +2,7 @@ use std
 use types
 
 struct UnknownC {
-    include: &Include,
+    include: *Include,
     name: str,
     generics: Array<Type>,
 }

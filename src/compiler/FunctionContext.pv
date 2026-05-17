@@ -3,7 +3,7 @@ use analyzer::types
 
 struct FunctionContext {
     allocator: &ArenaAllocator,
-    func_info: &Function,
+    func_info: *Function,
     use_scopes: bool,
     scopes: Array<FunctionScope>,
     coroutine: FunctionCoroutine,
@@ -16,7 +16,7 @@ impl FunctionContext {
             func_info,
             use_scopes,
             scopes: Array<FunctionScope>::new(allocator),
-            coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
+            coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
         };
 
         if self.use_scopes {
@@ -37,10 +37,10 @@ impl FunctionContext {
     fn new_const(allocator: &ArenaAllocator) -> Self {
         return Self {
             allocator,
-            func_info: 0,
+            func_info: null,
             use_scopes: false,
             scopes: Array<FunctionScope>::new(allocator),
-            coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: 0, data: 0, capacity: 0, length: 0 } },
+            coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
         };
     }
 

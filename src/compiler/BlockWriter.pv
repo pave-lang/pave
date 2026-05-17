@@ -119,11 +119,11 @@ impl BlockWriter {
         return true;
     }
 
-    fn write_block(&self, file: &FILE, return_type: &Type, block: &Block, generics: &GenericMap, inline_: bool, no_brackets: bool) -> bool {
+    fn write_block(&self, file: &FILE, return_type: &Type, block: *Block, generics: &GenericMap, inline_: bool, no_brackets: bool) -> bool {
         let g = self.generator;
         let expr = ExpressionWriter { generator: g };
 
-        if block == 0 {
+        if block == null {
             fprintf(file, "{}\n");
             return false;
         }
@@ -184,7 +184,7 @@ impl BlockWriter {
                         g.write_variable_decl(file, name.value, type, generics);
                     }
 
-                    if value != 0 {
+                    if value != null {
                         fprintf(file, " = ");
                         expr.write_expression(file, value, generics);
                     }
@@ -203,7 +203,7 @@ impl BlockWriter {
                 StatementData::ReturnStatement(ret) => {
                     let value = ret.expression;
                     let defer_statements = &ret.defer_statements;
-                    if value == 0 {
+                    if value == null {
                         self.write_defer_statements(file, return_type, defer_statements, generics);
                         g.write_indent(file);
                         fprintf(file, "return;\n");
@@ -229,7 +229,7 @@ impl BlockWriter {
                 StatementData::IfStatement(if_stmt) => {
                     g.write_indent(file);
 
-                    if if_stmt.pattern != 0 {
+                    if if_stmt.pattern != null {
                         match if_stmt.pattern {
                             MatchPattern::EnumVariant(type, enum_variant, &parameters) => {
                                 if !self.write_if_let_enum_variant(file, return_type, type, enum_variant, parameters, if_stmt.expression, if_stmt.block, block, generics) { return false; }
@@ -248,14 +248,14 @@ impl BlockWriter {
                     for else_statement in if_stmt.else_statements {
                         fprintf(file, " else ");
 
-                        if else_statement.pattern != 0 {
+                        if else_statement.pattern != null {
                             match else_statement.pattern {
                                 MatchPattern::EnumVariant(type, enum_variant, &parameters) => {
                                     if !self.write_if_let_enum_variant(file, return_type, type, enum_variant, parameters, else_statement.expression, else_statement.block, block, generics) { return false; }
                                 },
                                 _ => {},
                             }
-                        } else if else_statement.expression != 0 {
+                        } else if else_statement.expression != null {
                             fprintf(file, "if (");
                             expr.write_expression(file, else_statement.expression, generics);
                             fprintf(file, ") ");
@@ -468,6 +468,9 @@ impl BlockWriter {
                     let is_iterator = false;
 
                     match for_statement.type {
+                        ForStatementType::Error => {
+                            fprintf(file, "/* ERROR: Invalid for loop type */\n");
+                        },
                         ForStatementType::Range(start, end) => {
                             is_iterator = true;
                             let variable = &for_statement.variables.data[0];

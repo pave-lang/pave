@@ -6,36 +6,36 @@ struct LetStatement {
     is_static: bool,
     name: &Token,
     type: &Type,
-    value: &Expression,
+    value: *Expression,
 }
 
 impl LetStatement {
-    fn parse(context: &Context, generics: &Generics) -> &LetStatement {
+    fn parse(context: &Context, generics: &Generics) -> *LetStatement {
         let first_token = context.current();
-        if !context.expect_value(TokenType::Keyword, "let") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "let") { return null; }
 
         let is_static = context.check_next(TokenType::Keyword, "static");
 
         let name = context.expect(TokenType::Identifier);
-        if name == null { return 0; }
+        if name == null { return null; }
 
-        let type: &Type = 0;
+        let type: *Type = null;
 
         if context.check_next(TokenType::Symbol, ":") {
             type = context.parse_type2(generics);
-            if type == 0 { /*context.error("type");*/ return 0; }
+            if type == null { return null; }
         }
 
-        let expression: &Expression = 0;
+        let expression: *Expression = null;
 
         if context.check_next(TokenType::Symbol, "=") {
             expression = Expression::parse(context, generics);
-            if expression == 0 { /* context.error("expression"); */ return 0; }
+            if expression == null { return null; }
 
-            if type == 0 {
+            if type == null {
                 type = &expression.return_type;
 
-                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, null);
                 type_name.prepend(": ");
                 context.inlay_hint(name, type_name.c_str(), InlayHintKind::Type, false, false);
             } else {
@@ -43,8 +43,8 @@ impl LetStatement {
             }
         }
 
-        if !context.set_value(name, type) { context.error("set_value"); return 0; }
-        if !context.expect_value(TokenType::Symbol, ";") { return 0; }
+        if !context.set_value(name, type) { context.error("set_value"); return null; }
+        if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
         if type.is_unknown() {
             context.error_token(first_token, "Let statement is unable to determine it's type, manually specify it");

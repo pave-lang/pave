@@ -2,7 +2,7 @@ use analyzer
 use analyzer::expression
 
 struct ElseStatement {
-    pattern: &MatchPattern,
-    expression: &Expression,
-    block: &Block,
+    pattern: *MatchPattern,
+    expression: *Expression,
+    block: *Block,
 }

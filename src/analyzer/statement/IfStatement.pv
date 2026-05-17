@@ -4,124 +4,124 @@ use expression
 use types
 
 struct IfStatement {
-    pattern: &MatchPattern,
-    expression: &Expression,
-    block: &Block,
+    pattern: *MatchPattern,
+    expression: *Expression,
+    block: *Block,
     else_statements: Array<ElseStatement>,
 }
 
 impl IfStatement {
-    fn parse(context: &Context, generics: &Generics) -> &IfStatement {
-        if !context.expect_value(TokenType::Keyword, "if") { return 0; }
+    fn parse(context: &Context, generics: &Generics) -> *IfStatement {
+        if !context.expect_value(TokenType::Keyword, "if") { return null; }
 
-        let pattern: &MatchPattern = 0;
-        let expression: &Expression = 0;
+        let pattern: *MatchPattern = null;
+        let expression: *Expression = null;
         let block = Block::new_ptr(context);
 
         if context.check_next(TokenType::Keyword, "let") {
             context.push_scope(block);
             let p: MatchPattern = MatchPattern::Default;
-            if !MatchPattern::parse(context, generics, &p) { context.pop_scope(); return 0; }
-            if !context.expect_value(TokenType::Symbol, "=") { context.pop_scope(); return 0; }
+            if !MatchPattern::parse(context, generics, &p) { context.pop_scope(); return null; }
+            if !context.expect_value(TokenType::Symbol, "=") { context.pop_scope(); return null; }
             pattern = context.allocator.store(&p);
             expression = Expression::parse(context, generics);
-            if expression == 0 { context.pop_scope(); return 0; }
+            if expression == null { context.pop_scope(); return null; }
             match p {
                 MatchPattern::EnumVariant(enum_type, _, _) => {
                     if !expression.return_type.deref().eq(enum_type) {
                         context.error_token(expression.token, "If let expression type does not match pattern enum type");
                         context.pop_scope();
-                        return 0;
+                        return null;
                     }
                 },
                 _ => {
                     if !expression.return_type.deref().is_discriminated_union() {
                         context.error_token(expression.token, "If let expression must be an enum (discriminated union)");
                         context.pop_scope();
-                        return 0;
+                        return null;
                     }
                 },
             }
-            if !block.parse(context, generics, false) { context.pop_scope(); return 0; }
+            if !block.parse(context, generics, false) { context.pop_scope(); return null; }
             context.pop_scope();
         } else {
             expression = Expression::parse(context, generics);
-            if expression == 0 { return 0; }
+            if expression == null { return null; }
             match expression.return_type {
                 Type::Primitive(prim) => {
                     if !prim.name.eq("bool") {
                         context.error_token(expression.token, "If condition must be a bool expression");
-                        return 0;
+                        return null;
                     }
                 },
                 _ => {
                     context.error_token(expression.token, "If condition must be a bool expression");
-                    return 0;
+                    return null;
                 },
             }
-            if !block.parse(context, generics, true) { return 0; }
+            if !block.parse(context, generics, true) { return null; }
         }
 
         let else_statements = Array<ElseStatement>::new(context.allocator);
-        let else_expression: &Expression = 0;
-        let else_pattern: &MatchPattern = 0;
-        let else_block: &Block = 0;
+        let else_expression: *Expression = null;
+        let else_pattern: *MatchPattern = null;
+        let else_block: *Block = null;
         let else_end = false;
 
         while !else_end && context.check_next(TokenType::Keyword, "else") {
-            else_expression = 0;
-            else_pattern = 0;
+            else_expression = null;
+            else_pattern = null;
 
             if context.check_next(TokenType::Keyword, "if") {
                 if context.check_next(TokenType::Keyword, "let") {
                     else_block = Block::new_ptr(context);
                     context.push_scope(else_block);
                     let ep: MatchPattern = MatchPattern::Default;
-                    if !MatchPattern::parse(context, generics, &ep) { context.pop_scope(); return 0; }
-                    if !context.expect_value(TokenType::Symbol, "=") { context.pop_scope(); return 0; }
+                    if !MatchPattern::parse(context, generics, &ep) { context.pop_scope(); return null; }
+                    if !context.expect_value(TokenType::Symbol, "=") { context.pop_scope(); return null; }
                     else_pattern = context.allocator.store(&ep);
                     else_expression = Expression::parse(context, generics);
-                    if else_expression == 0 { context.pop_scope(); return 0; }
+                    if else_expression == null { context.pop_scope(); return null; }
                     match ep {
                         MatchPattern::EnumVariant(enum_type, _, _) => {
                             if !else_expression.return_type.eq(enum_type) {
                                 context.error_token(else_expression.token, "If let expression type does not match pattern enum type");
                                 context.pop_scope();
-                                return 0;
+                                return null;
                             }
                         },
                         _ => {
                             if !else_expression.return_type.is_enum() {
                                 context.error_token(else_expression.token, "If let expression must be an enum (discriminated union)");
                                 context.pop_scope();
-                                return 0;
+                                return null;
                             }
                         },
                     }
-                    if !else_block.parse(context, generics, false) { context.pop_scope(); return 0; }
+                    if !else_block.parse(context, generics, false) { context.pop_scope(); return null; }
                     context.pop_scope();
                 } else {
                     else_expression = Expression::parse(context, generics);
-                    if else_expression == 0 { return 0; }
+                    if else_expression == null { return null; }
                     match else_expression.return_type {
                         Type::Primitive(prim) => {
                             if !prim.name.eq("bool") {
                                 context.error_token(else_expression.token, "If condition must be a bool expression");
-                                return 0;
+                                return null;
                             }
                         },
                         _ => {
                             context.error_token(else_expression.token, "If condition must be a bool expression");
-                            return 0;
+                            return null;
                         },
                     }
                     else_block = Block::new_ptr(context);
-                    if !else_block.parse(context, generics, true) { return 0; }
+                    if !else_block.parse(context, generics, true) { return null; }
                 }
             } else {
                 else_end = true;
                 else_block = Block::new_ptr(context);
-                if !else_block.parse(context, generics, true) { return 0; }
+                if !else_block.parse(context, generics, true) { return null; }
             }
 
             else_statements.append(ElseStatement {

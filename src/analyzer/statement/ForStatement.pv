@@ -5,16 +5,16 @@ use types
 
 struct ForStatement {
     variables: Array<ForVariable>,
-    expression: &Expression,
+    expression: *Expression,
     type: ForStatementType,
-    iter_type: &Type,
-    value_type: &Type,
-    block: &Block,
+    iter_type: *Type,
+    value_type: *Type,
+    block: *Block,
 }
 
 impl ForStatement {
     fn new(allocator: &ArenaAllocator) -> Self {
-        return Self { variables: Array<ForVariable>::new(allocator), expression: 0, type: ForStatementType::Range(0, 0), iter_type: 0, value_type: 0, block: 0 };
+        return Self { variables: Array<ForVariable>::new(allocator), expression: null, type: ForStatementType::Error, iter_type: null, value_type: null, block: null };
     }
 
     fn parse_for_variable(context: &Context, variables: &Array<ForVariable>) -> bool {
@@ -24,36 +24,37 @@ impl ForStatement {
 
         if name == null { return false; }
 
-        variables.append(ForVariable { deref, ref, name, type: 0 });
+        variables.append(ForVariable { deref, ref, name, type: null });
 
         return true;
     }
 
-    fn parse(parent_block: &Block, context: &Context, generics: &Generics) -> &ForStatement {
+    fn parse(parent_block: &Block, context: &Context, generics: &Generics) -> *ForStatement {
         let for_statement = ForStatement::new(context.allocator);
 
-        if !context.expect_value(TokenType::Keyword, "for") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "for") { return null; }
 
         if context.check_next(TokenType::Symbol, "(") {
             while !context.check_value(TokenType::Symbol, ")") {
-                if !ForStatement::parse_for_variable(context, &for_statement.variables) { return 0; }
+                if !ForStatement::parse_for_variable(context, &for_statement.variables) { return null; }
 
                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                     context.expect_value(TokenType::Symbol, ")");
-                    return 0;
+                    return null;
                 }
             }
 
-            if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+            if !context.expect_value(TokenType::Symbol, ")") { return null; }
         } else {
-            if !ForStatement::parse_for_variable(context, &for_statement.variables) { return 0; }
+            if !ForStatement::parse_for_variable(context, &for_statement.variables) { return null; }
         }
 
-        if !context.expect_value(TokenType::Keyword, "in") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "in") { return null; }
 
         let expression_first_token = context.current();
-        for_statement.expression = Expression::parse(context, generics);
-        if for_statement.expression == 0 { return 0; }
+        let expression = Expression::parse(context, generics);
+        if expression == null { return null; }
+        for_statement.expression = expression;
 
         let generic_map = for_statement.expression.return_type.get_generic_map(context);
 
@@ -78,7 +79,7 @@ impl ForStatement {
 
         if is_range {
             let variable = for_statement.variables.data[0];
-            let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, 0);
+            let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, null);
             type_name.prepend(": ");
             context.inlay_hint(variable.name, type_name.c_str(), InlayHintKind::Type, false, false);
         } else {
@@ -111,7 +112,7 @@ impl ForStatement {
                 let iter_member_type = Expression::get_member_type(context, &for_statement.expression.return_type, iter_member, false);
                 let iter_member_is_function = false;
 
-                if iter_member_type != 0 {
+                if iter_member_type != null {
                     match iter_member_type {
                         Type::Function(_, _) => { iter_member_is_function = true; },
                         _ => {},
@@ -133,7 +134,7 @@ impl ForStatement {
                 value_member.value = "value";
 
                 let value_member_type = Expression::get_member_type(context, for_statement.iter_type, &value_member, true);
-                if value_member_type == 0 { return 0; }
+                if value_member_type == null { return null; }
                 for_statement.value_type = Expression::get_return_type(context, value_member_type, &value_member, generic_map);
             }
 
@@ -159,7 +160,7 @@ impl ForStatement {
                     variable.type = Type::Indirect(Indirect::new_reference(context.allocator, *variable.type)).to_ptr(context.allocator);
                 }
 
-                let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, 0);
+                let type_name = context.root.naming_decl.get_type_decl(variable.type, context.type_self, null);
                 type_name.prepend(": ");
                 context.inlay_hint(variable.name, type_name.c_str(), InlayHintKind::Type, false, false);
 
@@ -170,12 +171,12 @@ impl ForStatement {
         context.push_scope(parent_block);
 
         for variable2 in for_statement.variables {
-            if !context.set_value(variable2.name, variable2.type) { context.error("set_value"); return 0; }
+            if !context.set_value(variable2.name, variable2.type) { context.error("set_value"); return null; }
         }
 
         for_statement.block = Block::new_ptr(context);
         for_statement.block.is_loop = true;
-        if !for_statement.block.parse(context, generics, false) { return 0; }
+        if !for_statement.block.parse(context, generics, false) { return null; }
 
         context.pop_scope();
 

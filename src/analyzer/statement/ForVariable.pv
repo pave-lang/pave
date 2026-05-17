@@ -5,5 +5,5 @@ struct ForVariable {
     deref: bool,
     ref: bool,
     name: &Token,
-    type: &Type,
+    type: *Type,
 }

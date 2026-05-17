@@ -5,7 +5,7 @@ use expression
 struct Global {
     name: &Token,
     type: Type,
-    value: &Expression,
+    value: *Expression,
     module: &Module,
     token_start: usize,
     token_end: usize,
@@ -19,23 +19,23 @@ impl Global {
         context.pos = self.token_start;
 
         let generics = Generics::new(allocator);
-        let type: &Type = 0;
+        let type: *Type = null;
 
         if context.check_next(TokenType::Symbol, ":") {
             type = context.parse_type2(&generics);
-            if type == 0 { return false; }
+            if type == null { return false; }
         }
 
-        let expression: &Expression = 0;
+        let expression: *Expression = null;
 
         if context.check_next(TokenType::Symbol, "=") {
             expression = Expression::parse(context, &generics);
-            if expression == 0 { return false; }
+            if expression == null { return false; }
 
-            if type == 0 {
+            if type == null {
                 type = &expression.return_type;
 
-                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+                let type_name = context.root.naming_decl.get_type_decl(type, context.type_self, null);
                 type_name.prepend(": ");
                 context.inlay_hint(self.name, type_name.c_str(), InlayHintKind::Type, false, false);
             } else {
@@ -48,7 +48,7 @@ impl Global {
 
         if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
-        if type == 0 {
+        if type == null {
             context.error_token(self.name, "Global variable requires a type annotation or initializer");
             return false;
         }

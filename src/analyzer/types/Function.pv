@@ -4,17 +4,17 @@ use std
 use analyzer
 
 struct Parameter {
-    name: &Token,
+    name: *Token,
     type: Type,
 }
 
 enum FunctionParent {
     None,
-    Primitive(&Primitive, usize, &Trait),
-    Enum(&Enum, usize, &Trait),
-    Struct(&Struct, usize, &Trait),
+    Primitive(&Primitive, usize, *Trait),
+    Enum(&Enum, usize, *Trait),
+    Struct(&Struct, usize, *Trait),
     Trait(&Trait),
-    Type(&Type, usize, &Trait),
+    Type(&Type, usize, *Trait),
 }
 
 enum FunctionType {
@@ -37,7 +37,7 @@ struct Function {
     generics: Generics,
     parameters: Array<Parameter>,
     return_type: Type,
-    body: &Block,
+    body: *Block,
 }
 
 impl Function {
@@ -53,8 +53,8 @@ impl Function {
             token_end: 0,
             parent: FunctionParent::None,
             type: FunctionType::Standard,
-            return_type: Type::Primitive(0),
-            body: 0,
+            return_type: Type::Primitive(null),
+            body: null,
         };
     }
 
@@ -70,8 +70,8 @@ impl Function {
             token_end: 0,
             parent: FunctionParent::None,
             type: FunctionType::Standard,
-            return_type: Type::Primitive(0),
-            body: 0,
+            return_type: Type::Primitive(null),
+            body: null,
         };
     }
 
@@ -136,7 +136,7 @@ impl Function {
                     name,
                 };
 
-                if parameter.name == 0 {
+                if parameter.name == null {
                     return false;
                 }
 
@@ -144,10 +144,10 @@ impl Function {
             } else {
                 let parameter: Parameter = Parameter {
                     name: context.expect(TokenType::Identifier),
-                    type: Type::Primitive(0),
+                    type: Type::Primitive(null),
                 };
     
-                if parameter.name == 0 {
+                if parameter.name == null {
                     return false;
                 }
 
@@ -192,7 +192,7 @@ impl Function {
         return context.parse_type(&self.return_type, &self.generics);
     }
 
-    fn fill_types(&self, generics: &Generics) -> bool {
+    fn fill_types(&self, generics: *Generics) -> bool {
         self.generics.parent = generics;
 
         if self.type == FunctionType::Test {
@@ -221,7 +221,7 @@ impl Function {
         let context = self.context;
         context.pos = self.token_start;
         let block = Block::new_ptr(context);
-        context.push_scope(0);
+        context.push_scope(null);
         context.function = self;
 
         for param_info in self.parameters {
@@ -235,7 +235,7 @@ impl Function {
 
         if context.pos != self.token_end { context.pop_scope(); return true; }
 
-        context.function = 0;
+        context.function = null;
         context.pop_scope();
         return false;
     }

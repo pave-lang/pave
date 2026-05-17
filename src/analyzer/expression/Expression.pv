@@ -20,8 +20,8 @@ impl Expression {
         });
     }
 
-    fn make_next(context: &Context, node: Expression) -> &Expression {
-        let result: &Expression = context.allocator.store(&node);
+    fn make_next(context: &Context, node: Expression) -> *Expression {
+        let result = context.allocator.store(&node);
 
         context.next_token();
 
@@ -39,10 +39,10 @@ impl Expression {
         return "i32";
     }
 
-    fn parse_primary(context: &Context, generics: &Generics) -> &Expression {
+    fn parse_primary(context: &Context, generics: &Generics) -> *Expression {
         let token = context.current();
         let token_type = token.type;
-        let result: &Expression = 0;
+        let result: *Expression = null;
 
         match token_type {
             TokenType::Identifier => {
@@ -50,9 +50,9 @@ impl Expression {
 
                 if context.module.mode_cpp && (token.value.eq("new") || token.value.eq("delete")) {
                     return Expression::parse_cpp(context, generics);
-                } else if return_type == 0 {
+                } else if return_type == null {
                     let type = context.parse_type2(generics);
-                    if type != 0 {
+                    if type != null {
                         match type.resolve_typedef() {
                             Type::Enum(_, _) => { result = Expression::parse_enum(context, token, type, generics); },
                             Type::EnumC(_) => { result = Expression::parse_enum(context, token, type, generics); },
@@ -75,44 +75,44 @@ impl Expression {
                         result.data = ExpressionData::Type(&result.return_type);
                     } else {
                         context.error_token(token, "Unable to find variable or type with this name");
-                        return 0;
+                        return null;
                     }
                 } else {
                     match return_type {
                         Type::Function(func_info, _) => {
                             context.next_token();
                             let func_type = return_type;
-                            let parsed_generics = Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 };
+                            let parsed_generics = Array<Type> { allocator: context.allocator, data: null, length: 0, capacity: 0 };
 
                             if context.check_value(TokenType::Symbol, "<") {
                                 parsed_generics = context.parse_generics(generics);
                             }
 
-                            if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+                            if !context.expect_value(TokenType::Symbol, "(") { return null; }
 
                             let arguments = Array<InvokeArgument>::new(context.allocator);
 
                             while !context.check_value(TokenType::Symbol, ")") {
                                 let argument = Expression::parse(context, generics);
-                                if argument == null { return 0; }
+                                if argument == null { return null; }
                                 arguments.append(InvokeArgument { name: null, value: argument });
 
                                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
-                                    return 0;
+                                    return null;
                                 }
                             }
 
-                            if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+                            if !context.expect_value(TokenType::Symbol, ")") { return null; }
 
                             if func_info.generics.array.length > 0 {
                                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                                 func_type = context.root.make_type_usage(func_type, &func_generics.array);
                             }
 
-                            if !Expression::validate_arguments(context, token, func_type, &arguments, null, false) { return 0; }
+                            if !Expression::validate_arguments(context, token, func_type, &arguments, null, false) { return null; }
 
-                            let func_return_type: &Type = 0;
+                            let func_return_type: *Type = null;
                             match func_type {
                                 Type::Function(_, func_generic_map) => {
                                     match func_info.type {
@@ -120,7 +120,7 @@ impl Expression {
                                             func_return_type = context.allocator.store(&Type::CoroutineInstance(func_info, func_generic_map));
                                         },
                                         _ => {
-                                            func_return_type = Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, 0);
+                                            func_return_type = Context::resolve_type(context.allocator, &func_info.return_type, func_generic_map, null);
                                         },
                                     }
                                 },
@@ -196,7 +196,7 @@ impl Expression {
                         },
                         Type::FunctionC(func_info) => {
                             context.next_token();
-                            if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+                            if !context.expect_value(TokenType::Symbol, "(") { return null; }
 
                             let arguments = Array<InvokeArgument>::new(context.allocator);
 
@@ -206,11 +206,11 @@ impl Expression {
 
                                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
-                                    return 0;
+                                    return null;
                                 }
                             }
 
-                            if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+                            if !context.expect_value(TokenType::Symbol, ")") { return null; }
 
                             let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(return_type), return_type);
 
@@ -223,10 +223,12 @@ impl Expression {
                 }
             },
             TokenType::String => {
+                let return_type = if token.value.starts_with("'") { context.type_char } else { Type::Indirect(&context.pointer_const_char) };
+
                 result = Expression::make_next(context, Expression {
                     token,
                     data: ExpressionData::Literal(token.value),
-                    return_type: Type::Indirect(&context.pointer_const_char),
+                    return_type,
                 });
             },
             TokenType::Number => {
@@ -240,7 +242,7 @@ impl Expression {
             TokenType::Symbol => {
                 if token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+") || token.eq(TokenType::Symbol, "!") || token.eq(TokenType::Symbol, "&") || token.eq(TokenType::Symbol, "*") || token.eq(TokenType::Symbol, "/") || token.eq(TokenType::Symbol, "%") || token.eq(TokenType::Symbol, "~") {
                     let operator = context.expect(TokenType::Symbol);
-                    if operator == null { return 0; }
+                    if operator == null { return null; }
 
                     if operator.value.eq("*") && context.check_value(TokenType::Keyword, "const") {
                         context.pos -= 1;
@@ -248,7 +250,7 @@ impl Expression {
                         result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
                     } else {
                         let child = Expression::parse_primary(context, generics);
-                        if child == 0 { return 0; }
+                        if child == null { return null; }
 
                         if operator.value.eq("&") {
                             match child.data {
@@ -275,10 +277,10 @@ impl Expression {
                         }
                     }
                 } else if token.eq(TokenType::Symbol, "(") {
-                    if !context.expect_value(TokenType::Symbol, "(") { return 0; }
+                    if !context.expect_value(TokenType::Symbol, "(") { return null; }
 
                     let expr = Expression::parse(context, generics);
-                    if expr == null { return 0; }
+                    if expr == null { return null; }
 
                     if context.check_next(TokenType::Symbol, ",") {
                         let arguments = Array<InvokeArgument>::new(context.allocator);
@@ -297,13 +299,13 @@ impl Expression {
                             name.value = name_string.as_str();
 
                             let value = Expression::parse(context, generics);
-                            if value == null { return 0; }
+                            if value == null { return null; }
 
                             arguments.append(InvokeArgument { name, value });
 
                             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                 context.error("Expected , or )");
-                                return 0;
+                                return null;
                             }
                         }
 
@@ -315,29 +317,29 @@ impl Expression {
 
                         result = Expression::make_type_function_call(context, token, context.allocator.store(&Type::Tuple(tuple)), arguments, null);
                     } else {
-                        if !context.expect_value(TokenType::Symbol, ")") { return 0; }
+                        if !context.expect_value(TokenType::Symbol, ")") { return null; }
 
                         result = Expression::make(context.allocator, token, ExpressionData::ParenthesizedExpression(expr), &expr.return_type);
                     }
                 } else if token.eq(TokenType::Symbol, "[") {
-                    if !context.expect_value(TokenType::Symbol, "[") { return 0; }
+                    if !context.expect_value(TokenType::Symbol, "[") { return null; }
 
-                    let element_type: &Type = 0;
+                    let element_type: *Type = null;
                     let elements = Array<InvokeArgument>::new(context.allocator);
 
                     while !context.check_value(TokenType::Symbol, "]") {
                         let element = Expression::parse(context, generics);
-                        if element == null { return 0; }
+                        if element == null { return null; }
 
                         elements.append(InvokeArgument { name: null, value: element });
 
-                        if element_type == 0 {
+                        if element_type == null {
                             element_type = &element.return_type;
                         }
 
                         if context.check_next(TokenType::Symbol, ";") {
                             let count_token = context.expect(TokenType::Number);
-                            if count_token == null { return 0; }
+                            if count_token == null { return null; }
                             let count: usize = strtoul(count_token.value.ptr, 0, 10);
                             let i: usize = 1;
                             while i < count {
@@ -349,14 +351,14 @@ impl Expression {
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "]") {
                             context.expect_value(TokenType::Symbol, "]");
-                            return 0;
+                            return null;
                         }
                     }
 
                     context.expect_value(TokenType::Symbol, "]");
 
-                    if element_type == 0 { element_type = &context.root.type_void; }
-                    let parent_sequence = context.allocator.store(&Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type, element_pointer: Type::Primitive(0) });
+                    if element_type == null { element_type = &context.root.type_void; }
+                    let parent_sequence = context.allocator.store(&Sequence { type: SequenceType::FixedArray(elements.length), element: *element_type, element_pointer: Type::Primitive(null) });
                     let parent_type = context.allocator.store(&Type::Sequence(parent_sequence));
                     let parent_expression = Expression::make(context.allocator, token, ExpressionData::Type(parent_type), parent_type);
 
@@ -389,12 +391,12 @@ impl Expression {
             },
         }
 
-        if result == 0 { return 0; }
+        if result == null { return null; }
 
         return Expression::parse_postfix_chain(context, result, generics);
     }
 
-    fn parse(context: &Context, generics: &Generics) -> *Expression {
+    fn parse(context: &Context, generics: *Generics) -> *Expression {
         let result: *Expression = Expression::parse_primary(context, generics);
         if result == null { return null; }
 
@@ -565,10 +567,10 @@ impl Expression {
         if !type.eq(&self.return_type) {
             let message = String::new(context.allocator);
             message.append("Type ");
-            let type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, 0);
+            let type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, null);
             message.append(type_name.as_str());
             message.append(" does not match expression return type of ");
-            let return_type_name = context.root.naming_decl.get_type_decl(type, context.type_self, 0);
+            let return_type_name = context.root.naming_decl.get_type_decl(type, context.type_self, null);
             message.append(return_type_name.as_str());
             context.error_token(self.token, message.c_str());
             return false;
@@ -578,47 +580,47 @@ impl Expression {
         return true;
     }
 
-    fn parse_if_expression(context: &Context, generics: &Generics) -> &Expression {
+    fn parse_if_expression(context: &Context, generics: &Generics) -> *Expression {
         let token = context.current();
-        if !context.expect_value(TokenType::Keyword, "if") { return 0; }
+        if !context.expect_value(TokenType::Keyword, "if") { return null; }
 
         let condition = Expression::parse(context, generics);
-        if condition == null { return 0; }
+        if condition == null { return null; }
 
         match condition.return_type {
             Type::Primitive(prim) => {
                 if !prim.name.eq("bool") {
                     context.error_token(condition.token, "If condition must be a bool expression");
-                    return 0;
+                    return null;
                 }
             },
             _ => {
                 context.error_token(condition.token, "If condition must be a bool expression");
-                return 0;
+                return null;
             },
         }
 
-        if !context.expect_value(TokenType::Symbol, "{") { return 0; }
+        if !context.expect_value(TokenType::Symbol, "{") { return null; }
 
         let a = Expression::parse(context, generics);
-        if a == null { return 0; }
+        if a == null { return null; }
 
-        if !context.expect_value(TokenType::Symbol, "}") { return 0; }
-        if !context.expect_value(TokenType::Keyword, "else") { return 0; }
+        if !context.expect_value(TokenType::Symbol, "}") { return null; }
+        if !context.expect_value(TokenType::Keyword, "else") { return null; }
 
         let is_else_if = context.check_value(TokenType::Keyword, "if");
 
         if !is_else_if && !context.check_next(TokenType::Symbol, "{") {
             context.error("Expected { or else if");
-            return 0;
+            return null;
         }
 
         let b = Expression::parse(context, generics);
-        if b == null { return 0; }
+        if b == null { return null; }
 
-        if !is_else_if && !context.expect_value(TokenType::Symbol, "}") { return 0; }
+        if !is_else_if && !context.expect_value(TokenType::Symbol, "}") { return null; }
 
-        if !a.validate_type(context, &b.return_type, false) { return 0; }
+        if !a.validate_type(context, &b.return_type, false) { return null; }
 
         return Expression::make(context.allocator, token, ExpressionData::IfExpression(condition, a, b), &a.return_type);
     }

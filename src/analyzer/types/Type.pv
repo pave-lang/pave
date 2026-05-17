@@ -85,17 +85,17 @@ impl Tuple {
 }
 
 enum Type {
-    Primitive(&Primitive),
+    Primitive(*Primitive),
     Indirect(&Indirect),
     Sequence(&Sequence),
     Tuple(&Tuple),
-    Enum(&Enum, &GenericMap),
-    Struct(&Struct, &GenericMap),
-    Trait(&Trait, &GenericMap),
+    Enum(&Enum, *GenericMap),
+    Struct(&Struct, *GenericMap),
+    Trait(&Trait, *GenericMap),
     Generic(&Generic),
     GenericTypedef(&GenericTypedef),
-    Function(&Function, &GenericMap),
-    CoroutineInstance(&Function, &GenericMap),
+    Function(&Function, *GenericMap),
+    CoroutineInstance(&Function, *GenericMap),
     Self,
     TypedefC(&TypedefC),
     EnumC(&EnumC),
@@ -183,8 +183,8 @@ impl Type {
     }
 
     fn to_ptr(&self, allocator: &ArenaAllocator) -> *Type {
-        let type: &Type = allocator.alloc(sizeof(Type));
-        if type == 0 { return null; }
+        let type: *Type = allocator.alloc(sizeof(Type));
+        if type == null { return null; }
 
         *type = *self;
         return type;
@@ -285,7 +285,7 @@ impl Type {
             Type::Primitive(primitive_info) => {
                 return (primitive_info.is_void() && other.is_void()) || (primitive_info.is_number() && other.is_number()) || (primitive_info && other && primitive_info.name.eq(other.name));
             },
-            Type::Indirect(_) => { return true; },
+            // Type::Indirect(_) => { return true; },
             Type::TypedefC(_) => { return self.resolve_typedef().eq_primitive(other); },
             _ => { return false; },
         }
@@ -541,16 +541,16 @@ impl Type {
         }
     }
 
-    fn deref_1(&self) -> &Type {
+    fn deref_1(&self) -> *Type {
         match self {
             Type::Indirect(indirect) => { return &indirect.to; },
-            _ => { return 0; },
+            _ => { return null; },
         }
     }
 
     fn is_fat_pointer(&self) -> bool {
         let referenced_type = self.deref_1();
-        if referenced_type == 0 { return false; }
+        if referenced_type == null { return false; }
 
         match referenced_type {
             Type::Sequence(sequence) => { return sequence.is_slice(); },
@@ -561,7 +561,7 @@ impl Type {
 
     fn is_reference_sequence_dynamic(&self) -> bool {
         let referenced_type = self.deref_1();
-        if referenced_type == 0 { return false; }
+        if referenced_type == null { return false; }
 
         match referenced_type {
             Type::Sequence(sequence) => { return sequence.is_slice(); },
@@ -606,7 +606,7 @@ impl Type {
                 Type::Indirect(indirect) => {
                     match indirect.to {
                         Type::Primitive(primitive) => {
-                            return primitive != 0 && primitive.name.eq("char");
+                            return primitive != null && primitive.name.eq("char");
                         },
                         _ => { return false; },
                     }
@@ -630,8 +630,6 @@ impl Type {
     }
 
     fn is_primitive_or_c_type(&self) -> bool {
-        if self == 0 { return false; }
-
         match self {
             Type::Primitive(_) => { return true; },
             Type::TypedefC(_) => { return true; },

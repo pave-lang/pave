@@ -7,7 +7,7 @@ use types
 
 struct IncludeContext {
     include: &Include,
-    parent_context: &IncludeContext,
+    parent_context: *IncludeContext,
     types: &HashMap<str, Type>,
     values: &HashMap<str, Type>,
     parent: ParentCpp,
@@ -33,7 +33,7 @@ impl IncludeContext {
 
         let cursor_return_type = clang_getCursorResultType(cursor);
         let return_type = include.parse_type(cursor_return_type);
-        if return_type == 0 { return_type = include.root.allocator.store(&Type::UnknownC(UnknownC::new(include, ""))); }
+        if return_type == null { return_type = include.root.allocator.store(&Type::UnknownC(UnknownC::new(include, ""))); }
 
         self.insert_function(name, return_type);
     }
@@ -106,7 +106,7 @@ impl IncludeContext {
         let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
         let type = include.parse_type(underlying_type);
 
-        if type == 0 {
+        if type == null {
             let underlying_decl = clang_getTypeDeclaration(underlying_type);
             let underlying_name = clang_getCursorSpelling(underlying_decl);
             let underlying_name_cstring = clang_getCString(underlying_name);

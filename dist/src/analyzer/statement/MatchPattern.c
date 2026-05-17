@@ -510,5 +510,12 @@ bool MatchPattern__parse(struct Context* context, struct Generics* generics, str
             #line 253 "src/analyzer/statement/MatchPattern.pv"
             return false;
         } break;
+        #line 255 "src/analyzer/statement/MatchPattern.pv"
+        case ENUM_VARIANT_RESULT__CONST: {
+            #line 256 "src/analyzer/statement/MatchPattern.pv"
+            Context__error(context, "Expected an enum variant, not a const");
+            #line 257 "src/analyzer/statement/MatchPattern.pv"
+            return false;
+        } break;
     }
 }

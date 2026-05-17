@@ -3,12 +3,12 @@
 
 struct HashSetBucket<T> {
     value: T,
-    next: &HashSetBucket<T>,
+    next: *HashSetBucket<T>,
 }
 
 struct HashSetIter<T> {
-    iter: &HashSetBucket<T>,
-    end: &HashSetBucket<T>,
+    iter: *HashSetBucket<T>,
+    end: *HashSetBucket<T>,
 }
 
 impl<T> HashSetIter<T> {
@@ -24,8 +24,8 @@ impl<T> HashSetIter<T> {
 
 struct HashSet<T: Hash> {
     allocator: &ArenaAllocator,
-    buckets: &&HashSetBucket<T>,
-    data: &HashSetBucket<T>,
+    buckets: **HashSetBucket<T>,
+    data: *HashSetBucket<T>,
     capacity: usize,
     length: usize,
 }
@@ -35,8 +35,8 @@ impl<T: Hash> HashSet<T> {
         let initial_capacity = 16;
         let self = Self {
             allocator,
-            buckets: 0,
-            data: 0,
+            buckets: null,
+            data: null,
             capacity: 0,
             length: 0,
         };
@@ -60,7 +60,7 @@ impl<T: Hash> HashSet<T> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets[bucket_index];
 
-        while current_bucket_node != 0 {
+        while current_bucket_node != null {
             if current_bucket_node.value.hash()._0 == hash._0 {
                 return true;
             }
@@ -81,11 +81,11 @@ impl<T: Hash> HashSet<T> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets + bucket_index;
 
-        while *current_bucket_node != 0 {
+        while *current_bucket_node != null {
             current_bucket_node = &(*current_bucket_node).next;
         }
 
-        self.data[self.length] = HashSetBucket<T> { value, next: 0 };
+        self.data[self.length] = HashSetBucket<T> { value, next: null };
         let data = self.data + self.length;
         self.length += 1;
 
@@ -97,8 +97,8 @@ impl<T: Hash> HashSet<T> {
     fn release(&self) {
         self.allocator.free(self.buckets);
         self.allocator.free(self.data);
-        self.buckets = 0;
-        self.data = 0;
+        self.buckets = null;
+        self.data = null;
         self.capacity = 0;
         self.length = 0;
     }
@@ -107,12 +107,12 @@ impl<T: Hash> HashSet<T> {
         let i: usize = 0;
         while i < self.length {
             let node = self.data + i;
-            node.next = 0;
+            node.next = null;
             let hash = (*node).value.hash();
             let bucket_index: usize = hash._0 % self.capacity;
             let current_bucket_node = self.buckets + bucket_index;
 
-            while *current_bucket_node != 0 {
+            while *current_bucket_node != null {
                 current_bucket_node = &(*current_bucket_node).next;
             }
 

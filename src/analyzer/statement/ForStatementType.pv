@@ -2,6 +2,7 @@ use analyzer
 use analyzer::expression
 
 enum ForStatementType {
+    Error,
     Range(&Expression, &Expression),
     Iter(&Expression),
     Sequence(&Expression),

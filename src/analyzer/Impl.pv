@@ -5,7 +5,7 @@ use expression
 struct ImplConst {
     name: &Token,
     type: Type,
-    value: &Expression,
+    value: *Expression,
     context: &Context,
     token_start: usize,
     token_end: usize,
@@ -18,18 +18,18 @@ impl ImplConst {
         context.pos = self.token_start;
 
         let generics = Generics::new(allocator);
-        let type: &Type = 0;
+        let type: *Type = null;
 
         if context.check_next(TokenType::Symbol, ":") {
             type = context.parse_type2(&generics);
-            if type == 0 { return false; }
+            if type == null { return false; }
         }
 
         if context.check_next(TokenType::Symbol, "=") {
             let expression = Expression::parse(context, &generics);
             if expression == null { return false; }
 
-            if type == 0 {
+            if type == null {
                 type = &expression.return_type;
             } else {
                 expression.validate_type(context, type, true);
@@ -42,7 +42,7 @@ impl ImplConst {
 
         if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
-        if type == 0 {
+        if type == null {
             context.error_token(self.name, "Impl const requires a type annotation or initializer");
             return false;
         }
@@ -65,8 +65,8 @@ struct Impl {
     token_start: usize,
     token_end: usize,
     has_trait: bool,
-    trait_: &Trait,
-    trait_name: &Token,
+    trait_: *Trait,
+    trait_name: *Token,
     trait_type: Type,
     generics: Generics,
     nodes: Array<ImplNode>,
@@ -87,13 +87,13 @@ impl Impl {
             consts: HashMap<str, &ImplConst>::new(context.allocator),
             typedef_starts: HashMap<str, usize>::new(context.allocator),
             typedefs: HashMap<str, Type>::new(context.allocator),
-            type: Type::Primitive(0),
+            type: Type::Primitive(null),
             token_start: 0,
             token_end: 0,
             has_trait: false,
-            trait_: 0,
-            trait_name: 0,
-            trait_type: Type::Primitive(0),
+            trait_: null,
+            trait_name: null,
+            trait_type: Type::Primitive(null),
         };
 
         if !context.expect_value(TokenType::Keyword, "impl") { return node; }
@@ -191,8 +191,8 @@ impl Impl {
                     context,
                     token_start,
                     token_end,
-                    type: Type::Primitive(0),
-                    value: 0,
+                    type: Type::Primitive(null),
+                    value: null,
                 };
                 self.consts.insert(const_name.value, impl_const);
 
@@ -217,15 +217,15 @@ impl Impl {
         return true;
     }
 
-    fn find_function(&self, name: str) -> &Function {
+    fn find_function(&self, name: str) -> *Function {
         let func = self.functions.find(&name);
         if func != null { return func; }
 
-        if self.has_trait && self.trait_ != 0 {
+        if self.has_trait && self.trait_ != null {
             return self.trait_.functions.find(&name);
         }
 
-        return 0;
+        return null;
     }
 
     fn parse_consts(&self) -> bool {
@@ -240,12 +240,12 @@ impl Impl {
         for (name, &token_start) in self.typedef_starts {
             context.pos = *token_start;
             let typedef_type = context.parse_type2(&self.generics);
-            if typedef_type == 0 { return false; }
+            if typedef_type == null { return false; }
             if !context.expect_value(TokenType::Symbol, ";") { return false; }
             self.typedefs.insert(name, *typedef_type);
         }
 
-        if self.has_trait && self.trait_ != 0 {
+        if self.has_trait && self.trait_ != null {
             for (name, _) in self.trait_.typedefs {
                 if self.typedefs.find(&name) == null {
                     let message = String::new(self.context.allocator);
@@ -282,7 +282,7 @@ impl Impl {
             function.parse_function(&self.generics);
         }
 
-        if self.has_trait && self.trait_ != 0 {
+        if self.has_trait && self.trait_ != null {
             for (_, &trait_func) in self.trait_.functions {
                 let has_default = trait_func.token_start < trait_func.token_end;
 
@@ -322,17 +322,17 @@ impl Impl {
                         let trait_param = trait_func.parameters.get(i);
                         
                         let trait_param_type = &trait_param.type;
-                        if !trait_param_type.deref().is_self() { trait_param_type = Context::resolve_type(context.allocator, trait_param_type, generic_map, 0); }
+                        if !trait_param_type.deref().is_self() { trait_param_type = Context::resolve_type(context.allocator, trait_param_type, generic_map, null); }
 
                         if !impl_param.type.eq(trait_param_type) {
                             let message = String::new(self.context.allocator);
                             message.append("Parameter ");
                             message.append(impl_param.name.value);
                             message.append(" has type ");
-                            let impl_type_name = context.root.naming_decl.get_type_decl(&impl_param.type, context.type_self, 0);
+                            let impl_type_name = context.root.naming_decl.get_type_decl(&impl_param.type, context.type_self, null);
                             message.append(impl_type_name.as_str());
                             message.append(", expected ");
-                            let trait_type_name = context.root.naming_decl.get_type_decl(trait_param_type, context.type_self, 0);
+                            let trait_type_name = context.root.naming_decl.get_type_decl(trait_param_type, context.type_self, null);
                             message.append(trait_type_name.as_str());
                             self.context.error_token(impl_param.name, message.c_str());
                         }
@@ -341,17 +341,17 @@ impl Impl {
                 }
 
                 let trait_func_return_type = &trait_func.return_type;
-                if !trait_func_return_type.deref().is_self() { trait_func_return_type = Context::resolve_type(context.allocator, trait_func_return_type, generic_map, 0); }
+                if !trait_func_return_type.deref().is_self() { trait_func_return_type = Context::resolve_type(context.allocator, trait_func_return_type, generic_map, null); }
 
                 if !impl_func.return_type.eq(trait_func_return_type) {
                     let message = String::new(self.context.allocator);
                     message.append("Implementation of trait function ");
                     message.append(trait_func.name.value);
                     message.append(" has return type ");
-                    let impl_return_name = context.root.naming_decl.get_type_decl(&impl_func.return_type, context.type_self, 0);
+                    let impl_return_name = context.root.naming_decl.get_type_decl(&impl_func.return_type, context.type_self, null);
                     message.append(impl_return_name.as_str());
                     message.append(", expected ");
-                    let trait_return_name = context.root.naming_decl.get_type_decl(trait_func_return_type, context.type_self, 0);
+                    let trait_return_name = context.root.naming_decl.get_type_decl(trait_func_return_type, context.type_self, null);
                     message.append(trait_return_name.as_str());
                     self.context.error_token(impl_func.name, message.c_str());
                 }

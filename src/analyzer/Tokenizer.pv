@@ -208,9 +208,9 @@ impl Tokenizer {
     }
 
     fn read_file_into_string(allocator: &ArenaAllocator, filename: *const char) -> str {
-        let file: &FILE = fopen(filename, "rb");
+        let file: *FILE = fopen(filename, "rb");
 
-        if file == 0 {
+        if file == null {
             fprintf(stderr, "Unable to open file: %s\n", filename);
             perror("fopen");
             return str { ptr: null, length: 0 };
@@ -248,7 +248,7 @@ impl Tokenizer {
         let data = Tokenizer::read_file_into_string(allocator, path);
 
         if data.length == 0 {
-            return Array<Token> { allocator, data: 0, length: 0, capacity: 0 };
+            return Array<Token> { allocator, data: null, length: 0, capacity: 0 };
         }
 
         let tokenizer: Tokenizer = Tokenizer {

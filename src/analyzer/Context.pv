@@ -12,21 +12,23 @@ struct Context {
     base_path: str,
     path: str,
     pos: usize,
-    tokens: &Token,
+    tokens: *Token,
     length: usize,
     offset: usize,
     analysis: &Analysis,
-    type_self: &Type,
+    type_self: *Type,
+    type_char: Type,
     pointer_const_char: Indirect,
     types: HashMap<str, Type>,
     scopes: Array<Scope>,
     module: &Module,
     root: &Root,
-    function: &Function,
+    function: *Function,
 }
 
 impl Context {
-    fn new(allocator: &ArenaAllocator, base_path: str, path: str, tokens: &Array<Token>, analysis: &Analysis, module: &Module) -> Context {
+    fn new(allocator: &ArenaAllocator, base_path: str, path: str, tokens: *Array<Token>, analysis: &Analysis, module: &Module) -> Context {
+        let type_char = Type::Primitive(module.find_primitive("char"));
         let self: Context = Context {
             allocator,
             base_path,
@@ -37,25 +39,25 @@ impl Context {
             scopes: Array<Scope>::new(allocator),
             root: module.root,
             pos: 0,
-            tokens: 0,
+            tokens: null,
             length: 0,
             offset: 0,
-            type_self: 0,
-            pointer_const_char: Indirect { type: IndirectType::Reference, to: Type::Primitive(0) },
-            function: 0,
+            type_self: null,
+            type_char,
+            pointer_const_char: Indirect { type: IndirectType::ConstPointer, to: type_char },
+            function: null,
         };
 
-        if tokens != 0 {
+        if tokens != null {
             self.tokens = tokens.data;
             self.length = tokens.length;
         }
 
         self.type_self = &self.root.type_self;
-        self.pointer_const_char = Indirect { type: IndirectType::ConstPointer, to: Type::Primitive(module.find_primitive("char")) };
 
         let param_name = allocator.store(&Token { type: TokenType::String, value: "value", start_line: 0, start_column: 0, end_line: 0, end_column: 0 });
 
-        self.push_scope(0);
+        self.push_scope(null);
 
         let t = Generic::new(allocator);
         t.name = allocator.store(&Token { type: TokenType::String, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 });
@@ -123,8 +125,8 @@ impl Context {
 
     fn error_token(&self, token: &Token, message: *const char) {
         let diagnostics = &self.analysis.diagnostics;
-        let file_diagnostics: &Array<Diagnostic> = diagnostics.find(&self.path);
-        if file_diagnostics == 0 { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
+        let file_diagnostics = diagnostics.find(&self.path);
+        if file_diagnostics == null { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
 
         file_diagnostics.append(Diagnostic {
             message: message,
@@ -144,8 +146,8 @@ impl Context {
 
     fn error_token_value(&self, token: &Token, message: *const char, value: str) {
         let diagnostics = &self.analysis.diagnostics;
-        let file_diagnostics: &Array<Diagnostic> = diagnostics.find(&self.path);
-        if file_diagnostics == 0 { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
+        let file_diagnostics = diagnostics.find(&self.path);
+        if file_diagnostics == null { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
 
         file_diagnostics.append(Diagnostic {
             message: message,
@@ -211,8 +213,8 @@ impl Context {
 
     fn inlay_hint(&self, token: &Token, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
         let inlay_hints = &self.analysis.inlay_hints;
-        let file_inlay_hints: &Array<InlayHint> = inlay_hints.find(&self.path);
-        if file_inlay_hints == 0 { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
+        let file_inlay_hints = inlay_hints.find(&self.path);
+        if file_inlay_hints == null { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
 
         file_inlay_hints.append(InlayHint {
             position: Position {
@@ -228,8 +230,8 @@ impl Context {
 
     fn inlay_hint_before(&self, token: &Token, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
         let inlay_hints = &self.analysis.inlay_hints;
-        let file_inlay_hints: &Array<InlayHint> = inlay_hints.find(&self.path);
-        if file_inlay_hints == 0 { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
+        let file_inlay_hints = inlay_hints.find(&self.path);
+        if file_inlay_hints == null { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
 
         file_inlay_hints.append(InlayHint {
             position: Position {
@@ -368,7 +370,7 @@ impl Context {
         return true;
     }
 
-    fn push_scope(&self, block: &Block) {
+    fn push_scope(&self, block: *Block) {
         let scope: Scope = Scope::new(self.allocator, block);
         self.scopes.append(scope);
     }
@@ -377,7 +379,7 @@ impl Context {
         self.scopes.remove_back();
     }
 
-    fn parse_type(&self, type: &Type, generics: &Generics) -> bool {
+    fn parse_type(&self, type: &Type, generics: *Generics) -> bool {
         if self.check_next(TokenType::Symbol, "&&") {
             let target_type: Type;
             if !self.parse_type(&target_type, generics) { return false; }
@@ -406,7 +408,7 @@ impl Context {
             let indirect_type = IndirectType::Pointer;
             if self.check_next(TokenType::Keyword, "const") { indirect_type = IndirectType::ConstPointer; }
 
-            let indirect = self.allocator.store(&Indirect { type: indirect_type, to: Type::Primitive(0) });
+            let indirect = self.allocator.store(&Indirect { type: indirect_type, to: Type::Primitive(null) });
 
             if !self.parse_type(&indirect.to, generics) {
                 return false;
@@ -479,7 +481,7 @@ impl Context {
         } else if self.check_next(TokenType::Keyword, "fn") {
             let func_info_val = Function::new(self);
             let func_info = self.allocator.store(&func_info_val);
-            let generic_map = self.allocator.store(&GenericMap { self_type: self.type_self, array: Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+            let generic_map = self.allocator.store(&GenericMap { self_type: self.type_self, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
             
             if !func_info.parse_parameters(&func_info.generics) || !func_info.parse_return_type(&func_info.generics) { return false; }
 
@@ -515,7 +517,7 @@ impl Context {
             }
         }
 
-        if generics != 0 && generics.has(name.value) {
+        if generics != null && generics.has(name.value) {
             let generic_ref = generics.find(name.value);
 
             if self.check_next(TokenType::Symbol, "::") {
@@ -549,9 +551,9 @@ impl Context {
         }
 
         let new_type = self.module.find_make_type(name.value, &generics_);
-        if new_type == 0 {
+        if new_type == null {
             self.error_token(name, "Unknown type");
-            let unknown_c = self.allocator.store(&UnknownC { include: 0, name: name.value, generics: generics_ });
+            let unknown_c = self.allocator.store(&UnknownC { include: null, name: name.value, generics: generics_ });
             *type = Type::UnknownC(unknown_c);
             return false;
         }
@@ -644,7 +646,7 @@ impl Context {
         if name == null { return false; }
 
         let trait_info = self.module.find_trait(name.value);
-        if trait_info == 0 {
+        if trait_info == null {
             self.error_token(name, "Unable to find trait with this name");
             return false;
         }
@@ -668,23 +670,23 @@ impl Context {
             }
         }
 
-        *type = *self.root.make_type_usage(&Type::Trait(trait_info, 0), &generics_);
+        *type = *self.root.make_type_usage(&Type::Trait(trait_info, null), &generics_);
 
         return true;
     }
 
-    fn parse_type2(&self, generics: &Generics) -> &Type {
-        let result: &Type = self.allocator.alloc(sizeof(Type));
+    fn parse_type2(&self, generics: &Generics) -> *Type {
+        let result: *Type = self.allocator.alloc(sizeof(Type));
 
         if !self.parse_type(result, generics) {
             self.allocator.free(result);
-            return 0;
+            return null;
         }
 
         return result;
     }
     
-    fn resolve_type(allocator: &ArenaAllocator, type: &Type, generics_map: &GenericMap, fallback_generics_map: &GenericMap) -> &Type {
+    fn resolve_type(allocator: &ArenaAllocator, type: &Type, generics_map: *GenericMap, fallback_generics_map: *GenericMap) -> *Type {
         match type {
             Type::Indirect(indirect) => {
                 let resolved = allocator.store(&Indirect {
@@ -698,7 +700,7 @@ impl Context {
                 let resolved = allocator.store(&Sequence {
                     type: sequence.type,
                     element: *Context::resolve_type(allocator, &sequence.element, generics_map, fallback_generics_map),
-                    element_pointer: Type::Primitive(0),
+                    element_pointer: Type::Primitive(null),
                 });
                 resolved.element_pointer = Type::Indirect(allocator.store(&Indirect { type: IndirectType::Pointer, to: resolved.element }));
 
@@ -774,16 +776,16 @@ impl Context {
             },
             Type::GenericTypedef(gt) => {
                 let name = gt.generic.name.value;
-                let concrete_type: &Type = 0;
+                let concrete_type: *Type = null;
 
-                if generics_map != 0 { concrete_type = generics_map.get(name); }
-                if concrete_type == 0 && fallback_generics_map != 0 { concrete_type = fallback_generics_map.get(name); }
+                if generics_map != null { concrete_type = generics_map.get(name); }
+                if concrete_type == null && fallback_generics_map != null { concrete_type = fallback_generics_map.get(name); }
 
-                if concrete_type != 0 {
+                if concrete_type != null {
                     match concrete_type {
                         Type::Struct(struct_info, _) => {
                             for *impl_info in struct_info.impls {
-                                if impl_info.trait_ == 0 { continue; }
+                                if impl_info.trait_ == null { continue; }
                                 if impl_info.trait_.typedefs.find(&gt.typedef_name) == null { continue; }
                                 let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
                                 if typedef_type != null { return typedef_type; }
@@ -797,17 +799,17 @@ impl Context {
             },
             Type::Generic(generic) => {
                 let name = generic.name.value;
-                let generic_type: &Type = 0;
+                let generic_type: *Type = null;
 
-                if generic_type == 0 && generics_map != 0 {
+                if generic_type == null && generics_map != null {
                     generic_type = generics_map.get(name);
                 }
 
-                if generic_type == 0 && fallback_generics_map != 0 {
+                if generic_type == null && fallback_generics_map != null {
                     generic_type = fallback_generics_map.get(name);
                 }
 
-                if generic_type == 0 {
+                if generic_type == null {
                     let len: u32 = name.length;
                     fprintf(stderr, "Could not resolve generic %.*s generics1\n", len, name.ptr);
                     return type;
@@ -816,9 +818,9 @@ impl Context {
                 return generic_type;
             },
             Type::Self => {
-                if generics_map.self_type != 0 {
+                if generics_map.self_type != null {
                     return generics_map.self_type;
-                } else if fallback_generics_map != 0 && fallback_generics_map.self_type != 0 {
+                } else if fallback_generics_map != null && fallback_generics_map.self_type != null {
                     return fallback_generics_map.self_type;
                 } else {
                     return type;
@@ -847,7 +849,7 @@ impl Context {
         return true;
     }
 
-    fn get_value(&self, name: str) -> &Type {
+    fn get_value(&self, name: str) -> *Type {
         let scope_front = self.scopes.data;
         let scope = self.scopes.back();
 
@@ -859,7 +861,7 @@ impl Context {
         }
 
         let func = self.module.find_function(name);
-        if func != 0 { return func; }
+        if func != null { return func; }
 
         return self.module.find_value(name);
     }
@@ -870,7 +872,7 @@ impl Context {
         for scope in self.scopes.iter().reverse() {
             let block = scope.block;
 
-            if block != 0 {
+            if block != null {
                 for defer_statement in block.defer_statements.iter().reverse() {
                     defer_statements.append(*defer_statement);
                 }
@@ -886,7 +888,7 @@ impl Context {
         for scope in self.scopes.iter().reverse() {
             let block = scope.block;
 
-            if block != 0 {
+            if block != null {
                 for defer_statement in block.defer_statements.iter().reverse() {
                     defer_statements.append(*defer_statement);
                 }
@@ -901,18 +903,18 @@ impl Context {
     fn parse_generics(&self, generics: &Generics) -> Array<Type> {
         let generic_inputs = Array<Type>::new(self.allocator);
 
-        if !self.expect_value(TokenType::Symbol, "<") { return Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }; }
+        if !self.expect_value(TokenType::Symbol, "<") { return Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }; }
 
         while !self.check_next(TokenType::Symbol, ">") {
             let child_type: Type;
 
-            if !self.parse_type(&child_type, generics) { return Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 }; }
+            if !self.parse_type(&child_type, generics) { return Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }; }
 
             generic_inputs.append(child_type);
 
             if !self.check_next(TokenType::Symbol, ",") && !self.check_value(TokenType::Symbol, ">") {
                 self.error("Expected , or >");
-                return Array<Type> { allocator: self.allocator, data: 0, length: 0, capacity: 0 };
+                return Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
             }
         }
 

@@ -14,7 +14,7 @@ impl DeferStatement {
             if top_block_found {}
             else {
                 let top_block = scope.block;
-                if top_block != 0 {
+                if top_block != null {
                     top_block.is_top_level_and_has_defer_statements_inside = true;
                     top_block_found = true;
                 }

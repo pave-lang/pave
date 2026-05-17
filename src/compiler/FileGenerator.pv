@@ -47,7 +47,7 @@ impl FileGenerator {
         }
 
         let code = g.make_path(func_info.context.module, name_str, code_ext);
-        let code_file: &FILE = 0;
+        let code_file: *FILE = null;
         let code_tmp: *const char = null;
 
         code_tmp = tmpnam(0);
@@ -55,7 +55,7 @@ impl FileGenerator {
 
         g.code_files.append(code);
 
-        if code_file == 0 { perror(code.c_str()); return false; }
+        if code_file == null { perror(code.c_str()); return false; }
 
         g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
         g.write_includes_raw(code_file, &func_info.context.module.includes);
@@ -66,7 +66,7 @@ impl FileGenerator {
         g.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_function_definition(code_file, func_info, generics, 0) { fclose(code_file); return false; }
+        if !defs.write_function_definition(code_file, func_info, generics, null) { fclose(code_file); return false; }
 
         defs.write_function_block(code_file, name_str, func_info, generics, usage);
 
@@ -77,12 +77,12 @@ impl FileGenerator {
         include_writer = IncludeWriter::new(g.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
         let header = g.make_path(func_info.context.module, name_str, header_ext);
-        let header_file: &FILE = 0;
+        let header_file: *FILE = null;
         let header_tmp: *const char = null;
         header_tmp = tmpnam(0);
         header_file = fopen(header_tmp, "w+");
 
-        if header_file == 0 { perror(header.c_str()); return false; }
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name_str);
@@ -97,7 +97,7 @@ impl FileGenerator {
             defs.write_function_coroutine(header_file, func_info, generics);
         }
 
-        if !defs.write_function_definition(header_file, func_info, generics, 0) { fclose(header_file); return false; }
+        if !defs.write_function_definition(header_file, func_info, generics, null) { fclose(header_file); return false; }
         fprintf(header_file, ";\n");
 
         fprintf(header_file, "\n#endif\n");
@@ -106,7 +106,7 @@ impl FileGenerator {
         fclose(header_file);
         remove(header_tmp);
 
-        g.function_context = 0;
+        g.function_context = null;
 
         return true;
     }
@@ -130,8 +130,8 @@ impl FileGenerator {
         let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let header = g.make_path(module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name.as_str());
@@ -156,8 +156,8 @@ impl FileGenerator {
         g.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
-        let code_file: &FILE = fopen(code_tmp, "w+");
-        if code_file == 0 { perror(code.c_str()); return false; }
+        let code_file: *FILE = fopen(code_tmp, "w+");
+        if code_file == null { perror(code.c_str()); return false; }
 
         g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
         g.write_includes_raw(code_file, &module.includes);
@@ -196,8 +196,8 @@ impl FileGenerator {
 
         let header = g.make_path(struct_info.module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name.as_str());
@@ -272,8 +272,8 @@ impl FileGenerator {
         g.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
-        let code_file: &FILE = fopen(code_tmp, "w+");
-        if code_file == 0 { perror(code.c_str()); return false; }
+        let code_file: *FILE = fopen(code_tmp, "w+");
+        if code_file == null { perror(code.c_str()); return false; }
 
         g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
         g.write_includes_raw(code_file, &struct_info.module.includes);
@@ -495,8 +495,8 @@ impl FileGenerator {
 
         let header = g.make_path(null, name, ".h");
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name);
@@ -524,8 +524,8 @@ impl FileGenerator {
         g.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
-        let code_file: &FILE = fopen(code_tmp, "w+");
-        if code_file == 0 { perror(code.c_str()); return false; }
+        let code_file: *FILE = fopen(code_tmp, "w+");
+        if code_file == null { perror(code.c_str()); return false; }
 
         g.write_impl_includes_raw(code_file, &primitive_info.impls);
         g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
@@ -536,10 +536,10 @@ impl FileGenerator {
         g.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, 0, &primitive_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, null, &primitive_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         for *impl_info in primitive_info.impls {
-            if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+            if !impl_info.has_trait || impl_info.trait_ == null { continue; }
             let trait_info = impl_info.trait_;
             if !trait_info.has_dynamic_dispatch() { continue; }
 
@@ -601,8 +601,8 @@ impl FileGenerator {
 
         let header = g.make_path(null, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name.as_str());
@@ -635,8 +635,8 @@ impl FileGenerator {
         g.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
-        let code_file: &FILE = fopen(code_tmp, "w+");
-        if code_file == 0 { perror(code.c_str()); return false; }
+        let code_file: *FILE = fopen(code_tmp, "w+");
+        if code_file == null { perror(code.c_str()); return false; }
 
         let header_rel = g.make_rel_path(null, name.as_str(), ".h");
         fprintf(code_file, "#include <");
@@ -645,9 +645,9 @@ impl FileGenerator {
 
         let impls_base = [g.root.hack_type_impl.impl_info];
         let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: self.generator.allocator, capacity: 0 };
-        let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: 0, length: 0, allocator: self.generator.allocator, capacity: 0 };
+        let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: null, length: 0, allocator: self.generator.allocator, capacity: 0 };
 
-        if !defs.write_impls(code_file, 0, &impls, &impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, null, &impls, &impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         g.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -676,8 +676,8 @@ impl FileGenerator {
 
         let header = g.make_path(null, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name.as_str());
@@ -737,8 +737,8 @@ impl FileGenerator {
         let include_writer = IncludeWriter::new(g.allocator);
 
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name.as_str());
@@ -778,7 +778,7 @@ impl FileGenerator {
 
         let name = global.name.value;
 
-        let blank_generics = g.allocator.store(&GenericMap { self_type: 0, array: Array<Type> { allocator: g.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: g.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } });
+        let blank_generics = g.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: g.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: g.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
         blank_generics.self_type = Type::Self.to_ptr(g.allocator);
 
         let func_ctx = FunctionContext::new_const(g.allocator);
@@ -790,8 +790,8 @@ impl FileGenerator {
 
         let header = g.make_path(global.module, name, ".h");
         let header_tmp: *const char = tmpnam(0);
-        let header_file: &FILE = fopen(header_tmp, "w+");
-        if header_file == 0 { perror(header.c_str()); return false; }
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
         g.write_str_title(header_file, name);
@@ -816,8 +816,8 @@ impl FileGenerator {
 
         let code = g.make_path(global.module, name, ".c");
         let code_tmp: *const char = tmpnam(0);
-        let code_file: &FILE = fopen(code_tmp, "w+");
-        if code_file == 0 { perror(code.c_str()); return false; }
+        let code_file: *FILE = fopen(code_tmp, "w+");
+        if code_file == null { perror(code.c_str()); return false; }
 
         g.write_includes_raw(code_file, &global.module.includes);
 
@@ -828,7 +828,7 @@ impl FileGenerator {
 
         if global.is_const { fprintf(code_file, "const "); }
         g.write_variable_decl(code_file, name, &global.type, blank_generics);
-        if global.value != 0 {
+        if global.value != null {
             fprintf(code_file, " = ");
             ExpressionWriter { generator: g }.write_expression(code_file, global.value, blank_generics);
         }
@@ -840,7 +840,7 @@ impl FileGenerator {
 
         g.code_files.append(code);
 
-        g.function_context = 0;
+        g.function_context = null;
 
         return true;
     }
@@ -897,8 +897,8 @@ impl FileGenerator {
         runner_path.append("/main.test.c");
 
         let runner_tmp: *const char = tmpnam(0);
-        let runner_file: &FILE = fopen(runner_tmp, "w+");
-        if runner_file == 0 { return; }
+        let runner_file: *FILE = fopen(runner_tmp, "w+");
+        if runner_file == null { return; }
 
         fprintf(runner_file, "#include <stdio.h>\n\n");
 

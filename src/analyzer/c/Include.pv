@@ -171,7 +171,7 @@ impl Include {
         }
 
         let cursor = clang_getTranslationUnitCursor(unit);
-        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: 0, types: &self.types, values: &self.values, parent: ParentCpp::None });
+        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: null, types: &self.types, values: &self.values, parent: ParentCpp::None });
 
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
@@ -179,7 +179,7 @@ impl Include {
         return true;
     }
 
-    fn parse_type(&self, type: CXType) -> &Type {
+    fn parse_type(&self, type: CXType) -> *Type {
         let type_u32 = cast<u32>(type.kind);
         let lookup = self.cxtype_to_type.find(&type_u32);
 
@@ -260,7 +260,7 @@ impl Include {
         return &self.root.type_unknown;
     }
 
-    fn find_enum(&self, name: *const char) -> &EnumC {
+    fn find_enum(&self, name: *const char) -> *EnumC {
         let type_info = self.types.find(name);
 
         match type_info {
@@ -268,7 +268,7 @@ impl Include {
             _ => {},
         }
 
-        return 0;
+        return null;
     }
 
     fn make_string(&self, s: CXString) -> *char {

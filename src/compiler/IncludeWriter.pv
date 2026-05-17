@@ -31,7 +31,7 @@ impl IncludeWriter {
         defer type_declarations.release();
 
         for (_, &type) in types {
-            let resolved = Context::resolve_type(self.allocator, type, generics, 0);
+            let resolved = Context::resolve_type(self.allocator, type, generics, null);
             if deref { resolved = resolved.deref_all(); }
 
             match resolved {
@@ -49,7 +49,7 @@ impl IncludeWriter {
                             let name = generator.naming_c99.get_type_name(type_deref, generics.self_type, generics);
 
                             if struct_info.is_newtype() {
-                                let typedef_info = TypedefC { include: 0, name: name.as_str(), type: &struct_info.fields.data[0].value.type };
+                                let typedef_info = TypedefC { include: null, name: name.as_str(), type: &struct_info.fields.data[0].value.type };
                                 let typedef_type = Type::TypedefC(&typedef_info);
                                 let type_declaration = generator.naming_c99.get_type_decl(&typedef_type, generics.self_type, generics);
                                 if self.type_declarations.insert(type_declaration.as_str()) { type_declarations.insert(type_declaration.as_str()); }
@@ -91,7 +91,7 @@ impl IncludeWriter {
                             if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                         },
                         Type::UnknownC(info) => {
-                            if info.include != 0 && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                            if info.include != null && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                         },
                         _ => {},
                     }
@@ -143,7 +143,7 @@ impl IncludeWriter {
                     if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                 },
                 Type::UnknownC(info) => {
-                    if info.include != 0 && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                    if info.include != null && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                 },
                 _ => {
                     let name = generator.naming_ident.get_type_name(resolved, generics.self_type, generics);

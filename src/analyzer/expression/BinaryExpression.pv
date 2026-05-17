@@ -3,7 +3,7 @@ use analyzer
 use types
 
 impl Expression {
-    fn parse_binary(context: &Context, lhs: &Expression, min_prec: usize, generics: &Generics) -> &Expression {
+    fn parse_binary(context: &Context, lhs: &Expression, min_prec: usize, generics: &Generics) -> *Expression {
         let result = lhs;
 
         while true {
@@ -12,13 +12,13 @@ impl Expression {
             if prec < min_prec { break; }
 
             let operator = context.expect(TokenType::Symbol);
-            if operator == null { return 0; }
+            if operator == null { return null; }
 
             let rhs = Expression::parse_primary(context, generics);
-            if rhs == 0 { return 0; }
+            if rhs == null { return null; }
 
             let rhs_final = Expression::parse_binary(context, rhs, prec + 1, generics);
-            if rhs_final == 0 { return 0; }
+            if rhs_final == null { return null; }
 
             let is_arithmetic =
                 operator.value.eq("*") || operator.value.eq("+") ||
@@ -26,7 +26,7 @@ impl Expression {
 
             if is_arithmetic {
                 let trait_result = Expression::find_operator_trait_call(context, token, result, &result.return_type, operator.value, rhs_final);
-                if trait_result != 0 {
+                if trait_result != null {
                     result = trait_result;
                     continue;
                 }
@@ -38,10 +38,10 @@ impl Expression {
                 operator.value.eq("<")  || operator.value.eq(">")  ||
                 operator.value.eq("||") || operator.value.eq("&&");
 
-            let return_type: &Type = 0;
+            let return_type: *Type = null;
             if is_comparison {
                 if !operator.value.eq("||") && !operator.value.eq("&&") {
-                    if !result.validate_type(context, &rhs_final.return_type, false) { return 0; }
+                    if !result.validate_type(context, &rhs_final.return_type, false) { return null; }
 
                     // Also validate RHS null/0 literal against LHS type (catches `ptr == 0` / `ptr == null`)
                     match rhs_final.data {
@@ -68,7 +68,7 @@ impl Expression {
         return result;
     }
 
-    fn find_operator_trait_call(context: &Context, token: &Token, lhs: &Expression, lhs_type: &Type, operator: str, rhs: &Expression) -> &Expression {
+    fn find_operator_trait_call(context: &Context, token: &Token, lhs: &Expression, lhs_type: &Type, operator: str, rhs: &Expression) -> *Expression {
         let trait_name: str = "";
         let func_name: str = "";
 
@@ -76,13 +76,13 @@ impl Expression {
         else if operator.eq("+") { trait_name = "Add"; func_name = "add"; }
         else if operator.eq("-") { trait_name = "Sub"; func_name = "sub"; }
         else if operator.eq("/") { trait_name = "Div"; func_name = "div"; }
-        else { return 0; }
+        else { return null; }
 
-        if lhs_type.is_unknown() || rhs.return_type.is_unknown() { return 0; }
+        if lhs_type.is_unknown() || rhs.return_type.is_unknown() { return null; }
 
         match lhs_type {
             Type::Self => {
-                if context.type_self != 0 {
+                if context.type_self != null {
                     return Expression::find_operator_trait_call(context, token, lhs, context.type_self, operator, rhs);
                 }
             },
@@ -91,11 +91,11 @@ impl Expression {
             },
             Type::Struct(struct_info, generic_map) => {
                 for *impl_info in struct_info.impls {
-                    if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
                     if !impl_info.trait_.name.value.eq(trait_name) { continue; }
 
-                    let func: &Function = impl_info.functions.find(&func_name);
-                    if func == 0 { continue; }
+                    let func = impl_info.functions.find(&func_name);
+                    if func == null { continue; }
                     if func.parameters.length < 2 { continue; }
 
                     let other_param = func.parameters.get(1);
@@ -122,11 +122,11 @@ impl Expression {
             },
             Type::Primitive(primitive_info) => {
                 for *impl_info in primitive_info.impls {
-                    if !impl_info.has_trait || impl_info.trait_ == 0 { continue; }
+                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
                     if !impl_info.trait_.name.value.eq(trait_name) { continue; }
 
-                    let func: &Function = impl_info.functions.find(&func_name);
-                    if func == 0 { continue; }
+                    let func = impl_info.functions.find(&func_name);
+                    if func == null { continue; }
                     if func.parameters.length < 2 { continue; }
 
                     let other_param = func.parameters.get(1);
@@ -147,7 +147,7 @@ impl Expression {
             _ => {},
         }
 
-        return 0;
+        return null;
     }
 
     fn get_precedence(token: &Token) -> usize {

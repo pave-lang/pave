@@ -2,7 +2,7 @@ use std
 use analyzer
 
 struct GenericMap {
-    self_type: &Type,
+    self_type: *Type,
     array: Array<Type>,
     map: HashMap<str, usize>,
 }
@@ -12,7 +12,7 @@ impl GenericMap {
         let self: Self = Self {
             array: Array<Type>::new(allocator),
             map: HashMap<str, usize>::new(allocator),
-            self_type: 0,
+            self_type: null,
         };
 
         let i: usize = 0;
@@ -31,7 +31,7 @@ impl GenericMap {
         let self = Self {
             array: Array<Type>::new(allocator),
             map: HashMap<str, usize>::new(allocator),
-            self_type: 0,
+            self_type: null,
         };
 
         for generic in generics.array {
@@ -62,28 +62,28 @@ impl GenericMap {
         return true;
     }
 
-    fn get(&self, name: str) -> &Type {
-        if self.map.length == 0 { return 0; }
+    fn get(&self, name: str) -> *Type {
+        if self.map.length == 0 { return null; }
 
-        let index: &usize = self.map.find(&name);
-        if index == 0 { return 0; }
+        let index: *usize = self.map.find(&name);
+        if index == null { return null; }
 
         return self.array.data + *index;
     }
 
-    fn resolve_types(&self, allocator: &ArenaAllocator, generics: &GenericMap) -> Self {
+    fn resolve_types(&self, allocator: &ArenaAllocator, generics: *GenericMap) -> Self {
         let result: Self = Self {
             array: self.array.clone(allocator),
             map: self.map.clone(allocator),
             self_type: self.self_type,
         };
 
-        if generics != 0 {
-            result.self_type = Context::resolve_type(allocator, generics.self_type, generics, 0);
+        if generics != null {
+            result.self_type = Context::resolve_type(allocator, generics.self_type, generics, null);
         }
 
         for generic in result.array {
-            *generic = *Context::resolve_type(allocator, generic, generics, 0);
+            *generic = *Context::resolve_type(allocator, generic, generics, null);
         }
 
         return result;

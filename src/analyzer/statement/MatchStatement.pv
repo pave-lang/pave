@@ -10,30 +10,30 @@ struct MatchStatement {
 }
 
 impl MatchStatement {
-    fn parse(context: &Context, generics: &Generics) -> &MatchStatement {
-        if !context.expect_value(TokenType::Keyword, "match") { return 0; }
+    fn parse(context: &Context, generics: &Generics) -> *MatchStatement {
+        if !context.expect_value(TokenType::Keyword, "match") { return null; }
 
         let expression = Expression::parse(context, generics);
-        if expression == null { return 0; }
+        if expression == null { return null; }
 
-        if !context.expect_value(TokenType::Symbol, "{") { return 0; }
+        if !context.expect_value(TokenType::Symbol, "{") { return null; }
 
         let cases: Array<MatchCase> = Array<MatchCase>::new(context.allocator);
 
         while !context.check_value(TokenType::Symbol, "}") {
             let match_case: MatchCase;
-            if !match_case.parse(context, generics) { return 0; }
+            if !match_case.parse(context, generics) { return null; }
 
             cases.append(match_case);
 
             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
                 context.pop_scope();
                 context.expect_value(TokenType::Symbol, "}");
-                return 0;
+                return null;
             }
         }
 
-        if !context.expect_value(TokenType::Symbol, "}") { return 0; }
+        if !context.expect_value(TokenType::Symbol, "}") { return null; }
 
         return context.allocator.store(&MatchStatement {
             expression,

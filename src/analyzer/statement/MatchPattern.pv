@@ -81,7 +81,7 @@ impl MatchPattern {
 
         let type = context.get_value(token.value);
 
-        if type != 0 {
+        if type != null {
             context.next_token();
             let expression = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), type);
             *pattern = MatchPattern::StaticValue(expression);
@@ -89,7 +89,7 @@ impl MatchPattern {
         }
 
         type = context.parse_type2(generics);
-        if type == 0 {
+        if type == null {
             return false;
         } else if !type.is_enum() {
             context.error_token(token, "Type is not an enum");
@@ -101,7 +101,7 @@ impl MatchPattern {
         let enum_variant_token = context.expect(TokenType::Identifier);
         if enum_variant_token == null { return false; }
 
-        let generic_map: &GenericMap = 0;
+        let generic_map: *GenericMap = null;
 
         match type {
             Type::Self => {
@@ -139,15 +139,15 @@ impl MatchPattern {
 
                         parameters.append(EnumVariantParameter { ref, variable, field_name: str { ptr: null, length: 0 } });
 
-                        let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, 0);
-                        if variable_type == 0 { return false; }
+                        let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + variable_i, generic_map, null);
+                        if variable_type == null { return false; }
 
                         if ref {
                             let indirect = context.allocator.store(&Indirect { type: IndirectType::Reference, to: *variable_type });
                             variable_type = context.allocator.store(&Type::Indirect(indirect));
                         }
 
-                        let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);
+                        let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, null);
                         variable_type_name.prepend(": ");
                         context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
 
@@ -204,15 +204,15 @@ impl MatchPattern {
                             return false;
                         }
 
-                        let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + field_i, generic_map, 0);
-                        if variable_type == 0 { return false; }
+                        let variable_type = Context::resolve_type(context.allocator, enum_variant.types.data + field_i, generic_map, null);
+                        if variable_type == null { return false; }
 
                         if ref {
                             let indirect = context.allocator.store(&Indirect { type: IndirectType::Reference, to: *variable_type });
                             variable_type = context.allocator.store(&Type::Indirect(indirect));
                         }
 
-                        let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, 0);
+                        let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, null);
                         variable_type_name.prepend(": ");
                         context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
 
@@ -250,6 +250,10 @@ impl MatchPattern {
             },
             EnumVariantResult::Function(_, _) => {
                 context.error("Expected an enum variant, not a function");
+                return false;
+            },
+            EnumVariantResult::Const(_) => {
+                context.error("Expected an enum variant, not a const");
                 return false;
             },
         }

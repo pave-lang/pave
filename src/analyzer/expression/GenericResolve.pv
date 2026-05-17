@@ -9,7 +9,7 @@ impl Expression {
         let i: usize = 0;
         for generic in generics {
             let target = generic_map.array.get(i);
-            if target != 0 { *target = *generic; }
+            if target != null { *target = *generic; }
             i += 1;
         }
 
@@ -29,7 +29,7 @@ impl Expression {
 
         for generic in func_info.generics.array {
             let concrete_type = generic_map.get(generic.name.value);
-            if concrete_type == 0 { continue; }
+            if concrete_type == null { continue; }
 
             for *trait_info in generic.traits {
                 for (typedef_name, _) in trait_info.typedefs {
@@ -56,7 +56,7 @@ impl Expression {
         match param_type {
             Type::Generic(generic) => {
                 let generic_type = generic_map.get(generic.name.value);
-                if generic_type != 0 { *generic_type = *arg_type; }
+                if generic_type != null { *generic_type = *arg_type; }
             },
             Type::Indirect(indirect_type) => {
                 match arg_type {

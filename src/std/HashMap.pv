@@ -4,12 +4,12 @@
 struct HashMapBucket<K, V> {
     key: K,
     value: V,
-    next: &HashMapBucket<K, V>,
+    next: *HashMapBucket<K, V>,
 }
 
 struct HashMapIter<K, V> {
-    iter: &HashMapBucket<K, V>,
-    end: &HashMapBucket<K, V>,
+    iter: *HashMapBucket<K, V>,
+    end: *HashMapBucket<K, V>,
 }
 
 impl<K, V> HashMapIter<K, V> {
@@ -25,8 +25,8 @@ impl<K, V> HashMapIter<K, V> {
 
 struct HashMap<K: Hash, V> {
     allocator: &dyn Allocator,
-    buckets: &&HashMapBucket<K, V>,
-    data: &HashMapBucket<K, V>,
+    buckets: **HashMapBucket<K, V>,
+    data: *HashMapBucket<K, V>,
     capacity: usize,
     length: usize,
 }
@@ -39,8 +39,8 @@ impl<K: Hash, V> HashMap<K, V> {
     fn with_capacity(allocator: &dyn Allocator, capacity: usize) -> Self {
         let self = Self {
             allocator,
-            buckets: 0,
-            data: 0,
+            buckets: null,
+            data: null,
             capacity: 0,
             length: 0,
         };
@@ -64,7 +64,7 @@ impl<K: Hash, V> HashMap<K, V> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets[bucket_index];
 
-        while current_bucket_node != 0 {
+        while current_bucket_node != null {
             if current_bucket_node.key.hash()._0 == hash._0 {
                 return &current_bucket_node.value;
             }
@@ -89,11 +89,11 @@ impl<K: Hash, V> HashMap<K, V> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets + bucket_index;
 
-        while *current_bucket_node != 0 {
+        while *current_bucket_node != null {
             current_bucket_node = &(*current_bucket_node).next;
         }
 
-        self.data[self.length] = HashMapBucket<K, V> { key, value, next: 0 };
+        self.data[self.length] = HashMapBucket<K, V> { key, value, next: null };
         let data = self.data + self.length;
         self.length += 1;
 
@@ -109,7 +109,7 @@ impl<K: Hash, V> HashMap<K, V> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets[bucket_index];
 
-        while current_bucket_node != 0 {
+        while current_bucket_node != null {
             if current_bucket_node.key.hash()._0 == hash._0 {
                 let last = self.data + self.length - 1;
                 if current_bucket_node != last { *current_bucket_node = *last; }
@@ -129,8 +129,8 @@ impl<K: Hash, V> HashMap<K, V> {
     fn release(&self) {
         self.allocator.free(self.buckets);
         self.allocator.free(self.data);
-        self.buckets = 0;
-        self.data = 0;
+        self.buckets = null;
+        self.data = null;
         self.capacity = 0;
         self.length = 0;
     }
@@ -140,12 +140,12 @@ impl<K: Hash, V> HashMap<K, V> {
 
         for i in 0..self.length {
             let node = self.data + i;
-            node.next = 0;
+            node.next = null;
             let hash = (*node).key.hash();
             let bucket_index: usize = hash._0 % self.capacity;
             let current_bucket_node = self.buckets + bucket_index;
 
-            while *current_bucket_node != 0 {
+            while *current_bucket_node != null {
                 current_bucket_node = &(*current_bucket_node).next;
             }
 

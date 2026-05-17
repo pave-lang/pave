@@ -21,8 +21,8 @@ impl Expression {
                 }
 
                 for *impl_info in enum_info.impls {
-                    let function: &Function = impl_info.find_function(token.value);
-                    if function != 0 {
+                    let function = impl_info.find_function(token.value);
+                    if function != null {
                         return EnumVariantResult::Function(function, generic_map);
                     }
                 }
@@ -51,7 +51,7 @@ impl Expression {
         return EnumVariantResult::None;
     }
 
-    fn get_member_type(context: &Context, type: &Type, member: &Token, output_error: bool) -> &Type {
+    fn get_member_type(context: &Context, type: &Type, member: &Token, output_error: bool) -> *Type {
         match type {
             Type::Indirect(indirect) => {
                 return Expression::get_member_type(context, &indirect.to, member, output_error);
@@ -61,24 +61,24 @@ impl Expression {
             },
             Type::Primitive(primitive_info) => {
                 for *impl_info in primitive_info.impls {
-                    let function: &Function = impl_info.find_function(member.value);
-                    if function != 0 {
-                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap { self_type: type, array: Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } })));
+                    let function = impl_info.find_function(member.value);
+                    if function != null {
+                        return context.allocator.store(&Type::Function(function, context.allocator.store(&GenericMap { self_type: type, array: Array<Type> { allocator: context.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: null, data: null, capacity: 0, length: 0 } })));
                     }
                 }
 
                 if output_error { context.error_token(member, "Function not implemented on primitive"); }
-                return 0;
+                return null;
             },
             Type::Struct(struct_info, generic_map) => {
-                let field: &StructField = struct_info.fields.find(&member.value);
-                if field != 0 {
+                let field = struct_info.fields.find(&member.value);
+                if field != null {
                     return &field.type;
                 }
 
                 for *impl_info in struct_info.impls {
-                    let function: &Function = impl_info.find_function(member.value);
-                    if function != 0 {
+                    let function = impl_info.find_function(member.value);
+                    if function != null {
                         if impl_info.typedefs.length == 0 {
                             return context.allocator.store(&Type::Function(function, generic_map));
                         }
@@ -102,45 +102,45 @@ impl Expression {
                 if output_error {
                     context.error_token_value(member, "Field or function not found in struct", member.value);
                 }
-                return 0;
+                return null;
             },
             Type::CoroutineInstance(func_info, generic_map) => {
                 if member.value.eq("next") {
                     let func_next = context.allocator.store(&context.root.func_next);
-                    func_next.parent = FunctionParent::Type(type, 0, 0);
+                    func_next.parent = FunctionParent::Type(type, 0, null);
                     return context.allocator.store(&Type::Function(func_next, generic_map));
                 }
 
                 if member.value.eq("value") {
                     let func_value = context.allocator.store(&context.root.func_value);
-                    func_value.parent = FunctionParent::Type(type, 0, 0);
+                    func_value.parent = FunctionParent::Type(type, 0, null);
                     func_value.return_type = func_info.return_type;
                     return context.allocator.store(&Type::Function(func_value, generic_map));
                 }
 
                 if output_error { context.error_token(member, "Only next() and value() functions exist on coroutine instances"); }
-                return 0;
+                return null;
             },
             Type::Enum(enum_info, generic_map) => {
                 for *impl_info in enum_info.impls {
-                    let function: &Function = impl_info.find_function(member.value);
-                    if function != 0 {
+                    let function = impl_info.find_function(member.value);
+                    if function != null {
                         return context.allocator.store(&Type::Function(function, generic_map));
                     }
                 }
 
                 if output_error { context.error_token(member, "Function not found in enum"); }
-                return 0;
+                return null;
             },
             Type::Trait(trait_info, generic_map) => {
                 if member.value.eq("instance") {
                     return context.allocator.store(&Type::Indirect(Indirect::new_pointer(context.allocator, context.root.type_void)));
                 }
 
-                let function: &Function = trait_info.functions.find(&member.value);
-                if function == 0 {
+                let function = trait_info.functions.find(&member.value);
+                if function == null {
                     if output_error { context.error_token(member, "Function not found in trait"); }
-                    return 0;
+                    return null;
                 }
 
                 return context.allocator.store(&Type::Function(function, generic_map));
@@ -153,14 +153,14 @@ impl Expression {
                 if field != null { return &field.type; }
 
                 if output_error { context.error_token(member, "Field not found in C struct"); }
-                return 0;
+                return null;
             },
             Type::UnionC(union_info) => {
                 let field = union_info.fields.find(&member.value);
                 if field != null { return &field.type; }
 
                 if output_error { context.error_token(member, "Field not found in C union"); }
-                return 0;
+                return null;
             },
             Type::ClassCpp(class_info) => {
                 let field_type = class_info.fields.find(&member.value);
@@ -171,17 +171,17 @@ impl Expression {
 
                 for base in class_info.bases {
                     let base_type = Expression::get_member_type(context, base, member, output_error);
-                    if base_type != 0 { return base_type; }
+                    if base_type != null { return base_type; }
                 }
 
                 if output_error { context.error_token(member, "Field not found in Cpp class/struct"); }
-                return 0;
+                return null;
             },
             Type::Generic(generic) => {
                 for *trait_info in generic.traits {
-                    let function: &Function = trait_info.functions.find(&member.value);
-                    if function != 0 {
-                        let generic_map_val: GenericMap = GenericMap { self_type: 0, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
+                    let function = trait_info.functions.find(&member.value);
+                    if function != null {
+                        let generic_map_val: GenericMap = GenericMap { self_type: null, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
                         let generic_map = context.allocator.store(&generic_map_val);
                         for (typedef_name, _) in trait_info.typedefs {
                             let gt = context.allocator.store(&GenericTypedef { generic, typedef_name });
@@ -192,7 +192,7 @@ impl Expression {
                 }
 
                 if output_error { context.error_token(member, "Function not found in Generic traits"); }
-                return 0;
+                return null;
             },
             Type::Sequence(sequence) => {
                 if member.value.eq("data") {
@@ -205,9 +205,9 @@ impl Expression {
 
                 let impl_info = context.root.hack_type_impl.impl_info;
 
-                let function: &Function = impl_info.find_function(member.value);
-                if function != 0 {
-                    let generic_map = GenericMap::new(context.allocator, &Generics { parent: null, array: Array<Generic> { allocator: context.allocator, data: 0, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: 0, data: 0, capacity: 0, length: 0 } }, &Array<Type> { allocator: context.allocator, data: 0, length: 0, capacity: 0 });
+                let function = impl_info.find_function(member.value);
+                if function != null {
+                    let generic_map = GenericMap::new(context.allocator, &Generics { parent: null, array: Array<Generic> { allocator: context.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: context.allocator, buckets: null, data: null, capacity: 0, length: 0 } }, &Array<Type> { allocator: context.allocator, data: null, length: 0, capacity: 0 });
                     generic_map.insert("T", sequence.element);
                     generic_map.self_type = context.allocator.store(&Type::Indirect(Indirect::new_reference(context.allocator, Type::Sequence(sequence))));
 
@@ -215,18 +215,18 @@ impl Expression {
                 }
 
                 if output_error { context.error_token(member, "Sequences do not have this member"); }
-                return 0;
+                return null;
             },
             Type::Tuple(tuple) => {
                 if member.type != TokenType::Number {
                     context.error_token(member, "Tuples do not have this member");
-                    return 0;
+                    return null;
                 }
 
                 let index: usize = strtoul(member.value.ptr, 0, 10);
                 if index >= tuple.elements.length {
                     context.error_token(member, "Tuple does not have this member");
-                    return 0;
+                    return null;
                 }
 
                 return &tuple.elements.data[index];
@@ -240,12 +240,12 @@ impl Expression {
 
                 if output_error { context.error_token(member, "Namespace does not have this member"); }
 
-                return 0;
+                return null;
             },
             Type::UnknownC(_) => { return type; },
             _ => { context.error_token(member, "Type does not have members"); },
         }
 
-        return 0;
+        return null;
     }
 }

@@ -14,7 +14,7 @@ enum StructType {
 }
 
 struct Struct {
-    name: &Token,
+    name: *Token,
     module: &Module,
     token_start: usize,
     token_end: usize,
@@ -35,7 +35,7 @@ impl Struct {
             fields: HashMap<str, StructField>::new(context.allocator),
             traits: HashMap<str, (&Trait, &Type)>::new(context.allocator),
             impls: Array<&Impl>::new(context.allocator),
-            name: 0,
+            name: null,
             token_start: 0,
             token_end: 0,
             type: StructType::Incomplete,
@@ -142,7 +142,7 @@ impl Struct {
                 Type::Function(func_info, _) => {
                     func_info.name = name;
                     func_info.type = FunctionType::Builtin;
-                    func_info.parent = FunctionParent::Struct(self, 0, 0);
+                    func_info.parent = FunctionParent::Struct(self, null, null);
                 },
                 _ => {},
             }

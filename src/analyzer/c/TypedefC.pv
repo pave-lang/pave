@@ -2,7 +2,7 @@ use std
 use types
 
 struct TypedefC {
-    include: &Include,
+    include: *Include,
     name: str,
     type: &Type,
 }

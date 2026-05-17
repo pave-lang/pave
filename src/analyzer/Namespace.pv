@@ -171,17 +171,17 @@ impl Namespace {
         return true;
     }
 
-    fn find_type(&self, name: str) -> &Type {
+    fn find_type(&self, name: str) -> *Type {
         return self.types.find(&name);
     }
 
-    fn find_trait(&self, name: str) -> &Trait {
+    fn find_trait(&self, name: str) -> *Trait {
         let trait_info = self.traits.find(&name);
-        if trait_info == null { return 0; }
+        if trait_info == null { return null; }
         return *trait_info;
     }
 
-    fn find_function(&self, name: str) -> &Type {
+    fn find_function(&self, name: str) -> *Type {
         return self.functions.find(&name);
     }
 }
