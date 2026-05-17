@@ -18,25 +18,25 @@ impl BlockWriter {
     }
 
     fn write_if_let_enum_variant(&self, file: &FILE, return_type: &Type, type: &Type, enum_variant: &EnumVariant, parameters: &Array<EnumVariantParameter>, expression: &Expression, body: &Block, outer_block: &Block, generics: &GenericMap) -> bool {
-        let g = self.generator;
-        let expr = ExpressionWriter { generator: g };
+        let generator = self.generator;
+        let expr = ExpressionWriter { generator: generator };
         let expr_type = &expression.return_type;
-        let is_discriminated_union = g.type_is_discriminated_union(expr_type, generics);
+        let is_discriminated_union = generator.type_is_discriminated_union(expr_type, generics);
 
         fprintf(file, "if (");
         if is_discriminated_union {
             expr.write_expression(file, expression, generics);
-            g.write_instance_member_accessor(file, expr_type, generics);
+            generator.write_instance_member_accessor(file, expr_type, generics);
             fprintf(file, "type == ");
-            g.write_enum_variant_name(file, type, enum_variant);
+            generator.write_enum_variant_name(file, type, enum_variant);
         } else {
-            g.write_deref_if_needed(file, expr_type, generics);
+            generator.write_deref_if_needed(file, expr_type, generics);
             expr.write_expression(file, expression, generics);
             fprintf(file, " == ");
-            g.write_enum_variant_name(file, type, enum_variant);
+            generator.write_enum_variant_name(file, type, enum_variant);
         }
         fprintf(file, ") {\n");
-        g.indent += 1;
+        generator.indent += 1;
 
         let types = &enum_variant.types;
         let param_i: usize = 0;
@@ -47,7 +47,7 @@ impl BlockWriter {
             }
 
             let param_type: &Type;
-            let accessor = String::new(g.allocator);
+            let accessor = String::new(generator.allocator);
             accessor.append_str_lowercase(enum_variant.name.value);
             accessor.append("_value");
 
@@ -69,15 +69,15 @@ impl BlockWriter {
             }
 
             let variable_expression: &Expression = expression;
-            variable_expression = Expression::make(g.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
+            variable_expression = Expression::make(generator.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
 
             let name = param_iter.variable;
-            g.write_line_directive(file, outer_block.context, name);
-            g.write_indent(file);
-            g.write_type(file, param_type, generics);
+            generator.write_line_directive(file, outer_block.context, name);
+            generator.write_indent(file);
+            generator.write_type(file, param_type, generics);
             if param_iter.ref { fprintf(file, "*"); }
             fprintf(file, " ");
-            g.write_token(file, name);
+            generator.write_token(file, name);
             fprintf(file, " = ");
             if param_iter.ref { fprintf(file, "&"); }
             expr.write_expression(file, variable_expression, generics);
@@ -86,32 +86,32 @@ impl BlockWriter {
             param_i += 1;
         }
 
-        g.function_context.push_scope(false, false);
+        generator.function_context.push_scope(false, false);
         if !self.write_block(file, return_type, body, generics, true, true) { return false; }
-        g.function_context.pop_scope();
+        generator.function_context.pop_scope();
 
-        g.indent -= 1;
-        g.write_indent(file);
+        generator.indent -= 1;
+        generator.write_indent(file);
         fprintf(file, "}");
 
         return true;
     }
 
     fn write_defer_statements(&self, file: &FILE, return_type: &Type, defer_statements: &Array<DeferStatement>, generics: &GenericMap) -> bool {
-        let g = self.generator;
-        let expr = ExpressionWriter { generator: g };
+        let generator = self.generator;
+        let expr = ExpressionWriter { generator: generator };
         for defer_info in defer_statements {
             match defer_info {
                 DeferStatement::Expression(expression) => {
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     expr.write_expression(file, expression, generics);
                     fprintf(file, ";\n");
                 },
                 DeferStatement::Block(block) => {
-                    g.write_indent(file);
-                    g.function_context.push_scope(false, false);
+                    generator.write_indent(file);
+                    generator.function_context.push_scope(false, false);
                     self.write_block(file, return_type, block, generics, false, false);
-                    g.function_context.pop_scope();
+                    generator.function_context.pop_scope();
                 },
             }
         }
@@ -120,8 +120,8 @@ impl BlockWriter {
     }
 
     fn write_block(&self, file: &FILE, return_type: &Type, block: *Block, generics: &GenericMap, inline_: bool, no_brackets: bool) -> bool {
-        let g = self.generator;
-        let expr = ExpressionWriter { generator: g };
+        let generator = self.generator;
+        let expr = ExpressionWriter { generator: generator };
 
         if block == null {
             fprintf(file, "{}\n");
@@ -130,12 +130,12 @@ impl BlockWriter {
 
         if !no_brackets {
             fprintf(file, "{\n");
-            g.indent += 1;
+            generator.indent += 1;
         }
 
         if block.is_top_level_and_has_defer_statements_inside && !return_type.is_void() {
-            g.write_indent(file);
-            g.write_type(file, return_type, generics);
+            generator.write_indent(file);
+            generator.write_type(file, return_type, generics);
             fprintf(file, " __result;\n\n");
         }
 
@@ -150,38 +150,38 @@ impl BlockWriter {
                 }
             }
 
-            g.write_line_directive(file, block.context, statement.first_token);
+            generator.write_line_directive(file, block.context, statement.first_token);
 
             last_statement_is_return = false;
 
             match statement.data {
                 StatementData::BlockStatement(child_block) => {
-                    g.write_indent(file);
-                    g.function_context.push_scope(false, false);
+                    generator.write_indent(file);
+                    generator.function_context.push_scope(false, false);
                     if !self.write_block(file, return_type, child_block, generics, false, false) {
                         return false;
                     }
-                    g.function_context.pop_scope();
+                    generator.function_context.pop_scope();
                 },
                 StatementData::LetStatement(let_statement) => {
                     let name = let_statement.name;
                     let type = let_statement.type;
                     let value = let_statement.value;
 
-                    g.write_indent(file);
+                    generator.write_indent(file);
 
                     if !let_statement.is_static {
-                        g.function_context.add_variable(name.value, type);
+                        generator.function_context.add_variable(name.value, type);
                     }
 
                     if let_statement.is_static {
                         fprintf(file, "static ");
                     }
 
-                    if g.is_coroutine() {
-                        g.write_variable(file, name.value);
+                    if generator.is_coroutine() {
+                        generator.write_variable(file, name.value);
                     } else {
-                        g.write_variable_decl(file, name.value, type, generics);
+                        generator.write_variable_decl(file, name.value, type, generics);
                     }
 
                     if value != null {
@@ -192,10 +192,10 @@ impl BlockWriter {
                     fprintf(file, ";\n");
                 },
                 StatementData::YieldStatement(yield_stmt) => {
-                    g.function_context.coroutine.yield_count += 1;
+                    generator.function_context.coroutine.yield_count += 1;
 
-                    g.write_indent(file);
-                    let yield_number = g.function_context.coroutine.yield_count;
+                    generator.write_indent(file);
+                    let yield_number = generator.function_context.coroutine.yield_count;
                     fprintf(file, "ctx->_value = ");
                     expr.write_expression(file, yield_stmt.expression, generics);
                     fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:;\n", yield_number, yield_number);
@@ -205,20 +205,20 @@ impl BlockWriter {
                     let defer_statements = &ret.defer_statements;
                     if value == null {
                         self.write_defer_statements(file, return_type, defer_statements, generics);
-                        g.write_indent(file);
+                        generator.write_indent(file);
                         fprintf(file, "return;\n");
                     } else if defer_statements.length > 0 {
-                        g.write_indent(file);
+                        generator.write_indent(file);
                         fprintf(file, "__result = ");
                         expr.write_expression(file, value, generics);
                         fprintf(file, ";\n");
 
                         self.write_defer_statements(file, return_type, defer_statements, generics);
 
-                        g.write_indent(file);
+                        generator.write_indent(file);
                         fprintf(file, "return __result;\n");
                     } else {
-                        g.write_indent(file);
+                        generator.write_indent(file);
                         fprintf(file, "return ");
                         expr.write_expression(file, value, generics);
                         fprintf(file, ";\n");
@@ -227,7 +227,7 @@ impl BlockWriter {
                     last_statement_is_return = true;
                 },
                 StatementData::IfStatement(if_stmt) => {
-                    g.write_indent(file);
+                    generator.write_indent(file);
 
                     if if_stmt.pattern != null {
                         match if_stmt.pattern {
@@ -240,9 +240,9 @@ impl BlockWriter {
                         fprintf(file, "if (");
                         expr.write_expression(file, if_stmt.expression, generics);
                         fprintf(file, ") ");
-                        g.function_context.push_scope(false, false);
+                        generator.function_context.push_scope(false, false);
                         if !self.write_block(file, return_type, if_stmt.block, generics, true, false) { return false; }
-                        g.function_context.pop_scope();
+                        generator.function_context.pop_scope();
                     }
 
                     for else_statement in if_stmt.else_statements {
@@ -259,13 +259,13 @@ impl BlockWriter {
                             fprintf(file, "if (");
                             expr.write_expression(file, else_statement.expression, generics);
                             fprintf(file, ") ");
-                            g.function_context.push_scope(false, false);
+                            generator.function_context.push_scope(false, false);
                             if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
-                            g.function_context.pop_scope();
+                            generator.function_context.pop_scope();
                         } else {
-                            g.function_context.push_scope(false, false);
+                            generator.function_context.push_scope(false, false);
                             if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
-                            g.function_context.pop_scope();
+                            generator.function_context.pop_scope();
                         }
                     }
 
@@ -275,28 +275,28 @@ impl BlockWriter {
                     let expression = match_stmt.expression;
                     let cases = &match_stmt.cases;
                     let return_type = &expression.return_type;
-                    let is_discriminated_union = g.type_is_discriminated_union(return_type, generics);
+                    let is_discriminated_union = generator.type_is_discriminated_union(return_type, generics);
 
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     fprintf(file, "switch (");
 
                     if !is_discriminated_union {
-                        g.write_deref_if_needed(file, return_type, generics);
+                        generator.write_deref_if_needed(file, return_type, generics);
                     }
 
                     expr.write_expression(file, expression, generics);
 
                     if is_discriminated_union {
-                        g.write_instance_member_accessor(file, return_type, generics);
+                        generator.write_instance_member_accessor(file, return_type, generics);
                         fprintf(file, "type");
                     }
 
                     fprintf(file, ") {\n");
-                    g.indent += 1;
+                    generator.indent += 1;
 
                     for case_info in cases {
-                        g.write_line_directive(file, block.context, case_info.first_token);
-                        g.write_indent(file);
+                        generator.write_line_directive(file, block.context, case_info.first_token);
+                        generator.write_indent(file);
 
                         let patterns = &case_info.patterns;
                         for (i, pattern) in patterns.iter().enumerate() {
@@ -310,7 +310,7 @@ impl BlockWriter {
                                 },
                                 MatchPattern::EnumVariant(type, enum_variant, _) => {
                                     fprintf(file, "case ");
-                                    g.write_enum_variant_name(file, type, enum_variant);
+                                    generator.write_enum_variant_name(file, type, enum_variant);
                                     fprintf(file, ":");
                                 },
                                 MatchPattern::EnumCValue(enum_variant) => {
@@ -318,18 +318,18 @@ impl BlockWriter {
 
                                     let enum_info = enum_variant.parent;
                                     if !enum_info.parent.is_none() {
-                                        let type_name = g.naming_decl.get_type_name(&Type::EnumC(enum_info), generics.self_type, generics);
-                                        g.write_str(file, type_name.as_str());
+                                        let type_name = generator.naming_decl.get_type_name(&Type::EnumC(enum_info), generics.self_type, generics);
+                                        generator.write_str(file, type_name.as_str());
                                         type_name.release();
                                         fprintf(file, "::");
                                     }
 
-                                    g.write_str(file, enum_variant.name);
+                                    generator.write_str(file, enum_variant.name);
                                     fprintf(file, ":");
                                 },
                                 MatchPattern::TypeId(&type) => {
                                     fprintf(file, "case ");
-                                    g.write_typeid(file, type, generics);
+                                    generator.write_typeid(file, type, generics);
                                     fprintf(file, ":");
                                 },
                                 MatchPattern::Hash(token) => {
@@ -381,7 +381,7 @@ impl BlockWriter {
                         }
 
                         fprintf(file, " {\n");
-                        g.indent += 1;
+                        generator.indent += 1;
 
                         for pattern in patterns {
                             match pattern {
@@ -396,7 +396,7 @@ impl BlockWriter {
                                         }
 
                                         let param_type: &Type;
-                                        let accessor = String::new(g.allocator);
+                                        let accessor = String::new(generator.allocator);
                                         accessor.append_str_lowercase(enum_variant.name.value);
                                         accessor.append("_value");
 
@@ -418,15 +418,15 @@ impl BlockWriter {
                                         }
 
                                         let variable_expression: &Expression = expression;
-                                        variable_expression = Expression::make(g.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
+                                        variable_expression = Expression::make(generator.allocator, param_iter.variable, ExpressionData::MemberInstanceExpression(variable_expression, accessor.as_str()), param_type);
 
                                         let name = param_iter.variable;
-                                        g.write_line_directive(file, block.context, name);
-                                        g.write_indent(file);
-                                        g.write_type(file, param_type, generics);
+                                        generator.write_line_directive(file, block.context, name);
+                                        generator.write_indent(file);
+                                        generator.write_type(file, param_type, generics);
                                         if param_iter.ref { fprintf(file, "*"); }
                                         fprintf(file, " ");
-                                        g.write_token(file, name);
+                                        generator.write_token(file, name);
                                         fprintf(file, " = ");
                                         if param_iter.ref { fprintf(file, "&"); }
                                         expr.write_expression(file, variable_expression, generics);
@@ -442,27 +442,27 @@ impl BlockWriter {
                             }
                         }
 
-                        g.function_context.push_scope(true, false);
+                        generator.function_context.push_scope(true, false);
                         if !self.write_block(file, return_type, case_info.body, generics, true, true) { return false; }
-                        g.function_context.pop_scope();
+                        generator.function_context.pop_scope();
 
-                        g.indent -= 1;
-                        g.write_indent(file);
+                        generator.indent -= 1;
+                        generator.write_indent(file);
                         fprintf(file, "} break;\n");
                     }
 
-                    g.indent -= 1;
-                    g.write_indent(file);
+                    generator.indent -= 1;
+                    generator.write_indent(file);
                     fprintf(file, "}\n");
                 },
                 StatementData::WhileStatement(while_stmt) => {
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     fprintf(file, "while (");
                     expr.write_expression(file, while_stmt.expression, generics);
                     fprintf(file, ") ");
-                    g.function_context.push_scope(true, true);
+                    generator.function_context.push_scope(true, true);
                     if !self.write_block(file, return_type, while_stmt.block, generics, false, false) { return false; }
-                    g.function_context.pop_scope();
+                    generator.function_context.pop_scope();
                 },
                 StatementData::ForStatement(for_statement) => {
                     let is_iterator = false;
@@ -476,31 +476,31 @@ impl BlockWriter {
                             let variable = &for_statement.variables.data[0];
                             let variable_name = variable.name.value;
 
-                            g.write_indent(file);
+                            generator.write_indent(file);
                             fprintf(file, "for (");
 
-                            g.function_context.add_variable(variable_name, variable.type);
+                            generator.function_context.add_variable(variable_name, variable.type);
 
-                            if g.is_coroutine() {
-                                g.write_variable(file, variable_name);
+                            if generator.is_coroutine() {
+                                generator.write_variable(file, variable_name);
                             } else {
-                                g.write_variable_decl(file, variable_name, variable.type, generics);
+                                generator.write_variable_decl(file, variable_name, variable.type, generics);
                             }
 
                             fprintf(file, " = ");
                             expr.write_expression(file, start, generics);
                             fprintf(file, "; ");
-                            g.write_variable(file, variable_name);
+                            generator.write_variable(file, variable_name);
                             fprintf(file, " < ");
                             expr.write_expression(file, end, generics);
                             fprintf(file, "; ");
-                            g.write_variable(file, variable_name);
+                            generator.write_variable(file, variable_name);
                             fprintf(file, "++) {");
-                            g.indent += 1;
+                            generator.indent += 1;
                         },
                         ForStatementType::Sequence(iter_expression) => {
                             is_iterator = true;
-                            g.write_indent(file);
+                            generator.write_indent(file);
                             match for_statement.iter_type.deref() {
                                 Type::Sequence(sequence) => {
                                     match sequence.type {
@@ -517,16 +517,16 @@ impl BlockWriter {
                                 _ => { fprintf(file, "/* ERROR: Sequence for loop on non-sequence type */"); },
                             }
 
-                            g.indent += 1;
+                            generator.indent += 1;
 
                             let i: usize = 0;
                             for variable in for_statement.variables {
                                 if !variable.name.value.eq("_") {
-                                    g.write_line_directive(file, block.context, variable.name);
-                                    g.write_indent(file);
-                                    g.write_type(file, variable.type, generics);
+                                    generator.write_line_directive(file, block.context, variable.name);
+                                    generator.write_indent(file);
+                                    generator.write_type(file, variable.type, generics);
                                     fprintf(file, " ");
-                                    g.write_token(file, variable.name);
+                                    generator.write_token(file, variable.name);
                                     fprintf(file, " = ");
                                     if variable.ref { fprintf(file, "&"); }
                                     if variable.deref { fprintf(file, "*"); }
@@ -547,7 +547,7 @@ impl BlockWriter {
                                     }
 
                                     if for_statement.variables.length > 1 {
-                                        g.write_instance_member_accessor(file, for_statement.value_type, generics);
+                                        generator.write_instance_member_accessor(file, for_statement.value_type, generics);
                                         fprintf(file, "_%zu", i);
                                     }
 
@@ -560,23 +560,23 @@ impl BlockWriter {
                         ForStatementType::Iter(iter_expression) => {
                             is_iterator = for_statement.iter_type.deref().is_iterator();
                             if is_iterator {
-                                g.write_indent(file);
+                                generator.write_indent(file);
                                 fprintf(file, "while (");
                                 expr.write_expression(file, iter_expression, generics);
                                 fprintf(file, ".vtable->next(");
                                 expr.write_expression(file, iter_expression, generics);
                                 fprintf(file, ".instance)) {");
 
-                                g.indent += 1;
+                                generator.indent += 1;
 
                                 let i: usize = 0;
                                 for variable in for_statement.variables {
                                     if !variable.name.value.eq("_") {
-                                        g.write_line_directive(file, block.context, variable.name);
-                                        g.write_indent(file);
-                                        g.write_type(file, variable.type, generics);
+                                        generator.write_line_directive(file, block.context, variable.name);
+                                        generator.write_indent(file);
+                                        generator.write_type(file, variable.type, generics);
                                         fprintf(file, " ");
-                                        g.write_token(file, variable.name);
+                                        generator.write_token(file, variable.name);
                                         fprintf(file, " = ");
                                         if variable.ref { fprintf(file, "&"); }
                                         if variable.deref { fprintf(file, "*"); }
@@ -591,36 +591,36 @@ impl BlockWriter {
                                     i += 1;
                                 }
                             } else {
-                                let iter_type_name = g.naming_ident.get_type_name(for_statement.iter_type, generics.self_type, generics);
+                                let iter_type_name = generator.naming_ident.get_type_name(for_statement.iter_type, generics.self_type, generics);
 
-                                g.write_indent(file);
+                                generator.write_indent(file);
                                 fprintf(file, "{ ");
-                                g.write_type(file, for_statement.iter_type, generics);
+                                generator.write_type(file, for_statement.iter_type, generics);
                                 fprintf(file, " __iter = ");
                                 expr.write_expression(file, iter_expression, generics);
                                 fprintf(file, ";\n");
 
-                                g.write_line_directive(file, block.context, iter_expression.token);
+                                generator.write_line_directive(file, block.context, iter_expression.token);
 
-                                g.write_indent(file);
+                                generator.write_indent(file);
                                 fprintf(file, "while (");
-                                g.write_string(file, &iter_type_name);
+                                generator.write_string(file, &iter_type_name);
                                 fprintf(file, "__next(&__iter)) {\n");
 
-                                g.indent += 1;
+                                generator.indent += 1;
 
                                 let i: usize = 0;
                                 for variable in for_statement.variables {
                                     if !variable.name.value.eq("_") {
-                                        g.write_line_directive(file, block.context, variable.name);
-                                        g.write_indent(file);
-                                        g.write_type(file, variable.type, generics);
+                                        generator.write_line_directive(file, block.context, variable.name);
+                                        generator.write_indent(file);
+                                        generator.write_type(file, variable.type, generics);
                                         fprintf(file, " ");
-                                        g.write_token(file, variable.name);
+                                        generator.write_token(file, variable.name);
                                         fprintf(file, " = ");
                                         if variable.ref { fprintf(file, "&"); }
                                         if variable.deref { fprintf(file, "*"); }
-                                        g.write_string(file, &iter_type_name);
+                                        generator.write_string(file, &iter_type_name);
                                         fprintf(file, "__value");
                                         if !for_statement.value_type.deref().is_tuple() && for_statement.variables.length > 1 {
                                             fprintf(file, "_%zu", i);
@@ -628,7 +628,7 @@ impl BlockWriter {
                                         fprintf(file, "(&__iter)");
 
                                         if for_statement.value_type.deref().is_tuple() && for_statement.variables.length > 1 {
-                                            g.write_instance_member_accessor(file, for_statement.value_type, generics);
+                                            generator.write_instance_member_accessor(file, for_statement.value_type, generics);
                                             fprintf(file, "_%zu", i);
                                         }
 
@@ -643,12 +643,12 @@ impl BlockWriter {
 
                     fprintf(file, "\n");
 
-                    g.function_context.push_scope(true, true);
+                    generator.function_context.push_scope(true, true);
                     if !self.write_block(file, return_type, for_statement.block, generics, false, true) { return false; }
-                    g.function_context.pop_scope();
+                    generator.function_context.pop_scope();
 
-                    g.indent -= 1;
-                    g.write_indent(file);
+                    generator.indent -= 1;
+                    generator.write_indent(file);
                     if is_iterator {
                         fprintf(file, "}\n");
                     } else {
@@ -656,27 +656,27 @@ impl BlockWriter {
                     }
                 },
                 StatementData::AssignmentStatement(assignment) => {
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     expr.write_expression(file, assignment.left, generics);
                     fprintf(file, " ");
-                    g.write_str(file, assignment.operator.value);
+                    generator.write_str(file, assignment.operator.value);
                     fprintf(file, " ");
                     expr.write_expression(file, assignment.right, generics);
                     fprintf(file, ";\n");
                 },
                 StatementData::ExpressionStatement(expression) => {
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     expr.write_expression(file, expression, generics);
                     fprintf(file, ";\n");
                 },
                 StatementData::ContinueStatement(&defer_statements) => {
                     self.write_defer_statements(file, return_type, defer_statements, generics);
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     fprintf(file, "continue;\n");
                 },
                 StatementData::BreakStatement(&defer_statements) => {
                     self.write_defer_statements(file, return_type, defer_statements, generics);
-                    g.write_indent(file);
+                    generator.write_indent(file);
                     fprintf(file, "break;\n");
                 },
             }
@@ -687,8 +687,8 @@ impl BlockWriter {
         }
 
         if !no_brackets {
-            g.indent -= 1;
-            g.write_indent(file);
+            generator.indent -= 1;
+            generator.write_indent(file);
 
             if inline_ {
                 fprintf(file, "}");

@@ -121,9 +121,9 @@ bool FileGenerator__generate_function_loop(struct FileGenerator* self, struct Ty
 #line 28 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFunctionUsage* usage, struct UsageContext* usage_context) {
     #line 29 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 30 "src/compiler/FileGenerator.pv"
-    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = g };
+    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = generator };
     #line 31 "src/compiler/FileGenerator.pv"
     struct Function* func_info = usage->type;
     #line 32 "src/compiler/FileGenerator.pv"
@@ -135,16 +135,16 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     #line 34 "src/compiler/FileGenerator.pv"
     struct GenericMap* generics = usage_context->generic_map;
     #line 35 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 37 "src/compiler/FileGenerator.pv"
-    struct String name = Naming__get_type_name(&g->naming_ident, generics->self_type, generics->self_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
     #line 38 "src/compiler/FileGenerator.pv"
     struct str name_str = String__as_str(&name);
     #line 39 "src/compiler/FileGenerator.pv"
-    struct FunctionContext func_context = FunctionContext__new(g->allocator, func_info, true);
+    struct FunctionContext func_context = FunctionContext__new(generator->allocator, func_info, true);
     #line 40 "src/compiler/FileGenerator.pv"
-    g->function_context = &func_context;
+    generator->function_context = &func_context;
 
     #line 42 "src/compiler/FileGenerator.pv"
     struct str code_ext = (struct str){ .ptr = ".c", .length = strlen(".c") };
@@ -159,7 +159,7 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     }
 
     #line 49 "src/compiler/FileGenerator.pv"
-    struct String code = Generator__make_path(g, func_info->context->module, name_str, code_ext);
+    struct String code = Generator__make_path(generator, func_info->context->module, name_str, code_ext);
     #line 50 "src/compiler/FileGenerator.pv"
     FILE* code_file = 0;
     #line 51 "src/compiler/FileGenerator.pv"
@@ -171,7 +171,7 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     code_file = fopen(code_tmp, "w+");
 
     #line 56 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, code);
+    Array_String__append(&generator->code_files, code);
 
     #line 58 "src/compiler/FileGenerator.pv"
     if (code_file == 0) {
@@ -182,18 +182,18 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     }
 
     #line 60 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
+    Generator__write_context_primitives(generator, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 61 "src/compiler/FileGenerator.pv"
-    Generator__write_includes_raw(g, code_file, &func_info->context->module->includes);
+    Generator__write_includes_raw(generator, code_file, &func_info->context->module->includes);
     #line 62 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, code_file, g, &usage_context->body, generics, true);
+    IncludeWriter__write(&include_writer, code_file, generator, &usage_context->body, generics, true);
 
     #line 64 "src/compiler/FileGenerator.pv"
-    struct String header_rel = Generator__make_rel_path(g, func_info->context->module, name_str, header_ext);
+    struct String header_rel = Generator__make_rel_path(generator, func_info->context->module, name_str, header_ext);
     #line 65 "src/compiler/FileGenerator.pv"
     fprintf(code_file, "#include <");
     #line 66 "src/compiler/FileGenerator.pv"
-    Generator__write_str(g, code_file, String__as_str(&header_rel));
+    Generator__write_str(generator, code_file, String__as_str(&header_rel));
     #line 67 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ">\n\n");
 
@@ -209,17 +209,17 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     DefinitionWriter__write_function_block(&defs, code_file, name_str, func_info, generics, usage);
 
     #line 73 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&code), code_file);
+    Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
     #line 74 "src/compiler/FileGenerator.pv"
     fclose(code_file);
     #line 75 "src/compiler/FileGenerator.pv"
     remove(code_tmp);
 
     #line 77 "src/compiler/FileGenerator.pv"
-    include_writer = IncludeWriter__new(g->allocator);
+    include_writer = IncludeWriter__new(generator->allocator);
 
     #line 79 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, func_info->context->module, name_str, header_ext);
+    struct String header = Generator__make_path(generator, func_info->context->module, name_str, header_ext);
     #line 80 "src/compiler/FileGenerator.pv"
     FILE* header_file = 0;
     #line 81 "src/compiler/FileGenerator.pv"
@@ -240,21 +240,21 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     #line 87 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 88 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, name_str);
+    Generator__write_str_title(generator, header_file, name_str);
     #line 89 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 90 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, name_str);
+    Generator__write_str_title(generator, header_file, name_str);
     #line 91 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
     #line 93 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_code, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_code, 0);
     #line 94 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->signature, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->signature, generics, false);
 
     #line 96 "src/compiler/FileGenerator.pv"
-    if (Generator__is_coroutine(g)) {
+    if (Generator__is_coroutine(generator)) {
         #line 97 "src/compiler/FileGenerator.pv"
         DefinitionWriter__write_function_coroutine(&defs, header_file, func_info, generics);
     }
@@ -273,14 +273,14 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     fprintf(header_file, "\n#endif\n");
 
     #line 105 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 106 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 107 "src/compiler/FileGenerator.pv"
     remove(header_tmp);
 
     #line 109 "src/compiler/FileGenerator.pv"
-    g->function_context = 0;
+    generator->function_context = 0;
 
     #line 111 "src/compiler/FileGenerator.pv"
     return true;
@@ -307,9 +307,9 @@ bool FileGenerator__generate_enum_loop(struct FileGenerator* self, struct TypeUs
 #line 122 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_Enum* usage, struct UsageContext* usage_context) {
     #line 123 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 124 "src/compiler/FileGenerator.pv"
-    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = g };
+    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = generator };
     #line 125 "src/compiler/FileGenerator.pv"
     struct GenericMap* generics = usage_context->generic_map;
     #line 126 "src/compiler/FileGenerator.pv"
@@ -317,12 +317,12 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     #line 127 "src/compiler/FileGenerator.pv"
     struct Module* module = enum_info->context->module;
     #line 128 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 130 "src/compiler/FileGenerator.pv"
-    struct String name = Naming__get_type_name(&g->naming_ident, generics->self_type, generics->self_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
     #line 131 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 132 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
     #line 133 "src/compiler/FileGenerator.pv"
@@ -338,18 +338,18 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     #line 136 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 137 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 138 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 139 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 140 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
     #line 142 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_header, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_header, 0);
     #line 143 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->layout, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->layout, generics, false);
 
     #line 145 "src/compiler/FileGenerator.pv"
     if (!DefinitionWriter__write_enum_definition(&defs, header_file, enum_info, usage, usage_context, &include_writer)) {
@@ -363,7 +363,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     fprintf(header_file, "\n#endif\n");
 
     #line 149 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 150 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 151 "src/compiler/FileGenerator.pv"
@@ -376,9 +376,9 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     }
 
     #line 155 "src/compiler/FileGenerator.pv"
-    struct String code = Generator__make_path(g, module, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
+    struct String code = Generator__make_path(generator, module, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 156 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, code);
+    Array_String__append(&generator->code_files, code);
 
     #line 158 "src/compiler/FileGenerator.pv"
     char const* code_tmp = tmpnam(0);
@@ -393,18 +393,18 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     }
 
     #line 162 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
+    Generator__write_context_primitives(generator, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 163 "src/compiler/FileGenerator.pv"
-    Generator__write_includes_raw(g, code_file, &module->includes);
+    Generator__write_includes_raw(generator, code_file, &module->includes);
     #line 164 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, code_file, g, &usage_context->body, generics, true);
+    IncludeWriter__write(&include_writer, code_file, generator, &usage_context->body, generics, true);
 
     #line 166 "src/compiler/FileGenerator.pv"
-    struct String header_rel = Generator__make_rel_path(g, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header_rel = Generator__make_rel_path(generator, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 167 "src/compiler/FileGenerator.pv"
     fprintf(code_file, "#include <");
     #line 168 "src/compiler/FileGenerator.pv"
-    Generator__write_str(g, code_file, String__as_str(&header_rel));
+    Generator__write_str(generator, code_file, String__as_str(&header_rel));
     #line 169 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ">\n\n");
 
@@ -417,7 +417,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     }
 
     #line 173 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&code), code_file);
+    Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
     #line 174 "src/compiler/FileGenerator.pv"
     fclose(code_file);
     #line 175 "src/compiler/FileGenerator.pv"
@@ -448,22 +448,22 @@ bool FileGenerator__generate_struct_loop(struct FileGenerator* self, struct Type
 #line 188 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context) {
     #line 189 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 190 "src/compiler/FileGenerator.pv"
-    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = g };
+    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = generator };
     #line 191 "src/compiler/FileGenerator.pv"
     struct GenericMap* generics = usage_context->generic_map;
     #line 192 "src/compiler/FileGenerator.pv"
     struct Struct* struct_info = usage->type;
     #line 193 "src/compiler/FileGenerator.pv"
-    struct String name = Naming__get_type_name(&g->naming_ident, generics->self_type, generics->self_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
     #line 194 "src/compiler/FileGenerator.pv"
     struct Module* module = struct_info->module;
     #line 195 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 197 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 198 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
     #line 199 "src/compiler/FileGenerator.pv"
@@ -479,11 +479,11 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     #line 202 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 203 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 204 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 205 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 206 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
@@ -549,7 +549,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
 
         #line 235 "src/compiler/FileGenerator.pv"
         fprintf(header_file, "#endif\n\n");
-    } else if (g->root->mode_cpp) {
+    } else if (generator->root->mode_cpp) {
         #line 237 "src/compiler/FileGenerator.pv"
         fprintf(header_file, "#ifdef __cplusplus\n");
         #line 238 "src/compiler/FileGenerator.pv"
@@ -559,9 +559,9 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     }
 
     #line 242 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_header, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_header, 0);
     #line 243 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->layout, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->layout, generics, false);
     #line 244 "src/compiler/FileGenerator.pv"
     if (usage_context->layout.length > 0) {
         #line 244 "src/compiler/FileGenerator.pv"
@@ -577,7 +577,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     }
 
     #line 248 "src/compiler/FileGenerator.pv"
-    if (struct_info->module->mode_cpp || g->root->mode_cpp) {
+    if (struct_info->module->mode_cpp || generator->root->mode_cpp) {
         #line 249 "src/compiler/FileGenerator.pv"
         fprintf(header_file, "\n#ifdef __cplusplus\n");
         #line 250 "src/compiler/FileGenerator.pv"
@@ -590,7 +590,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     fprintf(header_file, "\n#endif\n");
 
     #line 256 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 257 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 258 "src/compiler/FileGenerator.pv"
@@ -614,9 +614,9 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     }
 
     #line 271 "src/compiler/FileGenerator.pv"
-    struct String code = Generator__make_path(g, struct_info->module, String__as_str(&name), ext);
+    struct String code = Generator__make_path(generator, struct_info->module, String__as_str(&name), ext);
     #line 272 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, code);
+    Array_String__append(&generator->code_files, code);
 
     #line 274 "src/compiler/FileGenerator.pv"
     char const* code_tmp = tmpnam(0);
@@ -631,18 +631,18 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     }
 
     #line 278 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
+    Generator__write_context_primitives(generator, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 279 "src/compiler/FileGenerator.pv"
-    Generator__write_includes_raw(g, code_file, &struct_info->module->includes);
+    Generator__write_includes_raw(generator, code_file, &struct_info->module->includes);
     #line 280 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, code_file, g, &usage_context->body, generics, true);
+    IncludeWriter__write(&include_writer, code_file, generator, &usage_context->body, generics, true);
 
     #line 282 "src/compiler/FileGenerator.pv"
-    struct String header_rel = Generator__make_rel_path(g, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header_rel = Generator__make_rel_path(generator, struct_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 283 "src/compiler/FileGenerator.pv"
     fprintf(code_file, "#include <");
     #line 284 "src/compiler/FileGenerator.pv"
-    Generator__write_str(g, code_file, String__as_str(&header_rel));
+    Generator__write_str(generator, code_file, String__as_str(&header_rel));
     #line 285 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ">\n\n");
 
@@ -677,15 +677,15 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 296 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "struct ");
         #line 297 "src/compiler/FileGenerator.pv"
-        Generator__write_type_name(g, code_file, trait_entry._1, generics);
+        Generator__write_type_name(generator, code_file, trait_entry._1, generics);
         #line 298 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "VTable ");
         #line 299 "src/compiler/FileGenerator.pv"
-        Generator__write_str_title(g, code_file, String__as_str(&name));
+        Generator__write_str_title(generator, code_file, String__as_str(&name));
         #line 300 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__VTABLE__");
         #line 301 "src/compiler/FileGenerator.pv"
-        Generator__write_str_title(g, code_file, trait_info->name->value);
+        Generator__write_str_title(generator, code_file, trait_info->name->value);
         #line 302 "src/compiler/FileGenerator.pv"
         fprintf(code_file, " = { ");
 
@@ -710,13 +710,13 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
             #line 309 "src/compiler/FileGenerator.pv"
             fprintf(code_file, ".");
             #line 310 "src/compiler/FileGenerator.pv"
-            Generator__write_token(g, code_file, func_info->name);
+            Generator__write_token(generator, code_file, func_info->name);
             #line 311 "src/compiler/FileGenerator.pv"
             fprintf(code_file, " = &");
             #line 312 "src/compiler/FileGenerator.pv"
-            struct String func_name = Generator__get_trait_function_name(g, String__as_str(&name), trait_info, trait_entry._1, func_info, generics);
+            struct String func_name = Generator__get_trait_function_name(generator, String__as_str(&name), trait_info, trait_entry._1, func_info, generics);
             #line 313 "src/compiler/FileGenerator.pv"
-            Generator__write_string(g, code_file, &func_name);
+            Generator__write_string(generator, code_file, &func_name);
         } }
 
         #line 316 "src/compiler/FileGenerator.pv"
@@ -735,14 +735,14 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 324 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "struct slice_tuple_usize_str_TypeId ");
         #line 325 "src/compiler/FileGenerator.pv"
-        Generator__write_string(g, code_file, &name);
+        Generator__write_string(generator, code_file, &name);
         #line 326 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
 
         #line 328 "src/compiler/FileGenerator.pv"
-        g->indent += 1;
+        generator->indent += 1;
         #line 329 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 330 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "static struct tuple_usize_str_TypeId fields[] = { ");
 
@@ -763,11 +763,11 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
             #line 335 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "(struct tuple_usize_str_TypeId){ ._0 = %zu, ._1 = (struct str){ .ptr = \"", field_index);
             #line 336 "src/compiler/FileGenerator.pv"
-            Generator__write_token(g, code_file, field->name);
+            Generator__write_token(generator, code_file, field->name);
             #line 337 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "\", .length = %zu }, ._2 = ", field->name->value.length);
             #line 338 "src/compiler/FileGenerator.pv"
-            Generator__write_typeid(g, code_file, &field->type, generics);
+            Generator__write_typeid(generator, code_file, &field->type, generics);
             #line 339 "src/compiler/FileGenerator.pv"
             fprintf(code_file, " }");
             #line 340 "src/compiler/FileGenerator.pv"
@@ -777,35 +777,35 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 343 "src/compiler/FileGenerator.pv"
         fprintf(code_file, " };\n");
         #line 344 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 345 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "return (struct slice_tuple_usize_str_TypeId){ .data = fields, .length = %zu };\n", struct_info->fields.length);
         #line 346 "src/compiler/FileGenerator.pv"
-        g->indent -= 1;
+        generator->indent -= 1;
         #line 347 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "}\n");
 
         #line 349 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "void* ");
         #line 350 "src/compiler/FileGenerator.pv"
-        Generator__write_string(g, code_file, &name);
+        Generator__write_string(generator, code_file, &name);
         #line 351 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__Struct__get_field(void* __self, uintptr_t index) {\n");
 
         #line 353 "src/compiler/FileGenerator.pv"
-        g->indent += 1;
+        generator->indent += 1;
 
         #line 355 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 356 "src/compiler/FileGenerator.pv"
-        Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
+        Generator__write_type(generator, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
 
         #line 358 "src/compiler/FileGenerator.pv"
         if (module->mode_cpp) {
             #line 359 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "* self = (");
             #line 360 "src/compiler/FileGenerator.pv"
-            Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
+            Generator__write_type(generator, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
             #line 361 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "*)__self;\n");
         } else {
@@ -814,11 +814,11 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         }
 
         #line 366 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 367 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "switch (index) {\n");
         #line 368 "src/compiler/FileGenerator.pv"
-        g->indent += 1;
+        generator->indent += 1;
 
         #line 370 "src/compiler/FileGenerator.pv"
         uintptr_t i = 0;
@@ -830,7 +830,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
             struct StructField* field = &HashMapIter_str_StructField__value(&__iter)->_1;
 
             #line 372 "src/compiler/FileGenerator.pv"
-            Generator__write_indent(g, code_file);
+            Generator__write_indent(generator, code_file);
             #line 373 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "case %zu: return ", i);
 
@@ -848,7 +848,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
                 #line 382 "src/compiler/FileGenerator.pv"
                 fprintf(code_file, "self->");
                 #line 383 "src/compiler/FileGenerator.pv"
-                Generator__write_token(g, code_file, field->name);
+                Generator__write_token(generator, code_file, field->name);
             }
 
             #line 386 "src/compiler/FileGenerator.pv"
@@ -858,43 +858,43 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         } }
 
         #line 390 "src/compiler/FileGenerator.pv"
-        g->indent -= 1;
+        generator->indent -= 1;
         #line 391 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 392 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "}\n");
 
         #line 394 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 395 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "return 0;\n");
 
         #line 397 "src/compiler/FileGenerator.pv"
-        g->indent -= 1;
+        generator->indent -= 1;
         #line 398 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "}\n");
 
         #line 400 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "bool ");
         #line 401 "src/compiler/FileGenerator.pv"
-        Generator__write_string(g, code_file, &name);
+        Generator__write_string(generator, code_file, &name);
         #line 402 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__Struct__set_field(void* __self, uintptr_t index, void* value) {\n");
 
         #line 404 "src/compiler/FileGenerator.pv"
-        g->indent += 1;
+        generator->indent += 1;
 
         #line 406 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 407 "src/compiler/FileGenerator.pv"
-        Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
+        Generator__write_type(generator, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
 
         #line 409 "src/compiler/FileGenerator.pv"
         if (module->mode_cpp) {
             #line 410 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "* self = (");
             #line 411 "src/compiler/FileGenerator.pv"
-            Generator__write_type(g, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
+            Generator__write_type(generator, code_file, (struct Type[]){(struct Type) { .type = TYPE__SELF }}, generics);
             #line 412 "src/compiler/FileGenerator.pv"
             fprintf(code_file, "*)__self;\n");
         } else {
@@ -903,11 +903,11 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         }
 
         #line 417 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 418 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "switch (index) {\n");
         #line 419 "src/compiler/FileGenerator.pv"
-        g->indent += 1;
+        generator->indent += 1;
 
         #line 421 "src/compiler/FileGenerator.pv"
         i = 0;
@@ -925,21 +925,21 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
             }
 
             #line 425 "src/compiler/FileGenerator.pv"
-            Generator__write_indent(g, code_file);
+            Generator__write_indent(generator, code_file);
 
             #line 427 "src/compiler/FileGenerator.pv"
             if (Struct__is_newtype(struct_info)) {
                 #line 428 "src/compiler/FileGenerator.pv"
                 fprintf(code_file, "case %zu: *self = *(", i);
                 #line 429 "src/compiler/FileGenerator.pv"
-                Generator__write_type(g, code_file, &field->type, generics);
+                Generator__write_type(generator, code_file, &field->type, generics);
                 #line 430 "src/compiler/FileGenerator.pv"
                 fprintf(code_file, "*)");
             } else {
                 #line 432 "src/compiler/FileGenerator.pv"
                 fprintf(code_file, "case %zu: self->", i);
                 #line 433 "src/compiler/FileGenerator.pv"
-                Generator__write_token(g, code_file, field->name);
+                Generator__write_token(generator, code_file, field->name);
                 #line 434 "src/compiler/FileGenerator.pv"
                 fprintf(code_file, " = ");
 
@@ -948,14 +948,14 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
                     #line 437 "src/compiler/FileGenerator.pv"
                     fprintf(code_file, "*(");
                     #line 438 "src/compiler/FileGenerator.pv"
-                    Generator__write_type(g, code_file, &field->type, generics);
+                    Generator__write_type(generator, code_file, &field->type, generics);
                     #line 439 "src/compiler/FileGenerator.pv"
                     fprintf(code_file, "*)");
                 } else if (module->mode_cpp) {
                     #line 441 "src/compiler/FileGenerator.pv"
                     fprintf(code_file, "(");
                     #line 442 "src/compiler/FileGenerator.pv"
-                    Generator__write_type(g, code_file, &field->type, generics);
+                    Generator__write_type(generator, code_file, &field->type, generics);
                     #line 443 "src/compiler/FileGenerator.pv"
                     fprintf(code_file, ")");
                 }
@@ -968,46 +968,46 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         } }
 
         #line 451 "src/compiler/FileGenerator.pv"
-        g->indent -= 1;
+        generator->indent -= 1;
         #line 452 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 453 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "}\n");
 
         #line 455 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, code_file);
+        Generator__write_indent(generator, code_file);
         #line 456 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "return false;\n");
 
         #line 458 "src/compiler/FileGenerator.pv"
-        g->indent -= 1;
+        generator->indent -= 1;
         #line 459 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "}\n");
 
         #line 461 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "struct trait_StructVTable ");
         #line 462 "src/compiler/FileGenerator.pv"
-        Generator__write_str_title(g, code_file, String__as_str(&name));
+        Generator__write_str_title(generator, code_file, String__as_str(&name));
         #line 463 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__VTABLE__STRUCT");
         #line 464 "src/compiler/FileGenerator.pv"
         fprintf(code_file, " = { .get_fields = &");
         #line 465 "src/compiler/FileGenerator.pv"
-        Generator__write_string(g, code_file, &name);
+        Generator__write_string(generator, code_file, &name);
         #line 466 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__Struct__get_fields, .get_field = &");
         #line 467 "src/compiler/FileGenerator.pv"
-        Generator__write_string(g, code_file, &name);
+        Generator__write_string(generator, code_file, &name);
         #line 468 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__Struct__get_field, .set_field = &");
         #line 469 "src/compiler/FileGenerator.pv"
-        Generator__write_string(g, code_file, &name);
+        Generator__write_string(generator, code_file, &name);
         #line 470 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__Struct__set_field };\n");
     }
 
     #line 473 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&code), code_file);
+    Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
     #line 474 "src/compiler/FileGenerator.pv"
     fclose(code_file);
     #line 475 "src/compiler/FileGenerator.pv"
@@ -1038,9 +1038,9 @@ bool FileGenerator__generate_primitive_loop(struct FileGenerator* self, struct T
 #line 488 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUsage_Primitive* usage, struct UsageContext* usage_context) {
     #line 489 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 490 "src/compiler/FileGenerator.pv"
-    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = g };
+    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = generator };
     #line 491 "src/compiler/FileGenerator.pv"
     struct Primitive* primitive_info = usage->type;
     #line 492 "src/compiler/FileGenerator.pv"
@@ -1048,10 +1048,10 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     #line 493 "src/compiler/FileGenerator.pv"
     struct str name = primitive_info->name;
     #line 494 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 496 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 497 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
     #line 498 "src/compiler/FileGenerator.pv"
@@ -1067,20 +1067,20 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     #line 501 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 502 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, name);
+    Generator__write_str_title(generator, header_file, name);
     #line 503 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 504 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, name);
+    Generator__write_str_title(generator, header_file, name);
     #line 505 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
     #line 507 "src/compiler/FileGenerator.pv"
-    Generator__write_impl_includes_raw(g, header_file, &primitive_info->impls);
+    Generator__write_impl_includes_raw(generator, header_file, &primitive_info->impls);
     #line 508 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_header, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_header, 0);
     #line 509 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->signature, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->signature, generics, false);
 
     #line 511 "src/compiler/FileGenerator.pv"
     if (!DefinitionWriter__write_primitive_definition(&defs, header_file, primitive_info, generics)) {
@@ -1094,7 +1094,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     fprintf(header_file, "\n#endif\n");
 
     #line 515 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 516 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 517 "src/compiler/FileGenerator.pv"
@@ -1107,9 +1107,9 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     }
 
     #line 523 "src/compiler/FileGenerator.pv"
-    struct String code = Generator__make_path(g, 0, name, (struct str){ .ptr = ".c", .length = strlen(".c") });
+    struct String code = Generator__make_path(generator, 0, name, (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 524 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, code);
+    Array_String__append(&generator->code_files, code);
 
     #line 526 "src/compiler/FileGenerator.pv"
     char const* code_tmp = tmpnam(0);
@@ -1124,18 +1124,18 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     }
 
     #line 530 "src/compiler/FileGenerator.pv"
-    Generator__write_impl_includes_raw(g, code_file, &primitive_info->impls);
+    Generator__write_impl_includes_raw(generator, code_file, &primitive_info->impls);
     #line 531 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
+    Generator__write_context_primitives(generator, code_file, &usage_context->primitive_code, &usage_context->primitive_header);
     #line 532 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, code_file, g, &usage_context->body, generics, true);
+    IncludeWriter__write(&include_writer, code_file, generator, &usage_context->body, generics, true);
 
     #line 534 "src/compiler/FileGenerator.pv"
-    struct String header_rel = Generator__make_rel_path(g, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header_rel = Generator__make_rel_path(generator, 0, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 535 "src/compiler/FileGenerator.pv"
     fprintf(code_file, "#include <");
     #line 536 "src/compiler/FileGenerator.pv"
-    Generator__write_str(g, code_file, String__as_str(&header_rel));
+    Generator__write_str(generator, code_file, String__as_str(&header_rel));
     #line 537 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ">\n\n");
 
@@ -1170,15 +1170,15 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
         #line 546 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "\nstruct ");
         #line 547 "src/compiler/FileGenerator.pv"
-        Generator__write_type_name(g, code_file, &impl_info->trait_type, generics);
+        Generator__write_type_name(generator, code_file, &impl_info->trait_type, generics);
         #line 548 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "VTable ");
         #line 549 "src/compiler/FileGenerator.pv"
-        Generator__write_str_title(g, code_file, name);
+        Generator__write_str_title(generator, code_file, name);
         #line 550 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__VTABLE__");
         #line 551 "src/compiler/FileGenerator.pv"
-        Generator__write_str_title(g, code_file, trait_info->name->value);
+        Generator__write_str_title(generator, code_file, trait_info->name->value);
         #line 552 "src/compiler/FileGenerator.pv"
         fprintf(code_file, " = { ");
 
@@ -1203,13 +1203,13 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
             #line 559 "src/compiler/FileGenerator.pv"
             fprintf(code_file, ".");
             #line 560 "src/compiler/FileGenerator.pv"
-            Generator__write_token(g, code_file, func_info->name);
+            Generator__write_token(generator, code_file, func_info->name);
             #line 561 "src/compiler/FileGenerator.pv"
             fprintf(code_file, " = &");
             #line 562 "src/compiler/FileGenerator.pv"
-            struct String func_name = Generator__get_trait_function_name(g, name, trait_info, &impl_info->trait_type, func_info, generics);
+            struct String func_name = Generator__get_trait_function_name(generator, name, trait_info, &impl_info->trait_type, func_info, generics);
             #line 563 "src/compiler/FileGenerator.pv"
-            Generator__write_string(g, code_file, &func_name);
+            Generator__write_string(generator, code_file, &func_name);
         } }
 
         #line 566 "src/compiler/FileGenerator.pv"
@@ -1217,7 +1217,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     } }
 
     #line 569 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&code), code_file);
+    Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
     #line 570 "src/compiler/FileGenerator.pv"
     fclose(code_file);
     #line 571 "src/compiler/FileGenerator.pv"
@@ -1257,9 +1257,9 @@ bool FileGenerator__generate_sequence(struct FileGenerator* self, struct TypeUsa
 #line 589 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_Sequence* usage, struct UsageContext* usage_context) {
     #line 590 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 591 "src/compiler/FileGenerator.pv"
-    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = g };
+    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = generator };
     #line 592 "src/compiler/FileGenerator.pv"
     struct GenericMap* generics = usage_context->generic_map;
     #line 593 "src/compiler/FileGenerator.pv"
@@ -1273,12 +1273,12 @@ bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_
     #line 598 "src/compiler/FileGenerator.pv"
     struct Type sequence_type = (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = usage->type };
     #line 599 "src/compiler/FileGenerator.pv"
-    struct String name = Naming__get_type_name(&g->naming_ident, &sequence_type, &sequence_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_ident, &sequence_type, &sequence_type, generics);
     #line 600 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 602 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 603 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
     #line 604 "src/compiler/FileGenerator.pv"
@@ -1294,53 +1294,53 @@ bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_
     #line 607 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 608 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 609 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 610 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 611 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
     #line 613 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_header, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_header, 0);
     #line 614 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->layout, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->layout, generics, false);
 
     #line 616 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "struct ");
     #line 617 "src/compiler/FileGenerator.pv"
-    Generator__write_string(g, header_file, &name);
+    Generator__write_string(generator, header_file, &name);
     #line 618 "src/compiler/FileGenerator.pv"
     fprintf(header_file, " { ");
 
     #line 620 "src/compiler/FileGenerator.pv"
-    Generator__write_variable_decl(g, header_file, (struct str){ .ptr = "data", .length = strlen("data") }, &element_reference_type, generics);
+    Generator__write_variable_decl(generator, header_file, (struct str){ .ptr = "data", .length = strlen("data") }, &element_reference_type, generics);
     #line 621 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "; ");
     #line 622 "src/compiler/FileGenerator.pv"
-    Generator__write_variable_decl(g, header_file, (struct str){ .ptr = "length", .length = strlen("length") }, &g->root->type_usize, generics);
+    Generator__write_variable_decl(generator, header_file, (struct str){ .ptr = "length", .length = strlen("length") }, &generator->root->type_usize, generics);
 
     #line 624 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "; };\n");
 
     #line 626 "src/compiler/FileGenerator.pv"
-    DefinitionWriter__write_impl_definition(&defs, header_file, String__as_str(&name), g->root->hack_type_impl->impl_info, generics);
+    DefinitionWriter__write_impl_definition(&defs, header_file, String__as_str(&name), generator->root->hack_type_impl->impl_info, generics);
 
     #line 628 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#endif\n");
 
     #line 630 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 631 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 632 "src/compiler/FileGenerator.pv"
     remove(header_tmp);
 
     #line 634 "src/compiler/FileGenerator.pv"
-    struct String code = Generator__make_path(g, 0, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
+    struct String code = Generator__make_path(generator, 0, String__as_str(&name), (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 635 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, code);
+    Array_String__append(&generator->code_files, code);
 
     #line 637 "src/compiler/FileGenerator.pv"
     char const* code_tmp = tmpnam(0);
@@ -1355,16 +1355,16 @@ bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_
     }
 
     #line 641 "src/compiler/FileGenerator.pv"
-    struct String header_rel = Generator__make_rel_path(g, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header_rel = Generator__make_rel_path(generator, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 642 "src/compiler/FileGenerator.pv"
     fprintf(code_file, "#include <");
     #line 643 "src/compiler/FileGenerator.pv"
-    Generator__write_str(g, code_file, String__as_str(&header_rel));
+    Generator__write_str(generator, code_file, String__as_str(&header_rel));
     #line 644 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ">\n\n");
 
     #line 646 "src/compiler/FileGenerator.pv"
-    struct Impl* impls_base[1] = {g->root->hack_type_impl->impl_info};
+    struct Impl* impls_base[1] = {generator->root->hack_type_impl->impl_info};
     #line 647 "src/compiler/FileGenerator.pv"
     struct Array_ref_Impl impls = (struct Array_ref_Impl) { .data = impls_base, .length = 1, .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->generator->allocator }, .capacity = 0 };
     #line 648 "src/compiler/FileGenerator.pv"
@@ -1379,7 +1379,7 @@ bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_
     }
 
     #line 652 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&code), code_file);
+    Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
     #line 653 "src/compiler/FileGenerator.pv"
     fclose(code_file);
     #line 654 "src/compiler/FileGenerator.pv"
@@ -1410,7 +1410,7 @@ bool FileGenerator__generate_tuple_loop(struct FileGenerator* self, struct TypeU
 #line 667 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_Tuple* usage, struct UsageContext* usage_context) {
     #line 668 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 669 "src/compiler/FileGenerator.pv"
     struct GenericMap* generics = usage_context->generic_map;
     #line 670 "src/compiler/FileGenerator.pv"
@@ -1421,12 +1421,12 @@ bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_
     struct Type tuple_type = (struct Type) { .type = TYPE__TUPLE, .tuple_value = tuple };
 
     #line 674 "src/compiler/FileGenerator.pv"
-    struct String name = Naming__get_type_name(&g->naming_ident, &tuple_type, &tuple_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_ident, &tuple_type, &tuple_type, generics);
     #line 675 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 677 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, 0, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 678 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
     #line 679 "src/compiler/FileGenerator.pv"
@@ -1442,27 +1442,27 @@ bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_
     #line 682 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 683 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 684 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 685 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 686 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
     #line 688 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_header, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_header, 0);
     #line 689 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->layout, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->layout, generics, false);
 
     #line 691 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "struct ");
     #line 692 "src/compiler/FileGenerator.pv"
-    Generator__write_string(g, header_file, &name);
+    Generator__write_string(generator, header_file, &name);
     #line 693 "src/compiler/FileGenerator.pv"
     fprintf(header_file, " {\n");
     #line 694 "src/compiler/FileGenerator.pv"
-    g->indent += 1;
+    generator->indent += 1;
 
     #line 696 "src/compiler/FileGenerator.pv"
     { struct IterEnumerate_ref_Type __iter = Iter_ref_Type__enumerate(Array_Type__iter(element_types));
@@ -1474,16 +1474,16 @@ bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_
         struct Type* element = IterEnumerate_ref_Type__value(&__iter)._1;
 
         #line 697 "src/compiler/FileGenerator.pv"
-        struct String element_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = g->allocator });
+        struct String element_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator });
         #line 698 "src/compiler/FileGenerator.pv"
         String__append(&element_name, (struct str){ .ptr = "_", .length = strlen("_") });
         #line 699 "src/compiler/FileGenerator.pv"
         String__append_usize(&element_name, i);
 
         #line 701 "src/compiler/FileGenerator.pv"
-        Generator__write_indent(g, header_file);
+        Generator__write_indent(generator, header_file);
         #line 702 "src/compiler/FileGenerator.pv"
-        Generator__write_variable_decl(g, header_file, String__as_str(&element_name), element, generics);
+        Generator__write_variable_decl(generator, header_file, String__as_str(&element_name), element, generics);
         #line 703 "src/compiler/FileGenerator.pv"
         fprintf(header_file, ";\n");
         #line 704 "src/compiler/FileGenerator.pv"
@@ -1491,7 +1491,7 @@ bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_
     } }
 
     #line 707 "src/compiler/FileGenerator.pv"
-    g->indent -= 1;
+    generator->indent -= 1;
     #line 708 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "};\n");
 
@@ -1499,7 +1499,7 @@ bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_
     fprintf(header_file, "\n#endif\n");
 
     #line 712 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 713 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 714 "src/compiler/FileGenerator.pv"
@@ -1530,9 +1530,9 @@ bool FileGenerator__generate_trait_loop(struct FileGenerator* self, struct TypeU
 #line 727 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context) {
     #line 728 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 729 "src/compiler/FileGenerator.pv"
-    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = g };
+    struct DefinitionWriter defs = (struct DefinitionWriter) { .generator = generator };
     #line 730 "src/compiler/FileGenerator.pv"
     struct GenericMap* generics = usage_context->generic_map;
     #line 731 "src/compiler/FileGenerator.pv"
@@ -1545,11 +1545,11 @@ bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_
     }
 
     #line 735 "src/compiler/FileGenerator.pv"
-    struct String name = Naming__get_type_name(&g->naming_ident, generics->self_type, generics->self_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
     #line 736 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, trait_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, trait_info->module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 737 "src/compiler/FileGenerator.pv"
-    struct IncludeWriter include_writer = IncludeWriter__new(g->allocator);
+    struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
     #line 739 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
@@ -1566,11 +1566,11 @@ bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_
     #line 743 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 744 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 745 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 746 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, String__as_str(&name));
+    Generator__write_str_title(generator, header_file, String__as_str(&name));
     #line 747 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
@@ -1585,9 +1585,9 @@ bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_
     }
 
     #line 755 "src/compiler/FileGenerator.pv"
-    Generator__write_context_primitives(g, header_file, &usage_context->primitive_header, 0);
+    Generator__write_context_primitives(generator, header_file, &usage_context->primitive_header, 0);
     #line 756 "src/compiler/FileGenerator.pv"
-    IncludeWriter__write(&include_writer, header_file, g, &usage_context->signature, generics, false);
+    IncludeWriter__write(&include_writer, header_file, generator, &usage_context->signature, generics, false);
 
     #line 758 "src/compiler/FileGenerator.pv"
     if (!DefinitionWriter__write_trait_definition(&defs, header_file, trait_info, generics)) {
@@ -1611,7 +1611,7 @@ bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_
     fprintf(header_file, "\n#endif\n");
 
     #line 768 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 769 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 770 "src/compiler/FileGenerator.pv"
@@ -1626,7 +1626,7 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     bool __result;
 
     #line 776 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 777 "src/compiler/FileGenerator.pv"
     if (Type__is_unknown(&global->type)) {
         #line 777 "src/compiler/FileGenerator.pv"
@@ -1637,23 +1637,23 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     struct str name = global->name->value;
 
     #line 781 "src/compiler/FileGenerator.pv"
-    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(g->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = 0, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = g->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = g->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
+    struct GenericMap* blank_generics = ArenaAllocator__store_GenericMap(generator->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = 0, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
     #line 782 "src/compiler/FileGenerator.pv"
-    blank_generics->self_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SELF }}, g->allocator);
+    blank_generics->self_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SELF }}, generator->allocator);
 
     #line 784 "src/compiler/FileGenerator.pv"
-    struct FunctionContext func_ctx = FunctionContext__new_const(g->allocator);
+    struct FunctionContext func_ctx = FunctionContext__new_const(generator->allocator);
     #line 785 "src/compiler/FileGenerator.pv"
-    g->function_context = &func_ctx;
+    generator->function_context = &func_ctx;
 
     #line 787 "src/compiler/FileGenerator.pv"
-    struct HashSet_str primitive_includes = HashSet_str__new(g->allocator);
+    struct HashSet_str primitive_includes = HashSet_str__new(generator->allocator);
 
     #line 789 "src/compiler/FileGenerator.pv"
-    Generator__collect_primitive_includes(g, &global->type, blank_generics, &primitive_includes);
+    Generator__collect_primitive_includes(generator, &global->type, blank_generics, &primitive_includes);
 
     #line 791 "src/compiler/FileGenerator.pv"
-    struct String header = Generator__make_path(g, global->module, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
+    struct String header = Generator__make_path(generator, global->module, name, (struct str){ .ptr = ".h", .length = strlen(".h") });
     #line 792 "src/compiler/FileGenerator.pv"
     char const* header_tmp = tmpnam(0);
     #line 793 "src/compiler/FileGenerator.pv"
@@ -1671,11 +1671,11 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     #line 796 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "#ifndef PAVE_");
     #line 797 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, name);
+    Generator__write_str_title(generator, header_file, name);
     #line 798 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n#define PAVE_");
     #line 799 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(g, header_file, name);
+    Generator__write_str_title(generator, header_file, name);
     #line 800 "src/compiler/FileGenerator.pv"
     fprintf(header_file, "\n\n");
 
@@ -1698,7 +1698,7 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
         fprintf(header_file, "const ");
     }
     #line 808 "src/compiler/FileGenerator.pv"
-    Generator__write_variable_decl(g, header_file, name, &global->type, blank_generics);
+    Generator__write_variable_decl(generator, header_file, name, &global->type, blank_generics);
     #line 809 "src/compiler/FileGenerator.pv"
     fprintf(header_file, ";\n");
 
@@ -1706,14 +1706,14 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     fprintf(header_file, "\n#endif\n");
 
     #line 813 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&header), header_file);
+    Generator__overwrite_if_different(generator, String__c_str(&header), header_file);
     #line 814 "src/compiler/FileGenerator.pv"
     fclose(header_file);
     #line 815 "src/compiler/FileGenerator.pv"
     remove(header_tmp);
 
     #line 817 "src/compiler/FileGenerator.pv"
-    struct String code = Generator__make_path(g, global->module, name, (struct str){ .ptr = ".c", .length = strlen(".c") });
+    struct String code = Generator__make_path(generator, global->module, name, (struct str){ .ptr = ".c", .length = strlen(".c") });
     #line 818 "src/compiler/FileGenerator.pv"
     char const* code_tmp = tmpnam(0);
     #line 819 "src/compiler/FileGenerator.pv"
@@ -1729,14 +1729,14 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
     }
 
     #line 822 "src/compiler/FileGenerator.pv"
-    Generator__write_includes_raw(g, code_file, &global->module->includes);
+    Generator__write_includes_raw(generator, code_file, &global->module->includes);
 
     #line 824 "src/compiler/FileGenerator.pv"
-    struct String header_rel = Generator__make_rel_path(g, global->module, name, (struct str){ .ptr = "", .length = strlen("") });
+    struct String header_rel = Generator__make_rel_path(generator, global->module, name, (struct str){ .ptr = "", .length = strlen("") });
     #line 825 "src/compiler/FileGenerator.pv"
     fprintf(code_file, "#include <");
     #line 826 "src/compiler/FileGenerator.pv"
-    Generator__write_str(g, code_file, String__as_str(&header_rel));
+    Generator__write_str(generator, code_file, String__as_str(&header_rel));
     #line 827 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ".h>\n\n");
 
@@ -1746,29 +1746,29 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
         fprintf(code_file, "const ");
     }
     #line 830 "src/compiler/FileGenerator.pv"
-    Generator__write_variable_decl(g, code_file, name, &global->type, blank_generics);
+    Generator__write_variable_decl(generator, code_file, name, &global->type, blank_generics);
     #line 831 "src/compiler/FileGenerator.pv"
     if (global->value != 0) {
         #line 832 "src/compiler/FileGenerator.pv"
         fprintf(code_file, " = ");
         #line 833 "src/compiler/FileGenerator.pv"
-        ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = g }}, code_file, global->value, blank_generics);
+        ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = generator }}, code_file, global->value, blank_generics);
     }
     #line 835 "src/compiler/FileGenerator.pv"
     fprintf(code_file, ";\n");
 
     #line 837 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&code), code_file);
+    Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
     #line 838 "src/compiler/FileGenerator.pv"
     fclose(code_file);
     #line 839 "src/compiler/FileGenerator.pv"
     remove(code_tmp);
 
     #line 841 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, code);
+    Array_String__append(&generator->code_files, code);
 
     #line 843 "src/compiler/FileGenerator.pv"
-    g->function_context = 0;
+    generator->function_context = 0;
 
     #line 845 "src/compiler/FileGenerator.pv"
     __result = true;
@@ -1812,7 +1812,7 @@ void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struc
 #line 860 "src/compiler/FileGenerator.pv"
 void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths, struct Array_str* module_paths) {
     #line 861 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
 
     #line 863 "src/compiler/FileGenerator.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(children);
@@ -1845,12 +1845,12 @@ void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str
                 Array_str__append(func_names, test_info->func_name);
 
                 #line 870 "src/compiler/FileGenerator.pv"
-                struct String header_path = Generator__make_rel_path(g, module, test_info->func_name, (struct str){ .ptr = ".test.h", .length = strlen(".test.h") });
+                struct String header_path = Generator__make_rel_path(generator, module, test_info->func_name, (struct str){ .ptr = ".test.h", .length = strlen(".test.h") });
                 #line 871 "src/compiler/FileGenerator.pv"
                 Array_str__append(header_paths, String__as_str(&header_path));
 
                 #line 873 "src/compiler/FileGenerator.pv"
-                struct String module_path = Generator__make_rel_path(g, module, module_name, (struct str){ .ptr = "", .length = strlen("") });
+                struct String module_path = Generator__make_rel_path(generator, module, module_name, (struct str){ .ptr = "", .length = strlen("") });
                 #line 874 "src/compiler/FileGenerator.pv"
                 Array_str__append(module_paths, String__as_str(&module_path));
             } }
@@ -1864,9 +1864,9 @@ void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str
 #line 882 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children) {
     #line 883 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 884 "src/compiler/FileGenerator.pv"
-    struct ArenaAllocator* allocator = g->allocator;
+    struct ArenaAllocator* allocator = generator->allocator;
 
     #line 886 "src/compiler/FileGenerator.pv"
     struct Array_str func_names = Array_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
@@ -1889,7 +1889,7 @@ void FileGenerator__generate_test_runner(struct FileGenerator* self, struct Hash
     #line 895 "src/compiler/FileGenerator.pv"
     struct String runner_path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
     #line 896 "src/compiler/FileGenerator.pv"
-    String__append(&runner_path, (struct str){ .ptr = g->path, .length = strlen(g->path) });
+    String__append(&runner_path, (struct str){ .ptr = generator->path, .length = strlen(generator->path) });
     #line 897 "src/compiler/FileGenerator.pv"
     String__append(&runner_path, (struct str){ .ptr = "/main.test.c", .length = strlen("/main.test.c") });
 
@@ -1915,7 +1915,7 @@ void FileGenerator__generate_test_runner(struct FileGenerator* self, struct Hash
         #line 908 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, "#include <");
         #line 909 "src/compiler/FileGenerator.pv"
-        Generator__write_str(g, runner_file, hp);
+        Generator__write_str(generator, runner_file, hp);
         #line 910 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, ">\n");
         #line 911 "src/compiler/FileGenerator.pv"
@@ -1943,17 +1943,17 @@ void FileGenerator__generate_test_runner(struct FileGenerator* self, struct Hash
         #line 924 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, "    fputs(\"[TEST] ");
         #line 925 "src/compiler/FileGenerator.pv"
-        Generator__write_str(g, runner_file, module_path);
+        Generator__write_str(generator, runner_file, module_path);
         #line 926 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, ": ");
         #line 927 "src/compiler/FileGenerator.pv"
-        Generator__write_str(g, runner_file, desc);
+        Generator__write_str(generator, runner_file, desc);
         #line 928 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, "\\n\", stdout);\n");
         #line 929 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, "    ");
         #line 930 "src/compiler/FileGenerator.pv"
-        Generator__write_str(g, runner_file, func_name);
+        Generator__write_str(generator, runner_file, func_name);
         #line 931 "src/compiler/FileGenerator.pv"
         fprintf(runner_file, "();\n");
         #line 932 "src/compiler/FileGenerator.pv"
@@ -1971,20 +1971,20 @@ void FileGenerator__generate_test_runner(struct FileGenerator* self, struct Hash
     fprintf(runner_file, "}\n");
 
     #line 941 "src/compiler/FileGenerator.pv"
-    Generator__overwrite_if_different(g, String__c_str(&runner_path), runner_file);
+    Generator__overwrite_if_different(generator, String__c_str(&runner_path), runner_file);
     #line 942 "src/compiler/FileGenerator.pv"
     fclose(runner_file);
     #line 943 "src/compiler/FileGenerator.pv"
     remove(runner_tmp);
 
     #line 945 "src/compiler/FileGenerator.pv"
-    Array_String__append(&g->code_files, runner_path);
+    Array_String__append(&generator->code_files, runner_path);
 }
 
 #line 948 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children) {
     #line 949 "src/compiler/FileGenerator.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
 
     #line 951 "src/compiler/FileGenerator.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(children);
@@ -1996,7 +1996,7 @@ void FileGenerator__create_directories(struct FileGenerator* self, struct str ba
         struct Namespace* namespace = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
         #line 952 "src/compiler/FileGenerator.pv"
-        struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = g->allocator });
+        struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator });
         #line 953 "src/compiler/FileGenerator.pv"
         String__append(&path, base_path);
         #line 954 "src/compiler/FileGenerator.pv"

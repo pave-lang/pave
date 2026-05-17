@@ -74,7 +74,7 @@ void ExpressionWriter__write_str_cast(struct ExpressionWriter* self, FILE* file,
 #line 27 "src/compiler/ExpressionWriter.pv"
 void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* file, struct Expression* inner_expr, struct Type* type, struct GenericMap* generics) {
     #line 28 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 29 "src/compiler/ExpressionWriter.pv"
     switch (Type__deref(&inner_expr->return_type)->type) {
         #line 30 "src/compiler/ExpressionWriter.pv"
@@ -95,7 +95,7 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
                         #line 35 "src/compiler/ExpressionWriter.pv"
                         struct Struct* struct_info = func_info->parent.struct_value._0;
                         #line 36 "src/compiler/ExpressionWriter.pv"
-                        Generator__write_str_title(g, file, struct_info->name->value);
+                        Generator__write_str_title(generator, file, struct_info->name->value);
                         #line 37 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "__");
                     } break;
@@ -105,11 +105,11 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
                 }
 
                 #line 42 "src/compiler/ExpressionWriter.pv"
-                Generator__write_str_title(g, file, func_info->name->value);
+                Generator__write_str_title(generator, file, func_info->name->value);
                 #line 43 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "__VTABLE__CO, .instance = &(struct ");
                 #line 44 "src/compiler/ExpressionWriter.pv"
-                Generator__write_function_name(g, file, func_info, func_generics);
+                Generator__write_function_name(generator, file, func_info, func_generics);
                 #line 45 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "__Co_CoroutineStatus__Instance) {}");
                 #line 46 "src/compiler/ExpressionWriter.pv"
@@ -125,7 +125,7 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
                         #line 51 "src/compiler/ExpressionWriter.pv"
                         struct Struct* struct_info = func_info->parent.struct_value._0;
                         #line 52 "src/compiler/ExpressionWriter.pv"
-                        Generator__write_str_title(g, file, struct_info->name->value);
+                        Generator__write_str_title(generator, file, struct_info->name->value);
                         #line 53 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "__");
                     } break;
@@ -135,11 +135,11 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
                 }
 
                 #line 58 "src/compiler/ExpressionWriter.pv"
-                Generator__write_str_title(g, file, func_info->name->value);
+                Generator__write_str_title(generator, file, func_info->name->value);
                 #line 59 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "__VTABLE__DYN_FN, .instance = &(struct ");
                 #line 60 "src/compiler/ExpressionWriter.pv"
-                Generator__write_function_name(g, file, func_info, func_generics);
+                Generator__write_function_name(generator, file, func_info, func_generics);
                 #line 61 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "__Fn__Instance) {}");
                 #line 62 "src/compiler/ExpressionWriter.pv"
@@ -163,21 +163,21 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
             #line 72 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "(");
             #line 73 "src/compiler/ExpressionWriter.pv"
-            Generator__write_type(g, file, type, generics);
+            Generator__write_type(generator, file, type, generics);
             #line 74 "src/compiler/ExpressionWriter.pv"
             fprintf(file, ") { .vtable = &");
 
             #line 76 "src/compiler/ExpressionWriter.pv"
-            struct Type* inner_type = Context__resolve_type(g->allocator, Type__deref(&inner_expr->return_type), generics, 0);
+            struct Type* inner_type = Context__resolve_type(generator->allocator, Type__deref(&inner_expr->return_type), generics, 0);
             #line 77 "src/compiler/ExpressionWriter.pv"
-            struct String inner_type_name = Naming__get_type_name(&g->naming_ident, inner_type, generics->array.data, generics);
+            struct String inner_type_name = Naming__get_type_name(&generator->naming_ident, inner_type, generics->array.data, generics);
             #line 78 "src/compiler/ExpressionWriter.pv"
-            Generator__write_str_title(g, file, String__as_str(&inner_type_name));
+            Generator__write_str_title(generator, file, String__as_str(&inner_type_name));
 
             #line 80 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "__VTABLE__");
             #line 81 "src/compiler/ExpressionWriter.pv"
-            Generator__write_str_title(g, file, trait_info->name->value);
+            Generator__write_str_title(generator, file, trait_info->name->value);
             #line 82 "src/compiler/ExpressionWriter.pv"
             fprintf(file, ", .instance = ");
             #line 83 "src/compiler/ExpressionWriter.pv"
@@ -196,7 +196,7 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
 #line 90 "src/compiler/ExpressionWriter.pv"
 void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* file, struct Expression* inner_expr, struct Sequence* sequence, struct GenericMap* generics) {
     #line 91 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 92 "src/compiler/ExpressionWriter.pv"
     struct Sequence* inner_sequence = 0;
 
@@ -256,7 +256,7 @@ void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* 
     #line 118 "src/compiler/ExpressionWriter.pv"
     struct Type sequence_type = (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence };
     #line 119 "src/compiler/ExpressionWriter.pv"
-    struct String name = Naming__get_type_name(&g->naming_c99, &sequence_type, &sequence_type, generics);
+    struct String name = Naming__get_type_name(&generator->naming_c99, &sequence_type, &sequence_type, generics);
     #line 120 "src/compiler/ExpressionWriter.pv"
     struct Expression* unary_inner = 0;
 
@@ -282,7 +282,7 @@ void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* 
     #line 131 "src/compiler/ExpressionWriter.pv"
     fprintf(file, "(");
     #line 132 "src/compiler/ExpressionWriter.pv"
-    Generator__write_string(g, file, &name);
+    Generator__write_string(generator, file, &name);
     #line 133 "src/compiler/ExpressionWriter.pv"
     fprintf(file, ") { .data = ");
 
@@ -329,7 +329,7 @@ void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* 
             #line 153 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "(");
             #line 154 "src/compiler/ExpressionWriter.pv"
-            Generator__write_type(g, file, &sequence->element, generics);
+            Generator__write_type(generator, file, &sequence->element, generics);
             #line 155 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "[])");
         }
@@ -349,9 +349,9 @@ void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* 
 #line 166 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, FILE* file, struct Type* type, struct Array_InvokeArgument* fields, struct GenericMap* generics) {
     #line 167 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 168 "src/compiler/ExpressionWriter.pv"
-    if (Generator__is_type_single_value_struct(g, type, generics)) {
+    if (Generator__is_type_single_value_struct(generator, type, generics)) {
         #line 169 "src/compiler/ExpressionWriter.pv"
         if (fields->length > 1) {
             #line 170 "src/compiler/ExpressionWriter.pv"
@@ -372,7 +372,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
         #line 180 "src/compiler/ExpressionWriter.pv"
         fprintf(file, "(");
         #line 181 "src/compiler/ExpressionWriter.pv"
-        Generator__write_type(g, file, type, generics);
+        Generator__write_type(generator, file, type, generics);
 
         #line 183 "src/compiler/ExpressionWriter.pv"
         if (fields->length == 0) {
@@ -389,7 +389,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
         }
 
         #line 190 "src/compiler/ExpressionWriter.pv"
-        g->indent += 1;
+        generator->indent += 1;
         #line 191 "src/compiler/ExpressionWriter.pv"
         { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(fields));
         #line 191 "src/compiler/ExpressionWriter.pv"
@@ -411,13 +411,13 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
                 }
             } else {
                 #line 196 "src/compiler/ExpressionWriter.pv"
-                Generator__write_indent(g, file);
+                Generator__write_indent(generator, file);
                 #line 197 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, ".");
             }
 
             #line 200 "src/compiler/ExpressionWriter.pv"
-            Generator__write_token(g, file, field->name);
+            Generator__write_token(generator, file, field->name);
             #line 201 "src/compiler/ExpressionWriter.pv"
             fprintf(file, " = ");
             #line 202 "src/compiler/ExpressionWriter.pv"
@@ -430,7 +430,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
         } }
 
         #line 206 "src/compiler/ExpressionWriter.pv"
-        g->indent -= 1;
+        generator->indent -= 1;
 
         #line 208 "src/compiler/ExpressionWriter.pv"
         if (fields->length != 0) {
@@ -440,7 +440,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
                 fprintf(file, " }");
             } else {
                 #line 212 "src/compiler/ExpressionWriter.pv"
-                Generator__write_indent(g, file);
+                Generator__write_indent(generator, file);
                 #line 213 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "}");
             }
@@ -454,14 +454,14 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
 #line 221 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* file, struct EnumVariant* variant, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generics) {
     #line 222 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 223 "src/compiler/ExpressionWriter.pv"
     struct Enum* parent = variant->parent;
 
     #line 225 "src/compiler/ExpressionWriter.pv"
     if (!Enum__is_discriminated_union(parent)) {
         #line 226 "src/compiler/ExpressionWriter.pv"
-        Generator__write_enum_variant_name(g, file, type, variant);
+        Generator__write_enum_variant_name(generator, file, type, variant);
         #line 227 "src/compiler/ExpressionWriter.pv"
         return true;
     }
@@ -469,11 +469,11 @@ bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* f
     #line 230 "src/compiler/ExpressionWriter.pv"
     fprintf(file, "(");
     #line 231 "src/compiler/ExpressionWriter.pv"
-    Generator__write_type(g, file, type, generics);
+    Generator__write_type(generator, file, type, generics);
     #line 232 "src/compiler/ExpressionWriter.pv"
     fprintf(file, ") { .type = ");
     #line 233 "src/compiler/ExpressionWriter.pv"
-    Generator__write_enum_variant_name(g, file, type, variant);
+    Generator__write_enum_variant_name(generator, file, type, variant);
 
     #line 235 "src/compiler/ExpressionWriter.pv"
     if (arguments == 0) {
@@ -490,7 +490,7 @@ bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* f
         #line 242 "src/compiler/ExpressionWriter.pv"
         struct Token* name = variant->name;
         #line 243 "src/compiler/ExpressionWriter.pv"
-        Generator__write_str_lowercase(g, file, name->value);
+        Generator__write_str_lowercase(generator, file, name->value);
         #line 244 "src/compiler/ExpressionWriter.pv"
         fprintf(file, "_value = ");
     }
@@ -519,7 +519,7 @@ bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* f
             #line 252 "src/compiler/ExpressionWriter.pv"
             fprintf(file, ".");
             #line 253 "src/compiler/ExpressionWriter.pv"
-            Generator__write_token(g, file, arg.name);
+            Generator__write_token(generator, file, arg.name);
             #line 254 "src/compiler/ExpressionWriter.pv"
             fprintf(file, " = ");
             #line 255 "src/compiler/ExpressionWriter.pv"
@@ -569,7 +569,7 @@ bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* f
 #line 278 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_coroutine_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics) {
     #line 279 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 280 "src/compiler/ExpressionWriter.pv"
     struct ExpressionData* data = &expression->data;
 
@@ -588,12 +588,12 @@ bool ExpressionWriter__write_coroutine_invoke(struct ExpressionWriter* self, FIL
                     #line 285 "src/compiler/ExpressionWriter.pv"
                     struct GenericMap* generic_map = type->function_value._1;
                     #line 286 "src/compiler/ExpressionWriter.pv"
-                    struct GenericMap resolved_generics = GenericMap__resolve_types(generic_map, g->allocator, generics);
+                    struct GenericMap resolved_generics = GenericMap__resolve_types(generic_map, generator->allocator, generics);
 
                     #line 288 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "(struct ");
                     #line 289 "src/compiler/ExpressionWriter.pv"
-                    Generator__write_function_name(g, file, func_info, &resolved_generics);
+                    Generator__write_function_name(generator, file, func_info, &resolved_generics);
                     #line 290 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, ") {");
 
@@ -616,7 +616,7 @@ bool ExpressionWriter__write_coroutine_invoke(struct ExpressionWriter* self, FIL
                         }
 
                         #line 297 "src/compiler/ExpressionWriter.pv"
-                        Generator__write_token(g, file, param->name);
+                        Generator__write_token(generator, file, param->name);
                         #line 298 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, " = ");
 
@@ -657,14 +657,14 @@ bool ExpressionWriter__write_coroutine_invoke(struct ExpressionWriter* self, FIL
 #line 322 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* self, FILE* file, struct Function* func_info, struct Array_InvokeArgument* arguments, struct GenericMap* func_generics, struct GenericMap* generics) {
     #line 323 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 324 "src/compiler/ExpressionWriter.pv"
     struct str name = func_info->name->value;
 
     #line 326 "src/compiler/ExpressionWriter.pv"
     if (str__eq(name, (struct str){ .ptr = "typeid", .length = strlen("typeid") })) {
         #line 327 "src/compiler/ExpressionWriter.pv"
-        struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, g->allocator, generics);
+        struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 328 "src/compiler/ExpressionWriter.pv"
         struct Type* type = GenericMap__get(&resolved_generics, (struct str){ .ptr = "T", .length = strlen("T") });
         #line 329 "src/compiler/ExpressionWriter.pv"
@@ -673,13 +673,13 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
             return false;
         }
         #line 330 "src/compiler/ExpressionWriter.pv"
-        return Generator__write_typeid(g, file, type, generics);
+        return Generator__write_typeid(generator, file, type, generics);
     }
 
     #line 333 "src/compiler/ExpressionWriter.pv"
     if (str__eq(name, (struct str){ .ptr = "cast", .length = strlen("cast") })) {
         #line 334 "src/compiler/ExpressionWriter.pv"
-        struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, g->allocator, generics);
+        struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 335 "src/compiler/ExpressionWriter.pv"
         struct InvokeArgument* arg = Array_InvokeArgument__get(arguments, 0);
         #line 336 "src/compiler/ExpressionWriter.pv"
@@ -697,7 +697,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
         #line 339 "src/compiler/ExpressionWriter.pv"
         fprintf(file, "(");
         #line 340 "src/compiler/ExpressionWriter.pv"
-        Generator__write_type(g, file, type, generics);
+        Generator__write_type(generator, file, type, generics);
         #line 341 "src/compiler/ExpressionWriter.pv"
         fprintf(file, ")(");
         #line 342 "src/compiler/ExpressionWriter.pv"
@@ -709,7 +709,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
     }
 
     #line 347 "src/compiler/ExpressionWriter.pv"
-    Generator__write_token(g, file, func_info->name);
+    Generator__write_token(generator, file, func_info->name);
     #line 348 "src/compiler/ExpressionWriter.pv"
     fprintf(file, "(");
     #line 349 "src/compiler/ExpressionWriter.pv"
@@ -741,7 +741,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
 #line 358 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics) {
     #line 359 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 360 "src/compiler/ExpressionWriter.pv"
     struct ExpressionData* data = &expression->data;
     #line 361 "src/compiler/ExpressionWriter.pv"
@@ -751,7 +751,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
             #line 362 "src/compiler/ExpressionWriter.pv"
             struct str name = data->variable_value;
             #line 363 "src/compiler/ExpressionWriter.pv"
-            bool success = Generator__write_str(g, file, name);
+            bool success = Generator__write_str(generator, file, name);
             #line 364 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "(");
             #line 365 "src/compiler/ExpressionWriter.pv"
@@ -912,7 +912,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                     #line 428 "src/compiler/ExpressionWriter.pv"
                     struct str name = func_info->name->value;
                     #line 429 "src/compiler/ExpressionWriter.pv"
-                    struct GenericMap resolved_generics = GenericMap__resolve_types(generic_map, g->allocator, generics);
+                    struct GenericMap resolved_generics = GenericMap__resolve_types(generic_map, generator->allocator, generics);
                     #line 430 "src/compiler/ExpressionWriter.pv"
                     struct Iter_ref_InvokeArgument args = Array_InvokeArgument__iter(arguments);
                     #line 431 "src/compiler/ExpressionWriter.pv"
@@ -944,7 +944,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                                 #line 445 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, ".vtable->");
                                 #line 446 "src/compiler/ExpressionWriter.pv"
-                                success = Generator__write_str(g, file, name) && success;
+                                success = Generator__write_str(generator, file, name) && success;
                                 #line 447 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "(");
                                 #line 448 "src/compiler/ExpressionWriter.pv"
@@ -955,17 +955,17 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                                 first = false;
                             } else {
                                 #line 452 "src/compiler/ExpressionWriter.pv"
-                                struct String parent_name = Naming__get_type_name(&g->naming_ident, Type__deref(&arg->value->return_type), generics->self_type, generics);
+                                struct String parent_name = Naming__get_type_name(&generator->naming_ident, Type__deref(&arg->value->return_type), generics->self_type, generics);
                                 #line 453 "src/compiler/ExpressionWriter.pv"
-                                success = Generator__write_str(g, file, String__as_str(&parent_name)) && success;
+                                success = Generator__write_str(generator, file, String__as_str(&parent_name)) && success;
                                 #line 454 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "__");
                                 #line 455 "src/compiler/ExpressionWriter.pv"
-                                success = Generator__write_str(g, file, trait_info->name->value) && success;
+                                success = Generator__write_str(generator, file, trait_info->name->value) && success;
                                 #line 456 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "__");
                                 #line 457 "src/compiler/ExpressionWriter.pv"
-                                success = Generator__write_str(g, file, func_info->name->value) && success;
+                                success = Generator__write_str(generator, file, func_info->name->value) && success;
                                 #line 458 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "(");
                                 #line 459 "src/compiler/ExpressionWriter.pv"
@@ -977,7 +977,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                         #line 463 "src/compiler/ExpressionWriter.pv"
                         default: {
                             #line 464 "src/compiler/ExpressionWriter.pv"
-                            success = Generator__write_function_name(g, file, func_info, &resolved_generics) && success;
+                            success = Generator__write_function_name(generator, file, func_info, &resolved_generics) && success;
                             #line 465 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "(");
                         } break;
@@ -1014,7 +1014,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                     #line 478 "src/compiler/ExpressionWriter.pv"
                     struct str name = func_info->name;
                     #line 479 "src/compiler/ExpressionWriter.pv"
-                    bool success = Generator__write_str(g, file, name);
+                    bool success = Generator__write_str(generator, file, name);
                     #line 480 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "(");
                     #line 481 "src/compiler/ExpressionWriter.pv"
@@ -1082,7 +1082,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                             #line 502 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "(");
                             #line 503 "src/compiler/ExpressionWriter.pv"
-                            Generator__write_type(g, file, &expression->return_type, generics);
+                            Generator__write_type(generator, file, &expression->return_type, generics);
                             #line 504 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, ") {");
                             #line 505 "src/compiler/ExpressionWriter.pv"
@@ -1105,7 +1105,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                                     fprintf(file, ", .");
                                 }
                                 #line 508 "src/compiler/ExpressionWriter.pv"
-                                success = Generator__write_str(g, file, arg->name->value) && success;
+                                success = Generator__write_str(generator, file, arg->name->value) && success;
                                 #line 509 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, " = ");
                                 #line 510 "src/compiler/ExpressionWriter.pv"
@@ -1121,7 +1121,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                 #line 517 "src/compiler/ExpressionWriter.pv"
                 case TYPE__CLASS_CPP: {
                     #line 518 "src/compiler/ExpressionWriter.pv"
-                    bool success = Generator__write_type(g, file, type, generics);
+                    bool success = Generator__write_type(generator, file, type, generics);
                     #line 519 "src/compiler/ExpressionWriter.pv"
                     bool function_mode = (arguments->length > 0) && (arguments->data[0].name == 0);
 
@@ -1174,7 +1174,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                                 fprintf(file, ", .");
                             }
                             #line 534 "src/compiler/ExpressionWriter.pv"
-                            success = Generator__write_str(g, file, arg->name->value) && success;
+                            success = Generator__write_str(generator, file, arg->name->value) && success;
                             #line 535 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, " = ");
                             #line 536 "src/compiler/ExpressionWriter.pv"
@@ -1209,7 +1209,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
 #line 555 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics) {
     #line 556 "src/compiler/ExpressionWriter.pv"
-    struct Generator* g = self->generator;
+    struct Generator* generator = self->generator;
     #line 557 "src/compiler/ExpressionWriter.pv"
     struct ExpressionData* data = &expression->data;
 
@@ -1220,7 +1220,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 560 "src/compiler/ExpressionWriter.pv"
             struct str name = data->variable_value;
             #line 561 "src/compiler/ExpressionWriter.pv"
-            Generator__write_variable(g, file, name);
+            Generator__write_variable(generator, file, name);
             #line 562 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
@@ -1229,7 +1229,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 564 "src/compiler/ExpressionWriter.pv"
             struct str value = data->literal_value;
             #line 565 "src/compiler/ExpressionWriter.pv"
-            Generator__write_literal(g, file, &expression->return_type, value);
+            Generator__write_literal(generator, file, &expression->return_type, value);
             #line 566 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
@@ -1303,7 +1303,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                     #line 597 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "(");
                     #line 598 "src/compiler/ExpressionWriter.pv"
-                    Generator__write_type(g, file, &inner->return_type, generics);
+                    Generator__write_type(generator, file, &inner->return_type, generics);
                     #line 599 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "[]){");
                     #line 600 "src/compiler/ExpressionWriter.pv"
@@ -1316,7 +1316,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             }
 
             #line 606 "src/compiler/ExpressionWriter.pv"
-            Generator__write_str(g, file, operator);
+            Generator__write_str(generator, file, operator);
             #line 607 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, inner, generics);
             #line 608 "src/compiler/ExpressionWriter.pv"
@@ -1333,7 +1333,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 611 "src/compiler/ExpressionWriter.pv"
             bool is_eq_or_ne = str__eq(operator, (struct str){ .ptr = "==", .length = strlen("==") }) || str__eq(operator, (struct str){ .ptr = "!=", .length = strlen("!=") });
             #line 612 "src/compiler/ExpressionWriter.pv"
-            if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(g, &left->return_type, generics)) {
+            if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(generator, &left->return_type, generics)) {
                 #line 613 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(");
                 #line 614 "src/compiler/ExpressionWriter.pv"
@@ -1349,7 +1349,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             fprintf(file, " %.*s ", (int32_t)(operator.length), operator.ptr);
 
             #line 622 "src/compiler/ExpressionWriter.pv"
-            if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(g, &right->return_type, generics)) {
+            if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(generator, &right->return_type, generics)) {
                 #line 623 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(");
                 #line 624 "src/compiler/ExpressionWriter.pv"
@@ -1411,13 +1411,13 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                         #line 646 "src/compiler/ExpressionWriter.pv"
                         if (impl_const_ptr != 0) {
                             #line 647 "src/compiler/ExpressionWriter.pv"
-                            struct String parent_name = Naming__get_type_name(&g->naming_ident, parent_type, parent_type, generics);
+                            struct String parent_name = Naming__get_type_name(&generator->naming_ident, parent_type, parent_type, generics);
                             #line 648 "src/compiler/ExpressionWriter.pv"
-                            Generator__write_str_title(g, file, String__as_str(&parent_name));
+                            Generator__write_str_title(generator, file, String__as_str(&parent_name));
                             #line 649 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "_");
                             #line 650 "src/compiler/ExpressionWriter.pv"
-                            Generator__write_str_title(g, file, member);
+                            Generator__write_str_title(generator, file, member);
                             #line 651 "src/compiler/ExpressionWriter.pv"
                             return true;
                         }
@@ -1439,13 +1439,13 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                         #line 658 "src/compiler/ExpressionWriter.pv"
                         if (impl_const_ptr != 0) {
                             #line 659 "src/compiler/ExpressionWriter.pv"
-                            struct String parent_name = Naming__get_type_name(&g->naming_ident, parent_type, parent_type, generics);
+                            struct String parent_name = Naming__get_type_name(&generator->naming_ident, parent_type, parent_type, generics);
                             #line 660 "src/compiler/ExpressionWriter.pv"
-                            Generator__write_str_title(g, file, String__as_str(&parent_name));
+                            Generator__write_str_title(generator, file, String__as_str(&parent_name));
                             #line 661 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "_");
                             #line 662 "src/compiler/ExpressionWriter.pv"
-                            Generator__write_str_title(g, file, member);
+                            Generator__write_str_title(generator, file, member);
                             #line 663 "src/compiler/ExpressionWriter.pv"
                             return true;
                         }
@@ -1458,9 +1458,9 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 669 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, parent, generics);
             #line 670 "src/compiler/ExpressionWriter.pv"
-            Generator__write_static_member_accessor(g, file, generics);
+            Generator__write_static_member_accessor(generator, file, generics);
             #line 671 "src/compiler/ExpressionWriter.pv"
-            Generator__write_str(g, file, member);
+            Generator__write_str(generator, file, member);
             #line 672 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
@@ -1474,7 +1474,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             struct Type* parent_type = &parent->return_type;
 
             #line 677 "src/compiler/ExpressionWriter.pv"
-            if (Generator__is_type_single_value_struct(g, parent_type, generics)) {
+            if (Generator__is_type_single_value_struct(generator, parent_type, generics)) {
                 #line 678 "src/compiler/ExpressionWriter.pv"
                 bool is_ref = Generator__is_reference(parent_type);
                 #line 679 "src/compiler/ExpressionWriter.pv"
@@ -1513,7 +1513,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                                 #line 692 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "!!ERROR NO MEMBER ");
                                 #line 693 "src/compiler/ExpressionWriter.pv"
-                                Generator__write_str(g, file, member);
+                                Generator__write_str(generator, file, member);
                                 #line 694 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "!!");
                             }
@@ -1530,14 +1530,14 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                     #line 703 "src/compiler/ExpressionWriter.pv"
                     ExpressionWriter__write_expression(self, file, parent, generics);
                     #line 704 "src/compiler/ExpressionWriter.pv"
-                    Generator__write_instance_member_accessor(g, file, &parent->return_type, generics);
+                    Generator__write_instance_member_accessor(generator, file, &parent->return_type, generics);
                     #line 705 "src/compiler/ExpressionWriter.pv"
                     if (member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9') {
                         #line 705 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "_");
                     }
                     #line 706 "src/compiler/ExpressionWriter.pv"
-                    Generator__write_str(g, file, member);
+                    Generator__write_str(generator, file, member);
                 } break;
             }
 
@@ -1549,7 +1549,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 712 "src/compiler/ExpressionWriter.pv"
             struct Type* type = data->type_value;
             #line 713 "src/compiler/ExpressionWriter.pv"
-            Generator__write_type(g, file, type, generics);
+            Generator__write_type(generator, file, type, generics);
             #line 714 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;

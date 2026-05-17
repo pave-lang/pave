@@ -26,18 +26,18 @@ impl FileGenerator {
     }
 
     fn generate_function(&self, usage: &TypeFunctionUsage, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
-        let defs = DefinitionWriter { generator: g };
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
         let func_info = usage.type;
         if func_info.type == FunctionType::Builtin { return true; }
 
         let generics = usage_context.generic_map;
-        let include_writer = IncludeWriter::new(g.allocator);
+        let include_writer = IncludeWriter::new(generator.allocator);
 
-        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_str = name.as_str();
-        let func_context = FunctionContext::new(g.allocator, func_info, true);
-        g.function_context = &func_context;
+        let func_context = FunctionContext::new(generator.allocator, func_info, true);
+        generator.function_context = &func_context;
 
         let code_ext: str = ".c";
         let header_ext: str = ".h";
@@ -46,37 +46,37 @@ impl FileGenerator {
             header_ext = ".test.h";
         }
 
-        let code = g.make_path(func_info.context.module, name_str, code_ext);
+        let code = generator.make_path(func_info.context.module, name_str, code_ext);
         let code_file: *FILE = null;
         let code_tmp: *const char = null;
 
         code_tmp = tmpnam(0);
         code_file = fopen(code_tmp, "w+");
 
-        g.code_files.append(code);
+        generator.code_files.append(code);
 
         if code_file == null { perror(code.c_str()); return false; }
 
-        g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        g.write_includes_raw(code_file, &func_info.context.module.includes);
-        include_writer.write(code_file, g, &usage_context.body, generics, true);
+        generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        generator.write_includes_raw(code_file, &func_info.context.module.includes);
+        include_writer.write(code_file, generator, &usage_context.body, generics, true);
 
-        let header_rel = g.make_rel_path(func_info.context.module, name_str, header_ext);
+        let header_rel = generator.make_rel_path(func_info.context.module, name_str, header_ext);
         fprintf(code_file, "#include <");
-        g.write_str(code_file, header_rel.as_str());
+        generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
         if !defs.write_function_definition(code_file, func_info, generics, null) { fclose(code_file); return false; }
 
         defs.write_function_block(code_file, name_str, func_info, generics, usage);
 
-        g.overwrite_if_different(code.c_str(), code_file);
+        generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
 
-        include_writer = IncludeWriter::new(g.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
+        include_writer = IncludeWriter::new(generator.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
-        let header = g.make_path(func_info.context.module, name_str, header_ext);
+        let header = generator.make_path(func_info.context.module, name_str, header_ext);
         let header_file: *FILE = null;
         let header_tmp: *const char = null;
         header_tmp = tmpnam(0);
@@ -85,15 +85,15 @@ impl FileGenerator {
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name_str);
+        generator.write_str_title(header_file, name_str);
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name_str);
+        generator.write_str_title(header_file, name_str);
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_code, null);
-        include_writer.write(header_file, g, &usage_context.signature, generics, false);
+        generator.write_context_primitives(header_file, &usage_context.primitive_code, null);
+        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
 
-        if g.is_coroutine() {
+        if generator.is_coroutine() {
             defs.write_function_coroutine(header_file, func_info, generics);
         }
 
@@ -102,11 +102,11 @@ impl FileGenerator {
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
-        g.function_context = null;
+        generator.function_context = null;
 
         return true;
     }
@@ -120,57 +120,57 @@ impl FileGenerator {
     }
 
     fn generate_enum(&self, usage: &TypeUsage<Enum>, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
-        let defs = DefinitionWriter { generator: g };
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
         let generics = usage_context.generic_map;
         let enum_info = usage.type;
         let module = enum_info.context.module;
-        let include_writer = IncludeWriter::new(g.allocator);
+        let include_writer = IncludeWriter::new(generator.allocator);
 
-        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
-        let header = g.make_path(module, name.as_str(), ".h");
+        let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let header = generator.make_path(module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, g, &usage_context.layout, generics, false);
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.layout, generics, false);
 
         if !defs.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
         if enum_info.impls.length == 0 { return true; }
 
-        let code = g.make_path(module, name.as_str(), ".c");
-        g.code_files.append(code);
+        let code = generator.make_path(module, name.as_str(), ".c");
+        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
         if code_file == null { perror(code.c_str()); return false; }
 
-        g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        g.write_includes_raw(code_file, &module.includes);
-        include_writer.write(code_file, g, &usage_context.body, generics, true);
+        generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        generator.write_includes_raw(code_file, &module.includes);
+        include_writer.write(code_file, generator, &usage_context.body, generics, true);
 
-        let header_rel = g.make_rel_path(module, name.as_str(), ".h");
+        let header_rel = generator.make_rel_path(module, name.as_str(), ".h");
         fprintf(code_file, "#include <");
-        g.write_str(code_file, header_rel.as_str());
+        generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
         if !defs.write_impls(code_file, module, &enum_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
-        g.overwrite_if_different(code.c_str(), code_file);
+        generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
 
@@ -186,23 +186,23 @@ impl FileGenerator {
     }
 
     fn generate_struct(&self, usage: &TypeUsage<Struct>, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
-        let defs = DefinitionWriter { generator: g };
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
         let generics = usage_context.generic_map;
         let struct_info = usage.type;
-        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let module = struct_info.module;
-        let include_writer = IncludeWriter::new(g.allocator);
+        let include_writer = IncludeWriter::new(generator.allocator);
 
-        let header = g.make_path(struct_info.module, name.as_str(), ".h");
+        let header = generator.make_path(struct_info.module, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
         if struct_info.module.mode_cpp || usage_context.cpp_usages.length > 0 {
@@ -233,19 +233,19 @@ impl FileGenerator {
             }
 
             fprintf(header_file, "#endif\n\n");
-        } else if g.root.mode_cpp {
+        } else if generator.root.mode_cpp {
             fprintf(header_file, "#ifdef __cplusplus\n");
             fprintf(header_file, "extern \"C\" {\n");
             fprintf(header_file, "#endif\n\n");
         }
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, g, &usage_context.layout, generics, false);
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.layout, generics, false);
         if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
 
         if !defs.write_struct_definition(header_file, struct_info, usage, usage_context) { fclose(header_file); return false; }
 
-        if struct_info.module.mode_cpp || g.root.mode_cpp {
+        if struct_info.module.mode_cpp || generator.root.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");
             fprintf(header_file, "}\n");
             fprintf(header_file, "#endif\n");
@@ -253,7 +253,7 @@ impl FileGenerator {
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
@@ -268,20 +268,20 @@ impl FileGenerator {
             ext = ".c";
         }
 
-        let code = g.make_path(struct_info.module, name.as_str(), ext);
-        g.code_files.append(code);
+        let code = generator.make_path(struct_info.module, name.as_str(), ext);
+        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
         if code_file == null { perror(code.c_str()); return false; }
 
-        g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        g.write_includes_raw(code_file, &struct_info.module.includes);
-        include_writer.write(code_file, g, &usage_context.body, generics, true);
+        generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        generator.write_includes_raw(code_file, &struct_info.module.includes);
+        include_writer.write(code_file, generator, &usage_context.body, generics, true);
 
-        let header_rel = g.make_rel_path(struct_info.module, name.as_str(), ".h");
+        let header_rel = generator.make_rel_path(struct_info.module, name.as_str(), ".h");
         fprintf(code_file, "#include <");
-        g.write_str(code_file, header_rel.as_str());
+        generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
         if !defs.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
@@ -294,11 +294,11 @@ impl FileGenerator {
             let trait_info = trait_entry.0;
             if !trait_info.has_dynamic_dispatch() { continue; }
             fprintf(code_file, "struct ");
-            g.write_type_name(code_file, trait_entry.1, generics);
+            generator.write_type_name(code_file, trait_entry.1, generics);
             fprintf(code_file, "VTable ");
-            g.write_str_title(code_file, name.as_str());
+            generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__");
-            g.write_str_title(code_file, trait_info.name.value);
+            generator.write_str_title(code_file, trait_info.name.value);
             fprintf(code_file, " = { ");
 
             let first = true;
@@ -307,10 +307,10 @@ impl FileGenerator {
                 else { fprintf(code_file, ", "); }
 
                 fprintf(code_file, ".");
-                g.write_token(code_file, func_info.name);
+                generator.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
-                let func_name = g.get_trait_function_name(name.as_str(), trait_info, trait_entry.1, func_info, generics);
-                g.write_string(code_file, &func_name);
+                let func_name = generator.get_trait_function_name(name.as_str(), trait_info, trait_entry.1, func_info, generics);
+                generator.write_string(code_file, &func_name);
             }
 
             fprintf(code_file, " };\n");
@@ -322,54 +322,54 @@ impl FileGenerator {
             fprintf(code_file, "#include <tuple_usize_str_TypeId.h>\n");
             fprintf(code_file, "#include <slice_tuple_usize_str_TypeId.h>\n");
             fprintf(code_file, "struct slice_tuple_usize_str_TypeId ");
-            g.write_string(code_file, &name);
+            generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
 
-            g.indent += 1;
-            g.write_indent(code_file);
+            generator.indent += 1;
+            generator.write_indent(code_file);
             fprintf(code_file, "static struct tuple_usize_str_TypeId fields[] = { ");
 
             let field_index: usize = 0;
             for (_, &field) in struct_info.fields {
                 if field_index > 0 { fprintf(code_file, ", "); }
                 fprintf(code_file, "(struct tuple_usize_str_TypeId){ ._0 = %zu, ._1 = (struct str){ .ptr = \"", field_index);
-                g.write_token(code_file, field.name);
+                generator.write_token(code_file, field.name);
                 fprintf(code_file, "\", .length = %zu }, ._2 = ", field.name.value.length);
-                g.write_typeid(code_file, &field.type, generics);
+                generator.write_typeid(code_file, &field.type, generics);
                 fprintf(code_file, " }");
                 field_index += 1;
             }
 
             fprintf(code_file, " };\n");
-            g.write_indent(code_file);
+            generator.write_indent(code_file);
             fprintf(code_file, "return (struct slice_tuple_usize_str_TypeId){ .data = fields, .length = %zu };\n", struct_info.fields.length);
-            g.indent -= 1;
+            generator.indent -= 1;
             fprintf(code_file, "}\n");
 
             fprintf(code_file, "void* ");
-            g.write_string(code_file, &name);
+            generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_field(void* __self, uintptr_t index) {\n");
 
-            g.indent += 1;
+            generator.indent += 1;
 
-            g.write_indent(code_file);
-            g.write_type(code_file, &Type::Self, generics);
+            generator.write_indent(code_file);
+            generator.write_type(code_file, &Type::Self, generics);
 
             if module.mode_cpp {
                 fprintf(code_file, "* self = (");
-                g.write_type(code_file, &Type::Self, generics);
+                generator.write_type(code_file, &Type::Self, generics);
                 fprintf(code_file, "*)__self;\n");
             } else {
                 fprintf(code_file, "* self = __self;\n");
             }
 
-            g.write_indent(code_file);
+            generator.write_indent(code_file);
             fprintf(code_file, "switch (index) {\n");
-            g.indent += 1;
+            generator.indent += 1;
 
             let i: usize = 0;
             for (_, &field) in struct_info.fields {
-                g.write_indent(code_file);
+                generator.write_indent(code_file);
                 fprintf(code_file, "case %zu: return ", i);
 
                 if struct_info.is_newtype() {
@@ -380,66 +380,66 @@ impl FileGenerator {
                     }
 
                     fprintf(code_file, "self->");
-                    g.write_token(code_file, field.name);
+                    generator.write_token(code_file, field.name);
                 }
 
                 fprintf(code_file, ";\n");
                 i += 1;
             }
 
-            g.indent -= 1;
-            g.write_indent(code_file);
+            generator.indent -= 1;
+            generator.write_indent(code_file);
             fprintf(code_file, "}\n");
 
-            g.write_indent(code_file);
+            generator.write_indent(code_file);
             fprintf(code_file, "return 0;\n");
 
-            g.indent -= 1;
+            generator.indent -= 1;
             fprintf(code_file, "}\n");
 
             fprintf(code_file, "bool ");
-            g.write_string(code_file, &name);
+            generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__set_field(void* __self, uintptr_t index, void* value) {\n");
 
-            g.indent += 1;
+            generator.indent += 1;
 
-            g.write_indent(code_file);
-            g.write_type(code_file, &Type::Self, generics);
+            generator.write_indent(code_file);
+            generator.write_type(code_file, &Type::Self, generics);
 
             if module.mode_cpp {
                 fprintf(code_file, "* self = (");
-                g.write_type(code_file, &Type::Self, generics);
+                generator.write_type(code_file, &Type::Self, generics);
                 fprintf(code_file, "*)__self;\n");
             } else {
                 fprintf(code_file, "* self = __self;\n");
             }
 
-            g.write_indent(code_file);
+            generator.write_indent(code_file);
             fprintf(code_file, "switch (index) {\n");
-            g.indent += 1;
+            generator.indent += 1;
 
             i = 0;
             for (_, &field) in struct_info.fields {
                 if field.type.is_sequence() { continue; }
 
-                g.write_indent(code_file);
+                generator.write_indent(code_file);
 
                 if struct_info.is_newtype() {
                     fprintf(code_file, "case %zu: *self = *(", i);
-                    g.write_type(code_file, &field.type, generics);
+                    generator.write_type(code_file, &field.type, generics);
                     fprintf(code_file, "*)");
                 } else {
                     fprintf(code_file, "case %zu: self->", i);
-                    g.write_token(code_file, field.name);
+                    generator.write_token(code_file, field.name);
                     fprintf(code_file, " = ");
 
                     if !Generator::is_reference(&field.type) || field.type.is_fat_pointer() {
                         fprintf(code_file, "*(");
-                        g.write_type(code_file, &field.type, generics);
+                        generator.write_type(code_file, &field.type, generics);
                         fprintf(code_file, "*)");
                     } else if module.mode_cpp {
                         fprintf(code_file, "(");
-                        g.write_type(code_file, &field.type, generics);
+                        generator.write_type(code_file, &field.type, generics);
                         fprintf(code_file, ")");
                     }
                 }
@@ -448,29 +448,29 @@ impl FileGenerator {
                 i += 1;
             }
 
-            g.indent -= 1;
-            g.write_indent(code_file);
+            generator.indent -= 1;
+            generator.write_indent(code_file);
             fprintf(code_file, "}\n");
 
-            g.write_indent(code_file);
+            generator.write_indent(code_file);
             fprintf(code_file, "return false;\n");
 
-            g.indent -= 1;
+            generator.indent -= 1;
             fprintf(code_file, "}\n");
 
             fprintf(code_file, "struct trait_StructVTable ");
-            g.write_str_title(code_file, name.as_str());
+            generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__STRUCT");
             fprintf(code_file, " = { .get_fields = &");
-            g.write_string(code_file, &name);
+            generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_fields, .get_field = &");
-            g.write_string(code_file, &name);
+            generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_field, .set_field = &");
-            g.write_string(code_file, &name);
+            generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__set_field };\n");
         }
 
-        g.overwrite_if_different(code.c_str(), code_file);
+        generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
 
@@ -486,33 +486,33 @@ impl FileGenerator {
     }
 
     fn generate_primitive(&self, usage: &TypeUsage<Primitive>, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
-        let defs = DefinitionWriter { generator: g };
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
         let primitive_info = usage.type;
         let generics = usage_context.generic_map;
         let name = primitive_info.name;
-        let include_writer = IncludeWriter::new(g.allocator);
+        let include_writer = IncludeWriter::new(generator.allocator);
 
-        let header = g.make_path(null, name, ".h");
+        let header = generator.make_path(null, name, ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name);
+        generator.write_str_title(header_file, name);
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name);
+        generator.write_str_title(header_file, name);
         fprintf(header_file, "\n\n");
 
-        g.write_impl_includes_raw(header_file, &primitive_info.impls);
-        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, g, &usage_context.signature, generics, false);
+        generator.write_impl_includes_raw(header_file, &primitive_info.impls);
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
 
         if !defs.write_primitive_definition(header_file, primitive_info, generics) { fclose(header_file); return false; }
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
@@ -520,20 +520,20 @@ impl FileGenerator {
             return true;
         }
 
-        let code = g.make_path(null, name, ".c");
-        g.code_files.append(code);
+        let code = generator.make_path(null, name, ".c");
+        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
         if code_file == null { perror(code.c_str()); return false; }
 
-        g.write_impl_includes_raw(code_file, &primitive_info.impls);
-        g.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        include_writer.write(code_file, g, &usage_context.body, generics, true);
+        generator.write_impl_includes_raw(code_file, &primitive_info.impls);
+        generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        include_writer.write(code_file, generator, &usage_context.body, generics, true);
 
-        let header_rel = g.make_rel_path(null, name, ".h");
+        let header_rel = generator.make_rel_path(null, name, ".h");
         fprintf(code_file, "#include <");
-        g.write_str(code_file, header_rel.as_str());
+        generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
         if !defs.write_impls(code_file, null, &primitive_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
@@ -544,11 +544,11 @@ impl FileGenerator {
             if !trait_info.has_dynamic_dispatch() { continue; }
 
             fprintf(code_file, "\nstruct ");
-            g.write_type_name(code_file, &impl_info.trait_type, generics);
+            generator.write_type_name(code_file, &impl_info.trait_type, generics);
             fprintf(code_file, "VTable ");
-            g.write_str_title(code_file, name);
+            generator.write_str_title(code_file, name);
             fprintf(code_file, "__VTABLE__");
-            g.write_str_title(code_file, trait_info.name.value);
+            generator.write_str_title(code_file, trait_info.name.value);
             fprintf(code_file, " = { ");
 
             let first = true;
@@ -557,16 +557,16 @@ impl FileGenerator {
                 else { fprintf(code_file, ", "); }
 
                 fprintf(code_file, ".");
-                g.write_token(code_file, func_info.name);
+                generator.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
-                let func_name = g.get_trait_function_name(name, trait_info, &impl_info.trait_type, func_info, generics);
-                g.write_string(code_file, &func_name);
+                let func_name = generator.get_trait_function_name(name, trait_info, &impl_info.trait_type, func_info, generics);
+                generator.write_string(code_file, &func_name);
             }
 
             fprintf(code_file, " };\n");
         }
 
-        g.overwrite_if_different(code.c_str(), code_file);
+        generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
 
@@ -587,8 +587,8 @@ impl FileGenerator {
     }
 
     fn generate_slice(&self, usage: &TypeUsage<Sequence>, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
-        let defs = DefinitionWriter { generator: g };
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
         let generics = usage_context.generic_map;
         let element_type = &usage.type.element;
 
@@ -596,60 +596,60 @@ impl FileGenerator {
         let element_reference_type = Type::Indirect(&element_indirect);
 
         let sequence_type = Type::Sequence(usage.type);
-        let name = g.naming_ident.get_type_name(&sequence_type, &sequence_type, generics);
-        let include_writer = IncludeWriter::new(g.allocator);
+        let name = generator.naming_ident.get_type_name(&sequence_type, &sequence_type, generics);
+        let include_writer = IncludeWriter::new(generator.allocator);
 
-        let header = g.make_path(null, name.as_str(), ".h");
+        let header = generator.make_path(null, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, g, &usage_context.layout, generics, false);
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.layout, generics, false);
 
         fprintf(header_file, "struct ");
-        g.write_string(header_file, &name);
+        generator.write_string(header_file, &name);
         fprintf(header_file, " { ");
 
-        g.write_variable_decl(header_file, "data", &element_reference_type, generics);
+        generator.write_variable_decl(header_file, "data", &element_reference_type, generics);
         fprintf(header_file, "; ");
-        g.write_variable_decl(header_file, "length", &g.root.type_usize, generics);
+        generator.write_variable_decl(header_file, "length", &generator.root.type_usize, generics);
 
         fprintf(header_file, "; };\n");
 
-        defs.write_impl_definition(header_file, name.as_str(), g.root.hack_type_impl.impl_info, generics);
+        defs.write_impl_definition(header_file, name.as_str(), generator.root.hack_type_impl.impl_info, generics);
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
-        let code = g.make_path(null, name.as_str(), ".c");
-        g.code_files.append(code);
+        let code = generator.make_path(null, name.as_str(), ".c");
+        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
         if code_file == null { perror(code.c_str()); return false; }
 
-        let header_rel = g.make_rel_path(null, name.as_str(), ".h");
+        let header_rel = generator.make_rel_path(null, name.as_str(), ".h");
         fprintf(code_file, "#include <");
-        g.write_str(code_file, header_rel.as_str());
+        generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        let impls_base = [g.root.hack_type_impl.impl_info];
+        let impls_base = [generator.root.hack_type_impl.impl_info];
         let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: self.generator.allocator, capacity: 0 };
         let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: null, length: 0, allocator: self.generator.allocator, capacity: 0 };
 
         if !defs.write_impls(code_file, null, &impls, &impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
-        g.overwrite_if_different(code.c_str(), code_file);
+        generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
 
@@ -665,51 +665,51 @@ impl FileGenerator {
     }
 
     fn generate_tuple(&self, usage: &TypeUsage<Tuple>, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
+        let generator = self.generator;
         let generics = usage_context.generic_map;
         let tuple = usage.type;
         let element_types = &tuple.elements;
         let tuple_type = Type::Tuple(tuple);
 
-        let name = g.naming_ident.get_type_name(&tuple_type, &tuple_type, generics);
-        let include_writer = IncludeWriter::new(g.allocator);
+        let name = generator.naming_ident.get_type_name(&tuple_type, &tuple_type, generics);
+        let include_writer = IncludeWriter::new(generator.allocator);
 
-        let header = g.make_path(null, name.as_str(), ".h");
+        let header = generator.make_path(null, name.as_str(), ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, g, &usage_context.layout, generics, false);
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.layout, generics, false);
 
         fprintf(header_file, "struct ");
-        g.write_string(header_file, &name);
+        generator.write_string(header_file, &name);
         fprintf(header_file, " {\n");
-        g.indent += 1;
+        generator.indent += 1;
 
         for (i, element) in element_types.iter().enumerate() {
-            let element_name = String::new(g.allocator);
+            let element_name = String::new(generator.allocator);
             element_name.append("_");
             element_name.append_usize(i);
 
-            g.write_indent(header_file);
-            g.write_variable_decl(header_file, element_name.as_str(), element, generics);
+            generator.write_indent(header_file);
+            generator.write_variable_decl(header_file, element_name.as_str(), element, generics);
             fprintf(header_file, ";\n");
             element_name.release();
         }
 
-        g.indent -= 1;
+        generator.indent -= 1;
         fprintf(header_file, "};\n");
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
@@ -725,25 +725,25 @@ impl FileGenerator {
     }
 
     fn generate_trait(&self, usage: &TypeUsage<Trait>, usage_context: &UsageContext) -> bool {
-        let g = self.generator;
-        let defs = DefinitionWriter { generator: g };
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
         let generics = usage_context.generic_map;
         let trait_info = usage.type;
 
         if !trait_info.has_dynamic_dispatch() { return true; }
 
-        let name = g.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
-        let header = g.make_path(trait_info.module, name.as_str(), ".h");
-        let include_writer = IncludeWriter::new(g.allocator);
+        let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
+        let header = generator.make_path(trait_info.module, name.as_str(), ".h");
+        let include_writer = IncludeWriter::new(generator.allocator);
 
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name.as_str());
+        generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
         if trait_info.module.mode_cpp {
@@ -752,8 +752,8 @@ impl FileGenerator {
             fprintf(header_file, "#endif\n\n");
         }
 
-        g.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, g, &usage_context.signature, generics, false);
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
 
         if !defs.write_trait_definition(header_file, trait_info, generics) { fclose(header_file); return false; }
 
@@ -765,7 +765,7 @@ impl FileGenerator {
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
@@ -773,30 +773,30 @@ impl FileGenerator {
     }
 
     fn generate_global(&self, global: &Global) -> bool {
-        let g = self.generator;
+        let generator = self.generator;
         if global.type.is_unknown() { return true; }
 
         let name = global.name.value;
 
-        let blank_generics = g.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: g.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: g.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
-        blank_generics.self_type = Type::Self.to_ptr(g.allocator);
+        let blank_generics = generator.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: generator.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: generator.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+        blank_generics.self_type = Type::Self.to_ptr(generator.allocator);
 
-        let func_ctx = FunctionContext::new_const(g.allocator);
-        g.function_context = &func_ctx;
+        let func_ctx = FunctionContext::new_const(generator.allocator);
+        generator.function_context = &func_ctx;
 
-        let primitive_includes = HashSet<str>::new(g.allocator);
+        let primitive_includes = HashSet<str>::new(generator.allocator);
         defer primitive_includes.release();
-        g.collect_primitive_includes(&global.type, blank_generics, &primitive_includes);
+        generator.collect_primitive_includes(&global.type, blank_generics, &primitive_includes);
 
-        let header = g.make_path(global.module, name, ".h");
+        let header = generator.make_path(global.module, name, ".h");
         let header_tmp: *const char = tmpnam(0);
         let header_file: *FILE = fopen(header_tmp, "w+");
         if header_file == null { perror(header.c_str()); return false; }
 
         fprintf(header_file, "#ifndef PAVE_");
-        g.write_str_title(header_file, name);
+        generator.write_str_title(header_file, name);
         fprintf(header_file, "\n#define PAVE_");
-        g.write_str_title(header_file, name);
+        generator.write_str_title(header_file, name);
         fprintf(header_file, "\n\n");
 
         for *inc in primitive_includes {
@@ -805,42 +805,42 @@ impl FileGenerator {
 
         fprintf(header_file, "\nextern ");
         if global.is_const { fprintf(header_file, "const "); }
-        g.write_variable_decl(header_file, name, &global.type, blank_generics);
+        generator.write_variable_decl(header_file, name, &global.type, blank_generics);
         fprintf(header_file, ";\n");
 
         fprintf(header_file, "\n#endif\n");
 
-        g.overwrite_if_different(header.c_str(), header_file);
+        generator.overwrite_if_different(header.c_str(), header_file);
         fclose(header_file);
         remove(header_tmp);
 
-        let code = g.make_path(global.module, name, ".c");
+        let code = generator.make_path(global.module, name, ".c");
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
         if code_file == null { perror(code.c_str()); return false; }
 
-        g.write_includes_raw(code_file, &global.module.includes);
+        generator.write_includes_raw(code_file, &global.module.includes);
 
-        let header_rel = g.make_rel_path(global.module, name, "");
+        let header_rel = generator.make_rel_path(global.module, name, "");
         fprintf(code_file, "#include <");
-        g.write_str(code_file, header_rel.as_str());
+        generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ".h>\n\n");
 
         if global.is_const { fprintf(code_file, "const "); }
-        g.write_variable_decl(code_file, name, &global.type, blank_generics);
+        generator.write_variable_decl(code_file, name, &global.type, blank_generics);
         if global.value != null {
             fprintf(code_file, " = ");
-            ExpressionWriter { generator: g }.write_expression(code_file, global.value, blank_generics);
+            ExpressionWriter { generator: generator }.write_expression(code_file, global.value, blank_generics);
         }
         fprintf(code_file, ";\n");
 
-        g.overwrite_if_different(code.c_str(), code_file);
+        generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
 
-        g.code_files.append(code);
+        generator.code_files.append(code);
 
-        g.function_context = null;
+        generator.function_context = null;
 
         return true;
     }
@@ -858,7 +858,7 @@ impl FileGenerator {
     }
 
     fn collect_tests(&self, children: &HashMap<str, &Namespace>, func_names: &Array<str>, descriptions: &Array<str>, header_paths: &Array<str>, module_paths: &Array<str>) {
-        let g = self.generator;
+        let generator = self.generator;
 
         for (_, namespace) in children {
             for (module_name, module) in namespace.modules {
@@ -867,10 +867,10 @@ impl FileGenerator {
                     descriptions.append(desc.slice(1, desc.length - 1));
                     func_names.append(test_info.func_name);
 
-                    let header_path = g.make_rel_path(module, test_info.func_name, ".test.h");
+                    let header_path = generator.make_rel_path(module, test_info.func_name, ".test.h");
                     header_paths.append(header_path.as_str());
 
-                    let module_path = g.make_rel_path(module, module_name, "");
+                    let module_path = generator.make_rel_path(module, module_name, "");
                     module_paths.append(module_path.as_str());
                 }
             }
@@ -880,8 +880,8 @@ impl FileGenerator {
     }
 
     fn generate_test_runner(&self, children: &HashMap<str, &Namespace>) {
-        let g = self.generator;
-        let allocator = g.allocator;
+        let generator = self.generator;
+        let allocator = generator.allocator;
 
         let func_names = Array<str>::new(allocator);
         let descriptions = Array<str>::new(allocator);
@@ -893,7 +893,7 @@ impl FileGenerator {
         if func_names.length == 0 { return; }
 
         let runner_path = String::new(allocator);
-        runner_path.append(g.path);
+        runner_path.append(generator.path);
         runner_path.append("/main.test.c");
 
         let runner_tmp: *const char = tmpnam(0);
@@ -906,7 +906,7 @@ impl FileGenerator {
         while i < header_paths.length {
             let hp = header_paths.data[i];
             fprintf(runner_file, "#include <");
-            g.write_str(runner_file, hp);
+            generator.write_str(runner_file, hp);
             fprintf(runner_file, ">\n");
             i += 1;
         }
@@ -922,12 +922,12 @@ impl FileGenerator {
             let module_path = module_paths.data[i];
 
             fprintf(runner_file, "    fputs(\"[TEST] ");
-            g.write_str(runner_file, module_path);
+            generator.write_str(runner_file, module_path);
             fprintf(runner_file, ": ");
-            g.write_str(runner_file, desc);
+            generator.write_str(runner_file, desc);
             fprintf(runner_file, "\\n\", stdout);\n");
             fprintf(runner_file, "    ");
-            g.write_str(runner_file, func_name);
+            generator.write_str(runner_file, func_name);
             fprintf(runner_file, "();\n");
             fprintf(runner_file, "    passed++;\n\n");
 
@@ -938,18 +938,18 @@ impl FileGenerator {
         fprintf(runner_file, "    return failed > 0 ? 1 : 0;\n");
         fprintf(runner_file, "}\n");
 
-        g.overwrite_if_different(runner_path.c_str(), runner_file);
+        generator.overwrite_if_different(runner_path.c_str(), runner_file);
         fclose(runner_file);
         remove(runner_tmp);
 
-        g.code_files.append(runner_path);
+        generator.code_files.append(runner_path);
     }
 
     fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {
-        let g = self.generator;
+        let generator = self.generator;
 
         for (name, namespace) in children {
-            let path = String::new(g.allocator);
+            let path = String::new(generator.allocator);
             path.append(base_path);
             path.append("/");
             path.append(name);
