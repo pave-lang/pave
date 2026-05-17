@@ -75,7 +75,7 @@ impl Namespace {
         path.append(name);
         path.append(".pave");
 
-        if !path_exists(path.c_str()) {
+        if path_exists(path.c_str()) == 0 {
             path.array.length -= 5;
             path.append(".pv");
         }

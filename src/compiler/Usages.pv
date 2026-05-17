@@ -314,7 +314,7 @@ impl Usages {
 
                 match func_info.parent {
                     FunctionParent::None => {
-                        is_type = (func_info.type == FunctionType::Standard || func_info.type == FunctionType::Coroutine) && func_info.name != 0;
+                        is_type = (func_info.type == FunctionType::Standard || func_info.type == FunctionType::Coroutine) && func_info.name != null;
                     },
                     FunctionParent::Primitive(primitive_info, _, _) => {
                         self.add_type(&Type::Primitive(primitive_info), generic_map);
@@ -442,7 +442,7 @@ impl Usages {
 
         self.add_type(&sequence.element, generic_map);
 
-        if self.std_namespace {
+        if self.std_namespace != null {
             let iter_type = self.std_namespace.find_type("Iter");
             let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
             let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1, allocator: self.allocator, capacity: 0 });
@@ -657,7 +657,7 @@ impl Usages {
                     self.process_block(statement.block, generic_map);
 
                     for else_statement in statement.else_statements {
-                        if else_statement.expression { self.process_expression(else_statement.expression, generic_map); }
+                        if else_statement.expression != 0 { self.process_expression(else_statement.expression, generic_map); }
                         self.process_block(else_statement.block, generic_map);
                     }
                 },
@@ -675,7 +675,7 @@ impl Usages {
                 StatementData::ForStatement(statement) => {
                     self.process_expression(statement.expression, generic_map);
                     self.add_type(statement.iter_type, generic_map);
-                    if statement.value_type {
+                    if statement.value_type != 0 {
                         self.add_type(statement.value_type, generic_map);
                     }
 

@@ -468,7 +468,7 @@ impl Type {
     }
 
     fn is_void(&self) -> bool {
-        if let Type::Primitive(primitive_info) = self {
+        if let Type::Primitive(primitive_info) = (*self) {
             return primitive_info.is_void();
         }
 
@@ -476,10 +476,10 @@ impl Type {
     }
 
     fn is_unknown(&self) -> bool {
-        match self {
-            Type::UnknownC(_) => { return true; },
-            _ => { return false; },
+        if let Type::UnknownC(_) = (*self) {
+            return true;
         }
+        return false;
     }
 
     fn is_enum(&self) -> bool {
@@ -648,7 +648,7 @@ impl Type {
             Type::Trait(trait_info, _) => { return trait_info.module; },
             Type::Generic(_) => { return null; },
             Type::UnknownC(_) => { return null; },
-            Type::Function(func_info, _) => { if func_info.context != 0 { return func_info.context.module; } else { return null; } },
+            Type::Function(func_info, _) => { if func_info.context != null { return func_info.context.module; } else { return null; } },
             Type::CoroutineInstance(func_info, _) => { return func_info.context.module; },
             Type::Self => { return null; },
             Type::TypedefC(_) => { return null; },

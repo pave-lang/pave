@@ -293,9 +293,9 @@ impl Context {
         return check;
     }
 
-    fn expect(&self, type: TokenType) -> &Token {
+    fn expect(&self, type: TokenType) -> *Token {
         if self.pos >= self.length {
-            return 0;
+            return null;
         }
 
         let token = &self.tokens[self.pos];
@@ -306,7 +306,7 @@ impl Context {
         }
 
         self.error_expected(type);
-        return 0;
+        return null;
     }
 
     fn expect_value(&self, type: TokenType, value: *const char) -> bool {
@@ -430,7 +430,7 @@ impl Context {
             }
 
             let length = self.expect(TokenType::Number);
-            if !length { return false; }
+            if length == null { return false; }
 
             let result: usize = 0;
 
@@ -489,7 +489,7 @@ impl Context {
         }
 
         let name = self.expect(TokenType::Identifier);
-        if name == 0 { return false; }
+        if name == null { return false; }
 
         if name.eq(TokenType::Identifier, "Self") {
             *type = Type::Self;
@@ -520,7 +520,7 @@ impl Context {
 
             if self.check_next(TokenType::Symbol, "::") {
                 let typedef_name = self.expect(TokenType::Identifier);
-                if typedef_name == 0 { return false; }
+                if typedef_name == null { return false; }
 
                 let found = false;
                 for *trait_info in generic_ref.traits {
@@ -586,7 +586,7 @@ impl Context {
         if !self.expect_value(TokenType::Symbol, "::") { return false; }
 
         let name = self.expect(TokenType::Identifier);
-        if name == 0 { return false; }
+        if name == null { return false; }
 
         let find_type = parent.types.find(&name.value);
         if find_type == null {
@@ -619,7 +619,7 @@ impl Context {
         }
 
         let name = self.expect(TokenType::Identifier);
-        if name == 0 { return false; }
+        if name == null { return false; }
 
         let find_type = parent.types.find(&name.value);
         if find_type == null {
@@ -641,7 +641,7 @@ impl Context {
 
     fn parse_type_trait(&self, type: &Type, generics: &Generics) -> bool {
         let name = self.expect(TokenType::Identifier);
-        if name == 0 { return false; }
+        if name == null { return false; }
 
         let trait_info = self.module.find_trait(name.value);
         if trait_info == 0 {

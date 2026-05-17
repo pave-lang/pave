@@ -516,7 +516,7 @@ impl ExpressionWriter {
                     },
                     Type::ClassCpp(_) => {
                         let success = g.write_type(file, type, generics);
-                        let function_mode = (arguments.length > 0) && (arguments.data[0].name == 0);
+                        let function_mode = (arguments.length > 0) && (arguments.data[0].name == null);
 
                         if function_mode {
                             fprintf(file, "(");

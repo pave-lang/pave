@@ -862,7 +862,7 @@ void Usages__process_sequence(struct Usages* self, struct Sequence* sequence) {
     Usages__add_type(self, &sequence->element, generic_map);
 
     #line 445 "src/compiler/Usages.pv"
-    if (self->std_namespace) {
+    if (self->std_namespace != 0) {
         #line 446 "src/compiler/Usages.pv"
         struct Type* iter_type = Namespace__find_type(self->std_namespace, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
         #line 447 "src/compiler/Usages.pv"
@@ -1302,7 +1302,7 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
                     struct ElseStatement* else_statement = Iter_ref_ElseStatement__value(&__iter);
 
                     #line 660 "src/compiler/Usages.pv"
-                    if (else_statement->expression) {
+                    if (else_statement->expression != 0) {
                         #line 660 "src/compiler/Usages.pv"
                         Usages__process_expression(self, else_statement->expression, generic_map);
                     }
@@ -1346,7 +1346,7 @@ void Usages__process_block(struct Usages* self, struct Block* block, struct Gene
                 #line 677 "src/compiler/Usages.pv"
                 Usages__add_type(self, statement->iter_type, generic_map);
                 #line 678 "src/compiler/Usages.pv"
-                if (statement->value_type) {
+                if (statement->value_type != 0) {
                     #line 679 "src/compiler/Usages.pv"
                     Usages__add_type(self, statement->value_type, generic_map);
                 }

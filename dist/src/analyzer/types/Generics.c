@@ -24,7 +24,7 @@ struct Generics Generics__new(struct trait_Allocator allocator) {
 #line 57 "src/analyzer/types/Generics.pv"
 bool Generics__has(struct Generics* self, struct str name) {
     #line 58 "src/analyzer/types/Generics.pv"
-    if (HashMap_str_usize__find(&self->map, &name)) {
+    if (HashMap_str_usize__find(&self->map, &name) != 0) {
         #line 58 "src/analyzer/types/Generics.pv"
         return true;
     }

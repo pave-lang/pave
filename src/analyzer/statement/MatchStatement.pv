@@ -14,7 +14,7 @@ impl MatchStatement {
         if !context.expect_value(TokenType::Keyword, "match") { return 0; }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return 0; }
+        if expression == null { return 0; }
 
         if !context.expect_value(TokenType::Symbol, "{") { return 0; }
 

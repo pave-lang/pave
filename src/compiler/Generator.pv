@@ -48,8 +48,8 @@ impl Generator {
 
         rewind(source);
 
-        let out: &FILE = fopen(file_name, "w");
-        if !out { perror("fopen"); return false; }
+        let out: *FILE = fopen(file_name, "w");
+        if out == null { perror("fopen"); return false; }
 
         let c: i32 = fgetc(source);
         while c != cast<i32>(EOF) {

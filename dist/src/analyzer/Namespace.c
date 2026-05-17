@@ -115,7 +115,7 @@ bool Namespace__add_module(struct Namespace* self, struct str name) {
     String__append(&path, (struct str){ .ptr = ".pave", .length = strlen(".pave") });
 
     #line 78 "src/analyzer/Namespace.pv"
-    if (!path_exists(String__c_str(&path))) {
+    if (path_exists(String__c_str(&path)) == 0) {
         #line 79 "src/analyzer/Namespace.pv"
         path.array.length -= 5;
         #line 80 "src/analyzer/Namespace.pv"

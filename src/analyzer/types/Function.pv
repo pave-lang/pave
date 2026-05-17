@@ -26,8 +26,8 @@ enum FunctionType {
 }
 
 struct Function {
-    name: &Token,
-    context: &Context,
+    name: *Token,
+    context: *Context,
     declaration_start: usize,
     declaration_end: usize,
     token_start: usize,
@@ -46,7 +46,7 @@ impl Function {
             context,
             generics: Generics::new(context.allocator),
             parameters: Array<Parameter>::new(context.allocator),
-            name: 0,
+            name: null,
             declaration_start: 0,
             declaration_end: 0,
             token_start: 0,
@@ -62,8 +62,8 @@ impl Function {
         return Self {
             generics: Generics::new(allocator),
             parameters: Array<Parameter>::new(allocator),
-            name: 0,
-            context: 0,
+            name: null,
+            context: null,
             declaration_start: 0,
             declaration_end: 0,
             token_start: 0,
@@ -94,7 +94,7 @@ impl Function {
         }
 
         let name = context.expect(TokenType::Identifier);
-        if name == 0 { return node; }
+        if name == null { return node; }
 
         node.declaration_start = context.pos;
 

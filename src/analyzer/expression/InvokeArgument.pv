@@ -1,6 +1,6 @@
 use analyzer
 
 struct InvokeArgument {
-    name: &Token,
+    name: *Token,
     value: &Expression,
 }

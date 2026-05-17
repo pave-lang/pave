@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
@@ -8,6 +9,10 @@
 #include <analyzer/Block.h>
 #include <analyzer/types/Generics.h>
 #include <std/ArenaAllocator.h>
+#include <analyzer/types/Type.h>
+#include <analyzer/Token.h>
+#include <std/str.h>
+#include <analyzer/types/Primitive.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <analyzer/statement/IfStatement.h>
@@ -62,120 +67,222 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
             return 0;
         }
         #line 29 "src/analyzer/statement/IfStatement.pv"
+        switch (p.type) {
+            #line 30 "src/analyzer/statement/IfStatement.pv"
+            case MATCH_PATTERN__ENUM_VARIANT: {
+                #line 30 "src/analyzer/statement/IfStatement.pv"
+                struct Type* enum_type = p.enumvariant_value._0;
+                #line 31 "src/analyzer/statement/IfStatement.pv"
+                if (!Type__eq(&expression->return_type, enum_type)) {
+                    #line 32 "src/analyzer/statement/IfStatement.pv"
+                    Context__error_token(context, expression->token, "If let expression type does not match pattern enum type");
+                    #line 33 "src/analyzer/statement/IfStatement.pv"
+                    Context__pop_scope(context);
+                    #line 34 "src/analyzer/statement/IfStatement.pv"
+                    return 0;
+                }
+            } break;
+            #line 37 "src/analyzer/statement/IfStatement.pv"
+            default: {
+                #line 38 "src/analyzer/statement/IfStatement.pv"
+                if (!Type__is_enum(&expression->return_type)) {
+                    #line 39 "src/analyzer/statement/IfStatement.pv"
+                    Context__error_token(context, expression->token, "If let expression must be an enum (discriminated union)");
+                    #line 40 "src/analyzer/statement/IfStatement.pv"
+                    Context__pop_scope(context);
+                    #line 41 "src/analyzer/statement/IfStatement.pv"
+                    return 0;
+                }
+            } break;
+        }
+        #line 45 "src/analyzer/statement/IfStatement.pv"
         if (!Block__parse(block, context, generics, false)) {
-            #line 29 "src/analyzer/statement/IfStatement.pv"
+            #line 45 "src/analyzer/statement/IfStatement.pv"
             Context__pop_scope(context);
-            #line 29 "src/analyzer/statement/IfStatement.pv"
+            #line 45 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 30 "src/analyzer/statement/IfStatement.pv"
+        #line 46 "src/analyzer/statement/IfStatement.pv"
         Context__pop_scope(context);
     } else {
-        #line 32 "src/analyzer/statement/IfStatement.pv"
+        #line 48 "src/analyzer/statement/IfStatement.pv"
         expression = Expression__parse(context, generics);
-        #line 33 "src/analyzer/statement/IfStatement.pv"
+        #line 49 "src/analyzer/statement/IfStatement.pv"
         if (expression == 0) {
-            #line 33 "src/analyzer/statement/IfStatement.pv"
+            #line 49 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 34 "src/analyzer/statement/IfStatement.pv"
+        #line 50 "src/analyzer/statement/IfStatement.pv"
+        switch (expression->return_type.type) {
+            #line 51 "src/analyzer/statement/IfStatement.pv"
+            case TYPE__PRIMITIVE: {
+                #line 51 "src/analyzer/statement/IfStatement.pv"
+                struct Primitive* prim = expression->return_type.primitive_value;
+                #line 52 "src/analyzer/statement/IfStatement.pv"
+                if (!str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                    #line 53 "src/analyzer/statement/IfStatement.pv"
+                    Context__error_token(context, expression->token, "If condition must be a bool expression");
+                    #line 54 "src/analyzer/statement/IfStatement.pv"
+                    return 0;
+                }
+            } break;
+            #line 57 "src/analyzer/statement/IfStatement.pv"
+            default: {
+                #line 58 "src/analyzer/statement/IfStatement.pv"
+                Context__error_token(context, expression->token, "If condition must be a bool expression");
+                #line 59 "src/analyzer/statement/IfStatement.pv"
+                return 0;
+            } break;
+        }
+        #line 62 "src/analyzer/statement/IfStatement.pv"
         if (!Block__parse(block, context, generics, true)) {
-            #line 34 "src/analyzer/statement/IfStatement.pv"
+            #line 62 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
     }
 
-    #line 37 "src/analyzer/statement/IfStatement.pv"
+    #line 65 "src/analyzer/statement/IfStatement.pv"
     struct Array_ElseStatement else_statements = Array_ElseStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-    #line 38 "src/analyzer/statement/IfStatement.pv"
+    #line 66 "src/analyzer/statement/IfStatement.pv"
     struct Expression* else_expression = 0;
-    #line 39 "src/analyzer/statement/IfStatement.pv"
+    #line 67 "src/analyzer/statement/IfStatement.pv"
     struct MatchPattern* else_pattern = 0;
-    #line 40 "src/analyzer/statement/IfStatement.pv"
+    #line 68 "src/analyzer/statement/IfStatement.pv"
     struct Block* else_block = 0;
-    #line 41 "src/analyzer/statement/IfStatement.pv"
+    #line 69 "src/analyzer/statement/IfStatement.pv"
     bool else_end = false;
 
-    #line 43 "src/analyzer/statement/IfStatement.pv"
+    #line 71 "src/analyzer/statement/IfStatement.pv"
     while (!else_end && Context__check_next(context, TOKEN_TYPE__KEYWORD, "else")) {
-        #line 44 "src/analyzer/statement/IfStatement.pv"
+        #line 72 "src/analyzer/statement/IfStatement.pv"
         else_expression = 0;
-        #line 45 "src/analyzer/statement/IfStatement.pv"
+        #line 73 "src/analyzer/statement/IfStatement.pv"
         else_pattern = 0;
 
-        #line 47 "src/analyzer/statement/IfStatement.pv"
+        #line 75 "src/analyzer/statement/IfStatement.pv"
         if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "if")) {
-            #line 48 "src/analyzer/statement/IfStatement.pv"
+            #line 76 "src/analyzer/statement/IfStatement.pv"
             if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "let")) {
-                #line 49 "src/analyzer/statement/IfStatement.pv"
+                #line 77 "src/analyzer/statement/IfStatement.pv"
                 else_block = Block__new_ptr(context);
-                #line 50 "src/analyzer/statement/IfStatement.pv"
+                #line 78 "src/analyzer/statement/IfStatement.pv"
                 Context__push_scope(context, else_block);
-                #line 51 "src/analyzer/statement/IfStatement.pv"
+                #line 79 "src/analyzer/statement/IfStatement.pv"
                 struct MatchPattern ep = (struct MatchPattern) { .type = MATCH_PATTERN__DEFAULT };
-                #line 52 "src/analyzer/statement/IfStatement.pv"
+                #line 80 "src/analyzer/statement/IfStatement.pv"
                 if (!MatchPattern__parse(context, generics, &ep)) {
-                    #line 52 "src/analyzer/statement/IfStatement.pv"
+                    #line 80 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 52 "src/analyzer/statement/IfStatement.pv"
+                    #line 80 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 53 "src/analyzer/statement/IfStatement.pv"
+                #line 81 "src/analyzer/statement/IfStatement.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "=")) {
-                    #line 53 "src/analyzer/statement/IfStatement.pv"
+                    #line 81 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 53 "src/analyzer/statement/IfStatement.pv"
+                    #line 81 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 54 "src/analyzer/statement/IfStatement.pv"
+                #line 82 "src/analyzer/statement/IfStatement.pv"
                 else_pattern = ArenaAllocator__store_MatchPattern(context->allocator, &ep);
-                #line 55 "src/analyzer/statement/IfStatement.pv"
+                #line 83 "src/analyzer/statement/IfStatement.pv"
                 else_expression = Expression__parse(context, generics);
-                #line 56 "src/analyzer/statement/IfStatement.pv"
+                #line 84 "src/analyzer/statement/IfStatement.pv"
                 if (else_expression == 0) {
-                    #line 56 "src/analyzer/statement/IfStatement.pv"
+                    #line 84 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 56 "src/analyzer/statement/IfStatement.pv"
+                    #line 84 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 57 "src/analyzer/statement/IfStatement.pv"
+                #line 85 "src/analyzer/statement/IfStatement.pv"
+                switch (ep.type) {
+                    #line 86 "src/analyzer/statement/IfStatement.pv"
+                    case MATCH_PATTERN__ENUM_VARIANT: {
+                        #line 86 "src/analyzer/statement/IfStatement.pv"
+                        struct Type* enum_type = ep.enumvariant_value._0;
+                        #line 87 "src/analyzer/statement/IfStatement.pv"
+                        if (!Type__eq(&else_expression->return_type, enum_type)) {
+                            #line 88 "src/analyzer/statement/IfStatement.pv"
+                            Context__error_token(context, else_expression->token, "If let expression type does not match pattern enum type");
+                            #line 89 "src/analyzer/statement/IfStatement.pv"
+                            Context__pop_scope(context);
+                            #line 90 "src/analyzer/statement/IfStatement.pv"
+                            return 0;
+                        }
+                    } break;
+                    #line 93 "src/analyzer/statement/IfStatement.pv"
+                    default: {
+                        #line 94 "src/analyzer/statement/IfStatement.pv"
+                        if (!Type__is_enum(&else_expression->return_type)) {
+                            #line 95 "src/analyzer/statement/IfStatement.pv"
+                            Context__error_token(context, else_expression->token, "If let expression must be an enum (discriminated union)");
+                            #line 96 "src/analyzer/statement/IfStatement.pv"
+                            Context__pop_scope(context);
+                            #line 97 "src/analyzer/statement/IfStatement.pv"
+                            return 0;
+                        }
+                    } break;
+                }
+                #line 101 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, false)) {
-                    #line 57 "src/analyzer/statement/IfStatement.pv"
+                    #line 101 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 57 "src/analyzer/statement/IfStatement.pv"
+                    #line 101 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 58 "src/analyzer/statement/IfStatement.pv"
+                #line 102 "src/analyzer/statement/IfStatement.pv"
                 Context__pop_scope(context);
             } else {
-                #line 60 "src/analyzer/statement/IfStatement.pv"
+                #line 104 "src/analyzer/statement/IfStatement.pv"
                 else_expression = Expression__parse(context, generics);
-                #line 61 "src/analyzer/statement/IfStatement.pv"
+                #line 105 "src/analyzer/statement/IfStatement.pv"
                 if (else_expression == 0) {
-                    #line 61 "src/analyzer/statement/IfStatement.pv"
+                    #line 105 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 62 "src/analyzer/statement/IfStatement.pv"
+                #line 106 "src/analyzer/statement/IfStatement.pv"
+                switch (else_expression->return_type.type) {
+                    #line 107 "src/analyzer/statement/IfStatement.pv"
+                    case TYPE__PRIMITIVE: {
+                        #line 107 "src/analyzer/statement/IfStatement.pv"
+                        struct Primitive* prim = else_expression->return_type.primitive_value;
+                        #line 108 "src/analyzer/statement/IfStatement.pv"
+                        if (!str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                            #line 109 "src/analyzer/statement/IfStatement.pv"
+                            Context__error_token(context, else_expression->token, "If condition must be a bool expression");
+                            #line 110 "src/analyzer/statement/IfStatement.pv"
+                            return 0;
+                        }
+                    } break;
+                    #line 113 "src/analyzer/statement/IfStatement.pv"
+                    default: {
+                        #line 114 "src/analyzer/statement/IfStatement.pv"
+                        Context__error_token(context, else_expression->token, "If condition must be a bool expression");
+                        #line 115 "src/analyzer/statement/IfStatement.pv"
+                        return 0;
+                    } break;
+                }
+                #line 118 "src/analyzer/statement/IfStatement.pv"
                 else_block = Block__new_ptr(context);
-                #line 63 "src/analyzer/statement/IfStatement.pv"
+                #line 119 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, true)) {
-                    #line 63 "src/analyzer/statement/IfStatement.pv"
+                    #line 119 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             }
         } else {
-            #line 66 "src/analyzer/statement/IfStatement.pv"
+            #line 122 "src/analyzer/statement/IfStatement.pv"
             else_end = true;
-            #line 67 "src/analyzer/statement/IfStatement.pv"
+            #line 123 "src/analyzer/statement/IfStatement.pv"
             else_block = Block__new_ptr(context);
-            #line 68 "src/analyzer/statement/IfStatement.pv"
+            #line 124 "src/analyzer/statement/IfStatement.pv"
             if (!Block__parse(else_block, context, generics, true)) {
-                #line 68 "src/analyzer/statement/IfStatement.pv"
+                #line 124 "src/analyzer/statement/IfStatement.pv"
                 return 0;
             }
         }
 
-        #line 71 "src/analyzer/statement/IfStatement.pv"
+        #line 127 "src/analyzer/statement/IfStatement.pv"
         Array_ElseStatement__append(&else_statements, (struct ElseStatement) {
             .pattern = else_pattern,
             .expression = else_expression,
@@ -183,7 +290,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
         });
     }
 
-    #line 78 "src/analyzer/statement/IfStatement.pv"
+    #line 134 "src/analyzer/statement/IfStatement.pv"
     return ArenaAllocator__store_IfStatement(context->allocator, (struct IfStatement[]){(struct IfStatement) {
         .pattern = pattern,
         .expression = expression,

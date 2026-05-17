@@ -14,13 +14,13 @@ impl NamespacePath {
         self.root = context.check_next(TokenType::Symbol, "::");
 
         let part = context.expect(TokenType::Identifier);
-        if part == 0 { return false; }
+        if part == null { return false; }
 
         self.parts.append(part);
 
         while context.check_next(TokenType::Symbol, "::") {
             part = context.expect(TokenType::Identifier);
-            if part == 0 { return false; }
+            if part == null { return false; }
             self.parts.append(part);
         }
 

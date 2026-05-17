@@ -12,7 +12,7 @@ impl WhileStatement {
         if !context.expect_value(TokenType::Keyword, "while") { return null; }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return null; }
+        if expression == null { return null; }
 
         let block = Block::new_ptr(context);
         block.is_loop = true;

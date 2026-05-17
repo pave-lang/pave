@@ -26,11 +26,39 @@ impl IfStatement {
             pattern = context.allocator.store(&p);
             expression = Expression::parse(context, generics);
             if expression == 0 { context.pop_scope(); return 0; }
+            match p {
+                MatchPattern::EnumVariant(enum_type, _, _) => {
+                    if !expression.return_type.eq(enum_type) {
+                        context.error_token(expression.token, "If let expression type does not match pattern enum type");
+                        context.pop_scope();
+                        return 0;
+                    }
+                },
+                _ => {
+                    if !expression.return_type.is_enum() {
+                        context.error_token(expression.token, "If let expression must be an enum (discriminated union)");
+                        context.pop_scope();
+                        return 0;
+                    }
+                },
+            }
             if !block.parse(context, generics, false) { context.pop_scope(); return 0; }
             context.pop_scope();
         } else {
             expression = Expression::parse(context, generics);
             if expression == 0 { return 0; }
+            match expression.return_type {
+                Type::Primitive(prim) => {
+                    if !prim.name.eq("bool") {
+                        context.error_token(expression.token, "If condition must be a bool expression");
+                        return 0;
+                    }
+                },
+                _ => {
+                    context.error_token(expression.token, "If condition must be a bool expression");
+                    return 0;
+                },
+            }
             if !block.parse(context, generics, true) { return 0; }
         }
 
@@ -54,11 +82,39 @@ impl IfStatement {
                     else_pattern = context.allocator.store(&ep);
                     else_expression = Expression::parse(context, generics);
                     if else_expression == 0 { context.pop_scope(); return 0; }
+                    match ep {
+                        MatchPattern::EnumVariant(enum_type, _, _) => {
+                            if !else_expression.return_type.eq(enum_type) {
+                                context.error_token(else_expression.token, "If let expression type does not match pattern enum type");
+                                context.pop_scope();
+                                return 0;
+                            }
+                        },
+                        _ => {
+                            if !else_expression.return_type.is_enum() {
+                                context.error_token(else_expression.token, "If let expression must be an enum (discriminated union)");
+                                context.pop_scope();
+                                return 0;
+                            }
+                        },
+                    }
                     if !else_block.parse(context, generics, false) { context.pop_scope(); return 0; }
                     context.pop_scope();
                 } else {
                     else_expression = Expression::parse(context, generics);
                     if else_expression == 0 { return 0; }
+                    match else_expression.return_type {
+                        Type::Primitive(prim) => {
+                            if !prim.name.eq("bool") {
+                                context.error_token(else_expression.token, "If condition must be a bool expression");
+                                return 0;
+                            }
+                        },
+                        _ => {
+                            context.error_token(else_expression.token, "If condition must be a bool expression");
+                            return 0;
+                        },
+                    }
                     else_block = Block::new_ptr(context);
                     if !else_block.parse(context, generics, true) { return 0; }
                 }

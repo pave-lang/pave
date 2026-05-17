@@ -28,7 +28,7 @@ impl Processor {
         let c: char = 0;
         let newlines: usize = 0;
         while pos < MAX_LENGTH - 1 {
-            if !read_pipe(pipe, &c, 1) { return false; }
+            if read_pipe(pipe, &c, 1) == 0 { return false; }
 
             buf[pos] = c;
             pos += 1;
@@ -39,7 +39,7 @@ impl Processor {
                     buf[pos] = '\0';
                     
                     let cl = strstr(buf, "Content-Length:");
-                    if cl { *content_length = strtoul(cl + 15, 0, 10); }
+                    if cl != null { *content_length = strtoul(cl + 15, 0, 10); }
 
                     return true;
                 }
@@ -59,7 +59,7 @@ impl Processor {
         content.ensure_can_hold(content_length);
 
         content.array.length = content_length;
-        read_pipe(self.pipe_read, content.array.data, content_length);
+        if read_pipe(self.pipe_read, content.array.data, content_length) == 0 { return String::new(self.allocator); }
 
         fprintf(stderr, "Receved: %s\n\n", content.c_str());
 

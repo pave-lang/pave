@@ -131,7 +131,7 @@ bool Generator__overwrite_if_different(struct Generator* self, char const* file_
     #line 51 "src/compiler/Generator.pv"
     FILE* out = fopen(file_name, "w");
     #line 52 "src/compiler/Generator.pv"
-    if (!out) {
+    if (out == 0) {
         #line 52 "src/compiler/Generator.pv"
         perror("fopen");
         #line 52 "src/compiler/Generator.pv"

@@ -2,7 +2,7 @@ use std
 use analyzer
 
 struct Trait {
-    name: &Token,
+    name: *Token,
     module: &Module,
     token_start: usize,
     token_end: usize,
@@ -21,7 +21,7 @@ impl Trait {
             generics: Generics::new(context.allocator),
             functions: HashMap<str, Function>::new(context.allocator),
             typedefs: HashMap<str, usize>::new(context.allocator),
-            name: 0,
+            name: null,
             token_start: 0,
             token_end: 0,
             type_self: Type::Primitive(0),
@@ -36,7 +36,7 @@ impl Trait {
         if !context.expect_value(TokenType::Keyword, "trait") { return node; }
 
         let name = context.expect(TokenType::Identifier);
-        if name == 0 { return node; }
+        if name == null { return node; }
 
         if context.check_value(TokenType::Symbol, "<") && !generics.parse(context) { return node; }
 
@@ -59,7 +59,7 @@ impl Trait {
             if context.check_value(TokenType::Keyword, "typedef") {
                 context.next_token();
                 let typedef_name = context.expect(TokenType::Identifier);
-                if typedef_name == 0 { return false; }
+                if typedef_name == null { return false; }
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
 
                 let generic: Generic = Generic::new(context.allocator);
@@ -69,7 +69,7 @@ impl Trait {
                 self.typedefs.insert(typedef_name.value, index);
             } else {
                 let func_info: Function = Function::parse_optional_body(context);
-                if func_info.name == 0 { return false; }
+                if func_info.name == null { return false; }
 
                 func_info.parent = parent;
 

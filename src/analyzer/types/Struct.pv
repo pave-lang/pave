@@ -49,7 +49,7 @@ impl Struct {
         if !context.expect_value(TokenType::Keyword, "struct") { return node; }
 
         let name = context.expect(TokenType::Identifier);
-        if name == 0 { return node; }
+        if name == null { return node; }
 
         node.token_start = context.pos;
 
@@ -104,11 +104,11 @@ impl Struct {
 
         while context.pos < self.token_end && !context.check_value(TokenType::Symbol, "}") {
             let name = context.expect(TokenType::Identifier);
-            if name == 0 { return false; }
+            if name == null { return false; }
 
             if !context.expect_value(TokenType::Symbol, ":") { return false; }
 
-            let type: Type = self.module.root.type_void;
+            let type = self.module.root.type_void;
             if !context.parse_type(&type, &self.generics) { return false; }
 
             let default_token_start: usize = 0;
@@ -147,7 +147,7 @@ impl Struct {
                 _ => {},
             }
 
-            if !self.fields.insert(name.value, field) { return false; }
+            self.fields.insert(name.value, field);
 
             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
                 context.expect_value(TokenType::Symbol, "}");
@@ -188,7 +188,7 @@ impl Struct {
                 default_token_start: 0,
             };
 
-            if !self.fields.insert(name_str, field) { return false; }
+            self.fields.insert(name_str, field);
 
             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                 context.expect_value(TokenType::Symbol, ")");

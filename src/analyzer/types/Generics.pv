@@ -19,7 +19,7 @@ impl Generic {
 
         if context.check_next(TokenType::Symbol, ":") {
             let name = context.expect(TokenType::Identifier);
-            if name == 0 { return false; }
+            if name == null { return false; }
 
             let trait_info = module.find_trait(name.value);
             if trait_info == 0 { context.error_token(name, "Unable to find trait"); return false; }
@@ -27,7 +27,7 @@ impl Generic {
 
             while context.check_next(TokenType::Symbol, "+") {
                 let name = context.expect(TokenType::Identifier);
-                if name == 0 { return false; }
+                if name == null { return false; }
 
                 let trait_info = module.find_trait(name.value);
                 if trait_info == 0 { context.error_token(name, "Unable to find trait"); return false; }
@@ -55,7 +55,7 @@ impl Generics {
     }
 
     fn has(&self, name: str) -> bool {
-        if self.map.find(&name) { return true; }
+        if self.map.find(&name) != null { return true; }
         if self.parent != null && self.parent.has(name) { return true; }
 
         return false;

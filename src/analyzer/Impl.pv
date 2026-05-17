@@ -27,7 +27,7 @@ impl ImplConst {
 
         if context.check_next(TokenType::Symbol, "=") {
             let expression = Expression::parse(context, &generics);
-            if expression == 0 { return false; }
+            if expression == null { return false; }
 
             if type == 0 {
                 type = &expression.return_type;
@@ -164,7 +164,7 @@ impl Impl {
             if context.check_value(TokenType::Keyword, "typedef") {
                 context.next_token();
                 let typedef_name = context.expect(TokenType::Identifier);
-                if typedef_name == 0 { return false; }
+                if typedef_name == null { return false; }
                 if !context.expect_value(TokenType::Symbol, "=") { return false; }
                 let token_start = context.pos;
                 while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
@@ -176,7 +176,7 @@ impl Impl {
             } else if context.check_value(TokenType::Keyword, "const") {
                 context.next_token();
                 let const_name = context.expect(TokenType::Identifier);
-                if const_name == 0 { return false; }
+                if const_name == null { return false; }
 
                 let token_start = context.pos;
                 while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
@@ -201,7 +201,7 @@ impl Impl {
             } else {
                 let func_info: Function = Function::parse(context);
                 func_info.parent = parent;
-                if func_info.name == 0 { return false; }
+                if func_info.name == null { return false; }
 
                 self.functions.insert(func_info.name.value, func_info);
 

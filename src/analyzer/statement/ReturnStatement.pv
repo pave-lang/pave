@@ -27,7 +27,7 @@ impl ReturnStatement {
         }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return null; }
+        if expression == null { return null; }
         if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
         expression.validate_type(context, &context.function.return_type, true);

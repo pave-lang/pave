@@ -7,7 +7,7 @@ impl Expression {
     fn parse_enum(context: &Context, token: &Token, enum_type: &Type, generics: &Generics) -> &Expression {
         if context.check_next(TokenType::Symbol, "::") {
             let variant_name = context.expect(TokenType::Identifier);
-            if variant_name == 0 { return 0; }
+            if variant_name == null { return 0; }
 
             let variant_result = Expression::get_enum_variant(context, enum_type, variant_name);
 
@@ -29,9 +29,9 @@ impl Expression {
 
                     while !context.check_value(TokenType::Symbol, ")") {
                         let argument = Expression::parse(context, generics);
-                        if argument == 0 { return 0; }
+                        if argument == null { return 0; }
 
-                        arguments.append(InvokeArgument { name: 0, value: argument });
+                        arguments.append(InvokeArgument { name: null, value: argument });
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                             context.expect_value(TokenType::Symbol, ")");
@@ -57,9 +57,9 @@ impl Expression {
 
                         while !context.check_value(TokenType::Symbol, ")") {
                             let argument = Expression::parse(context, generics);
-                            if argument == 0 { return 0; }
+                            if argument == null { return 0; }
 
-                            arguments.append(InvokeArgument { name: 0, value: argument });
+                            arguments.append(InvokeArgument { name: null, value: argument });
 
                             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                 context.expect_value(TokenType::Symbol, ")");
@@ -73,7 +73,7 @@ impl Expression {
 
                         while !context.check_value(TokenType::Symbol, "}") {
                             let name = context.expect(TokenType::Identifier);
-                            if name == 0 { return 0; }
+                            if name == null { return 0; }
 
                             let value: &Expression = 0;
                             if context.check_next(TokenType::Symbol, ":") {
@@ -134,7 +134,7 @@ impl Expression {
     fn parse_struct(context: &Context, token: &Token, struct_type: &Type, generics: &Generics) -> &Expression {
         if context.check_next(TokenType::Symbol, "::") {
             let member = context.expect(TokenType::Identifier);
-            if member == 0 { return 0; }
+            if member == null { return 0; }
 
             let member_type = Expression::get_member_type(context, struct_type, member, true);
             if member_type == 0 { return 0; }
@@ -158,9 +158,9 @@ impl Expression {
 
                 while !context.check_value(TokenType::Symbol, ")") {
                     let argument = Expression::parse(context, generics);
-                    if argument == 0 { return 0; }
+                    if argument == null { return 0; }
 
-                    arguments.append(InvokeArgument { name: 0, value: argument });
+                    arguments.append(InvokeArgument { name: null, value: argument });
 
                     if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                         context.expect_value(TokenType::Symbol, ")");
@@ -183,7 +183,7 @@ impl Expression {
 
             while !context.check_value(TokenType::Symbol, "}") {
                 let name = context.expect(TokenType::Identifier);
-                if name == 0 { return 0; }
+                if name == null { return 0; }
 
                 let value: &Expression = 0;
                 if context.check_next(TokenType::Symbol, ":") {
@@ -239,7 +239,7 @@ impl Expression {
                                 let default_expr = Expression::parse(struct_context, &struct_info.generics);
                                 struct_context.pos = saved_pos;
 
-                                if default_expr != 0 {
+                                if default_expr != null {
                                     fields.append(InvokeArgument { name: bucket.value.name, value: default_expr });
                                 }
                             }
@@ -269,7 +269,7 @@ impl Expression {
                 name_token.value = name_str;
 
                 let value = Expression::parse(context, generics);
-                if value == 0 { return 0; }
+                if value == null { return 0; }
 
                 fields.append(InvokeArgument {
                     name: context.allocator.store(&name_token),
@@ -299,7 +299,7 @@ impl Expression {
 
             while !context.check_value(TokenType::Symbol, "}") {
                 let name = context.expect(TokenType::Identifier);
-                if name == 0 { return 0; }
+                if name == null { return 0; }
 
                 let value: &Expression = 0;
                 if context.check_next(TokenType::Symbol, ":") {
@@ -334,9 +334,9 @@ impl Expression {
 
             while !context.check_value(TokenType::Symbol, ")") {
                 let argument = Expression::parse(context, generics);
-                if argument == 0 { return 0; }
+                if argument == null { return 0; }
 
-                arguments.append(InvokeArgument { name: 0, value: argument });
+                arguments.append(InvokeArgument { name: null, value: argument });
 
                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                     context.expect_value(TokenType::Symbol, ")");
@@ -364,13 +364,13 @@ impl Expression {
             }
 
             let expression = Expression::parse(context, generics);
-            if expression == 0 { return 0; }
+            if expression == null { return 0; }
 
             let indirect = Indirect::new_pointer(context.allocator, expression.return_type);
             return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::New(placement, expression)), &Type::Indirect(indirect));
         } else if context.check_next(TokenType::Identifier, "delete") {
             let expression = Expression::parse(context, generics);
-            if expression == 0 { return 0; }
+            if expression == null { return 0; }
 
             return Expression::make(context.allocator, token, ExpressionData::CppExpression(CppExpression::Delete(expression)), &context.root.type_unknown);
         }

@@ -12,7 +12,7 @@ impl Expression {
             if prec < min_prec { break; }
 
             let operator = context.expect(TokenType::Symbol);
-            if operator == 0 { return 0; }
+            if operator == null { return 0; }
 
             let rhs = Expression::parse_primary(context, generics);
             if rhs == 0 { return 0; }
@@ -114,8 +114,8 @@ impl Expression {
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
-                    arguments.append(InvokeArgument { name: 0, value: lhs });
-                    arguments.append(InvokeArgument { name: 0, value: rhs });
+                    arguments.append(InvokeArgument { name: null, value: lhs });
+                    arguments.append(InvokeArgument { name: null, value: rhs });
 
                     return Expression::make_type_function_call(context, token, func_type, arguments, null);
                 }
@@ -138,8 +138,8 @@ impl Expression {
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
-                    arguments.append(InvokeArgument { name: 0, value: lhs });
-                    arguments.append(InvokeArgument { name: 0, value: rhs });
+                    arguments.append(InvokeArgument { name: null, value: lhs });
+                    arguments.append(InvokeArgument { name: null, value: rhs });
 
                     return Expression::make_type_function_call(context, token, func_type, arguments, null);
                 }

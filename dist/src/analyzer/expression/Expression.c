@@ -1180,62 +1180,85 @@ struct Expression* Expression__parse_if_expression(struct Context* context, stru
     }
 
     #line 588 "src/analyzer/expression/Expression.pv"
+    switch (condition->return_type.type) {
+        #line 589 "src/analyzer/expression/Expression.pv"
+        case TYPE__PRIMITIVE: {
+            #line 589 "src/analyzer/expression/Expression.pv"
+            struct Primitive* prim = condition->return_type.primitive_value;
+            #line 590 "src/analyzer/expression/Expression.pv"
+            if (!str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                #line 591 "src/analyzer/expression/Expression.pv"
+                Context__error_token(context, condition->token, "If condition must be a bool expression");
+                #line 592 "src/analyzer/expression/Expression.pv"
+                return 0;
+            }
+        } break;
+        #line 595 "src/analyzer/expression/Expression.pv"
+        default: {
+            #line 596 "src/analyzer/expression/Expression.pv"
+            Context__error_token(context, condition->token, "If condition must be a bool expression");
+            #line 597 "src/analyzer/expression/Expression.pv"
+            return 0;
+        } break;
+    }
+
+    #line 601 "src/analyzer/expression/Expression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 588 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
-
-    #line 590 "src/analyzer/expression/Expression.pv"
-    struct Expression* a = Expression__parse(context, generics);
-    #line 591 "src/analyzer/expression/Expression.pv"
-    if (a == 0) {
-        #line 591 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
-
-    #line 593 "src/analyzer/expression/Expression.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 593 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
-    #line 594 "src/analyzer/expression/Expression.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "else")) {
-        #line 594 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
-
-    #line 596 "src/analyzer/expression/Expression.pv"
-    bool is_else_if = Context__check_value(context, TOKEN_TYPE__KEYWORD, "if");
-
-    #line 598 "src/analyzer/expression/Expression.pv"
-    if (!is_else_if && !Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 599 "src/analyzer/expression/Expression.pv"
-        Context__error(context, "Expected { or else if");
-        #line 600 "src/analyzer/expression/Expression.pv"
+        #line 601 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
     #line 603 "src/analyzer/expression/Expression.pv"
-    struct Expression* b = Expression__parse(context, generics);
+    struct Expression* a = Expression__parse(context, generics);
     #line 604 "src/analyzer/expression/Expression.pv"
-    if (b == 0) {
+    if (a == 0) {
         #line 604 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
     #line 606 "src/analyzer/expression/Expression.pv"
-    if (!is_else_if && !Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 606 "src/analyzer/expression/Expression.pv"
         return 0;
     }
-
-    #line 608 "src/analyzer/expression/Expression.pv"
-    if (!Expression__validate_type(a, context, &b->return_type, false)) {
-        #line 608 "src/analyzer/expression/Expression.pv"
+    #line 607 "src/analyzer/expression/Expression.pv"
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "else")) {
+        #line 607 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 610 "src/analyzer/expression/Expression.pv"
+    #line 609 "src/analyzer/expression/Expression.pv"
+    bool is_else_if = Context__check_value(context, TOKEN_TYPE__KEYWORD, "if");
+
+    #line 611 "src/analyzer/expression/Expression.pv"
+    if (!is_else_if && !Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
+        #line 612 "src/analyzer/expression/Expression.pv"
+        Context__error(context, "Expected { or else if");
+        #line 613 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 616 "src/analyzer/expression/Expression.pv"
+    struct Expression* b = Expression__parse(context, generics);
+    #line 617 "src/analyzer/expression/Expression.pv"
+    if (b == 0) {
+        #line 617 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 619 "src/analyzer/expression/Expression.pv"
+    if (!is_else_if && !Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+        #line 619 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 621 "src/analyzer/expression/Expression.pv"
+    if (!Expression__validate_type(a, context, &b->return_type, false)) {
+        #line 621 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 623 "src/analyzer/expression/Expression.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__IF_EXPRESSION, .ifexpression_value = { ._0 = condition, ._1 = a, ._2 = b} }, &a->return_type);
 }
 

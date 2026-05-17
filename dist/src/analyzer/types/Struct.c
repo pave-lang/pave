@@ -265,10 +265,7 @@ bool Struct__fill_types_field(struct Struct* self) {
         }
 
         #line 150 "src/analyzer/types/Struct.pv"
-        if (!HashMap_str_StructField__insert(&self->fields, name->value, field)) {
-            #line 150 "src/analyzer/types/Struct.pv"
-            return false;
-        }
+        HashMap_str_StructField__insert(&self->fields, name->value, field);
 
         #line 152 "src/analyzer/types/Struct.pv"
         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
@@ -340,10 +337,7 @@ bool Struct__fill_types_tuple(struct Struct* self) {
         };
 
         #line 191 "src/analyzer/types/Struct.pv"
-        if (!HashMap_str_StructField__insert(&self->fields, name_str, field)) {
-            #line 191 "src/analyzer/types/Struct.pv"
-            return false;
-        }
+        HashMap_str_StructField__insert(&self->fields, name_str, field);
 
         #line 193 "src/analyzer/types/Struct.pv"
         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {

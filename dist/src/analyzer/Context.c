@@ -725,7 +725,7 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         #line 432 "src/analyzer/Context.pv"
         struct Token* length = Context__expect(self, TOKEN_TYPE__NUMBER);
         #line 433 "src/analyzer/Context.pv"
-        if (!length) {
+        if (length == 0) {
             #line 433 "src/analyzer/Context.pv"
             return false;
         }

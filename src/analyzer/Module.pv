@@ -88,7 +88,7 @@ impl Module {
                 if context.check(TokenType::String) {
                     let name = context.expect(TokenType::String);
 
-                    if name == 0 {
+                    if name == null {
                         result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
@@ -97,7 +97,7 @@ impl Module {
                 } else {
                     let name = context.expect(TokenType::Identifier);
 
-                    if name == 0 {
+                    if name == null {
                         result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
@@ -109,7 +109,7 @@ impl Module {
                 if context.check(TokenType::String) {
                     let name = context.expect(TokenType::String);
 
-                    if name == 0 {
+                    if name == null {
                         result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
@@ -118,7 +118,7 @@ impl Module {
                 } else {
                     let name = context.expect(TokenType::Identifier);
 
-                    if name == 0 {
+                    if name == null {
                         result = false;
                     } else {
                         let namespace: &Namespace = self.namespace;
@@ -140,16 +140,16 @@ impl Module {
                 if !context.expect_value(TokenType::Keyword, "#include") { return false; }
 
                 let path = context.expect(TokenType::String);
-                if path == 0 { return false; }
+                if path == null { return false; }
 
                 let includes = &self.root.includes_c;
                 if self.mode_cpp { includes = &self.root.includes_cpp; } 
 
                 let include_ptr = includes.find(&path.value);
-                let include: &Include = 0;
+                let include: *Include = null;
                 if include_ptr != null { include = *include_ptr;}
 
-                if include == 0 {
+                if include == null {
                     include = Include::new(self.root, path.value, self.mode_cpp);
                     include.process();
                     includes.insert(path.value, include);
@@ -185,7 +185,7 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "trait") {
                 let node: Trait = Trait::parse(self);
 
-                if node.name == 0 {
+                if node.name == null {
                     result = false;
                 } else {
                     traits.insert(node.name.value, node);
@@ -193,7 +193,7 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "fn") || token.eq(TokenType::Keyword, "co") {
                 let node: Function = Function::parse(context);
 
-                if node.name == 0 {
+                if node.name == null {
                     result = false;
                 } else {
                     functions.insert(node.name.value, node);
@@ -202,7 +202,7 @@ impl Module {
                 if !context.expect_value(TokenType::Keyword, "test") { return false; }
 
                 let description = context.expect(TokenType::String);
-                if description == 0 { return false; }
+                if description == null { return false; }
 
                 let name_str = String::new(allocator);
 
@@ -279,7 +279,7 @@ impl Module {
                 let is_const = token.eq(TokenType::Keyword, "const");
                 context.next_token();
                 let global_name = context.expect(TokenType::Identifier);
-                if global_name == 0 { return false; }
+                if global_name == null { return false; }
 
                 let token_start = context.pos;
 

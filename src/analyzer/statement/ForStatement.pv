@@ -22,7 +22,7 @@ impl ForStatement {
         let ref = context.check_next(TokenType::Symbol, "&");
         let name = context.expect(TokenType::Identifier);
 
-        if name == 0 { return false; }
+        if name == null { return false; }
 
         variables.append(ForVariable { deref, ref, name, type: 0 });
 
@@ -123,7 +123,7 @@ impl ForStatement {
                     for_statement.iter_type = &for_statement.expression.return_type;
                 } else {
                     let args = Array<InvokeArgument>::new(context.allocator);
-                    args.append(InvokeArgument { name: 0, value: for_statement.expression });
+                    args.append(InvokeArgument { name: null, value: for_statement.expression });
 
                     for_statement.type = ForStatementType::Iter(Expression::make_type_function_call(context, iter_member, iter_member_type, args, generic_map));
                     for_statement.iter_type = Expression::get_return_type(context, iter_member_type, iter_member, generic_map);

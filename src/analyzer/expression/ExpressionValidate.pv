@@ -118,7 +118,7 @@ impl Expression {
 
                     arg.value.validate_type(context, param_type, true);
 
-                    if arg.name == 0 && param.name != 0 && !param.name.value.eq("self") && !param.name.value.eq(arg.value.token.value) {
+                    if arg.name == null && param.name != 0 && !param.name.value.eq("self") && !param.name.value.eq(arg.value.token.value) {
                         let label = String::new(context.allocator);
                         label.append(param.name.value);
                         label.append(": ");
@@ -150,7 +150,7 @@ impl Expression {
 
         if variant.names.length > 0 {
             for arg in arguments {
-                if arg.name == 0 {
+                if arg.name == null {
                     context.error_token(token, "Expected named field argument");
                     return false;
                 }

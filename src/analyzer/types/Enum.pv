@@ -54,7 +54,7 @@ impl Enum {
         if !context.expect_value(TokenType::Keyword, "enum") { return node; }
 
         let name = context.expect(TokenType::Identifier);
-        if name == 0 { return node; }
+        if name == null { return node; }
 
         node.token_start = context.pos;
 
@@ -99,7 +99,7 @@ impl Enum {
     fn parse_variant(&self) -> bool {
         let context = self.context;
         let name = context.expect(TokenType::Identifier);
-        if name == 0 { return false; }
+        if name == null { return false; }
 
         let types = Array<Type>::new(self.context.allocator);
         let names = Array<str>::new(self.context.allocator);
@@ -119,7 +119,7 @@ impl Enum {
         } else if context.check_next(TokenType::Symbol, "{") {
             while !context.check_next(TokenType::Symbol, "}") {
                 let field_name = context.expect(TokenType::Identifier);
-                if field_name == 0 { return false; }
+                if field_name == null { return false; }
 
                 if !context.expect_value(TokenType::Symbol, ":") { return false; }
 

@@ -99,7 +99,7 @@ impl MatchPattern {
         if !context.expect_value(TokenType::Symbol, "::") { return false; }
 
         let enum_variant_token = context.expect(TokenType::Identifier);
-        if enum_variant_token == 0 { return false; }
+        if enum_variant_token == null { return false; }
 
         let generic_map: &GenericMap = 0;
 
@@ -135,7 +135,7 @@ impl MatchPattern {
                     while !context.check_value(TokenType::Symbol, ")") {
                         let ref = context.check_next(TokenType::Symbol, "&");
                         let variable = context.expect(TokenType::Identifier);
-                        if variable == 0 { context.pop_scope(); return false; }
+                        if variable == null { context.pop_scope(); return false; }
 
                         parameters.append(EnumVariantParameter { ref, variable, field_name: str { ptr: null, length: 0 } });
 
@@ -177,7 +177,7 @@ impl MatchPattern {
                     while !context.check_value(TokenType::Symbol, "}") {
                         let ref = context.check_next(TokenType::Symbol, "&");
                         let field_name_token = context.expect(TokenType::Identifier);
-                        if field_name_token == 0 { context.pop_scope(); return false; }
+                        if field_name_token == null { context.pop_scope(); return false; }
 
                         let variable = field_name_token;
                         let field_name = field_name_token.value;
@@ -185,7 +185,7 @@ impl MatchPattern {
                         if context.check_next(TokenType::Symbol, ":") {
                             if ref { ref = false; ref = context.check_next(TokenType::Symbol, "&"); }
                             variable = context.expect(TokenType::Identifier);
-                            if variable == 0 { context.pop_scope(); return false; }
+                            if variable == null { context.pop_scope(); return false; }
                         }
 
                         let field_i: usize = 0;

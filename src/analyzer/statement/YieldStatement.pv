@@ -3,7 +3,7 @@ use expression
 use types
 
 struct YieldStatement {
-    expression: &Expression,
+    expression: *Expression,
 }
 
 impl YieldStatement {
@@ -11,11 +11,11 @@ impl YieldStatement {
         if !context.expect_value(TokenType::Keyword, "yield") { return null; }
 
         if context.check_next(TokenType::Symbol, ";") {
-            return context.allocator.store(&YieldStatement { expression: 0 });
+            return context.allocator.store(&YieldStatement { expression: null });
         }
 
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return null; }
+        if expression == null { return null; }
         if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
         expression.validate_type(context, &context.function.return_type, true);

@@ -31,14 +31,14 @@ impl Block {
 
     fn parse_expression_statement(&self, context: &Context, generics: &Generics, data: *StatementData) -> bool {
         let expression = Expression::parse(context, generics);
-        if expression == 0 { return false; }
+        if expression == null { return false; }
 
         if context.check_value(TokenType::Symbol, "=") || context.check_value(TokenType::Symbol, "+=") || context.check_value(TokenType::Symbol, "-=") || context.check_value(TokenType::Symbol, "*=") || context.check_value(TokenType::Symbol, "/=") || context.check_value(TokenType::Symbol, "|=") {
             let operator = context.expect(TokenType::Symbol);
-            if operator == 0 { return false; }
+            if operator == null { return false; }
 
             let value = Expression::parse(context, generics);
-            if value == 0 { return false; }
+            if value == null { return false; }
 
             value.validate_type(context, &expression.return_type, true);
 

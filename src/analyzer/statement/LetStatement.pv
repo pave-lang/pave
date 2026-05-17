@@ -17,7 +17,7 @@ impl LetStatement {
         let is_static = context.check_next(TokenType::Keyword, "static");
 
         let name = context.expect(TokenType::Identifier);
-        if name == 0 { return 0; }
+        if name == null { return 0; }
 
         let type: &Type = 0;
 

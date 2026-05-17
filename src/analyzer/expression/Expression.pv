@@ -94,8 +94,8 @@ impl Expression {
 
                             while !context.check_value(TokenType::Symbol, ")") {
                                 let argument = Expression::parse(context, generics);
-                                if argument == 0 { return 0; }
-                                arguments.append(InvokeArgument { name: 0, value: argument });
+                                if argument == null { return 0; }
+                                arguments.append(InvokeArgument { name: null, value: argument });
 
                                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
@@ -202,7 +202,7 @@ impl Expression {
 
                             while !context.check_value(TokenType::Symbol, ")") {
                                 let argument = Expression::parse(context, generics);
-                                arguments.append(InvokeArgument { name: 0, value: argument });
+                                arguments.append(InvokeArgument { name: null, value: argument });
 
                                 if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
@@ -240,7 +240,7 @@ impl Expression {
             TokenType::Symbol => {
                 if token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+") || token.eq(TokenType::Symbol, "!") || token.eq(TokenType::Symbol, "&") || token.eq(TokenType::Symbol, "*") || token.eq(TokenType::Symbol, "/") || token.eq(TokenType::Symbol, "%") || token.eq(TokenType::Symbol, "~") {
                     let operator = context.expect(TokenType::Symbol);
-                    if operator == 0 { return 0; }
+                    if operator == null { return 0; }
 
                     if operator.value.eq("*") && context.check_value(TokenType::Keyword, "const") {
                         context.pos -= 1;
@@ -278,7 +278,7 @@ impl Expression {
                     if !context.expect_value(TokenType::Symbol, "(") { return 0; }
 
                     let expr = Expression::parse(context, generics);
-                    if expr == 0 { return 0; }
+                    if expr == null { return 0; }
 
                     if context.check_next(TokenType::Symbol, ",") {
                         let arguments = Array<InvokeArgument>::new(context.allocator);
@@ -297,7 +297,7 @@ impl Expression {
                             name.value = name_string.as_str();
 
                             let value = Expression::parse(context, generics);
-                            if value == 0 { return 0; }
+                            if value == null { return 0; }
 
                             arguments.append(InvokeArgument { name, value });
 
@@ -327,9 +327,9 @@ impl Expression {
 
                     while !context.check_value(TokenType::Symbol, "]") {
                         let element = Expression::parse(context, generics);
-                        if element == 0 { return 0; }
+                        if element == null { return 0; }
 
-                        elements.append(InvokeArgument { name: 0, value: element });
+                        elements.append(InvokeArgument { name: null, value: element });
 
                         if element_type == 0 {
                             element_type = &element.return_type;
@@ -337,11 +337,11 @@ impl Expression {
 
                         if context.check_next(TokenType::Symbol, ";") {
                             let count_token = context.expect(TokenType::Number);
-                            if count_token == 0 { return 0; }
+                            if count_token == null { return 0; }
                             let count: usize = strtoul(count_token.value.ptr, 0, 10);
                             let i: usize = 1;
                             while i < count {
-                                elements.append(InvokeArgument { name: 0, value: element });
+                                elements.append(InvokeArgument { name: null, value: element });
                                 i += 1;
                             }
                             break;
@@ -394,24 +394,24 @@ impl Expression {
         return Expression::parse_postfix_chain(context, result, generics);
     }
 
-    fn parse(context: &Context, generics: &Generics) -> &Expression {
-        let result = Expression::parse_primary(context, generics);
-        if result == 0 { return 0; }
+    fn parse(context: &Context, generics: &Generics) -> *Expression {
+        let result: *Expression = Expression::parse_primary(context, generics);
+        if result == null { return null; }
 
         result = Expression::parse_binary(context, result, 1, generics);
-        if result == 0 { return 0; }
+        if result == null { return null; }
 
         if context.check_value(TokenType::Symbol, "..") {
             let token = context.expect(TokenType::Symbol);
 
             let range_start = result;
             let range_end = Expression::parse(context, generics);
-            if range_end == 0 { return 0; }
+            if range_end == null { return null; }
 
-            let enum_type = context.module.find_make_type("Range", &Array<Type> { data: &range_end.return_type, length: 1, allocator: context.allocator, capacity: 0 });
-            if enum_type == 0 {
+            let enum_type: *Type = context.module.find_make_type("Range", &Array<Type> { data: &range_end.return_type, length: 1, allocator: context.allocator, capacity: 0 });
+            if enum_type == null {
                 context.error_token(token, "Could not find Range type, include std library");
-                return 0;
+                return null;
             }
 
             let variant_name = *token;
@@ -419,19 +419,19 @@ impl Expression {
             variant_name.value = "StartEnd";
 
             let variant_result = Expression::get_enum_variant(context, enum_type, &variant_name);
-            let variant: &EnumVariant = 0;
+            let variant: *EnumVariant = null;
             match variant_result {
                 EnumVariantResult::EnumVariant(enum_variant) => { variant = enum_variant; },
                 _ => {},
             }
-            if variant == 0 {
+            if variant == null {
                 context.error_token(token, "Could not find Range StartEnd enum variant");
-                return 0;
+                return null;
             }
 
             let arguments = Array<InvokeArgument>::new(context.allocator);
-            arguments.append(InvokeArgument { name: 0, value: range_start });
-            arguments.append(InvokeArgument { name: 0, value: range_end });
+            arguments.append(InvokeArgument { name: null, value: range_start });
+            arguments.append(InvokeArgument { name: null, value: range_end });
 
             let enum_variant = Expression::make(context.allocator, token, ExpressionData::EnumVariant(variant), enum_type);
 
@@ -583,12 +583,25 @@ impl Expression {
         if !context.expect_value(TokenType::Keyword, "if") { return 0; }
 
         let condition = Expression::parse(context, generics);
-        if condition == 0 { return 0; }
+        if condition == null { return 0; }
+
+        match condition.return_type {
+            Type::Primitive(prim) => {
+                if !prim.name.eq("bool") {
+                    context.error_token(condition.token, "If condition must be a bool expression");
+                    return 0;
+                }
+            },
+            _ => {
+                context.error_token(condition.token, "If condition must be a bool expression");
+                return 0;
+            },
+        }
 
         if !context.expect_value(TokenType::Symbol, "{") { return 0; }
 
         let a = Expression::parse(context, generics);
-        if a == 0 { return 0; }
+        if a == null { return 0; }
 
         if !context.expect_value(TokenType::Symbol, "}") { return 0; }
         if !context.expect_value(TokenType::Keyword, "else") { return 0; }
@@ -601,7 +614,7 @@ impl Expression {
         }
 
         let b = Expression::parse(context, generics);
-        if b == 0 { return 0; }
+        if b == null { return 0; }
 
         if !is_else_if && !context.expect_value(TokenType::Symbol, "}") { return 0; }
 
