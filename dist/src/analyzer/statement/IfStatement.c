@@ -73,7 +73,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                 #line 30 "src/analyzer/statement/IfStatement.pv"
                 struct Type* enum_type = p.enumvariant_value._0;
                 #line 31 "src/analyzer/statement/IfStatement.pv"
-                if (!Type__eq(&expression->return_type, enum_type)) {
+                if (!Type__eq(Type__deref(&expression->return_type), enum_type)) {
                     #line 32 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If let expression type does not match pattern enum type");
                     #line 33 "src/analyzer/statement/IfStatement.pv"
@@ -85,7 +85,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
             #line 37 "src/analyzer/statement/IfStatement.pv"
             default: {
                 #line 38 "src/analyzer/statement/IfStatement.pv"
-                if (!Type__is_enum(&expression->return_type)) {
+                if (!Type__is_enum(Type__deref(&expression->return_type))) {
                     #line 39 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If let expression must be an enum (discriminated union)");
                     #line 40 "src/analyzer/statement/IfStatement.pv"

@@ -468,7 +468,7 @@ impl Type {
     }
 
     fn is_void(&self) -> bool {
-        if let Type::Primitive(primitive_info) = (*self) {
+        if let Type::Primitive(primitive_info) = self {
             return primitive_info.is_void();
         }
 
@@ -476,7 +476,7 @@ impl Type {
     }
 
     fn is_unknown(&self) -> bool {
-        if let Type::UnknownC(_) = (*self) {
+        if let Type::UnknownC(_) = self {
             return true;
         }
         return false;

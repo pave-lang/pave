@@ -1013,9 +1013,9 @@ bool Type__is_self(struct Type* self) {
 #line 470 "src/analyzer/types/Type.pv"
 bool Type__is_void(struct Type* self) {
     #line 471 "src/analyzer/types/Type.pv"
-    if ((*self).type == TYPE__PRIMITIVE) {
+    if (self->type == TYPE__PRIMITIVE) {
         #line 471 "src/analyzer/types/Type.pv"
-        struct Primitive* primitive_info = (*self).primitive_value;
+        struct Primitive* primitive_info = self->primitive_value;
         #line 472 "src/analyzer/types/Type.pv"
         return Primitive__is_void(primitive_info);
     }
@@ -1027,7 +1027,7 @@ bool Type__is_void(struct Type* self) {
 #line 478 "src/analyzer/types/Type.pv"
 bool Type__is_unknown(struct Type* self) {
     #line 479 "src/analyzer/types/Type.pv"
-    if ((*self).type == TYPE__UNKNOWN_C) {
+    if (self->type == TYPE__UNKNOWN_C) {
         #line 480 "src/analyzer/types/Type.pv"
         return true;
     }
