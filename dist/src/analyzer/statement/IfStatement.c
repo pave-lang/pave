@@ -85,7 +85,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
             #line 37 "src/analyzer/statement/IfStatement.pv"
             default: {
                 #line 38 "src/analyzer/statement/IfStatement.pv"
-                if (!Type__is_enum(Type__deref(&expression->return_type))) {
+                if (!Type__is_discriminated_union(Type__deref(&expression->return_type))) {
                     #line 39 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If let expression must be an enum (discriminated union)");
                     #line 40 "src/analyzer/statement/IfStatement.pv"

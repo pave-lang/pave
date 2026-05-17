@@ -35,7 +35,7 @@ impl IfStatement {
                     }
                 },
                 _ => {
-                    if !expression.return_type.deref().is_enum() {
+                    if !expression.return_type.deref().is_discriminated_union() {
                         context.error_token(expression.token, "If let expression must be an enum (discriminated union)");
                         context.pop_scope();
                         return 0;

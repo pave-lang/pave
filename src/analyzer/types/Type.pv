@@ -489,6 +489,13 @@ impl Type {
             _ => { return false; },
         }
     }
+
+    fn is_discriminated_union(&self) -> bool {
+        match self {
+            Type::Enum(enum_info, _) => { return enum_info.is_discriminated_union(); },
+            _ => { return false; },
+        }
+    }
     
     fn is_function(&self) -> bool {
         match self {
