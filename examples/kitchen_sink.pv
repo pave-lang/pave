@@ -4,9 +4,7 @@
 
 use std
 
-// =============================================================================
-// 1. Plain structs + impl methods
-// =============================================================================
+// --- 1. Structs + impl methods ---
 
 struct Point {
     x: f32,
@@ -23,15 +21,9 @@ impl Point {
         let dy = self.y - other.y;
         return dx * dx + dy * dy;
     }
-
-    fn print(&self) {
-        printf("Point(%.2f, %.2f)\n", self.x, self.y);
-    }
 }
 
-// =============================================================================
-// 2. Tuple struct
-// =============================================================================
+// --- 2. Tuple struct ---
 
 struct Meters(f32);
 
@@ -39,9 +31,7 @@ impl Meters {
     fn value(self) -> f32 { return self._0; }
 }
 
-// =============================================================================
-// 3. Generic struct
-// =============================================================================
+// --- 3. Generic struct ---
 
 struct Pair<A, B> {
     first: A,
@@ -54,9 +44,7 @@ impl<A, B> Pair<A, B> {
     }
 }
 
-// =============================================================================
-// 4. Standard enum + match
-// =============================================================================
+// --- 4. Plain enum + match ---
 
 enum Direction {
     North,
@@ -76,9 +64,7 @@ impl Direction {
     }
 }
 
-// =============================================================================
-// 5. Discriminated enum + match with bindings
-// =============================================================================
+// --- 5. Discriminated enum (tuple payloads) ---
 
 enum Shape {
     Circle(f32),
@@ -89,9 +75,9 @@ enum Shape {
 impl Shape {
     fn area(&self) -> f32 {
         match self {
-            Shape::Circle(r)          => { return 3.14159f * r * r; },
-            Shape::Rectangle(w, h)    => { return w * h; },
-            Shape::Triangle(a, b, c)  => {
+            Shape::Circle(r)         => { return 3.14159f * r * r; },
+            Shape::Rectangle(w, h)   => { return w * h; },
+            Shape::Triangle(a, b, c) => {
                 let s = (a + b + c) * 0.5f;
                 return s * (s - a) * (s - b) * (s - c);
             },
@@ -99,22 +85,15 @@ impl Shape {
     }
 }
 
-// =============================================================================
-// 6. Traits — &self (dynamic-dispatch compatible) and value self
-// =============================================================================
+// --- 6. Traits — static dispatch (&[T: Trait]) and dynamic dispatch (&dyn Trait) ---
 
 trait Printable {
     fn print(&self);
 }
 
-trait Scalable {
-    typedef Output;
-    fn scale(self, factor: f32) -> Output;
-}
-
 impl Printable for Point {
     fn print(&self) {
-        self.print();
+        printf("Point(%.2f, %.2f)\n", self.x, self.y);
     }
 }
 
@@ -124,13 +103,20 @@ impl Printable for Direction {
     }
 }
 
-// =============================================================================
-// 7. Operator traits (Add, Mul)
-// =============================================================================
+fn print_all<T: Printable>(items: &[T]) {
+    for item in items {
+        item.print();
+    }
+}
+
+fn print_dynamic(item: &dyn Printable) {
+    item.print();
+}
+
+// --- 7. Operator traits ---
 
 impl Add<Point> for Point {
     typedef Output = Point;
-
     fn add(self, other: Point) -> Point {
         return Point { x: self.x + other.x, y: self.y + other.y };
     }
@@ -138,57 +124,12 @@ impl Add<Point> for Point {
 
 impl Mul<f32> for Point {
     typedef Output = Point;
-
     fn mul(self, scale: f32) -> Point {
         return Point { x: self.x * scale, y: self.y * scale };
     }
 }
 
-impl Sub<Point> for Point {
-    typedef Output = Point;
-
-    fn sub(self, other: Point) -> Point {
-        return Point { x: self.x - other.x, y: self.y - other.y };
-    }
-}
-
-// =============================================================================
-// 8. Generic functions with trait bounds
-// =============================================================================
-
-fn print_all<T: Printable>(items: &[T]) {
-    for item in items {
-        item.print();
-    }
-}
-
-// =============================================================================
-// 9. Dynamic dispatch (&dyn Trait)
-// =============================================================================
-
-fn print_dynamic(item: &dyn Printable) {
-    item.print();
-}
-
-// =============================================================================
-// 10. Custom Hash implementation
-// =============================================================================
-
-struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
-}
-
-impl Hash for Color {
-    fn hash(&self) -> Hashed {
-        return Fnv1a::hash(self, sizeof(Color));
-    }
-}
-
-// =============================================================================
-// 11. Null pointers (*T uses null, not 0)
-// =============================================================================
+// --- 8. Null pointers (*T uses null, not 0) ---
 
 struct Node {
     value: i32,
@@ -196,7 +137,7 @@ struct Node {
 }
 
 fn make_node(value: i32) -> *Node {
-    let n: *Node = cast<*Node>(malloc(sizeof(Node)));
+    let n = cast<*Node>(malloc(sizeof(Node)));
     *n = Node { value, next: null };
     return n;
 }
@@ -205,9 +146,7 @@ fn chain_nodes(a: *Node, b: *Node) {
     a.next = b;
 }
 
-// =============================================================================
-// 12. Struct default field values
-// =============================================================================
+// --- 9. Struct default field values ---
 
 struct Config {
     width: i32 = 800,
@@ -215,9 +154,7 @@ struct Config {
     title: *const char = "Untitled",
 }
 
-// =============================================================================
-// 13. Enum struct variants (named fields)
-// =============================================================================
+// --- 10. Enum struct variants (named fields) ---
 
 enum Event {
     KeyPress { key: i32, shift: bool },
@@ -238,9 +175,7 @@ impl Event {
     }
 }
 
-// =============================================================================
-// 14. Impl const values
-// =============================================================================
+// --- 11. Impl const values ---
 
 struct Limits {
     value: i32,
@@ -251,9 +186,7 @@ impl Limits {
     const MIN: i32 = -1000;
 }
 
-// =============================================================================
-// 15. Numeric match patterns
-// =============================================================================
+// --- 12. Numeric match patterns ---
 
 fn classify(n: i32) -> *const char {
     match n {
@@ -264,14 +197,11 @@ fn classify(n: i32) -> *const char {
     }
 }
 
-// =============================================================================
-// 16. Coroutines (co + yield)
-// =============================================================================
+// --- 13. Coroutine (co + yield) ---
 
 co fibonacci(n: usize) -> u64 {
     let a: u64 = 0;
     let b: u64 = 1;
-
     for i in 0..n {
         yield a;
         let tmp = a + b;
@@ -280,27 +210,13 @@ co fibonacci(n: usize) -> u64 {
     }
 }
 
-co running_sum(values: &[f32]) -> f32 {
-    let total = 0.0f;
-    for v in values {
-        total += v;
-        yield total;
-    }
-}
-
-// =============================================================================
-// 17. Static local variables
-// =============================================================================
+// --- 14. Static local variables ---
 
 fn next_id() -> u32 {
     let static counter: u32 = 0;
     counter += 1;
     return counter;
 }
-
-// =============================================================================
-// 18. Slice helper
-// =============================================================================
 
 fn sum_slice(values: &[f32]) -> f32 {
     let total = 0.0f;
@@ -310,98 +226,60 @@ fn sum_slice(values: &[f32]) -> f32 {
     return total;
 }
 
-// =============================================================================
-// 19. Dynamic function dispatch (Fn trait + typeid)
-// =============================================================================
-
-struct Particle {
-    pos: Point,
-    mass: f32,
-}
-
-struct Gravity {
-    g: f32,
-}
-
-impl Gravity {
-    fn apply(&self, p: &Point, mass: f32) {
-        p.y += self.g * mass;
-    }
-}
-
-fn simulate(func: &dyn Fn, particles: &[Particle], gravity: Gravity) {
-    let params = func.get_params();
-
-    for particle in particles {
-        for (i, *param) in params.iter().enumerate() {
-            if param == typeid(Gravity) {
-                func.set_arg(i, &gravity);
-            } else if param == typeid(&Point) {
-                func.set_arg(i, &particle.pos);
-            } else if param == typeid(f32) {
-                func.set_arg(i, &particle.mass);
-            }
-        }
-        func.execute();
-    }
-}
-
-// =============================================================================
-// main — exercises everything above
-// =============================================================================
+// --- main ---
 
 fn main(argc: i32, argv: **const char) -> i32 {
-    // --- Struct methods ---
+    // Struct methods
     let p1 = Point::new(1.0f, 2.0f);
     let p2 = Point::new(4.0f, 6.0f);
     p1.print();
     printf("distance_sq: %.2f\n", p1.distance_sq(&p2));
 
-    // --- Operator overloading ---
-    let sum   = p1 + p2;
-    let diff  = p2 - p1;
-    let scaled = p1 * 3.0f;
-    printf("sum:    %.2f, %.2f\n", sum.x, sum.y);
-    printf("diff:   %.2f, %.2f\n", diff.x, diff.y);
-    printf("scaled: %.2f, %.2f\n", scaled.x, scaled.y);
+    // Operator overloading
+    let sum_pt = p1 + p2;
+    let scaled  = p1 * 3.0f;
+    printf("sum:    %.2f, %.2f\n", sum_pt.x, sum_pt.y);
+    printf("scaled: %.2f, %.2f\n", scaled.x,  scaled.y);
 
-    // --- Tuple struct ---
+    // Tuple struct
     let dist = Meters(5.5f);
     printf("meters: %.2f\n", dist.value());
 
-    // --- Generic struct ---
+    // Generic struct
     let pair = Pair<i32, f32>::new(42, 3.14f);
     printf("pair: %d %.2f\n", pair.first, pair.second);
 
-    // --- Enum label + print ---
+    // Enum + match
     let dir = Direction::North;
     printf("direction: %s\n", dir.label());
 
-    // --- Discriminated enum + area ---
     let circle = Shape::Circle(3.0f);
     let rect   = Shape::Rectangle(4.0f, 5.0f);
     printf("circle area: %.4f\n", circle.area());
     printf("rect area:   %.2f\n", rect.area());
 
-    // --- Dynamic dispatch ---
+    // Traits: dynamic dispatch and generic static dispatch
     print_dynamic(&p1);
     print_dynamic(&dir);
 
-    // --- Range-based for loop ---
+    let pts = [Point::new(0.0f, 0.0f), Point::new(1.0f, 1.0f)];
+    print_all(&pts);
+
+    // Range-based for loop
     let acc: i32 = 0;
     for i in 1..6 {
         acc += i;
     }
     printf("sum 1..5: %d\n", acc);
 
-    // --- while loop ---
+    // while loop
     let n: i32 = 1;
     while n < 32 {
         n = n * 2;
     }
     printf("next power of 2 >= 32: %d\n", n);
 
-    // --- Array<T> + for *v in ---
+    // Array<T> + for *v in + enumerate
     let arr = Array<i32>::new(GeneralPurposeAllocator::default());
     arr.append(10);
     arr.append(20);
@@ -412,31 +290,22 @@ fn main(argc: i32, argv: **const char) -> i32 {
         printf("%d ", v);
     }
     printf("\n");
-
-    // --- enumerate ---
     for (i, *v) in arr.iter().enumerate() {
         printf("arr[%zu] = %d\n", i, v);
     }
 
-    // --- str methods ---
+    // str methods
     let greeting: str = "  hello, world  ";
     let trimmed = greeting.trim();
     printf("trimmed: %.*s\n", cast<i32>(trimmed.length), trimmed.ptr);
     printf("starts_with 'hello': %d\n", trimmed.starts_with("hello"));
     printf("index of ',': %zd\n", trimmed.index_of(','));
 
-    // --- String builder ---
-    let sb = String::new(GeneralPurposeAllocator::default());
-    sb.append("result = ");
-    sb.append_u64(cast<u64>(acc));
-    printf("%s\n", sb.c_str());
-    sb.release();
-
-    // --- Fixed array + slice ---
+    // Fixed array + slice
     let fixed = [1.0f, 2.5f, 3.5f, 4.0f];
     printf("slice sum: %.1f\n", sum_slice(&fixed));
 
-    // --- HashMap ---
+    // HashMap
     let map = HashMap<str, i32>::new(GeneralPurposeAllocator::default());
     map.insert("alpha", 1);
     map.insert("beta",  2);
@@ -449,7 +318,7 @@ fn main(argc: i32, argv: **const char) -> i32 {
         printf("map: %.*s = %d\n", cast<i32>(key.length), key.ptr, value);
     }
 
-    // --- Null pointers ---
+    // Null pointers
     let na = make_node(1);
     let nb = make_node(2);
     chain_nodes(na, nb);
@@ -457,63 +326,43 @@ fn main(argc: i32, argv: **const char) -> i32 {
     free(cast<*void>(na));
     free(cast<*void>(nb));
 
-    // --- Struct defaults ---
-    let cfg = Config { };
-    printf("config: %dx%d %s\n", cfg.width, cfg.height, cfg.title);
+    // Struct defaults
+    let cfg  = Config { };
     let cfg2 = Config { width: 1920, height: 1080 };
+    printf("config: %dx%d %s\n", cfg.width, cfg.height, cfg.title);
     printf("config2: %dx%d\n", cfg2.width, cfg2.height);
 
-    // --- Enum struct variants ---
+    // Enum struct variants
     let ev = Event::KeyPress { key: 65, shift: true };
-    printf("event: %s\n", ev.describe());
     let mv = Event::MouseMove { x: 1.5f, y: 2.5f };
+    printf("event: %s\n", ev.describe());
     printf("event: %s\n", mv.describe());
 
-    // --- Impl consts ---
+    // Impl consts
     printf("limits: %d .. %d\n", Limits::MIN, Limits::MAX);
 
-    // --- Numeric match patterns ---
+    // Numeric match
     printf("classify 0: %s\n", classify(0));
     printf("classify -1: %s\n", classify(-1));
     printf("classify 42: %s\n", classify(42));
 
-    // --- Coroutines ---
+    // Coroutines
     printf("fibonacci(8): ");
     for fib in fibonacci(8) {
         printf("%llu ", fib);
     }
     printf("\n");
 
-    let seeds = [1.0f, 2.0f, 3.0f];
-    printf("running sums: ");
-    for s in running_sum(&seeds) {
-        printf("%.1f ", s);
-    }
-    printf("\n");
-
-    // --- Static counter ---
+    // Static counter
     printf("ids: %u %u %u\n", next_id(), next_id(), next_id());
 
-    // --- Dynamic Fn dispatch ---
-    let particles = Array<Particle>::new(GeneralPurposeAllocator::default());
-    particles.append(Particle { pos: Point { x: 0.0f, y: 10.0f }, mass: 1.0f });
-    particles.append(Particle { pos: Point { x: 1.0f, y: 5.0f  }, mass: 2.0f });
-    simulate(&Gravity::apply, particles.as_slice(), Gravity { g: -9.81f });
-    for *part in particles {
-        printf("particle y: %.4f\n", part.pos.y);
-    }
-
-    // --- Cleanup ---
     arr.release();
     map.release();
-    particles.release();
 
     return 0;
 }
 
-// =============================================================================
-// Tests
-// =============================================================================
+// --- Tests ---
 
 test "point distance squared" {
     let a = Point::new(0.0f, 0.0f);
