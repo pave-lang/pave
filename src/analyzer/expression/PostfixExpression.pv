@@ -158,6 +158,9 @@ impl Expression {
             _ => {},
         }
 
+        let index_trait_result = Expression::find_index_trait_call(context, index_expr.token, inner, index_expr);
+        if index_trait_result != null { return index_trait_result; }
+
         let inner_return_type = &inner.return_type;
         let element_type: *Type = null;
 

@@ -21,3 +21,20 @@ trait Div<T> {
 trait Eq<T> {
     fn eq(self, other: T) -> bool;
 }
+
+trait Neg {
+    typedef Output;
+    fn neg(self) -> Output;
+}
+
+trait Ord<T> {
+    fn lt(self, other: T) -> bool;
+    fn gt(self, other: T) -> bool;
+    fn le(self, other: T) -> bool;
+    fn ge(self, other: T) -> bool;
+}
+
+trait Index<T> {
+    typedef Output;
+    fn index(&self, idx: T) -> &Output;
+}

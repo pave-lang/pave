@@ -273,7 +273,16 @@ impl Expression {
                                 _ => { result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), child.return_type.deref()); },
                             }
                         } else {
-                            result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), &child.return_type);
+                            if operator.value.eq("-") {
+                                let trait_result = Expression::find_unary_trait_call(context, operator, child);
+                                if trait_result != null {
+                                    result = trait_result;
+                                } else {
+                                    result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), &child.return_type);
+                                }
+                            } else {
+                                result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), &child.return_type);
+                            }
                         }
                     }
                 } else if token.eq(TokenType::Symbol, "(") {

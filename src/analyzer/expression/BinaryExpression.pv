@@ -24,7 +24,9 @@ impl Expression {
                 operator.value.eq("*") || operator.value.eq("+") ||
                 operator.value.eq("-") || operator.value.eq("/");
 
-            let is_trait_op = is_arithmetic || operator.value.eq("==");
+            let is_trait_op = is_arithmetic || operator.value.eq("==") ||
+                operator.value.eq("<") || operator.value.eq(">") ||
+                operator.value.eq("<=") || operator.value.eq(">=");
 
             if is_trait_op {
                 let trait_result = Expression::find_operator_trait_call(context, token, result, &result.return_type, operator.value, rhs_final);
@@ -79,6 +81,10 @@ impl Expression {
         else if operator.eq("-") { trait_name = "Sub"; func_name = "sub"; }
         else if operator.eq("/") { trait_name = "Div"; func_name = "div"; }
         else if operator.eq("==") { trait_name = "Eq"; func_name = "eq"; }
+        else if operator.eq("<")  { trait_name = "Ord"; func_name = "lt"; }
+        else if operator.eq(">")  { trait_name = "Ord"; func_name = "gt"; }
+        else if operator.eq("<=") { trait_name = "Ord"; func_name = "le"; }
+        else if operator.eq(">=") { trait_name = "Ord"; func_name = "ge"; }
         else { return null; }
 
         if lhs_type.is_unknown() || rhs.return_type.is_unknown() { return null; }
@@ -143,6 +149,87 @@ impl Expression {
                     let arguments = Array<InvokeArgument>::new(context.allocator);
                     arguments.append(InvokeArgument { name: null, value: lhs });
                     arguments.append(InvokeArgument { name: null, value: rhs });
+
+                    return Expression::make_type_function_call(context, token, func_type, arguments, null);
+                }
+            },
+            _ => {},
+        }
+
+        return null;
+    }
+
+    fn find_unary_trait_call(context: &Context, token: &Token, operand: &Expression) -> *Expression {
+        if operand.return_type.is_unknown() { return null; }
+
+        match operand.return_type {
+            Type::Self => {
+                if context.type_self != null {
+                    return Expression::find_unary_trait_call(context, token, operand);
+                }
+            },
+            Type::Struct(struct_info, generic_map) => {
+                for *impl_info in struct_info.impls {
+                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
+                    if !impl_info.trait_.name.value.eq("Neg") { continue; }
+
+                    let func = impl_info.functions.find("neg");
+                    if func == null { continue; }
+                    if func.parameters.length < 1 { continue; }
+
+                    let func_map: *GenericMap = generic_map;
+                    if impl_info.typedefs.length > 0 {
+                        let aug_map_val = generic_map.clone(context.allocator);
+                        let aug_map = context.allocator.store(&aug_map_val);
+                        for (name, &typedef_type) in impl_info.typedefs {
+                            aug_map.insert(name, *typedef_type);
+                        }
+                        func_map = aug_map;
+                    }
+
+                    let func_type = context.allocator.store(&Type::Function(func, func_map));
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+                    arguments.append(InvokeArgument { name: null, value: operand });
+
+                    return Expression::make_type_function_call(context, token, func_type, arguments, null);
+                }
+            },
+            _ => {},
+        }
+
+        return null;
+    }
+
+    fn find_index_trait_call(context: &Context, token: &Token, inner: &Expression, index_expr: &Expression) -> *Expression {
+        if inner.return_type.is_unknown() { return null; }
+
+        match inner.return_type {
+            Type::Struct(struct_info, generic_map) => {
+                for *impl_info in struct_info.impls {
+                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
+                    if !impl_info.trait_.name.value.eq("Index") { continue; }
+
+                    let func = impl_info.functions.find("index");
+                    if func == null { continue; }
+                    if func.parameters.length < 2 { continue; }
+
+                    let other_param = func.parameters.get(1);
+                    if !other_param.type.eq(&index_expr.return_type) { continue; }
+
+                    let func_map: *GenericMap = generic_map;
+                    if impl_info.typedefs.length > 0 {
+                        let aug_map_val = generic_map.clone(context.allocator);
+                        let aug_map = context.allocator.store(&aug_map_val);
+                        for (name, &typedef_type) in impl_info.typedefs {
+                            aug_map.insert(name, *typedef_type);
+                        }
+                        func_map = aug_map;
+                    }
+
+                    let func_type = context.allocator.store(&Type::Function(func, func_map));
+                    let arguments = Array<InvokeArgument>::new(context.allocator);
+                    arguments.append(InvokeArgument { name: null, value: inner });
+                    arguments.append(InvokeArgument { name: null, value: index_expr });
 
                     return Expression::make_type_function_call(context, token, func_type, arguments, null);
                 }
