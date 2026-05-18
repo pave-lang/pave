@@ -252,3 +252,11 @@ void HashMap_str_str__clear(struct HashMap_str_str* self) {
     #line 180 "src/std/HashMap.pv"
     self->length = 0;
 }
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_str* HashMap_str_str__Index__index(void* __self) {
+    struct HashMap_str_str* self = __self; (void)self;
+    #line 187 "src/std/HashMap.pv"
+    return self->data;
+}
+

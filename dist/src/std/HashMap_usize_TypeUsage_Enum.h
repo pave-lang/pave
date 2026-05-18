@@ -22,6 +22,7 @@ struct HashMap_usize_TypeUsage_Enum {
 #include <std/HashMapIter_usize_TypeUsage_Enum.h>
 struct HashMap_usize_TypeUsage_Enum;
 struct TypeUsage_Enum;
+struct HashMapBucket_usize_TypeUsage_Enum;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__new(struct trait_Allocator allocator);
@@ -55,5 +56,9 @@ struct HashMapIter_usize_TypeUsage_Enum HashMap_usize_TypeUsage_Enum__iter(struc
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Enum__clear(struct HashMap_usize_TypeUsage_Enum* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_usize_TypeUsage_Enum* HashMap_usize_TypeUsage_Enum__Index__index(void* __self);
+
 
 #endif

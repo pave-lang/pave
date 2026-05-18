@@ -253,3 +253,11 @@ void HashMap_usize_TypeUsage_Tuple__clear(struct HashMap_usize_TypeUsage_Tuple* 
     #line 180 "src/std/HashMap.pv"
     self->length = 0;
 }
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_usize_TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__Index__index(void* __self) {
+    struct HashMap_usize_TypeUsage_Tuple* self = __self; (void)self;
+    #line 187 "src/std/HashMap.pv"
+    return self->data;
+}
+

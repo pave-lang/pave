@@ -180,3 +180,10 @@ impl<K: Hash, V> HashMap<K, V> {
         self.length = 0;
     }
 }
+
+impl<K: Hash, V> Index for HashMap<K, V> {
+    typedef Output = HashMapBucket<K, V>;
+    fn index(&self) -> *HashMapBucket<K, V> {
+        return self.data;
+    }
+}

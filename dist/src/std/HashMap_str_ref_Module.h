@@ -23,6 +23,7 @@ struct HashMap_str_ref_Module {
 struct HashMap_str_ref_Module;
 struct str;
 struct Module;
+struct HashMapBucket_str_ref_Module;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Module HashMap_str_ref_Module__new(struct trait_Allocator allocator);
@@ -56,5 +57,9 @@ struct HashMapIter_str_ref_Module HashMap_str_ref_Module__iter(struct HashMap_st
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_ref_Module__clear(struct HashMap_str_ref_Module* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_ref_Module* HashMap_str_ref_Module__Index__index(void* __self);
+
 
 #endif

@@ -24,6 +24,7 @@ struct HashMap_str_Array_Diagnostic {
 struct HashMap_str_Array_Diagnostic;
 struct str;
 struct Array_Diagnostic;
+struct HashMapBucket_str_Array_Diagnostic;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Array_Diagnostic HashMap_str_Array_Diagnostic__new(struct trait_Allocator allocator);
@@ -57,5 +58,9 @@ struct HashMapIter_str_Array_Diagnostic HashMap_str_Array_Diagnostic__iter(struc
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__clear(struct HashMap_str_Array_Diagnostic* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_Array_Diagnostic* HashMap_str_Array_Diagnostic__Index__index(void* __self);
+
 
 #endif

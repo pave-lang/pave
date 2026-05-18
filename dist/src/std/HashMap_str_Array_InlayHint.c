@@ -253,3 +253,11 @@ void HashMap_str_Array_InlayHint__clear(struct HashMap_str_Array_InlayHint* self
     #line 180 "src/std/HashMap.pv"
     self->length = 0;
 }
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_Array_InlayHint* HashMap_str_Array_InlayHint__Index__index(void* __self) {
+    struct HashMap_str_Array_InlayHint* self = __self; (void)self;
+    #line 187 "src/std/HashMap.pv"
+    return self->data;
+}
+

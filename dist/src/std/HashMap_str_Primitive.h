@@ -24,6 +24,7 @@ struct HashMap_str_Primitive {
 struct HashMap_str_Primitive;
 struct str;
 struct Primitive;
+struct HashMapBucket_str_Primitive;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Primitive HashMap_str_Primitive__new(struct trait_Allocator allocator);
@@ -57,5 +58,9 @@ struct HashMapIter_str_Primitive HashMap_str_Primitive__iter(struct HashMap_str_
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_Primitive__clear(struct HashMap_str_Primitive* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_Primitive* HashMap_str_Primitive__Index__index(void* __self);
+
 
 #endif

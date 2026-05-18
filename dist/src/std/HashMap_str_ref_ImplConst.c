@@ -253,3 +253,11 @@ void HashMap_str_ref_ImplConst__clear(struct HashMap_str_ref_ImplConst* self) {
     #line 180 "src/std/HashMap.pv"
     self->length = 0;
 }
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_ref_ImplConst* HashMap_str_ref_ImplConst__Index__index(void* __self) {
+    struct HashMap_str_ref_ImplConst* self = __self; (void)self;
+    #line 187 "src/std/HashMap.pv"
+    return self->data;
+}
+

@@ -253,3 +253,11 @@ void HashMap_u32_Type__clear(struct HashMap_u32_Type* self) {
     #line 180 "src/std/HashMap.pv"
     self->length = 0;
 }
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_u32_Type* HashMap_u32_Type__Index__index(void* __self) {
+    struct HashMap_u32_Type* self = __self; (void)self;
+    #line 187 "src/std/HashMap.pv"
+    return self->data;
+}
+

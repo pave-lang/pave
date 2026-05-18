@@ -22,6 +22,7 @@ struct HashMap_usize_TypeUsage_Struct {
 #include <std/HashMapIter_usize_TypeUsage_Struct.h>
 struct HashMap_usize_TypeUsage_Struct;
 struct TypeUsage_Struct;
+struct HashMapBucket_usize_TypeUsage_Struct;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__new(struct trait_Allocator allocator);
@@ -55,5 +56,9 @@ struct HashMapIter_usize_TypeUsage_Struct HashMap_usize_TypeUsage_Struct__iter(s
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Struct__clear(struct HashMap_usize_TypeUsage_Struct* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_usize_TypeUsage_Struct* HashMap_usize_TypeUsage_Struct__Index__index(void* __self);
+
 
 #endif

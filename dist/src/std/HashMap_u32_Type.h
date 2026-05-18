@@ -22,6 +22,7 @@ struct HashMap_u32_Type {
 #include <std/HashMapIter_u32_Type.h>
 struct HashMap_u32_Type;
 struct Type;
+struct HashMapBucket_u32_Type;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_u32_Type HashMap_u32_Type__new(struct trait_Allocator allocator);
@@ -55,5 +56,9 @@ struct HashMapIter_u32_Type HashMap_u32_Type__iter(struct HashMap_u32_Type* self
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_u32_Type__clear(struct HashMap_u32_Type* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_u32_Type* HashMap_u32_Type__Index__index(void* __self);
+
 
 #endif

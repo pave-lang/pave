@@ -253,3 +253,11 @@ void HashMap_str_EnumVariant__clear(struct HashMap_str_EnumVariant* self) {
     #line 180 "src/std/HashMap.pv"
     self->length = 0;
 }
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_EnumVariant* HashMap_str_EnumVariant__Index__index(void* __self) {
+    struct HashMap_str_EnumVariant* self = __self; (void)self;
+    #line 187 "src/std/HashMap.pv"
+    return self->data;
+}
+

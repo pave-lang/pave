@@ -24,6 +24,7 @@ struct HashMap_str_EnumCValue {
 struct HashMap_str_EnumCValue;
 struct str;
 struct EnumCValue;
+struct HashMapBucket_str_EnumCValue;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_EnumCValue HashMap_str_EnumCValue__new(struct trait_Allocator allocator);
@@ -57,5 +58,9 @@ struct HashMapIter_str_EnumCValue HashMap_str_EnumCValue__iter(struct HashMap_st
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_EnumCValue__clear(struct HashMap_str_EnumCValue* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_EnumCValue* HashMap_str_EnumCValue__Index__index(void* __self);
+
 
 #endif

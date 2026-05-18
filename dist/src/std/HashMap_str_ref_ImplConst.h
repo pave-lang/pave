@@ -23,6 +23,7 @@ struct HashMap_str_ref_ImplConst {
 struct HashMap_str_ref_ImplConst;
 struct str;
 struct ImplConst;
+struct HashMapBucket_str_ref_ImplConst;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_ImplConst HashMap_str_ref_ImplConst__new(struct trait_Allocator allocator);
@@ -56,5 +57,9 @@ struct HashMapIter_str_ref_ImplConst HashMap_str_ref_ImplConst__iter(struct Hash
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_ref_ImplConst__clear(struct HashMap_str_ref_ImplConst* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_ref_ImplConst* HashMap_str_ref_ImplConst__Index__index(void* __self);
+
 
 #endif

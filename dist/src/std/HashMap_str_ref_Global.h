@@ -23,6 +23,7 @@ struct HashMap_str_ref_Global {
 struct HashMap_str_ref_Global;
 struct str;
 struct Global;
+struct HashMapBucket_str_ref_Global;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Global HashMap_str_ref_Global__new(struct trait_Allocator allocator);
@@ -56,5 +57,9 @@ struct HashMapIter_str_ref_Global HashMap_str_ref_Global__iter(struct HashMap_st
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_ref_Global__clear(struct HashMap_str_ref_Global* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_ref_Global* HashMap_str_ref_Global__Index__index(void* __self);
+
 
 #endif

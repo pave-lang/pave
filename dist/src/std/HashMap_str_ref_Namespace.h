@@ -23,6 +23,7 @@ struct HashMap_str_ref_Namespace {
 struct HashMap_str_ref_Namespace;
 struct str;
 struct Namespace;
+struct HashMapBucket_str_ref_Namespace;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Namespace HashMap_str_ref_Namespace__new(struct trait_Allocator allocator);
@@ -56,5 +57,9 @@ struct HashMapIter_str_ref_Namespace HashMap_str_ref_Namespace__iter(struct Hash
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_ref_Namespace__clear(struct HashMap_str_ref_Namespace* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_ref_Namespace* HashMap_str_ref_Namespace__Index__index(void* __self);
+
 
 #endif

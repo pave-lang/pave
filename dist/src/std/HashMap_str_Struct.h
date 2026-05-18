@@ -24,6 +24,7 @@ struct HashMap_str_Struct {
 struct HashMap_str_Struct;
 struct str;
 struct Struct;
+struct HashMapBucket_str_Struct;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_Struct HashMap_str_Struct__new(struct trait_Allocator allocator);
@@ -57,5 +58,9 @@ struct HashMapIter_str_Struct HashMap_str_Struct__iter(struct HashMap_str_Struct
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_Struct__clear(struct HashMap_str_Struct* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_Struct* HashMap_str_Struct__Index__index(void* __self);
+
 
 #endif

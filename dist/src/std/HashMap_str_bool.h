@@ -22,6 +22,7 @@ struct HashMap_str_bool {
 #include <std/HashMapIter_str_bool.h>
 struct HashMap_str_bool;
 struct str;
+struct HashMapBucket_str_bool;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_bool HashMap_str_bool__new(struct trait_Allocator allocator);
@@ -55,5 +56,9 @@ struct HashMapIter_str_bool HashMap_str_bool__iter(struct HashMap_str_bool* self
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_bool__clear(struct HashMap_str_bool* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_bool* HashMap_str_bool__Index__index(void* __self);
+
 
 #endif

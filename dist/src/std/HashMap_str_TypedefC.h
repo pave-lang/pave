@@ -24,6 +24,7 @@ struct HashMap_str_TypedefC {
 struct HashMap_str_TypedefC;
 struct str;
 struct TypedefC;
+struct HashMapBucket_str_TypedefC;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_TypedefC HashMap_str_TypedefC__new(struct trait_Allocator allocator);
@@ -57,5 +58,9 @@ struct HashMapIter_str_TypedefC HashMap_str_TypedefC__iter(struct HashMap_str_Ty
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_TypedefC__clear(struct HashMap_str_TypedefC* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_TypedefC* HashMap_str_TypedefC__Index__index(void* __self);
+
 
 #endif

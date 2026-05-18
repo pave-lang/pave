@@ -23,6 +23,7 @@ struct HashMap_str_ref_Include {
 struct HashMap_str_ref_Include;
 struct str;
 struct Include;
+struct HashMapBucket_str_ref_Include;
 
 #line 35 "src/std/HashMap.pv"
 struct HashMap_str_ref_Include HashMap_str_ref_Include__new(struct trait_Allocator allocator);
@@ -56,5 +57,9 @@ struct HashMapIter_str_ref_Include HashMap_str_ref_Include__iter(struct HashMap_
 
 #line 177 "src/std/HashMap.pv"
 void HashMap_str_ref_Include__clear(struct HashMap_str_ref_Include* self);
+
+#line 186 "src/std/HashMap.pv"
+struct HashMapBucket_str_ref_Include* HashMap_str_ref_Include__Index__index(void* __self);
+
 
 #endif
