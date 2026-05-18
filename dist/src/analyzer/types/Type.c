@@ -573,7 +573,7 @@ bool Type__eq_primitive(struct Type* self, struct Primitive* other) {
             #line 285 "src/analyzer/types/Type.pv"
             struct Primitive* primitive_info = self->primitive_value;
             #line 286 "src/analyzer/types/Type.pv"
-            return (Primitive__is_void(primitive_info) && Primitive__is_void(other)) || (Primitive__is_number(primitive_info) && Primitive__is_number(other)) || (primitive_info && other && str__eq(primitive_info->name, other->name));
+            return (Primitive__is_void(primitive_info) && Primitive__is_void(other)) || (Primitive__is_number(primitive_info) && Primitive__is_number(other)) || (primitive_info && other && str__Eq_str__eq(primitive_info->name, other->name));
         } break;
         #line 289 "src/analyzer/types/Type.pv"
         case TYPE__TYPEDEF_C: {
@@ -749,7 +749,7 @@ bool Type__eq_generic(struct Type* self, struct Generic* other_generic) {
             #line 351 "src/analyzer/types/Type.pv"
             struct Generic* generic = self->generic_value;
             #line 351 "src/analyzer/types/Type.pv"
-            return str__eq(generic->name->value, other_generic->name->value);
+            return str__Eq_str__eq(generic->name->value, other_generic->name->value);
         } break;
         #line 352 "src/analyzer/types/Type.pv"
         case TYPE__SELF: {
@@ -776,7 +776,7 @@ bool Type__eq_generic_typedef(struct Type* self, struct GenericTypedef* other) {
             #line 361 "src/analyzer/types/Type.pv"
             struct GenericTypedef* gt = self->generictypedef_value;
             #line 362 "src/analyzer/types/Type.pv"
-            return gt->generic == other->generic && str__eq(gt->typedef_name, other->typedef_name);
+            return gt->generic == other->generic && str__Eq_str__eq(gt->typedef_name, other->typedef_name);
         } break;
         #line 364 "src/analyzer/types/Type.pv"
         default: {
@@ -844,7 +844,7 @@ bool Type__eq_typedef_c(struct Type* self, struct TypedefC* other) {
             #line 402 "src/analyzer/types/Type.pv"
             struct TypedefC* info = self->typedefc_value;
             #line 402 "src/analyzer/types/Type.pv"
-            return str__eq(info->name, other->name) || Type__eq(Type__resolve_typedef(info->type), Type__resolve_typedef(other->type));
+            return str__Eq_str__eq(info->name, other->name) || Type__eq(Type__resolve_typedef(info->type), Type__resolve_typedef(other->type));
         } break;
         #line 403 "src/analyzer/types/Type.pv"
         default: {
@@ -866,7 +866,7 @@ bool Type__eq_enum_c(struct Type* self, struct EnumC* other_enum) {
             #line 411 "src/analyzer/types/Type.pv"
             struct EnumC* enum_info = self->enumc_value;
             #line 411 "src/analyzer/types/Type.pv"
-            return str__eq(enum_info->name, other_enum->name);
+            return str__Eq_str__eq(enum_info->name, other_enum->name);
         } break;
         #line 412 "src/analyzer/types/Type.pv"
         default: {
@@ -888,7 +888,7 @@ bool Type__eq_struct_c(struct Type* self, struct StructC* other_struct) {
             #line 420 "src/analyzer/types/Type.pv"
             struct StructC* struct_info = self->structc_value;
             #line 420 "src/analyzer/types/Type.pv"
-            return str__eq(struct_info->name, other_struct->name);
+            return str__Eq_str__eq(struct_info->name, other_struct->name);
         } break;
         #line 421 "src/analyzer/types/Type.pv"
         default: {
@@ -910,7 +910,7 @@ bool Type__eq_union_c(struct Type* self, struct StructC* other_union) {
             #line 429 "src/analyzer/types/Type.pv"
             struct StructC* union_info = self->unionc_value;
             #line 429 "src/analyzer/types/Type.pv"
-            return str__eq(union_info->name, other_union->name);
+            return str__Eq_str__eq(union_info->name, other_union->name);
         } break;
         #line 430 "src/analyzer/types/Type.pv"
         default: {
@@ -932,7 +932,7 @@ bool Type__eq_class_cpp(struct Type* self, struct ClassCpp* other_class) {
             #line 438 "src/analyzer/types/Type.pv"
             struct ClassCpp* class_info = self->classcpp_value;
             #line 438 "src/analyzer/types/Type.pv"
-            return str__eq(class_info->name, other_class->name);
+            return str__Eq_str__eq(class_info->name, other_class->name);
         } break;
         #line 439 "src/analyzer/types/Type.pv"
         default: {
@@ -954,7 +954,7 @@ bool Type__eq_namespace_cpp(struct Type* self, struct NamespaceCpp* other_namesp
             #line 447 "src/analyzer/types/Type.pv"
             struct NamespaceCpp* namespace_info = self->namespacecpp_value;
             #line 447 "src/analyzer/types/Type.pv"
-            return str__eq(namespace_info->name, other_namespace->name);
+            return str__Eq_str__eq(namespace_info->name, other_namespace->name);
         } break;
         #line 448 "src/analyzer/types/Type.pv"
         default: {
@@ -976,7 +976,7 @@ bool Type__eq_function_c(struct Type* self, struct FunctionC* other_function) {
             #line 456 "src/analyzer/types/Type.pv"
             struct FunctionC* function = self->functionc_value;
             #line 456 "src/analyzer/types/Type.pv"
-            return str__eq(function->name, other_function->name);
+            return str__Eq_str__eq(function->name, other_function->name);
         } break;
         #line 457 "src/analyzer/types/Type.pv"
         default: {
@@ -1281,7 +1281,7 @@ bool Type__is_iterator(struct Type* self) {
             #line 584 "src/analyzer/types/Type.pv"
             struct Trait* trait_info = self->trait_value._0;
             #line 585 "src/analyzer/types/Type.pv"
-            return str__eq(trait_info->name->value, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
+            return str__Eq_str__eq(trait_info->name->value, (struct str){ .ptr = "Iter", .length = strlen("Iter") });
         } break;
         #line 587 "src/analyzer/types/Type.pv"
         default: {
@@ -1305,7 +1305,7 @@ bool Type__needs_implicit_cast(struct Type* self, struct Type* other) {
             #line 596 "src/analyzer/types/Type.pv"
             struct Struct* struct_info = self->struct_value._0;
             #line 597 "src/analyzer/types/Type.pv"
-            str_cast = str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") });
+            str_cast = str__Eq_str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") });
             #line 598 "src/analyzer/types/Type.pv"
             if (!str_cast) {
                 #line 598 "src/analyzer/types/Type.pv"
@@ -1323,7 +1323,7 @@ bool Type__needs_implicit_cast(struct Type* self, struct Type* other) {
                     #line 602 "src/analyzer/types/Type.pv"
                     struct Struct* struct_info = indirect->to.struct_value._0;
                     #line 603 "src/analyzer/types/Type.pv"
-                    str_cast = str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") });
+                    str_cast = str__Eq_str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") });
                     #line 604 "src/analyzer/types/Type.pv"
                     if (!str_cast) {
                         #line 604 "src/analyzer/types/Type.pv"
@@ -1369,7 +1369,7 @@ bool Type__needs_implicit_cast(struct Type* self, struct Type* other) {
                         #line 618 "src/analyzer/types/Type.pv"
                         struct Primitive* primitive = indirect->to.primitive_value;
                         #line 619 "src/analyzer/types/Type.pv"
-                        return primitive != 0 && str__eq(primitive->name, (struct str){ .ptr = "char", .length = strlen("char") });
+                        return primitive != 0 && str__Eq_str__eq(primitive->name, (struct str){ .ptr = "char", .length = strlen("char") });
                     } break;
                     #line 621 "src/analyzer/types/Type.pv"
                     default: {

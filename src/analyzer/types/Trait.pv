@@ -83,7 +83,15 @@ impl Trait {
     }
 
     fn has_dynamic_dispatch(&self) -> bool {
-        return self.typedefs.length == 0;
+        if self.typedefs.length != 0 { return false; }
+
+        for (_, &func) in self.functions {
+            if func.parameters.length == 0 { continue; }
+            let first_param = func.parameters.get(0);
+            if first_param.type.is_self() { return false; }
+        }
+
+        return true;
     }
 
     fn parse_functions(&self) -> bool {

@@ -17,3 +17,7 @@ trait Div<T> {
     typedef Output;
     fn div(self, other: T) -> Output;
 }
+
+trait Eq<T> {
+    fn eq(self, other: T) -> bool;
+}

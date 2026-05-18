@@ -18,12 +18,6 @@ impl str {
         };
     }
 
-    fn eq(self, s: str) -> bool {
-        if self.length != s.length { return false; }
-
-        return strncmp(self.ptr, s.ptr, self.length) == 0;
-    }
-
     fn eq_len(self, s: *const char, len: usize) -> bool {
         if len > self.length { return false; }
         return strncmp(self.ptr, s, len) == 0;
@@ -111,6 +105,14 @@ impl str {
 
 impl Hash for str {
     fn hash(&self) -> Hashed { return Fnv1a::hash(self.ptr, self.length); }
+}
+
+impl Eq<str> for str {
+    fn eq(self, other: str) -> bool {
+        if self.length != other.length { return false; }
+
+        return strncmp(self.ptr, other.ptr, self.length) == 0;
+    }
 }
 
 test "eq - equal strings" {

@@ -24,7 +24,9 @@ impl Expression {
                 operator.value.eq("*") || operator.value.eq("+") ||
                 operator.value.eq("-") || operator.value.eq("/");
 
-            if is_arithmetic {
+            let is_trait_op = is_arithmetic || operator.value.eq("==");
+
+            if is_trait_op {
                 let trait_result = Expression::find_operator_trait_call(context, token, result, &result.return_type, operator.value, rhs_final);
                 if trait_result != null {
                     result = trait_result;
@@ -76,6 +78,7 @@ impl Expression {
         else if operator.eq("+") { trait_name = "Add"; func_name = "add"; }
         else if operator.eq("-") { trait_name = "Sub"; func_name = "sub"; }
         else if operator.eq("/") { trait_name = "Div"; func_name = "div"; }
+        else if operator.eq("==") { trait_name = "Eq"; func_name = "eq"; }
         else { return null; }
 
         if lhs_type.is_unknown() || rhs.return_type.is_unknown() { return null; }

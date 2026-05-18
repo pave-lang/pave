@@ -119,7 +119,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                 #line 51 "src/analyzer/statement/IfStatement.pv"
                 struct Primitive* prim = expression->return_type.primitive_value;
                 #line 52 "src/analyzer/statement/IfStatement.pv"
-                if (!str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                if (!str__Eq_str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
                     #line 53 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If condition must be a bool expression");
                     #line 54 "src/analyzer/statement/IfStatement.pv"
@@ -247,7 +247,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                         #line 107 "src/analyzer/statement/IfStatement.pv"
                         struct Primitive* prim = else_expression->return_type.primitive_value;
                         #line 108 "src/analyzer/statement/IfStatement.pv"
-                        if (!str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                        if (!str__Eq_str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
                             #line 109 "src/analyzer/statement/IfStatement.pv"
                             Context__error_token(context, else_expression->token, "If condition must be a bool expression");
                             #line 110 "src/analyzer/statement/IfStatement.pv"

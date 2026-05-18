@@ -40,7 +40,7 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent);
 #line 85 "src/analyzer/types/Trait.pv"
 bool Trait__has_dynamic_dispatch(struct Trait* self);
 
-#line 89 "src/analyzer/types/Trait.pv"
+#line 97 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self);
 
 #endif

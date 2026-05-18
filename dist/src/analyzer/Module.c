@@ -416,7 +416,7 @@ bool Module__parse(struct Module* self) {
             #line 231 "src/analyzer/Module.pv"
             uintptr_t stem_end = mod_path.length;
             #line 232 "src/analyzer/Module.pv"
-            if (stem_end >= 3 && str__eq(str__slice(mod_path, stem_end - 3, stem_end), (struct str){ .ptr = ".pv", .length = strlen(".pv") })) {
+            if (stem_end >= 3 && str__Eq_str__eq(str__slice(mod_path, stem_end - 3, stem_end), (struct str){ .ptr = ".pv", .length = strlen(".pv") })) {
                 #line 233 "src/analyzer/Module.pv"
                 stem_end = stem_end - 3;
             }
@@ -715,7 +715,7 @@ bool Module__prefill_types(struct Module* self) {
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
         #line 393 "src/analyzer/Module.pv"
-        if (str__eq(namespace->name, (struct str){ .ptr = "std", .length = strlen("std") })) {
+        if (str__Eq_str__eq(namespace->name, (struct str){ .ptr = "std", .length = strlen("std") })) {
             #line 394 "src/analyzer/Module.pv"
             struct Generic t = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
             #line 395 "src/analyzer/Module.pv"

@@ -113,10 +113,10 @@ struct Expression* Expression__parse_postfix_chain(struct Context* context, stru
 #line 6 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
 
-#line 71 "src/analyzer/expression/BinaryExpression.pv"
+#line 73 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_operator_trait_call(struct Context* context, struct Token* token, struct Expression* lhs, struct Type* lhs_type, struct str operator, struct Expression* rhs);
 
-#line 153 "src/analyzer/expression/BinaryExpression.pv"
+#line 156 "src/analyzer/expression/BinaryExpression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
 #endif

@@ -961,7 +961,7 @@ struct String Naming__get_type_decl(struct Naming* self, struct Type* type, stru
             #line 510 "src/analyzer/Naming.pv"
             struct String return_name = Naming__get_type_decl(self, &func_info->return_type, type_self, generics_map);
             #line 511 "src/analyzer/Naming.pv"
-            if (!str__eq(String__as_str(&return_name), (struct str){ .ptr = "void", .length = strlen("void") })) {
+            if (!str__Eq_str__eq(String__as_str(&return_name), (struct str){ .ptr = "void", .length = strlen("void") })) {
                 #line 512 "src/analyzer/Naming.pv"
                 String__append(&result, (struct str){ .ptr = ") -> ", .length = strlen(") -> ") });
                 #line 513 "src/analyzer/Naming.pv"

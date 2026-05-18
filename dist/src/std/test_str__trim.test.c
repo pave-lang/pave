@@ -10,11 +10,11 @@
 
 #line 1 "src/std/str.pv"
 void test_str__trim() {
-    #line 159 "src/std/str.pv"
+    #line 161 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "  hello  ", .length = strlen("  hello  ") };
-    #line 160 "src/std/str.pv"
-    if (!str__eq(str__trim(s), (struct str){ .ptr = "hello", .length = strlen("hello") })) {
-        #line 160 "src/std/str.pv"
+    #line 162 "src/std/str.pv"
+    if (!str__Eq_str__eq(str__trim(s), (struct str){ .ptr = "hello", .length = strlen("hello") })) {
+        #line 162 "src/std/str.pv"
         abort();
     }
 }

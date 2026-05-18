@@ -11,16 +11,16 @@
 
 #line 1 "src/std/str.pv"
 void test_str__index_of() {
-    #line 169 "src/std/str.pv"
+    #line 171 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "hello", .length = strlen("hello") };
-    #line 170 "src/std/str.pv"
+    #line 172 "src/std/str.pv"
     if (str__index_of(s, 'l') != 2) {
-        #line 170 "src/std/str.pv"
+        #line 172 "src/std/str.pv"
         abort();
     }
-    #line 171 "src/std/str.pv"
+    #line 173 "src/std/str.pv"
     if (str__index_of(s, 'z') != -1) {
-        #line 171 "src/std/str.pv"
+        #line 173 "src/std/str.pv"
         abort();
     }
 }
