@@ -192,4 +192,4 @@ Hashed str__Hash__hash(void* __self) {
     return Fnv1a__hash(self->ptr, self->length);
 }
 
-struct trait_HashVTable STR__VTABLE__HASH = { .hash = &str__Hash__hash };
+struct trait_HashVTable STR__VTABLE__HASH = { .fn_hash = &str__Hash__hash };

@@ -42,9 +42,9 @@ struct HashMap_str_usize HashMap_str_usize__with_capacity(struct trait_Allocator
 #line 53 "src/std/HashMap.pv"
 void HashMap_str_usize__resize(struct HashMap_str_usize* self, uintptr_t new_capacity) {
     #line 54 "src/std/HashMap.pv"
-    self->buckets = self->allocator.vtable->realloc(self->allocator.instance, self->buckets, new_capacity * sizeof(struct HashMapBucket_str_usize*));
+    self->buckets = self->allocator.vtable->fn_realloc(self->allocator.instance, self->buckets, new_capacity * sizeof(struct HashMapBucket_str_usize*));
     #line 55 "src/std/HashMap.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, new_capacity * sizeof(struct HashMapBucket_str_usize));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, new_capacity * sizeof(struct HashMapBucket_str_usize));
     #line 56 "src/std/HashMap.pv"
     self->capacity = new_capacity;
     #line 57 "src/std/HashMap.pv"
@@ -173,9 +173,9 @@ bool HashMap_str_usize__remove(struct HashMap_str_usize* self, struct str* key) 
 #line 129 "src/std/HashMap.pv"
 void HashMap_str_usize__release(struct HashMap_str_usize* self) {
     #line 130 "src/std/HashMap.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->buckets);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->buckets);
     #line 131 "src/std/HashMap.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 132 "src/std/HashMap.pv"
     self->buckets = 0;
     #line 133 "src/std/HashMap.pv"
@@ -220,8 +220,8 @@ struct HashMap_str_usize HashMap_str_usize__clone(struct HashMap_str_usize* self
     #line 157 "src/std/HashMap.pv"
     struct HashMap_str_usize other = (struct HashMap_str_usize) {
         .allocator = allocator,
-        .buckets = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(self->data)),
-        .data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct HashMapBucket_str_usize)),
+        .buckets = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(self->data)),
+        .data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(struct HashMapBucket_str_usize)),
         .length = self->length,
         .capacity = self->capacity,
     };

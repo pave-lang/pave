@@ -43,9 +43,9 @@ struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type
 #line 53 "src/std/HashMap.pv"
 void HashMap_str_tuple_ref_Trait_ref_Type__resize(struct HashMap_str_tuple_ref_Trait_ref_Type* self, uintptr_t new_capacity) {
     #line 54 "src/std/HashMap.pv"
-    self->buckets = self->allocator.vtable->realloc(self->allocator.instance, self->buckets, new_capacity * sizeof(struct HashMapBucket_str_tuple_ref_Trait_ref_Type*));
+    self->buckets = self->allocator.vtable->fn_realloc(self->allocator.instance, self->buckets, new_capacity * sizeof(struct HashMapBucket_str_tuple_ref_Trait_ref_Type*));
     #line 55 "src/std/HashMap.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, new_capacity * sizeof(struct HashMapBucket_str_tuple_ref_Trait_ref_Type));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, new_capacity * sizeof(struct HashMapBucket_str_tuple_ref_Trait_ref_Type));
     #line 56 "src/std/HashMap.pv"
     self->capacity = new_capacity;
     #line 57 "src/std/HashMap.pv"
@@ -174,9 +174,9 @@ bool HashMap_str_tuple_ref_Trait_ref_Type__remove(struct HashMap_str_tuple_ref_T
 #line 129 "src/std/HashMap.pv"
 void HashMap_str_tuple_ref_Trait_ref_Type__release(struct HashMap_str_tuple_ref_Trait_ref_Type* self) {
     #line 130 "src/std/HashMap.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->buckets);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->buckets);
     #line 131 "src/std/HashMap.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 132 "src/std/HashMap.pv"
     self->buckets = 0;
     #line 133 "src/std/HashMap.pv"
@@ -221,8 +221,8 @@ struct HashMap_str_tuple_ref_Trait_ref_Type HashMap_str_tuple_ref_Trait_ref_Type
     #line 157 "src/std/HashMap.pv"
     struct HashMap_str_tuple_ref_Trait_ref_Type other = (struct HashMap_str_tuple_ref_Trait_ref_Type) {
         .allocator = allocator,
-        .buckets = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(self->data)),
-        .data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct HashMapBucket_str_tuple_ref_Trait_ref_Type)),
+        .buckets = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(self->data)),
+        .data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(struct HashMapBucket_str_tuple_ref_Trait_ref_Type)),
         .length = self->length,
         .capacity = self->capacity,
     };

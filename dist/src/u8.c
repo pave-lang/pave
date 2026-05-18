@@ -12,4 +12,4 @@ Hashed u8__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(uint8_t));
 }
 
-struct trait_HashVTable U8__VTABLE__HASH = { .hash = &u8__Hash__hash };
+struct trait_HashVTable U8__VTABLE__HASH = { .fn_hash = &u8__Hash__hash };

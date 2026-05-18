@@ -49,7 +49,7 @@ void Array_EnumVariantParameter__reserve(struct Array_EnumVariantParameter* self
     }
 
     #line 99 "src/std/Array.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, capacity * sizeof(struct EnumVariantParameter));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, capacity * sizeof(struct EnumVariantParameter));
     #line 100 "src/std/Array.pv"
     self->capacity = capacity;
 }
@@ -159,7 +159,7 @@ void Array_EnumVariantParameter__clear(struct Array_EnumVariantParameter* self) 
 #line 165 "src/std/Array.pv"
 void Array_EnumVariantParameter__release(struct Array_EnumVariantParameter* self) {
     #line 166 "src/std/Array.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 167 "src/std/Array.pv"
     self->data = 0;
     #line 168 "src/std/Array.pv"
@@ -171,7 +171,7 @@ void Array_EnumVariantParameter__release(struct Array_EnumVariantParameter* self
 #line 172 "src/std/Array.pv"
 struct Array_EnumVariantParameter Array_EnumVariantParameter__clone(struct Array_EnumVariantParameter* self, struct trait_Allocator allocator) {
     #line 173 "src/std/Array.pv"
-    struct EnumVariantParameter* data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct EnumVariantParameter));
+    struct EnumVariantParameter* data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(struct EnumVariantParameter));
     #line 174 "src/std/Array.pv"
     memcpy(data, self->data, self->length * sizeof(struct EnumVariantParameter));
 

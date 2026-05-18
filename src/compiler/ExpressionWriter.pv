@@ -442,7 +442,7 @@ impl ExpressionWriter {
 
                                 if arg.value.return_type.deref().is_trait() {
                                     success = self.write_expression(file, arg.value, generics) && success;
-                                    fprintf(file, ".vtable->");
+                                    fprintf(file, ".vtable->fn_");
                                     success = generator.write_str(file, name) && success;
                                     fprintf(file, "(");
                                     success = self.write_expression(file, arg.value, generics) && success;

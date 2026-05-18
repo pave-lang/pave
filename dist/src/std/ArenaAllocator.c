@@ -596,7 +596,7 @@ void* ArenaAllocator__Allocator__alloc(void* __self, uintptr_t size) {
         #line 178 "src/std/ArenaAllocator.pv"
         uintptr_t total_size = sizeof(struct ArenaOversize) + size;
         #line 179 "src/std/ArenaAllocator.pv"
-        struct ArenaOversize* oversize = self->allocator.vtable->alloc(self->allocator.instance, total_size);
+        struct ArenaOversize* oversize = self->allocator.vtable->fn_alloc(self->allocator.instance, total_size);
         #line 180 "src/std/ArenaAllocator.pv"
         oversize->size = size;
         #line 181 "src/std/ArenaAllocator.pv"
@@ -761,7 +761,7 @@ bool ArenaAllocator__Allocator__free(void* __self, void* ptr) {
             }
 
             #line 263 "src/std/ArenaAllocator.pv"
-            return self->allocator.vtable->free(self->allocator.instance, oversize);
+            return self->allocator.vtable->fn_free(self->allocator.instance, oversize);
         }
 
         #line 266 "src/std/ArenaAllocator.pv"
@@ -791,4 +791,4 @@ bool ArenaAllocator__Allocator__free(void* __self, void* ptr) {
     return false;
 }
 
-struct trait_AllocatorVTable ARENA_ALLOCATOR__VTABLE__ALLOCATOR = { .alloc = &ArenaAllocator__Allocator__alloc, .realloc = &ArenaAllocator__Allocator__realloc, .free = &ArenaAllocator__Allocator__free };
+struct trait_AllocatorVTable ARENA_ALLOCATOR__VTABLE__ALLOCATOR = { .fn_alloc = &ArenaAllocator__Allocator__alloc, .fn_realloc = &ArenaAllocator__Allocator__realloc, .fn_free = &ArenaAllocator__Allocator__free };

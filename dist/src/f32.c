@@ -12,4 +12,4 @@ Hashed f32__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(float));
 }
 
-struct trait_HashVTable F32__VTABLE__HASH = { .hash = &f32__Hash__hash };
+struct trait_HashVTable F32__VTABLE__HASH = { .fn_hash = &f32__Hash__hash };

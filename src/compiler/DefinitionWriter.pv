@@ -114,6 +114,8 @@ impl DefinitionWriter {
         let generator = self.generator;
         generator.write_line_directive(file, func_info.context, func_info.name);
 
+        generator.write_indent(file);
+
         if func_info.type == FunctionType::Coroutine {
             fprintf(file, "bool");
         } else {
@@ -275,9 +277,9 @@ impl DefinitionWriter {
 
             generator.write_str_title(file, func_info.name.value);
 
-            fprintf(file, "__VTABLE__ITER = { .next = ");
+            fprintf(file, "__VTABLE__ITER = { .fn_next = ");
             generator.write_function_name(file, func_info, generics);
-            fprintf(file, "__next, .value = ");
+            fprintf(file, "__next, .fn_value = ");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__value };\n\n");
 
@@ -660,11 +662,10 @@ impl DefinitionWriter {
         for (_, &func_info) in trait_info.functions {
             if func_info.generics.array.length == 0 {
                 let func_name = String::new(generator.allocator);
-                func_name.append("(*");
+                func_name.append("(*fn_");
                 func_name.append(func_info.name.value);
                 func_name.append(")");
 
-                generator.write_indent(file);
                 if !self.write_function_definition(file, func_info, &void_self_generics, &func_name) { return false; }
                 fprintf(file, ";\n");
             }
@@ -928,19 +929,19 @@ impl DefinitionWriter {
             fprintf(file, "__VTABLE__DYN_FN");
         }
 
-        fprintf(file, " = { .get_params = &");
+        fprintf(file, " = { .fn_get_params = &");
         generator.write_function_name(file, func_info, generics);
 
         if generator.is_coroutine() {
-            fprintf(file, "__Co__get_params, .set_arg = &");
+            fprintf(file, "__Co__get_params, .fn_set_arg = &");
             generator.write_function_name(file, func_info, generics);
-            fprintf(file, "__Co__set_arg, .init = &");
+            fprintf(file, "__Co__set_arg, .fn_init = &");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Co__init };\n");
         } else {
-            fprintf(file, "__Fn__get_params, .set_arg = &");
+            fprintf(file, "__Fn__get_params, .fn_set_arg = &");
             generator.write_function_name(file, func_info, generics);
-            fprintf(file, "__Fn__set_arg, .execute = &");
+            fprintf(file, "__Fn__set_arg, .fn_execute = &");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Fn__execute };\n");
         }

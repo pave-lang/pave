@@ -563,7 +563,7 @@ impl BlockWriter {
                                 generator.write_indent(file);
                                 fprintf(file, "while (");
                                 expr.write_expression(file, iter_expression, generics);
-                                fprintf(file, ".vtable->next(");
+                                fprintf(file, ".vtable->fn_next(");
                                 expr.write_expression(file, iter_expression, generics);
                                 fprintf(file, ".instance)) {");
 
@@ -581,7 +581,7 @@ impl BlockWriter {
                                         if variable.ref { fprintf(file, "&"); }
                                         if variable.deref { fprintf(file, "*"); }
                                         expr.write_expression(file, iter_expression, generics);
-                                        fprintf(file, ".vtable->value");
+                                        fprintf(file, ".vtable->fn_value");
                                         if for_statement.variables.length > 1 { fprintf(file, "_%zu", i); }
                                         fprintf(file, "(");
                                         expr.write_expression(file, iter_expression, generics);

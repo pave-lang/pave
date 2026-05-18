@@ -49,7 +49,7 @@ void Array_NamespacePath__reserve(struct Array_NamespacePath* self, uintptr_t ca
     }
 
     #line 99 "src/std/Array.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, capacity * sizeof(struct NamespacePath));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, capacity * sizeof(struct NamespacePath));
     #line 100 "src/std/Array.pv"
     self->capacity = capacity;
 }
@@ -159,7 +159,7 @@ void Array_NamespacePath__clear(struct Array_NamespacePath* self) {
 #line 165 "src/std/Array.pv"
 void Array_NamespacePath__release(struct Array_NamespacePath* self) {
     #line 166 "src/std/Array.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 167 "src/std/Array.pv"
     self->data = 0;
     #line 168 "src/std/Array.pv"
@@ -171,7 +171,7 @@ void Array_NamespacePath__release(struct Array_NamespacePath* self) {
 #line 172 "src/std/Array.pv"
 struct Array_NamespacePath Array_NamespacePath__clone(struct Array_NamespacePath* self, struct trait_Allocator allocator) {
     #line 173 "src/std/Array.pv"
-    struct NamespacePath* data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct NamespacePath));
+    struct NamespacePath* data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(struct NamespacePath));
     #line 174 "src/std/Array.pv"
     memcpy(data, self->data, self->length * sizeof(struct NamespacePath));
 

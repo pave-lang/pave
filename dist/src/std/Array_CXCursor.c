@@ -48,7 +48,7 @@ void Array_CXCursor__reserve(struct Array_CXCursor* self, uintptr_t capacity) {
     }
 
     #line 99 "src/std/Array.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, capacity * sizeof(CXCursor));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, capacity * sizeof(CXCursor));
     #line 100 "src/std/Array.pv"
     self->capacity = capacity;
 }
@@ -158,7 +158,7 @@ void Array_CXCursor__clear(struct Array_CXCursor* self) {
 #line 165 "src/std/Array.pv"
 void Array_CXCursor__release(struct Array_CXCursor* self) {
     #line 166 "src/std/Array.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 167 "src/std/Array.pv"
     self->data = 0;
     #line 168 "src/std/Array.pv"
@@ -170,7 +170,7 @@ void Array_CXCursor__release(struct Array_CXCursor* self) {
 #line 172 "src/std/Array.pv"
 struct Array_CXCursor Array_CXCursor__clone(struct Array_CXCursor* self, struct trait_Allocator allocator) {
     #line 173 "src/std/Array.pv"
-    CXCursor* data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(CXCursor));
+    CXCursor* data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(CXCursor));
     #line 174 "src/std/Array.pv"
     memcpy(data, self->data, self->length * sizeof(CXCursor));
 

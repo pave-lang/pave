@@ -49,7 +49,7 @@ void Array_DeferStatement__reserve(struct Array_DeferStatement* self, uintptr_t 
     }
 
     #line 99 "src/std/Array.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, capacity * sizeof(struct DeferStatement));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, capacity * sizeof(struct DeferStatement));
     #line 100 "src/std/Array.pv"
     self->capacity = capacity;
 }
@@ -159,7 +159,7 @@ void Array_DeferStatement__clear(struct Array_DeferStatement* self) {
 #line 165 "src/std/Array.pv"
 void Array_DeferStatement__release(struct Array_DeferStatement* self) {
     #line 166 "src/std/Array.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 167 "src/std/Array.pv"
     self->data = 0;
     #line 168 "src/std/Array.pv"
@@ -171,7 +171,7 @@ void Array_DeferStatement__release(struct Array_DeferStatement* self) {
 #line 172 "src/std/Array.pv"
 struct Array_DeferStatement Array_DeferStatement__clone(struct Array_DeferStatement* self, struct trait_Allocator allocator) {
     #line 173 "src/std/Array.pv"
-    struct DeferStatement* data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct DeferStatement));
+    struct DeferStatement* data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(struct DeferStatement));
     #line 174 "src/std/Array.pv"
     memcpy(data, self->data, self->length * sizeof(struct DeferStatement));
 

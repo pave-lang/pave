@@ -7,8 +7,8 @@
 
 #line 1 "src/std/Iterator.pv"
 struct trait_IteratorVTable {
-        #line 2 "src/std/Iterator.pv"
-bool (*next)(void* __self);
+    #line 2 "src/std/Iterator.pv"
+    bool (*fn_next)(void* __self);
 };
 
 #line 1 "src/std/Iterator.pv"

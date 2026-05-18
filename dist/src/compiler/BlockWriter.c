@@ -1185,7 +1185,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                             #line 565 "src/compiler/BlockWriter.pv"
                             ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
                             #line 566 "src/compiler/BlockWriter.pv"
-                            fprintf(file, ".vtable->next(");
+                            fprintf(file, ".vtable->fn_next(");
                             #line 567 "src/compiler/BlockWriter.pv"
                             ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
                             #line 568 "src/compiler/BlockWriter.pv"
@@ -1230,7 +1230,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                     #line 583 "src/compiler/BlockWriter.pv"
                                     ExpressionWriter__write_expression(&expr, file, iter_expression, generics);
                                     #line 584 "src/compiler/BlockWriter.pv"
-                                    fprintf(file, ".vtable->value");
+                                    fprintf(file, ".vtable->fn_value");
                                     #line 585 "src/compiler/BlockWriter.pv"
                                     if (for_statement->variables.length > 1) {
                                         #line 585 "src/compiler/BlockWriter.pv"

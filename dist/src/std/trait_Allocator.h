@@ -8,12 +8,12 @@
 
 #line 1 "src/std/Allocator.pv"
 struct trait_AllocatorVTable {
-        #line 2 "src/std/Allocator.pv"
-void* (*alloc)(void* __self, uintptr_t size);
-        #line 3 "src/std/Allocator.pv"
-void* (*realloc)(void* __self, void* ptr, uintptr_t new_size);
-        #line 4 "src/std/Allocator.pv"
-bool (*free)(void* __self, void* ptr);
+    #line 2 "src/std/Allocator.pv"
+    void* (*fn_alloc)(void* __self, uintptr_t size);
+    #line 3 "src/std/Allocator.pv"
+    void* (*fn_realloc)(void* __self, void* ptr, uintptr_t new_size);
+    #line 4 "src/std/Allocator.pv"
+    bool (*fn_free)(void* __self, void* ptr);
 };
 
 #line 1 "src/std/Allocator.pv"

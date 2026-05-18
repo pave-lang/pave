@@ -942,7 +942,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                                 #line 444 "src/compiler/ExpressionWriter.pv"
                                 success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                                 #line 445 "src/compiler/ExpressionWriter.pv"
-                                fprintf(file, ".vtable->");
+                                fprintf(file, ".vtable->fn_");
                                 #line 446 "src/compiler/ExpressionWriter.pv"
                                 success = Generator__write_str(generator, file, name) && success;
                                 #line 447 "src/compiler/ExpressionWriter.pv"

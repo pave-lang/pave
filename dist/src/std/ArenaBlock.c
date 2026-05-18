@@ -16,7 +16,7 @@
 #line 25 "src/std/ArenaAllocator.pv"
 struct ArenaBlock* ArenaBlock__new(struct trait_Allocator allocator, uintptr_t capacity, struct ArenaBlock* prev) {
     #line 26 "src/std/ArenaAllocator.pv"
-    uint8_t* buffer = allocator.vtable->alloc(allocator.instance, capacity);
+    uint8_t* buffer = allocator.vtable->fn_alloc(allocator.instance, capacity);
     #line 27 "src/std/ArenaAllocator.pv"
     if (buffer == 0) {
         #line 28 "src/std/ArenaAllocator.pv"
@@ -128,7 +128,7 @@ bool ArenaBlock__free(struct ArenaBlock* self, void* ptr) {
 #line 91 "src/std/ArenaAllocator.pv"
 void ArenaBlock__destroy(struct ArenaBlock* self, struct trait_Allocator allocator) {
     #line 92 "src/std/ArenaAllocator.pv"
-    allocator.vtable->free(allocator.instance, self->buffer);
+    allocator.vtable->fn_free(allocator.instance, self->buffer);
 }
 
 #line 95 "src/std/ArenaAllocator.pv"

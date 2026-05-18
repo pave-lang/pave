@@ -49,7 +49,7 @@ void Array_TypeImpl__reserve(struct Array_TypeImpl* self, uintptr_t capacity) {
     }
 
     #line 99 "src/std/Array.pv"
-    self->data = self->allocator.vtable->realloc(self->allocator.instance, self->data, capacity * sizeof(struct TypeImpl));
+    self->data = self->allocator.vtable->fn_realloc(self->allocator.instance, self->data, capacity * sizeof(struct TypeImpl));
     #line 100 "src/std/Array.pv"
     self->capacity = capacity;
 }
@@ -159,7 +159,7 @@ void Array_TypeImpl__clear(struct Array_TypeImpl* self) {
 #line 165 "src/std/Array.pv"
 void Array_TypeImpl__release(struct Array_TypeImpl* self) {
     #line 166 "src/std/Array.pv"
-    self->allocator.vtable->free(self->allocator.instance, self->data);
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 167 "src/std/Array.pv"
     self->data = 0;
     #line 168 "src/std/Array.pv"
@@ -171,7 +171,7 @@ void Array_TypeImpl__release(struct Array_TypeImpl* self) {
 #line 172 "src/std/Array.pv"
 struct Array_TypeImpl Array_TypeImpl__clone(struct Array_TypeImpl* self, struct trait_Allocator allocator) {
     #line 173 "src/std/Array.pv"
-    struct TypeImpl* data = allocator.vtable->alloc(allocator.instance, self->capacity * sizeof(struct TypeImpl));
+    struct TypeImpl* data = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(struct TypeImpl));
     #line 174 "src/std/Array.pv"
     memcpy(data, self->data, self->length * sizeof(struct TypeImpl));
 

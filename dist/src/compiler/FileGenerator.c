@@ -708,7 +708,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
             }
 
             #line 309 "src/compiler/FileGenerator.pv"
-            fprintf(code_file, ".");
+            fprintf(code_file, ".fn_");
             #line 310 "src/compiler/FileGenerator.pv"
             Generator__write_token(generator, code_file, func_info->name);
             #line 311 "src/compiler/FileGenerator.pv"
@@ -991,15 +991,15 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
         #line 463 "src/compiler/FileGenerator.pv"
         fprintf(code_file, "__VTABLE__STRUCT");
         #line 464 "src/compiler/FileGenerator.pv"
-        fprintf(code_file, " = { .get_fields = &");
+        fprintf(code_file, " = { .fn_get_fields = &");
         #line 465 "src/compiler/FileGenerator.pv"
         Generator__write_string(generator, code_file, &name);
         #line 466 "src/compiler/FileGenerator.pv"
-        fprintf(code_file, "__Struct__get_fields, .get_field = &");
+        fprintf(code_file, "__Struct__get_fields, .fn_get_field = &");
         #line 467 "src/compiler/FileGenerator.pv"
         Generator__write_string(generator, code_file, &name);
         #line 468 "src/compiler/FileGenerator.pv"
-        fprintf(code_file, "__Struct__get_field, .set_field = &");
+        fprintf(code_file, "__Struct__get_field, .fn_set_field = &");
         #line 469 "src/compiler/FileGenerator.pv"
         Generator__write_string(generator, code_file, &name);
         #line 470 "src/compiler/FileGenerator.pv"
@@ -1201,7 +1201,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
             }
 
             #line 559 "src/compiler/FileGenerator.pv"
-            fprintf(code_file, ".");
+            fprintf(code_file, ".fn_");
             #line 560 "src/compiler/FileGenerator.pv"
             Generator__write_token(generator, code_file, func_info->name);
             #line 561 "src/compiler/FileGenerator.pv"

@@ -9,12 +9,12 @@
 
 #line 1 "src/std/Struct.pv"
 struct trait_StructVTable {
-        #line 2 "src/std/Struct.pv"
-struct slice_tuple_usize_str_TypeId (*get_fields)(void* __self);
-        #line 3 "src/std/Struct.pv"
-void* (*get_field)(void* __self, uintptr_t index);
-        #line 4 "src/std/Struct.pv"
-bool (*set_field)(void* __self, uintptr_t index, void* value);
+    #line 2 "src/std/Struct.pv"
+    struct slice_tuple_usize_str_TypeId (*fn_get_fields)(void* __self);
+    #line 3 "src/std/Struct.pv"
+    void* (*fn_get_field)(void* __self, uintptr_t index);
+    #line 4 "src/std/Struct.pv"
+    bool (*fn_set_field)(void* __self, uintptr_t index, void* value);
 };
 
 #line 1 "src/std/Struct.pv"

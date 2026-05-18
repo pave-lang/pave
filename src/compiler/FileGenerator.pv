@@ -306,7 +306,7 @@ impl FileGenerator {
                 if first { first = false; }
                 else { fprintf(code_file, ", "); }
 
-                fprintf(code_file, ".");
+                fprintf(code_file, ".fn_");
                 generator.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
                 let func_name = generator.get_trait_function_name(name.as_str(), trait_info, trait_entry.1, func_info, generics);
@@ -461,11 +461,11 @@ impl FileGenerator {
             fprintf(code_file, "struct trait_StructVTable ");
             generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__STRUCT");
-            fprintf(code_file, " = { .get_fields = &");
+            fprintf(code_file, " = { .fn_get_fields = &");
             generator.write_string(code_file, &name);
-            fprintf(code_file, "__Struct__get_fields, .get_field = &");
+            fprintf(code_file, "__Struct__get_fields, .fn_get_field = &");
             generator.write_string(code_file, &name);
-            fprintf(code_file, "__Struct__get_field, .set_field = &");
+            fprintf(code_file, "__Struct__get_field, .fn_set_field = &");
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__set_field };\n");
         }
@@ -556,7 +556,7 @@ impl FileGenerator {
                 if first { first = false; }
                 else { fprintf(code_file, ", "); }
 
-                fprintf(code_file, ".");
+                fprintf(code_file, ".fn_");
                 generator.write_token(code_file, func_info.name);
                 fprintf(code_file, " = &");
                 let func_name = generator.get_trait_function_name(name, trait_info, &impl_info.trait_type, func_info, generics);

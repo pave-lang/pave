@@ -12,4 +12,4 @@ Hashed isize__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(intptr_t));
 }
 
-struct trait_HashVTable ISIZE__VTABLE__HASH = { .hash = &isize__Hash__hash };
+struct trait_HashVTable ISIZE__VTABLE__HASH = { .fn_hash = &isize__Hash__hash };

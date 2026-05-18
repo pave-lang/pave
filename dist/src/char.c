@@ -12,4 +12,4 @@ Hashed char__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(char));
 }
 
-struct trait_HashVTable CHAR__VTABLE__HASH = { .hash = &char__Hash__hash };
+struct trait_HashVTable CHAR__VTABLE__HASH = { .fn_hash = &char__Hash__hash };
