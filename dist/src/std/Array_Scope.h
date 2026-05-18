@@ -65,4 +65,8 @@ struct Iter_ref_Scope Array_Scope__iter(struct Array_Scope* self);
 #line 188 "src/std/Array.pv"
 struct slice_Scope Array_Scope__as_slice(struct Array_Scope* self);
 
+#line 195 "src/std/Array.pv"
+struct Scope* Array_Scope__Index__index(void* __self);
+
+
 #endif

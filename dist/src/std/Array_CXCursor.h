@@ -64,4 +64,8 @@ struct Iter_ref_CXCursor Array_CXCursor__iter(struct Array_CXCursor* self);
 #line 188 "src/std/Array.pv"
 struct slice_CXCursor Array_CXCursor__as_slice(struct Array_CXCursor* self);
 
+#line 195 "src/std/Array.pv"
+CXCursor* Array_CXCursor__Index__index(void* __self);
+
+
 #endif

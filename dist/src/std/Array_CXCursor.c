@@ -194,3 +194,11 @@ struct slice_CXCursor Array_CXCursor__as_slice(struct Array_CXCursor* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_CXCursor) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+CXCursor* Array_CXCursor__Index__index(void* __self) {
+    struct Array_CXCursor* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

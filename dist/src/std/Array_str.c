@@ -195,3 +195,11 @@ struct slice_str Array_str__as_slice(struct Array_str* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_str) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct str* Array_str__Index__index(void* __self) {
+    struct Array_str* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

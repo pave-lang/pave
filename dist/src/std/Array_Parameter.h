@@ -65,4 +65,8 @@ struct Iter_ref_Parameter Array_Parameter__iter(struct Array_Parameter* self);
 #line 188 "src/std/Array.pv"
 struct slice_Parameter Array_Parameter__as_slice(struct Array_Parameter* self);
 
+#line 195 "src/std/Array.pv"
+struct Parameter* Array_Parameter__Index__index(void* __self);
+
+
 #endif

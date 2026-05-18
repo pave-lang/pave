@@ -65,4 +65,8 @@ struct Iter_ref_DeferStatement Array_DeferStatement__iter(struct Array_DeferStat
 #line 188 "src/std/Array.pv"
 struct slice_DeferStatement Array_DeferStatement__as_slice(struct Array_DeferStatement* self);
 
+#line 195 "src/std/Array.pv"
+struct DeferStatement* Array_DeferStatement__Index__index(void* __self);
+
+
 #endif

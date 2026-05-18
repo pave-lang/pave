@@ -190,6 +190,13 @@ impl<T> Array<T> {
     }
 }
 
+impl<T> Index for Array<T> {
+    typedef Output = T;
+    fn index(&self) -> *T {
+        return self.data;
+    }
+}
+
 // impl<T> Deref<[T]> for Array<T> {
 //     fn deref(&self) -> &[T] {
 //         return self.data[..self.length];

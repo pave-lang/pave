@@ -65,4 +65,8 @@ struct Iter_ref_MatchCase Array_MatchCase__iter(struct Array_MatchCase* self);
 #line 188 "src/std/Array.pv"
 struct slice_MatchCase Array_MatchCase__as_slice(struct Array_MatchCase* self);
 
+#line 195 "src/std/Array.pv"
+struct MatchCase* Array_MatchCase__Index__index(void* __self);
+
+
 #endif

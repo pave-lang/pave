@@ -65,4 +65,8 @@ struct Iter_ref_Diagnostic Array_Diagnostic__iter(struct Array_Diagnostic* self)
 #line 188 "src/std/Array.pv"
 struct slice_Diagnostic Array_Diagnostic__as_slice(struct Array_Diagnostic* self);
 
+#line 195 "src/std/Array.pv"
+struct Diagnostic* Array_Diagnostic__Index__index(void* __self);
+
+
 #endif

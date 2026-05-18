@@ -65,4 +65,8 @@ struct Iter_ref_str Array_str__iter(struct Array_str* self);
 #line 188 "src/std/Array.pv"
 struct slice_str Array_str__as_slice(struct Array_str* self);
 
+#line 195 "src/std/Array.pv"
+struct str* Array_str__Index__index(void* __self);
+
+
 #endif

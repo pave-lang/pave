@@ -65,4 +65,8 @@ struct Iter_ref_Statement Array_Statement__iter(struct Array_Statement* self);
 #line 188 "src/std/Array.pv"
 struct slice_Statement Array_Statement__as_slice(struct Array_Statement* self);
 
+#line 195 "src/std/Array.pv"
+struct Statement* Array_Statement__Index__index(void* __self);
+
+
 #endif

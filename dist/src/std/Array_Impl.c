@@ -195,3 +195,11 @@ struct slice_Impl Array_Impl__as_slice(struct Array_Impl* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_Impl) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct Impl* Array_Impl__Index__index(void* __self) {
+    struct Array_Impl* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

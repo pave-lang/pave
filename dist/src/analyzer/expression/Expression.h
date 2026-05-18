@@ -119,10 +119,10 @@ struct Expression* Expression__find_operator_trait_call(struct Context* context,
 #line 162 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_unary_trait_call(struct Context* context, struct Token* token, struct Expression* operand);
 
-#line 203 "src/analyzer/expression/BinaryExpression.pv"
+#line 204 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_index_trait_call(struct Context* context, struct Token* token, struct Expression* inner, struct Expression* index_expr);
 
-#line 243 "src/analyzer/expression/BinaryExpression.pv"
+#line 245 "src/analyzer/expression/BinaryExpression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
 #endif

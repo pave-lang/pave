@@ -65,4 +65,8 @@ struct Iter_ref_UsageContext Array_UsageContext__iter(struct Array_UsageContext*
 #line 188 "src/std/Array.pv"
 struct slice_UsageContext Array_UsageContext__as_slice(struct Array_UsageContext* self);
 
+#line 195 "src/std/Array.pv"
+struct UsageContext* Array_UsageContext__Index__index(void* __self);
+
+
 #endif

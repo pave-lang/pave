@@ -195,3 +195,11 @@ struct slice_Generic Array_Generic__as_slice(struct Array_Generic* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_Generic) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct Generic* Array_Generic__Index__index(void* __self) {
+    struct Array_Generic* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

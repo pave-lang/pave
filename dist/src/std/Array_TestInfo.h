@@ -65,4 +65,8 @@ struct Iter_ref_TestInfo Array_TestInfo__iter(struct Array_TestInfo* self);
 #line 188 "src/std/Array.pv"
 struct slice_TestInfo Array_TestInfo__as_slice(struct Array_TestInfo* self);
 
+#line 195 "src/std/Array.pv"
+struct TestInfo* Array_TestInfo__Index__index(void* __self);
+
+
 #endif

@@ -63,4 +63,8 @@ struct Iter_ref_ref_Namespace Array_ref_Namespace__iter(struct Array_ref_Namespa
 #line 188 "src/std/Array.pv"
 struct slice_ref_Namespace Array_ref_Namespace__as_slice(struct Array_ref_Namespace* self);
 
+#line 195 "src/std/Array.pv"
+struct Namespace** Array_ref_Namespace__Index__index(void* __self);
+
+
 #endif

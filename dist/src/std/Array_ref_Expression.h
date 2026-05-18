@@ -63,4 +63,8 @@ struct Iter_ref_ref_Expression Array_ref_Expression__iter(struct Array_ref_Expre
 #line 188 "src/std/Array.pv"
 struct slice_ref_Expression Array_ref_Expression__as_slice(struct Array_ref_Expression* self);
 
+#line 195 "src/std/Array.pv"
+struct Expression** Array_ref_Expression__Index__index(void* __self);
+
+
 #endif

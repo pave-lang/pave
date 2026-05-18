@@ -63,4 +63,8 @@ struct Iter_ref_ref_Trait Array_ref_Trait__iter(struct Array_ref_Trait* self);
 #line 188 "src/std/Array.pv"
 struct slice_ref_Trait Array_ref_Trait__as_slice(struct Array_ref_Trait* self);
 
+#line 195 "src/std/Array.pv"
+struct Trait** Array_ref_Trait__Index__index(void* __self);
+
+
 #endif

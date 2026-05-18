@@ -194,3 +194,11 @@ struct slice_ptrc_char Array_ptrc_char__as_slice(struct Array_ptrc_char* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_ptrc_char) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+char const** Array_ptrc_char__Index__index(void* __self) {
+    struct Array_ptrc_char* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

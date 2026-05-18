@@ -65,4 +65,8 @@ struct Iter_ref_InlayHint Array_InlayHint__iter(struct Array_InlayHint* self);
 #line 188 "src/std/Array.pv"
 struct slice_InlayHint Array_InlayHint__as_slice(struct Array_InlayHint* self);
 
+#line 195 "src/std/Array.pv"
+struct InlayHint* Array_InlayHint__Index__index(void* __self);
+
+
 #endif

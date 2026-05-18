@@ -65,4 +65,8 @@ struct Iter_ref_MatchPattern Array_MatchPattern__iter(struct Array_MatchPattern*
 #line 188 "src/std/Array.pv"
 struct slice_MatchPattern Array_MatchPattern__as_slice(struct Array_MatchPattern* self);
 
+#line 195 "src/std/Array.pv"
+struct MatchPattern* Array_MatchPattern__Index__index(void* __self);
+
+
 #endif

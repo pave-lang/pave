@@ -65,4 +65,8 @@ struct Iter_ref_Token Array_Token__iter(struct Array_Token* self);
 #line 188 "src/std/Array.pv"
 struct slice_Token Array_Token__as_slice(struct Array_Token* self);
 
+#line 195 "src/std/Array.pv"
+struct Token* Array_Token__Index__index(void* __self);
+
+
 #endif

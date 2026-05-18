@@ -195,3 +195,11 @@ struct slice_ref_Trait Array_ref_Trait__as_slice(struct Array_ref_Trait* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_ref_Trait) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct Trait** Array_ref_Trait__Index__index(void* __self) {
+    struct Array_ref_Trait* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

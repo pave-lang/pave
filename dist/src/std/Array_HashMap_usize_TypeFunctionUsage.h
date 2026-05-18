@@ -65,4 +65,8 @@ struct Iter_ref_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFunction
 #line 188 "src/std/Array.pv"
 struct slice_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFunctionUsage__as_slice(struct Array_HashMap_usize_TypeFunctionUsage* self);
 
+#line 195 "src/std/Array.pv"
+struct HashMap_usize_TypeFunctionUsage* Array_HashMap_usize_TypeFunctionUsage__Index__index(void* __self);
+
+
 #endif

@@ -65,4 +65,8 @@ struct Iter_ref_ForVariable Array_ForVariable__iter(struct Array_ForVariable* se
 #line 188 "src/std/Array.pv"
 struct slice_ForVariable Array_ForVariable__as_slice(struct Array_ForVariable* self);
 
+#line 195 "src/std/Array.pv"
+struct ForVariable* Array_ForVariable__Index__index(void* __self);
+
+
 #endif

@@ -65,4 +65,8 @@ struct Iter_ref_TypeId Array_TypeId__iter(struct Array_TypeId* self);
 #line 188 "src/std/Array.pv"
 struct slice_TypeId Array_TypeId__as_slice(struct Array_TypeId* self);
 
+#line 195 "src/std/Array.pv"
+TypeId* Array_TypeId__Index__index(void* __self);
+
+
 #endif

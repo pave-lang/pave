@@ -65,4 +65,8 @@ struct Iter_ref_FunctionScope Array_FunctionScope__iter(struct Array_FunctionSco
 #line 188 "src/std/Array.pv"
 struct slice_FunctionScope Array_FunctionScope__as_slice(struct Array_FunctionScope* self);
 
+#line 195 "src/std/Array.pv"
+struct FunctionScope* Array_FunctionScope__Index__index(void* __self);
+
+
 #endif

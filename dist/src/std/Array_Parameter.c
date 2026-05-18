@@ -195,3 +195,11 @@ struct slice_Parameter Array_Parameter__as_slice(struct Array_Parameter* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_Parameter) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct Parameter* Array_Parameter__Index__index(void* __self) {
+    struct Array_Parameter* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

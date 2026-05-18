@@ -195,3 +195,11 @@ struct slice_MatchPattern Array_MatchPattern__as_slice(struct Array_MatchPattern
     #line 189 "src/std/Array.pv"
     return (struct slice_MatchPattern) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct MatchPattern* Array_MatchPattern__Index__index(void* __self) {
+    struct Array_MatchPattern* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

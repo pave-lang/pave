@@ -182,7 +182,8 @@ impl Expression {
                         let aug_map_val = generic_map.clone(context.allocator);
                         let aug_map = context.allocator.store(&aug_map_val);
                         for (name, &typedef_type) in impl_info.typedefs {
-                            aug_map.insert(name, *typedef_type);
+                            let resolved = Context::resolve_type(context.allocator, typedef_type, generic_map, null);
+                            aug_map.insert(name, *resolved);
                         }
                         func_map = aug_map;
                     }
@@ -211,17 +212,15 @@ impl Expression {
 
                     let func = impl_info.functions.find("index");
                     if func == null { continue; }
-                    if func.parameters.length < 2 { continue; }
-
-                    let other_param = func.parameters.get(1);
-                    if !other_param.type.eq(&index_expr.return_type) { continue; }
+                    if func.parameters.length < 1 { continue; }
 
                     let func_map: *GenericMap = generic_map;
                     if impl_info.typedefs.length > 0 {
                         let aug_map_val = generic_map.clone(context.allocator);
                         let aug_map = context.allocator.store(&aug_map_val);
                         for (name, &typedef_type) in impl_info.typedefs {
-                            aug_map.insert(name, *typedef_type);
+                            let resolved = Context::resolve_type(context.allocator, typedef_type, generic_map, null);
+                            aug_map.insert(name, *resolved);
                         }
                         func_map = aug_map;
                     }
@@ -229,9 +228,12 @@ impl Expression {
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
                     let arguments = Array<InvokeArgument>::new(context.allocator);
                     arguments.append(InvokeArgument { name: null, value: inner });
-                    arguments.append(InvokeArgument { name: null, value: index_expr });
 
-                    return Expression::make_type_function_call(context, token, func_type, arguments, null);
+                    let ptr_expr = Expression::make_type_function_call(context, token, func_type, arguments, null);
+                    if ptr_expr == null { return null; }
+
+                    let element_type = ptr_expr.return_type.deref();
+                    return Expression::make(context.allocator, token, ExpressionData::IndexExpression(ptr_expr, index_expr), element_type);
                 }
             },
             _ => {},

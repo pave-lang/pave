@@ -195,3 +195,11 @@ struct slice_ForVariable Array_ForVariable__as_slice(struct Array_ForVariable* s
     #line 189 "src/std/Array.pv"
     return (struct slice_ForVariable) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct ForVariable* Array_ForVariable__Index__index(void* __self) {
+    struct Array_ForVariable* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

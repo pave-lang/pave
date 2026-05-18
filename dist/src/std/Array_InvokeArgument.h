@@ -65,4 +65,8 @@ struct Iter_ref_InvokeArgument Array_InvokeArgument__iter(struct Array_InvokeArg
 #line 188 "src/std/Array.pv"
 struct slice_InvokeArgument Array_InvokeArgument__as_slice(struct Array_InvokeArgument* self);
 
+#line 195 "src/std/Array.pv"
+struct InvokeArgument* Array_InvokeArgument__Index__index(void* __self);
+
+
 #endif

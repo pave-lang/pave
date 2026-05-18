@@ -195,3 +195,11 @@ struct slice_FunctionScope Array_FunctionScope__as_slice(struct Array_FunctionSc
     #line 189 "src/std/Array.pv"
     return (struct slice_FunctionScope) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct FunctionScope* Array_FunctionScope__Index__index(void* __self) {
+    struct Array_FunctionScope* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

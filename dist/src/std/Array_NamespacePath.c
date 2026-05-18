@@ -195,3 +195,11 @@ struct slice_NamespacePath Array_NamespacePath__as_slice(struct Array_NamespaceP
     #line 189 "src/std/Array.pv"
     return (struct slice_NamespacePath) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct NamespacePath* Array_NamespacePath__Index__index(void* __self) {
+    struct Array_NamespacePath* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

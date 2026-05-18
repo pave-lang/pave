@@ -65,4 +65,8 @@ struct Iter_ref_Type Array_Type__iter(struct Array_Type* self);
 #line 188 "src/std/Array.pv"
 struct slice_Type Array_Type__as_slice(struct Array_Type* self);
 
+#line 195 "src/std/Array.pv"
+struct Type* Array_Type__Index__index(void* __self);
+
+
 #endif

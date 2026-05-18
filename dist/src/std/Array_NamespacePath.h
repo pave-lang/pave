@@ -65,4 +65,8 @@ struct Iter_ref_NamespacePath Array_NamespacePath__iter(struct Array_NamespacePa
 #line 188 "src/std/Array.pv"
 struct slice_NamespacePath Array_NamespacePath__as_slice(struct Array_NamespacePath* self);
 
+#line 195 "src/std/Array.pv"
+struct NamespacePath* Array_NamespacePath__Index__index(void* __self);
+
+
 #endif

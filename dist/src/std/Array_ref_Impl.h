@@ -63,4 +63,8 @@ struct Iter_ref_ref_Impl Array_ref_Impl__iter(struct Array_ref_Impl* self);
 #line 188 "src/std/Array.pv"
 struct slice_ref_Impl Array_ref_Impl__as_slice(struct Array_ref_Impl* self);
 
+#line 195 "src/std/Array.pv"
+struct Impl** Array_ref_Impl__Index__index(void* __self);
+
+
 #endif

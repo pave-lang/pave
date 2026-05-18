@@ -34,7 +34,7 @@ trait Ord<T> {
     fn ge(self, other: T) -> bool;
 }
 
-trait Index<T> {
+trait Index {
     typedef Output;
-    fn index(&self, idx: T) -> &Output;
+    fn index(&self) -> *Output;
 }

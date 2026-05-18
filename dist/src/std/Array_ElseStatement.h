@@ -65,4 +65,8 @@ struct Iter_ref_ElseStatement Array_ElseStatement__iter(struct Array_ElseStateme
 #line 188 "src/std/Array.pv"
 struct slice_ElseStatement Array_ElseStatement__as_slice(struct Array_ElseStatement* self);
 
+#line 195 "src/std/Array.pv"
+struct ElseStatement* Array_ElseStatement__Index__index(void* __self);
+
+
 #endif

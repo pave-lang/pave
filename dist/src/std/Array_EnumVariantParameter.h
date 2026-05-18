@@ -65,4 +65,8 @@ struct Iter_ref_EnumVariantParameter Array_EnumVariantParameter__iter(struct Arr
 #line 188 "src/std/Array.pv"
 struct slice_EnumVariantParameter Array_EnumVariantParameter__as_slice(struct Array_EnumVariantParameter* self);
 
+#line 195 "src/std/Array.pv"
+struct EnumVariantParameter* Array_EnumVariantParameter__Index__index(void* __self);
+
+
 #endif

@@ -195,3 +195,11 @@ struct slice_Statement Array_Statement__as_slice(struct Array_Statement* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_Statement) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct Statement* Array_Statement__Index__index(void* __self) {
+    struct Array_Statement* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

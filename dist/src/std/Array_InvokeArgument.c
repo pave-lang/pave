@@ -195,3 +195,11 @@ struct slice_InvokeArgument Array_InvokeArgument__as_slice(struct Array_InvokeAr
     #line 189 "src/std/Array.pv"
     return (struct slice_InvokeArgument) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct InvokeArgument* Array_InvokeArgument__Index__index(void* __self) {
+    struct Array_InvokeArgument* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+

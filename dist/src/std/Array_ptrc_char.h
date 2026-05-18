@@ -62,4 +62,8 @@ struct Iter_ref_ptrc_char Array_ptrc_char__iter(struct Array_ptrc_char* self);
 #line 188 "src/std/Array.pv"
 struct slice_ptrc_char Array_ptrc_char__as_slice(struct Array_ptrc_char* self);
 
+#line 195 "src/std/Array.pv"
+char const** Array_ptrc_char__Index__index(void* __self);
+
+
 #endif

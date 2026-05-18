@@ -65,4 +65,8 @@ struct Iter_ref_Generic Array_Generic__iter(struct Array_Generic* self);
 #line 188 "src/std/Array.pv"
 struct slice_Generic Array_Generic__as_slice(struct Array_Generic* self);
 
+#line 195 "src/std/Array.pv"
+struct Generic* Array_Generic__Index__index(void* __self);
+
+
 #endif

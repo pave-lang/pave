@@ -195,3 +195,11 @@ struct slice_ref_Token Array_ref_Token__as_slice(struct Array_ref_Token* self) {
     #line 189 "src/std/Array.pv"
     return (struct slice_ref_Token) { .data = self->data, .length = self->length };
 }
+
+#line 195 "src/std/Array.pv"
+struct Token** Array_ref_Token__Index__index(void* __self) {
+    struct Array_ref_Token* self = __self; (void)self;
+    #line 196 "src/std/Array.pv"
+    return self->data;
+}
+
