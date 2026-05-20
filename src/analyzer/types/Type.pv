@@ -144,6 +144,19 @@ impl Type {
         return self;
     }
 
+    fn deref_reference(&self) -> &Self {
+        match self {
+            Type::Indirect(indirect) => {
+                if indirect.type == IndirectType::Reference {
+                    return &indirect.to;
+                }
+            },
+            _ => {},
+        }
+
+        return self;
+    }
+
     fn deref_all(&self) -> &Self {
         match self {
             Type::Indirect(indirect) => { return indirect.to.deref_all(); },

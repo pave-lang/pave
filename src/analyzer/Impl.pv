@@ -153,7 +153,7 @@ impl Impl {
     fn fill_types(&self, parent: FunctionParent) -> bool {
         let context = self.context;
         context.pos = self.token_start;
-        let nodes: &Array<ImplNode> = &self.nodes;
+        let nodes = &self.nodes;
         let allocator = context.allocator;
 
         if !context.expect_value(TokenType::Symbol, "{") { return false; }

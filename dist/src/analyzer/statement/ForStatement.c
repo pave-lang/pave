@@ -142,7 +142,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
                     #line 66 "src/analyzer/statement/ForStatement.pv"
                     struct GenericMap* generic_map = target->return_type.enum_value._1;
                     #line 67 "src/analyzer/statement/ForStatement.pv"
-                    if (str__Eq_str__eq(enum_info->name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
+                    if (str__Eq_str__eq(&enum_info->name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
                         #line 68 "src/analyzer/statement/ForStatement.pv"
                         is_range = true;
                         #line 69 "src/analyzer/statement/ForStatement.pv"

@@ -204,7 +204,7 @@ impl Expression {
     fn find_index_trait_call(context: &Context, token: &Token, inner: &Expression, index_expr: &Expression) -> *Expression {
         if inner.return_type.is_unknown() { return null; }
 
-        match inner.return_type {
+        match inner.return_type.deref_reference() {
             Type::Struct(struct_info, generic_map) => {
                 for *impl_info in struct_info.impls {
                     if !impl_info.has_trait || impl_info.trait_ == null { continue; }

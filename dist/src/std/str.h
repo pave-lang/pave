@@ -55,8 +55,12 @@ struct str str__trim(struct str self);
 Hashed str__Hash__hash(void* __self);
 
 #line 111 "src/std/str.pv"
-bool str__Eq_str__eq(struct str self, struct str other);
+bool str__Eq_str__eq(void* __self, struct str other);
+
+#line 119 "src/std/str.pv"
+bool str__Eq_ref_str__eq(void* __self, struct str* other);
 
 extern struct trait_HashVTable STR__VTABLE__HASH;
+extern struct trait_Eq_ref_strVTable STR__VTABLE__EQ;
 
 #endif

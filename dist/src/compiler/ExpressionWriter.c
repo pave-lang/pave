@@ -269,7 +269,7 @@ void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* 
             #line 123 "src/compiler/ExpressionWriter.pv"
             struct Expression* inner = inner_expr->data.unaryexpression_value._1;
             #line 124 "src/compiler/ExpressionWriter.pv"
-            if (str__Eq_str__eq(expr, (struct str){ .ptr = "&", .length = strlen("&") })) {
+            if (str__Eq_str__eq(&expr, (struct str){ .ptr = "&", .length = strlen("&") })) {
                 #line 125 "src/compiler/ExpressionWriter.pv"
                 unary_inner = inner;
             }
@@ -662,7 +662,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
     struct str name = func_info->name->value;
 
     #line 326 "src/compiler/ExpressionWriter.pv"
-    if (str__Eq_str__eq(name, (struct str){ .ptr = "typeid", .length = strlen("typeid") })) {
+    if (str__Eq_str__eq(&name, (struct str){ .ptr = "typeid", .length = strlen("typeid") })) {
         #line 327 "src/compiler/ExpressionWriter.pv"
         struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 328 "src/compiler/ExpressionWriter.pv"
@@ -677,7 +677,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
     }
 
     #line 333 "src/compiler/ExpressionWriter.pv"
-    if (str__Eq_str__eq(name, (struct str){ .ptr = "cast", .length = strlen("cast") })) {
+    if (str__Eq_str__eq(&name, (struct str){ .ptr = "cast", .length = strlen("cast") })) {
         #line 334 "src/compiler/ExpressionWriter.pv"
         struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 335 "src/compiler/ExpressionWriter.pv"
@@ -1263,7 +1263,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 578 "src/compiler/ExpressionWriter.pv"
             struct Expression* inner = data->unaryexpression_value._1;
             #line 579 "src/compiler/ExpressionWriter.pv"
-            bool skip_operator = str__Eq_str__eq(operator, (struct str){ .ptr = "&", .length = strlen("&") }) && Type__is_fat_pointer(&expression->return_type);
+            bool skip_operator = str__Eq_str__eq(&operator, (struct str){ .ptr = "&", .length = strlen("&") }) && Type__is_fat_pointer(&expression->return_type);
             #line 580 "src/compiler/ExpressionWriter.pv"
             if (skip_operator) {
                 #line 581 "src/compiler/ExpressionWriter.pv"
@@ -1273,7 +1273,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             }
 
             #line 585 "src/compiler/ExpressionWriter.pv"
-            if (str__Eq_str__eq(operator, (struct str){ .ptr = "&", .length = strlen("&") })) {
+            if (str__Eq_str__eq(&operator, (struct str){ .ptr = "&", .length = strlen("&") })) {
                 #line 586 "src/compiler/ExpressionWriter.pv"
                 bool is_rvalue = false;
                 #line 587 "src/compiler/ExpressionWriter.pv"
@@ -1331,7 +1331,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
             #line 610 "src/compiler/ExpressionWriter.pv"
             struct Expression* right = data->binaryexpression_value._2;
             #line 611 "src/compiler/ExpressionWriter.pv"
-            bool is_eq_or_ne = str__Eq_str__eq(operator, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(operator, (struct str){ .ptr = "!=", .length = strlen("!=") });
+            bool is_eq_or_ne = str__Eq_str__eq(&operator, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(&operator, (struct str){ .ptr = "!=", .length = strlen("!=") });
             #line 612 "src/compiler/ExpressionWriter.pv"
             if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(generator, &left->return_type, generics)) {
                 #line 613 "src/compiler/ExpressionWriter.pv"
@@ -1506,7 +1506,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                             #line 688 "src/compiler/ExpressionWriter.pv"
                             uintptr_t length = sequence->type.fixedarray_value;
                             #line 689 "src/compiler/ExpressionWriter.pv"
-                            if (str__Eq_str__eq(member, (struct str){ .ptr = "length", .length = strlen("length") })) {
+                            if (str__Eq_str__eq(&member, (struct str){ .ptr = "length", .length = strlen("length") })) {
                                 #line 690 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "%zu", length);
                             } else {
@@ -1639,7 +1639,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                     #line 753 "src/compiler/ExpressionWriter.pv"
                     struct Struct* struct_info = expression->return_type.struct_value._0;
                     #line 754 "src/compiler/ExpressionWriter.pv"
-                    if (str__Eq_str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
+                    if (str__Eq_str__eq(&struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
                         #line 755 "src/compiler/ExpressionWriter.pv"
                         ExpressionWriter__write_str_cast(self, file, inner_expr, generics, false);
                     }
@@ -1655,7 +1655,7 @@ bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* fil
                             #line 760 "src/compiler/ExpressionWriter.pv"
                             struct Struct* struct_info = indirect->to.struct_value._0;
                             #line 761 "src/compiler/ExpressionWriter.pv"
-                            if (str__Eq_str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
+                            if (str__Eq_str__eq(&struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
                                 #line 762 "src/compiler/ExpressionWriter.pv"
                                 ExpressionWriter__write_str_cast(self, file, inner_expr, generics, true);
                             } else {

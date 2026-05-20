@@ -709,7 +709,7 @@ bool Generator__write_literal(struct Generator* self, FILE* file, struct Type* t
             #line 359 "src/compiler/Generator.pv"
             struct Primitive* primitive_info = type->primitive_value;
             #line 360 "src/compiler/Generator.pv"
-            if (str__Eq_str__eq(primitive_info->name, (struct str){ .ptr = "u64", .length = strlen("u64") })) {
+            if (str__Eq_str__eq(&primitive_info->name, (struct str){ .ptr = "u64", .length = strlen("u64") })) {
                 #line 361 "src/compiler/Generator.pv"
                 fprintf(file, "ULL");
             }
@@ -878,7 +878,7 @@ bool Generator__has_void_self_replacement(struct Parameter* parameter, struct Ge
             #line 440 "src/compiler/Generator.pv"
             struct Primitive* primitive_info = generics->self_type->primitive_value;
             #line 441 "src/compiler/Generator.pv"
-            if (!str__Eq_str__eq(primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") })) {
+            if (!str__Eq_str__eq(&primitive_info->name, (struct str){ .ptr = "void", .length = strlen("void") })) {
                 #line 442 "src/compiler/Generator.pv"
                 return false;
             }

@@ -243,7 +243,11 @@ impl Naming {
                 }
 
                 result.append(enum_info.name.value);
-                generics = generics2.array;
+
+                for gen in enum_info.generics.array {
+                    let value = generics2.get(gen.name.value);
+                    if value != null { generics.append(*value); }
+                }
             },
             Type::Struct(struct_info, generics2) => {
                 if !struct_info.is_newtype() {
@@ -252,8 +256,9 @@ impl Naming {
 
                 result.append(struct_info.name.value);
 
-                if struct_info.generics.array.length > 0 {
-                    generics = generics2.array;
+                for gen in struct_info.generics.array {
+                    let value = generics2.get(gen.name.value);
+                    if value != null { generics.append(*value); }
                 }
             },
             Type::Trait(trait_info, generics2) => {

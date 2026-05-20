@@ -48,6 +48,16 @@ trait Hash {
     fn hash(&self) -> Hashed { return Fnv1a::hash(self, sizeof(Self)); }
 }
 
+impl Hash for Hashed {
+    fn hash(&self) -> Hashed { return *self; }
+}
+
+impl Eq<Hashed> for Hashed {
+    fn eq(&self, other: Hashed) -> bool {
+        return self._0 == other._0;
+    }
+}
+
 impl Hash for char {}
 
 impl Hash for i8 {}

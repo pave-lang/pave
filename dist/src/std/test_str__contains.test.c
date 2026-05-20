@@ -10,16 +10,16 @@
 
 #line 1 "src/std/str.pv"
 void test_str__contains() {
-    #line 155 "src/std/str.pv"
+    #line 163 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "hello world", .length = strlen("hello world") };
-    #line 156 "src/std/str.pv"
+    #line 164 "src/std/str.pv"
     if (!str__contains(s, "lo wo")) {
-        #line 156 "src/std/str.pv"
+        #line 164 "src/std/str.pv"
         abort();
     }
-    #line 157 "src/std/str.pv"
+    #line 165 "src/std/str.pv"
     if (str__contains(s, "xyz")) {
-        #line 157 "src/std/str.pv"
+        #line 165 "src/std/str.pv"
         abort();
     }
 }

@@ -1680,7 +1680,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                     #line 815 "src/compiler/Usages.pv"
                     struct Struct* struct_info = expression->return_type.struct_value._0;
                     #line 816 "src/compiler/Usages.pv"
-                    if (str__Eq_str__eq(struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
+                    if (str__Eq_str__eq(&struct_info->name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
                         #line 817 "src/compiler/Usages.pv"
                         HashSet_str__insert(&self->usage_context->primitive_code, (struct str){ .ptr = "str", .length = strlen("str") });
                     }
@@ -1783,7 +1783,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                     #line 861 "src/compiler/Usages.pv"
                                     struct Trait* trait_info = indirect->to.trait_value._0;
                                     #line 862 "src/compiler/Usages.pv"
-                                    if (str__Eq_str__eq(trait_info->name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
+                                    if (str__Eq_str__eq(&trait_info->name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
                                         #line 863 "src/compiler/Usages.pv"
                                         uintptr_t ptr = (uintptr_t)(struct_info);
                                         #line 864 "src/compiler/Usages.pv"

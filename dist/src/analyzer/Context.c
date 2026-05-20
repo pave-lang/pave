@@ -1683,9 +1683,9 @@ bool Context__validate_generic_constraints(struct Context* self, struct Generics
     #line 926 "src/analyzer/Context.pv"
     while (i < generics->array.length && i < usage_types->length) {
         #line 927 "src/analyzer/Context.pv"
-        struct Generic* generic = generics->array.data + i;
+        struct Generic* generic = &generics->array.data[i];
         #line 928 "src/analyzer/Context.pv"
-        struct Type* usage_type = usage_types->data + i;
+        struct Type* usage_type = &usage_types->data[i];
 
         #line 930 "src/analyzer/Context.pv"
         { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);

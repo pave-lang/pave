@@ -202,7 +202,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
             }
 
             #line 161 "src/analyzer/types/Function.pv"
-            if (!has_type && str__Eq_str__eq(parameter.name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
+            if (!has_type && str__Eq_str__eq(&parameter.name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
                 #line 162 "src/analyzer/types/Function.pv"
                 parameter.type = (struct Type) { .type = TYPE__SELF };
                 #line 163 "src/analyzer/types/Function.pv"

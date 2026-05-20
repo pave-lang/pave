@@ -924,8 +924,8 @@ impl Context {
     fn validate_generic_constraints(&self, generics: &Generics, usage_types: &Array<Type>) -> bool {
         let i: usize = 0;
         while i < generics.array.length && i < usage_types.length {
-            let generic = generics.array.data + i;
-            let usage_type = usage_types.data + i;
+            let generic = &generics.array.data[i];
+            let usage_type = &usage_types.data[i];
 
             for *required_trait in generic.traits {
                 let implements = false;
