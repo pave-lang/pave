@@ -334,7 +334,7 @@ impl BlockWriter {
                                 },
                                 MatchPattern::Hash(token) => {
                                     fprintf(file, "case ");
-                                    let hash: Hashed;
+                                    let hash: Hash;
 
                                     match token.type {
                                         TokenType::String => {
@@ -362,13 +362,13 @@ impl BlockWriter {
                                                 },
                                                 _ => {
                                                     fprintf(stderr, "Hash match pattern on unsupported number literal type\n");
-                                                    hash = Hashed(0);
+                                                    hash = Hash(0);
                                                 }
                                             }
                                         },
                                         _ => {
                                             fprintf(stderr, "Hash match pattern on unsupported token type\n");
-                                            hash = Hashed(0);
+                                            hash = Hash(0);
                                         }
                                     }
 

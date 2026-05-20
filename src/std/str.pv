@@ -104,7 +104,7 @@ impl str {
 }
 
 impl Hash for str {
-    fn hash(&self) -> Hashed { return Fnv1a::hash(self.ptr, self.length); }
+    fn hash(&self) -> Hash { return Fnv1a::hash(self.ptr, self.length); }
 }
 
 impl Eq<str> for str {

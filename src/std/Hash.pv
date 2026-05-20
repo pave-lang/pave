@@ -1,8 +1,8 @@
-struct Hashed(u64);
+struct Hash(u64);
 
 struct Fnv1a;
 impl Fnv1a {
-    fn hash(value: *const void, size: usize) -> Hashed {
+    fn hash(value: *const void, size: usize) -> Hash {
         let fnv_prime: u64 = 1099511628211u;
         let fnv_offset_basis: u64 = 14695981039346656037u;
         
@@ -17,10 +17,10 @@ impl Fnv1a {
             i += 1;
         }
 
-        return Hashed(result);
+        return Hash(result);
     }
 
-    fn continue_with(hash: Hashed, value: *const void, size: usize) -> Hashed {
+    fn continue_with(hash: Hash, value: *const void, size: usize) -> Hash {
         let fnv_prime: u64 = 1099511628211u;
         
         let result = hash._0; 
@@ -34,26 +34,26 @@ impl Fnv1a {
             i += 1;
         }
 
-        return Hashed(result);
+        return Hash(result);
     }
 }
 
-impl Hashed {
-    fn continue_with(self, value: *const void, size: usize) -> Hashed {
+impl Hash {
+    fn continue_with(self, value: *const void, size: usize) -> Hash {
         return Fnv1a::continue_with(self, value, size);
     }
 }
 
 trait Hash {
-    fn hash(&self) -> Hashed { return Fnv1a::hash(self, sizeof(Self)); }
+    fn hash(&self) -> Hash { return Fnv1a::hash(self, sizeof(Self)); }
 }
 
-impl Hash for Hashed {
-    fn hash(&self) -> Hashed { return *self; }
+impl Hash for Hash {
+    fn hash(&self) -> Hash { return *self; }
 }
 
-impl Eq<Hashed> for Hashed {
-    fn eq(&self, other: Hashed) -> bool {
+impl Eq<Hash> for Hash {
+    fn eq(&self, other: Hash) -> bool {
         return self._0 == other._0;
     }
 }
