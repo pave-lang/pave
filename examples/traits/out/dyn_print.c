@@ -4,5 +4,5 @@
 #include <traits/dyn_print.h>
 
 void dyn_print(struct trait_Print data) {
-    data.vtable->print(data.instance);
+    data.vtable->fn_print(data.instance);
 }

@@ -11,4 +11,4 @@ void Data1__Print__print(void* __self) {
     printf("%.2f %d\n", self->a, self->b);
 }
 
-struct trait_PrintVTable DATA1__VTABLE__PRINT = { .print = &Data1__Print__print };
+struct trait_PrintVTable DATA1__VTABLE__PRINT = { .fn_print = &Data1__Print__print };

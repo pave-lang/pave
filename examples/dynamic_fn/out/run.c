@@ -15,7 +15,7 @@
 #include <dynamic_fn/run.h>
 
 void run(struct trait_Fn func, struct slice_Object objects, struct Time time, struct Physics physics) {
-    struct Array_TypeId* params = func.vtable->get_params(func.instance);
+    struct Array_TypeId* params = func.vtable->fn_get_params(func.instance);
 
     for (size_t __iter = 0; __iter < objects.length; __iter++) {
         struct Object obj = objects.data[__iter];
@@ -26,14 +26,14 @@ void run(struct trait_Fn func, struct slice_Object objects, struct Time time, st
             TypeId param = *IterEnumerate_ref_TypeId__value(&__iter)._1;
 
             if (param == 1569699411331758434ULL) {
-                func.vtable->set_arg(func.instance, i, &physics);
+                func.vtable->fn_set_arg(func.instance, i, &physics);
             } else if (param == 5251627053891867748ULL) {
-                func.vtable->set_arg(func.instance, i, &time);
+                func.vtable->fn_set_arg(func.instance, i, &time);
             } else if (param == 9740451013666663182ULL) {
-                func.vtable->set_arg(func.instance, i, &obj.position);
+                func.vtable->fn_set_arg(func.instance, i, &obj.position);
             }
         } }
 
-        func.vtable->execute(func.instance);
+        func.vtable->fn_execute(func.instance);
     }
 }

@@ -4,7 +4,7 @@
 #include <traits/trait_Print.h>
 
 struct trait_PrintVTable {
-    void (*print)(void* __self);
+    void (*fn_print)(void* __self);
 };
 
 struct trait_Print {

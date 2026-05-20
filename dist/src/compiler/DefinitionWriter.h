@@ -79,21 +79,24 @@ bool DefinitionWriter__write_trait_definition(struct DefinitionWriter* self, FIL
 bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct Type* impl_trait_type, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage);
 
 #line 729 "src/compiler/DefinitionWriter.pv"
+void DefinitionWriter__write_dynamic_size(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics);
+
+#line 744 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_get_params(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics);
 
-#line 760 "src/compiler/DefinitionWriter.pv"
+#line 775 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_set_arg(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module);
 
-#line 827 "src/compiler/DefinitionWriter.pv"
+#line 842 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_execute_or_init(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module);
 
-#line 909 "src/compiler/DefinitionWriter.pv"
+#line 924 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_vtable(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics);
 
-#line 950 "src/compiler/DefinitionWriter.pv"
+#line 968 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_function_impl(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module);
 
-#line 962 "src/compiler/DefinitionWriter.pv"
+#line 981 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, struct Module* module, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics, struct IncludeWriter* include_writer);
 
 #endif

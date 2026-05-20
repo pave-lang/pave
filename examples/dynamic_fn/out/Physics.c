@@ -9,6 +9,9 @@ void Physics__apply_physics(struct Physics* self, struct Position* data, struct 
     data->y += time.delta * self->gravity;
 }
 
+uintptr_t Physics__apply_physics__Fn__size(void* __self) {
+    return sizeof(struct Physics__apply_physics__Fn__Instance);
+}
 #include <std/Array_TypeId.h>
 struct Array_TypeId* Physics__apply_physics__Fn__get_params(void* __self) {
     static TypeId type_ids[] = { 6811604471128968318ULL, 9740451013666663182ULL, 5251627053891867748ULL };
@@ -28,4 +31,4 @@ void Physics__apply_physics__Fn__execute(void* __self) {
     struct Physics__apply_physics__Fn__Instance* self = __self;
     Physics__apply_physics(self->self, self->data, self->time);
 }
-struct trait_FnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN = { .get_params = &Physics__apply_physics__Fn__get_params, .set_arg = &Physics__apply_physics__Fn__set_arg, .execute = &Physics__apply_physics__Fn__execute };
+struct trait_FnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN = { .fn_size = &Physics__apply_physics__Fn__size, .fn_get_params = &Physics__apply_physics__Fn__get_params, .fn_set_arg = &Physics__apply_physics__Fn__set_arg, .fn_execute = &Physics__apply_physics__Fn__execute };

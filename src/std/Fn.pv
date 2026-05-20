@@ -1,4 +1,5 @@
 trait Fn {
+    fn size(&self) -> usize;
     fn get_params(&self) -> &Array<TypeId>;
     fn set_arg(&self, index: usize, value: *void) -> bool;
     fn execute(&self);

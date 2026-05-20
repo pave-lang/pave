@@ -10,10 +10,12 @@ struct Array_TypeId;
 #line 1 "src/std/Fn.pv"
 struct trait_FnVTable {
     #line 2 "src/std/Fn.pv"
-    struct Array_TypeId* (*fn_get_params)(void* __self);
+    uintptr_t (*fn_size)(void* __self);
     #line 3 "src/std/Fn.pv"
-    bool (*fn_set_arg)(void* __self, uintptr_t index, void* value);
+    struct Array_TypeId* (*fn_get_params)(void* __self);
     #line 4 "src/std/Fn.pv"
+    bool (*fn_set_arg)(void* __self, uintptr_t index, void* value);
+    #line 5 "src/std/Fn.pv"
     void (*fn_execute)(void* __self);
 };
 

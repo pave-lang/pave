@@ -726,6 +726,21 @@ impl DefinitionWriter {
         return true;
     }
 
+    fn write_dynamic_size(&self, file: &FILE, func_info: &Function, generics: &GenericMap) {
+        let generator = self.generator;
+        fprintf(file, "uintptr_t ");
+        generator.write_function_name(file, func_info, generics);
+        fprintf(file, "__Fn__size(void* __self) {\n");
+
+        generator.indent += 1;
+        generator.write_indent(file);
+        fprintf(file, "return sizeof(struct ");
+        generator.write_function_name(file, func_info, generics);
+        fprintf(file, "__Fn__Instance);\n");
+        generator.indent -= 1;
+        fprintf(file, "}\n");
+    }
+
     fn write_dynamic_get_params(&self, file: &FILE, func_info: &Function, generics: &GenericMap) {
         let generator = self.generator;
         fprintf(file, "#include <std/Array_TypeId.h>\n");
@@ -929,16 +944,19 @@ impl DefinitionWriter {
             fprintf(file, "__VTABLE__DYN_FN");
         }
 
-        fprintf(file, " = { .fn_get_params = &");
-        generator.write_function_name(file, func_info, generics);
-
         if generator.is_coroutine() {
+            fprintf(file, " = { .fn_get_params = &");
+            generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Co__get_params, .fn_set_arg = &");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Co__set_arg, .fn_init = &");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Co__init };\n");
         } else {
+            fprintf(file, " = { .fn_size = &");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Fn__size, .fn_get_params = &");
+            generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Fn__get_params, .fn_set_arg = &");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Fn__set_arg, .fn_execute = &");
@@ -953,6 +971,7 @@ impl DefinitionWriter {
         if generator.is_coroutine() {
             fprintf(file, "#include <std/trait_Allocator.h>\n");
         }
+        if !generator.is_coroutine() { self.write_dynamic_size(file, func_info, generics); }
         self.write_dynamic_get_params(file, func_info, generics);
         self.write_dynamic_set_arg(file, func_info, generics, module);
         self.write_dynamic_execute_or_init(file, func_info, generics, module);

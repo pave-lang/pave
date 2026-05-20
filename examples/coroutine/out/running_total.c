@@ -26,5 +26,5 @@ bool running_total__next(void* _ctx) {
     ctx->_state = -1; return false;
 }
 float running_total__value(void* ctx) { return ((struct running_total*)ctx)->_value; }
-struct trait_Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER = { .next = running_total__next, .value = running_total__value };
+struct trait_Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER = { .fn_next = running_total__next, .fn_value = running_total__value };
 
