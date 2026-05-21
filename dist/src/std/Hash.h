@@ -1,0 +1,25 @@
+#ifndef PAVE_HASH
+#define PAVE_HASH
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#line 1 "src/std/Hash.pv"
+typedef uint64_t Hash;
+
+#include <std/Hash.h>
+typedef uint64_t Hash;
+
+#line 42 "src/std/Hash.pv"
+Hash Hash__continue_with(Hash self, void const* value, uintptr_t size);
+
+#line 52 "src/std/Hash.pv"
+Hash Hash__Hash__hash(void* __self);
+
+#line 56 "src/std/Hash.pv"
+bool Hash__Eq_Hash__eq(void* __self, Hash other);
+
+extern struct trait_HashVTable HASH__VTABLE__HASH;
+extern struct trait_Eq_HashVTable HASH__VTABLE__EQ;
+
+#endif

@@ -9,7 +9,7 @@
 #include <std/Range_ptrc_char.h>
 #include <std/Range_usize.h>
 #include <std/trait_Hash.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/Fnv1a.h>
 #include <std/trait_Eq_str.h>
 #include <std/trait_Eq_ref_str.h>
@@ -176,7 +176,7 @@ struct str str__trim(struct str self) {
 }
 
 #line 107 "src/std/str.pv"
-Hashed str__Hash__hash(void* __self) {
+Hash str__Hash__hash(void* __self) {
     struct str* self = __self; (void)self;
     #line 107 "src/std/str.pv"
     return Fnv1a__hash(self->ptr, self->length);

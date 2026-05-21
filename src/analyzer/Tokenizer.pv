@@ -304,6 +304,11 @@ impl Tokenizer {
                     while tokenizer.is_digit(0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') {
                         tokenizer.increase_pos();
                     }
+                } else if tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'b' || tokenizer.data.ptr[tokenizer.pos] == 'B') {
+                    tokenizer.increase_pos();
+                    while tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1' {
+                        tokenizer.increase_pos();
+                    }
                 } else {
                     tokenizer.skip_digits();
 

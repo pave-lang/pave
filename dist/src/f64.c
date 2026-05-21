@@ -6,7 +6,7 @@
 #include <f64.h>
 
 #line 48 "src/std/Hash.pv"
-Hashed f64__Hash__hash(void* __self) {
+Hash f64__Hash__hash(void* __self) {
     double* self = __self; (void)self;
     #line 48 "src/std/Hash.pv"
     return Fnv1a__hash(self, sizeof(double));

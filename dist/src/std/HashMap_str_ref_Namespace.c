@@ -6,7 +6,7 @@
 #include <string.h>
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/HashMapBucket_str_ref_Namespace.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <std/str.h>
 #include <analyzer/Namespace.h>
@@ -61,7 +61,7 @@ struct Namespace** HashMap_str_ref_Namespace__find(struct HashMap_str_ref_Namesp
     }
 
     #line 63 "src/std/HashMap.pv"
-    Hashed hash = str__Hash__hash(&(*key));
+    Hash hash = str__Hash__hash(&(*key));
     #line 64 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 65 "src/std/HashMap.pv"
@@ -101,7 +101,7 @@ struct Namespace** HashMap_str_ref_Namespace__insert(struct HashMap_str_ref_Name
     }
 
     #line 88 "src/std/HashMap.pv"
-    Hashed hash = str__Hash__hash(&key);
+    Hash hash = str__Hash__hash(&key);
     #line 89 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 90 "src/std/HashMap.pv"
@@ -136,7 +136,7 @@ bool HashMap_str_ref_Namespace__remove(struct HashMap_str_ref_Namespace* self, s
     }
 
     #line 108 "src/std/HashMap.pv"
-    Hashed hash = str__Hash__hash(&(*key));
+    Hash hash = str__Hash__hash(&(*key));
     #line 109 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 110 "src/std/HashMap.pv"
@@ -199,7 +199,7 @@ void HashMap_str_ref_Namespace__fill_buckets(struct HashMap_str_ref_Namespace* s
         #line 143 "src/std/HashMap.pv"
         node->next = 0;
         #line 144 "src/std/HashMap.pv"
-        Hashed hash = str__Hash__hash(&(*node).key);
+        Hash hash = str__Hash__hash(&(*node).key);
         #line 145 "src/std/HashMap.pv"
         uintptr_t bucket_index = hash % self->capacity;
         #line 146 "src/std/HashMap.pv"

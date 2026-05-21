@@ -13,7 +13,7 @@
 #include <analyzer/types/Type.h>
 #include <analyzer/statement/AssignmentStatement.h>
 #include <analyzer/statement/StatementData.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/str.h>
 #include <analyzer/statement/LetStatement.h>
 #include <analyzer/statement/ReturnStatement.h>

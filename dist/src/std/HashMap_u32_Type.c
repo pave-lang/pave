@@ -6,7 +6,7 @@
 #include <string.h>
 #include <std/HashMap_u32_Type.h>
 #include <std/HashMapBucket_u32_Type.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <u32.h>
 #include <analyzer/types/Type.h>
@@ -61,7 +61,7 @@ struct Type* HashMap_u32_Type__find(struct HashMap_u32_Type* self, uint32_t* key
     }
 
     #line 63 "src/std/HashMap.pv"
-    Hashed hash = u32__Hash__hash(&(*key));
+    Hash hash = u32__Hash__hash(&(*key));
     #line 64 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 65 "src/std/HashMap.pv"
@@ -101,7 +101,7 @@ struct Type* HashMap_u32_Type__insert(struct HashMap_u32_Type* self, uint32_t ke
     }
 
     #line 88 "src/std/HashMap.pv"
-    Hashed hash = u32__Hash__hash(&key);
+    Hash hash = u32__Hash__hash(&key);
     #line 89 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 90 "src/std/HashMap.pv"
@@ -136,7 +136,7 @@ bool HashMap_u32_Type__remove(struct HashMap_u32_Type* self, uint32_t* key) {
     }
 
     #line 108 "src/std/HashMap.pv"
-    Hashed hash = u32__Hash__hash(&(*key));
+    Hash hash = u32__Hash__hash(&(*key));
     #line 109 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 110 "src/std/HashMap.pv"
@@ -199,7 +199,7 @@ void HashMap_u32_Type__fill_buckets(struct HashMap_u32_Type* self) {
         #line 143 "src/std/HashMap.pv"
         node->next = 0;
         #line 144 "src/std/HashMap.pv"
-        Hashed hash = u32__Hash__hash(&(*node).key);
+        Hash hash = u32__Hash__hash(&(*node).key);
         #line 145 "src/std/HashMap.pv"
         uintptr_t bucket_index = hash % self->capacity;
         #line 146 "src/std/HashMap.pv"

@@ -4,7 +4,7 @@
 #include <usize.h>
 
 #line 48 "src/std/Hash.pv"
-Hashed usize__Hash__hash(void* __self) {
+Hash usize__Hash__hash(void* __self) {
     uintptr_t* self = __self; (void)self;
     #line 48 "src/std/Hash.pv"
     return Fnv1a__hash(self, sizeof(uintptr_t));

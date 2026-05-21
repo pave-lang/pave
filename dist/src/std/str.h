@@ -12,7 +12,7 @@ struct str {
 
 #include <std/str.h>
 #include <std/Iter_ptrc_char.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 struct str;
 
 #line 10 "src/std/str.pv"
@@ -52,7 +52,7 @@ bool str__is_whitespace(char ch);
 struct str str__trim(struct str self);
 
 #line 107 "src/std/str.pv"
-Hashed str__Hash__hash(void* __self);
+Hash str__Hash__hash(void* __self);
 
 #line 111 "src/std/str.pv"
 bool str__Eq_str__eq(void* __self, struct str other);

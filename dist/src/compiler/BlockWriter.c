@@ -56,7 +56,7 @@
 #include <analyzer/c/EnumCValue.h>
 #include <analyzer/c/ParentCpp.h>
 #include <analyzer/Naming.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <f32.h>
 #include <f64.h>
@@ -724,7 +724,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                 #line 336 "src/compiler/BlockWriter.pv"
                                 fprintf(file, "case ");
                                 #line 337 "src/compiler/BlockWriter.pv"
-                                Hashed hash;
+                                Hash hash;
 
                                 #line 339 "src/compiler/BlockWriter.pv"
                                 switch (token->type) {

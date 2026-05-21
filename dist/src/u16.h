@@ -4,11 +4,11 @@
 #include <stdint.h>
 
 #include <std/trait_Hash.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 
 
 #line 48 "src/std/Hash.pv"
-Hashed u16__Hash__hash(void* __self);
+Hash u16__Hash__hash(void* __self);
 
 extern struct trait_HashVTable U16__VTABLE__HASH;
 

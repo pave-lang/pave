@@ -6,7 +6,7 @@
 #include <string.h>
 #include <std/HashMap_str_Trait.h>
 #include <std/HashMapBucket_str_Trait.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <std/str.h>
 #include <analyzer/types/Trait.h>
@@ -61,7 +61,7 @@ struct Trait* HashMap_str_Trait__find(struct HashMap_str_Trait* self, struct str
     }
 
     #line 63 "src/std/HashMap.pv"
-    Hashed hash = str__Hash__hash(&(*key));
+    Hash hash = str__Hash__hash(&(*key));
     #line 64 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 65 "src/std/HashMap.pv"
@@ -101,7 +101,7 @@ struct Trait* HashMap_str_Trait__insert(struct HashMap_str_Trait* self, struct s
     }
 
     #line 88 "src/std/HashMap.pv"
-    Hashed hash = str__Hash__hash(&key);
+    Hash hash = str__Hash__hash(&key);
     #line 89 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 90 "src/std/HashMap.pv"
@@ -136,7 +136,7 @@ bool HashMap_str_Trait__remove(struct HashMap_str_Trait* self, struct str* key) 
     }
 
     #line 108 "src/std/HashMap.pv"
-    Hashed hash = str__Hash__hash(&(*key));
+    Hash hash = str__Hash__hash(&(*key));
     #line 109 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 110 "src/std/HashMap.pv"
@@ -199,7 +199,7 @@ void HashMap_str_Trait__fill_buckets(struct HashMap_str_Trait* self) {
         #line 143 "src/std/HashMap.pv"
         node->next = 0;
         #line 144 "src/std/HashMap.pv"
-        Hashed hash = str__Hash__hash(&(*node).key);
+        Hash hash = str__Hash__hash(&(*node).key);
         #line 145 "src/std/HashMap.pv"
         uintptr_t bucket_index = hash % self->capacity;
         #line 146 "src/std/HashMap.pv"

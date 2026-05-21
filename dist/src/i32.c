@@ -6,7 +6,7 @@
 #include <i32.h>
 
 #line 48 "src/std/Hash.pv"
-Hashed i32__Hash__hash(void* __self) {
+Hash i32__Hash__hash(void* __self) {
     int32_t* self = __self; (void)self;
     #line 48 "src/std/Hash.pv"
     return Fnv1a__hash(self, sizeof(int32_t));

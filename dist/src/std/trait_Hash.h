@@ -2,12 +2,12 @@
 #define PAVE_TRAIT_HASH
 
 #include <std/trait_Hash.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 
 #line 47 "src/std/Hash.pv"
 struct trait_HashVTable {
     #line 48 "src/std/Hash.pv"
-    Hashed (*fn_hash)(void* __self);
+    Hash (*fn_hash)(void* __self);
 };
 
 #line 47 "src/std/Hash.pv"

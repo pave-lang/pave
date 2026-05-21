@@ -6,7 +6,7 @@
 #include <string.h>
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <std/HashMapBucket_usize_TypeFunctionUsage.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <usize.h>
 #include <compiler/TypeFunctionUsage.h>
@@ -61,7 +61,7 @@ struct TypeFunctionUsage* HashMap_usize_TypeFunctionUsage__find(struct HashMap_u
     }
 
     #line 63 "src/std/HashMap.pv"
-    Hashed hash = usize__Hash__hash(&(*key));
+    Hash hash = usize__Hash__hash(&(*key));
     #line 64 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 65 "src/std/HashMap.pv"
@@ -101,7 +101,7 @@ struct TypeFunctionUsage* HashMap_usize_TypeFunctionUsage__insert(struct HashMap
     }
 
     #line 88 "src/std/HashMap.pv"
-    Hashed hash = usize__Hash__hash(&key);
+    Hash hash = usize__Hash__hash(&key);
     #line 89 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 90 "src/std/HashMap.pv"
@@ -136,7 +136,7 @@ bool HashMap_usize_TypeFunctionUsage__remove(struct HashMap_usize_TypeFunctionUs
     }
 
     #line 108 "src/std/HashMap.pv"
-    Hashed hash = usize__Hash__hash(&(*key));
+    Hash hash = usize__Hash__hash(&(*key));
     #line 109 "src/std/HashMap.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 110 "src/std/HashMap.pv"
@@ -199,7 +199,7 @@ void HashMap_usize_TypeFunctionUsage__fill_buckets(struct HashMap_usize_TypeFunc
         #line 143 "src/std/HashMap.pv"
         node->next = 0;
         #line 144 "src/std/HashMap.pv"
-        Hashed hash = usize__Hash__hash(&(*node).key);
+        Hash hash = usize__Hash__hash(&(*node).key);
         #line 145 "src/std/HashMap.pv"
         uintptr_t bucket_index = hash % self->capacity;
         #line 146 "src/std/HashMap.pv"

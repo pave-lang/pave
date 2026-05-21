@@ -6,7 +6,7 @@
 #include <isize.h>
 
 #line 48 "src/std/Hash.pv"
-Hashed isize__Hash__hash(void* __self) {
+Hash isize__Hash__hash(void* __self) {
     intptr_t* self = __self; (void)self;
     #line 48 "src/std/Hash.pv"
     return Fnv1a__hash(self, sizeof(intptr_t));

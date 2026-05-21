@@ -6,7 +6,7 @@
 #include <f32.h>
 
 #line 48 "src/std/Hash.pv"
-Hashed f32__Hash__hash(void* __self) {
+Hash f32__Hash__hash(void* __self) {
     float* self = __self; (void)self;
     #line 48 "src/std/Hash.pv"
     return Fnv1a__hash(self, sizeof(float));

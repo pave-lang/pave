@@ -6,7 +6,7 @@
 #include <char.h>
 
 #line 48 "src/std/Hash.pv"
-Hashed char__Hash__hash(void* __self) {
+Hash char__Hash__hash(void* __self) {
     char* self = __self; (void)self;
     #line 48 "src/std/Hash.pv"
     return Fnv1a__hash(self, sizeof(char));

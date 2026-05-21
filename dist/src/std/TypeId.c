@@ -1,11 +1,11 @@
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/TypeId.h>
 #include <std/TypeId.h>
 
 #include <std/TypeId.h>
 
 #line 3 "src/std/TypeId.pv"
-Hashed TypeId__Hash__hash(void* __self) {
+Hash TypeId__Hash__hash(void* __self) {
     TypeId* self = __self; (void)self;
     #line 3 "src/std/TypeId.pv"
     return (*self);

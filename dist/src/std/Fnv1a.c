@@ -1,13 +1,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/Fnv1a.h>
 
 #include <std/Fnv1a.h>
 
 #line 5 "src/std/Hash.pv"
-Hashed Fnv1a__hash(void const* value, uintptr_t size) {
+Hash Fnv1a__hash(void const* value, uintptr_t size) {
     #line 6 "src/std/Hash.pv"
     uint64_t fnv_prime = 1099511628211u;
     #line 7 "src/std/Hash.pv"
@@ -36,7 +36,7 @@ Hashed Fnv1a__hash(void const* value, uintptr_t size) {
 }
 
 #line 23 "src/std/Hash.pv"
-Hashed Fnv1a__continue_with(Hashed hash, void const* value, uintptr_t size) {
+Hash Fnv1a__continue_with(Hash hash, void const* value, uintptr_t size) {
     #line 24 "src/std/Hash.pv"
     uint64_t fnv_prime = 1099511628211u;
 

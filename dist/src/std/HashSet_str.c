@@ -7,7 +7,7 @@
 #include <std/HashSet_str.h>
 #include <std/ArenaAllocator.h>
 #include <std/HashSetBucket_str.h>
-#include <std/Hashed.h>
+#include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <std/str.h>
 #include <std/HashSetIter_str.h>
@@ -53,7 +53,7 @@ void HashSet_str__resize(struct HashSet_str* self, uintptr_t new_capacity) {
 #line 58 "src/std/HashSet.pv"
 bool HashSet_str__has(struct HashSet_str* self, struct str* value) {
     #line 59 "src/std/HashSet.pv"
-    Hashed hash = str__Hash__hash(&(*value));
+    Hash hash = str__Hash__hash(&(*value));
     #line 60 "src/std/HashSet.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 61 "src/std/HashSet.pv"
@@ -89,7 +89,7 @@ bool HashSet_str__insert(struct HashSet_str* self, struct str value) {
     }
 
     #line 80 "src/std/HashSet.pv"
-    Hashed hash = str__Hash__hash(&value);
+    Hash hash = str__Hash__hash(&value);
     #line 81 "src/std/HashSet.pv"
     uintptr_t bucket_index = hash % self->capacity;
     #line 82 "src/std/HashSet.pv"
@@ -142,7 +142,7 @@ void HashSet_str__fill_buckets(struct HashSet_str* self) {
         #line 110 "src/std/HashSet.pv"
         node->next = 0;
         #line 111 "src/std/HashSet.pv"
-        Hashed hash = str__Hash__hash(&(*node).value);
+        Hash hash = str__Hash__hash(&(*node).value);
         #line 112 "src/std/HashSet.pv"
         uintptr_t bucket_index = hash % self->capacity;
         #line 113 "src/std/HashSet.pv"
