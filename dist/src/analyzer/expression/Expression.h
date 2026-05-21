@@ -58,9 +58,12 @@ bool Expression__is_const_expression(struct Expression* self, struct Context* co
 void Expression__append_ident_name(struct Expression* self, struct String* result);
 
 #line 557 "src/analyzer/expression/Expression.pv"
+void Expression__append_display_name(struct Expression* self, struct String* result);
+
+#line 598 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 687 "src/analyzer/expression/Expression.pv"
+#line 728 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

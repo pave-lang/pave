@@ -207,7 +207,11 @@ impl Naming {
                             result.append(self.sequence_open);
                             result.append(element_name.as_str());
                             result.append(self.sequence_fixed_delimiter);
-                            length.append_ident_name(&result);
+                            if self.type == NamingType::Ident {
+                                length.append_ident_name(&result);
+                            } else {
+                                length.append_display_name(&result);
+                            }
                             result.append(self.sequence_close);
                         },
                         SequenceType::Slice => {
@@ -568,7 +572,11 @@ impl Naming {
                 match sequence.type {
                     SequenceType::FixedArray(length) => {
                         result.append(self.sequence_open);
-                        length.append_ident_name(result);
+                        if self.type == NamingType::Ident {
+                            length.append_ident_name(result);
+                        } else {
+                            length.append_display_name(result);
+                        }
                         result.append(self.sequence_close);
 
                         self.append_decl_suffix(result, &sequence.element);

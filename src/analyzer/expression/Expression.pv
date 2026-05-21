@@ -554,6 +554,47 @@ impl Expression {
         }
     }
 
+    fn append_display_name(&self, result: &String) {
+        match self.data {
+            ExpressionData::Literal(value) => {
+                result.append(value);
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                result.append("(");
+                inner.append_display_name(result);
+                result.append(")");
+            },
+            ExpressionData::UnaryExpression(op, inner) => {
+                result.append(op);
+                inner.append_display_name(result);
+            },
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                lhs.append_display_name(result);
+                result.append(" ");
+                result.append(op);
+                result.append(" ");
+                rhs.append_display_name(result);
+            },
+            ExpressionData::EnumVariant(variant) => {
+                result.append(variant.parent.name.value);
+                result.append("::");
+                result.append(variant.name.value);
+            },
+            ExpressionData::Invoke(target, _) => {
+                target.append_display_name(result);
+            },
+            ExpressionData::MemberStaticExpression(_, member_name) => {
+                result.append(member_name);
+            },
+            ExpressionData::Variable(name) => {
+                result.append(name);
+            },
+            _ => {
+                result.append("expr");
+            },
+        }
+    }
+
     fn validate_type(&self, context: &Context, type: &Type, apply_implicit_cast: bool) -> bool {
         let success = true;
 
