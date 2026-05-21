@@ -2,10 +2,12 @@
 #define PAVE_INCLUDE
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <std/str.h>
 #include <std/HashMap_u32_Type.h>
 #include <std/HashMap_str_Type.h>
+#include <std/HashMap_str_i64.h>
 struct Root;
 
 #line 9 "src/analyzer/c/Include.pv"
@@ -17,6 +19,7 @@ struct Include {
     struct HashMap_str_Type typedef_to_type;
     struct HashMap_str_Type types;
     struct HashMap_str_Type values;
+    struct HashMap_str_i64 macro_values;
 };
 
 #include <clang-c/Index.h>
@@ -26,31 +29,34 @@ struct Include;
 struct Type;
 struct EnumC;
 
-#line 20 "src/analyzer/c/Include.pv"
+#line 21 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp);
 
-#line 80 "src/analyzer/c/Include.pv"
+#line 82 "src/analyzer/c/Include.pv"
 void Include__add_cxtype_primitive(struct Include* self, enum CXTypeKind kind, char const* name);
 
-#line 86 "src/analyzer/c/Include.pv"
+#line 88 "src/analyzer/c/Include.pv"
 void Include__add_typedef_primitive(struct Include* self, char const* type, char const* name);
 
-#line 91 "src/analyzer/c/Include.pv"
+#line 93 "src/analyzer/c/Include.pv"
 bool Include__process(struct Include* self);
 
-#line 182 "src/analyzer/c/Include.pv"
+#line 184 "src/analyzer/c/Include.pv"
 struct Type* Include__parse_type(struct Include* self, CXType type);
 
-#line 263 "src/analyzer/c/Include.pv"
+#line 265 "src/analyzer/c/Include.pv"
 struct EnumC* Include__find_enum(struct Include* self, char const* name);
 
-#line 274 "src/analyzer/c/Include.pv"
+#line 276 "src/analyzer/c/Include.pv"
 char* Include__make_string(struct Include* self, CXString s);
 
-#line 281 "src/analyzer/c/Include.pv"
+#line 283 "src/analyzer/c/Include.pv"
 struct str Include__make_str(struct Include* self, CXString s);
 
-#line 288 "src/analyzer/c/Include.pv"
+#line 290 "src/analyzer/c/Include.pv"
+bool Include__try_parse_int_macro(struct Include* self, CXCursor cursor, int64_t* out);
+
+#line 378 "src/analyzer/c/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor);
 
 #endif

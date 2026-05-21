@@ -438,6 +438,19 @@ impl Context {
                 if name == null { return false; }
 
                 if !self.check_value(TokenType::Symbol, "::") {
+                    let macro_value = self.module.find_macro_value(name.value);
+                    if macro_value != null {
+                        if *macro_value < 0 {
+                            self.error_token(name, "Array length from C macro must be non-negative");
+                            return false;
+                        }
+                        result = *macro_value;
+                        sequence.type = SequenceType::FixedArray(result);
+                        *type = Type::Sequence(sequence);
+                        if !self.expect_value(TokenType::Symbol, "]") { return false; }
+                        return true;
+                    }
+
                     let value_type = self.module.find_value(name.value);
                     if value_type == null {
                         self.error_token(name, "Unknown value in array length");
@@ -457,7 +470,7 @@ impl Context {
                             result = variant.value;
                         },
                         _ => {
-                            self.error_token(name, "Array length value must be a C enum constant");
+                            self.error_token(name, "Array length value must be a C enum constant or integer macro");
                             return false;
                         },
                     }

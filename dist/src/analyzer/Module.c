@@ -68,6 +68,7 @@
 #include <std/HashMap_str_ref_Module.h>
 #include <std/HashMapIter_str_ref_Module.h>
 #include <tuple_str_ref_Module.h>
+#include <std/HashMap_str_i64.h>
 #include <std/HashMap_str_Primitive.h>
 #include <analyzer/Module.h>
 
@@ -1325,17 +1326,38 @@ struct Type* Module__find_value(struct Module* self, struct str name) {
 }
 
 #line 645 "src/analyzer/Module.pv"
-struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types) {
+int64_t* Module__find_macro_value(struct Module* self, struct str name) {
     #line 646 "src/analyzer/Module.pv"
+    { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
+    #line 646 "src/analyzer/Module.pv"
+    while (HashMapIter_str_ref_Include__next(&__iter)) {
+        #line 646 "src/analyzer/Module.pv"
+        struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
+
+        #line 647 "src/analyzer/Module.pv"
+        int64_t* value = HashMap_str_i64__find(&include->macro_values, &name);
+        #line 648 "src/analyzer/Module.pv"
+        if (value != 0) {
+            #line 648 "src/analyzer/Module.pv"
+            return value;
+        }
+    } }
+    #line 650 "src/analyzer/Module.pv"
+    return 0;
+}
+
+#line 653 "src/analyzer/Module.pv"
+struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types) {
+    #line 654 "src/analyzer/Module.pv"
     struct Type* type = Module__find_type(self, name);
-    #line 647 "src/analyzer/Module.pv"
+    #line 655 "src/analyzer/Module.pv"
     return Root__make_type_usage(self->root, type, usage_types);
 }
 
-#line 650 "src/analyzer/Module.pv"
+#line 658 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name) {
-    #line 651 "src/analyzer/Module.pv"
+    #line 659 "src/analyzer/Module.pv"
     struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
-    #line 652 "src/analyzer/Module.pv"
+    #line 660 "src/analyzer/Module.pv"
     return HashMap_str_Primitive__find(primitives, &name);
 }

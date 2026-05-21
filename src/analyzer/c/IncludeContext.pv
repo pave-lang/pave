@@ -329,6 +329,10 @@ impl IncludeContext {
             if include.is_function_like_macro(cursor) {
                 self.add_basic_function(name);
             } else {
+                let macro_value: i64 = 0;
+                if include.try_parse_int_macro(cursor, &macro_value) {
+                    include.macro_values.insert(name, macro_value);
+                }
                 self.insert_value(name, Type::UnknownC(UnknownC::new(include, name)));
             }
 

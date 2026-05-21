@@ -29,6 +29,7 @@
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/types/Primitive.h>
 #include <std/HashMap_str_Primitive.h>
+#include <std/HashMap_str_i64.h>
 #include <analyzer/c/IncludeContext.h>
 
 #include <analyzer/c/IncludeContext.h>
@@ -539,16 +540,23 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
             IncludeContext__add_basic_function(self, name);
         } else {
             #line 332 "src/analyzer/c/IncludeContext.pv"
+            int64_t macro_value = 0;
+            #line 333 "src/analyzer/c/IncludeContext.pv"
+            if (Include__try_parse_int_macro(include, cursor, &macro_value)) {
+                #line 334 "src/analyzer/c/IncludeContext.pv"
+                HashMap_str_i64__insert(&include->macro_values, (struct str){ .ptr = name, .length = strlen(name) }, macro_value);
+            }
+            #line 336 "src/analyzer/c/IncludeContext.pv"
             IncludeContext__insert_value(self, name, (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, name) });
         }
 
-        #line 335 "src/analyzer/c/IncludeContext.pv"
+        #line 339 "src/analyzer/c/IncludeContext.pv"
         return CXChildVisit_Continue;
     }
 
-    #line 338 "src/analyzer/c/IncludeContext.pv"
+    #line 342 "src/analyzer/c/IncludeContext.pv"
     ArenaAllocator__Allocator__free(include->root->allocator, name);
 
-    #line 340 "src/analyzer/c/IncludeContext.pv"
+    #line 344 "src/analyzer/c/IncludeContext.pv"
     return CXChildVisit_Continue;
 }

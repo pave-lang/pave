@@ -642,6 +642,14 @@ impl Module {
         return null;
     }
 
+    fn find_macro_value(&self, name: str) -> *i64 {
+        for (_, include) in self.includes {
+            let value = include.macro_values.find(&name);
+            if value != null { return value; }
+        }
+        return null;
+    }
+
     fn find_make_type(&self, name: str, usage_types: &Array<Type>) -> *Type {
         let type = self.find_type(name);
         return self.root.make_type_usage(type, usage_types);

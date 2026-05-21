@@ -2,6 +2,7 @@
 #define PAVE_MODULE
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <std/str.h>
 #include <std/Array_NamespacePath.h>
@@ -96,9 +97,12 @@ struct Type* Module__find_function(struct Module* self, struct str name);
 struct Type* Module__find_value(struct Module* self, struct str name);
 
 #line 645 "src/analyzer/Module.pv"
+int64_t* Module__find_macro_value(struct Module* self, struct str name);
+
+#line 653 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
-#line 650 "src/analyzer/Module.pv"
+#line 658 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name);
 
 #endif
