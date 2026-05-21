@@ -3,4 +3,5 @@ use std
 struct EnumCValue {
     parent: &EnumC,
     name: str,
+    value: i64,
 }

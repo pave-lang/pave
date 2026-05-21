@@ -307,39 +307,43 @@ enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCu
         clang_disposeString(value_spelling);
 
         #line 175 "src/analyzer/c/IncludeObjectContext.pv"
-        IncludeContext__add_enum_value(self->context, enum_info, value_name);
+        int64_t value = clang_getEnumConstantDeclValue(cursor);
+        #line 176 "src/analyzer/c/IncludeObjectContext.pv"
+        IncludeContext__add_enum_value(self->context, enum_info, value_name, value);
     }
 
-    #line 178 "src/analyzer/c/IncludeObjectContext.pv"
+    #line 179 "src/analyzer/c/IncludeObjectContext.pv"
     return CXChildVisit_Continue;
 }
 
-#line 181 "src/analyzer/c/IncludeObjectContext.pv"
+#line 182 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum_into_class(CXCursor cursor, CXCursor parent, CXClientData client_data) {
-    #line 182 "src/analyzer/c/IncludeObjectContext.pv"
-    struct IncludeObjectContext* self = client_data;
     #line 183 "src/analyzer/c/IncludeObjectContext.pv"
-    struct IncludeObjectEnumClass* payload = self->object;
+    struct IncludeObjectContext* self = client_data;
     #line 184 "src/analyzer/c/IncludeObjectContext.pv"
-    struct Include* include = self->context->include;
+    struct IncludeObjectEnumClass* payload = self->object;
     #line 185 "src/analyzer/c/IncludeObjectContext.pv"
+    struct Include* include = self->context->include;
+    #line 186 "src/analyzer/c/IncludeObjectContext.pv"
     enum CXCursorKind kind = clang_getCursorKind(cursor);
 
-    #line 187 "src/analyzer/c/IncludeObjectContext.pv"
+    #line 188 "src/analyzer/c/IncludeObjectContext.pv"
     if (kind == CXCursor_EnumConstantDecl) {
-        #line 188 "src/analyzer/c/IncludeObjectContext.pv"
-        CXString value_spelling = clang_getCursorSpelling(cursor);
         #line 189 "src/analyzer/c/IncludeObjectContext.pv"
-        struct str value_name = Include__make_str(include, value_spelling);
+        CXString value_spelling = clang_getCursorSpelling(cursor);
         #line 190 "src/analyzer/c/IncludeObjectContext.pv"
+        struct str value_name = Include__make_str(include, value_spelling);
+        #line 191 "src/analyzer/c/IncludeObjectContext.pv"
         clang_disposeString(value_spelling);
 
-        #line 192 "src/analyzer/c/IncludeObjectContext.pv"
-        HashMap_str_EnumCValue__insert(&payload->enum_info->values, value_name, (struct EnumCValue) { .parent = payload->enum_info, .name = value_name });
         #line 193 "src/analyzer/c/IncludeObjectContext.pv"
+        int64_t value = clang_getEnumConstantDeclValue(cursor);
+        #line 194 "src/analyzer/c/IncludeObjectContext.pv"
+        HashMap_str_EnumCValue__insert(&payload->enum_info->values, value_name, (struct EnumCValue) { .parent = payload->enum_info, .name = value_name, .value = value });
+        #line 195 "src/analyzer/c/IncludeObjectContext.pv"
         HashMap_str_Type__insert(&payload->class_info->values, value_name, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = payload->enum_info });
     }
 
-    #line 196 "src/analyzer/c/IncludeObjectContext.pv"
+    #line 198 "src/analyzer/c/IncludeObjectContext.pv"
     return CXChildVisit_Continue;
 }

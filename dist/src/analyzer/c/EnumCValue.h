@@ -1,6 +1,8 @@
 #ifndef PAVE_ENUM_CVALUE
 #define PAVE_ENUM_CVALUE
 
+#include <stdint.h>
+
 #include <std/str.h>
 struct EnumC;
 
@@ -8,6 +10,7 @@ struct EnumC;
 struct EnumCValue {
     struct EnumC* parent;
     struct str name;
+    int64_t value;
 };
 
 #endif

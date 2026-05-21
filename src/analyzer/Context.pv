@@ -437,6 +437,36 @@ impl Context {
                 let name = self.expect(TokenType::Identifier);
                 if name == null { return false; }
 
+                if !self.check_value(TokenType::Symbol, "::") {
+                    let value_type = self.module.find_value(name.value);
+                    if value_type == null {
+                        self.error_token(name, "Unknown value in array length");
+                        return false;
+                    }
+                    match value_type {
+                        Type::EnumC(enum_info) => {
+                            let variant = enum_info.values.find(&name.value);
+                            if variant == null {
+                                self.error_token(name, "C enum variant not found");
+                                return false;
+                            }
+                            if variant.value < 0 {
+                                self.error_token(name, "Array length from C enum variant must be non-negative");
+                                return false;
+                            }
+                            result = variant.value;
+                        },
+                        _ => {
+                            self.error_token(name, "Array length value must be a C enum constant");
+                            return false;
+                        },
+                    }
+                    sequence.type = SequenceType::FixedArray(result);
+                    *type = Type::Sequence(sequence);
+                    if !self.expect_value(TokenType::Symbol, "]") { return false; }
+                    return true;
+                }
+
                 let type_lookup: *Type = self.types.find(&name.value);
                 if type_lookup == null {
                     let empty_generics = Array<Type>::new(self.allocator);
@@ -472,6 +502,18 @@ impl Context {
                             self.error_token(variant_token, "Variant not found in enum");
                             return false;
                         }
+                    },
+                    Type::EnumC(enum_info) => {
+                        let variant = enum_info.values.find(&variant_token.value);
+                        if variant == null {
+                            self.error_token(variant_token, "Variant not found in C enum");
+                            return false;
+                        }
+                        if variant.value < 0 {
+                            self.error_token(variant_token, "Array length from C enum variant must be non-negative");
+                            return false;
+                        }
+                        result = variant.value;
                     },
                     _ => {
                         self.error_token(name, "Array length identifier must reference an enum");

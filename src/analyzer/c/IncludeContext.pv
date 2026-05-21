@@ -61,8 +61,8 @@ impl IncludeContext {
         return enum_info;
     }
 
-    fn add_enum_value(&self, enum_info: &EnumC, value_name: *const char) {
-        enum_info.values.insert(value_name, EnumCValue { parent: enum_info, name: value_name });
+    fn add_enum_value(&self, enum_info: &EnumC, value_name: *const char, value: i64) {
+        enum_info.values.insert(value_name, EnumCValue { parent: enum_info, name: value_name, value });
         self.insert_value(value_name, Type::EnumC(enum_info));
     }
 

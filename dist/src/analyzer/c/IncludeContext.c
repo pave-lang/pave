@@ -113,9 +113,9 @@ struct EnumC* IncludeContext__add_enum(struct IncludeContext* self, char const* 
 }
 
 #line 64 "src/analyzer/c/IncludeContext.pv"
-void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name) {
+void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name, int64_t value) {
     #line 65 "src/analyzer/c/IncludeContext.pv"
-    HashMap_str_EnumCValue__insert(&enum_info->values, (struct str){ .ptr = value_name, .length = strlen(value_name) }, (struct EnumCValue) { .parent = enum_info, .name = (struct str){ .ptr = value_name, .length = strlen(value_name) } });
+    HashMap_str_EnumCValue__insert(&enum_info->values, (struct str){ .ptr = value_name, .length = strlen(value_name) }, (struct EnumCValue) { .parent = enum_info, .name = (struct str){ .ptr = value_name, .length = strlen(value_name) }, .value = value });
     #line 66 "src/analyzer/c/IncludeContext.pv"
     IncludeContext__insert_value(self, value_name, (struct Type) { .type = TYPE__ENUM_C, .enumc_value = enum_info });
 }

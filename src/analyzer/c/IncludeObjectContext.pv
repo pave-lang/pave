@@ -172,7 +172,8 @@ impl IncludeObjectContext {
             let value_name = self.context.include.make_string(value_spelling);
             clang_disposeString(value_spelling);
 
-            self.context.add_enum_value(enum_info, value_name);
+            let value = clang_getEnumConstantDeclValue(cursor);
+            self.context.add_enum_value(enum_info, value_name, value);
         }
 
         return CXChildVisit_Continue;
@@ -189,7 +190,8 @@ impl IncludeObjectContext {
             let value_name = include.make_str(value_spelling);
             clang_disposeString(value_spelling);
 
-            payload.enum_info.values.insert(value_name, EnumCValue { parent: payload.enum_info, name: value_name });
+            let value = clang_getEnumConstantDeclValue(cursor);
+            payload.enum_info.values.insert(value_name, EnumCValue { parent: payload.enum_info, name: value_name, value });
             payload.class_info.values.insert(value_name, Type::EnumC(payload.enum_info));
         }
 

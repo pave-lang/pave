@@ -20,7 +20,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
 #line 165 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-#line 181 "src/analyzer/c/IncludeObjectContext.pv"
+#line 182 "src/analyzer/c/IncludeObjectContext.pv"
 enum CXChildVisitResult IncludeObjectContext__visitor_enum_into_class(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

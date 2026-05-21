@@ -2,6 +2,7 @@
 #define PAVE_INCLUDE_CONTEXT
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <analyzer/c/ParentCpp.h>
 struct Include;
@@ -50,7 +51,7 @@ struct StructC* IncludeContext__add_union(struct IncludeContext* self, char cons
 struct EnumC* IncludeContext__add_enum(struct IncludeContext* self, char const* name);
 
 #line 64 "src/analyzer/c/IncludeContext.pv"
-void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name);
+void IncludeContext__add_enum_value(struct IncludeContext* self, struct EnumC* enum_info, char const* value_name, int64_t value);
 
 #line 69 "src/analyzer/c/IncludeContext.pv"
 struct IncludeContext* IncludeContext__add_namespace(struct IncludeContext* self, char const* name);
