@@ -51,9 +51,12 @@ struct Expression* Expression__parse(struct Context* context, struct Generics* g
 bool Expression__is_zero(struct Expression* self);
 
 #line 462 "src/analyzer/expression/Expression.pv"
+bool Expression__try_eval_const_int(struct Expression* self, struct Context* context, int64_t* out);
+
+#line 582 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 592 "src/analyzer/expression/Expression.pv"
+#line 712 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

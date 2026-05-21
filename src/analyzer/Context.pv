@@ -6,6 +6,7 @@ use std
 use statement
 use types
 use c
+use expression
 
 struct Context {
     allocator: &ArenaAllocator,
@@ -431,129 +432,21 @@ impl Context {
                 return true;
             }
 
-            let result: usize = 0;
+            let length_token = self.current();
+            let length_expr = Expression::parse(self, generics);
+            if length_expr == null { return false; }
 
-            if self.check(TokenType::Identifier) {
-                let name = self.expect(TokenType::Identifier);
-                if name == null { return false; }
-
-                if !self.check_value(TokenType::Symbol, "::") {
-                    let macro_value = self.module.find_macro_value(name.value);
-                    if macro_value != null {
-                        if *macro_value < 0 {
-                            self.error_token(name, "Array length from C macro must be non-negative");
-                            return false;
-                        }
-                        result = *macro_value;
-                        sequence.type = SequenceType::FixedArray(result);
-                        *type = Type::Sequence(sequence);
-                        if !self.expect_value(TokenType::Symbol, "]") { return false; }
-                        return true;
-                    }
-
-                    let value_type = self.module.find_value(name.value);
-                    if value_type == null {
-                        self.error_token(name, "Unknown value in array length");
-                        return false;
-                    }
-                    match value_type {
-                        Type::EnumC(enum_info) => {
-                            let variant = enum_info.values.find(&name.value);
-                            if variant == null {
-                                self.error_token(name, "C enum variant not found");
-                                return false;
-                            }
-                            if variant.value < 0 {
-                                self.error_token(name, "Array length from C enum variant must be non-negative");
-                                return false;
-                            }
-                            result = variant.value;
-                        },
-                        _ => {
-                            self.error_token(name, "Array length value must be a C enum constant or integer macro");
-                            return false;
-                        },
-                    }
-                    sequence.type = SequenceType::FixedArray(result);
-                    *type = Type::Sequence(sequence);
-                    if !self.expect_value(TokenType::Symbol, "]") { return false; }
-                    return true;
-                }
-
-                let type_lookup: *Type = self.types.find(&name.value);
-                if type_lookup == null {
-                    let empty_generics = Array<Type>::new(self.allocator);
-                    type_lookup = self.module.find_make_type(name.value, &empty_generics);
-                }
-                if type_lookup == null {
-                    self.error_token(name, "Unknown type in array length");
-                    return false;
-                }
-
-                if !self.expect_value(TokenType::Symbol, "::") { return false; }
-
-                let variant_token = self.expect(TokenType::Identifier);
-                if variant_token == null { return false; }
-
-                match type_lookup {
-                    Type::Enum(enum_info, _) => {
-                        let found = false;
-                        let current: usize = 0;
-                        for (_, &variant) in enum_info.variants {
-                            if variant.value != null {
-                                self.error_token(variant_token, "Array length from enum with explicit variant values is not supported");
-                                return false;
-                            }
-                            if variant.name.value.eq(variant_token.value) {
-                                result = current;
-                                found = true;
-                                break;
-                            }
-                            current += 1;
-                        }
-                        if !found {
-                            self.error_token(variant_token, "Variant not found in enum");
-                            return false;
-                        }
-                    },
-                    Type::EnumC(enum_info) => {
-                        let variant = enum_info.values.find(&variant_token.value);
-                        if variant == null {
-                            self.error_token(variant_token, "Variant not found in C enum");
-                            return false;
-                        }
-                        if variant.value < 0 {
-                            self.error_token(variant_token, "Array length from C enum variant must be non-negative");
-                            return false;
-                        }
-                        result = variant.value;
-                    },
-                    _ => {
-                        self.error_token(name, "Array length identifier must reference an enum");
-                        return false;
-                    },
-                }
-            } else {
-                let length = self.expect(TokenType::Number);
-                if length == null { return false; }
-
-                let i = 0;
-                while i < length.value.length {
-                    let c = length.value.ptr[i];
-
-                    if c >= '0' && c <= '9' {
-                        result = result * 10 + (c - '0');
-                    } else {
-                        break;
-                    }
-
-                    i += 1;
-                }
-
-                if i != length.value.length {
-                    self.error_token(length, "Fixed array length must be a standard positive integer");
-                }
+            let length_value: i64 = 0;
+            if !length_expr.try_eval_const_int(self, &length_value) {
+                self.error_token(length_token, "Fixed array length must be a compile-time constant integer");
+                return false;
             }
+            if length_value < 0 {
+                self.error_token(length_token, "Fixed array length must be non-negative");
+                return false;
+            }
+
+            let result: usize = length_value;
 
             sequence.type = SequenceType::FixedArray(result);
             *type = Type::Sequence(sequence);

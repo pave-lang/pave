@@ -459,6 +459,126 @@ impl Expression {
         }
     }
 
+    fn try_eval_const_int(&self, context: &Context, out: *i64) -> bool {
+        match self.data {
+            ExpressionData::Literal(value) => {
+                let len = value.length;
+                if len == 0 { return false; }
+
+                let i: usize = 0;
+                let result: i64 = 0;
+                let radix: i64 = 10;
+
+                if len > 2 && value.ptr[0] == '0' && (value.ptr[1] == 'x' || value.ptr[1] == 'X') {
+                    radix = 16;
+                    i = 2;
+                } else if len > 2 && value.ptr[0] == '0' && (value.ptr[1] == 'b' || value.ptr[1] == 'B') {
+                    radix = 2;
+                    i = 2;
+                }
+
+                let any_digit = false;
+                while i < len {
+                    let c = value.ptr[i];
+                    if c == '_' { i += 1; continue; }
+
+                    let digit: i64 = -1;
+                    if c >= '0' && c <= '9' { digit = c - '0'; }
+                    else if c >= 'a' && c <= 'f' { digit = c - 'a' + 10; }
+                    else if c >= 'A' && c <= 'F' { digit = c - 'A' + 10; }
+                    else { break; }
+
+                    if digit >= radix { return false; }
+                    result = result * radix + digit;
+                    any_digit = true;
+                    i += 1;
+                }
+
+                if !any_digit { return false; }
+
+                while i < len {
+                    let c = value.ptr[i];
+                    if c == 'u' || c == 'U' || c == 'l' || c == 'L' || c == 'f' || c == 'F' {
+                        i += 1;
+                    } else {
+                        return false;
+                    }
+                }
+
+                *out = result;
+                return true;
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                return inner.try_eval_const_int(context, out);
+            },
+            ExpressionData::UnaryExpression(op, inner) => {
+                let inner_value: i64 = 0;
+                if !inner.try_eval_const_int(context, &inner_value) { return false; }
+                if op.eq("-") { *out = -inner_value; return true; }
+                if op.eq("+") { *out = inner_value; return true; }
+                return false;
+            },
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                let l: i64 = 0;
+                let r: i64 = 0;
+                if !lhs.try_eval_const_int(context, &l) { return false; }
+                if !rhs.try_eval_const_int(context, &r) { return false; }
+                if op.eq("+") { *out = l + r; return true; }
+                if op.eq("-") { *out = l - r; return true; }
+                if op.eq("*") { *out = l * r; return true; }
+                if op.eq("/") { if r == 0 { return false; } *out = l / r; return true; }
+                if op.eq("%") { if r == 0 { return false; } *out = l % r; return true; }
+                return false;
+            },
+            ExpressionData::EnumVariant(variant) => {
+                let enum_info = variant.parent;
+                let index: i64 = 0;
+                for (_, &v) in enum_info.variants {
+                    if v.value != null { return false; }
+                    if v.name.value.eq(variant.name.value) {
+                        *out = index;
+                        return true;
+                    }
+                    index += 1;
+                }
+                return false;
+            },
+            ExpressionData::Invoke(target, arguments) => {
+                if arguments.length != 0 { return false; }
+                return target.try_eval_const_int(context, out);
+            },
+            ExpressionData::MemberStaticExpression(_, member_name) => {
+                match self.return_type {
+                    Type::EnumC(enum_info) => {
+                        let variant = enum_info.values.find(&member_name);
+                        if variant == null { return false; }
+                        *out = variant.value;
+                        return true;
+                    },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::Variable(name) => {
+                match self.return_type {
+                    Type::EnumC(enum_info) => {
+                        let variant = enum_info.values.find(&name);
+                        if variant == null { return false; }
+                        *out = variant.value;
+                        return true;
+                    },
+                    Type::UnknownC(_) => {
+                        let macro_value = context.module.find_macro_value(name);
+                        if macro_value == null { return false; }
+                        *out = *macro_value;
+                        return true;
+                    },
+                    _ => { return false; },
+                }
+            },
+            _ => { return false; },
+        }
+    }
+
     fn validate_type(&self, context: &Context, type: &Type, apply_implicit_cast: bool) -> bool {
         let success = true;
 
