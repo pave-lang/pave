@@ -357,10 +357,20 @@ impl Generator {
             let acc: u64 = 0;
             let i: usize = 2;
             while i < value.length {
-                acc = (acc << 1) | cast<u64>(value.ptr[i] - '0');
+                if value.ptr[i] != '_' {
+                    acc = (acc << 1) | cast<u64>(value.ptr[i] - '0');
+                }
                 i += 1;
             }
             fprintf(file, "0x%llx", acc);
+        } else if value.length > 0 && value.ptr[0] >= '0' && value.ptr[0] <= '9' {
+            let i: usize = 0;
+            while i < value.length {
+                if value.ptr[i] != '_' {
+                    fprintf(file, "%c", cast<i32>(value.ptr[i]));
+                }
+                i += 1;
+            }
         } else {
             self.write_str(file, value);
         }

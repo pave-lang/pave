@@ -107,9 +107,9 @@ impl Tokenizer {
     }
 
     fn skip_digits(&self) {
-        while self.is_digit(0) {
+        while self.is_digit(0) || (self.data.ptr[self.pos] == '_' && self.is_digit(1)) {
             self.increase_pos();
-        } 
+        }
     }
 
     fn skip_string(&self) {
@@ -301,12 +301,12 @@ impl Tokenizer {
                 
                 if tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'x' || tokenizer.data.ptr[tokenizer.pos] == 'X') {
                     tokenizer.increase_pos();
-                    while tokenizer.is_digit(0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') {
+                    while tokenizer.is_digit(0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') || tokenizer.data.ptr[tokenizer.pos] == '_' {
                         tokenizer.increase_pos();
                     }
                 } else if tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'b' || tokenizer.data.ptr[tokenizer.pos] == 'B') {
                     tokenizer.increase_pos();
-                    while tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1' {
+                    while tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1' || tokenizer.data.ptr[tokenizer.pos] == '_' {
                         tokenizer.increase_pos();
                     }
                 } else {

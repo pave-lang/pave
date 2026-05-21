@@ -163,7 +163,7 @@ void Tokenizer__skip_alphanumeric(struct Tokenizer* self) {
 #line 109 "src/analyzer/Tokenizer.pv"
 void Tokenizer__skip_digits(struct Tokenizer* self) {
     #line 110 "src/analyzer/Tokenizer.pv"
-    while (Tokenizer__is_digit(self, 0)) {
+    while (Tokenizer__is_digit(self, 0) || (self->data.ptr[self->pos] == '_' && Tokenizer__is_digit(self, 1))) {
         #line 111 "src/analyzer/Tokenizer.pv"
         Tokenizer__increase_pos(self);
     }
@@ -477,7 +477,7 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
                 #line 303 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
                 #line 304 "src/analyzer/Tokenizer.pv"
-                while (Tokenizer__is_digit(&tokenizer, 0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F')) {
+                while (Tokenizer__is_digit(&tokenizer, 0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') || tokenizer.data.ptr[tokenizer.pos] == '_') {
                     #line 305 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
@@ -485,7 +485,7 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
                 #line 308 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
                 #line 309 "src/analyzer/Tokenizer.pv"
-                while (tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1') {
+                while (tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1' || tokenizer.data.ptr[tokenizer.pos] == '_') {
                     #line 310 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
