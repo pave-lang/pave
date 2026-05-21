@@ -1067,11 +1067,11 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                         #line 507 "src/compiler/BlockWriter.pv"
                                         struct Expression* size = sequence->type.fixedarray_value;
                                         #line 508 "src/compiler/BlockWriter.pv"
-                                        fprintf(file, "for (size_t __iter = 0; __iter < ");
+                                        fprintf(file, "for (size_t __iter = 0; __iter < (");
                                         #line 509 "src/compiler/BlockWriter.pv"
                                         ExpressionWriter__write_expression(&expr, file, size, generics);
                                         #line 510 "src/compiler/BlockWriter.pv"
-                                        fprintf(file, "; __iter++) {\n");
+                                        fprintf(file, "); __iter++) {\n");
                                     } break;
                                     #line 512 "src/compiler/BlockWriter.pv"
                                     case SEQUENCE_TYPE__SLICE: {
