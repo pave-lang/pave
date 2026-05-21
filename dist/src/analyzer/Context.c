@@ -43,8 +43,14 @@
 #include <analyzer/Block.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/SequenceType.h>
-#include <analyzer/types/Tuple.h>
 #include <std/Array_Type.h>
+#include <std/HashMap_str_EnumVariant.h>
+#include <analyzer/types/Enum.h>
+#include <std/HashMapIter_str_EnumVariant.h>
+#include <tuple_str_EnumVariant.h>
+#include <analyzer/expression/Expression.h>
+#include <analyzer/types/EnumVariant.h>
+#include <analyzer/types/Tuple.h>
 #include <std/Array_ref_Trait.h>
 #include <std/Iter_ref_ref_Trait.h>
 #include <analyzer/types/Trait.h>
@@ -52,7 +58,6 @@
 #include <analyzer/c/UnknownC.h>
 #include <analyzer/c/NamespaceCpp.h>
 #include <analyzer/types/Struct.h>
-#include <analyzer/types/Enum.h>
 #include <analyzer/c/ClassCpp.h>
 #include <std/Iter_ref_Type.h>
 #include <std/Array_ref_Impl.h>
@@ -723,1032 +728,1127 @@ bool Context__parse_type(struct Context* self, struct Type* type, struct Generic
         }
 
         #line 434 "src/analyzer/Context.pv"
-        struct Token* length = Context__expect(self, TOKEN_TYPE__NUMBER);
-        #line 435 "src/analyzer/Context.pv"
-        if (length == 0) {
-            #line 435 "src/analyzer/Context.pv"
-            return false;
-        }
-
-        #line 437 "src/analyzer/Context.pv"
         uintptr_t result = 0;
 
-        #line 439 "src/analyzer/Context.pv"
-        int32_t i = 0;
-        #line 440 "src/analyzer/Context.pv"
-        while (i < length->value.length) {
-            #line 441 "src/analyzer/Context.pv"
-            char c = length->value.ptr[i];
-
-            #line 443 "src/analyzer/Context.pv"
-            if (c >= '0' && c <= '9') {
-                #line 444 "src/analyzer/Context.pv"
-                result = result * 10 + (c - '0');
-            } else {
-                #line 446 "src/analyzer/Context.pv"
-                break;
+        #line 436 "src/analyzer/Context.pv"
+        if (Context__check(self, TOKEN_TYPE__IDENTIFIER)) {
+            #line 437 "src/analyzer/Context.pv"
+            struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
+            #line 438 "src/analyzer/Context.pv"
+            if (name == 0) {
+                #line 438 "src/analyzer/Context.pv"
+                return false;
             }
 
-            #line 449 "src/analyzer/Context.pv"
-            i += 1;
-        }
+            #line 440 "src/analyzer/Context.pv"
+            struct Type* type_lookup = HashMap_str_Type__find(&self->types, &name->value);
+            #line 441 "src/analyzer/Context.pv"
+            if (type_lookup == 0) {
+                #line 442 "src/analyzer/Context.pv"
+                struct Array_Type empty_generics = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+                #line 443 "src/analyzer/Context.pv"
+                type_lookup = Module__find_make_type(self->module, name->value, &empty_generics);
+            }
+            #line 445 "src/analyzer/Context.pv"
+            if (type_lookup == 0) {
+                #line 446 "src/analyzer/Context.pv"
+                Context__error_token(self, name, "Unknown type in array length");
+                #line 447 "src/analyzer/Context.pv"
+                return false;
+            }
 
-        #line 452 "src/analyzer/Context.pv"
-        if (i != length->value.length) {
+            #line 450 "src/analyzer/Context.pv"
+            if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "::")) {
+                #line 450 "src/analyzer/Context.pv"
+                return false;
+            }
+
+            #line 452 "src/analyzer/Context.pv"
+            struct Token* variant_token = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
             #line 453 "src/analyzer/Context.pv"
-            Context__error_token(self, length, "Fixed array length must be a standard positive integer");
+            if (variant_token == 0) {
+                #line 453 "src/analyzer/Context.pv"
+                return false;
+            }
+
+            #line 455 "src/analyzer/Context.pv"
+            switch (type_lookup->type) {
+                #line 456 "src/analyzer/Context.pv"
+                case TYPE__ENUM: {
+                    #line 456 "src/analyzer/Context.pv"
+                    struct Enum* enum_info = type_lookup->enum_value._0;
+                    #line 457 "src/analyzer/Context.pv"
+                    bool found = false;
+                    #line 458 "src/analyzer/Context.pv"
+                    uintptr_t current = 0;
+                    #line 459 "src/analyzer/Context.pv"
+                    { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
+                    #line 459 "src/analyzer/Context.pv"
+                    while (HashMapIter_str_EnumVariant__next(&__iter)) {
+                        #line 459 "src/analyzer/Context.pv"
+                        struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
+
+                        #line 460 "src/analyzer/Context.pv"
+                        if (variant->value != 0) {
+                            #line 461 "src/analyzer/Context.pv"
+                            Context__error_token(self, variant_token, "Array length from enum with explicit variant values is not supported");
+                            #line 462 "src/analyzer/Context.pv"
+                            return false;
+                        }
+                        #line 464 "src/analyzer/Context.pv"
+                        if (str__Eq_str__eq(&variant->name->value, variant_token->value)) {
+                            #line 465 "src/analyzer/Context.pv"
+                            result = current;
+                            #line 466 "src/analyzer/Context.pv"
+                            found = true;
+                            #line 467 "src/analyzer/Context.pv"
+                            break;
+                        }
+                        #line 469 "src/analyzer/Context.pv"
+                        current += 1;
+                    } }
+                    #line 471 "src/analyzer/Context.pv"
+                    if (!found) {
+                        #line 472 "src/analyzer/Context.pv"
+                        Context__error_token(self, variant_token, "Variant not found in enum");
+                        #line 473 "src/analyzer/Context.pv"
+                        return false;
+                    }
+                } break;
+                #line 476 "src/analyzer/Context.pv"
+                default: {
+                    #line 477 "src/analyzer/Context.pv"
+                    Context__error_token(self, name, "Array length identifier must reference an enum");
+                    #line 478 "src/analyzer/Context.pv"
+                    return false;
+                } break;
+            }
+        } else {
+            #line 482 "src/analyzer/Context.pv"
+            struct Token* length = Context__expect(self, TOKEN_TYPE__NUMBER);
+            #line 483 "src/analyzer/Context.pv"
+            if (length == 0) {
+                #line 483 "src/analyzer/Context.pv"
+                return false;
+            }
+
+            #line 485 "src/analyzer/Context.pv"
+            int32_t i = 0;
+            #line 486 "src/analyzer/Context.pv"
+            while (i < length->value.length) {
+                #line 487 "src/analyzer/Context.pv"
+                char c = length->value.ptr[i];
+
+                #line 489 "src/analyzer/Context.pv"
+                if (c >= '0' && c <= '9') {
+                    #line 490 "src/analyzer/Context.pv"
+                    result = result * 10 + (c - '0');
+                } else {
+                    #line 492 "src/analyzer/Context.pv"
+                    break;
+                }
+
+                #line 495 "src/analyzer/Context.pv"
+                i += 1;
+            }
+
+            #line 498 "src/analyzer/Context.pv"
+            if (i != length->value.length) {
+                #line 499 "src/analyzer/Context.pv"
+                Context__error_token(self, length, "Fixed array length must be a standard positive integer");
+            }
         }
 
-        #line 456 "src/analyzer/Context.pv"
+        #line 503 "src/analyzer/Context.pv"
         sequence->type = (struct SequenceType) { .type = SEQUENCE_TYPE__FIXED_ARRAY, .fixedarray_value = result };
-        #line 457 "src/analyzer/Context.pv"
+        #line 504 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence };
 
-        #line 459 "src/analyzer/Context.pv"
+        #line 506 "src/analyzer/Context.pv"
         if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "]")) {
-            #line 459 "src/analyzer/Context.pv"
+            #line 506 "src/analyzer/Context.pv"
             return false;
         }
 
-        #line 461 "src/analyzer/Context.pv"
+        #line 508 "src/analyzer/Context.pv"
         return true;
     } else if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "(")) {
-        #line 463 "src/analyzer/Context.pv"
+        #line 510 "src/analyzer/Context.pv"
         struct Tuple* tuple = ArenaAllocator__Allocator__alloc(self->allocator, sizeof(struct Tuple));
-        #line 464 "src/analyzer/Context.pv"
+        #line 511 "src/analyzer/Context.pv"
         tuple->elements = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-        #line 466 "src/analyzer/Context.pv"
+        #line 513 "src/analyzer/Context.pv"
         while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 467 "src/analyzer/Context.pv"
+            #line 514 "src/analyzer/Context.pv"
             struct Type element_type;
 
-            #line 469 "src/analyzer/Context.pv"
+            #line 516 "src/analyzer/Context.pv"
             if (!Context__parse_type(self, &element_type, generics)) {
-                #line 469 "src/analyzer/Context.pv"
+                #line 516 "src/analyzer/Context.pv"
                 return false;
             }
 
-            #line 471 "src/analyzer/Context.pv"
+            #line 518 "src/analyzer/Context.pv"
             Array_Type__append(&tuple->elements, element_type);
 
-            #line 473 "src/analyzer/Context.pv"
+            #line 520 "src/analyzer/Context.pv"
             if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 474 "src/analyzer/Context.pv"
+                #line 521 "src/analyzer/Context.pv"
                 Context__error(self, "Expected , or )");
-                #line 475 "src/analyzer/Context.pv"
+                #line 522 "src/analyzer/Context.pv"
                 return false;
             }
         }
 
-        #line 479 "src/analyzer/Context.pv"
+        #line 526 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__TUPLE, .tuple_value = tuple };
-        #line 480 "src/analyzer/Context.pv"
+        #line 527 "src/analyzer/Context.pv"
         return true;
     } else if (Context__check_next(self, TOKEN_TYPE__KEYWORD, "fn")) {
-        #line 482 "src/analyzer/Context.pv"
+        #line 529 "src/analyzer/Context.pv"
         struct Function func_info_val = Function__new(self);
-        #line 483 "src/analyzer/Context.pv"
+        #line 530 "src/analyzer/Context.pv"
         struct Function* func_info = ArenaAllocator__store_Function(self->allocator, &func_info_val);
-        #line 484 "src/analyzer/Context.pv"
+        #line 531 "src/analyzer/Context.pv"
         struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = self->type_self, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
 
-        #line 486 "src/analyzer/Context.pv"
+        #line 533 "src/analyzer/Context.pv"
         if (!Function__parse_parameters(func_info, &func_info->generics) || !Function__parse_return_type(func_info, &func_info->generics)) {
-            #line 486 "src/analyzer/Context.pv"
+            #line 533 "src/analyzer/Context.pv"
             return false;
         }
 
-        #line 488 "src/analyzer/Context.pv"
+        #line 535 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generic_map} };
 
-        #line 490 "src/analyzer/Context.pv"
+        #line 537 "src/analyzer/Context.pv"
         return true;
     }
 
-    #line 493 "src/analyzer/Context.pv"
+    #line 540 "src/analyzer/Context.pv"
     struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
-    #line 494 "src/analyzer/Context.pv"
+    #line 541 "src/analyzer/Context.pv"
     if (name == 0) {
-        #line 494 "src/analyzer/Context.pv"
+        #line 541 "src/analyzer/Context.pv"
         return false;
     }
 
-    #line 496 "src/analyzer/Context.pv"
+    #line 543 "src/analyzer/Context.pv"
     if (Token__eq(name, TOKEN_TYPE__IDENTIFIER, "Self")) {
-        #line 497 "src/analyzer/Context.pv"
+        #line 544 "src/analyzer/Context.pv"
         *type = (struct Type) { .type = TYPE__SELF };
-        #line 498 "src/analyzer/Context.pv"
+        #line 545 "src/analyzer/Context.pv"
         return true;
     }
 
-    #line 501 "src/analyzer/Context.pv"
+    #line 548 "src/analyzer/Context.pv"
     struct Array_Type generics_ = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 503 "src/analyzer/Context.pv"
+    #line 550 "src/analyzer/Context.pv"
     if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "<")) {
-        #line 504 "src/analyzer/Context.pv"
+        #line 551 "src/analyzer/Context.pv"
         while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
-            #line 505 "src/analyzer/Context.pv"
+            #line 552 "src/analyzer/Context.pv"
             struct Type child_type;
 
-            #line 507 "src/analyzer/Context.pv"
+            #line 554 "src/analyzer/Context.pv"
             if (!Context__parse_type(self, &child_type, generics)) {
-                #line 508 "src/analyzer/Context.pv"
+                #line 555 "src/analyzer/Context.pv"
                 return false;
             }
 
-            #line 511 "src/analyzer/Context.pv"
+            #line 558 "src/analyzer/Context.pv"
             Array_Type__append(&generics_, child_type);
 
-            #line 513 "src/analyzer/Context.pv"
+            #line 560 "src/analyzer/Context.pv"
             if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
-                #line 514 "src/analyzer/Context.pv"
+                #line 561 "src/analyzer/Context.pv"
                 Context__error(self, "Expected , or >");
-                #line 515 "src/analyzer/Context.pv"
+                #line 562 "src/analyzer/Context.pv"
                 return false;
             }
         }
     }
 
-    #line 520 "src/analyzer/Context.pv"
+    #line 567 "src/analyzer/Context.pv"
     if (generics != 0 && Generics__has(generics, name->value)) {
-        #line 521 "src/analyzer/Context.pv"
+        #line 568 "src/analyzer/Context.pv"
         struct Generic* generic_ref = Generics__find(generics, name->value);
 
-        #line 523 "src/analyzer/Context.pv"
+        #line 570 "src/analyzer/Context.pv"
         if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "::")) {
-            #line 524 "src/analyzer/Context.pv"
+            #line 571 "src/analyzer/Context.pv"
             struct Token* typedef_name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
-            #line 525 "src/analyzer/Context.pv"
+            #line 572 "src/analyzer/Context.pv"
             if (typedef_name == 0) {
-                #line 525 "src/analyzer/Context.pv"
+                #line 572 "src/analyzer/Context.pv"
                 return false;
             }
 
-            #line 527 "src/analyzer/Context.pv"
+            #line 574 "src/analyzer/Context.pv"
             bool found = false;
-            #line 528 "src/analyzer/Context.pv"
+            #line 575 "src/analyzer/Context.pv"
             { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic_ref->traits);
-            #line 528 "src/analyzer/Context.pv"
+            #line 575 "src/analyzer/Context.pv"
             while (Iter_ref_ref_Trait__next(&__iter)) {
-                #line 528 "src/analyzer/Context.pv"
+                #line 575 "src/analyzer/Context.pv"
                 struct Trait* trait_info = *Iter_ref_ref_Trait__value(&__iter);
 
-                #line 529 "src/analyzer/Context.pv"
+                #line 576 "src/analyzer/Context.pv"
                 if (HashMap_str_usize__find(&trait_info->typedefs, &typedef_name->value) != 0) {
-                    #line 529 "src/analyzer/Context.pv"
+                    #line 576 "src/analyzer/Context.pv"
                     found = true;
                 }
             } }
-            #line 531 "src/analyzer/Context.pv"
+            #line 578 "src/analyzer/Context.pv"
             if (!found) {
-                #line 532 "src/analyzer/Context.pv"
+                #line 579 "src/analyzer/Context.pv"
                 Context__error_token(self, typedef_name, "Unknown typedef in trait bound");
-                #line 533 "src/analyzer/Context.pv"
+                #line 580 "src/analyzer/Context.pv"
                 return false;
             }
 
-            #line 536 "src/analyzer/Context.pv"
+            #line 583 "src/analyzer/Context.pv"
             struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(self->allocator, (struct GenericTypedef[]){(struct GenericTypedef) { .generic = generic_ref, .typedef_name = typedef_name->value }});
-            #line 537 "src/analyzer/Context.pv"
+            #line 584 "src/analyzer/Context.pv"
             struct Type new_type = (struct Type) { .type = TYPE__GENERIC_TYPEDEF, .generictypedef_value = gt };
-            #line 538 "src/analyzer/Context.pv"
+            #line 585 "src/analyzer/Context.pv"
             memcpy(type, &new_type, sizeof(struct Type));
-            #line 539 "src/analyzer/Context.pv"
+            #line 586 "src/analyzer/Context.pv"
             return true;
         }
 
-        #line 542 "src/analyzer/Context.pv"
+        #line 589 "src/analyzer/Context.pv"
         struct Type new_type = (struct Type) { .type = TYPE__GENERIC, .generic_value = generic_ref };
-        #line 543 "src/analyzer/Context.pv"
+        #line 590 "src/analyzer/Context.pv"
         memcpy(type, &new_type, sizeof(struct Type));
-        #line 544 "src/analyzer/Context.pv"
-        return true;
-    }
-
-    #line 547 "src/analyzer/Context.pv"
-    struct Type* context_type = HashMap_str_Type__find(&self->types, &name->value);
-    #line 548 "src/analyzer/Context.pv"
-    if (context_type != 0) {
-        #line 549 "src/analyzer/Context.pv"
-        memcpy(type, context_type, sizeof(struct Type));
-        #line 550 "src/analyzer/Context.pv"
-        return true;
-    }
-
-    #line 553 "src/analyzer/Context.pv"
-    struct Type* new_type = Module__find_make_type(self->module, name->value, &generics_);
-    #line 554 "src/analyzer/Context.pv"
-    if (new_type == 0) {
-        #line 555 "src/analyzer/Context.pv"
-        Context__error_token(self, name, "Unknown type");
-        #line 556 "src/analyzer/Context.pv"
-        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(self->allocator, (struct UnknownC[]){(struct UnknownC) { .include = 0, .name = name->value, .generics = generics_ }});
-        #line 557 "src/analyzer/Context.pv"
-        *type = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c };
-        #line 558 "src/analyzer/Context.pv"
-        return false;
-    }
-
-    #line 561 "src/analyzer/Context.pv"
-    switch (new_type->type) {
-        #line 562 "src/analyzer/Context.pv"
-        case TYPE__NAMESPACE_CPP: {
-            #line 562 "src/analyzer/Context.pv"
-            struct NamespaceCpp* ns_info = new_type->namespacecpp_value;
-            #line 563 "src/analyzer/Context.pv"
-            return Context__parse_type_namespace_cpp(self, ns_info, type, generics);
-        } break;
-        #line 565 "src/analyzer/Context.pv"
-        default: {
-        } break;
-    }
-
-    #line 568 "src/analyzer/Context.pv"
-    switch (new_type->type) {
-        #line 569 "src/analyzer/Context.pv"
-        case TYPE__STRUCT: {
-            #line 569 "src/analyzer/Context.pv"
-            struct Struct* struct_info = new_type->struct_value._0;
-            #line 570 "src/analyzer/Context.pv"
-            if (!Context__validate_generic_constraints(self, &struct_info->generics, &generics_)) {
-                #line 570 "src/analyzer/Context.pv"
-                return false;
-            }
-        } break;
-        #line 572 "src/analyzer/Context.pv"
-        case TYPE__ENUM: {
-            #line 572 "src/analyzer/Context.pv"
-            struct Enum* enum_info = new_type->enum_value._0;
-            #line 573 "src/analyzer/Context.pv"
-            if (!Context__validate_generic_constraints(self, &enum_info->generics, &generics_)) {
-                #line 573 "src/analyzer/Context.pv"
-                return false;
-            }
-        } break;
-        #line 575 "src/analyzer/Context.pv"
-        case TYPE__TRAIT: {
-            #line 575 "src/analyzer/Context.pv"
-            struct Trait* trait_info = new_type->trait_value._0;
-            #line 576 "src/analyzer/Context.pv"
-            if (!Context__validate_generic_constraints(self, &trait_info->generics, &generics_)) {
-                #line 576 "src/analyzer/Context.pv"
-                return false;
-            }
-        } break;
-        #line 578 "src/analyzer/Context.pv"
-        default: {
-        } break;
-    }
-
-    #line 581 "src/analyzer/Context.pv"
-    *type = *new_type;
-    #line 582 "src/analyzer/Context.pv"
-    return true;
-}
-
-#line 585 "src/analyzer/Context.pv"
-bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp* parent, struct Type* type, struct Generics* generics) {
-    #line 586 "src/analyzer/Context.pv"
-    uintptr_t start_pos = self->pos;
-
-    #line 588 "src/analyzer/Context.pv"
-    if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 588 "src/analyzer/Context.pv"
-        return false;
-    }
-
-    #line 590 "src/analyzer/Context.pv"
-    struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
-    #line 591 "src/analyzer/Context.pv"
-    if (name == 0) {
         #line 591 "src/analyzer/Context.pv"
-        return false;
+        return true;
     }
 
-    #line 593 "src/analyzer/Context.pv"
-    struct Type* find_type = HashMap_str_Type__find(&parent->types, &name->value);
     #line 594 "src/analyzer/Context.pv"
-    if (find_type == 0) {
-        #line 595 "src/analyzer/Context.pv"
-        self->pos = start_pos;
+    struct Type* context_type = HashMap_str_Type__find(&self->types, &name->value);
+    #line 595 "src/analyzer/Context.pv"
+    if (context_type != 0) {
         #line 596 "src/analyzer/Context.pv"
-        *type = (struct Type) { .type = TYPE__NAMESPACE_CPP, .namespacecpp_value = parent };
+        memcpy(type, context_type, sizeof(struct Type));
         #line 597 "src/analyzer/Context.pv"
         return true;
     }
 
     #line 600 "src/analyzer/Context.pv"
-    switch (find_type->type) {
-        #line 601 "src/analyzer/Context.pv"
-        case TYPE__NAMESPACE_CPP: {
-            #line 601 "src/analyzer/Context.pv"
-            struct NamespaceCpp* ns_info = find_type->namespacecpp_value;
-            #line 602 "src/analyzer/Context.pv"
-            return Context__parse_type_namespace_cpp(self, ns_info, type, generics);
-        } break;
+    struct Type* new_type = Module__find_make_type(self->module, name->value, &generics_);
+    #line 601 "src/analyzer/Context.pv"
+    if (new_type == 0) {
+        #line 602 "src/analyzer/Context.pv"
+        Context__error_token(self, name, "Unknown type");
+        #line 603 "src/analyzer/Context.pv"
+        struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(self->allocator, (struct UnknownC[]){(struct UnknownC) { .include = 0, .name = name->value, .generics = generics_ }});
         #line 604 "src/analyzer/Context.pv"
-        case TYPE__CLASS_CPP: {
-            #line 604 "src/analyzer/Context.pv"
-            struct ClassCpp* class_info = find_type->classcpp_value;
-            #line 605 "src/analyzer/Context.pv"
-            return Context__parse_type_class_cpp(self, class_info, type, generics);
-        } break;
-        #line 607 "src/analyzer/Context.pv"
-        default: {
-        } break;
-    }
-
-    #line 610 "src/analyzer/Context.pv"
-    *type = *find_type;
-
-    #line 612 "src/analyzer/Context.pv"
-    return true;
-}
-
-#line 615 "src/analyzer/Context.pv"
-bool Context__parse_type_class_cpp(struct Context* self, struct ClassCpp* parent, struct Type* type, struct Generics* generics) {
-    #line 616 "src/analyzer/Context.pv"
-    uintptr_t start_pos = self->pos;
-
-    #line 618 "src/analyzer/Context.pv"
-    if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 619 "src/analyzer/Context.pv"
-        *type = (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = parent };
-        #line 620 "src/analyzer/Context.pv"
-        return true;
-    }
-
-    #line 623 "src/analyzer/Context.pv"
-    struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
-    #line 624 "src/analyzer/Context.pv"
-    if (name == 0) {
-        #line 624 "src/analyzer/Context.pv"
+        *type = (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c };
+        #line 605 "src/analyzer/Context.pv"
         return false;
     }
 
-    #line 626 "src/analyzer/Context.pv"
-    struct Type* find_type = HashMap_str_Type__find(&parent->types, &name->value);
-    #line 627 "src/analyzer/Context.pv"
-    if (find_type == 0) {
-        #line 628 "src/analyzer/Context.pv"
-        self->pos = start_pos;
-        #line 629 "src/analyzer/Context.pv"
-        *type = (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = parent };
-        #line 630 "src/analyzer/Context.pv"
-        return true;
-    }
-
-    #line 633 "src/analyzer/Context.pv"
-    switch (find_type->type) {
-        #line 634 "src/analyzer/Context.pv"
-        case TYPE__CLASS_CPP: {
-            #line 634 "src/analyzer/Context.pv"
-            struct ClassCpp* class_info = find_type->classcpp_value;
-            #line 635 "src/analyzer/Context.pv"
-            return Context__parse_type_class_cpp(self, class_info, type, generics);
+    #line 608 "src/analyzer/Context.pv"
+    switch (new_type->type) {
+        #line 609 "src/analyzer/Context.pv"
+        case TYPE__NAMESPACE_CPP: {
+            #line 609 "src/analyzer/Context.pv"
+            struct NamespaceCpp* ns_info = new_type->namespacecpp_value;
+            #line 610 "src/analyzer/Context.pv"
+            return Context__parse_type_namespace_cpp(self, ns_info, type, generics);
         } break;
-        #line 637 "src/analyzer/Context.pv"
+        #line 612 "src/analyzer/Context.pv"
         default: {
         } break;
+    }
+
+    #line 615 "src/analyzer/Context.pv"
+    switch (new_type->type) {
+        #line 616 "src/analyzer/Context.pv"
+        case TYPE__STRUCT: {
+            #line 616 "src/analyzer/Context.pv"
+            struct Struct* struct_info = new_type->struct_value._0;
+            #line 617 "src/analyzer/Context.pv"
+            if (!Context__validate_generic_constraints(self, &struct_info->generics, &generics_)) {
+                #line 617 "src/analyzer/Context.pv"
+                return false;
+            }
+        } break;
+        #line 619 "src/analyzer/Context.pv"
+        case TYPE__ENUM: {
+            #line 619 "src/analyzer/Context.pv"
+            struct Enum* enum_info = new_type->enum_value._0;
+            #line 620 "src/analyzer/Context.pv"
+            if (!Context__validate_generic_constraints(self, &enum_info->generics, &generics_)) {
+                #line 620 "src/analyzer/Context.pv"
+                return false;
+            }
+        } break;
+        #line 622 "src/analyzer/Context.pv"
+        case TYPE__TRAIT: {
+            #line 622 "src/analyzer/Context.pv"
+            struct Trait* trait_info = new_type->trait_value._0;
+            #line 623 "src/analyzer/Context.pv"
+            if (!Context__validate_generic_constraints(self, &trait_info->generics, &generics_)) {
+                #line 623 "src/analyzer/Context.pv"
+                return false;
+            }
+        } break;
+        #line 625 "src/analyzer/Context.pv"
+        default: {
+        } break;
+    }
+
+    #line 628 "src/analyzer/Context.pv"
+    *type = *new_type;
+    #line 629 "src/analyzer/Context.pv"
+    return true;
+}
+
+#line 632 "src/analyzer/Context.pv"
+bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp* parent, struct Type* type, struct Generics* generics) {
+    #line 633 "src/analyzer/Context.pv"
+    uintptr_t start_pos = self->pos;
+
+    #line 635 "src/analyzer/Context.pv"
+    if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "::")) {
+        #line 635 "src/analyzer/Context.pv"
+        return false;
+    }
+
+    #line 637 "src/analyzer/Context.pv"
+    struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
+    #line 638 "src/analyzer/Context.pv"
+    if (name == 0) {
+        #line 638 "src/analyzer/Context.pv"
+        return false;
     }
 
     #line 640 "src/analyzer/Context.pv"
-    *type = *find_type;
+    struct Type* find_type = HashMap_str_Type__find(&parent->types, &name->value);
     #line 641 "src/analyzer/Context.pv"
+    if (find_type == 0) {
+        #line 642 "src/analyzer/Context.pv"
+        self->pos = start_pos;
+        #line 643 "src/analyzer/Context.pv"
+        *type = (struct Type) { .type = TYPE__NAMESPACE_CPP, .namespacecpp_value = parent };
+        #line 644 "src/analyzer/Context.pv"
+        return true;
+    }
+
+    #line 647 "src/analyzer/Context.pv"
+    switch (find_type->type) {
+        #line 648 "src/analyzer/Context.pv"
+        case TYPE__NAMESPACE_CPP: {
+            #line 648 "src/analyzer/Context.pv"
+            struct NamespaceCpp* ns_info = find_type->namespacecpp_value;
+            #line 649 "src/analyzer/Context.pv"
+            return Context__parse_type_namespace_cpp(self, ns_info, type, generics);
+        } break;
+        #line 651 "src/analyzer/Context.pv"
+        case TYPE__CLASS_CPP: {
+            #line 651 "src/analyzer/Context.pv"
+            struct ClassCpp* class_info = find_type->classcpp_value;
+            #line 652 "src/analyzer/Context.pv"
+            return Context__parse_type_class_cpp(self, class_info, type, generics);
+        } break;
+        #line 654 "src/analyzer/Context.pv"
+        default: {
+        } break;
+    }
+
+    #line 657 "src/analyzer/Context.pv"
+    *type = *find_type;
+
+    #line 659 "src/analyzer/Context.pv"
     return true;
 }
 
-#line 644 "src/analyzer/Context.pv"
-bool Context__parse_type_trait(struct Context* self, struct Type* type, struct Generics* generics) {
-    #line 645 "src/analyzer/Context.pv"
+#line 662 "src/analyzer/Context.pv"
+bool Context__parse_type_class_cpp(struct Context* self, struct ClassCpp* parent, struct Type* type, struct Generics* generics) {
+    #line 663 "src/analyzer/Context.pv"
+    uintptr_t start_pos = self->pos;
+
+    #line 665 "src/analyzer/Context.pv"
+    if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, "::")) {
+        #line 666 "src/analyzer/Context.pv"
+        *type = (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = parent };
+        #line 667 "src/analyzer/Context.pv"
+        return true;
+    }
+
+    #line 670 "src/analyzer/Context.pv"
     struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
-    #line 646 "src/analyzer/Context.pv"
+    #line 671 "src/analyzer/Context.pv"
     if (name == 0) {
-        #line 646 "src/analyzer/Context.pv"
+        #line 671 "src/analyzer/Context.pv"
         return false;
     }
 
-    #line 648 "src/analyzer/Context.pv"
+    #line 673 "src/analyzer/Context.pv"
+    struct Type* find_type = HashMap_str_Type__find(&parent->types, &name->value);
+    #line 674 "src/analyzer/Context.pv"
+    if (find_type == 0) {
+        #line 675 "src/analyzer/Context.pv"
+        self->pos = start_pos;
+        #line 676 "src/analyzer/Context.pv"
+        *type = (struct Type) { .type = TYPE__CLASS_CPP, .classcpp_value = parent };
+        #line 677 "src/analyzer/Context.pv"
+        return true;
+    }
+
+    #line 680 "src/analyzer/Context.pv"
+    switch (find_type->type) {
+        #line 681 "src/analyzer/Context.pv"
+        case TYPE__CLASS_CPP: {
+            #line 681 "src/analyzer/Context.pv"
+            struct ClassCpp* class_info = find_type->classcpp_value;
+            #line 682 "src/analyzer/Context.pv"
+            return Context__parse_type_class_cpp(self, class_info, type, generics);
+        } break;
+        #line 684 "src/analyzer/Context.pv"
+        default: {
+        } break;
+    }
+
+    #line 687 "src/analyzer/Context.pv"
+    *type = *find_type;
+    #line 688 "src/analyzer/Context.pv"
+    return true;
+}
+
+#line 691 "src/analyzer/Context.pv"
+bool Context__parse_type_trait(struct Context* self, struct Type* type, struct Generics* generics) {
+    #line 692 "src/analyzer/Context.pv"
+    struct Token* name = Context__expect(self, TOKEN_TYPE__IDENTIFIER);
+    #line 693 "src/analyzer/Context.pv"
+    if (name == 0) {
+        #line 693 "src/analyzer/Context.pv"
+        return false;
+    }
+
+    #line 695 "src/analyzer/Context.pv"
     struct Trait* trait_info = Module__find_trait(self->module, name->value);
-    #line 649 "src/analyzer/Context.pv"
+    #line 696 "src/analyzer/Context.pv"
     if (trait_info == 0) {
-        #line 650 "src/analyzer/Context.pv"
+        #line 697 "src/analyzer/Context.pv"
         Context__error_token(self, name, "Unable to find trait with this name");
-        #line 651 "src/analyzer/Context.pv"
+        #line 698 "src/analyzer/Context.pv"
         return false;
     }
 
-    #line 654 "src/analyzer/Context.pv"
+    #line 701 "src/analyzer/Context.pv"
     struct Array_Type generics_ = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 656 "src/analyzer/Context.pv"
+    #line 703 "src/analyzer/Context.pv"
     if (Context__check_next(self, TOKEN_TYPE__SYMBOL, "<")) {
-        #line 657 "src/analyzer/Context.pv"
+        #line 704 "src/analyzer/Context.pv"
         while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
-            #line 658 "src/analyzer/Context.pv"
+            #line 705 "src/analyzer/Context.pv"
             struct Type child_type;
 
-            #line 660 "src/analyzer/Context.pv"
+            #line 707 "src/analyzer/Context.pv"
             if (!Context__parse_type(self, &child_type, generics)) {
-                #line 661 "src/analyzer/Context.pv"
+                #line 708 "src/analyzer/Context.pv"
                 return false;
             }
 
-            #line 664 "src/analyzer/Context.pv"
+            #line 711 "src/analyzer/Context.pv"
             Array_Type__append(&generics_, child_type);
 
-            #line 666 "src/analyzer/Context.pv"
+            #line 713 "src/analyzer/Context.pv"
             if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
-                #line 667 "src/analyzer/Context.pv"
+                #line 714 "src/analyzer/Context.pv"
                 Context__error(self, "Expected , or >");
-                #line 668 "src/analyzer/Context.pv"
+                #line 715 "src/analyzer/Context.pv"
                 return false;
             }
         }
     }
 
-    #line 673 "src/analyzer/Context.pv"
+    #line 720 "src/analyzer/Context.pv"
     *type = *Root__make_type_usage(self->root, (struct Type[]){(struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = 0} }}, &generics_);
 
-    #line 675 "src/analyzer/Context.pv"
+    #line 722 "src/analyzer/Context.pv"
     return true;
 }
 
-#line 678 "src/analyzer/Context.pv"
+#line 725 "src/analyzer/Context.pv"
 struct Type* Context__parse_type2(struct Context* self, struct Generics* generics) {
-    #line 679 "src/analyzer/Context.pv"
+    #line 726 "src/analyzer/Context.pv"
     struct Type* result = ArenaAllocator__Allocator__alloc(self->allocator, sizeof(struct Type));
 
-    #line 681 "src/analyzer/Context.pv"
+    #line 728 "src/analyzer/Context.pv"
     if (!Context__parse_type(self, result, generics)) {
-        #line 682 "src/analyzer/Context.pv"
+        #line 729 "src/analyzer/Context.pv"
         ArenaAllocator__Allocator__free(self->allocator, result);
-        #line 683 "src/analyzer/Context.pv"
+        #line 730 "src/analyzer/Context.pv"
         return 0;
     }
 
-    #line 686 "src/analyzer/Context.pv"
+    #line 733 "src/analyzer/Context.pv"
     return result;
 }
 
-#line 689 "src/analyzer/Context.pv"
+#line 736 "src/analyzer/Context.pv"
 struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type* type, struct GenericMap* generics_map, struct GenericMap* fallback_generics_map) {
-    #line 690 "src/analyzer/Context.pv"
+    #line 737 "src/analyzer/Context.pv"
     switch (type->type) {
-        #line 691 "src/analyzer/Context.pv"
+        #line 738 "src/analyzer/Context.pv"
         case TYPE__INDIRECT: {
-            #line 691 "src/analyzer/Context.pv"
+            #line 738 "src/analyzer/Context.pv"
             struct Indirect* indirect = type->indirect_value;
-            #line 692 "src/analyzer/Context.pv"
+            #line 739 "src/analyzer/Context.pv"
             struct Indirect* resolved = ArenaAllocator__store_Indirect(allocator, (struct Indirect[]){(struct Indirect) {
                 .type = indirect->type,
                 .to = *Context__resolve_type(allocator, &indirect->to, generics_map, fallback_generics_map),
             }});
 
-            #line 697 "src/analyzer/Context.pv"
+            #line 744 "src/analyzer/Context.pv"
             return Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = resolved }}, allocator);
         } break;
-        #line 699 "src/analyzer/Context.pv"
+        #line 746 "src/analyzer/Context.pv"
         case TYPE__SEQUENCE: {
-            #line 699 "src/analyzer/Context.pv"
+            #line 746 "src/analyzer/Context.pv"
             struct Sequence* sequence = type->sequence_value;
-            #line 700 "src/analyzer/Context.pv"
+            #line 747 "src/analyzer/Context.pv"
             struct Sequence* resolved = ArenaAllocator__store_Sequence(allocator, (struct Sequence[]){(struct Sequence) {
                 .type = sequence->type,
                 .element = *Context__resolve_type(allocator, &sequence->element, generics_map, fallback_generics_map),
                 .element_pointer = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 },
             }});
-            #line 705 "src/analyzer/Context.pv"
+            #line 752 "src/analyzer/Context.pv"
             resolved->element_pointer = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = ArenaAllocator__store_Indirect(allocator, (struct Indirect[]){(struct Indirect) { .type = INDIRECT_TYPE__POINTER, .to = resolved->element }}) };
 
-            #line 707 "src/analyzer/Context.pv"
+            #line 754 "src/analyzer/Context.pv"
             return Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = resolved }}, allocator);
         } break;
-        #line 709 "src/analyzer/Context.pv"
+        #line 756 "src/analyzer/Context.pv"
         case TYPE__TUPLE: {
-            #line 709 "src/analyzer/Context.pv"
+            #line 756 "src/analyzer/Context.pv"
             struct Tuple* tuple = type->tuple_value;
-            #line 710 "src/analyzer/Context.pv"
+            #line 757 "src/analyzer/Context.pv"
             struct Tuple resolved = Tuple__clone(tuple, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
-            #line 712 "src/analyzer/Context.pv"
+            #line 759 "src/analyzer/Context.pv"
             { struct Iter_ref_Type __iter = Array_Type__iter(&resolved.elements);
-            #line 712 "src/analyzer/Context.pv"
+            #line 759 "src/analyzer/Context.pv"
             while (Iter_ref_Type__next(&__iter)) {
-                #line 712 "src/analyzer/Context.pv"
+                #line 759 "src/analyzer/Context.pv"
                 struct Type* element = Iter_ref_Type__value(&__iter);
 
-                #line 713 "src/analyzer/Context.pv"
+                #line 760 "src/analyzer/Context.pv"
                 *element = *Context__resolve_type(allocator, element, generics_map, fallback_generics_map);
             } }
 
-            #line 716 "src/analyzer/Context.pv"
+            #line 763 "src/analyzer/Context.pv"
             return Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__TUPLE, .tuple_value = ArenaAllocator__store_Tuple(allocator, &resolved) }}, allocator);
         } break;
-        #line 718 "src/analyzer/Context.pv"
+        #line 765 "src/analyzer/Context.pv"
         case TYPE__PRIMITIVE: {
-            #line 719 "src/analyzer/Context.pv"
+            #line 766 "src/analyzer/Context.pv"
             return type;
         } break;
-        #line 721 "src/analyzer/Context.pv"
+        #line 768 "src/analyzer/Context.pv"
         case TYPE__ENUM: {
-            #line 721 "src/analyzer/Context.pv"
+            #line 768 "src/analyzer/Context.pv"
             struct Enum* enum_info = type->enum_value._0;
-            #line 721 "src/analyzer/Context.pv"
+            #line 768 "src/analyzer/Context.pv"
             struct GenericMap* generics = type->enum_value._1;
-            #line 722 "src/analyzer/Context.pv"
+            #line 769 "src/analyzer/Context.pv"
             struct GenericMap resolved_generics = GenericMap__clone(generics, allocator);
 
-            #line 724 "src/analyzer/Context.pv"
-            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics.array);
-            #line 724 "src/analyzer/Context.pv"
-            while (Iter_ref_Type__next(&__iter)) {
-                #line 724 "src/analyzer/Context.pv"
-                struct Type* generic = Iter_ref_Type__value(&__iter);
-
-                #line 725 "src/analyzer/Context.pv"
-                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
-            } }
-
-            #line 728 "src/analyzer/Context.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 729 "src/analyzer/Context.pv"
-            resolved_generics.self_type = self_type;
-            #line 730 "src/analyzer/Context.pv"
-            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &resolved_generics)} };
-
-            #line 732 "src/analyzer/Context.pv"
-            return self_type;
-        } break;
-        #line 734 "src/analyzer/Context.pv"
-        case TYPE__STRUCT: {
-            #line 734 "src/analyzer/Context.pv"
-            struct Struct* struct_info = type->struct_value._0;
-            #line 734 "src/analyzer/Context.pv"
-            struct GenericMap* generics = type->struct_value._1;
-            #line 735 "src/analyzer/Context.pv"
-            struct GenericMap resolved_generics_val = GenericMap__clone(generics, allocator);
-            #line 736 "src/analyzer/Context.pv"
-            struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, &resolved_generics_val);
-
-            #line 738 "src/analyzer/Context.pv"
-            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
-            #line 738 "src/analyzer/Context.pv"
-            while (Iter_ref_Type__next(&__iter)) {
-                #line 738 "src/analyzer/Context.pv"
-                struct Type* generic = Iter_ref_Type__value(&__iter);
-
-                #line 739 "src/analyzer/Context.pv"
-                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
-            } }
-
-            #line 742 "src/analyzer/Context.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 743 "src/analyzer/Context.pv"
-            resolved_generics->self_type = self_type;
-            #line 744 "src/analyzer/Context.pv"
-            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = resolved_generics} };
-
-            #line 746 "src/analyzer/Context.pv"
-            return self_type;
-        } break;
-        #line 748 "src/analyzer/Context.pv"
-        case TYPE__TRAIT: {
-            #line 748 "src/analyzer/Context.pv"
-            struct Trait* trait_info = type->trait_value._0;
-            #line 748 "src/analyzer/Context.pv"
-            struct GenericMap* generics = type->trait_value._1;
-            #line 749 "src/analyzer/Context.pv"
-            struct GenericMap resolved_generics_val = GenericMap__clone(generics, allocator);
-            #line 750 "src/analyzer/Context.pv"
-            struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, &resolved_generics_val);
-
-            #line 752 "src/analyzer/Context.pv"
-            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
-            #line 752 "src/analyzer/Context.pv"
-            while (Iter_ref_Type__next(&__iter)) {
-                #line 752 "src/analyzer/Context.pv"
-                struct Type* generic = Iter_ref_Type__value(&__iter);
-
-                #line 753 "src/analyzer/Context.pv"
-                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
-            } }
-
-            #line 756 "src/analyzer/Context.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 757 "src/analyzer/Context.pv"
-            resolved_generics->self_type = self_type;
-            #line 758 "src/analyzer/Context.pv"
-            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = resolved_generics} };
-
-            #line 760 "src/analyzer/Context.pv"
-            return self_type;
-        } break;
-        #line 762 "src/analyzer/Context.pv"
-        case TYPE__FUNCTION: {
-            #line 762 "src/analyzer/Context.pv"
-            struct Function* func_info = type->function_value._0;
-            #line 762 "src/analyzer/Context.pv"
-            struct GenericMap* generics = type->function_value._1;
-            #line 763 "src/analyzer/Context.pv"
-            if (func_info->type == FUNCTION_TYPE__METHOD_CPP) {
-                #line 763 "src/analyzer/Context.pv"
-                return type;
-            }
-            #line 764 "src/analyzer/Context.pv"
-            struct GenericMap resolved_generics_val = GenericMap__clone(generics, allocator);
-            #line 765 "src/analyzer/Context.pv"
-            struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, &resolved_generics_val);
-
-            #line 767 "src/analyzer/Context.pv"
-            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
-            #line 767 "src/analyzer/Context.pv"
-            while (Iter_ref_Type__next(&__iter)) {
-                #line 767 "src/analyzer/Context.pv"
-                struct Type* generic = Iter_ref_Type__value(&__iter);
-
-                #line 768 "src/analyzer/Context.pv"
-                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
-            } }
-
             #line 771 "src/analyzer/Context.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 772 "src/analyzer/Context.pv"
-            resolved_generics->self_type = self_type;
-            #line 773 "src/analyzer/Context.pv"
-            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = resolved_generics} };
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics.array);
+            #line 771 "src/analyzer/Context.pv"
+            while (Iter_ref_Type__next(&__iter)) {
+                #line 771 "src/analyzer/Context.pv"
+                struct Type* generic = Iter_ref_Type__value(&__iter);
+
+                #line 772 "src/analyzer/Context.pv"
+                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
+            } }
 
             #line 775 "src/analyzer/Context.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 776 "src/analyzer/Context.pv"
+            resolved_generics.self_type = self_type;
+            #line 777 "src/analyzer/Context.pv"
+            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &resolved_generics)} };
+
+            #line 779 "src/analyzer/Context.pv"
             return self_type;
         } break;
-        #line 777 "src/analyzer/Context.pv"
+        #line 781 "src/analyzer/Context.pv"
+        case TYPE__STRUCT: {
+            #line 781 "src/analyzer/Context.pv"
+            struct Struct* struct_info = type->struct_value._0;
+            #line 781 "src/analyzer/Context.pv"
+            struct GenericMap* generics = type->struct_value._1;
+            #line 782 "src/analyzer/Context.pv"
+            struct GenericMap resolved_generics_val = GenericMap__clone(generics, allocator);
+            #line 783 "src/analyzer/Context.pv"
+            struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, &resolved_generics_val);
+
+            #line 785 "src/analyzer/Context.pv"
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
+            #line 785 "src/analyzer/Context.pv"
+            while (Iter_ref_Type__next(&__iter)) {
+                #line 785 "src/analyzer/Context.pv"
+                struct Type* generic = Iter_ref_Type__value(&__iter);
+
+                #line 786 "src/analyzer/Context.pv"
+                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
+            } }
+
+            #line 789 "src/analyzer/Context.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 790 "src/analyzer/Context.pv"
+            resolved_generics->self_type = self_type;
+            #line 791 "src/analyzer/Context.pv"
+            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = resolved_generics} };
+
+            #line 793 "src/analyzer/Context.pv"
+            return self_type;
+        } break;
+        #line 795 "src/analyzer/Context.pv"
+        case TYPE__TRAIT: {
+            #line 795 "src/analyzer/Context.pv"
+            struct Trait* trait_info = type->trait_value._0;
+            #line 795 "src/analyzer/Context.pv"
+            struct GenericMap* generics = type->trait_value._1;
+            #line 796 "src/analyzer/Context.pv"
+            struct GenericMap resolved_generics_val = GenericMap__clone(generics, allocator);
+            #line 797 "src/analyzer/Context.pv"
+            struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, &resolved_generics_val);
+
+            #line 799 "src/analyzer/Context.pv"
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
+            #line 799 "src/analyzer/Context.pv"
+            while (Iter_ref_Type__next(&__iter)) {
+                #line 799 "src/analyzer/Context.pv"
+                struct Type* generic = Iter_ref_Type__value(&__iter);
+
+                #line 800 "src/analyzer/Context.pv"
+                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
+            } }
+
+            #line 803 "src/analyzer/Context.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 804 "src/analyzer/Context.pv"
+            resolved_generics->self_type = self_type;
+            #line 805 "src/analyzer/Context.pv"
+            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = resolved_generics} };
+
+            #line 807 "src/analyzer/Context.pv"
+            return self_type;
+        } break;
+        #line 809 "src/analyzer/Context.pv"
+        case TYPE__FUNCTION: {
+            #line 809 "src/analyzer/Context.pv"
+            struct Function* func_info = type->function_value._0;
+            #line 809 "src/analyzer/Context.pv"
+            struct GenericMap* generics = type->function_value._1;
+            #line 810 "src/analyzer/Context.pv"
+            if (func_info->type == FUNCTION_TYPE__METHOD_CPP) {
+                #line 810 "src/analyzer/Context.pv"
+                return type;
+            }
+            #line 811 "src/analyzer/Context.pv"
+            struct GenericMap resolved_generics_val = GenericMap__clone(generics, allocator);
+            #line 812 "src/analyzer/Context.pv"
+            struct GenericMap* resolved_generics = ArenaAllocator__store_GenericMap(allocator, &resolved_generics_val);
+
+            #line 814 "src/analyzer/Context.pv"
+            { struct Iter_ref_Type __iter = Array_Type__iter(&resolved_generics->array);
+            #line 814 "src/analyzer/Context.pv"
+            while (Iter_ref_Type__next(&__iter)) {
+                #line 814 "src/analyzer/Context.pv"
+                struct Type* generic = Iter_ref_Type__value(&__iter);
+
+                #line 815 "src/analyzer/Context.pv"
+                *generic = *Context__resolve_type(allocator, generic, generics_map, fallback_generics_map);
+            } }
+
+            #line 818 "src/analyzer/Context.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 819 "src/analyzer/Context.pv"
+            resolved_generics->self_type = self_type;
+            #line 820 "src/analyzer/Context.pv"
+            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = resolved_generics} };
+
+            #line 822 "src/analyzer/Context.pv"
+            return self_type;
+        } break;
+        #line 824 "src/analyzer/Context.pv"
         case TYPE__GENERIC_TYPEDEF: {
-            #line 777 "src/analyzer/Context.pv"
+            #line 824 "src/analyzer/Context.pv"
             struct GenericTypedef* gt = type->generictypedef_value;
-            #line 778 "src/analyzer/Context.pv"
+            #line 825 "src/analyzer/Context.pv"
             struct str name = gt->generic->name->value;
-            #line 779 "src/analyzer/Context.pv"
+            #line 826 "src/analyzer/Context.pv"
             struct Type* concrete_type = 0;
 
-            #line 781 "src/analyzer/Context.pv"
+            #line 828 "src/analyzer/Context.pv"
             if (generics_map != 0) {
-                #line 781 "src/analyzer/Context.pv"
+                #line 828 "src/analyzer/Context.pv"
                 concrete_type = GenericMap__get(generics_map, name);
             }
-            #line 782 "src/analyzer/Context.pv"
+            #line 829 "src/analyzer/Context.pv"
             if (concrete_type == 0 && fallback_generics_map != 0) {
-                #line 782 "src/analyzer/Context.pv"
+                #line 829 "src/analyzer/Context.pv"
                 concrete_type = GenericMap__get(fallback_generics_map, name);
             }
 
-            #line 784 "src/analyzer/Context.pv"
+            #line 831 "src/analyzer/Context.pv"
             if (concrete_type != 0) {
-                #line 785 "src/analyzer/Context.pv"
+                #line 832 "src/analyzer/Context.pv"
                 switch (concrete_type->type) {
-                    #line 786 "src/analyzer/Context.pv"
+                    #line 833 "src/analyzer/Context.pv"
                     case TYPE__STRUCT: {
-                        #line 786 "src/analyzer/Context.pv"
+                        #line 833 "src/analyzer/Context.pv"
                         struct Struct* struct_info = concrete_type->struct_value._0;
-                        #line 787 "src/analyzer/Context.pv"
+                        #line 834 "src/analyzer/Context.pv"
                         { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-                        #line 787 "src/analyzer/Context.pv"
+                        #line 834 "src/analyzer/Context.pv"
                         while (Iter_ref_ref_Impl__next(&__iter)) {
-                            #line 787 "src/analyzer/Context.pv"
+                            #line 834 "src/analyzer/Context.pv"
                             struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                            #line 788 "src/analyzer/Context.pv"
+                            #line 835 "src/analyzer/Context.pv"
                             if (impl_info->trait_ == 0) {
-                                #line 788 "src/analyzer/Context.pv"
+                                #line 835 "src/analyzer/Context.pv"
                                 continue;
                             }
-                            #line 789 "src/analyzer/Context.pv"
+                            #line 836 "src/analyzer/Context.pv"
                             if (HashMap_str_usize__find(&impl_info->trait_->typedefs, &gt->typedef_name) == 0) {
-                                #line 789 "src/analyzer/Context.pv"
+                                #line 836 "src/analyzer/Context.pv"
                                 continue;
                             }
-                            #line 790 "src/analyzer/Context.pv"
+                            #line 837 "src/analyzer/Context.pv"
                             struct Type* typedef_type = HashMap_str_Type__find(&impl_info->typedefs, &gt->typedef_name);
-                            #line 791 "src/analyzer/Context.pv"
+                            #line 838 "src/analyzer/Context.pv"
                             if (typedef_type != 0) {
-                                #line 791 "src/analyzer/Context.pv"
+                                #line 838 "src/analyzer/Context.pv"
                                 return typedef_type;
                             }
                         } }
                     } break;
-                    #line 794 "src/analyzer/Context.pv"
+                    #line 841 "src/analyzer/Context.pv"
                     default: {
                     } break;
                 }
             }
 
-            #line 798 "src/analyzer/Context.pv"
+            #line 845 "src/analyzer/Context.pv"
             return type;
         } break;
-        #line 800 "src/analyzer/Context.pv"
+        #line 847 "src/analyzer/Context.pv"
         case TYPE__GENERIC: {
-            #line 800 "src/analyzer/Context.pv"
+            #line 847 "src/analyzer/Context.pv"
             struct Generic* generic = type->generic_value;
-            #line 801 "src/analyzer/Context.pv"
+            #line 848 "src/analyzer/Context.pv"
             struct str name = generic->name->value;
-            #line 802 "src/analyzer/Context.pv"
+            #line 849 "src/analyzer/Context.pv"
             struct Type* generic_type = 0;
 
-            #line 804 "src/analyzer/Context.pv"
+            #line 851 "src/analyzer/Context.pv"
             if (generic_type == 0 && generics_map != 0) {
-                #line 805 "src/analyzer/Context.pv"
+                #line 852 "src/analyzer/Context.pv"
                 generic_type = GenericMap__get(generics_map, name);
             }
 
-            #line 808 "src/analyzer/Context.pv"
+            #line 855 "src/analyzer/Context.pv"
             if (generic_type == 0 && fallback_generics_map != 0) {
-                #line 809 "src/analyzer/Context.pv"
+                #line 856 "src/analyzer/Context.pv"
                 generic_type = GenericMap__get(fallback_generics_map, name);
             }
 
-            #line 812 "src/analyzer/Context.pv"
+            #line 859 "src/analyzer/Context.pv"
             if (generic_type == 0) {
-                #line 813 "src/analyzer/Context.pv"
+                #line 860 "src/analyzer/Context.pv"
                 uint32_t len = name.length;
-                #line 814 "src/analyzer/Context.pv"
+                #line 861 "src/analyzer/Context.pv"
                 fprintf(stderr, "Could not resolve generic %.*s generics1\n", len, name.ptr);
-                #line 815 "src/analyzer/Context.pv"
+                #line 862 "src/analyzer/Context.pv"
                 return type;
             }
 
-            #line 818 "src/analyzer/Context.pv"
+            #line 865 "src/analyzer/Context.pv"
             return generic_type;
         } break;
-        #line 820 "src/analyzer/Context.pv"
+        #line 867 "src/analyzer/Context.pv"
         case TYPE__SELF: {
-            #line 821 "src/analyzer/Context.pv"
+            #line 868 "src/analyzer/Context.pv"
             if (generics_map->self_type != 0) {
-                #line 822 "src/analyzer/Context.pv"
+                #line 869 "src/analyzer/Context.pv"
                 return generics_map->self_type;
             } else if (fallback_generics_map != 0 && fallback_generics_map->self_type != 0) {
-                #line 824 "src/analyzer/Context.pv"
+                #line 871 "src/analyzer/Context.pv"
                 return fallback_generics_map->self_type;
             } else {
-                #line 826 "src/analyzer/Context.pv"
+                #line 873 "src/analyzer/Context.pv"
                 return type;
             }
         } break;
-        #line 829 "src/analyzer/Context.pv"
+        #line 876 "src/analyzer/Context.pv"
         default: {
         } break;
     }
 
-    #line 832 "src/analyzer/Context.pv"
+    #line 879 "src/analyzer/Context.pv"
     return type;
 }
 
-#line 835 "src/analyzer/Context.pv"
+#line 882 "src/analyzer/Context.pv"
 bool Context__set_value(struct Context* self, struct Token* name, struct Type* type) {
-    #line 836 "src/analyzer/Context.pv"
+    #line 883 "src/analyzer/Context.pv"
     struct Scope* scope = Array_Scope__back(&self->scopes);
-    #line 837 "src/analyzer/Context.pv"
+    #line 884 "src/analyzer/Context.pv"
     struct HashMap_str_Type* values = &scope->values;
 
-    #line 839 "src/analyzer/Context.pv"
+    #line 886 "src/analyzer/Context.pv"
     if (HashMap_str_Type__find(values, &name->value) != 0) {
-        #line 840 "src/analyzer/Context.pv"
+        #line 887 "src/analyzer/Context.pv"
         struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
-        #line 841 "src/analyzer/Context.pv"
+        #line 888 "src/analyzer/Context.pv"
         String__append(&message, (struct str){ .ptr = "Variable name already in use: ", .length = strlen("Variable name already in use: ") });
-        #line 842 "src/analyzer/Context.pv"
+        #line 889 "src/analyzer/Context.pv"
         String__append(&message, name->value);
-        #line 843 "src/analyzer/Context.pv"
+        #line 890 "src/analyzer/Context.pv"
         Context__error_token(self, name, String__c_str(&message));
-        #line 844 "src/analyzer/Context.pv"
+        #line 891 "src/analyzer/Context.pv"
         return false;
     }
 
-    #line 847 "src/analyzer/Context.pv"
+    #line 894 "src/analyzer/Context.pv"
     HashMap_str_Type__insert(values, name->value, *type);
 
-    #line 849 "src/analyzer/Context.pv"
+    #line 896 "src/analyzer/Context.pv"
     return true;
 }
 
-#line 852 "src/analyzer/Context.pv"
+#line 899 "src/analyzer/Context.pv"
 struct Type* Context__get_value(struct Context* self, struct str name) {
-    #line 853 "src/analyzer/Context.pv"
+    #line 900 "src/analyzer/Context.pv"
     struct Scope* scope_front = self->scopes.data;
-    #line 854 "src/analyzer/Context.pv"
+    #line 901 "src/analyzer/Context.pv"
     struct Scope* scope = Array_Scope__back(&self->scopes);
 
-    #line 856 "src/analyzer/Context.pv"
+    #line 903 "src/analyzer/Context.pv"
     while (scope >= scope_front) {
-        #line 857 "src/analyzer/Context.pv"
+        #line 904 "src/analyzer/Context.pv"
         struct Type* type = HashMap_str_Type__find(&scope->values, &name);
-        #line 858 "src/analyzer/Context.pv"
+        #line 905 "src/analyzer/Context.pv"
         if (type != 0) {
-            #line 858 "src/analyzer/Context.pv"
+            #line 905 "src/analyzer/Context.pv"
             return type;
         }
 
-        #line 860 "src/analyzer/Context.pv"
+        #line 907 "src/analyzer/Context.pv"
         scope -= 1;
     }
 
-    #line 863 "src/analyzer/Context.pv"
+    #line 910 "src/analyzer/Context.pv"
     struct Type* func = Module__find_function(self->module, name);
-    #line 864 "src/analyzer/Context.pv"
+    #line 911 "src/analyzer/Context.pv"
     if (func != 0) {
-        #line 864 "src/analyzer/Context.pv"
+        #line 911 "src/analyzer/Context.pv"
         return func;
     }
 
-    #line 866 "src/analyzer/Context.pv"
+    #line 913 "src/analyzer/Context.pv"
     return Module__find_value(self->module, name);
 }
 
-#line 869 "src/analyzer/Context.pv"
+#line 916 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_defer_statements(struct Context* self) {
-    #line 870 "src/analyzer/Context.pv"
+    #line 917 "src/analyzer/Context.pv"
     struct Array_DeferStatement defer_statements = Array_DeferStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 872 "src/analyzer/Context.pv"
+    #line 919 "src/analyzer/Context.pv"
     { struct Iter_ref_Scope __iter = Iter_ref_Scope__reverse(Array_Scope__iter(&self->scopes));
-    #line 872 "src/analyzer/Context.pv"
+    #line 919 "src/analyzer/Context.pv"
     while (Iter_ref_Scope__next(&__iter)) {
-        #line 872 "src/analyzer/Context.pv"
+        #line 919 "src/analyzer/Context.pv"
         struct Scope* scope = Iter_ref_Scope__value(&__iter);
 
-        #line 873 "src/analyzer/Context.pv"
+        #line 920 "src/analyzer/Context.pv"
         struct Block* block = scope->block;
 
-        #line 875 "src/analyzer/Context.pv"
+        #line 922 "src/analyzer/Context.pv"
         if (block != 0) {
-            #line 876 "src/analyzer/Context.pv"
+            #line 923 "src/analyzer/Context.pv"
             { struct Iter_ref_DeferStatement __iter = Iter_ref_DeferStatement__reverse(Array_DeferStatement__iter(&block->defer_statements));
-            #line 876 "src/analyzer/Context.pv"
+            #line 923 "src/analyzer/Context.pv"
             while (Iter_ref_DeferStatement__next(&__iter)) {
-                #line 876 "src/analyzer/Context.pv"
+                #line 923 "src/analyzer/Context.pv"
                 struct DeferStatement* defer_statement = Iter_ref_DeferStatement__value(&__iter);
 
-                #line 877 "src/analyzer/Context.pv"
+                #line 924 "src/analyzer/Context.pv"
                 Array_DeferStatement__append(&defer_statements, *defer_statement);
             } }
         }
     } }
 
-    #line 882 "src/analyzer/Context.pv"
+    #line 929 "src/analyzer/Context.pv"
     return defer_statements;
 }
 
-#line 885 "src/analyzer/Context.pv"
+#line 932 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* self) {
-    #line 886 "src/analyzer/Context.pv"
+    #line 933 "src/analyzer/Context.pv"
     struct Array_DeferStatement defer_statements = Array_DeferStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 888 "src/analyzer/Context.pv"
+    #line 935 "src/analyzer/Context.pv"
     { struct Iter_ref_Scope __iter = Iter_ref_Scope__reverse(Array_Scope__iter(&self->scopes));
-    #line 888 "src/analyzer/Context.pv"
+    #line 935 "src/analyzer/Context.pv"
     while (Iter_ref_Scope__next(&__iter)) {
-        #line 888 "src/analyzer/Context.pv"
+        #line 935 "src/analyzer/Context.pv"
         struct Scope* scope = Iter_ref_Scope__value(&__iter);
 
-        #line 889 "src/analyzer/Context.pv"
+        #line 936 "src/analyzer/Context.pv"
         struct Block* block = scope->block;
 
-        #line 891 "src/analyzer/Context.pv"
+        #line 938 "src/analyzer/Context.pv"
         if (block != 0) {
-            #line 892 "src/analyzer/Context.pv"
+            #line 939 "src/analyzer/Context.pv"
             { struct Iter_ref_DeferStatement __iter = Iter_ref_DeferStatement__reverse(Array_DeferStatement__iter(&block->defer_statements));
-            #line 892 "src/analyzer/Context.pv"
+            #line 939 "src/analyzer/Context.pv"
             while (Iter_ref_DeferStatement__next(&__iter)) {
-                #line 892 "src/analyzer/Context.pv"
+                #line 939 "src/analyzer/Context.pv"
                 struct DeferStatement* defer_statement = Iter_ref_DeferStatement__value(&__iter);
 
-                #line 893 "src/analyzer/Context.pv"
+                #line 940 "src/analyzer/Context.pv"
                 Array_DeferStatement__append(&defer_statements, *defer_statement);
             } }
 
-            #line 896 "src/analyzer/Context.pv"
+            #line 943 "src/analyzer/Context.pv"
             if (block->is_loop) {
-                #line 896 "src/analyzer/Context.pv"
+                #line 943 "src/analyzer/Context.pv"
                 return defer_statements;
             }
         }
     } }
 
-    #line 900 "src/analyzer/Context.pv"
+    #line 947 "src/analyzer/Context.pv"
     return defer_statements;
 }
 
-#line 903 "src/analyzer/Context.pv"
+#line 950 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics) {
-    #line 904 "src/analyzer/Context.pv"
+    #line 951 "src/analyzer/Context.pv"
     struct Array_Type generic_inputs = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 906 "src/analyzer/Context.pv"
+    #line 953 "src/analyzer/Context.pv"
     if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "<")) {
-        #line 906 "src/analyzer/Context.pv"
+        #line 953 "src/analyzer/Context.pv"
         return (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 };
     }
 
-    #line 908 "src/analyzer/Context.pv"
+    #line 955 "src/analyzer/Context.pv"
     while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
-        #line 909 "src/analyzer/Context.pv"
+        #line 956 "src/analyzer/Context.pv"
         struct Type child_type;
 
-        #line 911 "src/analyzer/Context.pv"
+        #line 958 "src/analyzer/Context.pv"
         if (!Context__parse_type(self, &child_type, generics)) {
-            #line 911 "src/analyzer/Context.pv"
+            #line 958 "src/analyzer/Context.pv"
             return (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 };
         }
 
-        #line 913 "src/analyzer/Context.pv"
+        #line 960 "src/analyzer/Context.pv"
         Array_Type__append(&generic_inputs, child_type);
 
-        #line 915 "src/analyzer/Context.pv"
+        #line 962 "src/analyzer/Context.pv"
         if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
-            #line 916 "src/analyzer/Context.pv"
+            #line 963 "src/analyzer/Context.pv"
             Context__error(self, "Expected , or >");
-            #line 917 "src/analyzer/Context.pv"
+            #line 964 "src/analyzer/Context.pv"
             return (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 };
         }
     }
 
-    #line 921 "src/analyzer/Context.pv"
+    #line 968 "src/analyzer/Context.pv"
     return generic_inputs;
 }
 
-#line 924 "src/analyzer/Context.pv"
+#line 971 "src/analyzer/Context.pv"
 bool Context__validate_generic_constraints(struct Context* self, struct Generics* generics, struct Array_Type* usage_types) {
-    #line 925 "src/analyzer/Context.pv"
+    #line 972 "src/analyzer/Context.pv"
     uintptr_t i = 0;
-    #line 926 "src/analyzer/Context.pv"
+    #line 973 "src/analyzer/Context.pv"
     while (i < generics->array.length && i < usage_types->length) {
-        #line 927 "src/analyzer/Context.pv"
+        #line 974 "src/analyzer/Context.pv"
         struct Generic* generic = &generics->array.data[i];
-        #line 928 "src/analyzer/Context.pv"
+        #line 975 "src/analyzer/Context.pv"
         struct Type* usage_type = &usage_types->data[i];
 
-        #line 930 "src/analyzer/Context.pv"
+        #line 977 "src/analyzer/Context.pv"
         { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);
-        #line 930 "src/analyzer/Context.pv"
+        #line 977 "src/analyzer/Context.pv"
         while (Iter_ref_ref_Trait__next(&__iter)) {
-            #line 930 "src/analyzer/Context.pv"
+            #line 977 "src/analyzer/Context.pv"
             struct Trait* required_trait = *Iter_ref_ref_Trait__value(&__iter);
 
-            #line 931 "src/analyzer/Context.pv"
+            #line 978 "src/analyzer/Context.pv"
             bool implements = false;
-            #line 932 "src/analyzer/Context.pv"
+            #line 979 "src/analyzer/Context.pv"
             switch (usage_type->type) {
-                #line 933 "src/analyzer/Context.pv"
+                #line 980 "src/analyzer/Context.pv"
                 case TYPE__STRUCT: {
-                    #line 933 "src/analyzer/Context.pv"
+                    #line 980 "src/analyzer/Context.pv"
                     struct Struct* struct_info = usage_type->struct_value._0;
-                    #line 934 "src/analyzer/Context.pv"
+                    #line 981 "src/analyzer/Context.pv"
                     implements = HashMap_str_tuple_ref_Trait_ref_Type__find(&struct_info->traits, &required_trait->name->value) != 0;
                 } break;
-                #line 936 "src/analyzer/Context.pv"
+                #line 983 "src/analyzer/Context.pv"
                 case TYPE__GENERIC: {
-                    #line 936 "src/analyzer/Context.pv"
+                    #line 983 "src/analyzer/Context.pv"
                     struct Generic* generic_info = usage_type->generic_value;
-                    #line 937 "src/analyzer/Context.pv"
+                    #line 984 "src/analyzer/Context.pv"
                     { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic_info->traits);
-                    #line 937 "src/analyzer/Context.pv"
+                    #line 984 "src/analyzer/Context.pv"
                     while (Iter_ref_ref_Trait__next(&__iter)) {
-                        #line 937 "src/analyzer/Context.pv"
+                        #line 984 "src/analyzer/Context.pv"
                         struct Trait* generic_trait = *Iter_ref_ref_Trait__value(&__iter);
 
-                        #line 938 "src/analyzer/Context.pv"
+                        #line 985 "src/analyzer/Context.pv"
                         if (generic_trait == required_trait) {
-                            #line 938 "src/analyzer/Context.pv"
+                            #line 985 "src/analyzer/Context.pv"
                             implements = true;
                         }
                     } }
                 } break;
-                #line 941 "src/analyzer/Context.pv"
+                #line 988 "src/analyzer/Context.pv"
                 default: {
-                    #line 941 "src/analyzer/Context.pv"
+                    #line 988 "src/analyzer/Context.pv"
                     implements = true;
                 } break;
             }
-            #line 943 "src/analyzer/Context.pv"
+            #line 990 "src/analyzer/Context.pv"
             if (!implements) {
-                #line 944 "src/analyzer/Context.pv"
+                #line 991 "src/analyzer/Context.pv"
                 struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
-                #line 945 "src/analyzer/Context.pv"
+                #line 992 "src/analyzer/Context.pv"
                 String__append(&message, (struct str){ .ptr = "Type does not implement required trait '", .length = strlen("Type does not implement required trait '") });
-                #line 946 "src/analyzer/Context.pv"
+                #line 993 "src/analyzer/Context.pv"
                 String__append(&message, required_trait->name->value);
-                #line 947 "src/analyzer/Context.pv"
+                #line 994 "src/analyzer/Context.pv"
                 String__append(&message, (struct str){ .ptr = "'", .length = strlen("'") });
-                #line 948 "src/analyzer/Context.pv"
+                #line 995 "src/analyzer/Context.pv"
                 Context__error(self, String__c_str(&message));
-                #line 949 "src/analyzer/Context.pv"
+                #line 996 "src/analyzer/Context.pv"
                 return false;
             }
         } }
 
-        #line 953 "src/analyzer/Context.pv"
+        #line 1000 "src/analyzer/Context.pv"
         i += 1;
     }
-    #line 955 "src/analyzer/Context.pv"
+    #line 1002 "src/analyzer/Context.pv"
     return true;
 }

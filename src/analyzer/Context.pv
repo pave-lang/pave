@@ -431,26 +431,73 @@ impl Context {
                 return true;
             }
 
-            let length = self.expect(TokenType::Number);
-            if length == null { return false; }
-
             let result: usize = 0;
 
-            let i = 0;
-            while i < length.value.length {
-                let c = length.value.ptr[i];
+            if self.check(TokenType::Identifier) {
+                let name = self.expect(TokenType::Identifier);
+                if name == null { return false; }
 
-                if c >= '0' && c <= '9' {
-                    result = result * 10 + (c - '0'); 
-                } else {
-                    break; 
+                let type_lookup: *Type = self.types.find(&name.value);
+                if type_lookup == null {
+                    let empty_generics = Array<Type>::new(self.allocator);
+                    type_lookup = self.module.find_make_type(name.value, &empty_generics);
+                }
+                if type_lookup == null {
+                    self.error_token(name, "Unknown type in array length");
+                    return false;
                 }
 
-                i += 1;
-            }
+                if !self.expect_value(TokenType::Symbol, "::") { return false; }
 
-            if i != length.value.length {
-                self.error_token(length, "Fixed array length must be a standard positive integer");
+                let variant_token = self.expect(TokenType::Identifier);
+                if variant_token == null { return false; }
+
+                match type_lookup {
+                    Type::Enum(enum_info, _) => {
+                        let found = false;
+                        let current: usize = 0;
+                        for (_, &variant) in enum_info.variants {
+                            if variant.value != null {
+                                self.error_token(variant_token, "Array length from enum with explicit variant values is not supported");
+                                return false;
+                            }
+                            if variant.name.value.eq(variant_token.value) {
+                                result = current;
+                                found = true;
+                                break;
+                            }
+                            current += 1;
+                        }
+                        if !found {
+                            self.error_token(variant_token, "Variant not found in enum");
+                            return false;
+                        }
+                    },
+                    _ => {
+                        self.error_token(name, "Array length identifier must reference an enum");
+                        return false;
+                    },
+                }
+            } else {
+                let length = self.expect(TokenType::Number);
+                if length == null { return false; }
+
+                let i = 0;
+                while i < length.value.length {
+                    let c = length.value.ptr[i];
+
+                    if c >= '0' && c <= '9' {
+                        result = result * 10 + (c - '0');
+                    } else {
+                        break;
+                    }
+
+                    i += 1;
+                }
+
+                if i != length.value.length {
+                    self.error_token(length, "Fixed array length must be a standard positive integer");
+                }
             }
 
             sequence.type = SequenceType::FixedArray(result);
