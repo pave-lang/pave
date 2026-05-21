@@ -436,19 +436,12 @@ impl Context {
             let length_expr = Expression::parse(self, generics);
             if length_expr == null { return false; }
 
-            let length_value: i64 = 0;
-            if !length_expr.try_eval_const_int(self, &length_value) {
-                self.error_token(length_token, "Fixed array length must be a compile-time constant integer");
-                return false;
-            }
-            if length_value < 0 {
-                self.error_token(length_token, "Fixed array length must be non-negative");
+            if !length_expr.is_const_expression(self) {
+                self.error_token(length_token, "Fixed array length must be a compile-time constant integer expression");
                 return false;
             }
 
-            let result: usize = length_value;
-
-            sequence.type = SequenceType::FixedArray(result);
+            sequence.type = SequenceType::FixedArray(length_expr);
             *type = Type::Sequence(sequence);
 
             if !self.expect_value(TokenType::Symbol, "]") { return false; }
@@ -845,14 +838,16 @@ impl Context {
     }
 
     fn get_value(&self, name: str) -> *Type {
-        let scope_front = self.scopes.data;
-        let scope = self.scopes.back();
+        if self.scopes.length > 0 {
+            let scope_front = self.scopes.data;
+            let scope = self.scopes.back();
 
-        while scope >= scope_front {
-            let type = scope.values.find(&name);
-            if type != null { return type; }
+            while scope >= scope_front {
+                let type = scope.values.find(&name);
+                if type != null { return type; }
 
-            scope -= 1;
+                scope -= 1;
+            }
         }
 
         let func = self.module.find_function(name);

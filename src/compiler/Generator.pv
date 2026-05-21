@@ -170,7 +170,27 @@ impl Generator {
         let variable_decl = self.naming_c99.get_variable_decl(name, type, self_type, generics);
         self.write_str(file, variable_decl.as_str());
         variable_decl.release();
+
+        self.write_array_decl_suffix(file, type, generics);
+
         return true;
+    }
+
+    fn write_array_decl_suffix(&self, file: &FILE, type: &Type, generics: *GenericMap) {
+        match type {
+            Type::Sequence(sequence) => {
+                match sequence.type {
+                    SequenceType::FixedArray(length) => {
+                        fprintf(file, "[");
+                        ExpressionWriter { generator: self }.write_expression(file, length, generics);
+                        fprintf(file, "]");
+                        self.write_array_decl_suffix(file, &sequence.element, generics);
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
     }
 
     fn write_function_name(&self, file: &FILE, func_info: &Function, generics: &GenericMap) -> bool {
@@ -487,7 +507,9 @@ impl Generator {
     }
 
     fn write_variable(&self, file: &FILE, name: str) {
-        name = self.function_context.get_variable_replacement(name);
+        if self.function_context != null {
+            name = self.function_context.get_variable_replacement(name);
+        }
         self.write_str(file, name);
     }
 

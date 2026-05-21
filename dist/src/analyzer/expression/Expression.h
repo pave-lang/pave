@@ -26,6 +26,7 @@ struct Type;
 struct Expression;
 struct Context;
 struct Generics;
+struct String;
 struct Function;
 struct Array_Type;
 struct Array_InvokeArgument;
@@ -44,19 +45,22 @@ struct str Expression__number_primitive(struct str value);
 #line 42 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 408 "src/analyzer/expression/Expression.pv"
+#line 414 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 455 "src/analyzer/expression/Expression.pv"
+#line 461 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 462 "src/analyzer/expression/Expression.pv"
-bool Expression__try_eval_const_int(struct Expression* self, struct Context* context, int64_t* out);
+#line 468 "src/analyzer/expression/Expression.pv"
+bool Expression__is_const_expression(struct Expression* self, struct Context* context);
 
-#line 582 "src/analyzer/expression/Expression.pv"
+#line 506 "src/analyzer/expression/Expression.pv"
+void Expression__append_ident_name(struct Expression* self, struct String* result);
+
+#line 557 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
 
-#line 712 "src/analyzer/expression/Expression.pv"
+#line 687 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

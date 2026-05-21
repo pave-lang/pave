@@ -108,6 +108,14 @@ impl String {
         self.append_sized(value.ptr, value.length);
     }
 
+    fn append_char(&self, c: char) {
+        let array: &Array<char> = &self.array;
+        self.ensure_can_hold(1);
+        array.data[array.length] = c;
+        array.length += 1;
+        array.data[array.length] = 0;
+    }
+
     fn append_string(&self, value: &String) {
         self.append(value.as_str());
     }

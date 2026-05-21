@@ -1,7 +1,7 @@
 #ifndef PAVE_INDIRECT_TYPE
 #define PAVE_INDIRECT_TYPE
 
-#line 7 "src/analyzer/types/Type.pv"
+#line 8 "src/analyzer/types/Type.pv"
 enum IndirectType {
     INDIRECT_TYPE__REFERENCE,
     INDIRECT_TYPE__DYNAMIC_DISPATCH,

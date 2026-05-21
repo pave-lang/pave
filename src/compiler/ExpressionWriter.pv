@@ -106,9 +106,9 @@ impl ExpressionWriter {
             return;
         }
 
-        let length: usize = 0;
+        let length_expr: *Expression = null;
         match inner_sequence.type {
-            SequenceType::FixedArray(seq_length) => { length = seq_length; },
+            SequenceType::FixedArray(seq_length) => { length_expr = seq_length; },
             _ => {
                 fprintf(file, " !!ERROR INVALID SEQUENCE TYPE TO CONVERT INTO SLICE!! ");
                 return;
@@ -160,7 +160,9 @@ impl ExpressionWriter {
             self.write_expression(file, inner_expr, generics);
         }
 
-        fprintf(file, ", .length = %zu }", length);
+        fprintf(file, ", .length = ");
+        self.write_expression(file, length_expr, generics);
+        fprintf(file, " }");
     }
 
     fn write_struct_construction(&self, file: &FILE, type: &Type, fields: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
@@ -687,7 +689,7 @@ impl ExpressionWriter {
                         match sequence.type {
                             SequenceType::FixedArray(length) => {
                                 if member.eq("length") {
-                                    fprintf(file, "%zu", length);
+                                    self.write_expression(file, length, generics);
                                 } else {
                                     fprintf(file, "!!ERROR NO MEMBER ");
                                     generator.write_str(file, member);

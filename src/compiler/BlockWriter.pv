@@ -505,7 +505,9 @@ impl BlockWriter {
                                 Type::Sequence(sequence) => {
                                     match sequence.type {
                                         SequenceType::FixedArray(size) => {
-                                            fprintf(file, "for (size_t __iter = 0; __iter < %zu; __iter++) {\n", size);
+                                            fprintf(file, "for (size_t __iter = 0; __iter < ");
+                                            expr.write_expression(file, size, generics);
+                                            fprintf(file, "; __iter++) {\n");
                                         },
                                         SequenceType::Slice => {
                                             fprintf(file, "for (size_t __iter = 0; __iter < ");

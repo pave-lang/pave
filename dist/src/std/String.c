@@ -169,88 +169,102 @@ void String__append(struct String* self, struct str value) {
 }
 
 #line 111 "src/std/String.pv"
-void String__append_string(struct String* self, struct String* value) {
+void String__append_char(struct String* self, char c) {
     #line 112 "src/std/String.pv"
-    String__append(self, String__as_str(value));
-}
-
-#line 115 "src/std/String.pv"
-void String__append_str_lowercase(struct String* self, struct str value) {
+    struct Array_char* array = &self->array;
+    #line 113 "src/std/String.pv"
+    String__ensure_can_hold(self, 1);
+    #line 114 "src/std/String.pv"
+    array->data[array->length] = c;
+    #line 115 "src/std/String.pv"
+    array->length += 1;
     #line 116 "src/std/String.pv"
-    String__append_sized_lowercase(self, value.ptr, value.length);
+    array->data[array->length] = 0;
 }
 
 #line 119 "src/std/String.pv"
-void String__prepend_sized(struct String* self, char const* ptr, uintptr_t length) {
+void String__append_string(struct String* self, struct String* value) {
     #line 120 "src/std/String.pv"
+    String__append(self, String__as_str(value));
+}
+
+#line 123 "src/std/String.pv"
+void String__append_str_lowercase(struct String* self, struct str value) {
+    #line 124 "src/std/String.pv"
+    String__append_sized_lowercase(self, value.ptr, value.length);
+}
+
+#line 127 "src/std/String.pv"
+void String__prepend_sized(struct String* self, char const* ptr, uintptr_t length) {
+    #line 128 "src/std/String.pv"
     struct Array_char* array = &self->array;
 
-    #line 122 "src/std/String.pv"
+    #line 130 "src/std/String.pv"
     String__ensure_can_hold(self, length);
 
-    #line 124 "src/std/String.pv"
+    #line 132 "src/std/String.pv"
     memmove(array->data + length, array->data, array->length + 1);
-    #line 125 "src/std/String.pv"
+    #line 133 "src/std/String.pv"
     memcpy(array->data, ptr, length);
-    #line 126 "src/std/String.pv"
+    #line 134 "src/std/String.pv"
     array->length += length;
 }
 
-#line 129 "src/std/String.pv"
+#line 137 "src/std/String.pv"
 void String__prepend(struct String* self, struct str s) {
-    #line 130 "src/std/String.pv"
+    #line 138 "src/std/String.pv"
     String__prepend_sized(self, s.ptr, s.length);
 }
 
-#line 133 "src/std/String.pv"
+#line 141 "src/std/String.pv"
 void String__clear(struct String* self) {
-    #line 134 "src/std/String.pv"
+    #line 142 "src/std/String.pv"
     Array_char__clear(&self->array);
 }
 
-#line 137 "src/std/String.pv"
+#line 145 "src/std/String.pv"
 void String__release(struct String* self) {
-    #line 138 "src/std/String.pv"
+    #line 146 "src/std/String.pv"
     Array_char__release(&self->array);
 }
 
-#line 141 "src/std/String.pv"
+#line 149 "src/std/String.pv"
 struct str String__as_str(struct String* self) {
-    #line 142 "src/std/String.pv"
+    #line 150 "src/std/String.pv"
     struct Array_char* array = &self->array;
-    #line 143 "src/std/String.pv"
+    #line 151 "src/std/String.pv"
     return (struct str) { .ptr = array->data, .length = array->length };
 }
 
-#line 146 "src/std/String.pv"
+#line 154 "src/std/String.pv"
 char const* String__c_str(struct String* self) {
-    #line 147 "src/std/String.pv"
+    #line 155 "src/std/String.pv"
     return self->array.data;
 }
 
-#line 150 "src/std/String.pv"
+#line 158 "src/std/String.pv"
 bool String__eq(struct String* self, char const* s) {
-    #line 151 "src/std/String.pv"
+    #line 159 "src/std/String.pv"
     uintptr_t length = strlen(s);
 
-    #line 153 "src/std/String.pv"
+    #line 161 "src/std/String.pv"
     if (self->array.length != length) {
-        #line 153 "src/std/String.pv"
+        #line 161 "src/std/String.pv"
         return false;
     }
 
-    #line 155 "src/std/String.pv"
+    #line 163 "src/std/String.pv"
     return strncmp(self->array.data, s, length) == 0;
 }
 
-#line 158 "src/std/String.pv"
+#line 166 "src/std/String.pv"
 uintptr_t String__length(struct String* self) {
-    #line 159 "src/std/String.pv"
+    #line 167 "src/std/String.pv"
     return self->array.length;
 }
 
-#line 162 "src/std/String.pv"
+#line 170 "src/std/String.pv"
 int32_t String__len_i32(struct String* self) {
-    #line 163 "src/std/String.pv"
+    #line 171 "src/std/String.pv"
     return self->array.length;
 }

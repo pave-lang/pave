@@ -3,6 +3,7 @@
 use std
 use analyzer
 use c
+use expression
 
 enum IndirectType {
     Reference,
@@ -43,7 +44,7 @@ impl Indirect {
 }
 
 enum SequenceType {
-    FixedArray(usize),
+    FixedArray(&Expression),
     Slice,
 }
 

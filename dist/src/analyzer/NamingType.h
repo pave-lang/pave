@@ -1,7 +1,7 @@
 #ifndef PAVE_NAMING_TYPE
 #define PAVE_NAMING_TYPE
 
-#line 7 "src/analyzer/Naming.pv"
+#line 8 "src/analyzer/Naming.pv"
 enum NamingType {
     NAMING_TYPE__IDENT,
     NAMING_TYPE__DECL,

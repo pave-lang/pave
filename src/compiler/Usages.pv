@@ -336,9 +336,16 @@ impl Usages {
             },
             Type::Trait(trait_info, _) => { is_trait = trait_info.has_dynamic_dispatch(); },
             Type::Sequence(sequence) => {
-                is_type = sequence.is_slice();
-                type = type.deref();
-                resolved_type = type_deref;
+                match sequence.type {
+                    SequenceType::FixedArray(expression) => {
+                        self.process_expression(expression, generic_map);
+                    },
+                    SequenceType::Slice => {
+                        is_type = sequence.is_slice();
+                        type = type.deref();
+                        resolved_type = type_deref;
+                    }
+                }
             },
             Type::Tuple(_) => { is_type = true; },
             Type::StructC(struct_c) => { is_type = !struct_c.include.mode_cpp; },
