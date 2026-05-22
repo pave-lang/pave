@@ -18,6 +18,7 @@ struct Struct {
     struct Module* module;
     uintptr_t token_start;
     uintptr_t token_end;
+    uintptr_t generic_arity;
     struct Generics generics;
     enum StructType type;
     struct HashMap_str_StructField fields;
@@ -29,25 +30,25 @@ struct Struct {
 struct Module;
 struct Struct;
 
-#line 29 "src/analyzer/types/Struct.pv"
+#line 30 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);
 
-#line 45 "src/analyzer/types/Struct.pv"
+#line 47 "src/analyzer/types/Struct.pv"
 struct Struct Struct__parse(struct Module* module);
 
-#line 74 "src/analyzer/types/Struct.pv"
+#line 94 "src/analyzer/types/Struct.pv"
 bool Struct__prefill_types(struct Struct* self);
 
-#line 87 "src/analyzer/types/Struct.pv"
+#line 107 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types(struct Struct* self);
 
-#line 100 "src/analyzer/types/Struct.pv"
+#line 120 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_field(struct Struct* self);
 
-#line 167 "src/analyzer/types/Struct.pv"
+#line 187 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_tuple(struct Struct* self);
 
-#line 211 "src/analyzer/types/Struct.pv"
+#line 231 "src/analyzer/types/Struct.pv"
 bool Struct__is_newtype(struct Struct* self);
 
 #endif

@@ -17,6 +17,7 @@ struct Trait {
     struct Module* module;
     uintptr_t token_start;
     uintptr_t token_end;
+    uintptr_t generic_arity;
     struct Generics generics;
     struct HashMap_str_Function functions;
     struct HashMap_str_usize typedefs;
@@ -25,22 +26,27 @@ struct Trait {
 
 #include <analyzer/types/Trait.h>
 #include <analyzer/types/FunctionParent.h>
+#include <std/trait_Allocator.h>
+#include <std/str.h>
 struct Module;
 struct Trait;
 
-#line 16 "src/analyzer/types/Trait.pv"
+#line 17 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);
 
-#line 31 "src/analyzer/types/Trait.pv"
+#line 33 "src/analyzer/types/Trait.pv"
 struct Trait Trait__parse(struct Module* module);
 
-#line 52 "src/analyzer/types/Trait.pv"
+#line 55 "src/analyzer/types/Trait.pv"
 bool Trait__fill_types(struct Trait* self, struct FunctionParent parent);
 
-#line 85 "src/analyzer/types/Trait.pv"
+#line 88 "src/analyzer/types/Trait.pv"
+struct str Trait__get_key(struct Trait* self, struct trait_Allocator allocator);
+
+#line 96 "src/analyzer/types/Trait.pv"
 bool Trait__has_dynamic_dispatch(struct Trait* self);
 
-#line 97 "src/analyzer/types/Trait.pv"
+#line 108 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self);
 
 #endif

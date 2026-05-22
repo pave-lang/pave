@@ -42,7 +42,7 @@ bool Generic__parse(struct Generic* self, struct Context* context) {
         }
 
         #line 24 "src/analyzer/types/Generics.pv"
-        struct Trait* trait_info = Module__find_trait(module, name->value);
+        struct Trait* trait_info = Module__find_trait(module, name->value, 0);
         #line 25 "src/analyzer/types/Generics.pv"
         if (trait_info == 0) {
             #line 25 "src/analyzer/types/Generics.pv"
@@ -64,7 +64,7 @@ bool Generic__parse(struct Generic* self, struct Context* context) {
             }
 
             #line 32 "src/analyzer/types/Generics.pv"
-            struct Trait* trait_info = Module__find_trait(module, name->value);
+            struct Trait* trait_info = Module__find_trait(module, name->value, 0);
             #line 33 "src/analyzer/types/Generics.pv"
             if (trait_info == 0) {
                 #line 33 "src/analyzer/types/Generics.pv"

@@ -65,6 +65,7 @@ examples:
 	$(call build_example,enum)
 	$(call build_example,iterators)
 	$(call build_example,structs)
+	$(call build_example,query)
 	$(call build_example,traits)
 	$(call build_example,dynamic_fn)
 	$(call build_example,cpp)

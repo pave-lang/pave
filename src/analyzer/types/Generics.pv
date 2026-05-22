@@ -21,7 +21,7 @@ impl Generic {
             let name = context.expect(TokenType::Identifier);
             if name == null { return false; }
 
-            let trait_info = module.find_trait(name.value);
+            let trait_info = module.find_trait(name.value, 0);
             if trait_info == null { context.error_token(name, "Unable to find trait"); return false; }
             self.traits.append(trait_info);
 
@@ -29,7 +29,7 @@ impl Generic {
                 let name = context.expect(TokenType::Identifier);
                 if name == null { return false; }
 
-                let trait_info = module.find_trait(name.value);
+                let trait_info = module.find_trait(name.value, 0);
                 if trait_info == null { context.error_token(name, "Unable to find trait"); return false; }
                 self.traits.append(trait_info);
             }

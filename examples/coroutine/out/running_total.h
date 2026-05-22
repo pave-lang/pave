@@ -15,7 +15,7 @@ struct running_total {
 
 #include <std/trait_Iter_f32.h>
 float running_total__value(void* ctx);
-extern struct trait_Iter_f32VTable RUNNING_TOTAL__VTABLE__ITER;
+extern struct trait_Iter_f32VTable running_total__VTABLE__ITER;
 bool running_total__next(void* _ctx);
 
 #endif

@@ -633,14 +633,8 @@ impl Context {
         let name = self.expect(TokenType::Identifier);
         if name == null { return false; }
 
-        let trait_info = self.module.find_trait(name.value);
-        if trait_info == null {
-            self.error_token(name, "Unable to find trait with this name");
-            return false;
-        }
-
         let generics_ = Array<Type>::new(self.allocator);
-        
+
         if self.check_next(TokenType::Symbol, "<") {
             while !self.check_next(TokenType::Symbol, ">") {
                 let child_type: Type;
@@ -656,6 +650,12 @@ impl Context {
                     return false;
                 }
             }
+        }
+
+        let trait_info = self.module.find_trait(name.value, generics_.length);
+        if trait_info == null {
+            self.error_token(name, "Unable to find trait with this name");
+            return false;
         }
 
         *type = *self.root.make_type_usage(&Type::Trait(trait_info, null), &generics_);
@@ -921,7 +921,8 @@ impl Context {
                 let implements = false;
                 match usage_type {
                     Type::Struct(struct_info, _) => {
-                        implements = struct_info.traits.find(&required_trait.name.value) != null;
+                        let trait_key = required_trait.get_key(self.allocator);
+                        implements = struct_info.traits.find(&trait_key) != null;
                     },
                     Type::Generic(generic_info) => {
                         for *generic_trait in generic_info.traits {

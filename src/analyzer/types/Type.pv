@@ -145,6 +145,15 @@ impl Type {
         return self;
     }
 
+    fn get_arity(&self) -> usize {
+        match self {
+            Type::Struct(struct_info, _) => { return struct_info.generic_arity; },
+            Type::Enum(enum_info, _) => { return enum_info.generic_arity; },
+            Type::Trait(trait_info, _) => { return trait_info.generic_arity; },
+            _ => { return 0; },
+        }
+    }
+
     fn deref_reference(&self) -> &Self {
         match self {
             Type::Indirect(indirect) => {
@@ -334,8 +343,8 @@ impl Type {
                 return true;
             },
             Type::Trait(trait_info, _) => {
-                let trait_name: &Token = trait_info.name;
-                return other_struct.traits.find(&trait_name.value) != null;
+                let trait_key = trait_info.get_key(trait_info.module.context.allocator);
+                return other_struct.traits.find(&trait_key) != null;
             },
             Type::Self => { return true; },
             _ => { return false; },

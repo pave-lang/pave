@@ -33,5 +33,5 @@ bool test_FunctionCoroutine_fibonacci_1__next(void* _ctx) {
     ctx->_state = -1; return false;
 }
 uint64_t test_FunctionCoroutine_fibonacci_1__value(void* ctx) { return ((struct test_FunctionCoroutine_fibonacci_1*)ctx)->_value; }
-struct trait_Iter_u64VTable TEST_FUNCTION_COROUTINE_FIBONACCI_1__VTABLE__ITER = { .fn_next = test_FunctionCoroutine_fibonacci_1__next, .fn_value = test_FunctionCoroutine_fibonacci_1__value };
+struct trait_Iter_u64VTable test_FunctionCoroutine_fibonacci_1__VTABLE__ITER = { .fn_next = test_FunctionCoroutine_fibonacci_1__next, .fn_value = test_FunctionCoroutine_fibonacci_1__value };
 

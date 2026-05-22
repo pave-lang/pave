@@ -6,6 +6,7 @@ struct Trait {
     module: &Module,
     token_start: usize,
     token_end: usize,
+    generic_arity: usize,
     generics: Generics,
     functions: HashMap<str, Function>,
     typedefs: HashMap<str, usize>,
@@ -24,6 +25,7 @@ impl Trait {
             name: null,
             token_start: 0,
             token_end: 0,
+            generic_arity: 0,
             type_self: Type::Primitive(null),
         };
     }
@@ -39,6 +41,7 @@ impl Trait {
         if name == null { return node; }
 
         if context.check_value(TokenType::Symbol, "<") && !generics.parse(context) { return node; }
+        node.generic_arity = generics.array.length;
 
         node.token_start = context.pos;
         context.skip_brackets("{", "}");
@@ -80,6 +83,14 @@ impl Trait {
         if !context.expect_value(TokenType::Symbol, "}") { return false; }
 
         return true;
+    }
+
+    fn get_key(&self, allocator: &dyn Allocator) -> str {
+        let key = String::new(allocator);
+        key.append(self.name.value);
+        key.append("#");
+        key.append_usize(self.generic_arity);
+        return key.as_str();
     }
 
     fn has_dynamic_dispatch(&self) -> bool {

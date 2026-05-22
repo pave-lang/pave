@@ -8,10 +8,10 @@ use c
 struct Root {
     allocator: &ArenaAllocator,
     children: HashMap<str, &Namespace>,
-    types: HashMap<str, Type>,
+    types: HashMap<str, Array<Type>>,
     primitives: HashMap<str, Primitive>,
     ctypes: HashMap<str, TypedefC>,
-    traits: HashMap<str, &Trait>,
+    traits: HashMap<str, Array<&Trait>>,
     functions: HashMap<str, Type>,
     clang_args: Array<*const char>,
     analysis: &Analysis,
@@ -40,10 +40,10 @@ impl Root {
         *self = Self {
             allocator,
             children: HashMap<str, &Namespace>::new(allocator),
-            types: HashMap<str, Type>::new(allocator),
+            types: HashMap<str, Array<Type>>::new(allocator),
             primitives: HashMap<str, Primitive>::new(allocator),
             ctypes: HashMap<str, TypedefC>::new(allocator),
-            traits: HashMap<str, &Trait>::new(allocator),
+            traits: HashMap<str, Array<&Trait>>::new(allocator),
             functions: HashMap<str, Type>::new(allocator),
             clang_args: Array<*const char>::new(allocator),
             analysis,
@@ -120,7 +120,9 @@ impl Root {
         self.func_value.parameters.append(Parameter { name: allocator.store(&Token { type: TokenType::Identifier, value: "self", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), type: self.type_ref_self });
 
         for (key, &value) in self.primitives {
-            self.types.insert(key, Type::Primitive(value));
+            let arr = Array<Type>::new(allocator);
+            arr.append(Type::Primitive(value));
+            self.types.insert(key, arr);
         }
 
         for *arg in args {
@@ -253,14 +255,27 @@ impl Root {
         return true;
     }
 
-    fn find_type(&self, name: str) -> *Type {
-        return self.types.find(&name);
+    fn find_type(&self, name: str, arity: usize) -> *Type {
+        let arr = self.types.find(&name);
+        if arr == null { return null; }
+        let i: usize = 0;
+        while i < arr.length {
+            if arr.data[i].get_arity() == arity { return &arr.data[i]; }
+            i += 1;
+        }
+        return null;
     }
 
-    fn find_trait(&self, name: str) -> *Trait {
-        let trait_info = self.traits.find(&name);
-        if trait_info == null { return null; }
-        return *trait_info;
+    fn find_trait(&self, name: str, arity: usize) -> *Trait {
+        let arr = self.traits.find(&name);
+        if arr == null { return null; }
+        let i: usize = 0;
+        while i < arr.length {
+            let trait_info = arr.data[i];
+            if trait_info.generic_arity == arity { return trait_info; }
+            i += 1;
+        }
+        return null;
     }
 
     fn find_function(&self, name: str) -> *Type {

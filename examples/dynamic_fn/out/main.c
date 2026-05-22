@@ -18,7 +18,7 @@ int32_t main(int32_t argc, char const** argv) {
     Array_Object__append(&objects, (struct Object) { .position = (struct Position) { .x = 2.0f, .y = 1.0f } });
     Array_Object__append(&objects, (struct Object) { .position = (struct Position) { .x = 3.0f, .y = 7.0f } });
 
-    run((struct trait_Fn) { .vtable = &PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN, .instance = &(struct Physics__apply_physics__Fn__Instance) {} }, Array_Object__as_slice(&objects), (struct Time) { .delta = 0.16f }, (struct Physics) { .gravity = -9.81f });
+    run((struct trait_Fn) { .vtable = &Physics__apply_physics__VTABLE__DYN_FN, .instance = &(struct Physics__apply_physics__Fn__Instance) {} }, Array_Object__as_slice(&objects), (struct Time) { .delta = 0.16f }, (struct Physics) { .gravity = -9.81f });
 
     return 0;
 }

@@ -19,6 +19,7 @@ struct Enum {
     uintptr_t token_start;
     uintptr_t token_end;
     enum EnumType type;
+    uintptr_t generic_arity;
     struct Generics generics;
     struct HashMap_str_EnumVariant variants;
     struct HashMap_str_ref_Trait traits;
@@ -29,22 +30,22 @@ struct Enum {
 struct Context;
 struct Enum;
 
-#line 37 "src/analyzer/types/Enum.pv"
+#line 38 "src/analyzer/types/Enum.pv"
 struct Enum Enum__new(struct Context* context);
 
-#line 51 "src/analyzer/types/Enum.pv"
+#line 53 "src/analyzer/types/Enum.pv"
 struct Enum Enum__parse(struct Context* context);
 
-#line 70 "src/analyzer/types/Enum.pv"
+#line 92 "src/analyzer/types/Enum.pv"
 bool Enum__prefill_types(struct Enum* self);
 
-#line 80 "src/analyzer/types/Enum.pv"
+#line 102 "src/analyzer/types/Enum.pv"
 bool Enum__fill_variants(struct Enum* self);
 
-#line 99 "src/analyzer/types/Enum.pv"
+#line 121 "src/analyzer/types/Enum.pv"
 bool Enum__parse_variant(struct Enum* self);
 
-#line 163 "src/analyzer/types/Enum.pv"
+#line 185 "src/analyzer/types/Enum.pv"
 bool Enum__is_discriminated_union(struct Enum* self);
 
 #endif

@@ -215,56 +215,62 @@ impl Usages {
             }
         }
 
-        for (_, &enum_info) in module.enums {
-            let usage = self.enums.insert(cast<usize>(enum_info), TypeUsage<Enum>::new(self.allocator, enum_info, enum_info.impls.length));
+        for (_, &enum_arr) in module.enums {
+            for *enum_info in enum_arr {
+                let usage = self.enums.insert(cast<usize>(enum_info), TypeUsage<Enum>::new(self.allocator, enum_info, enum_info.impls.length));
 
-            let i: usize = 0;
-            for *impl_info in enum_info.impls {
-                for (_, &func_info) in impl_info.functions {
-                    usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                let i: usize = 0;
+                for *impl_info in enum_info.impls {
+                    for (_, &func_info) in impl_info.functions {
+                        usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                    }
+                    i += 1;
                 }
-                i += 1;
-            }
 
-            if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
-                let self_type = self.allocator.store(&Type::Enum(enum_info, generic_map));
-                generic_map.self_type = self_type;
-                self.usages.append(Type::Enum(enum_info, generic_map));
+                if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
+                    let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+                    let self_type = self.allocator.store(&Type::Enum(enum_info, generic_map));
+                    generic_map.self_type = self_type;
+                    self.usages.append(Type::Enum(enum_info, generic_map));
+                }
             }
         }
 
-        for (_, &struct_info) in module.structs {
-            let usage = self.structs.insert(cast<usize>(struct_info), TypeUsage<Struct>::new(self.allocator, struct_info, struct_info.impls.length));
+        for (_, &struct_arr) in module.structs {
+            for *struct_info in struct_arr {
+                let usage = self.structs.insert(cast<usize>(struct_info), TypeUsage<Struct>::new(self.allocator, struct_info, struct_info.impls.length));
 
-            let i: usize = 0;
-            for *impl_info in struct_info.impls {
-                for (_, &func_info) in impl_info.functions {
-                    usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                let i: usize = 0;
+                for *impl_info in struct_info.impls {
+                    for (_, &func_info) in impl_info.functions {
+                        usage.impl_functions.data[i].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                    }
+                    i += 1;
                 }
-                i += 1;
-            }
 
-            if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
-                let self_type = self.allocator.store(&Type::Struct(struct_info, generic_map));
-                generic_map.self_type = self_type;
-                self.usages.append(Type::Struct(struct_info, generic_map));
+                if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
+                    let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+                    let self_type = self.allocator.store(&Type::Struct(struct_info, generic_map));
+                    generic_map.self_type = self_type;
+                    self.usages.append(Type::Struct(struct_info, generic_map));
+                }
             }
         }
 
-        for (_, &trait_info) in module.traits {
-            let usage = self.traits.insert(cast<usize>(trait_info), TypeUsage<Trait>::new(self.allocator, trait_info, 1));
+        for (_, &trait_arr) in module.traits {
+            for *trait_info in trait_arr {
+                let usage = self.traits.insert(cast<usize>(trait_info), TypeUsage<Trait>::new(self.allocator, trait_info, 1));
 
-            for (_, &func_info) in trait_info.functions {
-                usage.impl_functions.data[0].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
-            }
+                for (_, &func_info) in trait_info.functions {
+                    usage.impl_functions.data[0].insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
+                }
 
-            if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
-                let self_type = self.allocator.store(&Type::Trait(trait_info, generic_map));
-                generic_map.self_type = self_type;
-                self.usages.append(Type::Trait(trait_info, generic_map));
+                if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
+                    let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+                    let self_type = self.allocator.store(&Type::Trait(trait_info, generic_map));
+                    generic_map.self_type = self_type;
+                    self.usages.append(Type::Trait(trait_info, generic_map));
+                }
             }
         }
     }
@@ -450,7 +456,7 @@ impl Usages {
         self.add_type(&sequence.element, generic_map);
 
         if self.std_namespace != null {
-            let iter_type = self.std_namespace.find_type("Iter");
+            let iter_type = self.std_namespace.find_type("Iter", 1);
             let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
             let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1, allocator: self.allocator, capacity: 0 });
             self.add_type(sequence_iter, generic_map);
@@ -610,7 +616,7 @@ impl Usages {
         }
 
         if self.std_namespace && func_info.type == FunctionType::Coroutine {
-            let iter_trait = self.std_namespace.find_trait("Iter");
+            let iter_trait = self.std_namespace.find_trait("Iter", 1);
             let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, null), &Array<Type> { data: &func_info.return_type, length: 1, allocator: self.allocator, capacity: 0 });
             self.add_type(sequence_iter, generic_map);
         }

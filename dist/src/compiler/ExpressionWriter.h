@@ -31,25 +31,25 @@ void ExpressionWriter__write_str_cast(struct ExpressionWriter* self, FILE* file,
 #line 27 "src/compiler/ExpressionWriter.pv"
 void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* file, struct Expression* inner_expr, struct Type* type, struct GenericMap* generics);
 
-#line 90 "src/compiler/ExpressionWriter.pv"
+#line 72 "src/compiler/ExpressionWriter.pv"
 void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* file, struct Expression* inner_expr, struct Sequence* sequence, struct GenericMap* generics);
 
-#line 168 "src/compiler/ExpressionWriter.pv"
+#line 150 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, FILE* file, struct Type* type, struct Array_InvokeArgument* fields, struct GenericMap* generics);
 
-#line 223 "src/compiler/ExpressionWriter.pv"
+#line 205 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* file, struct EnumVariant* variant, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 280 "src/compiler/ExpressionWriter.pv"
+#line 262 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_coroutine_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 324 "src/compiler/ExpressionWriter.pv"
+#line 306 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* self, FILE* file, struct Function* func_info, struct Array_InvokeArgument* arguments, struct GenericMap* func_generics, struct GenericMap* generics);
 
-#line 360 "src/compiler/ExpressionWriter.pv"
+#line 342 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 557 "src/compiler/ExpressionWriter.pv"
+#line 539 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics);
 
 #endif

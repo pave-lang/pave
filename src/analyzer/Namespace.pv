@@ -10,8 +10,8 @@ struct Namespace {
     path: str,
     children: HashMap<str, &Namespace>,
     modules: HashMap<str, &Module>,
-    types: HashMap<str, Type>,
-    traits: HashMap<str, &Trait>,
+    types: HashMap<str, Array<Type>>,
+    traits: HashMap<str, Array<&Trait>>,
     functions: HashMap<str, Type>,
 }
 
@@ -19,7 +19,7 @@ impl Namespace {
     fn new(root: &Root, parent: *Namespace, name: str, path: str) -> &Self {
         let allocator = root.allocator;
         let self: &Self = allocator.alloc(sizeof(Self));
-        
+
         *self = Self {
             root,
             parent,
@@ -27,12 +27,47 @@ impl Namespace {
             path,
             children: HashMap<str, &Namespace>::new(allocator),
             modules: HashMap<str, &Module>::new(allocator),
-            types: HashMap<str, Type>::new(allocator),
-            traits: HashMap<str, &Trait>::new(allocator),
+            types: HashMap<str, Array<Type>>::new(allocator),
+            traits: HashMap<str, Array<&Trait>>::new(allocator),
             functions: HashMap<str, Type>::new(allocator),
         };
 
         return self;
+    }
+
+    fn add_type(&self, name: str, type: Type) -> bool {
+        let arr = self.types.find(&name);
+        if arr == null {
+            let new_arr = Array<Type>::new(self.root.allocator);
+            new_arr.append(type);
+            self.types.insert(name, new_arr);
+        } else {
+            let arity = type.get_arity();
+            let i: usize = 0;
+            while i < arr.length {
+                if arr.data[i].get_arity() == arity { return false; }
+                i += 1;
+            }
+            arr.append(type);
+        }
+        return true;
+    }
+
+    fn add_trait(&self, name: str, trait_info: &Trait) -> bool {
+        let arr = self.traits.find(&name);
+        if arr == null {
+            let new_arr = Array<&Trait>::new(self.root.allocator);
+            new_arr.append(trait_info);
+            self.traits.insert(name, new_arr);
+        } else {
+            let i: usize = 0;
+            while i < arr.length {
+                if arr.data[i].generic_arity == trait_info.generic_arity { return false; }
+                i += 1;
+            }
+            arr.append(trait_info);
+        }
+        return true;
     }
 
     fn parse(&self) -> bool {
@@ -171,14 +206,27 @@ impl Namespace {
         return true;
     }
 
-    fn find_type(&self, name: str) -> *Type {
-        return self.types.find(&name);
+    fn find_type(&self, name: str, arity: usize) -> *Type {
+        let arr = self.types.find(&name);
+        if arr == null { return null; }
+        let i: usize = 0;
+        while i < arr.length {
+            if arr.data[i].get_arity() == arity { return &arr.data[i]; }
+            i += 1;
+        }
+        return null;
     }
 
-    fn find_trait(&self, name: str) -> *Trait {
-        let trait_info = self.traits.find(&name);
-        if trait_info == null { return null; }
-        return *trait_info;
+    fn find_trait(&self, name: str, arity: usize) -> *Trait {
+        let arr = self.traits.find(&name);
+        if arr == null { return null; }
+        let i: usize = 0;
+        while i < arr.length {
+            let trait_info = arr.data[i];
+            if trait_info.generic_arity == arity { return trait_info; }
+            i += 1;
+        }
+        return null;
     }
 
     fn find_function(&self, name: str) -> *Type {

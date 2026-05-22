@@ -1,0 +1,74 @@
+#include "assert.h"
+#include "stdio.h"
+
+use std
+
+struct Position {}
+struct Velocity {}
+
+struct Query {
+    flags: u32,
+}
+
+impl Query {
+    fn add_flag<T>(self) -> Query<T> {
+        return Query<T> { flags: self.flags | 1 };
+    }
+
+    co run(&self) -> u32 {
+        yield self.flags;
+    }
+}
+
+struct Query<T> {
+    flags: u32,
+}
+
+impl<T> Query<T> {
+    fn add_flag<U>(self) -> Query<T, U> {
+        return Query<T, U> { flags: self.flags | 2 };
+    }
+
+    co run(&self) -> (u32, *T) {
+        yield (self.flags, null);
+    }
+}
+
+struct Query<T, U> {
+    flags: u32,
+}
+
+impl<T, U> Query<T, U> {
+    co run(&self) -> (u32, *T, *U) {
+        yield (self.flags, null, null);
+    }
+}
+
+fn main(argc: i32, argv: **const char) -> i32 {
+    let base = Query { flags: 0 };
+    let with_position = base.add_flag<Position>();
+    let with_both = with_position.add_flag<Velocity>();
+
+    for (flags, pos, vel) in with_both.run() {
+            printf("flags: %u\n", flags);
+    }
+
+    assert(with_position.flags == 1);
+    assert(with_both.flags == 3);
+
+    printf("query flags: %u\n", with_both.flags);
+
+    let reversed_with_position = base.add_flag<Velocity>();
+    let reversed_with_both = reversed_with_position.add_flag<Position>();
+
+    for (flags, vel, pos) in reversed_with_both.run() {
+        printf("flags: %u\n", flags);
+    }
+
+    assert(reversed_with_position.flags == 1);
+    assert(reversed_with_both.flags == 3);
+
+    printf("query flags: %u\n", reversed_with_both.flags);
+
+    return 0;
+}

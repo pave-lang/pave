@@ -200,7 +200,7 @@ impl DefinitionWriter {
         name.release();
 
         fprintf(file, "VTable ");
-        generator.write_str_title(file, func_info.name.value);
+        generator.write_function_name(file, func_info, generics);
         fprintf(file, "__VTABLE__ITER;\n");
 
         return true;
@@ -266,16 +266,7 @@ impl DefinitionWriter {
             name.release();
 
             fprintf(file, "VTable ");
-
-            match func_info.parent {
-                FunctionParent::Struct(struct_info, _, _) => {
-                    generator.write_str_title(file, struct_info.name.value);
-                    fprintf(file, "__");
-                },
-                _ => {},
-            }
-
-            generator.write_str_title(file, func_info.name.value);
+            generator.write_function_name(file, func_info, generics);
 
             fprintf(file, "__VTABLE__ITER = { .fn_next = ");
             generator.write_function_name(file, func_info, generics);
@@ -871,16 +862,7 @@ impl DefinitionWriter {
 
             generator.write_indent(file);
             fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
-
-            match func_info.parent {
-                FunctionParent::Struct(struct_info, _, _) => {
-                    generator.write_str_title(file, struct_info.name.value);
-                    fprintf(file, "__");
-                },
-                _ => {},
-            }
-            generator.write_str_title(file, func_info.name.value);
-
+            generator.write_function_name(file, func_info, generics);
             fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
 
             generator.indent -= 1;
@@ -929,14 +911,7 @@ impl DefinitionWriter {
             fprintf(file, "struct trait_FnVTable ");
         }
 
-        match func_info.parent {
-            FunctionParent::Struct(struct_info, _, _) => {
-                generator.write_str_title(file, struct_info.name.value);
-                fprintf(file, "__");
-            },
-            _ => {},
-        }
-        generator.write_str_title(file, func_info.name.value);
+        generator.write_function_name(file, func_info, generics);
 
         if generator.is_coroutine() {
             fprintf(file, "__VTABLE__CO");

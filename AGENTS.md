@@ -17,6 +17,8 @@ The bootstrap stages:
 
 Changes to `src/analyzer/` or `src/compiler/` require `make all` to take effect (they're compiler source, not library source). Changes to `src/std/` take effect immediately since `dist/pavec.exe` reads them at compile time.
 
+When a change is complete, run `make all` and ensure it passes before calling the work done. If `make all` fails, fix the failure or clearly report the blocker and the exact failure.
+
 To quickly check that modified `.pv` files parse and generate valid C without a full build:
 ```sh
 mkdir -p build/test/src && dist/pavec.exe -o build/test/src compiler=src/compiler std=src/std analyzer=src/analyzer -- -I"C:/Program Files/LLVM/include" -I./src/compiler 2>&1

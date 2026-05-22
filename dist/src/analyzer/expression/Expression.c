@@ -3673,423 +3673,462 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
             #line 85 "src/analyzer/expression/PostfixExpression.pv"
             struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
             #line 86 "src/analyzer/expression/PostfixExpression.pv"
-            member_type = Root__make_type_usage(context->root, member_type, &func_generics->array);
+            struct GenericMap combined_generics_val = GenericMap__clone(func_generics, context->allocator);
+            #line 87 "src/analyzer/expression/PostfixExpression.pv"
+            struct GenericMap* combined_generics = ArenaAllocator__store_GenericMap(context->allocator, &combined_generics_val);
+
+            #line 89 "src/analyzer/expression/PostfixExpression.pv"
+            if (generic_map != 0) {
+                #line 90 "src/analyzer/expression/PostfixExpression.pv"
+                { struct HashMapIter_str_usize __iter = HashMap_str_usize__iter(&generic_map->map);
+                #line 90 "src/analyzer/expression/PostfixExpression.pv"
+                while (HashMapIter_str_usize__next(&__iter)) {
+                    #line 90 "src/analyzer/expression/PostfixExpression.pv"
+                    struct str name = HashMapIter_str_usize__value(&__iter)->_0;
+
+                    #line 91 "src/analyzer/expression/PostfixExpression.pv"
+                    struct Type* concrete_type = GenericMap__get(generic_map, name);
+                    #line 92 "src/analyzer/expression/PostfixExpression.pv"
+                    if (concrete_type != 0) {
+                        #line 93 "src/analyzer/expression/PostfixExpression.pv"
+                        GenericMap__insert(combined_generics, name, *concrete_type);
+                    }
+                } }
+            }
+
+            #line 98 "src/analyzer/expression/PostfixExpression.pv"
+            switch (member_type->type) {
+                #line 99 "src/analyzer/expression/PostfixExpression.pv"
+                case TYPE__FUNCTION: {
+                    #line 99 "src/analyzer/expression/PostfixExpression.pv"
+                    struct Function* function_info = member_type->function_value._0;
+                    #line 100 "src/analyzer/expression/PostfixExpression.pv"
+                    struct Type function_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = combined_generics} };
+                    #line 101 "src/analyzer/expression/PostfixExpression.pv"
+                    member_type = ArenaAllocator__store_Type(context->allocator, &function_type);
+                } break;
+                #line 103 "src/analyzer/expression/PostfixExpression.pv"
+                default: {
+                    #line 104 "src/analyzer/expression/PostfixExpression.pv"
+                    member_type = Root__make_type_usage(context->root, member_type, &func_generics->array);
+                } break;
+            }
         }
 
-        #line 89 "src/analyzer/expression/PostfixExpression.pv"
+        #line 109 "src/analyzer/expression/PostfixExpression.pv"
         if (func_info != 0 && (func_info->type == FUNCTION_TYPE__BUILTIN || func_info->type == FUNCTION_TYPE__METHOD_CPP)) {
-            #line 90 "src/analyzer/expression/PostfixExpression.pv"
+            #line 110 "src/analyzer/expression/PostfixExpression.pv"
             struct Expression* member_expression = Expression__make(context->allocator, member_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION, .memberinstanceexpression_value = { ._0 = inner, ._1 = member_name->value} }, member_type);
-            #line 91 "src/analyzer/expression/PostfixExpression.pv"
+            #line 111 "src/analyzer/expression/PostfixExpression.pv"
             return Expression__make_member_function_call(context, member_expression, member_name, member_type, arguments, generic_map);
         } else {
-            #line 93 "src/analyzer/expression/PostfixExpression.pv"
+            #line 113 "src/analyzer/expression/PostfixExpression.pv"
             return Expression__make_type_function_call(context, member_name, member_type, arguments, generic_map);
         }
     } else {
-        #line 96 "src/analyzer/expression/PostfixExpression.pv"
+        #line 116 "src/analyzer/expression/PostfixExpression.pv"
         if (generic_map != 0) {
-            #line 97 "src/analyzer/expression/PostfixExpression.pv"
+            #line 117 "src/analyzer/expression/PostfixExpression.pv"
             member_type = Context__resolve_type(context->allocator, member_type, generic_map, 0);
         }
 
-        #line 100 "src/analyzer/expression/PostfixExpression.pv"
+        #line 120 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__make(context->allocator, member_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION, .memberinstanceexpression_value = { ._0 = inner, ._1 = member_name->value} }, member_type);
     }
 }
 
-#line 104 "src/analyzer/expression/PostfixExpression.pv"
+#line 124 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics) {
-    #line 105 "src/analyzer/expression/PostfixExpression.pv"
+    #line 125 "src/analyzer/expression/PostfixExpression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "[")) {
-        #line 105 "src/analyzer/expression/PostfixExpression.pv"
+        #line 125 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 107 "src/analyzer/expression/PostfixExpression.pv"
+    #line 127 "src/analyzer/expression/PostfixExpression.pv"
     struct Expression* index_expr = Expression__parse(context, generics);
-    #line 108 "src/analyzer/expression/PostfixExpression.pv"
+    #line 128 "src/analyzer/expression/PostfixExpression.pv"
     if (index_expr == 0) {
-        #line 108 "src/analyzer/expression/PostfixExpression.pv"
+        #line 128 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 110 "src/analyzer/expression/PostfixExpression.pv"
+    #line 130 "src/analyzer/expression/PostfixExpression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "]")) {
-        #line 110 "src/analyzer/expression/PostfixExpression.pv"
+        #line 130 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 112 "src/analyzer/expression/PostfixExpression.pv"
+    #line 132 "src/analyzer/expression/PostfixExpression.pv"
     switch (index_expr->data.type) {
-        #line 113 "src/analyzer/expression/PostfixExpression.pv"
+        #line 133 "src/analyzer/expression/PostfixExpression.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 113 "src/analyzer/expression/PostfixExpression.pv"
+            #line 133 "src/analyzer/expression/PostfixExpression.pv"
             struct Expression* target = index_expr->data.invoke_value._0;
-            #line 113 "src/analyzer/expression/PostfixExpression.pv"
+            #line 133 "src/analyzer/expression/PostfixExpression.pv"
             struct Array_InvokeArgument args = index_expr->data.invoke_value._1;
-            #line 114 "src/analyzer/expression/PostfixExpression.pv"
+            #line 134 "src/analyzer/expression/PostfixExpression.pv"
             switch (target->return_type.type) {
-                #line 115 "src/analyzer/expression/PostfixExpression.pv"
+                #line 135 "src/analyzer/expression/PostfixExpression.pv"
                 case TYPE__ENUM: {
-                    #line 115 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 135 "src/analyzer/expression/PostfixExpression.pv"
                     struct Enum* enum_info = target->return_type.enum_value._0;
-                    #line 116 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 136 "src/analyzer/expression/PostfixExpression.pv"
                     if (str__Eq_str__eq(&enum_info->name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
-                        #line 117 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 137 "src/analyzer/expression/PostfixExpression.pv"
                         struct Sequence* sequence = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) {
                             .type = (struct SequenceType) { .type = SEQUENCE_TYPE__SLICE },
                             .element = *Type__deref(&inner->return_type),
                             .element_pointer = inner->return_type,
                         }});
 
-                        #line 123 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 143 "src/analyzer/expression/PostfixExpression.pv"
                         struct Expression* start = args.data[0].value;
-                        #line 124 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 144 "src/analyzer/expression/PostfixExpression.pv"
                         struct Expression* end = args.data[1].value;
 
-                        #line 126 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 146 "src/analyzer/expression/PostfixExpression.pv"
                         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                        #line 128 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 148 "src/analyzer/expression/PostfixExpression.pv"
                         struct Token* argument_name_data = ArenaAllocator__store_Token(context->allocator, index_expr->token);
-                        #line 129 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 149 "src/analyzer/expression/PostfixExpression.pv"
                         argument_name_data->type = TOKEN_TYPE__IDENTIFIER;
-                        #line 130 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 150 "src/analyzer/expression/PostfixExpression.pv"
                         argument_name_data->value = (struct str){ .ptr = "data", .length = strlen("data") };
 
-                        #line 132 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 152 "src/analyzer/expression/PostfixExpression.pv"
                         struct Token* argument_name_length = ArenaAllocator__store_Token(context->allocator, argument_name_data);
-                        #line 133 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 153 "src/analyzer/expression/PostfixExpression.pv"
                         argument_name_length->value = (struct str){ .ptr = "length", .length = strlen("length") };
 
-                        #line 135 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 155 "src/analyzer/expression/PostfixExpression.pv"
                         if (Expression__is_zero(start)) {
-                            #line 136 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 156 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = argument_name_data, .value = inner });
-                            #line 137 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 157 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = argument_name_length, .value = end });
                         } else {
-                            #line 139 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 159 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) {
                                 .name = argument_name_data,
                                 .value = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__BINARY_EXPRESSION, .binaryexpression_value = { ._0 = inner, ._1 = (struct str){ .ptr = "+", .length = strlen("+") }, ._2 = start} }, &sequence->element_pointer),
                             });
 
-                            #line 144 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 164 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) {
                                 .name = argument_name_length,
                                 .value = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__BINARY_EXPRESSION, .binaryexpression_value = { ._0 = end, ._1 = (struct str){ .ptr = "-", .length = strlen("-") }, ._2 = start} }, &context->root->type_usize),
                             });
                         }
 
-                        #line 150 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 170 "src/analyzer/expression/PostfixExpression.pv"
                         struct Type* sequence_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }});
-                        #line 151 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 171 "src/analyzer/expression/PostfixExpression.pv"
                         struct Expression* sequence_expr = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = sequence_type }, sequence_type);
-                        #line 152 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 172 "src/analyzer/expression/PostfixExpression.pv"
                         return Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = sequence_expr, ._1 = arguments} }, sequence_type);
                     }
                 } break;
-                #line 155 "src/analyzer/expression/PostfixExpression.pv"
+                #line 175 "src/analyzer/expression/PostfixExpression.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 158 "src/analyzer/expression/PostfixExpression.pv"
+        #line 178 "src/analyzer/expression/PostfixExpression.pv"
         default: {
         } break;
     }
 
-    #line 161 "src/analyzer/expression/PostfixExpression.pv"
+    #line 181 "src/analyzer/expression/PostfixExpression.pv"
     struct Expression* index_trait_result = Expression__find_index_trait_call(context, index_expr->token, inner, index_expr);
-    #line 162 "src/analyzer/expression/PostfixExpression.pv"
+    #line 182 "src/analyzer/expression/PostfixExpression.pv"
     if (index_trait_result != 0) {
-        #line 162 "src/analyzer/expression/PostfixExpression.pv"
+        #line 182 "src/analyzer/expression/PostfixExpression.pv"
         return index_trait_result;
     }
 
-    #line 164 "src/analyzer/expression/PostfixExpression.pv"
+    #line 184 "src/analyzer/expression/PostfixExpression.pv"
     struct Type* inner_return_type = &inner->return_type;
-    #line 165 "src/analyzer/expression/PostfixExpression.pv"
+    #line 185 "src/analyzer/expression/PostfixExpression.pv"
     struct Type* element_type = 0;
 
-    #line 167 "src/analyzer/expression/PostfixExpression.pv"
+    #line 187 "src/analyzer/expression/PostfixExpression.pv"
     if (Type__is_reference_sequence_dynamic(inner_return_type)) {
-        #line 168 "src/analyzer/expression/PostfixExpression.pv"
+        #line 188 "src/analyzer/expression/PostfixExpression.pv"
         switch (Type__deref_1(inner_return_type)->type) {
-            #line 169 "src/analyzer/expression/PostfixExpression.pv"
+            #line 189 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__SEQUENCE: {
-                #line 169 "src/analyzer/expression/PostfixExpression.pv"
+                #line 189 "src/analyzer/expression/PostfixExpression.pv"
                 struct Sequence* sequence = Type__deref_1(inner_return_type)->sequence_value;
-                #line 170 "src/analyzer/expression/PostfixExpression.pv"
+                #line 190 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &sequence->element;
             } break;
-            #line 172 "src/analyzer/expression/PostfixExpression.pv"
+            #line 192 "src/analyzer/expression/PostfixExpression.pv"
             default: {
             } break;
         }
     } else {
-        #line 175 "src/analyzer/expression/PostfixExpression.pv"
+        #line 195 "src/analyzer/expression/PostfixExpression.pv"
         switch (inner_return_type->type) {
-            #line 176 "src/analyzer/expression/PostfixExpression.pv"
+            #line 196 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__INDIRECT: {
-                #line 176 "src/analyzer/expression/PostfixExpression.pv"
+                #line 196 "src/analyzer/expression/PostfixExpression.pv"
                 struct Indirect* indirect = inner_return_type->indirect_value;
-                #line 177 "src/analyzer/expression/PostfixExpression.pv"
+                #line 197 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &indirect->to;
             } break;
-            #line 179 "src/analyzer/expression/PostfixExpression.pv"
+            #line 199 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__SEQUENCE: {
-                #line 179 "src/analyzer/expression/PostfixExpression.pv"
+                #line 199 "src/analyzer/expression/PostfixExpression.pv"
                 struct Sequence* sequence = inner_return_type->sequence_value;
-                #line 180 "src/analyzer/expression/PostfixExpression.pv"
+                #line 200 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &sequence->element;
             } break;
-            #line 182 "src/analyzer/expression/PostfixExpression.pv"
+            #line 202 "src/analyzer/expression/PostfixExpression.pv"
             default: {
             } break;
         }
     }
 
-    #line 186 "src/analyzer/expression/PostfixExpression.pv"
+    #line 206 "src/analyzer/expression/PostfixExpression.pv"
     if (element_type == 0 && context->module->mode_cpp) {
-        #line 187 "src/analyzer/expression/PostfixExpression.pv"
+        #line 207 "src/analyzer/expression/PostfixExpression.pv"
         struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(context->allocator, (struct UnknownC[]){(struct UnknownC) { .include = 0, .name = (struct str){ .ptr = "", .length = strlen("") }, .generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 } }});
-        #line 188 "src/analyzer/expression/PostfixExpression.pv"
+        #line 208 "src/analyzer/expression/PostfixExpression.pv"
         element_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c }}, context->allocator);
     }
 
-    #line 191 "src/analyzer/expression/PostfixExpression.pv"
+    #line 211 "src/analyzer/expression/PostfixExpression.pv"
     if (element_type == 0) {
-        #line 192 "src/analyzer/expression/PostfixExpression.pv"
+        #line 212 "src/analyzer/expression/PostfixExpression.pv"
         Context__error_token(context, index_expr->token, "Type is not indexable");
-        #line 193 "src/analyzer/expression/PostfixExpression.pv"
+        #line 213 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 196 "src/analyzer/expression/PostfixExpression.pv"
+    #line 216 "src/analyzer/expression/PostfixExpression.pv"
     return Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__INDEX_EXPRESSION, .indexexpression_value = { ._0 = inner, ._1 = index_expr} }, element_type);
 }
 
-#line 199 "src/analyzer/expression/PostfixExpression.pv"
+#line 219 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics) {
-    #line 200 "src/analyzer/expression/PostfixExpression.pv"
+    #line 220 "src/analyzer/expression/PostfixExpression.pv"
     struct Token* token = Context__current(context);
 
-    #line 202 "src/analyzer/expression/PostfixExpression.pv"
+    #line 222 "src/analyzer/expression/PostfixExpression.pv"
     if (Token__eq(token, TOKEN_TYPE__SYMBOL, ".")) {
-        #line 203 "src/analyzer/expression/PostfixExpression.pv"
+        #line 223 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_instance_member_expression(context, inner, generics);
     } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 205 "src/analyzer/expression/PostfixExpression.pv"
+        #line 225 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_type_member_expression(context, inner, generics);
     } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "[")) {
-        #line 207 "src/analyzer/expression/PostfixExpression.pv"
+        #line 227 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_index_expression(context, inner, generics);
     } else if (Type__is_function(Type__resolve_typedef_function(&inner->return_type)) && (Token__eq(token, TOKEN_TYPE__SYMBOL, "<") || Token__eq(token, TOKEN_TYPE__SYMBOL, "("))) {
-        #line 209 "src/analyzer/expression/PostfixExpression.pv"
+        #line 229 "src/analyzer/expression/PostfixExpression.pv"
         switch (Type__resolve_typedef_function(&inner->return_type)->type) {
-            #line 210 "src/analyzer/expression/PostfixExpression.pv"
+            #line 230 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__FUNCTION: {
-                #line 210 "src/analyzer/expression/PostfixExpression.pv"
+                #line 230 "src/analyzer/expression/PostfixExpression.pv"
                 struct Function* func_info = Type__resolve_typedef_function(&inner->return_type)->function_value._0;
-                #line 211 "src/analyzer/expression/PostfixExpression.pv"
+                #line 231 "src/analyzer/expression/PostfixExpression.pv"
                 struct Array_Type parsed_generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 };
 
-                #line 213 "src/analyzer/expression/PostfixExpression.pv"
+                #line 233 "src/analyzer/expression/PostfixExpression.pv"
                 if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "<")) {
-                    #line 214 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 234 "src/analyzer/expression/PostfixExpression.pv"
                     parsed_generics = Context__parse_generics(context, generics);
                 }
 
-                #line 217 "src/analyzer/expression/PostfixExpression.pv"
+                #line 237 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 217 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 237 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 219 "src/analyzer/expression/PostfixExpression.pv"
+                #line 239 "src/analyzer/expression/PostfixExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                #line 221 "src/analyzer/expression/PostfixExpression.pv"
+                #line 241 "src/analyzer/expression/PostfixExpression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 222 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 242 "src/analyzer/expression/PostfixExpression.pv"
                     struct Expression* argument = Expression__parse(context, generics);
-                    #line 223 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 243 "src/analyzer/expression/PostfixExpression.pv"
                     Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                    #line 225 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 245 "src/analyzer/expression/PostfixExpression.pv"
                     if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 226 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 246 "src/analyzer/expression/PostfixExpression.pv"
                         Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 227 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 247 "src/analyzer/expression/PostfixExpression.pv"
                         return 0;
                     }
                 }
 
-                #line 231 "src/analyzer/expression/PostfixExpression.pv"
+                #line 251 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 231 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 251 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 233 "src/analyzer/expression/PostfixExpression.pv"
+                #line 253 "src/analyzer/expression/PostfixExpression.pv"
                 if (func_info->generics.array.length > 0) {
-                    #line 234 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 254 "src/analyzer/expression/PostfixExpression.pv"
                     struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                    #line 235 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 255 "src/analyzer/expression/PostfixExpression.pv"
                     inner->return_type = *Root__make_type_usage(context->root, &inner->return_type, &func_generics->array);
 
-                    #line 237 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 257 "src/analyzer/expression/PostfixExpression.pv"
                     switch (inner->data.type) {
-                        #line 238 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 258 "src/analyzer/expression/PostfixExpression.pv"
                         case EXPRESSION_DATA__TYPE: {
-                            #line 238 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 258 "src/analyzer/expression/PostfixExpression.pv"
                             struct Type** type = &inner->data.type_value;
-                            #line 239 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 259 "src/analyzer/expression/PostfixExpression.pv"
                             *type = &inner->return_type;
                         } break;
-                        #line 241 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 261 "src/analyzer/expression/PostfixExpression.pv"
                         default: {
                         } break;
                     }
                 }
 
-                #line 245 "src/analyzer/expression/PostfixExpression.pv"
+                #line 265 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Expression__validate_arguments(context, token, &inner->return_type, &arguments, 0, false)) {
-                    #line 245 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 265 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 247 "src/analyzer/expression/PostfixExpression.pv"
+                #line 267 "src/analyzer/expression/PostfixExpression.pv"
                 return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
             } break;
-            #line 249 "src/analyzer/expression/PostfixExpression.pv"
+            #line 269 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__FUNCTION_C: {
-                #line 249 "src/analyzer/expression/PostfixExpression.pv"
-                struct FunctionC* func_info = Type__resolve_typedef_function(&inner->return_type)->functionc_value;
-                #line 250 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 250 "src/analyzer/expression/PostfixExpression.pv"
-                    return 0;
-                }
-
-                #line 252 "src/analyzer/expression/PostfixExpression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-
-                #line 254 "src/analyzer/expression/PostfixExpression.pv"
-                while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 255 "src/analyzer/expression/PostfixExpression.pv"
-                    struct Expression* argument = Expression__parse(context, generics);
-                    #line 256 "src/analyzer/expression/PostfixExpression.pv"
-                    Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
-
-                    #line 258 "src/analyzer/expression/PostfixExpression.pv"
-                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 259 "src/analyzer/expression/PostfixExpression.pv"
-                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 260 "src/analyzer/expression/PostfixExpression.pv"
-                        return 0;
-                    }
-                }
-
-                #line 264 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 264 "src/analyzer/expression/PostfixExpression.pv"
-                    return 0;
-                }
-
-                #line 266 "src/analyzer/expression/PostfixExpression.pv"
-                return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
-            } break;
-            #line 268 "src/analyzer/expression/PostfixExpression.pv"
-            case TYPE__CLASS_CPP: {
                 #line 269 "src/analyzer/expression/PostfixExpression.pv"
-                return Expression__parse_class(context, token, inner, generics);
-            } break;
-            #line 271 "src/analyzer/expression/PostfixExpression.pv"
-            case TYPE__UNKNOWN_C: {
-                #line 272 "src/analyzer/expression/PostfixExpression.pv"
+                struct FunctionC* func_info = Type__resolve_typedef_function(&inner->return_type)->functionc_value;
+                #line 270 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 272 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 270 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
+
+                #line 272 "src/analyzer/expression/PostfixExpression.pv"
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
                 #line 274 "src/analyzer/expression/PostfixExpression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-
-                #line 276 "src/analyzer/expression/PostfixExpression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 277 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 275 "src/analyzer/expression/PostfixExpression.pv"
                     struct Expression* argument = Expression__parse(context, generics);
-                    #line 278 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 276 "src/analyzer/expression/PostfixExpression.pv"
                     Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                    #line 280 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 278 "src/analyzer/expression/PostfixExpression.pv"
                     if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 281 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 279 "src/analyzer/expression/PostfixExpression.pv"
                         Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 282 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 280 "src/analyzer/expression/PostfixExpression.pv"
                         return 0;
                     }
+                }
+
+                #line 284 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 284 "src/analyzer/expression/PostfixExpression.pv"
+                    return 0;
                 }
 
                 #line 286 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 286 "src/analyzer/expression/PostfixExpression.pv"
+                return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
+            } break;
+            #line 288 "src/analyzer/expression/PostfixExpression.pv"
+            case TYPE__CLASS_CPP: {
+                #line 289 "src/analyzer/expression/PostfixExpression.pv"
+                return Expression__parse_class(context, token, inner, generics);
+            } break;
+            #line 291 "src/analyzer/expression/PostfixExpression.pv"
+            case TYPE__UNKNOWN_C: {
+                #line 292 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
+                    #line 292 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 288 "src/analyzer/expression/PostfixExpression.pv"
+                #line 294 "src/analyzer/expression/PostfixExpression.pv"
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+
+                #line 296 "src/analyzer/expression/PostfixExpression.pv"
+                while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 297 "src/analyzer/expression/PostfixExpression.pv"
+                    struct Expression* argument = Expression__parse(context, generics);
+                    #line 298 "src/analyzer/expression/PostfixExpression.pv"
+                    Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
+
+                    #line 300 "src/analyzer/expression/PostfixExpression.pv"
+                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                        #line 301 "src/analyzer/expression/PostfixExpression.pv"
+                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
+                        #line 302 "src/analyzer/expression/PostfixExpression.pv"
+                        return 0;
+                    }
+                }
+
+                #line 306 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 306 "src/analyzer/expression/PostfixExpression.pv"
+                    return 0;
+                }
+
+                #line 308 "src/analyzer/expression/PostfixExpression.pv"
                 return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &context->root->type_unknown);
             } break;
-            #line 290 "src/analyzer/expression/PostfixExpression.pv"
+            #line 310 "src/analyzer/expression/PostfixExpression.pv"
             default: {
-                #line 291 "src/analyzer/expression/PostfixExpression.pv"
+                #line 311 "src/analyzer/expression/PostfixExpression.pv"
                 Context__error_token(context, token, "Unexpected token when parsing open bracket");
-                #line 292 "src/analyzer/expression/PostfixExpression.pv"
+                #line 312 "src/analyzer/expression/PostfixExpression.pv"
                 return 0;
             } break;
         }
     }
 
-    #line 297 "src/analyzer/expression/PostfixExpression.pv"
+    #line 317 "src/analyzer/expression/PostfixExpression.pv"
     return inner;
 }
 
-#line 300 "src/analyzer/expression/PostfixExpression.pv"
+#line 320 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics) {
-    #line 301 "src/analyzer/expression/PostfixExpression.pv"
+    #line 321 "src/analyzer/expression/PostfixExpression.pv"
     struct Expression* result = inner;
-    #line 302 "src/analyzer/expression/PostfixExpression.pv"
+    #line 322 "src/analyzer/expression/PostfixExpression.pv"
     while (true) {
-        #line 303 "src/analyzer/expression/PostfixExpression.pv"
+        #line 323 "src/analyzer/expression/PostfixExpression.pv"
         struct Expression* next = Expression__parse_postfix(context, result, generics);
-        #line 304 "src/analyzer/expression/PostfixExpression.pv"
+        #line 324 "src/analyzer/expression/PostfixExpression.pv"
         if (next == result) {
-            #line 304 "src/analyzer/expression/PostfixExpression.pv"
+            #line 324 "src/analyzer/expression/PostfixExpression.pv"
             break;
         }
-        #line 305 "src/analyzer/expression/PostfixExpression.pv"
+        #line 325 "src/analyzer/expression/PostfixExpression.pv"
         if (next == 0) {
-            #line 305 "src/analyzer/expression/PostfixExpression.pv"
+            #line 325 "src/analyzer/expression/PostfixExpression.pv"
             return 0;
         }
 
-        #line 307 "src/analyzer/expression/PostfixExpression.pv"
+        #line 327 "src/analyzer/expression/PostfixExpression.pv"
         struct Token* expanded_token = ArenaAllocator__store_Token(context->allocator, next->token);
-        #line 308 "src/analyzer/expression/PostfixExpression.pv"
+        #line 328 "src/analyzer/expression/PostfixExpression.pv"
         expanded_token->start_line = result->token->start_line;
-        #line 309 "src/analyzer/expression/PostfixExpression.pv"
+        #line 329 "src/analyzer/expression/PostfixExpression.pv"
         expanded_token->start_column = result->token->start_column;
-        #line 310 "src/analyzer/expression/PostfixExpression.pv"
+        #line 330 "src/analyzer/expression/PostfixExpression.pv"
         next->token = expanded_token;
 
-        #line 312 "src/analyzer/expression/PostfixExpression.pv"
+        #line 332 "src/analyzer/expression/PostfixExpression.pv"
         result = next;
     }
-    #line 314 "src/analyzer/expression/PostfixExpression.pv"
+    #line 334 "src/analyzer/expression/PostfixExpression.pv"
     return result;
 }
 

@@ -27,6 +27,7 @@ struct Enum {
     token_start: usize,
     token_end: usize,
     type: EnumType,
+    generic_arity: usize,
     generics: Generics,
     variants: HashMap<str, EnumVariant>,
     traits: HashMap<str, &Trait>,
@@ -44,6 +45,7 @@ impl Enum {
             name: null,
             token_start: 0,
             token_end: 0,
+            generic_arity: 0,
             type: EnumType::Standard,
         };
     }
@@ -57,6 +59,26 @@ impl Enum {
         if name == null { return node; }
 
         node.token_start = context.pos;
+
+        if context.check_next(TokenType::Symbol, "<") {
+            let depth: usize = 1;
+            let expect_generic = true;
+            while context.pos < context.length && depth > 0 {
+                if context.check_value(TokenType::Symbol, "<") {
+                    depth += 1;
+                } else if context.check_value(TokenType::Symbol, ">") {
+                    depth -= 1;
+                    if depth == 0 { break; }
+                } else if depth == 1 && expect_generic && context.check(TokenType::Identifier) {
+                    node.generic_arity += 1;
+                    expect_generic = false;
+                } else if depth == 1 && context.check_value(TokenType::Symbol, ",") {
+                    expect_generic = true;
+                }
+                context.next_token();
+            }
+            if !context.expect_value(TokenType::Symbol, ">") { return node; }
+        }
 
         if !context.skip_to_symbol("{") { return node; }
         if !context.skip_brackets("{", "}") { return node; }

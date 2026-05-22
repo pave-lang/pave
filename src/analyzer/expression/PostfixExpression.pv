@@ -83,7 +83,27 @@ impl Expression {
 
             if func_info != null && func_info.generics.array.length > 0 {
                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                member_type = context.root.make_type_usage(member_type, &func_generics.array);
+                let combined_generics_val = func_generics.clone(context.allocator);
+                let combined_generics = context.allocator.store(&combined_generics_val);
+
+                if generic_map != null {
+                    for (name, _) in generic_map.map {
+                        let concrete_type = generic_map.get(name);
+                        if concrete_type != null {
+                            combined_generics.insert(name, *concrete_type);
+                        }
+                    }
+                }
+
+                match member_type {
+                    Type::Function(function_info, _) => {
+                        let function_type = Type::Function(function_info, combined_generics);
+                        member_type = context.allocator.store(&function_type);
+                    },
+                    _ => {
+                        member_type = context.root.make_type_usage(member_type, &func_generics.array);
+                    },
+                }
             }
 
             if func_info != null && (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {

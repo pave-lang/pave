@@ -30,32 +30,14 @@ impl ExpressionWriter {
             Type::Function(func_info, func_generics) => {
                 if func_info.type == FunctionType::Coroutine {
                     fprintf(file, "(struct trait_Co_CoroutineStatus) { .vtable = &");
-
-                    match func_info.parent {
-                        FunctionParent::Struct(struct_info, _, _) => {
-                            generator.write_str_title(file, struct_info.name.value);
-                            fprintf(file, "__");
-                        },
-                        _ => {},
-                    }
-
-                    generator.write_str_title(file, func_info.name.value);
+                    generator.write_function_name(file, func_info, func_generics);
                     fprintf(file, "__VTABLE__CO, .instance = &(struct ");
                     generator.write_function_name(file, func_info, func_generics);
                     fprintf(file, "__Co_CoroutineStatus__Instance) {}");
                     fprintf(file, " }");
                 } else {
                     fprintf(file, "(struct trait_Fn) { .vtable = &");
-
-                    match func_info.parent {
-                        FunctionParent::Struct(struct_info, _, _) => {
-                            generator.write_str_title(file, struct_info.name.value);
-                            fprintf(file, "__");
-                        },
-                        _ => {},
-                    }
-
-                    generator.write_str_title(file, func_info.name.value);
+                    generator.write_function_name(file, func_info, func_generics);
                     fprintf(file, "__VTABLE__DYN_FN, .instance = &(struct ");
                     generator.write_function_name(file, func_info, func_generics);
                     fprintf(file, "__Fn__Instance) {}");
