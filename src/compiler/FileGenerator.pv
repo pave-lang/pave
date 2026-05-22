@@ -68,7 +68,7 @@ impl FileGenerator {
 
         if !defs.write_function_definition(code_file, func_info, generics, null) { fclose(code_file); return false; }
 
-        defs.write_function_block(code_file, name_str, func_info, generics, usage);
+        defs.write_function_block(code_file, name_str, func_info, generics, usage_context);
 
         generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -168,7 +168,7 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, module, &enum_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, module, &enum_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
@@ -284,7 +284,7 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, struct_info.module, &struct_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, struct_info.module, &struct_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         if struct_info.traits.length > 0 {
             fprintf(code_file, "\n");
@@ -536,7 +536,7 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, null, &primitive_info.impls, &usage.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, null, &primitive_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         for *impl_info in primitive_info.impls {
             if !impl_info.has_trait || impl_info.trait_ == null { continue; }

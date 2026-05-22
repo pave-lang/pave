@@ -40,10 +40,9 @@
 #include <std/HashMapIter_str_ref_Type.h>
 #include <tuple_str_ref_Type.h>
 #include <compiler/BlockWriter.h>
-#include <std/Range_usize.h>
-#include <compiler/TypeFunctionUsage.h>
-#include <analyzer/Block.h>
 #include <compiler/UsageContext.h>
+#include <std/Range_usize.h>
+#include <analyzer/Block.h>
 #include <std/Array_char.h>
 #include <std/Array_Generic.h>
 #include <std/Array_Type.h>
@@ -56,15 +55,14 @@
 #include <std/Array_ref_Impl.h>
 #include <tuple_usize_ref_ref_Impl.h>
 #include <std/HashMap_usize_TypeFunctionUsage.h>
-#include <compiler/TypeUsage_Enum.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
+#include <compiler/TypeFunctionUsage.h>
 #include <std/Array_UsageContext.h>
 #include <std/Iter_ref_UsageContext.h>
 #include <std/HashMap_str_ref_ImplConst.h>
 #include <std/HashMapIter_str_ref_ImplConst.h>
 #include <tuple_str_ref_ImplConst.h>
 #include <analyzer/ImplConst.h>
-#include <compiler/TypeUsage_Struct.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Struct.h>
 #include <analyzer/types/StructType.h>
@@ -77,6 +75,7 @@
 #include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
 #include <tuple_str_tuple_ref_Trait_ref_Type.h>
 #include <tuple_ref_Trait_ref_Type.h>
+#include <compiler/TypeUsage_Struct.h>
 #include <analyzer/types/Primitive.h>
 #include <std/trait_Allocator.h>
 #include <compiler/DefinitionWriter.h>
@@ -450,7 +449,7 @@ bool DefinitionWriter__write_function_coroutine(struct DefinitionWriter* self, F
 }
 
 #line 209 "src/compiler/DefinitionWriter.pv"
-bool DefinitionWriter__write_function_block(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct GenericMap* generics, struct TypeFunctionUsage* function_usage) {
+bool DefinitionWriter__write_function_block(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct GenericMap* generics, struct UsageContext* function_usage_context) {
     #line 210 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
     #line 211 "src/compiler/DefinitionWriter.pv"
@@ -485,1643 +484,1650 @@ bool DefinitionWriter__write_function_block(struct DefinitionWriter* self, FILE*
         generator->indent += 1;
 
         #line 229 "src/compiler/DefinitionWriter.pv"
-        for (uintptr_t i = 1; i < function_usage->function_context.coroutine.yield_count + 1; i++) {
+        uintptr_t yield_count = 0;
+        #line 230 "src/compiler/DefinitionWriter.pv"
+        if (function_usage_context != 0) {
             #line 230 "src/compiler/DefinitionWriter.pv"
+            yield_count = function_usage_context->function_context.coroutine.yield_count;
+        }
+        #line 231 "src/compiler/DefinitionWriter.pv"
+        for (uintptr_t i = 1; i < yield_count + 1; i++) {
+            #line 232 "src/compiler/DefinitionWriter.pv"
             Generator__write_indent(generator, file);
-            #line 231 "src/compiler/DefinitionWriter.pv"
+            #line 233 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "case %zu: goto yield_%zu;\n", i, i);
         }
 
-        #line 234 "src/compiler/DefinitionWriter.pv"
+        #line 236 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 235 "src/compiler/DefinitionWriter.pv"
+        #line 237 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "default: return false;\n");
 
-        #line 237 "src/compiler/DefinitionWriter.pv"
-        generator->indent -= 1;
-        #line 238 "src/compiler/DefinitionWriter.pv"
-        Generator__write_indent(generator, file);
         #line 239 "src/compiler/DefinitionWriter.pv"
+        generator->indent -= 1;
+        #line 240 "src/compiler/DefinitionWriter.pv"
+        Generator__write_indent(generator, file);
+        #line 241 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "}\n\n");
 
-        #line 241 "src/compiler/DefinitionWriter.pv"
+        #line 243 "src/compiler/DefinitionWriter.pv"
         generator->function_context->coroutine.yield_count = 0;
-        #line 242 "src/compiler/DefinitionWriter.pv"
+        #line 244 "src/compiler/DefinitionWriter.pv"
         if (!BlockWriter__write_block(&blocks, file, &func_info->return_type, func_info->body, generics, false, true)) {
-            #line 243 "src/compiler/DefinitionWriter.pv"
-            uint32_t name_length = name.length;
-            #line 244 "src/compiler/DefinitionWriter.pv"
-            fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
             #line 245 "src/compiler/DefinitionWriter.pv"
-            fclose(file);
+            uint32_t name_length = name.length;
             #line 246 "src/compiler/DefinitionWriter.pv"
+            fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+            #line 247 "src/compiler/DefinitionWriter.pv"
+            fclose(file);
+            #line 248 "src/compiler/DefinitionWriter.pv"
             return false;
         }
 
-        #line 249 "src/compiler/DefinitionWriter.pv"
+        #line 251 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 250 "src/compiler/DefinitionWriter.pv"
+        #line 252 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "ctx->_state = -1; return false;\n");
 
-        #line 252 "src/compiler/DefinitionWriter.pv"
+        #line 254 "src/compiler/DefinitionWriter.pv"
         generator->indent -= 1;
-        #line 253 "src/compiler/DefinitionWriter.pv"
+        #line 255 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "}\n");
 
-        #line 255 "src/compiler/DefinitionWriter.pv"
-        Generator__write_type(generator, file, &func_info->return_type, generics);
-        #line 256 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, " ");
         #line 257 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
+        Generator__write_type(generator, file, &func_info->return_type, generics);
         #line 258 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__value(void* ctx) { return ((struct ");
+        fprintf(file, " ");
         #line 259 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 260 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "__value(void* ctx) { return ((struct ");
+        #line 261 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
+        #line 262 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "*)ctx)->_value; }\n");
 
-        #line 262 "src/compiler/DefinitionWriter.pv"
+        #line 264 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct trait_Iter_");
 
-        #line 264 "src/compiler/DefinitionWriter.pv"
-        struct String name = Naming__get_type_name(&generator->naming_ident, &func_info->return_type, generics->self_type, generics);
-        #line 265 "src/compiler/DefinitionWriter.pv"
-        Generator__write_string(generator, file, &name);
         #line 266 "src/compiler/DefinitionWriter.pv"
+        struct String name = Naming__get_type_name(&generator->naming_ident, &func_info->return_type, generics->self_type, generics);
+        #line 267 "src/compiler/DefinitionWriter.pv"
+        Generator__write_string(generator, file, &name);
+        #line 268 "src/compiler/DefinitionWriter.pv"
         String__release(&name);
 
-        #line 268 "src/compiler/DefinitionWriter.pv"
+        #line 270 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "VTable ");
-        #line 269 "src/compiler/DefinitionWriter.pv"
+        #line 271 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
 
-        #line 271 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__VTABLE__ITER = { .fn_next = ");
-        #line 272 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
         #line 273 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__next, .fn_value = ");
+        fprintf(file, "__VTABLE__ITER = { .fn_next = ");
         #line 274 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 275 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "__next, .fn_value = ");
+        #line 276 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
+        #line 277 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__value };\n\n");
 
-        #line 277 "src/compiler/DefinitionWriter.pv"
+        #line 279 "src/compiler/DefinitionWriter.pv"
         return true;
     }
 
-    #line 280 "src/compiler/DefinitionWriter.pv"
+    #line 282 "src/compiler/DefinitionWriter.pv"
     fprintf(file, " ");
-    #line 281 "src/compiler/DefinitionWriter.pv"
+    #line 283 "src/compiler/DefinitionWriter.pv"
     if (!BlockWriter__write_block(&blocks, file, &func_info->return_type, func_info->body, generics, false, false)) {
-        #line 282 "src/compiler/DefinitionWriter.pv"
-        uint32_t name_length = name.length;
-        #line 283 "src/compiler/DefinitionWriter.pv"
-        fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
         #line 284 "src/compiler/DefinitionWriter.pv"
-        fclose(file);
+        uint32_t name_length = name.length;
         #line 285 "src/compiler/DefinitionWriter.pv"
+        fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
+        #line 286 "src/compiler/DefinitionWriter.pv"
+        fclose(file);
+        #line 287 "src/compiler/DefinitionWriter.pv"
         return false;
     }
 
-    #line 288 "src/compiler/DefinitionWriter.pv"
+    #line 290 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 291 "src/compiler/DefinitionWriter.pv"
+#line 293 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_enum_definition(struct DefinitionWriter* self, FILE* file, struct Enum* enum_info, struct TypeUsage_Enum* usage, struct UsageContext* usage_context, struct IncludeWriter* include_writer) {
-    #line 292 "src/compiler/DefinitionWriter.pv"
-    struct Generator* generator = self->generator;
-    #line 293 "src/compiler/DefinitionWriter.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 294 "src/compiler/DefinitionWriter.pv"
-    struct Token* enum_name = enum_info->name;
+    struct Generator* generator = self->generator;
     #line 295 "src/compiler/DefinitionWriter.pv"
-    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
+    struct GenericMap* generics = usage_context->generic_map;
     #line 296 "src/compiler/DefinitionWriter.pv"
-    uint32_t name_length = name.array.length;
+    struct Token* enum_name = enum_info->name;
     #line 297 "src/compiler/DefinitionWriter.pv"
+    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
+    #line 298 "src/compiler/DefinitionWriter.pv"
+    uint32_t name_length = name.array.length;
+    #line 299 "src/compiler/DefinitionWriter.pv"
     bool is_discriminated_union = Enum__is_discriminated_union(enum_info);
 
-    #line 299 "src/compiler/DefinitionWriter.pv"
+    #line 301 "src/compiler/DefinitionWriter.pv"
     Generator__write_line_directive(generator, file, enum_info->context, enum_info->name);
 
-    #line 301 "src/compiler/DefinitionWriter.pv"
+    #line 303 "src/compiler/DefinitionWriter.pv"
     if (!is_discriminated_union) {
-        #line 302 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "enum ");
-        #line 303 "src/compiler/DefinitionWriter.pv"
-        Generator__write_str(generator, file, enum_name->value);
         #line 304 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, " {\n");
+        fprintf(file, "enum ");
         #line 305 "src/compiler/DefinitionWriter.pv"
+        Generator__write_str(generator, file, enum_name->value);
+        #line 306 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, " {\n");
+        #line 307 "src/compiler/DefinitionWriter.pv"
         generator->indent += 1;
 
-        #line 307 "src/compiler/DefinitionWriter.pv"
+        #line 309 "src/compiler/DefinitionWriter.pv"
         DefinitionWriter__write_enum_variants(self, file, enum_info, generics);
 
-        #line 309 "src/compiler/DefinitionWriter.pv"
+        #line 311 "src/compiler/DefinitionWriter.pv"
         generator->indent -= 1;
-        #line 310 "src/compiler/DefinitionWriter.pv"
+        #line 312 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "};\n");
     } else {
-        #line 312 "src/compiler/DefinitionWriter.pv"
+        #line 314 "src/compiler/DefinitionWriter.pv"
         bool has_generics = enum_info->generics.array.length > 0;
 
-        #line 314 "src/compiler/DefinitionWriter.pv"
+        #line 316 "src/compiler/DefinitionWriter.pv"
         if (has_generics) {
-            #line 315 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "#ifndef PAVE_");
-            #line 316 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, enum_info->name->value);
             #line 317 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            fprintf(file, "#ifndef PAVE_");
             #line 318 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "\n#define PAVE_");
-            #line 319 "src/compiler/DefinitionWriter.pv"
             Generator__write_str_title(generator, file, enum_info->name->value);
-            #line 320 "src/compiler/DefinitionWriter.pv"
+            #line 319 "src/compiler/DefinitionWriter.pv"
             Generator__write_str_title(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            #line 320 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "\n#define PAVE_");
             #line 321 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str_title(generator, file, enum_info->name->value);
+            #line 322 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str_title(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            #line 323 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "\n");
 
-            #line 323 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "enum ");
-            #line 324 "src/compiler/DefinitionWriter.pv"
-            Generator__write_token(generator, file, enum_info->name);
             #line 325 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            fprintf(file, "enum ");
             #line 326 "src/compiler/DefinitionWriter.pv"
+            Generator__write_token(generator, file, enum_info->name);
+            #line 327 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            #line 328 "src/compiler/DefinitionWriter.pv"
             fprintf(file, " {\n");
 
-            #line 328 "src/compiler/DefinitionWriter.pv"
+            #line 330 "src/compiler/DefinitionWriter.pv"
             generator->indent += 1;
 
-            #line 330 "src/compiler/DefinitionWriter.pv"
+            #line 332 "src/compiler/DefinitionWriter.pv"
             DefinitionWriter__write_enum_variants(self, file, enum_info, generics);
 
-            #line 332 "src/compiler/DefinitionWriter.pv"
-            generator->indent -= 1;
-            #line 333 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "};\n");
             #line 334 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "#endif\n");
+            generator->indent -= 1;
             #line 335 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "};\n");
+            #line 336 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "#endif\n");
+            #line 337 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "\n");
         }
 
-        #line 338 "src/compiler/DefinitionWriter.pv"
+        #line 340 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct %.*s {\n", name_length, name.array.data);
-        #line 339 "src/compiler/DefinitionWriter.pv"
+        #line 341 "src/compiler/DefinitionWriter.pv"
         generator->indent += 1;
 
-        #line 341 "src/compiler/DefinitionWriter.pv"
+        #line 343 "src/compiler/DefinitionWriter.pv"
         if (!has_generics) {
-            #line 342 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
-            #line 343 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "enum {\n");
             #line 344 "src/compiler/DefinitionWriter.pv"
+            Generator__write_indent(generator, file);
+            #line 345 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "enum {\n");
+            #line 346 "src/compiler/DefinitionWriter.pv"
             generator->indent += 1;
 
-            #line 346 "src/compiler/DefinitionWriter.pv"
+            #line 348 "src/compiler/DefinitionWriter.pv"
             { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-            #line 346 "src/compiler/DefinitionWriter.pv"
+            #line 348 "src/compiler/DefinitionWriter.pv"
             while (HashMapIter_str_EnumVariant__next(&__iter)) {
-                #line 346 "src/compiler/DefinitionWriter.pv"
+                #line 348 "src/compiler/DefinitionWriter.pv"
                 struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-                #line 347 "src/compiler/DefinitionWriter.pv"
-                Generator__write_indent(generator, file);
-                #line 348 "src/compiler/DefinitionWriter.pv"
-                Generator__write_enum_variant_name(generator, file, generics->self_type, variant);
                 #line 349 "src/compiler/DefinitionWriter.pv"
+                Generator__write_indent(generator, file);
+                #line 350 "src/compiler/DefinitionWriter.pv"
+                Generator__write_enum_variant_name(generator, file, generics->self_type, variant);
+                #line 351 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, ",\n");
             } }
 
-            #line 352 "src/compiler/DefinitionWriter.pv"
-            generator->indent -= 1;
-            #line 353 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
             #line 354 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "} type;\n");
+            generator->indent -= 1;
             #line 355 "src/compiler/DefinitionWriter.pv"
+            Generator__write_indent(generator, file);
+            #line 356 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "} type;\n");
+            #line 357 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "\n");
         } else {
-            #line 357 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
-            #line 358 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "enum ");
             #line 359 "src/compiler/DefinitionWriter.pv"
-            Generator__write_token(generator, file, enum_info->name);
+            Generator__write_indent(generator, file);
             #line 360 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            fprintf(file, "enum ");
             #line 361 "src/compiler/DefinitionWriter.pv"
+            Generator__write_token(generator, file, enum_info->name);
+            #line 362 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str(generator, file, generator->naming_ident.enum_generic_type_suffix);
+            #line 363 "src/compiler/DefinitionWriter.pv"
             fprintf(file, " type;\n");
         }
 
-        #line 364 "src/compiler/DefinitionWriter.pv"
+        #line 366 "src/compiler/DefinitionWriter.pv"
         uintptr_t variants_with_data = 0;
-        #line 365 "src/compiler/DefinitionWriter.pv"
+        #line 367 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-        #line 365 "src/compiler/DefinitionWriter.pv"
+        #line 367 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_EnumVariant__next(&__iter)) {
-            #line 365 "src/compiler/DefinitionWriter.pv"
+            #line 367 "src/compiler/DefinitionWriter.pv"
             struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-            #line 366 "src/compiler/DefinitionWriter.pv"
+            #line 368 "src/compiler/DefinitionWriter.pv"
             variants_with_data += (uintptr_t)(variant->types.length > 0);
         } }
 
-        #line 369 "src/compiler/DefinitionWriter.pv"
+        #line 371 "src/compiler/DefinitionWriter.pv"
         if (variants_with_data > 1) {
-            #line 370 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
-            #line 371 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "union {\n");
             #line 372 "src/compiler/DefinitionWriter.pv"
+            Generator__write_indent(generator, file);
+            #line 373 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "union {\n");
+            #line 374 "src/compiler/DefinitionWriter.pv"
             generator->indent += 1;
         }
 
-        #line 375 "src/compiler/DefinitionWriter.pv"
+        #line 377 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&enum_info->variants);
-        #line 375 "src/compiler/DefinitionWriter.pv"
+        #line 377 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_EnumVariant__next(&__iter)) {
-            #line 375 "src/compiler/DefinitionWriter.pv"
+            #line 377 "src/compiler/DefinitionWriter.pv"
             struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-            #line 376 "src/compiler/DefinitionWriter.pv"
+            #line 378 "src/compiler/DefinitionWriter.pv"
             if (variant->names.length > 0) {
-                #line 377 "src/compiler/DefinitionWriter.pv"
+                #line 379 "src/compiler/DefinitionWriter.pv"
                 Generator__write_indent(generator, file);
-                #line 378 "src/compiler/DefinitionWriter.pv"
+                #line 380 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "struct { ");
 
-                #line 380 "src/compiler/DefinitionWriter.pv"
+                #line 382 "src/compiler/DefinitionWriter.pv"
                 uintptr_t i = 0;
-                #line 381 "src/compiler/DefinitionWriter.pv"
+                #line 383 "src/compiler/DefinitionWriter.pv"
                 { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
-                #line 381 "src/compiler/DefinitionWriter.pv"
+                #line 383 "src/compiler/DefinitionWriter.pv"
                 while (Iter_ref_Type__next(&__iter)) {
-                    #line 381 "src/compiler/DefinitionWriter.pv"
+                    #line 383 "src/compiler/DefinitionWriter.pv"
                     struct Type* type = Iter_ref_Type__value(&__iter);
 
-                    #line 382 "src/compiler/DefinitionWriter.pv"
-                    Generator__write_type(generator, file, type, generics);
-                    #line 383 "src/compiler/DefinitionWriter.pv"
-                    fprintf(file, " ");
                     #line 384 "src/compiler/DefinitionWriter.pv"
-                    Generator__write_str(generator, file, variant->names.data[i]);
+                    Generator__write_type(generator, file, type, generics);
                     #line 385 "src/compiler/DefinitionWriter.pv"
-                    fprintf(file, "; ");
+                    fprintf(file, " ");
                     #line 386 "src/compiler/DefinitionWriter.pv"
+                    Generator__write_str(generator, file, variant->names.data[i]);
+                    #line 387 "src/compiler/DefinitionWriter.pv"
+                    fprintf(file, "; ");
+                    #line 388 "src/compiler/DefinitionWriter.pv"
                     i += 1;
                 } }
 
-                #line 389 "src/compiler/DefinitionWriter.pv"
-                fprintf(file, "} ");
-                #line 390 "src/compiler/DefinitionWriter.pv"
-                Generator__write_str_lowercase(generator, file, variant->name->value);
                 #line 391 "src/compiler/DefinitionWriter.pv"
+                fprintf(file, "} ");
+                #line 392 "src/compiler/DefinitionWriter.pv"
+                Generator__write_str_lowercase(generator, file, variant->name->value);
+                #line 393 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "_value;\n");
             } else if (variant->types.length == 1) {
-                #line 393 "src/compiler/DefinitionWriter.pv"
-                Generator__write_indent(generator, file);
-                #line 394 "src/compiler/DefinitionWriter.pv"
-                Generator__write_type(generator, file, variant->types.data, generics);
                 #line 395 "src/compiler/DefinitionWriter.pv"
-                fprintf(file, " ");
+                Generator__write_indent(generator, file);
                 #line 396 "src/compiler/DefinitionWriter.pv"
-                struct Token* name = variant->name;
+                Generator__write_type(generator, file, variant->types.data, generics);
                 #line 397 "src/compiler/DefinitionWriter.pv"
-                Generator__write_str_lowercase(generator, file, name->value);
+                fprintf(file, " ");
                 #line 398 "src/compiler/DefinitionWriter.pv"
+                struct Token* name = variant->name;
+                #line 399 "src/compiler/DefinitionWriter.pv"
+                Generator__write_str_lowercase(generator, file, name->value);
+                #line 400 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "_value;\n");
             } else if (variant->types.length > 1) {
-                #line 400 "src/compiler/DefinitionWriter.pv"
+                #line 402 "src/compiler/DefinitionWriter.pv"
                 Generator__write_indent(generator, file);
-                #line 401 "src/compiler/DefinitionWriter.pv"
+                #line 403 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "struct { ");
 
-                #line 403 "src/compiler/DefinitionWriter.pv"
+                #line 405 "src/compiler/DefinitionWriter.pv"
                 { struct Iter_ref_Type __iter = Array_Type__iter(&variant->types);
-                #line 403 "src/compiler/DefinitionWriter.pv"
+                #line 405 "src/compiler/DefinitionWriter.pv"
                 while (Iter_ref_Type__next(&__iter)) {
-                    #line 403 "src/compiler/DefinitionWriter.pv"
+                    #line 405 "src/compiler/DefinitionWriter.pv"
                     struct Type* type = Iter_ref_Type__value(&__iter);
 
-                    #line 404 "src/compiler/DefinitionWriter.pv"
+                    #line 406 "src/compiler/DefinitionWriter.pv"
                     Generator__write_type(generator, file, type, generics);
-                    #line 405 "src/compiler/DefinitionWriter.pv"
+                    #line 407 "src/compiler/DefinitionWriter.pv"
                     fprintf(file, " _%zu; ", type - variant->types.data);
                 } }
 
-                #line 408 "src/compiler/DefinitionWriter.pv"
-                fprintf(file, "} ");
-                #line 409 "src/compiler/DefinitionWriter.pv"
-                struct Token* name = variant->name;
                 #line 410 "src/compiler/DefinitionWriter.pv"
-                Generator__write_str_lowercase(generator, file, name->value);
+                fprintf(file, "} ");
                 #line 411 "src/compiler/DefinitionWriter.pv"
+                struct Token* name = variant->name;
+                #line 412 "src/compiler/DefinitionWriter.pv"
+                Generator__write_str_lowercase(generator, file, name->value);
+                #line 413 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "_value;\n");
             }
         } }
 
-        #line 415 "src/compiler/DefinitionWriter.pv"
+        #line 417 "src/compiler/DefinitionWriter.pv"
         if (variants_with_data > 1) {
-            #line 416 "src/compiler/DefinitionWriter.pv"
-            generator->indent -= 1;
-            #line 417 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
             #line 418 "src/compiler/DefinitionWriter.pv"
+            generator->indent -= 1;
+            #line 419 "src/compiler/DefinitionWriter.pv"
+            Generator__write_indent(generator, file);
+            #line 420 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "};\n");
         }
 
-        #line 421 "src/compiler/DefinitionWriter.pv"
+        #line 423 "src/compiler/DefinitionWriter.pv"
         generator->indent -= 1;
-        #line 422 "src/compiler/DefinitionWriter.pv"
+        #line 424 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "};\n");
     }
 
-    #line 425 "src/compiler/DefinitionWriter.pv"
+    #line 427 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "\n");
-    #line 426 "src/compiler/DefinitionWriter.pv"
+    #line 428 "src/compiler/DefinitionWriter.pv"
     IncludeWriter__write(include_writer, file, generator, &usage_context->signature, generics, false);
 
-    #line 428 "src/compiler/DefinitionWriter.pv"
+    #line 430 "src/compiler/DefinitionWriter.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&enum_info->impls));
-    #line 428 "src/compiler/DefinitionWriter.pv"
+    #line 430 "src/compiler/DefinitionWriter.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 428 "src/compiler/DefinitionWriter.pv"
+        #line 430 "src/compiler/DefinitionWriter.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 428 "src/compiler/DefinitionWriter.pv"
+        #line 430 "src/compiler/DefinitionWriter.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 429 "src/compiler/DefinitionWriter.pv"
+        #line 431 "src/compiler/DefinitionWriter.pv"
         struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
-        #line 430 "src/compiler/DefinitionWriter.pv"
-        if (usage != 0) {
-            #line 430 "src/compiler/DefinitionWriter.pv"
-            impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(&usage->impl_functions, impl_index);
+        #line 432 "src/compiler/DefinitionWriter.pv"
+        if (usage_context->impl_functions.length > impl_index) {
+            #line 432 "src/compiler/DefinitionWriter.pv"
+            impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(&usage_context->impl_functions, impl_index);
         }
 
-        #line 432 "src/compiler/DefinitionWriter.pv"
+        #line 434 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 432 "src/compiler/DefinitionWriter.pv"
+        #line 434 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 432 "src/compiler/DefinitionWriter.pv"
+            #line 434 "src/compiler/DefinitionWriter.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 433 "src/compiler/DefinitionWriter.pv"
-            uintptr_t func_ptr = (uintptr_t)(func_info);
-            #line 434 "src/compiler/DefinitionWriter.pv"
-            struct TypeFunctionUsage* function_usage = 0;
             #line 435 "src/compiler/DefinitionWriter.pv"
+            uintptr_t func_ptr = (uintptr_t)(func_info);
+            #line 436 "src/compiler/DefinitionWriter.pv"
+            struct TypeFunctionUsage* function_usage = 0;
+            #line 437 "src/compiler/DefinitionWriter.pv"
             if (impl_functions_for_impl != 0) {
-                #line 435 "src/compiler/DefinitionWriter.pv"
+                #line 437 "src/compiler/DefinitionWriter.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 437 "src/compiler/DefinitionWriter.pv"
+            #line 439 "src/compiler/DefinitionWriter.pv"
             if (func_info->generics.array.length == 0) {
-                #line 438 "src/compiler/DefinitionWriter.pv"
+                #line 440 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
-                #line 439 "src/compiler/DefinitionWriter.pv"
+                #line 441 "src/compiler/DefinitionWriter.pv"
                 if (!DefinitionWriter__write_function_definition(self, file, func_info, generics, 0)) {
-                    #line 439 "src/compiler/DefinitionWriter.pv"
+                    #line 441 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }
-                #line 440 "src/compiler/DefinitionWriter.pv"
+                #line 442 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, ";\n");
             }
 
-            #line 443 "src/compiler/DefinitionWriter.pv"
-            if (impl_functions_for_impl != 0 && function_usage != 0) {
-                #line 444 "src/compiler/DefinitionWriter.pv"
+            #line 445 "src/compiler/DefinitionWriter.pv"
+            if (impl_functions_for_impl != 0 && function_usage != 0 && func_info->generics.array.length > 0) {
+                #line 446 "src/compiler/DefinitionWriter.pv"
                 { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
-                #line 444 "src/compiler/DefinitionWriter.pv"
+                #line 446 "src/compiler/DefinitionWriter.pv"
                 while (Iter_ref_UsageContext__next(&__iter)) {
-                    #line 444 "src/compiler/DefinitionWriter.pv"
+                    #line 446 "src/compiler/DefinitionWriter.pv"
                     struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-                    #line 445 "src/compiler/DefinitionWriter.pv"
-                    IncludeWriter__write(include_writer, file, generator, &usage_context->signature, usage_context->generic_map, false);
-                    #line 446 "src/compiler/DefinitionWriter.pv"
-                    usage_context->generic_map->self_type = generics->self_type;
                     #line 447 "src/compiler/DefinitionWriter.pv"
-                    fprintf(file, "\n");
+                    IncludeWriter__write(include_writer, file, generator, &usage_context->signature, usage_context->generic_map, false);
                     #line 448 "src/compiler/DefinitionWriter.pv"
+                    usage_context->generic_map->self_type = generics->self_type;
+                    #line 449 "src/compiler/DefinitionWriter.pv"
+                    fprintf(file, "\n");
+                    #line 450 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_function_definition(self, file, func_info, usage_context->generic_map, 0)) {
-                        #line 448 "src/compiler/DefinitionWriter.pv"
+                        #line 450 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
-                    #line 449 "src/compiler/DefinitionWriter.pv"
+                    #line 451 "src/compiler/DefinitionWriter.pv"
                     fprintf(file, ";\n");
                 } }
             }
         } }
 
-        #line 454 "src/compiler/DefinitionWriter.pv"
+        #line 456 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_ref_ImplConst __iter = HashMap_str_ref_ImplConst__iter(&impl_info->consts);
-        #line 454 "src/compiler/DefinitionWriter.pv"
+        #line 456 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_ref_ImplConst__next(&__iter)) {
-            #line 454 "src/compiler/DefinitionWriter.pv"
+            #line 456 "src/compiler/DefinitionWriter.pv"
             struct ImplConst* impl_const = HashMapIter_str_ref_ImplConst__value(&__iter)->_1;
 
-            #line 455 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "\nextern const ");
-            #line 456 "src/compiler/DefinitionWriter.pv"
-            Generator__write_type(generator, file, &impl_const->type, generics);
             #line 457 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, " ");
+            fprintf(file, "\nextern const ");
             #line 458 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, String__as_str(&name));
+            Generator__write_type(generator, file, &impl_const->type, generics);
             #line 459 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "_");
+            fprintf(file, " ");
             #line 460 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, impl_const->name->value);
+            Generator__write_str_title(generator, file, String__as_str(&name));
             #line 461 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "_");
+            #line 462 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str_title(generator, file, impl_const->name->value);
+            #line 463 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }
     } }
 
-    #line 465 "src/compiler/DefinitionWriter.pv"
+    #line 467 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 468 "src/compiler/DefinitionWriter.pv"
+#line 470 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_struct_definition(struct DefinitionWriter* self, FILE* file, struct Struct* struct_info, struct TypeUsage_Struct* usage, struct UsageContext* usage_context) {
-    #line 469 "src/compiler/DefinitionWriter.pv"
-    struct Generator* generator = self->generator;
-    #line 470 "src/compiler/DefinitionWriter.pv"
-    struct GenericMap* generics = usage_context->generic_map;
     #line 471 "src/compiler/DefinitionWriter.pv"
-    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
+    struct Generator* generator = self->generator;
     #line 472 "src/compiler/DefinitionWriter.pv"
-    int32_t name_length = name.array.length;
+    struct GenericMap* generics = usage_context->generic_map;
     #line 473 "src/compiler/DefinitionWriter.pv"
-    struct Array_HashMap_usize_TypeFunctionUsage* impl_functions = &usage->impl_functions;
+    struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
     #line 474 "src/compiler/DefinitionWriter.pv"
+    int32_t name_length = name.array.length;
+    #line 475 "src/compiler/DefinitionWriter.pv"
+    struct Array_HashMap_usize_TypeFunctionUsage* impl_functions = &usage_context->impl_functions;
+    #line 476 "src/compiler/DefinitionWriter.pv"
     struct IncludeWriter include_writer = IncludeWriter__new(generator->allocator);
 
-    #line 476 "src/compiler/DefinitionWriter.pv"
+    #line 478 "src/compiler/DefinitionWriter.pv"
     Generator__write_line_directive(generator, file, &struct_info->module->context, struct_info->name);
 
-    #line 478 "src/compiler/DefinitionWriter.pv"
+    #line 480 "src/compiler/DefinitionWriter.pv"
     if (struct_info->type == STRUCT_TYPE__INCOMPLETE) {
-        #line 479 "src/compiler/DefinitionWriter.pv"
+        #line 481 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct %.*s;\n", name_length, name.array.data);
     } else if (Struct__is_newtype(struct_info)) {
-        #line 481 "src/compiler/DefinitionWriter.pv"
-        struct StructField* field = &struct_info->fields.data[0].value;
-        #line 482 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "typedef ");
         #line 483 "src/compiler/DefinitionWriter.pv"
-        Generator__write_type(generator, file, &field->type, generics);
+        struct StructField* field = &struct_info->fields.data[0].value;
         #line 484 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "typedef ");
+        #line 485 "src/compiler/DefinitionWriter.pv"
+        Generator__write_type(generator, file, &field->type, generics);
+        #line 486 "src/compiler/DefinitionWriter.pv"
         fprintf(file, " %.*s;\n", name_length, name.array.data);
     } else {
-        #line 486 "src/compiler/DefinitionWriter.pv"
+        #line 488 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct %.*s {\n", name_length, name.array.data);
-        #line 487 "src/compiler/DefinitionWriter.pv"
+        #line 489 "src/compiler/DefinitionWriter.pv"
         generator->indent += 1;
 
-        #line 489 "src/compiler/DefinitionWriter.pv"
+        #line 491 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_StructField __iter = HashMap_str_StructField__iter(&struct_info->fields);
-        #line 489 "src/compiler/DefinitionWriter.pv"
+        #line 491 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_StructField__next(&__iter)) {
-            #line 489 "src/compiler/DefinitionWriter.pv"
+            #line 491 "src/compiler/DefinitionWriter.pv"
             struct StructField* field = &HashMapIter_str_StructField__value(&__iter)->_1;
 
-            #line 490 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
-            #line 491 "src/compiler/DefinitionWriter.pv"
-            Generator__write_variable_decl(generator, file, field->name->value, &field->type, generics);
             #line 492 "src/compiler/DefinitionWriter.pv"
+            Generator__write_indent(generator, file);
+            #line 493 "src/compiler/DefinitionWriter.pv"
+            Generator__write_variable_decl(generator, file, field->name->value, &field->type, generics);
+            #line 494 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }
 
-        #line 495 "src/compiler/DefinitionWriter.pv"
+        #line 497 "src/compiler/DefinitionWriter.pv"
         generator->indent -= 1;
-        #line 496 "src/compiler/DefinitionWriter.pv"
+        #line 498 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "};\n");
     }
 
-    #line 499 "src/compiler/DefinitionWriter.pv"
+    #line 501 "src/compiler/DefinitionWriter.pv"
     if (usage_context->signature.length > 0) {
-        #line 499 "src/compiler/DefinitionWriter.pv"
+        #line 501 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "\n");
     }
-    #line 500 "src/compiler/DefinitionWriter.pv"
+    #line 502 "src/compiler/DefinitionWriter.pv"
     IncludeWriter__write(&include_writer, file, generator, &usage_context->signature, generics, false);
 
-    #line 502 "src/compiler/DefinitionWriter.pv"
+    #line 504 "src/compiler/DefinitionWriter.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(&struct_info->impls));
-    #line 502 "src/compiler/DefinitionWriter.pv"
+    #line 504 "src/compiler/DefinitionWriter.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 502 "src/compiler/DefinitionWriter.pv"
+        #line 504 "src/compiler/DefinitionWriter.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 502 "src/compiler/DefinitionWriter.pv"
+        #line 504 "src/compiler/DefinitionWriter.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 503 "src/compiler/DefinitionWriter.pv"
-        struct Trait* trait_info = impl_info->trait_;
-        #line 504 "src/compiler/DefinitionWriter.pv"
-        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
         #line 505 "src/compiler/DefinitionWriter.pv"
+        struct Trait* trait_info = impl_info->trait_;
+        #line 506 "src/compiler/DefinitionWriter.pv"
+        struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
+        #line 507 "src/compiler/DefinitionWriter.pv"
         if (impl_functions != 0) {
-            #line 505 "src/compiler/DefinitionWriter.pv"
+            #line 507 "src/compiler/DefinitionWriter.pv"
             impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(impl_functions, impl_index);
         }
 
-        #line 507 "src/compiler/DefinitionWriter.pv"
+        #line 509 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 507 "src/compiler/DefinitionWriter.pv"
+        #line 509 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 507 "src/compiler/DefinitionWriter.pv"
+            #line 509 "src/compiler/DefinitionWriter.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 508 "src/compiler/DefinitionWriter.pv"
-            uintptr_t func_ptr = (uintptr_t)(func_info);
-            #line 509 "src/compiler/DefinitionWriter.pv"
-            struct TypeFunctionUsage* function_usage = 0;
             #line 510 "src/compiler/DefinitionWriter.pv"
+            uintptr_t func_ptr = (uintptr_t)(func_info);
+            #line 511 "src/compiler/DefinitionWriter.pv"
+            struct TypeFunctionUsage* function_usage = 0;
+            #line 512 "src/compiler/DefinitionWriter.pv"
             if (impl_functions_for_impl != 0) {
-                #line 510 "src/compiler/DefinitionWriter.pv"
+                #line 512 "src/compiler/DefinitionWriter.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 512 "src/compiler/DefinitionWriter.pv"
+            #line 514 "src/compiler/DefinitionWriter.pv"
             if (func_info->generics.array.length == 0) {
-                #line 513 "src/compiler/DefinitionWriter.pv"
+                #line 515 "src/compiler/DefinitionWriter.pv"
                 if (trait_info == 0) {
-                    #line 514 "src/compiler/DefinitionWriter.pv"
-                    if (func_info->type == FUNCTION_TYPE__COROUTINE && function_usage != 0) {
-                        #line 515 "src/compiler/DefinitionWriter.pv"
-                        generator->function_context = &function_usage->function_context;
-                        #line 516 "src/compiler/DefinitionWriter.pv"
-                        DefinitionWriter__write_function_coroutine(self, file, func_info, generics);
+                    #line 516 "src/compiler/DefinitionWriter.pv"
+                    if (func_info->type == FUNCTION_TYPE__COROUTINE && function_usage != 0 && function_usage->usage_contexts.length > 0) {
                         #line 517 "src/compiler/DefinitionWriter.pv"
+                        generator->function_context = &function_usage->usage_contexts.data[0].function_context;
+                        #line 518 "src/compiler/DefinitionWriter.pv"
+                        DefinitionWriter__write_function_coroutine(self, file, func_info, generics);
+                        #line 519 "src/compiler/DefinitionWriter.pv"
                         generator->function_context = 0;
                     }
 
-                    #line 520 "src/compiler/DefinitionWriter.pv"
+                    #line 522 "src/compiler/DefinitionWriter.pv"
                     fprintf(file, "\n");
-                    #line 521 "src/compiler/DefinitionWriter.pv"
+                    #line 523 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_function_definition(self, file, func_info, generics, 0)) {
-                        #line 521 "src/compiler/DefinitionWriter.pv"
+                        #line 523 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
                 } else {
-                    #line 523 "src/compiler/DefinitionWriter.pv"
+                    #line 525 "src/compiler/DefinitionWriter.pv"
                     fprintf(file, "\n");
-                    #line 524 "src/compiler/DefinitionWriter.pv"
+                    #line 526 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_trait_function_decl(self, file, String__as_str(&name), trait_info, &impl_info->trait_type, func_info, generics)) {
-                        #line 524 "src/compiler/DefinitionWriter.pv"
+                        #line 526 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
                 }
 
-                #line 527 "src/compiler/DefinitionWriter.pv"
+                #line 529 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, ";\n");
             }
 
-            #line 530 "src/compiler/DefinitionWriter.pv"
+            #line 532 "src/compiler/DefinitionWriter.pv"
             if (impl_functions_for_impl != 0) {
-                #line 531 "src/compiler/DefinitionWriter.pv"
+                #line 533 "src/compiler/DefinitionWriter.pv"
                 struct TypeFunctionUsage* function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
-                #line 532 "src/compiler/DefinitionWriter.pv"
+                #line 534 "src/compiler/DefinitionWriter.pv"
                 if (function_usage != 0) {
-                    #line 533 "src/compiler/DefinitionWriter.pv"
-                    { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
-                    #line 533 "src/compiler/DefinitionWriter.pv"
-                    while (Iter_ref_UsageContext__next(&__iter)) {
-                        #line 533 "src/compiler/DefinitionWriter.pv"
-                        struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
+                    #line 535 "src/compiler/DefinitionWriter.pv"
+                    if (func_info->generics.array.length > 0) {
+                        #line 536 "src/compiler/DefinitionWriter.pv"
+                        { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
+                        #line 536 "src/compiler/DefinitionWriter.pv"
+                        while (Iter_ref_UsageContext__next(&__iter)) {
+                            #line 536 "src/compiler/DefinitionWriter.pv"
+                            struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
 
-                        #line 534 "src/compiler/DefinitionWriter.pv"
-                        IncludeWriter__write(&include_writer, file, generator, &usage_context->signature, usage_context->generic_map, false);
-                        #line 537 "src/compiler/DefinitionWriter.pv"
-                        usage_context->generic_map->self_type = generics->self_type;
-                        #line 538 "src/compiler/DefinitionWriter.pv"
-                        fprintf(file, "\n");
-                        #line 539 "src/compiler/DefinitionWriter.pv"
-                        if (!DefinitionWriter__write_function_definition(self, file, func_info, usage_context->generic_map, 0)) {
-                            #line 539 "src/compiler/DefinitionWriter.pv"
-                            return false;
-                        }
-                        #line 540 "src/compiler/DefinitionWriter.pv"
-                        fprintf(file, ";\n");
-                    } }
+                            #line 537 "src/compiler/DefinitionWriter.pv"
+                            IncludeWriter__write(&include_writer, file, generator, &usage_context->signature, usage_context->generic_map, false);
+                            #line 540 "src/compiler/DefinitionWriter.pv"
+                            usage_context->generic_map->self_type = generics->self_type;
+                            #line 541 "src/compiler/DefinitionWriter.pv"
+                            fprintf(file, "\n");
+                            #line 542 "src/compiler/DefinitionWriter.pv"
+                            if (!DefinitionWriter__write_function_definition(self, file, func_info, usage_context->generic_map, 0)) {
+                                #line 542 "src/compiler/DefinitionWriter.pv"
+                                return false;
+                            }
+                            #line 543 "src/compiler/DefinitionWriter.pv"
+                            fprintf(file, ";\n");
+                        } }
+                    }
 
-                    #line 543 "src/compiler/DefinitionWriter.pv"
+                    #line 547 "src/compiler/DefinitionWriter.pv"
                     if (function_usage->impl_dynamic_function) {
-                        #line 544 "src/compiler/DefinitionWriter.pv"
+                        #line 548 "src/compiler/DefinitionWriter.pv"
                         DefinitionWriter__write_dynamic_function_instance_header(self, file, func_info, struct_info->name->value, generics, func_info->type == FUNCTION_TYPE__COROUTINE);
                     }
                 }
             }
         } }
 
-        #line 550 "src/compiler/DefinitionWriter.pv"
+        #line 554 "src/compiler/DefinitionWriter.pv"
         if (trait_info != 0) {
-            #line 551 "src/compiler/DefinitionWriter.pv"
+            #line 555 "src/compiler/DefinitionWriter.pv"
             if (!DefinitionWriter__write_trait_default_decls(self, file, String__as_str(&name), impl_info, trait_info, generics)) {
-                #line 551 "src/compiler/DefinitionWriter.pv"
+                #line 555 "src/compiler/DefinitionWriter.pv"
                 return false;
             }
         }
 
-        #line 554 "src/compiler/DefinitionWriter.pv"
+        #line 558 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_ref_ImplConst __iter = HashMap_str_ref_ImplConst__iter(&impl_info->consts);
-        #line 554 "src/compiler/DefinitionWriter.pv"
+        #line 558 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_ref_ImplConst__next(&__iter)) {
-            #line 554 "src/compiler/DefinitionWriter.pv"
+            #line 558 "src/compiler/DefinitionWriter.pv"
             struct ImplConst* impl_const = HashMapIter_str_ref_ImplConst__value(&__iter)->_1;
 
-            #line 555 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "\nextern const ");
-            #line 556 "src/compiler/DefinitionWriter.pv"
-            Generator__write_type(generator, file, &impl_const->type, generics);
-            #line 557 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, " ");
-            #line 558 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, String__as_str(&name));
             #line 559 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "_");
+            fprintf(file, "\nextern const ");
             #line 560 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, impl_const->name->value);
+            Generator__write_type(generator, file, &impl_const->type, generics);
             #line 561 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, " ");
+            #line 562 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str_title(generator, file, String__as_str(&name));
+            #line 563 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "_");
+            #line 564 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str_title(generator, file, impl_const->name->value);
+            #line 565 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }
     } }
 
-    #line 565 "src/compiler/DefinitionWriter.pv"
+    #line 569 "src/compiler/DefinitionWriter.pv"
     if (struct_info->traits.length > 0) {
-        #line 565 "src/compiler/DefinitionWriter.pv"
+        #line 569 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "\n");
     }
 
-    #line 567 "src/compiler/DefinitionWriter.pv"
+    #line 571 "src/compiler/DefinitionWriter.pv"
     { struct HashMapIter_str_tuple_ref_Trait_ref_Type __iter = HashMap_str_tuple_ref_Trait_ref_Type__iter(&struct_info->traits);
-    #line 567 "src/compiler/DefinitionWriter.pv"
+    #line 571 "src/compiler/DefinitionWriter.pv"
     while (HashMapIter_str_tuple_ref_Trait_ref_Type__next(&__iter)) {
-        #line 567 "src/compiler/DefinitionWriter.pv"
+        #line 571 "src/compiler/DefinitionWriter.pv"
         struct tuple_ref_Trait_ref_Type trait_entry = HashMapIter_str_tuple_ref_Trait_ref_Type__value(&__iter)->_1;
 
-        #line 568 "src/compiler/DefinitionWriter.pv"
+        #line 572 "src/compiler/DefinitionWriter.pv"
         struct Trait* trait_info = trait_entry._0;
-        #line 569 "src/compiler/DefinitionWriter.pv"
+        #line 573 "src/compiler/DefinitionWriter.pv"
         if (!Trait__has_dynamic_dispatch(trait_info)) {
-            #line 569 "src/compiler/DefinitionWriter.pv"
+            #line 573 "src/compiler/DefinitionWriter.pv"
             continue;
         }
-        #line 570 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "extern struct ");
-        #line 571 "src/compiler/DefinitionWriter.pv"
-        Generator__write_type_name(generator, file, trait_entry._1, generics);
-        #line 572 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "VTable ");
-        #line 573 "src/compiler/DefinitionWriter.pv"
-        Generator__write_str_title(generator, file, String__as_str(&name));
         #line 574 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__VTABLE__");
+        fprintf(file, "extern struct ");
         #line 575 "src/compiler/DefinitionWriter.pv"
-        Generator__write_str_title(generator, file, trait_info->name->value);
+        Generator__write_type_name(generator, file, trait_entry._1, generics);
         #line 576 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "VTable ");
+        #line 577 "src/compiler/DefinitionWriter.pv"
+        Generator__write_str_title(generator, file, String__as_str(&name));
+        #line 578 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "__VTABLE__");
+        #line 579 "src/compiler/DefinitionWriter.pv"
+        Generator__write_str_title(generator, file, trait_info->name->value);
+        #line 580 "src/compiler/DefinitionWriter.pv"
         fprintf(file, ";\n");
     } }
 
-    #line 579 "src/compiler/DefinitionWriter.pv"
+    #line 583 "src/compiler/DefinitionWriter.pv"
     if (usage->impl_dynamic_usage) {
-        #line 580 "src/compiler/DefinitionWriter.pv"
+        #line 584 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "#include <std/trait_Struct.h>\n");
-        #line 581 "src/compiler/DefinitionWriter.pv"
+        #line 585 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "extern struct trait_StructVTable ");
-        #line 582 "src/compiler/DefinitionWriter.pv"
+        #line 586 "src/compiler/DefinitionWriter.pv"
         Generator__write_str_title(generator, file, String__as_str(&name));
-        #line 583 "src/compiler/DefinitionWriter.pv"
+        #line 587 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__VTABLE__STRUCT;\n");
     }
 
-    #line 586 "src/compiler/DefinitionWriter.pv"
+    #line 590 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 589 "src/compiler/DefinitionWriter.pv"
+#line 593 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_impl_definition(struct DefinitionWriter* self, FILE* file, struct str name, struct Impl* impl_info, struct GenericMap* generics) {
-    #line 590 "src/compiler/DefinitionWriter.pv"
+    #line 594 "src/compiler/DefinitionWriter.pv"
     struct Trait* trait_info = impl_info->trait_;
 
-    #line 592 "src/compiler/DefinitionWriter.pv"
+    #line 596 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "\n");
 
-    #line 594 "src/compiler/DefinitionWriter.pv"
+    #line 598 "src/compiler/DefinitionWriter.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-    #line 594 "src/compiler/DefinitionWriter.pv"
+    #line 598 "src/compiler/DefinitionWriter.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 594 "src/compiler/DefinitionWriter.pv"
+        #line 598 "src/compiler/DefinitionWriter.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 595 "src/compiler/DefinitionWriter.pv"
+        #line 599 "src/compiler/DefinitionWriter.pv"
         if (func_info->generics.array.length == 0) {
-            #line 596 "src/compiler/DefinitionWriter.pv"
+            #line 600 "src/compiler/DefinitionWriter.pv"
             if (trait_info == 0) {
-                #line 597 "src/compiler/DefinitionWriter.pv"
+                #line 601 "src/compiler/DefinitionWriter.pv"
                 if (!DefinitionWriter__write_function_definition(self, file, func_info, generics, 0)) {
-                    #line 597 "src/compiler/DefinitionWriter.pv"
+                    #line 601 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }
             } else {
-                #line 599 "src/compiler/DefinitionWriter.pv"
+                #line 603 "src/compiler/DefinitionWriter.pv"
                 if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, &impl_info->trait_type, func_info, generics)) {
-                    #line 599 "src/compiler/DefinitionWriter.pv"
+                    #line 603 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }
             }
 
-            #line 602 "src/compiler/DefinitionWriter.pv"
+            #line 606 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         }
     } }
 
-    #line 606 "src/compiler/DefinitionWriter.pv"
+    #line 610 "src/compiler/DefinitionWriter.pv"
     if (trait_info != 0) {
-        #line 607 "src/compiler/DefinitionWriter.pv"
+        #line 611 "src/compiler/DefinitionWriter.pv"
         if (!DefinitionWriter__write_trait_default_decls(self, file, name, impl_info, trait_info, generics)) {
-            #line 607 "src/compiler/DefinitionWriter.pv"
+            #line 611 "src/compiler/DefinitionWriter.pv"
             return false;
         }
     }
 
-    #line 610 "src/compiler/DefinitionWriter.pv"
+    #line 614 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 613 "src/compiler/DefinitionWriter.pv"
+#line 617 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_primitive_definition(struct DefinitionWriter* self, FILE* file, struct Primitive* primitive_info, struct GenericMap* generics) {
-    #line 614 "src/compiler/DefinitionWriter.pv"
+    #line 618 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 615 "src/compiler/DefinitionWriter.pv"
+    #line 619 "src/compiler/DefinitionWriter.pv"
     struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
 
-    #line 617 "src/compiler/DefinitionWriter.pv"
+    #line 621 "src/compiler/DefinitionWriter.pv"
     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
-    #line 617 "src/compiler/DefinitionWriter.pv"
+    #line 621 "src/compiler/DefinitionWriter.pv"
     while (Iter_ref_ref_Impl__next(&__iter)) {
-        #line 617 "src/compiler/DefinitionWriter.pv"
+        #line 621 "src/compiler/DefinitionWriter.pv"
         struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-        #line 618 "src/compiler/DefinitionWriter.pv"
+        #line 622 "src/compiler/DefinitionWriter.pv"
         DefinitionWriter__write_impl_definition(self, file, String__as_str(&name), impl_info, generics);
     } }
 
-    #line 621 "src/compiler/DefinitionWriter.pv"
+    #line 625 "src/compiler/DefinitionWriter.pv"
     if (primitive_info->impls.length > 0) {
-        #line 621 "src/compiler/DefinitionWriter.pv"
+        #line 625 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "\n");
     }
 
-    #line 623 "src/compiler/DefinitionWriter.pv"
+    #line 627 "src/compiler/DefinitionWriter.pv"
     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
-    #line 623 "src/compiler/DefinitionWriter.pv"
+    #line 627 "src/compiler/DefinitionWriter.pv"
     while (Iter_ref_ref_Impl__next(&__iter)) {
-        #line 623 "src/compiler/DefinitionWriter.pv"
+        #line 627 "src/compiler/DefinitionWriter.pv"
         struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-        #line 624 "src/compiler/DefinitionWriter.pv"
-        if (!impl_info->has_trait || impl_info->trait_ == 0) {
-            #line 624 "src/compiler/DefinitionWriter.pv"
-            continue;
-        }
-        #line 625 "src/compiler/DefinitionWriter.pv"
-        struct Trait* trait_info = impl_info->trait_;
-        #line 626 "src/compiler/DefinitionWriter.pv"
-        if (!Trait__has_dynamic_dispatch(trait_info)) {
-            #line 626 "src/compiler/DefinitionWriter.pv"
-            continue;
-        }
-        #line 627 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "extern struct ");
         #line 628 "src/compiler/DefinitionWriter.pv"
-        Generator__write_type_name(generator, file, &impl_info->trait_type, generics);
+        if (!impl_info->has_trait || impl_info->trait_ == 0) {
+            #line 628 "src/compiler/DefinitionWriter.pv"
+            continue;
+        }
         #line 629 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "VTable ");
+        struct Trait* trait_info = impl_info->trait_;
         #line 630 "src/compiler/DefinitionWriter.pv"
-        Generator__write_str_title(generator, file, String__as_str(&name));
+        if (!Trait__has_dynamic_dispatch(trait_info)) {
+            #line 630 "src/compiler/DefinitionWriter.pv"
+            continue;
+        }
         #line 631 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__VTABLE__");
+        fprintf(file, "extern struct ");
         #line 632 "src/compiler/DefinitionWriter.pv"
-        Generator__write_str_title(generator, file, trait_info->name->value);
+        Generator__write_type_name(generator, file, &impl_info->trait_type, generics);
         #line 633 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "VTable ");
+        #line 634 "src/compiler/DefinitionWriter.pv"
+        Generator__write_str_title(generator, file, String__as_str(&name));
+        #line 635 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "__VTABLE__");
+        #line 636 "src/compiler/DefinitionWriter.pv"
+        Generator__write_str_title(generator, file, trait_info->name->value);
+        #line 637 "src/compiler/DefinitionWriter.pv"
         fprintf(file, ";\n");
     } }
 
-    #line 636 "src/compiler/DefinitionWriter.pv"
+    #line 640 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 639 "src/compiler/DefinitionWriter.pv"
+#line 643 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_trait_definition(struct DefinitionWriter* self, FILE* file, struct Trait* trait_info, struct GenericMap* generics) {
-    #line 640 "src/compiler/DefinitionWriter.pv"
+    #line 644 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 641 "src/compiler/DefinitionWriter.pv"
+    #line 645 "src/compiler/DefinitionWriter.pv"
     struct GenericMap void_self_generics = *generics;
-    #line 642 "src/compiler/DefinitionWriter.pv"
+    #line 646 "src/compiler/DefinitionWriter.pv"
     void_self_generics.self_type = &generator->root->type_void;
 
-    #line 644 "src/compiler/DefinitionWriter.pv"
+    #line 648 "src/compiler/DefinitionWriter.pv"
     struct String name = Naming__get_type_name(&generator->naming_ident, generics->self_type, generics->self_type, generics);
-    #line 645 "src/compiler/DefinitionWriter.pv"
+    #line 649 "src/compiler/DefinitionWriter.pv"
     int32_t name_length = name.array.length;
 
-    #line 647 "src/compiler/DefinitionWriter.pv"
+    #line 651 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "\n");
-    #line 648 "src/compiler/DefinitionWriter.pv"
+    #line 652 "src/compiler/DefinitionWriter.pv"
     Generator__write_line_directive(generator, file, &trait_info->module->context, trait_info->name);
 
-    #line 650 "src/compiler/DefinitionWriter.pv"
+    #line 654 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "struct %.*sVTable {\n", name_length, name.array.data);
-    #line 651 "src/compiler/DefinitionWriter.pv"
+    #line 655 "src/compiler/DefinitionWriter.pv"
     generator->indent += 1;
 
-    #line 653 "src/compiler/DefinitionWriter.pv"
+    #line 657 "src/compiler/DefinitionWriter.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-    #line 653 "src/compiler/DefinitionWriter.pv"
+    #line 657 "src/compiler/DefinitionWriter.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 653 "src/compiler/DefinitionWriter.pv"
+        #line 657 "src/compiler/DefinitionWriter.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 654 "src/compiler/DefinitionWriter.pv"
+        #line 658 "src/compiler/DefinitionWriter.pv"
         if (func_info->generics.array.length == 0) {
-            #line 655 "src/compiler/DefinitionWriter.pv"
+            #line 659 "src/compiler/DefinitionWriter.pv"
             struct String func_name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator });
-            #line 656 "src/compiler/DefinitionWriter.pv"
+            #line 660 "src/compiler/DefinitionWriter.pv"
             String__append(&func_name, (struct str){ .ptr = "(*fn_", .length = strlen("(*fn_") });
-            #line 657 "src/compiler/DefinitionWriter.pv"
+            #line 661 "src/compiler/DefinitionWriter.pv"
             String__append(&func_name, func_info->name->value);
-            #line 658 "src/compiler/DefinitionWriter.pv"
+            #line 662 "src/compiler/DefinitionWriter.pv"
             String__append(&func_name, (struct str){ .ptr = ")", .length = strlen(")") });
 
-            #line 660 "src/compiler/DefinitionWriter.pv"
+            #line 664 "src/compiler/DefinitionWriter.pv"
             if (!DefinitionWriter__write_function_definition(self, file, func_info, &void_self_generics, &func_name)) {
-                #line 660 "src/compiler/DefinitionWriter.pv"
+                #line 664 "src/compiler/DefinitionWriter.pv"
                 return false;
             }
-            #line 661 "src/compiler/DefinitionWriter.pv"
+            #line 665 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         }
     } }
 
-    #line 665 "src/compiler/DefinitionWriter.pv"
+    #line 669 "src/compiler/DefinitionWriter.pv"
     generator->indent -= 1;
-    #line 666 "src/compiler/DefinitionWriter.pv"
+    #line 670 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "};\n\n");
 
-    #line 668 "src/compiler/DefinitionWriter.pv"
+    #line 672 "src/compiler/DefinitionWriter.pv"
     Generator__write_line_directive(generator, file, &trait_info->module->context, trait_info->name);
 
-    #line 670 "src/compiler/DefinitionWriter.pv"
+    #line 674 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "struct %.*s {\n", name_length, name.array.data);
-    #line 671 "src/compiler/DefinitionWriter.pv"
+    #line 675 "src/compiler/DefinitionWriter.pv"
     generator->indent += 1;
 
-    #line 673 "src/compiler/DefinitionWriter.pv"
+    #line 677 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 674 "src/compiler/DefinitionWriter.pv"
+    #line 678 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "const struct %.*sVTable* vtable;\n", name_length, name.array.data);
-    #line 675 "src/compiler/DefinitionWriter.pv"
+    #line 679 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 676 "src/compiler/DefinitionWriter.pv"
+    #line 680 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "void* instance;\n");
 
-    #line 678 "src/compiler/DefinitionWriter.pv"
+    #line 682 "src/compiler/DefinitionWriter.pv"
     generator->indent -= 1;
-    #line 679 "src/compiler/DefinitionWriter.pv"
+    #line 683 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "};\n");
 
-    #line 681 "src/compiler/DefinitionWriter.pv"
+    #line 685 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 684 "src/compiler/DefinitionWriter.pv"
-bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct Type* impl_trait_type, struct GenericMap* generics, struct Module* module, struct TypeFunctionUsage* function_usage) {
-    #line 685 "src/compiler/DefinitionWriter.pv"
+#line 688 "src/compiler/DefinitionWriter.pv"
+bool DefinitionWriter__write_trait_function_with_body(struct DefinitionWriter* self, FILE* file, struct str name, struct Function* func_info, struct Trait* trait_info, struct Type* impl_trait_type, struct GenericMap* generics, struct Module* module, struct UsageContext* function_usage_context) {
+    #line 689 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 686 "src/compiler/DefinitionWriter.pv"
+    #line 690 "src/compiler/DefinitionWriter.pv"
     if (!DefinitionWriter__write_trait_function_decl(self, file, name, trait_info, impl_trait_type, func_info, generics)) {
-        #line 687 "src/compiler/DefinitionWriter.pv"
+        #line 691 "src/compiler/DefinitionWriter.pv"
         uint32_t name_length = name.length;
-        #line 688 "src/compiler/DefinitionWriter.pv"
+        #line 692 "src/compiler/DefinitionWriter.pv"
         uint32_t func_name_length = func_info->name->value.length;
-        #line 689 "src/compiler/DefinitionWriter.pv"
+        #line 693 "src/compiler/DefinitionWriter.pv"
         fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info->name->value.ptr);
-        #line 690 "src/compiler/DefinitionWriter.pv"
+        #line 694 "src/compiler/DefinitionWriter.pv"
         return false;
     }
 
-    #line 693 "src/compiler/DefinitionWriter.pv"
+    #line 697 "src/compiler/DefinitionWriter.pv"
     fprintf(file, " {\n");
-    #line 694 "src/compiler/DefinitionWriter.pv"
+    #line 698 "src/compiler/DefinitionWriter.pv"
     generator->indent += 1;
 
-    #line 696 "src/compiler/DefinitionWriter.pv"
+    #line 700 "src/compiler/DefinitionWriter.pv"
     bool is_value_self = func_info->parameters.length > 0 && Type__is_self(&func_info->parameters.data[0].type);
-    #line 697 "src/compiler/DefinitionWriter.pv"
+    #line 701 "src/compiler/DefinitionWriter.pv"
     if (!is_value_self) {
-        #line 698 "src/compiler/DefinitionWriter.pv"
+        #line 702 "src/compiler/DefinitionWriter.pv"
         DefinitionWriter__write_self_cast(self, file, module, generics);
     }
 
-    #line 701 "src/compiler/DefinitionWriter.pv"
+    #line 705 "src/compiler/DefinitionWriter.pv"
     struct FunctionContext func_context = FunctionContext__new(generator->allocator, func_info, true);
-    #line 702 "src/compiler/DefinitionWriter.pv"
-    if (function_usage != 0) {
-        #line 702 "src/compiler/DefinitionWriter.pv"
-        func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
+    #line 706 "src/compiler/DefinitionWriter.pv"
+    if (function_usage_context != 0) {
+        #line 706 "src/compiler/DefinitionWriter.pv"
+        func_context.coroutine.yield_count = function_usage_context->function_context.coroutine.yield_count;
     }
-    #line 703 "src/compiler/DefinitionWriter.pv"
+    #line 707 "src/compiler/DefinitionWriter.pv"
     generator->function_context = &func_context;
 
-    #line 705 "src/compiler/DefinitionWriter.pv"
+    #line 709 "src/compiler/DefinitionWriter.pv"
     if (!BlockWriter__write_block((struct BlockWriter[]){(struct BlockWriter) { .generator = generator }}, file, &func_info->return_type, func_info->body, generics, false, true)) {
-        #line 706 "src/compiler/DefinitionWriter.pv"
+        #line 710 "src/compiler/DefinitionWriter.pv"
         uint32_t name_length = name.length;
-        #line 707 "src/compiler/DefinitionWriter.pv"
+        #line 711 "src/compiler/DefinitionWriter.pv"
         uint32_t func_name_length = func_info->name->value.length;
-        #line 708 "src/compiler/DefinitionWriter.pv"
+        #line 712 "src/compiler/DefinitionWriter.pv"
         fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info->name->value.ptr);
-        #line 709 "src/compiler/DefinitionWriter.pv"
+        #line 713 "src/compiler/DefinitionWriter.pv"
         return false;
     }
 
-    #line 712 "src/compiler/DefinitionWriter.pv"
+    #line 716 "src/compiler/DefinitionWriter.pv"
     generator->indent -= 1;
-    #line 713 "src/compiler/DefinitionWriter.pv"
+    #line 717 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 714 "src/compiler/DefinitionWriter.pv"
+    #line 718 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "}\n");
 
-    #line 716 "src/compiler/DefinitionWriter.pv"
+    #line 720 "src/compiler/DefinitionWriter.pv"
     generator->function_context = 0;
-    #line 717 "src/compiler/DefinitionWriter.pv"
+    #line 721 "src/compiler/DefinitionWriter.pv"
     return true;
 }
 
-#line 720 "src/compiler/DefinitionWriter.pv"
+#line 724 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_size(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics) {
-    #line 721 "src/compiler/DefinitionWriter.pv"
+    #line 725 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 722 "src/compiler/DefinitionWriter.pv"
+    #line 726 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "uintptr_t ");
-    #line 723 "src/compiler/DefinitionWriter.pv"
+    #line 727 "src/compiler/DefinitionWriter.pv"
     Generator__write_function_name(generator, file, func_info, generics);
-    #line 724 "src/compiler/DefinitionWriter.pv"
+    #line 728 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "__Fn__size(void* __self) {\n");
 
-    #line 726 "src/compiler/DefinitionWriter.pv"
-    generator->indent += 1;
-    #line 727 "src/compiler/DefinitionWriter.pv"
-    Generator__write_indent(generator, file);
-    #line 728 "src/compiler/DefinitionWriter.pv"
-    fprintf(file, "return sizeof(struct ");
-    #line 729 "src/compiler/DefinitionWriter.pv"
-    Generator__write_function_name(generator, file, func_info, generics);
     #line 730 "src/compiler/DefinitionWriter.pv"
-    fprintf(file, "__Fn__Instance);\n");
+    generator->indent += 1;
     #line 731 "src/compiler/DefinitionWriter.pv"
-    generator->indent -= 1;
+    Generator__write_indent(generator, file);
     #line 732 "src/compiler/DefinitionWriter.pv"
+    fprintf(file, "return sizeof(struct ");
+    #line 733 "src/compiler/DefinitionWriter.pv"
+    Generator__write_function_name(generator, file, func_info, generics);
+    #line 734 "src/compiler/DefinitionWriter.pv"
+    fprintf(file, "__Fn__Instance);\n");
+    #line 735 "src/compiler/DefinitionWriter.pv"
+    generator->indent -= 1;
+    #line 736 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "}\n");
 }
 
-#line 735 "src/compiler/DefinitionWriter.pv"
+#line 739 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_get_params(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics) {
-    #line 736 "src/compiler/DefinitionWriter.pv"
+    #line 740 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 737 "src/compiler/DefinitionWriter.pv"
+    #line 741 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "#include <std/Array_TypeId.h>\n");
-    #line 738 "src/compiler/DefinitionWriter.pv"
+    #line 742 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "struct Array_TypeId* ");
-    #line 739 "src/compiler/DefinitionWriter.pv"
+    #line 743 "src/compiler/DefinitionWriter.pv"
     Generator__write_function_name(generator, file, func_info, generics);
 
-    #line 741 "src/compiler/DefinitionWriter.pv"
+    #line 745 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 742 "src/compiler/DefinitionWriter.pv"
+        #line 746 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Co__get_params(void* __self) {\n");
     } else {
-        #line 744 "src/compiler/DefinitionWriter.pv"
+        #line 748 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Fn__get_params(void* __self) {\n");
     }
 
-    #line 747 "src/compiler/DefinitionWriter.pv"
+    #line 751 "src/compiler/DefinitionWriter.pv"
     generator->indent += 1;
-    #line 748 "src/compiler/DefinitionWriter.pv"
+    #line 752 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 749 "src/compiler/DefinitionWriter.pv"
+    #line 753 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "static TypeId type_ids[] = { ");
 
-    #line 751 "src/compiler/DefinitionWriter.pv"
+    #line 755 "src/compiler/DefinitionWriter.pv"
     bool first = true;
-    #line 752 "src/compiler/DefinitionWriter.pv"
+    #line 756 "src/compiler/DefinitionWriter.pv"
     { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-    #line 752 "src/compiler/DefinitionWriter.pv"
+    #line 756 "src/compiler/DefinitionWriter.pv"
     while (Iter_ref_Parameter__next(&__iter)) {
-        #line 752 "src/compiler/DefinitionWriter.pv"
+        #line 756 "src/compiler/DefinitionWriter.pv"
         struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-        #line 753 "src/compiler/DefinitionWriter.pv"
+        #line 757 "src/compiler/DefinitionWriter.pv"
         if (first) {
-            #line 753 "src/compiler/DefinitionWriter.pv"
+            #line 757 "src/compiler/DefinitionWriter.pv"
             first = false;
         } else {
-            #line 753 "src/compiler/DefinitionWriter.pv"
+            #line 757 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ", ");
         }
-        #line 754 "src/compiler/DefinitionWriter.pv"
+        #line 758 "src/compiler/DefinitionWriter.pv"
         Generator__write_typeid(generator, file, &param->type, generics);
     } }
 
-    #line 757 "src/compiler/DefinitionWriter.pv"
-    fprintf(file, " };\n");
-    #line 758 "src/compiler/DefinitionWriter.pv"
-    Generator__write_indent(generator, file);
-    #line 759 "src/compiler/DefinitionWriter.pv"
-    fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info->parameters.length);
-    #line 760 "src/compiler/DefinitionWriter.pv"
-    Generator__write_indent(generator, file);
     #line 761 "src/compiler/DefinitionWriter.pv"
-    fprintf(file, "return &result;\n");
+    fprintf(file, " };\n");
     #line 762 "src/compiler/DefinitionWriter.pv"
-    generator->indent -= 1;
+    Generator__write_indent(generator, file);
     #line 763 "src/compiler/DefinitionWriter.pv"
+    fprintf(file, "static struct Array_TypeId result = { .data = type_ids, .length = %zu };\n", func_info->parameters.length);
+    #line 764 "src/compiler/DefinitionWriter.pv"
+    Generator__write_indent(generator, file);
+    #line 765 "src/compiler/DefinitionWriter.pv"
+    fprintf(file, "return &result;\n");
+    #line 766 "src/compiler/DefinitionWriter.pv"
+    generator->indent -= 1;
+    #line 767 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "}\n");
 }
 
-#line 766 "src/compiler/DefinitionWriter.pv"
+#line 770 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_set_arg(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module) {
-    #line 767 "src/compiler/DefinitionWriter.pv"
+    #line 771 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 768 "src/compiler/DefinitionWriter.pv"
+    #line 772 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "bool ");
-    #line 769 "src/compiler/DefinitionWriter.pv"
+    #line 773 "src/compiler/DefinitionWriter.pv"
     Generator__write_function_name(generator, file, func_info, generics);
 
-    #line 771 "src/compiler/DefinitionWriter.pv"
+    #line 775 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 772 "src/compiler/DefinitionWriter.pv"
+        #line 776 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Co__set_arg(void* __self, uintptr_t index, void* value) {\n");
     } else {
-        #line 774 "src/compiler/DefinitionWriter.pv"
+        #line 778 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Fn__set_arg(void* __self, uintptr_t index, void* value) {\n");
     }
 
-    #line 777 "src/compiler/DefinitionWriter.pv"
+    #line 781 "src/compiler/DefinitionWriter.pv"
     generator->indent += 1;
 
-    #line 779 "src/compiler/DefinitionWriter.pv"
+    #line 783 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 780 "src/compiler/DefinitionWriter.pv"
+    #line 784 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "struct ");
-    #line 781 "src/compiler/DefinitionWriter.pv"
+    #line 785 "src/compiler/DefinitionWriter.pv"
     Generator__write_function_name(generator, file, func_info, generics);
 
-    #line 783 "src/compiler/DefinitionWriter.pv"
+    #line 787 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 784 "src/compiler/DefinitionWriter.pv"
+        #line 788 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
     } else {
-        #line 786 "src/compiler/DefinitionWriter.pv"
+        #line 790 "src/compiler/DefinitionWriter.pv"
         if (module->mode_cpp) {
-            #line 787 "src/compiler/DefinitionWriter.pv"
+            #line 791 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "__Fn__Instance* self = (struct ");
-            #line 788 "src/compiler/DefinitionWriter.pv"
+            #line 792 "src/compiler/DefinitionWriter.pv"
             Generator__write_function_name(generator, file, func_info, generics);
-            #line 789 "src/compiler/DefinitionWriter.pv"
+            #line 793 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "__Fn__Instance*)__self;\n");
         } else {
-            #line 791 "src/compiler/DefinitionWriter.pv"
+            #line 795 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "__Fn__Instance* self = __self;\n");
         }
     }
 
-    #line 795 "src/compiler/DefinitionWriter.pv"
+    #line 799 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 796 "src/compiler/DefinitionWriter.pv"
+    #line 800 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "switch (index) {\n");
-    #line 797 "src/compiler/DefinitionWriter.pv"
+    #line 801 "src/compiler/DefinitionWriter.pv"
     generator->indent += 1;
 
-    #line 799 "src/compiler/DefinitionWriter.pv"
+    #line 803 "src/compiler/DefinitionWriter.pv"
     uintptr_t i = 0;
-    #line 800 "src/compiler/DefinitionWriter.pv"
+    #line 804 "src/compiler/DefinitionWriter.pv"
     { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-    #line 800 "src/compiler/DefinitionWriter.pv"
+    #line 804 "src/compiler/DefinitionWriter.pv"
     while (Iter_ref_Parameter__next(&__iter)) {
-        #line 800 "src/compiler/DefinitionWriter.pv"
+        #line 804 "src/compiler/DefinitionWriter.pv"
         struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-        #line 801 "src/compiler/DefinitionWriter.pv"
+        #line 805 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 802 "src/compiler/DefinitionWriter.pv"
+        #line 806 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "case %zu: self->", i);
-        #line 803 "src/compiler/DefinitionWriter.pv"
+        #line 807 "src/compiler/DefinitionWriter.pv"
         Generator__write_token(generator, file, param->name);
-        #line 804 "src/compiler/DefinitionWriter.pv"
+        #line 808 "src/compiler/DefinitionWriter.pv"
         fprintf(file, " = ");
 
-        #line 806 "src/compiler/DefinitionWriter.pv"
+        #line 810 "src/compiler/DefinitionWriter.pv"
         if (!Generator__is_reference(&param->type)) {
-            #line 807 "src/compiler/DefinitionWriter.pv"
+            #line 811 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "*(");
-            #line 808 "src/compiler/DefinitionWriter.pv"
+            #line 812 "src/compiler/DefinitionWriter.pv"
             Generator__write_type(generator, file, &param->type, generics);
-            #line 809 "src/compiler/DefinitionWriter.pv"
+            #line 813 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "*)");
         } else {
-            #line 811 "src/compiler/DefinitionWriter.pv"
+            #line 815 "src/compiler/DefinitionWriter.pv"
             if (module->mode_cpp) {
-                #line 812 "src/compiler/DefinitionWriter.pv"
+                #line 816 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "(");
-                #line 813 "src/compiler/DefinitionWriter.pv"
+                #line 817 "src/compiler/DefinitionWriter.pv"
                 Generator__write_type(generator, file, &param->type, generics);
-                #line 814 "src/compiler/DefinitionWriter.pv"
+                #line 818 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, ")");
             }
         }
 
-        #line 818 "src/compiler/DefinitionWriter.pv"
+        #line 822 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "value; return true;\n");
-        #line 819 "src/compiler/DefinitionWriter.pv"
+        #line 823 "src/compiler/DefinitionWriter.pv"
         i += 1;
     } }
 
-    #line 822 "src/compiler/DefinitionWriter.pv"
+    #line 826 "src/compiler/DefinitionWriter.pv"
     generator->indent -= 1;
-    #line 823 "src/compiler/DefinitionWriter.pv"
+    #line 827 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 824 "src/compiler/DefinitionWriter.pv"
+    #line 828 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "}\n");
 
-    #line 826 "src/compiler/DefinitionWriter.pv"
+    #line 830 "src/compiler/DefinitionWriter.pv"
     Generator__write_indent(generator, file);
-    #line 827 "src/compiler/DefinitionWriter.pv"
+    #line 831 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "return false;\n");
 
-    #line 829 "src/compiler/DefinitionWriter.pv"
+    #line 833 "src/compiler/DefinitionWriter.pv"
     generator->indent -= 1;
-    #line 830 "src/compiler/DefinitionWriter.pv"
+    #line 834 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "}\n");
 }
 
-#line 833 "src/compiler/DefinitionWriter.pv"
+#line 837 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_execute_or_init(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module) {
-    #line 834 "src/compiler/DefinitionWriter.pv"
+    #line 838 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 835 "src/compiler/DefinitionWriter.pv"
+    #line 839 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 836 "src/compiler/DefinitionWriter.pv"
+        #line 840 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct Iter_CoroutineStatus ");
-        #line 837 "src/compiler/DefinitionWriter.pv"
+        #line 841 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
-        #line 838 "src/compiler/DefinitionWriter.pv"
+        #line 842 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
 
-        #line 840 "src/compiler/DefinitionWriter.pv"
+        #line 844 "src/compiler/DefinitionWriter.pv"
         generator->indent += 1;
 
-        #line 842 "src/compiler/DefinitionWriter.pv"
+        #line 846 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 843 "src/compiler/DefinitionWriter.pv"
+        #line 847 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct ");
-        #line 844 "src/compiler/DefinitionWriter.pv"
+        #line 848 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
-        #line 845 "src/compiler/DefinitionWriter.pv"
+        #line 849 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
 
-        #line 847 "src/compiler/DefinitionWriter.pv"
-        Generator__write_indent(generator, file);
-        #line 848 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "struct ");
-        #line 849 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
-        #line 850 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
         #line 851 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
+        Generator__write_indent(generator, file);
         #line 852 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "struct ");
+        #line 853 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
+        #line 854 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
+        #line 855 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
+        #line 856 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "));\n");
 
-        #line 854 "src/compiler/DefinitionWriter.pv"
+        #line 858 "src/compiler/DefinitionWriter.pv"
         { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-        #line 854 "src/compiler/DefinitionWriter.pv"
+        #line 858 "src/compiler/DefinitionWriter.pv"
         while (Iter_ref_Parameter__next(&__iter)) {
-            #line 854 "src/compiler/DefinitionWriter.pv"
+            #line 858 "src/compiler/DefinitionWriter.pv"
             struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-            #line 855 "src/compiler/DefinitionWriter.pv"
-            Generator__write_indent(generator, file);
-            #line 856 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "instance->");
-            #line 857 "src/compiler/DefinitionWriter.pv"
-            Generator__write_token(generator, file, param->name);
-            #line 858 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, " = self->");
             #line 859 "src/compiler/DefinitionWriter.pv"
-            Generator__write_token(generator, file, param->name);
+            Generator__write_indent(generator, file);
             #line 860 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "instance->");
+            #line 861 "src/compiler/DefinitionWriter.pv"
+            Generator__write_token(generator, file, param->name);
+            #line 862 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, " = self->");
+            #line 863 "src/compiler/DefinitionWriter.pv"
+            Generator__write_token(generator, file, param->name);
+            #line 864 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }
 
-        #line 863 "src/compiler/DefinitionWriter.pv"
+        #line 867 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 864 "src/compiler/DefinitionWriter.pv"
+        #line 868 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
-        #line 865 "src/compiler/DefinitionWriter.pv"
+        #line 869 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
-        #line 866 "src/compiler/DefinitionWriter.pv"
+        #line 870 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
 
-        #line 868 "src/compiler/DefinitionWriter.pv"
+        #line 872 "src/compiler/DefinitionWriter.pv"
         generator->indent -= 1;
-        #line 869 "src/compiler/DefinitionWriter.pv"
+        #line 873 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "}\n");
     } else {
-        #line 871 "src/compiler/DefinitionWriter.pv"
+        #line 875 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "void ");
-        #line 872 "src/compiler/DefinitionWriter.pv"
+        #line 876 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
-        #line 873 "src/compiler/DefinitionWriter.pv"
+        #line 877 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Fn__execute(void* __self) {\n");
 
-        #line 875 "src/compiler/DefinitionWriter.pv"
+        #line 879 "src/compiler/DefinitionWriter.pv"
         generator->indent += 1;
 
-        #line 877 "src/compiler/DefinitionWriter.pv"
+        #line 881 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 878 "src/compiler/DefinitionWriter.pv"
+        #line 882 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct ");
-        #line 879 "src/compiler/DefinitionWriter.pv"
+        #line 883 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
-        #line 880 "src/compiler/DefinitionWriter.pv"
+        #line 884 "src/compiler/DefinitionWriter.pv"
         if (module->mode_cpp) {
-            #line 881 "src/compiler/DefinitionWriter.pv"
+            #line 885 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "__Fn__Instance* self = (struct ");
-            #line 882 "src/compiler/DefinitionWriter.pv"
+            #line 886 "src/compiler/DefinitionWriter.pv"
             Generator__write_function_name(generator, file, func_info, generics);
-            #line 883 "src/compiler/DefinitionWriter.pv"
+            #line 887 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "__Fn__Instance*)__self;\n");
         } else {
-            #line 885 "src/compiler/DefinitionWriter.pv"
+            #line 889 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "__Fn__Instance* self = __self;\n");
         }
 
-        #line 888 "src/compiler/DefinitionWriter.pv"
+        #line 892 "src/compiler/DefinitionWriter.pv"
         Generator__write_indent(generator, file);
-        #line 889 "src/compiler/DefinitionWriter.pv"
+        #line 893 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
-        #line 890 "src/compiler/DefinitionWriter.pv"
+        #line 894 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "(");
 
-        #line 892 "src/compiler/DefinitionWriter.pv"
+        #line 896 "src/compiler/DefinitionWriter.pv"
         bool first = true;
-        #line 893 "src/compiler/DefinitionWriter.pv"
+        #line 897 "src/compiler/DefinitionWriter.pv"
         { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-        #line 893 "src/compiler/DefinitionWriter.pv"
+        #line 897 "src/compiler/DefinitionWriter.pv"
         while (Iter_ref_Parameter__next(&__iter)) {
-            #line 893 "src/compiler/DefinitionWriter.pv"
+            #line 897 "src/compiler/DefinitionWriter.pv"
             struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-            #line 894 "src/compiler/DefinitionWriter.pv"
+            #line 898 "src/compiler/DefinitionWriter.pv"
             if (first) {
-                #line 894 "src/compiler/DefinitionWriter.pv"
+                #line 898 "src/compiler/DefinitionWriter.pv"
                 first = false;
             } else {
-                #line 894 "src/compiler/DefinitionWriter.pv"
+                #line 898 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, ", ");
             }
-            #line 895 "src/compiler/DefinitionWriter.pv"
+            #line 899 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "self->");
-            #line 896 "src/compiler/DefinitionWriter.pv"
+            #line 900 "src/compiler/DefinitionWriter.pv"
             Generator__write_token(generator, file, param->name);
         } }
 
-        #line 899 "src/compiler/DefinitionWriter.pv"
+        #line 903 "src/compiler/DefinitionWriter.pv"
         fprintf(file, ");\n");
 
-        #line 901 "src/compiler/DefinitionWriter.pv"
+        #line 905 "src/compiler/DefinitionWriter.pv"
         generator->indent -= 1;
-        #line 902 "src/compiler/DefinitionWriter.pv"
+        #line 906 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "}\n");
     }
 }
 
-#line 906 "src/compiler/DefinitionWriter.pv"
+#line 910 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_vtable(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics) {
-    #line 907 "src/compiler/DefinitionWriter.pv"
+    #line 911 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 908 "src/compiler/DefinitionWriter.pv"
+    #line 912 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 909 "src/compiler/DefinitionWriter.pv"
+        #line 913 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
     } else {
-        #line 911 "src/compiler/DefinitionWriter.pv"
+        #line 915 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "struct trait_FnVTable ");
     }
 
-    #line 914 "src/compiler/DefinitionWriter.pv"
+    #line 918 "src/compiler/DefinitionWriter.pv"
     Generator__write_function_name(generator, file, func_info, generics);
 
-    #line 916 "src/compiler/DefinitionWriter.pv"
+    #line 920 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 917 "src/compiler/DefinitionWriter.pv"
+        #line 921 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__VTABLE__CO");
     } else {
-        #line 919 "src/compiler/DefinitionWriter.pv"
+        #line 923 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__VTABLE__DYN_FN");
     }
 
-    #line 922 "src/compiler/DefinitionWriter.pv"
+    #line 926 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 923 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, " = { .fn_get_params = &");
-        #line 924 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
-        #line 925 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Co__get_params, .fn_set_arg = &");
-        #line 926 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
         #line 927 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Co__set_arg, .fn_init = &");
+        fprintf(file, " = { .fn_get_params = &");
         #line 928 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 929 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Co__init };\n");
-    } else {
+        fprintf(file, "__Co__get_params, .fn_set_arg = &");
+        #line 930 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
         #line 931 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, " = { .fn_size = &");
+        fprintf(file, "__Co__set_arg, .fn_init = &");
         #line 932 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 933 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Fn__size, .fn_get_params = &");
-        #line 934 "src/compiler/DefinitionWriter.pv"
-        Generator__write_function_name(generator, file, func_info, generics);
+        fprintf(file, "__Co__init };\n");
+    } else {
         #line 935 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Fn__get_params, .fn_set_arg = &");
+        fprintf(file, " = { .fn_size = &");
         #line 936 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 937 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Fn__set_arg, .fn_execute = &");
+        fprintf(file, "__Fn__size, .fn_get_params = &");
         #line 938 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 939 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "__Fn__get_params, .fn_set_arg = &");
+        #line 940 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
+        #line 941 "src/compiler/DefinitionWriter.pv"
+        fprintf(file, "__Fn__set_arg, .fn_execute = &");
+        #line 942 "src/compiler/DefinitionWriter.pv"
+        Generator__write_function_name(generator, file, func_info, generics);
+        #line 943 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "__Fn__execute };\n");
     }
 }
 
-#line 943 "src/compiler/DefinitionWriter.pv"
+#line 947 "src/compiler/DefinitionWriter.pv"
 void DefinitionWriter__write_dynamic_function_impl(struct DefinitionWriter* self, FILE* file, struct Function* func_info, struct GenericMap* generics, struct Module* module) {
-    #line 944 "src/compiler/DefinitionWriter.pv"
+    #line 948 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 945 "src/compiler/DefinitionWriter.pv"
+    #line 949 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "\n");
-    #line 946 "src/compiler/DefinitionWriter.pv"
+    #line 950 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
-        #line 947 "src/compiler/DefinitionWriter.pv"
+        #line 951 "src/compiler/DefinitionWriter.pv"
         fprintf(file, "#include <std/trait_Allocator.h>\n");
     }
-    #line 949 "src/compiler/DefinitionWriter.pv"
+    #line 953 "src/compiler/DefinitionWriter.pv"
     if (!Generator__is_coroutine(generator)) {
-        #line 949 "src/compiler/DefinitionWriter.pv"
+        #line 953 "src/compiler/DefinitionWriter.pv"
         DefinitionWriter__write_dynamic_size(self, file, func_info, generics);
     }
-    #line 950 "src/compiler/DefinitionWriter.pv"
+    #line 954 "src/compiler/DefinitionWriter.pv"
     DefinitionWriter__write_dynamic_get_params(self, file, func_info, generics);
-    #line 951 "src/compiler/DefinitionWriter.pv"
+    #line 955 "src/compiler/DefinitionWriter.pv"
     DefinitionWriter__write_dynamic_set_arg(self, file, func_info, generics, module);
-    #line 952 "src/compiler/DefinitionWriter.pv"
+    #line 956 "src/compiler/DefinitionWriter.pv"
     DefinitionWriter__write_dynamic_execute_or_init(self, file, func_info, generics, module);
-    #line 953 "src/compiler/DefinitionWriter.pv"
+    #line 957 "src/compiler/DefinitionWriter.pv"
     DefinitionWriter__write_dynamic_vtable(self, file, func_info, generics);
 }
 
-#line 956 "src/compiler/DefinitionWriter.pv"
+#line 960 "src/compiler/DefinitionWriter.pv"
 bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, struct Module* module, struct Array_ref_Impl* impls, struct Array_HashMap_usize_TypeFunctionUsage* impl_functions, struct GenericMap* generics, struct IncludeWriter* include_writer) {
-    #line 957 "src/compiler/DefinitionWriter.pv"
+    #line 961 "src/compiler/DefinitionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 958 "src/compiler/DefinitionWriter.pv"
+    #line 962 "src/compiler/DefinitionWriter.pv"
     struct String name = Naming__get_type_name(&generator->naming_ident, Type__deref(generics->self_type), generics->self_type, generics);
-    #line 959 "src/compiler/DefinitionWriter.pv"
+    #line 963 "src/compiler/DefinitionWriter.pv"
     int32_t name_length = name.array.length;
-    #line 960 "src/compiler/DefinitionWriter.pv"
+    #line 964 "src/compiler/DefinitionWriter.pv"
     struct String path = Generator__make_rel_path(generator, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
 
-    #line 962 "src/compiler/DefinitionWriter.pv"
+    #line 966 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "#include <%.*s>\n", (int32_t)(path.array.length), path.array.data);
 
-    #line 964 "src/compiler/DefinitionWriter.pv"
+    #line 968 "src/compiler/DefinitionWriter.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
-    #line 964 "src/compiler/DefinitionWriter.pv"
+    #line 968 "src/compiler/DefinitionWriter.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 964 "src/compiler/DefinitionWriter.pv"
+        #line 968 "src/compiler/DefinitionWriter.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 964 "src/compiler/DefinitionWriter.pv"
+        #line 968 "src/compiler/DefinitionWriter.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 965 "src/compiler/DefinitionWriter.pv"
+        #line 969 "src/compiler/DefinitionWriter.pv"
         struct Trait* trait_info = impl_info->trait_;
-        #line 966 "src/compiler/DefinitionWriter.pv"
+        #line 970 "src/compiler/DefinitionWriter.pv"
         struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
-        #line 967 "src/compiler/DefinitionWriter.pv"
+        #line 971 "src/compiler/DefinitionWriter.pv"
         if (impl_functions != 0) {
-            #line 967 "src/compiler/DefinitionWriter.pv"
+            #line 971 "src/compiler/DefinitionWriter.pv"
             impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(impl_functions, impl_index);
         }
 
-        #line 969 "src/compiler/DefinitionWriter.pv"
+        #line 973 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 969 "src/compiler/DefinitionWriter.pv"
+        #line 973 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 969 "src/compiler/DefinitionWriter.pv"
+            #line 973 "src/compiler/DefinitionWriter.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 970 "src/compiler/DefinitionWriter.pv"
+            #line 974 "src/compiler/DefinitionWriter.pv"
             uintptr_t func_ptr = (uintptr_t)(func_info);
-            #line 971 "src/compiler/DefinitionWriter.pv"
+            #line 975 "src/compiler/DefinitionWriter.pv"
             struct TypeFunctionUsage* function_usage = 0;
-            #line 972 "src/compiler/DefinitionWriter.pv"
+            #line 976 "src/compiler/DefinitionWriter.pv"
             if (impl_functions_for_impl != 0) {
-                #line 972 "src/compiler/DefinitionWriter.pv"
+                #line 976 "src/compiler/DefinitionWriter.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 974 "src/compiler/DefinitionWriter.pv"
+            #line 978 "src/compiler/DefinitionWriter.pv"
             if (func_info->generics.array.length == 0) {
-                #line 975 "src/compiler/DefinitionWriter.pv"
+                #line 981 "src/compiler/DefinitionWriter.pv"
+                struct UsageContext* function_usage_context = 0;
+                #line 982 "src/compiler/DefinitionWriter.pv"
+                if (function_usage != 0 && function_usage->usage_contexts.length > 0) {
+                    #line 983 "src/compiler/DefinitionWriter.pv"
+                    function_usage_context = &function_usage->usage_contexts.data[0];
+                }
+
+                #line 986 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
-                #line 976 "src/compiler/DefinitionWriter.pv"
+                #line 987 "src/compiler/DefinitionWriter.pv"
                 if (trait_info != 0) {
-                    #line 977 "src/compiler/DefinitionWriter.pv"
-                    if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, function_usage)) {
-                        #line 977 "src/compiler/DefinitionWriter.pv"
+                    #line 988 "src/compiler/DefinitionWriter.pv"
+                    if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, function_usage_context)) {
+                        #line 988 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
                 } else {
-                    #line 979 "src/compiler/DefinitionWriter.pv"
+                    #line 990 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_function_definition(self, file, func_info, generics, 0)) {
-                        #line 980 "src/compiler/DefinitionWriter.pv"
+                        #line 991 "src/compiler/DefinitionWriter.pv"
                         uint32_t func_name_length = func_info->name->value.length;
-                        #line 981 "src/compiler/DefinitionWriter.pv"
+                        #line 992 "src/compiler/DefinitionWriter.pv"
                         fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
-                        #line 982 "src/compiler/DefinitionWriter.pv"
+                        #line 993 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
 
-                    #line 985 "src/compiler/DefinitionWriter.pv"
+                    #line 996 "src/compiler/DefinitionWriter.pv"
                     struct FunctionContext func_context = FunctionContext__new(generator->allocator, func_info, true);
-                    #line 986 "src/compiler/DefinitionWriter.pv"
-                    if (function_usage != 0) {
-                        #line 986 "src/compiler/DefinitionWriter.pv"
-                        func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
+                    #line 997 "src/compiler/DefinitionWriter.pv"
+                    if (function_usage_context != 0) {
+                        #line 997 "src/compiler/DefinitionWriter.pv"
+                        func_context.coroutine.yield_count = function_usage_context->function_context.coroutine.yield_count;
                     }
-                    #line 987 "src/compiler/DefinitionWriter.pv"
+                    #line 998 "src/compiler/DefinitionWriter.pv"
                     generator->function_context = &func_context;
 
-                    #line 989 "src/compiler/DefinitionWriter.pv"
-                    if (!DefinitionWriter__write_function_block(self, file, String__as_str(&name), func_info, generics, function_usage)) {
-                        #line 990 "src/compiler/DefinitionWriter.pv"
+                    #line 1000 "src/compiler/DefinitionWriter.pv"
+                    if (!DefinitionWriter__write_function_block(self, file, String__as_str(&name), func_info, generics, function_usage_context)) {
+                        #line 1001 "src/compiler/DefinitionWriter.pv"
                         uint32_t func_name_length = func_info->name->value.length;
-                        #line 991 "src/compiler/DefinitionWriter.pv"
+                        #line 1002 "src/compiler/DefinitionWriter.pv"
                         fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
-                        #line 992 "src/compiler/DefinitionWriter.pv"
+                        #line 1003 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
 
-                    #line 995 "src/compiler/DefinitionWriter.pv"
-                    struct TypeFunctionUsage* function_usage = 0;
-                    #line 996 "src/compiler/DefinitionWriter.pv"
-                    if (impl_functions_for_impl != 0) {
-                        #line 996 "src/compiler/DefinitionWriter.pv"
-                        function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
-                    }
-
-                    #line 998 "src/compiler/DefinitionWriter.pv"
+                    #line 1006 "src/compiler/DefinitionWriter.pv"
                     if (function_usage != 0 && function_usage->impl_dynamic_function) {
-                        #line 999 "src/compiler/DefinitionWriter.pv"
+                        #line 1007 "src/compiler/DefinitionWriter.pv"
                         DefinitionWriter__write_dynamic_function_impl(self, file, func_info, generics, module);
                     }
 
-                    #line 1002 "src/compiler/DefinitionWriter.pv"
+                    #line 1010 "src/compiler/DefinitionWriter.pv"
                     generator->function_context = 0;
                 }
             } else if (impl_functions_for_impl != 0) {
-                #line 1005 "src/compiler/DefinitionWriter.pv"
+                #line 1013 "src/compiler/DefinitionWriter.pv"
                 if (function_usage != 0) {
-                    #line 1006 "src/compiler/DefinitionWriter.pv"
+                    #line 1014 "src/compiler/DefinitionWriter.pv"
                     struct Function* func2 = ArenaAllocator__Allocator__alloc(generator->allocator, sizeof(struct Function));
-                    #line 1007 "src/compiler/DefinitionWriter.pv"
+                    #line 1015 "src/compiler/DefinitionWriter.pv"
                     *func2 = *func_info;
 
-                    #line 1009 "src/compiler/DefinitionWriter.pv"
-                    { struct Iter_ref_UsageContext __iter = Array_UsageContext__iter(&function_usage->usage_contexts);
-                    #line 1009 "src/compiler/DefinitionWriter.pv"
-                    while (Iter_ref_UsageContext__next(&__iter)) {
-                        #line 1009 "src/compiler/DefinitionWriter.pv"
-                        struct UsageContext* usage_context = Iter_ref_UsageContext__value(&__iter);
-
-                        #line 1010 "src/compiler/DefinitionWriter.pv"
+                    #line 1017 "src/compiler/DefinitionWriter.pv"
+                    for (uintptr_t i = 0; i < function_usage->usage_contexts.length; i++) {
+                        #line 1018 "src/compiler/DefinitionWriter.pv"
+                        struct UsageContext* usage_context = &function_usage->usage_contexts.data[i];
+                        #line 1019 "src/compiler/DefinitionWriter.pv"
                         struct GenericMap* generics3 = usage_context->generic_map;
-                        #line 1013 "src/compiler/DefinitionWriter.pv"
+                        #line 1022 "src/compiler/DefinitionWriter.pv"
                         generics3->self_type = generics->self_type;
 
-                        #line 1015 "src/compiler/DefinitionWriter.pv"
+                        #line 1024 "src/compiler/DefinitionWriter.pv"
                         IncludeWriter__write(include_writer, file, generator, &usage_context->body, generics3, true);
-                        #line 1016 "src/compiler/DefinitionWriter.pv"
+                        #line 1025 "src/compiler/DefinitionWriter.pv"
                         fprintf(file, "\n");
-                        #line 1017 "src/compiler/DefinitionWriter.pv"
+                        #line 1026 "src/compiler/DefinitionWriter.pv"
                         if (!DefinitionWriter__write_function_definition(self, file, func_info, generics3, 0)) {
-                            #line 1018 "src/compiler/DefinitionWriter.pv"
+                            #line 1027 "src/compiler/DefinitionWriter.pv"
                             uint32_t func_name_length = func_info->name->value.length;
-                            #line 1019 "src/compiler/DefinitionWriter.pv"
+                            #line 1028 "src/compiler/DefinitionWriter.pv"
                             fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info->name->value.ptr);
-                            #line 1020 "src/compiler/DefinitionWriter.pv"
+                            #line 1029 "src/compiler/DefinitionWriter.pv"
                             return false;
                         }
 
-                        #line 1023 "src/compiler/DefinitionWriter.pv"
+                        #line 1032 "src/compiler/DefinitionWriter.pv"
                         struct FunctionContext func_context = FunctionContext__new(generator->allocator, func_info, true);
-                        #line 1024 "src/compiler/DefinitionWriter.pv"
-                        func_context.coroutine.yield_count = function_usage->function_context.coroutine.yield_count;
-                        #line 1025 "src/compiler/DefinitionWriter.pv"
+                        #line 1033 "src/compiler/DefinitionWriter.pv"
+                        func_context.coroutine.yield_count = usage_context->function_context.coroutine.yield_count;
+                        #line 1034 "src/compiler/DefinitionWriter.pv"
                         generator->function_context = &func_context;
 
-                        #line 1027 "src/compiler/DefinitionWriter.pv"
-                        DefinitionWriter__write_function_block(self, file, String__as_str(&name), func_info, generics3, function_usage);
+                        #line 1036 "src/compiler/DefinitionWriter.pv"
+                        DefinitionWriter__write_function_block(self, file, String__as_str(&name), func_info, generics3, usage_context);
 
-                        #line 1029 "src/compiler/DefinitionWriter.pv"
+                        #line 1038 "src/compiler/DefinitionWriter.pv"
                         generator->function_context = 0;
-                    } }
+                    }
                 }
             }
         } }
 
-        #line 1035 "src/compiler/DefinitionWriter.pv"
+        #line 1044 "src/compiler/DefinitionWriter.pv"
         if (trait_info != 0) {
-            #line 1036 "src/compiler/DefinitionWriter.pv"
+            #line 1045 "src/compiler/DefinitionWriter.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-            #line 1036 "src/compiler/DefinitionWriter.pv"
+            #line 1045 "src/compiler/DefinitionWriter.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 1036 "src/compiler/DefinitionWriter.pv"
+                #line 1045 "src/compiler/DefinitionWriter.pv"
                 struct str func_base_name = HashMapIter_str_Function__value(&__iter)->_0;
-                #line 1036 "src/compiler/DefinitionWriter.pv"
+                #line 1045 "src/compiler/DefinitionWriter.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 1037 "src/compiler/DefinitionWriter.pv"
+                #line 1046 "src/compiler/DefinitionWriter.pv"
                 if (HashMap_str_Function__find(&impl_info->functions, &func_base_name) != 0) {
-                    #line 1037 "src/compiler/DefinitionWriter.pv"
+                    #line 1046 "src/compiler/DefinitionWriter.pv"
                     continue;
                 }
 
-                #line 1039 "src/compiler/DefinitionWriter.pv"
+                #line 1048 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
-                #line 1040 "src/compiler/DefinitionWriter.pv"
+                #line 1049 "src/compiler/DefinitionWriter.pv"
                 if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, 0)) {
-                    #line 1040 "src/compiler/DefinitionWriter.pv"
+                    #line 1049 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }
             } }
         }
 
-        #line 1044 "src/compiler/DefinitionWriter.pv"
+        #line 1053 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_ref_ImplConst __iter = HashMap_str_ref_ImplConst__iter(&impl_info->consts);
-        #line 1044 "src/compiler/DefinitionWriter.pv"
+        #line 1053 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_ref_ImplConst__next(&__iter)) {
-            #line 1044 "src/compiler/DefinitionWriter.pv"
+            #line 1053 "src/compiler/DefinitionWriter.pv"
             struct ImplConst* impl_const = HashMapIter_str_ref_ImplConst__value(&__iter)->_1;
 
-            #line 1045 "src/compiler/DefinitionWriter.pv"
+            #line 1054 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "\nconst ");
-            #line 1046 "src/compiler/DefinitionWriter.pv"
+            #line 1055 "src/compiler/DefinitionWriter.pv"
             Generator__write_type(generator, file, &impl_const->type, generics);
-            #line 1047 "src/compiler/DefinitionWriter.pv"
+            #line 1056 "src/compiler/DefinitionWriter.pv"
             fprintf(file, " ");
-            #line 1048 "src/compiler/DefinitionWriter.pv"
+            #line 1057 "src/compiler/DefinitionWriter.pv"
             Generator__write_str_title(generator, file, String__as_str(&name));
-            #line 1049 "src/compiler/DefinitionWriter.pv"
+            #line 1058 "src/compiler/DefinitionWriter.pv"
             fprintf(file, "_");
-            #line 1050 "src/compiler/DefinitionWriter.pv"
+            #line 1059 "src/compiler/DefinitionWriter.pv"
             Generator__write_str_title(generator, file, impl_const->name->value);
-            #line 1051 "src/compiler/DefinitionWriter.pv"
+            #line 1060 "src/compiler/DefinitionWriter.pv"
             fprintf(file, " = ");
-            #line 1052 "src/compiler/DefinitionWriter.pv"
+            #line 1061 "src/compiler/DefinitionWriter.pv"
             ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = generator }}, file, impl_const->value, generics);
-            #line 1053 "src/compiler/DefinitionWriter.pv"
+            #line 1062 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }
     } }
 
-    #line 1057 "src/compiler/DefinitionWriter.pv"
+    #line 1066 "src/compiler/DefinitionWriter.pv"
     return true;
 }

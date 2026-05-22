@@ -206,7 +206,7 @@ bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFun
     }
 
     #line 71 "src/compiler/FileGenerator.pv"
-    DefinitionWriter__write_function_block(&defs, code_file, name_str, func_info, generics, usage);
+    DefinitionWriter__write_function_block(&defs, code_file, name_str, func_info, generics, usage_context);
 
     #line 73 "src/compiler/FileGenerator.pv"
     Generator__overwrite_if_different(generator, String__c_str(&code), code_file);
@@ -409,7 +409,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     fprintf(code_file, ">\n\n");
 
     #line 171 "src/compiler/FileGenerator.pv"
-    if (!DefinitionWriter__write_impls(&defs, code_file, module, &enum_info->impls, &usage->impl_functions, generics, &include_writer)) {
+    if (!DefinitionWriter__write_impls(&defs, code_file, module, &enum_info->impls, &usage_context->impl_functions, generics, &include_writer)) {
         #line 171 "src/compiler/FileGenerator.pv"
         fclose(code_file);
         #line 171 "src/compiler/FileGenerator.pv"
@@ -647,7 +647,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     fprintf(code_file, ">\n\n");
 
     #line 287 "src/compiler/FileGenerator.pv"
-    if (!DefinitionWriter__write_impls(&defs, code_file, struct_info->module, &struct_info->impls, &usage->impl_functions, generics, &include_writer)) {
+    if (!DefinitionWriter__write_impls(&defs, code_file, struct_info->module, &struct_info->impls, &usage_context->impl_functions, generics, &include_writer)) {
         #line 287 "src/compiler/FileGenerator.pv"
         fclose(code_file);
         #line 287 "src/compiler/FileGenerator.pv"
@@ -1140,7 +1140,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     fprintf(code_file, ">\n\n");
 
     #line 539 "src/compiler/FileGenerator.pv"
-    if (!DefinitionWriter__write_impls(&defs, code_file, 0, &primitive_info->impls, &usage->impl_functions, generics, &include_writer)) {
+    if (!DefinitionWriter__write_impls(&defs, code_file, 0, &primitive_info->impls, &usage_context->impl_functions, generics, &include_writer)) {
         #line 539 "src/compiler/FileGenerator.pv"
         fclose(code_file);
         #line 539 "src/compiler/FileGenerator.pv"

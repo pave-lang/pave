@@ -4,14 +4,14 @@
 #include <stdbool.h>
 
 #include <std/Array_UsageContext.h>
-#include <compiler/FunctionContext.h>
+struct ArenaAllocator;
 struct Function;
 
 #line 9 "src/compiler/Usages.pv"
 struct TypeFunctionUsage {
+    struct ArenaAllocator* allocator;
     struct Function* type;
     struct Array_UsageContext usage_contexts;
-    struct FunctionContext function_context;
     bool impl_dynamic_function;
 };
 

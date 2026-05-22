@@ -732,429 +732,446 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
             #line 400 "src/analyzer/Naming.pv"
             String__append(&result, func_info->name->value);
             #line 401 "src/analyzer/Naming.pv"
-            if (func_info->generics.map.length > 0) {
+            if (func_info->generics.array.length > 0 && generics2 != 0) {
                 #line 402 "src/analyzer/Naming.pv"
-                generics = generics2->array;
+                struct Array_Type own_generics = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
+                #line 403 "src/analyzer/Naming.pv"
+                { struct Iter_ref_Generic __iter = Array_Generic__iter(&func_info->generics.array);
+                #line 403 "src/analyzer/Naming.pv"
+                while (Iter_ref_Generic__next(&__iter)) {
+                    #line 403 "src/analyzer/Naming.pv"
+                    struct Generic generic = *Iter_ref_Generic__value(&__iter);
+
+                    #line 404 "src/analyzer/Naming.pv"
+                    struct Type* gtype = GenericMap__get(generics2, generic.name->value);
+                    #line 405 "src/analyzer/Naming.pv"
+                    if (gtype != 0) {
+                        #line 406 "src/analyzer/Naming.pv"
+                        Array_Type__append(&own_generics, *gtype);
+                    }
+                } }
+                #line 409 "src/analyzer/Naming.pv"
+                generics = own_generics;
             }
         } break;
-        #line 405 "src/analyzer/Naming.pv"
+        #line 412 "src/analyzer/Naming.pv"
         case TYPE__COROUTINE_INSTANCE: {
-            #line 405 "src/analyzer/Naming.pv"
+            #line 412 "src/analyzer/Naming.pv"
             struct Function* func_info = type->coroutineinstance_value._0;
-            #line 405 "src/analyzer/Naming.pv"
+            #line 412 "src/analyzer/Naming.pv"
             struct GenericMap* generics2 = type->coroutineinstance_value._1;
-            #line 406 "src/analyzer/Naming.pv"
+            #line 413 "src/analyzer/Naming.pv"
             String__append(&result, self->coroutine_instance_prefix);
 
-            #line 408 "src/analyzer/Naming.pv"
+            #line 415 "src/analyzer/Naming.pv"
             bool has_parent = false;
-            #line 409 "src/analyzer/Naming.pv"
+            #line 416 "src/analyzer/Naming.pv"
             struct Type parent_type;
 
-            #line 411 "src/analyzer/Naming.pv"
+            #line 418 "src/analyzer/Naming.pv"
             switch (func_info->parent.type) {
-                #line 412 "src/analyzer/Naming.pv"
+                #line 419 "src/analyzer/Naming.pv"
                 case FUNCTION_PARENT__PRIMITIVE: {
-                    #line 412 "src/analyzer/Naming.pv"
+                    #line 419 "src/analyzer/Naming.pv"
                     struct Primitive* primitive = func_info->parent.primitive_value._0;
-                    #line 413 "src/analyzer/Naming.pv"
-                    parent_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive };
-                    #line 414 "src/analyzer/Naming.pv"
-                    has_parent = true;
-                } break;
-                #line 416 "src/analyzer/Naming.pv"
-                case FUNCTION_PARENT__ENUM: {
-                    #line 416 "src/analyzer/Naming.pv"
-                    struct Enum* enum_info = func_info->parent.enum_value._0;
-                    #line 417 "src/analyzer/Naming.pv"
-                    parent_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = generics2} };
-                    #line 418 "src/analyzer/Naming.pv"
-                    has_parent = true;
-                } break;
-                #line 420 "src/analyzer/Naming.pv"
-                case FUNCTION_PARENT__STRUCT: {
                     #line 420 "src/analyzer/Naming.pv"
-                    struct Struct* struct_info = func_info->parent.struct_value._0;
+                    parent_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = primitive };
                     #line 421 "src/analyzer/Naming.pv"
-                    parent_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = generics2} };
-                    #line 422 "src/analyzer/Naming.pv"
                     has_parent = true;
                 } break;
-                #line 424 "src/analyzer/Naming.pv"
-                case FUNCTION_PARENT__TYPE: {
+                #line 423 "src/analyzer/Naming.pv"
+                case FUNCTION_PARENT__ENUM: {
+                    #line 423 "src/analyzer/Naming.pv"
+                    struct Enum* enum_info = func_info->parent.enum_value._0;
                     #line 424 "src/analyzer/Naming.pv"
-                    struct Type* type = func_info->parent.type_value._0;
+                    parent_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = generics2} };
                     #line 425 "src/analyzer/Naming.pv"
+                    has_parent = true;
+                } break;
+                #line 427 "src/analyzer/Naming.pv"
+                case FUNCTION_PARENT__STRUCT: {
+                    #line 427 "src/analyzer/Naming.pv"
+                    struct Struct* struct_info = func_info->parent.struct_value._0;
+                    #line 428 "src/analyzer/Naming.pv"
+                    parent_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = generics2} };
+                    #line 429 "src/analyzer/Naming.pv"
+                    has_parent = true;
+                } break;
+                #line 431 "src/analyzer/Naming.pv"
+                case FUNCTION_PARENT__TYPE: {
+                    #line 431 "src/analyzer/Naming.pv"
+                    struct Type* type = func_info->parent.type_value._0;
+                    #line 432 "src/analyzer/Naming.pv"
                     if (Type__is_fat_pointer(type)) {
-                        #line 426 "src/analyzer/Naming.pv"
+                        #line 433 "src/analyzer/Naming.pv"
                         parent_type = *Type__deref_1(type);
                     } else {
-                        #line 428 "src/analyzer/Naming.pv"
+                        #line 435 "src/analyzer/Naming.pv"
                         parent_type = *type;
                     }
-                    #line 430 "src/analyzer/Naming.pv"
+                    #line 437 "src/analyzer/Naming.pv"
                     has_parent = true;
                 } break;
-                #line 432 "src/analyzer/Naming.pv"
+                #line 439 "src/analyzer/Naming.pv"
                 default: {
                 } break;
             }
 
-            #line 435 "src/analyzer/Naming.pv"
+            #line 442 "src/analyzer/Naming.pv"
             if (has_parent) {
-                #line 436 "src/analyzer/Naming.pv"
+                #line 443 "src/analyzer/Naming.pv"
                 if (self->naming_ident != 0) {
-                    #line 437 "src/analyzer/Naming.pv"
+                    #line 444 "src/analyzer/Naming.pv"
                     struct String parent_type_name = Naming__get_type_name(self->naming_ident, &parent_type, type_self, generics_map);
-                    #line 438 "src/analyzer/Naming.pv"
+                    #line 445 "src/analyzer/Naming.pv"
                     String__append_string(&result, &parent_type_name);
-                    #line 439 "src/analyzer/Naming.pv"
+                    #line 446 "src/analyzer/Naming.pv"
                     String__append(&result, (struct str){ .ptr = "__", .length = strlen("__") });
                 } else {
-                    #line 441 "src/analyzer/Naming.pv"
+                    #line 448 "src/analyzer/Naming.pv"
                     struct String parent_type_name = Naming__get_type_name(self, &parent_type, type_self, generics_map);
-                    #line 442 "src/analyzer/Naming.pv"
+                    #line 449 "src/analyzer/Naming.pv"
                     String__append_string(&result, &parent_type_name);
-                    #line 443 "src/analyzer/Naming.pv"
+                    #line 450 "src/analyzer/Naming.pv"
                     String__append(&result, (struct str){ .ptr = "__", .length = strlen("__") });
                 }
             }
 
-            #line 447 "src/analyzer/Naming.pv"
+            #line 454 "src/analyzer/Naming.pv"
             String__append(&result, func_info->name->value);
         } break;
-        #line 449 "src/analyzer/Naming.pv"
+        #line 456 "src/analyzer/Naming.pv"
         case TYPE__SELF: {
-            #line 450 "src/analyzer/Naming.pv"
+            #line 457 "src/analyzer/Naming.pv"
             return Naming__get_type_name(self, type_self, type_self, generics_map);
         } break;
-        #line 452 "src/analyzer/Naming.pv"
+        #line 459 "src/analyzer/Naming.pv"
         case TYPE__TYPEDEF_C: {
-            #line 452 "src/analyzer/Naming.pv"
+            #line 459 "src/analyzer/Naming.pv"
             struct TypedefC* info = type->typedefc_value;
-            #line 453 "src/analyzer/Naming.pv"
+            #line 460 "src/analyzer/Naming.pv"
             String__append(&result, info->name);
         } break;
-        #line 455 "src/analyzer/Naming.pv"
+        #line 462 "src/analyzer/Naming.pv"
         case TYPE__ENUM_C: {
-            #line 455 "src/analyzer/Naming.pv"
+            #line 462 "src/analyzer/Naming.pv"
             struct EnumC* enum_info = type->enumc_value;
-            #line 456 "src/analyzer/Naming.pv"
+            #line 463 "src/analyzer/Naming.pv"
             if (self->type == NAMING_TYPE__C99) {
-                #line 456 "src/analyzer/Naming.pv"
+                #line 463 "src/analyzer/Naming.pv"
                 String__append(&result, (struct str){ .ptr = "enum ", .length = strlen("enum ") });
             }
-            #line 457 "src/analyzer/Naming.pv"
+            #line 464 "src/analyzer/Naming.pv"
             Naming__append_cpp_path(self, &result, enum_info->parent);
-            #line 458 "src/analyzer/Naming.pv"
+            #line 465 "src/analyzer/Naming.pv"
             String__append(&result, enum_info->name);
         } break;
-        #line 460 "src/analyzer/Naming.pv"
+        #line 467 "src/analyzer/Naming.pv"
         case TYPE__STRUCT_C: {
-            #line 460 "src/analyzer/Naming.pv"
+            #line 467 "src/analyzer/Naming.pv"
             struct StructC* struct_info = type->structc_value;
-            #line 461 "src/analyzer/Naming.pv"
+            #line 468 "src/analyzer/Naming.pv"
             if (self->type == NAMING_TYPE__C99) {
-                #line 461 "src/analyzer/Naming.pv"
+                #line 468 "src/analyzer/Naming.pv"
                 String__append(&result, (struct str){ .ptr = "struct ", .length = strlen("struct ") });
             }
-            #line 462 "src/analyzer/Naming.pv"
+            #line 469 "src/analyzer/Naming.pv"
             String__append(&result, struct_info->name);
         } break;
-        #line 464 "src/analyzer/Naming.pv"
+        #line 471 "src/analyzer/Naming.pv"
         case TYPE__UNION_C: {
-            #line 464 "src/analyzer/Naming.pv"
+            #line 471 "src/analyzer/Naming.pv"
             struct StructC* union_info = type->unionc_value;
-            #line 465 "src/analyzer/Naming.pv"
+            #line 472 "src/analyzer/Naming.pv"
             if (self->type == NAMING_TYPE__C99) {
-                #line 465 "src/analyzer/Naming.pv"
+                #line 472 "src/analyzer/Naming.pv"
                 String__append(&result, (struct str){ .ptr = "union ", .length = strlen("union ") });
             }
-            #line 466 "src/analyzer/Naming.pv"
+            #line 473 "src/analyzer/Naming.pv"
             String__append(&result, union_info->name);
         } break;
-        #line 468 "src/analyzer/Naming.pv"
+        #line 475 "src/analyzer/Naming.pv"
         case TYPE__CLASS_CPP: {
-            #line 468 "src/analyzer/Naming.pv"
+            #line 475 "src/analyzer/Naming.pv"
             struct ClassCpp* class_info = type->classcpp_value;
-            #line 469 "src/analyzer/Naming.pv"
+            #line 476 "src/analyzer/Naming.pv"
             Naming__append_cpp_path(self, &result, class_info->parent);
-            #line 470 "src/analyzer/Naming.pv"
+            #line 477 "src/analyzer/Naming.pv"
             String__append(&result, class_info->name);
         } break;
-        #line 472 "src/analyzer/Naming.pv"
+        #line 479 "src/analyzer/Naming.pv"
         case TYPE__FUNCTION_C: {
-            #line 472 "src/analyzer/Naming.pv"
+            #line 479 "src/analyzer/Naming.pv"
             struct FunctionC* func_info = type->functionc_value;
-            #line 473 "src/analyzer/Naming.pv"
+            #line 480 "src/analyzer/Naming.pv"
             String__append(&result, func_info->name);
         } break;
-        #line 475 "src/analyzer/Naming.pv"
+        #line 482 "src/analyzer/Naming.pv"
         case TYPE__NAMESPACE_CPP: {
-            #line 475 "src/analyzer/Naming.pv"
+            #line 482 "src/analyzer/Naming.pv"
             struct NamespaceCpp* namespace_info = type->namespacecpp_value;
-            #line 476 "src/analyzer/Naming.pv"
+            #line 483 "src/analyzer/Naming.pv"
             String__append(&result, namespace_info->name);
         } break;
-        #line 478 "src/analyzer/Naming.pv"
+        #line 485 "src/analyzer/Naming.pv"
         case TYPE__GLOBAL: {
-            #line 478 "src/analyzer/Naming.pv"
+            #line 485 "src/analyzer/Naming.pv"
             struct Global* g = type->global_value;
-            #line 479 "src/analyzer/Naming.pv"
+            #line 486 "src/analyzer/Naming.pv"
             String__release(&result);
-            #line 480 "src/analyzer/Naming.pv"
+            #line 487 "src/analyzer/Naming.pv"
             return Naming__get_type_name(self, &g->type, type_self, generics_map);
         } break;
     }
 
-    #line 484 "src/analyzer/Naming.pv"
+    #line 491 "src/analyzer/Naming.pv"
     if (generics.length > 0) {
-        #line 485 "src/analyzer/Naming.pv"
+        #line 492 "src/analyzer/Naming.pv"
         String__append(&result, generic_start);
 
-        #line 487 "src/analyzer/Naming.pv"
+        #line 494 "src/analyzer/Naming.pv"
         bool first = true;
-        #line 488 "src/analyzer/Naming.pv"
+        #line 495 "src/analyzer/Naming.pv"
         { struct Iter_ref_Type __iter = Array_Type__iter(&generics);
-        #line 488 "src/analyzer/Naming.pv"
+        #line 495 "src/analyzer/Naming.pv"
         while (Iter_ref_Type__next(&__iter)) {
-            #line 488 "src/analyzer/Naming.pv"
+            #line 495 "src/analyzer/Naming.pv"
             struct Type* generic = Iter_ref_Type__value(&__iter);
 
-            #line 489 "src/analyzer/Naming.pv"
+            #line 496 "src/analyzer/Naming.pv"
             if (first) {
-                #line 489 "src/analyzer/Naming.pv"
+                #line 496 "src/analyzer/Naming.pv"
                 first = false;
             } else {
-                #line 489 "src/analyzer/Naming.pv"
+                #line 496 "src/analyzer/Naming.pv"
                 String__append(&result, self->generic_seperator);
             }
 
-            #line 491 "src/analyzer/Naming.pv"
+            #line 498 "src/analyzer/Naming.pv"
             if (self->naming_ident != 0) {
-                #line 492 "src/analyzer/Naming.pv"
+                #line 499 "src/analyzer/Naming.pv"
                 struct String generic_name = Naming__get_type_name(self->naming_ident, generic, type_self, generics_map);
-                #line 493 "src/analyzer/Naming.pv"
+                #line 500 "src/analyzer/Naming.pv"
                 String__append(&result, String__as_str(&generic_name));
             } else {
-                #line 495 "src/analyzer/Naming.pv"
+                #line 502 "src/analyzer/Naming.pv"
                 struct String generic_name = Naming__get_type_name(self, generic, type_self, generics_map);
-                #line 496 "src/analyzer/Naming.pv"
+                #line 503 "src/analyzer/Naming.pv"
                 String__append(&result, String__as_str(&generic_name));
             }
         } }
 
-        #line 500 "src/analyzer/Naming.pv"
+        #line 507 "src/analyzer/Naming.pv"
         String__append(&result, generic_end);
     }
 
-    #line 503 "src/analyzer/Naming.pv"
+    #line 510 "src/analyzer/Naming.pv"
     return result;
 }
 
-#line 506 "src/analyzer/Naming.pv"
+#line 513 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map) {
-    #line 507 "src/analyzer/Naming.pv"
+    #line 514 "src/analyzer/Naming.pv"
     switch (type->type) {
-        #line 508 "src/analyzer/Naming.pv"
+        #line 515 "src/analyzer/Naming.pv"
         case TYPE__FUNCTION: {
-            #line 508 "src/analyzer/Naming.pv"
+            #line 515 "src/analyzer/Naming.pv"
             struct Function* func_info = type->function_value._0;
-            #line 509 "src/analyzer/Naming.pv"
+            #line 516 "src/analyzer/Naming.pv"
             struct String result = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
-            #line 510 "src/analyzer/Naming.pv"
+            #line 517 "src/analyzer/Naming.pv"
             String__append(&result, (struct str){ .ptr = "fn(", .length = strlen("fn(") });
 
-            #line 512 "src/analyzer/Naming.pv"
+            #line 519 "src/analyzer/Naming.pv"
             bool first = true;
-            #line 513 "src/analyzer/Naming.pv"
+            #line 520 "src/analyzer/Naming.pv"
             { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-            #line 513 "src/analyzer/Naming.pv"
+            #line 520 "src/analyzer/Naming.pv"
             while (Iter_ref_Parameter__next(&__iter)) {
-                #line 513 "src/analyzer/Naming.pv"
+                #line 520 "src/analyzer/Naming.pv"
                 struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-                #line 514 "src/analyzer/Naming.pv"
+                #line 521 "src/analyzer/Naming.pv"
                 if (first) {
-                    #line 514 "src/analyzer/Naming.pv"
+                    #line 521 "src/analyzer/Naming.pv"
                     first = false;
                 } else {
-                    #line 514 "src/analyzer/Naming.pv"
+                    #line 521 "src/analyzer/Naming.pv"
                     String__append(&result, (struct str){ .ptr = ", ", .length = strlen(", ") });
                 }
-                #line 515 "src/analyzer/Naming.pv"
+                #line 522 "src/analyzer/Naming.pv"
                 struct String param_name = Naming__get_type_decl(self, &param->type, type_self, generics_map);
-                #line 516 "src/analyzer/Naming.pv"
+                #line 523 "src/analyzer/Naming.pv"
                 String__append_string(&result, &param_name);
             } }
-            #line 518 "src/analyzer/Naming.pv"
+            #line 525 "src/analyzer/Naming.pv"
             String__append(&result, (struct str){ .ptr = ")", .length = strlen(")") });
 
-            #line 520 "src/analyzer/Naming.pv"
+            #line 527 "src/analyzer/Naming.pv"
             struct String return_name = Naming__get_type_decl(self, &func_info->return_type, type_self, generics_map);
-            #line 521 "src/analyzer/Naming.pv"
+            #line 528 "src/analyzer/Naming.pv"
             if (!str__Eq_str__eq((struct str[]){String__as_str(&return_name)}, (struct str){ .ptr = "void", .length = strlen("void") })) {
-                #line 522 "src/analyzer/Naming.pv"
+                #line 529 "src/analyzer/Naming.pv"
                 String__append(&result, (struct str){ .ptr = ") -> ", .length = strlen(") -> ") });
-                #line 523 "src/analyzer/Naming.pv"
+                #line 530 "src/analyzer/Naming.pv"
                 String__append_string(&result, &return_name);
             }
 
-            #line 526 "src/analyzer/Naming.pv"
+            #line 533 "src/analyzer/Naming.pv"
             return result;
         } break;
-        #line 528 "src/analyzer/Naming.pv"
+        #line 535 "src/analyzer/Naming.pv"
         case TYPE__TYPEDEF_C: {
-            #line 528 "src/analyzer/Naming.pv"
+            #line 535 "src/analyzer/Naming.pv"
             struct TypedefC* typedef_info = type->typedefc_value;
-            #line 529 "src/analyzer/Naming.pv"
+            #line 536 "src/analyzer/Naming.pv"
             struct String result = Naming__get_variable_decl(self, typedef_info->name, typedef_info->type, type_self, generics_map);
-            #line 530 "src/analyzer/Naming.pv"
+            #line 537 "src/analyzer/Naming.pv"
             String__prepend(&result, (struct str){ .ptr = "typedef ", .length = strlen("typedef ") });
-            #line 531 "src/analyzer/Naming.pv"
+            #line 538 "src/analyzer/Naming.pv"
             return result;
         } break;
-        #line 533 "src/analyzer/Naming.pv"
+        #line 540 "src/analyzer/Naming.pv"
         default: {
         } break;
     }
 
-    #line 536 "src/analyzer/Naming.pv"
+    #line 543 "src/analyzer/Naming.pv"
     return Naming__get_type_name(self, type, type_self, generics_map);
 }
 
-#line 539 "src/analyzer/Naming.pv"
+#line 546 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map) {
-    #line 540 "src/analyzer/Naming.pv"
+    #line 547 "src/analyzer/Naming.pv"
     switch (type->type) {
-        #line 541 "src/analyzer/Naming.pv"
+        #line 548 "src/analyzer/Naming.pv"
         case TYPE__FUNCTION: {
-            #line 541 "src/analyzer/Naming.pv"
+            #line 548 "src/analyzer/Naming.pv"
             struct Function* func_info = type->function_value._0;
-            #line 542 "src/analyzer/Naming.pv"
+            #line 549 "src/analyzer/Naming.pv"
             struct String result = Naming__get_type_name(self, &func_info->return_type, type_self, generics_map);
-            #line 543 "src/analyzer/Naming.pv"
+            #line 550 "src/analyzer/Naming.pv"
             String__append(&result, (struct str){ .ptr = " (*", .length = strlen(" (*") });
-            #line 544 "src/analyzer/Naming.pv"
+            #line 551 "src/analyzer/Naming.pv"
             String__append(&result, variable_name);
-            #line 545 "src/analyzer/Naming.pv"
+            #line 552 "src/analyzer/Naming.pv"
             String__append(&result, (struct str){ .ptr = ")(", .length = strlen(")(") });
 
-            #line 547 "src/analyzer/Naming.pv"
+            #line 554 "src/analyzer/Naming.pv"
             { struct IterEnumerate_ref_Parameter __iter = Iter_ref_Parameter__enumerate(Array_Parameter__iter(&func_info->parameters));
-            #line 547 "src/analyzer/Naming.pv"
+            #line 554 "src/analyzer/Naming.pv"
             while (IterEnumerate_ref_Parameter__next(&__iter)) {
-                #line 547 "src/analyzer/Naming.pv"
+                #line 554 "src/analyzer/Naming.pv"
                 uintptr_t i = IterEnumerate_ref_Parameter__value(&__iter)._0;
-                #line 547 "src/analyzer/Naming.pv"
+                #line 554 "src/analyzer/Naming.pv"
                 struct Parameter* param = IterEnumerate_ref_Parameter__value(&__iter)._1;
 
-                #line 548 "src/analyzer/Naming.pv"
+                #line 555 "src/analyzer/Naming.pv"
                 if (i > 0) {
-                    #line 548 "src/analyzer/Naming.pv"
+                    #line 555 "src/analyzer/Naming.pv"
                     String__append(&result, (struct str){ .ptr = ", ", .length = strlen(", ") });
                 }
 
-                #line 550 "src/analyzer/Naming.pv"
+                #line 557 "src/analyzer/Naming.pv"
                 struct String param_type_name = Naming__get_type_name(self, &param->type, type_self, generics_map);
-                #line 551 "src/analyzer/Naming.pv"
+                #line 558 "src/analyzer/Naming.pv"
                 String__append_string(&result, &param_type_name);
-                #line 552 "src/analyzer/Naming.pv"
+                #line 559 "src/analyzer/Naming.pv"
                 String__release(&param_type_name);
             } }
 
-            #line 555 "src/analyzer/Naming.pv"
+            #line 562 "src/analyzer/Naming.pv"
             String__append(&result, (struct str){ .ptr = ")", .length = strlen(")") });
 
-            #line 557 "src/analyzer/Naming.pv"
+            #line 564 "src/analyzer/Naming.pv"
             return result;
         } break;
-        #line 559 "src/analyzer/Naming.pv"
+        #line 566 "src/analyzer/Naming.pv"
         default: {
         } break;
     }
 
-    #line 562 "src/analyzer/Naming.pv"
+    #line 569 "src/analyzer/Naming.pv"
     struct String result = Naming__get_type_name(self, type, type_self, generics_map);
-    #line 563 "src/analyzer/Naming.pv"
+    #line 570 "src/analyzer/Naming.pv"
     String__append(&result, (struct str){ .ptr = " ", .length = strlen(" ") });
-    #line 564 "src/analyzer/Naming.pv"
+    #line 571 "src/analyzer/Naming.pv"
     String__append(&result, variable_name);
 
-    #line 566 "src/analyzer/Naming.pv"
+    #line 573 "src/analyzer/Naming.pv"
     return result;
 }
 
-#line 569 "src/analyzer/Naming.pv"
+#line 576 "src/analyzer/Naming.pv"
 void Naming__append_decl_suffix(struct Naming* self, struct String* result, struct Type* type) {
-    #line 570 "src/analyzer/Naming.pv"
+    #line 577 "src/analyzer/Naming.pv"
     switch (type->type) {
-        #line 571 "src/analyzer/Naming.pv"
+        #line 578 "src/analyzer/Naming.pv"
         case TYPE__SEQUENCE: {
-            #line 571 "src/analyzer/Naming.pv"
+            #line 578 "src/analyzer/Naming.pv"
             struct Sequence* sequence = type->sequence_value;
-            #line 572 "src/analyzer/Naming.pv"
+            #line 579 "src/analyzer/Naming.pv"
             switch (sequence->type.type) {
-                #line 573 "src/analyzer/Naming.pv"
+                #line 580 "src/analyzer/Naming.pv"
                 case SEQUENCE_TYPE__FIXED_ARRAY: {
-                    #line 573 "src/analyzer/Naming.pv"
+                    #line 580 "src/analyzer/Naming.pv"
                     struct Expression* length = sequence->type.fixedarray_value;
-                    #line 574 "src/analyzer/Naming.pv"
+                    #line 581 "src/analyzer/Naming.pv"
                     String__append(result, self->sequence_open);
-                    #line 575 "src/analyzer/Naming.pv"
+                    #line 582 "src/analyzer/Naming.pv"
                     if (self->type == NAMING_TYPE__IDENT) {
-                        #line 576 "src/analyzer/Naming.pv"
+                        #line 583 "src/analyzer/Naming.pv"
                         Expression__append_ident_name(length, result);
                     } else {
-                        #line 578 "src/analyzer/Naming.pv"
+                        #line 585 "src/analyzer/Naming.pv"
                         Expression__append_display_name(length, result);
                     }
-                    #line 580 "src/analyzer/Naming.pv"
+                    #line 587 "src/analyzer/Naming.pv"
                     String__append(result, self->sequence_close);
 
-                    #line 582 "src/analyzer/Naming.pv"
+                    #line 589 "src/analyzer/Naming.pv"
                     Naming__append_decl_suffix(self, result, &sequence->element);
                 } break;
-                #line 584 "src/analyzer/Naming.pv"
+                #line 591 "src/analyzer/Naming.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 587 "src/analyzer/Naming.pv"
+        #line 594 "src/analyzer/Naming.pv"
         default: {
         } break;
     }
 }
 
-#line 591 "src/analyzer/Naming.pv"
+#line 598 "src/analyzer/Naming.pv"
 void Naming__append_cpp_path(struct Naming* self, struct String* result, struct ParentCpp parent) {
-    #line 592 "src/analyzer/Naming.pv"
+    #line 599 "src/analyzer/Naming.pv"
     switch (parent.type) {
-        #line 593 "src/analyzer/Naming.pv"
+        #line 600 "src/analyzer/Naming.pv"
         case PARENT_CPP__NONE: {
-            #line 593 "src/analyzer/Naming.pv"
+            #line 600 "src/analyzer/Naming.pv"
             return;
         } break;
-        #line 594 "src/analyzer/Naming.pv"
+        #line 601 "src/analyzer/Naming.pv"
         case PARENT_CPP__NAMESPACE: {
-            #line 594 "src/analyzer/Naming.pv"
+            #line 601 "src/analyzer/Naming.pv"
             struct NamespaceCpp* ns_info = parent.namespace_value;
-            #line 595 "src/analyzer/Naming.pv"
+            #line 602 "src/analyzer/Naming.pv"
             Naming__append_cpp_path(self, result, ns_info->parent);
-            #line 596 "src/analyzer/Naming.pv"
+            #line 603 "src/analyzer/Naming.pv"
             String__append(result, ns_info->name);
-            #line 597 "src/analyzer/Naming.pv"
+            #line 604 "src/analyzer/Naming.pv"
             String__append(result, (struct str){ .ptr = "::", .length = strlen("::") });
         } break;
-        #line 599 "src/analyzer/Naming.pv"
+        #line 606 "src/analyzer/Naming.pv"
         case PARENT_CPP__CLASS: {
-            #line 599 "src/analyzer/Naming.pv"
+            #line 606 "src/analyzer/Naming.pv"
             struct ClassCpp* class_info = parent.class_value;
-            #line 600 "src/analyzer/Naming.pv"
+            #line 607 "src/analyzer/Naming.pv"
             Naming__append_cpp_path(self, result, class_info->parent);
-            #line 601 "src/analyzer/Naming.pv"
+            #line 608 "src/analyzer/Naming.pv"
             String__append(result, class_info->name);
-            #line 602 "src/analyzer/Naming.pv"
+            #line 609 "src/analyzer/Naming.pv"
             String__append(result, (struct str){ .ptr = "::", .length = strlen("::") });
         } break;
     }

@@ -398,8 +398,15 @@ impl Naming {
                 }
 
                 result.append(func_info.name.value);
-                if func_info.generics.map.length > 0 {
-                    generics = generics2.array;
+                if func_info.generics.array.length > 0 && generics2 != null {
+                    let own_generics = Array<Type>::new(self.allocator);
+                    for *generic in func_info.generics.array {
+                        let gtype = generics2.get(generic.name.value);
+                        if gtype != null {
+                            own_generics.append(*gtype);
+                        }
+                    }
+                    generics = own_generics;
                 }
             },
             Type::CoroutineInstance(func_info, generics2) => {
