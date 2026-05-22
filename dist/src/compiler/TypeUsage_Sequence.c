@@ -12,9 +12,9 @@
 
 #include <compiler/TypeUsage_Sequence.h>
 
-#line 110 "src/compiler/Usages.pv"
+#line 123 "src/compiler/Usages.pv"
 struct TypeUsage_Sequence TypeUsage_Sequence__new(struct ArenaAllocator* allocator, struct Sequence* type) {
-    #line 111 "src/compiler/Usages.pv"
+    #line 124 "src/compiler/Usages.pv"
     return (struct TypeUsage_Sequence) {
         .allocator = allocator,
         .type = type,
@@ -23,12 +23,12 @@ struct TypeUsage_Sequence TypeUsage_Sequence__new(struct ArenaAllocator* allocat
     };
 }
 
-#line 119 "src/compiler/Usages.pv"
+#line 132 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Sequence__add_usage(struct TypeUsage_Sequence* self, struct GenericMap* generic_map) {
-    #line 120 "src/compiler/Usages.pv"
+    #line 133 "src/compiler/Usages.pv"
     struct UsageContext usage_context = UsageContext__new(self->allocator, generic_map);
-    #line 121 "src/compiler/Usages.pv"
+    #line 134 "src/compiler/Usages.pv"
     uintptr_t index = Array_UsageContext__append(&self->usage_contexts, usage_context);
-    #line 122 "src/compiler/Usages.pv"
+    #line 135 "src/compiler/Usages.pv"
     return &self->usage_contexts.data[index];
 }

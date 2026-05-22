@@ -7,7 +7,7 @@
 struct ArenaAllocator;
 struct Sequence;
 
-#line 102 "src/compiler/Usages.pv"
+#line 115 "src/compiler/Usages.pv"
 struct TypeUsage_Sequence {
     struct ArenaAllocator* allocator;
     struct Sequence* type;
@@ -22,10 +22,10 @@ struct TypeUsage_Sequence;
 struct GenericMap;
 struct UsageContext;
 
-#line 110 "src/compiler/Usages.pv"
+#line 123 "src/compiler/Usages.pv"
 struct TypeUsage_Sequence TypeUsage_Sequence__new(struct ArenaAllocator* allocator, struct Sequence* type);
 
-#line 119 "src/compiler/Usages.pv"
+#line 132 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Sequence__add_usage(struct TypeUsage_Sequence* self, struct GenericMap* generic_map);
 
 #endif

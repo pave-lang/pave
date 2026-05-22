@@ -7,7 +7,7 @@
 struct ArenaAllocator;
 struct Enum;
 
-#line 102 "src/compiler/Usages.pv"
+#line 115 "src/compiler/Usages.pv"
 struct TypeUsage_Enum {
     struct ArenaAllocator* allocator;
     struct Enum* type;
@@ -22,10 +22,10 @@ struct TypeUsage_Enum;
 struct GenericMap;
 struct UsageContext;
 
-#line 110 "src/compiler/Usages.pv"
+#line 123 "src/compiler/Usages.pv"
 struct TypeUsage_Enum TypeUsage_Enum__new(struct ArenaAllocator* allocator, struct Enum* type);
 
-#line 119 "src/compiler/Usages.pv"
+#line 132 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Enum__add_usage(struct TypeUsage_Enum* self, struct GenericMap* generic_map);
 
 #endif

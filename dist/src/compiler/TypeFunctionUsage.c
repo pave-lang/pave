@@ -31,7 +31,9 @@ struct UsageContext* TypeFunctionUsage__add_usage(struct TypeFunctionUsage* self
     #line 28 "src/compiler/Usages.pv"
     usage_context.function_context = FunctionContext__new(self->allocator, self->type, false);
     #line 29 "src/compiler/Usages.pv"
-    uintptr_t index = Array_UsageContext__append(&self->usage_contexts, usage_context);
+    usage_context.impl_dynamic_function = self->impl_dynamic_function;
     #line 30 "src/compiler/Usages.pv"
+    uintptr_t index = Array_UsageContext__append(&self->usage_contexts, usage_context);
+    #line 31 "src/compiler/Usages.pv"
     return &self->usage_contexts.data[index];
 }

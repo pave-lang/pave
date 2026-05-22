@@ -202,6 +202,15 @@ impl Generator {
         return true;
     }
 
+    fn write_dynamic_vtable_name(&self, file: &FILE, func_info: &Function, generics: &GenericMap) -> bool {
+        let name = self.naming_ident.get_type_name(&Type::Function(func_info, generics), generics.self_type, generics);
+        defer name.release();
+
+        self.write_str_title(file, name.as_str());
+
+        return true;
+    }
+
     fn is_reference(type: &Type) -> bool {
         match type {
             Type::Indirect(_) => { return true; },

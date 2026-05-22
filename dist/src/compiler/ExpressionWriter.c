@@ -88,7 +88,7 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
                 #line 32 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(struct trait_Co_CoroutineStatus) { .vtable = &");
                 #line 33 "src/compiler/ExpressionWriter.pv"
-                Generator__write_function_name(generator, file, func_info, func_generics);
+                Generator__write_dynamic_vtable_name(generator, file, func_info, func_generics);
                 #line 34 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "__VTABLE__CO, .instance = &(struct ");
                 #line 35 "src/compiler/ExpressionWriter.pv"
@@ -101,7 +101,7 @@ void ExpressionWriter__write_trait_cast(struct ExpressionWriter* self, FILE* fil
                 #line 39 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(struct trait_Fn) { .vtable = &");
                 #line 40 "src/compiler/ExpressionWriter.pv"
-                Generator__write_function_name(generator, file, func_info, func_generics);
+                Generator__write_dynamic_vtable_name(generator, file, func_info, func_generics);
                 #line 41 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "__VTABLE__DYN_FN, .instance = &(struct ");
                 #line 42 "src/compiler/ExpressionWriter.pv"

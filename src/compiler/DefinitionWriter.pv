@@ -100,9 +100,7 @@ impl DefinitionWriter {
         } else {
             fprintf(file, "extern struct trait_FnVTable ");
         }
-        generator.write_str_title(file, struct_name);
-        fprintf(file, "__");
-        generator.write_str_title(file, func_info.name.value);
+        generator.write_dynamic_vtable_name(file, func_info, generics);
         if is_coroutine {
             fprintf(file, "__VTABLE__CO;\n");
         } else {
@@ -440,6 +438,10 @@ impl DefinitionWriter {
                     fprintf(file, "\n");
                     if !self.write_function_definition(file, func_info, generics, null) { return false; }
                     fprintf(file, ";\n");
+
+                    if function_usage != null && function_usage.impl_dynamic_function {
+                        self.write_dynamic_function_instance_header(file, func_info, enum_info.name.value, generics, func_info.type == FunctionType::Coroutine);
+                    }
                 }
 
                 if impl_functions_for_impl != null && function_usage != null && func_info.generics.array.length > 0 {
@@ -449,6 +451,10 @@ impl DefinitionWriter {
                         fprintf(file, "\n");
                         if !self.write_function_definition(file, func_info, usage_context.generic_map, null) { return false; }
                         fprintf(file, ";\n");
+
+                        if usage_context.impl_dynamic_function {
+                            self.write_dynamic_function_instance_header(file, func_info, enum_info.name.value, usage_context.generic_map, func_info.type == FunctionType::Coroutine);
+                        }
                     }
                 }
             }
@@ -541,10 +547,14 @@ impl DefinitionWriter {
                                 fprintf(file, "\n");
                                 if !self.write_function_definition(file, func_info, usage_context.generic_map, null) { return false; }
                                 fprintf(file, ";\n");
+
+                                if usage_context.impl_dynamic_function {
+                                    self.write_dynamic_function_instance_header(file, func_info, struct_info.name.value, usage_context.generic_map, func_info.type == FunctionType::Coroutine);
+                                }
                             }
                         }
 
-                        if function_usage.impl_dynamic_function {
+                        if function_usage.impl_dynamic_function && func_info.generics.array.length == 0 {
                             self.write_dynamic_function_instance_header(file, func_info, struct_info.name.value, generics, func_info.type == FunctionType::Coroutine);
                         }
                     }
@@ -915,7 +925,7 @@ impl DefinitionWriter {
             fprintf(file, "struct trait_FnVTable ");
         }
 
-        generator.write_function_name(file, func_info, generics);
+        generator.write_dynamic_vtable_name(file, func_info, generics);
 
         if generator.is_coroutine() {
             fprintf(file, "__VTABLE__CO");
@@ -1034,6 +1044,10 @@ impl DefinitionWriter {
                             generator.function_context = &func_context;
 
                             self.write_function_block(file, name.as_str(), func_info, generics3, usage_context);
+
+                            if usage_context.impl_dynamic_function {
+                                self.write_dynamic_function_impl(file, func_info, generics3, module);
+                            }
 
                             generator.function_context = null;
                         }

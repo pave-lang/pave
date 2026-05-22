@@ -7,7 +7,7 @@
 struct ArenaAllocator;
 struct Struct;
 
-#line 102 "src/compiler/Usages.pv"
+#line 115 "src/compiler/Usages.pv"
 struct TypeUsage_Struct {
     struct ArenaAllocator* allocator;
     struct Struct* type;
@@ -22,10 +22,10 @@ struct TypeUsage_Struct;
 struct GenericMap;
 struct UsageContext;
 
-#line 110 "src/compiler/Usages.pv"
+#line 123 "src/compiler/Usages.pv"
 struct TypeUsage_Struct TypeUsage_Struct__new(struct ArenaAllocator* allocator, struct Struct* type);
 
-#line 119 "src/compiler/Usages.pv"
+#line 132 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Struct__add_usage(struct TypeUsage_Struct* self, struct GenericMap* generic_map);
 
 #endif

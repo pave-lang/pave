@@ -26,6 +26,7 @@ impl TypeFunctionUsage {
     fn add_usage(&self, generic_map: &GenericMap) -> &UsageContext {
         let usage_context = UsageContext::new(self.allocator, generic_map);
         usage_context.function_context = FunctionContext::new(self.allocator, self.type, false);
+        usage_context.impl_dynamic_function = self.impl_dynamic_function;
         let index = self.usage_contexts.append(usage_context);
         return &self.usage_contexts.data[index];
     }
@@ -40,6 +41,7 @@ enum UsageMode {
 struct UsageContext {
     generic_map: &GenericMap,
     function_context: FunctionContext,
+    impl_dynamic_function: bool,
     primitive_header: HashSet<str>,
     primitive_code: HashSet<str>,
     layout: HashMap<str, Type>,
@@ -54,6 +56,7 @@ impl UsageContext {
         return Self {
             generic_map,
             function_context: FunctionContext::new_const(allocator),
+            impl_dynamic_function: false,
             primitive_header: HashSet<str>::new(allocator),
             primitive_code: HashSet<str>::new(allocator),
             layout: HashMap<str, Type>::new(allocator),
@@ -95,6 +98,16 @@ impl UsageContext {
 
         for (_, &func_info) in trait_info.functions {
             self.impl_functions.data[0].insert(cast<usize>(func_info), TypeFunctionUsage::new(allocator, func_info));
+        }
+    }
+
+    fn apply_pending_dynamic_functions(&self, dynamic_impl_functions: &HashSet<usize>) {
+        for *impl_functions_for_impl in self.impl_functions {
+            for (func_ptr, &function_usage) in impl_functions_for_impl {
+                if dynamic_impl_functions.has(&func_ptr) {
+                    function_usage.impl_dynamic_function = true;
+                }
+            }
         }
     }
 }
@@ -140,6 +153,7 @@ struct Usages {
     traits: HashMap<usize, TypeUsage<Trait>>,
     sequences: HashMap<usize, TypeUsage<Sequence>>,
     tuples: HashMap<usize, TypeUsage<Tuple>>,
+    dynamic_impl_functions: HashSet<usize>,
 
     usage_mode: UsageMode,
     usage_context: *UsageContext,
@@ -170,6 +184,7 @@ impl Usages {
             traits: HashMap<usize, TypeUsage<Trait>>::new(allocator),
             sequences: HashMap<usize, TypeUsage<Sequence>>::new(allocator),
             tuples: HashMap<usize, TypeUsage<Tuple>>::new(allocator),
+            dynamic_impl_functions: HashSet<usize>::new(allocator),
 
             std_namespace: generator.root.find_namespace("std"),
             usage_mode: UsageMode::Layout,
@@ -436,6 +451,7 @@ impl Usages {
         let parent_usage = self.primitives.find(&parent_ptr);
         self.usage_context = parent_usage.add_usage(generic_map);
         self.usage_context.populate_impls(self.allocator, &primitive_info.impls);
+        self.usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
 
         self.process_impls(&primitive_info.impls, generic_map);
 
@@ -509,6 +525,7 @@ impl Usages {
         let parent_usage = self.structs.find(&parent_ptr);
         self.usage_context = parent_usage.add_usage(generic_map);
         self.usage_context.populate_impls(self.allocator, &struct_info.impls);
+        self.usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
         self.usage_mode = UsageMode::Layout;
 
         for (_, &field) in struct_info.fields {
@@ -542,6 +559,7 @@ impl Usages {
         let parent_usage = self.enums.find(&parent_ptr);
         self.usage_context = parent_usage.add_usage(generic_map);
         self.usage_context.populate_impls(self.allocator, &enum_info.impls);
+        self.usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
 
         self.usage_mode = UsageMode::Layout;
 
@@ -931,31 +949,72 @@ impl Usages {
                         match func_info.parent {
                             FunctionParent::None => {
                                 let usage = self.functions.find(&func_ptr);
-                                usage.impl_dynamic_function = true;
+                                if func_info.generics.array.length == 0 {
+                                    usage.impl_dynamic_function = true;
+                                }
+                                for *uc in usage.usage_contexts {
+                                    uc.impl_dynamic_function = true;
+                                }
                             },
                             FunctionParent::Primitive(primitive_info, impl_index, _) => {
                                 let parent_ptr = cast<usize>(primitive_info);
                                 let parent_usage = self.primitives.find(&parent_ptr);
-                                for *uc in parent_usage.usage_contexts {
-                                    let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
-                                    if impl_function != null { impl_function.impl_dynamic_function = true; }
+                                let marked = false;
+                                if parent_usage != null {
+                                    for *uc in parent_usage.usage_contexts {
+                                        let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
+                                        if impl_function != null {
+                                            marked = true;
+                                            if func_info.generics.array.length == 0 {
+                                                impl_function.impl_dynamic_function = true;
+                                            }
+                                            for *func_uc in impl_function.usage_contexts {
+                                                func_uc.impl_dynamic_function = true;
+                                            }
+                                        }
+                                    }
                                 }
+                                if !marked { self.dynamic_impl_functions.insert(func_ptr); }
                             },
                             FunctionParent::Struct(struct_info, impl_index, _) => {
                                 let parent_ptr = cast<usize>(struct_info);
                                 let parent_usage = self.structs.find(&parent_ptr);
-                                for *uc in parent_usage.usage_contexts {
-                                    let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
-                                    if impl_function != null { impl_function.impl_dynamic_function = true; }
+                                let marked = false;
+                                if parent_usage != null {
+                                    for *uc in parent_usage.usage_contexts {
+                                        let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
+                                        if impl_function != null {
+                                            marked = true;
+                                            if func_info.generics.array.length == 0 {
+                                                impl_function.impl_dynamic_function = true;
+                                            }
+                                            for *func_uc in impl_function.usage_contexts {
+                                                func_uc.impl_dynamic_function = true;
+                                            }
+                                        }
+                                    }
                                 }
+                                if !marked { self.dynamic_impl_functions.insert(func_ptr); }
                             },
                             FunctionParent::Enum(enum_info, impl_index, _) => {
                                 let parent_ptr = cast<usize>(enum_info);
                                 let parent_usage = self.enums.find(&parent_ptr);
-                                for *uc in parent_usage.usage_contexts {
-                                    let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
-                                    if impl_function != null { impl_function.impl_dynamic_function = true; }
+                                let marked = false;
+                                if parent_usage != null {
+                                    for *uc in parent_usage.usage_contexts {
+                                        let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
+                                        if impl_function != null {
+                                            marked = true;
+                                            if func_info.generics.array.length == 0 {
+                                                impl_function.impl_dynamic_function = true;
+                                            }
+                                            for *func_uc in impl_function.usage_contexts {
+                                                func_uc.impl_dynamic_function = true;
+                                            }
+                                        }
+                                    }
                                 }
+                                if !marked { self.dynamic_impl_functions.insert(func_ptr); }
                             },
                             _ => {},
                         }

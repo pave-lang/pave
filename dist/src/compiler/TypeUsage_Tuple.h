@@ -7,7 +7,7 @@
 struct ArenaAllocator;
 struct Tuple;
 
-#line 102 "src/compiler/Usages.pv"
+#line 115 "src/compiler/Usages.pv"
 struct TypeUsage_Tuple {
     struct ArenaAllocator* allocator;
     struct Tuple* type;
@@ -22,10 +22,10 @@ struct TypeUsage_Tuple;
 struct GenericMap;
 struct UsageContext;
 
-#line 110 "src/compiler/Usages.pv"
+#line 123 "src/compiler/Usages.pv"
 struct TypeUsage_Tuple TypeUsage_Tuple__new(struct ArenaAllocator* allocator, struct Tuple* type);
 
-#line 119 "src/compiler/Usages.pv"
+#line 132 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Tuple__add_usage(struct TypeUsage_Tuple* self, struct GenericMap* generic_map);
 
 #endif

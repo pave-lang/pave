@@ -31,4 +31,4 @@ void Physics__apply_physics__Fn__execute(void* __self) {
     struct Physics__apply_physics__Fn__Instance* self = __self;
     Physics__apply_physics(self->self, self->data, self->time);
 }
-struct trait_FnVTable Physics__apply_physics__VTABLE__DYN_FN = { .fn_size = &Physics__apply_physics__Fn__size, .fn_get_params = &Physics__apply_physics__Fn__get_params, .fn_set_arg = &Physics__apply_physics__Fn__set_arg, .fn_execute = &Physics__apply_physics__Fn__execute };
+struct trait_FnVTable PHYSICS__APPLY_PHYSICS__VTABLE__DYN_FN = { .fn_size = &Physics__apply_physics__Fn__size, .fn_get_params = &Physics__apply_physics__Fn__get_params, .fn_set_arg = &Physics__apply_physics__Fn__set_arg, .fn_execute = &Physics__apply_physics__Fn__execute };
