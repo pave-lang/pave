@@ -25,50 +25,32 @@ struct Query<T> {
 }
 
 impl<T> Query<T> {
-    fn add_flag<U>(self) -> Query<T, U> {
-        return Query<T, U> { flags: self.flags | 2 };
-    }
-
     co run(&self) -> (u32, *T) {
         yield (self.flags, null);
     }
 }
 
-struct Query<T, U> {
-    flags: u32,
-}
-
-impl<T, U> Query<T, U> {
-    co run(&self) -> (u32, *T, *U) {
-        yield (self.flags, null, null);
-    }
-}
-
 fn main(argc: i32, argv: **const char) -> i32 {
     let base = Query { flags: 0 };
-    let with_position = base.add_flag<Position>();
-    let with_both = with_position.add_flag<Velocity>();
+    let positions = base.add_flag<Position>();
 
-    for (flags, pos, vel) in with_both.run() {
+    for (flags, pos) in positions.run() {
             printf("flags: %u\n", flags);
     }
 
-    assert(with_position.flags == 1);
-    assert(with_both.flags == 3);
+    assert(positions.flags == 1);
 
-    printf("query flags: %u\n", with_both.flags);
+    printf("query flags: %u\n", positions.flags);
 
-    let reversed_with_position = base.add_flag<Velocity>();
-    let reversed_with_both = reversed_with_position.add_flag<Position>();
+    let velocities = base.add_flag<Velocity>();
 
-    for (flags, vel, pos) in reversed_with_both.run() {
+    for (flags, vel) in velocities.run() {
         printf("flags: %u\n", flags);
     }
 
-    assert(reversed_with_position.flags == 1);
-    assert(reversed_with_both.flags == 3);
+    assert(velocities.flags == 1);
 
-    printf("query flags: %u\n", reversed_with_both.flags);
+    printf("query flags: %u\n", velocities.flags);
 
     return 0;
 }

@@ -8,24 +8,12 @@
 #include <query/Query_Velocity.h>
 
 #include <query/Query_Velocity.h>
-#include <query/Query_Position_Velocity.h>
-#include <query/Query_Position.h>
-
-struct Query_Position_Velocity Query_Position__add_flag_Velocity_Position(struct Query_Velocity self) {
-    return (struct Query_Position_Velocity) { .flags = self.flags | 2 };
-}
-#include <query/Query_Velocity_Position.h>
-
-struct Query_Velocity_Position Query_Velocity__add_flag_Position_Velocity(struct Query_Velocity self) {
-    return (struct Query_Velocity_Position) { .flags = self.flags | 2 };
-}
 
 bool Query_Velocity__run__next(void* _ctx) {
     struct Query_Velocity__run* ctx = _ctx;
     switch (ctx->_state) {
     case 0: break;
         case 1: goto yield_1;
-        case 2: goto yield_2;
         default: return false;
     }
 

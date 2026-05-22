@@ -631,6 +631,10 @@ impl Usages {
 
         self.usage_mode = UsageMode::Body;
 
+        if func_info.type == FunctionType::Coroutine {
+            self.function_context.coroutine.yield_count = 0;
+        }
+
         self.process_block(func_info.body, generic_map);
 
         self.usage_context = parent_usage_context;
