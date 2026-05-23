@@ -16,6 +16,7 @@ struct Expression {
 };
 
 #include <analyzer/expression/ExpressionData.h>
+#include <analyzer/TokenBounds.h>
 #include <analyzer/expression/Expression.h>
 #include <std/str.h>
 #include <analyzer/expression/EnumVariantResult.h>
@@ -38,33 +39,36 @@ struct Array_NullNarrowing;
 struct Expression* Expression__make(struct ArenaAllocator* allocator, struct Token* token, struct ExpressionData data, struct Type* return_type);
 
 #line 23 "src/analyzer/expression/Expression.pv"
+struct TokenBounds Expression__get_token_bounds(struct Expression* self);
+
+#line 93 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__make_next(struct Context* context, struct Expression node);
 
-#line 31 "src/analyzer/expression/Expression.pv"
+#line 101 "src/analyzer/expression/Expression.pv"
 struct str Expression__number_primitive(struct str value);
 
-#line 42 "src/analyzer/expression/Expression.pv"
+#line 112 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 433 "src/analyzer/expression/Expression.pv"
+#line 503 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 480 "src/analyzer/expression/Expression.pv"
+#line 550 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 487 "src/analyzer/expression/Expression.pv"
+#line 557 "src/analyzer/expression/Expression.pv"
 bool Expression__is_const_expression(struct Expression* self, struct Context* context);
 
-#line 525 "src/analyzer/expression/Expression.pv"
+#line 595 "src/analyzer/expression/Expression.pv"
 void Expression__append_ident_name(struct Expression* self, struct String* result);
 
-#line 582 "src/analyzer/expression/Expression.pv"
+#line 652 "src/analyzer/expression/Expression.pv"
 void Expression__append_display_name(struct Expression* self, struct String* result);
 
-#line 629 "src/analyzer/expression/Expression.pv"
-bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* type, bool apply_implicit_cast);
+#line 699 "src/analyzer/expression/Expression.pv"
+bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast);
 
-#line 759 "src/analyzer/expression/Expression.pv"
+#line 829 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
@@ -127,7 +131,7 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
 #line 289 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 393 "src/analyzer/expression/PostfixExpression.pv"
+#line 395 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 11 "src/analyzer/expression/BinaryExpression.pv"

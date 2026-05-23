@@ -20,6 +20,76 @@ impl Expression {
         });
     }
 
+    fn get_token_bounds(&self) -> TokenBounds {
+        match self.data {
+            ExpressionData::BinaryExpression(lhs, _, rhs) => {
+                let lhs_bounds = lhs.get_token_bounds();
+                let rhs_bounds = rhs.get_token_bounds();
+                return TokenBounds::new(lhs_bounds.first, rhs_bounds.last);
+            },
+            ExpressionData::UnaryExpression(_, inner) => {
+                let inner_bounds = inner.get_token_bounds();
+                return TokenBounds::new(self.token, inner_bounds.last);
+            },
+            ExpressionData::IfExpression(_, _, otherwise) => {
+                let otherwise_bounds = otherwise.get_token_bounds();
+                return TokenBounds::new(self.token, otherwise_bounds.last);
+            },
+            ExpressionData::OptionalExpression(inner, value) => {
+                let inner_bounds = inner.get_token_bounds();
+                let value_bounds = value.get_token_bounds();
+                return TokenBounds::new(inner_bounds.first, value_bounds.last);
+            },
+            ExpressionData::MemberStaticExpression(inner, _) => {
+                let inner_bounds = inner.get_token_bounds();
+                return TokenBounds::new(inner_bounds.first, self.token);
+            },
+            ExpressionData::MemberInstanceExpression(inner, _) => {
+                let inner_bounds = inner.get_token_bounds();
+                return TokenBounds::new(inner_bounds.first, self.token);
+            },
+            ExpressionData::IndexExpression(inner, index) => {
+                let inner_bounds = inner.get_token_bounds();
+                let index_bounds = index.get_token_bounds();
+                return TokenBounds::new(inner_bounds.first, index_bounds.last);
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                let inner_bounds = inner.get_token_bounds();
+                return TokenBounds::new(self.token, inner_bounds.last);
+            },
+            ExpressionData::CppExpression(cpp) => {
+                match cpp {
+                    CppExpression::New { placement, expression: new_expression } => {
+                        let expression_bounds = new_expression.get_token_bounds();
+                        let last = expression_bounds.last;
+                        if placement != null {
+                            last = expression_bounds.last;
+                        }
+                        return TokenBounds::new(self.token, last);
+                    },
+                    CppExpression::Delete(delete_expression) => {
+                        let expression_bounds = delete_expression.get_token_bounds();
+                        return TokenBounds::new(self.token, expression_bounds.last);
+                    },
+                }
+            },
+            ExpressionData::ImplicitCast(inner) => {
+                return inner.get_token_bounds();
+            },
+            ExpressionData::Invoke(target, arguments) => {
+                let bounds = target.get_token_bounds();
+                for argument in arguments {
+                    let argument_bounds = argument.value.get_token_bounds();
+                    bounds.include(argument_bounds);
+                }
+                return bounds;
+            },
+            _ => {},
+        }
+
+        return TokenBounds::new(self.token, self.token);
+    }
+
     fn make_next(context: &Context, node: Expression) -> *Expression {
         let result = context.allocator.store(&node);
 
@@ -626,12 +696,12 @@ impl Expression {
         }
     }
 
-    fn validate_type(&self, context: &Context, type: &Type, apply_implicit_cast: bool) -> bool {
+    fn validate_type(&self, context: &Context, expected_type: &Type, apply_implicit_cast: bool) -> bool {
         let success = true;
 
         match self.data {
             ExpressionData::NullLiteral => {
-                match type.resolve_typedef() {
+                match expected_type.resolve_typedef() {
                     Type::Indirect(indirect) => {
                         match indirect.type {
                             IndirectType::Reference => {
@@ -650,7 +720,7 @@ impl Expression {
             },
             ExpressionData::Literal(value) => {
                 if value.eq("0") {
-                    match type {
+                    match expected_type {
                         Type::Indirect(indirect) => {
                             match indirect.type {
                                 IndirectType::Pointer => {
@@ -674,7 +744,7 @@ impl Expression {
         match self.data {
             ExpressionData::UnaryExpression(operator, child) => {
             if operator.eq("&") {
-                match type {
+                match expected_type {
                     Type::Indirect(indirect) => {
                         match indirect.to {
                             Type::Sequence(_) => {
@@ -695,15 +765,15 @@ impl Expression {
             }
         },
         ExpressionData::Invoke(invoke, &arguments) => {
-                match type {
+                match expected_type {
                     Type::Tuple(tuple) => {
                         for (i, argument) in arguments.iter().enumerate() {
                             success = argument.value.validate_type(context, &tuple.elements.data[i], apply_implicit_cast) && success;
                         }
 
-                        invoke.data = ExpressionData::Type(type);
-                        invoke.return_type = *type;
-                        self.return_type = *type;
+                        invoke.data = ExpressionData::Type(expected_type);
+                        invoke.return_type = *expected_type;
+                        self.return_type = *expected_type;
 
                         return success;
                     },
@@ -733,22 +803,22 @@ impl Expression {
             _ => {},
         }
 
-        if apply_implicit_cast && type.needs_implicit_cast(&self.return_type) {
+        if apply_implicit_cast && expected_type.needs_implicit_cast(&self.return_type) {
             let expression = context.allocator.store(self);
             self.data = ExpressionData::ImplicitCast(expression);
-            self.return_type = *type;
+            self.return_type = *expected_type;
             return true;
         }
 
-        if !type.eq(&self.return_type) {
+        if !expected_type.eq(&self.return_type) {
             let message = String::new(context.allocator);
-            message.append("Type ");
-            let type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, null);
-            message.append(type_name.as_str());
-            message.append(" does not match expression return type of ");
-            let return_type_name = context.root.naming_decl.get_type_decl(type, context.type_self, null);
-            message.append(return_type_name.as_str());
-            context.error_token(self.token, message.c_str());
+            message.append("Expected expression of type ");
+            let expected_type_name = context.root.naming_decl.get_type_decl(expected_type, context.type_self, null);
+            message.append(expected_type_name.as_str());
+            message.append(", but found ");
+            let actual_type_name = context.root.naming_decl.get_type_decl(&self.return_type, context.type_self, null);
+            message.append(actual_type_name.as_str());
+            context.error_expression(self, message.c_str());
             return false;
         }
 
@@ -766,17 +836,17 @@ impl Expression {
         match condition.return_type {
             Type::Primitive(prim) => {
                 if prim == null {
-                    context.error_token(condition.token, "If condition return type is blank");
+                    context.error_expression(condition, "If condition return type is blank");
                     return null;
                 }
 
                 if !prim.name.eq("bool") {
-                    context.error_token(condition.token, "If condition must be a bool expression");
+                    context.error_expression(condition, "If condition must be a bool expression");
                     return null;
                 }
             },
             _ => {
-                context.error_token(condition.token, "If condition must be a bool expression");
+                context.error_expression(condition, "If condition must be a bool expression");
                 return null;
             },
         }

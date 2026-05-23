@@ -12,7 +12,6 @@
 #include <analyzer/types/Generics.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Type.h>
-#include <analyzer/Token.h>
 #include <analyzer/types/Primitive.h>
 #include <std/str.h>
 #include <std/Array_NullNarrowing.h>
@@ -114,7 +113,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                 #line 42 "src/analyzer/statement/IfStatement.pv"
                 if (!Type__eq(Type__deref(&expression->return_type), enum_type)) {
                     #line 43 "src/analyzer/statement/IfStatement.pv"
-                    Context__error_token(context, expression->token, "If let expression type does not match pattern enum type");
+                    Context__error_expression(context, expression, "If let expression type does not match pattern enum type");
                     #line 44 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
                     #line 45 "src/analyzer/statement/IfStatement.pv"
@@ -126,7 +125,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                 #line 49 "src/analyzer/statement/IfStatement.pv"
                 if (!Type__is_discriminated_union(Type__deref(&expression->return_type))) {
                     #line 50 "src/analyzer/statement/IfStatement.pv"
-                    Context__error_token(context, expression->token, "If let expression must be an enum (discriminated union)");
+                    Context__error_expression(context, expression, "If let expression must be an enum (discriminated union)");
                     #line 51 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
                     #line 52 "src/analyzer/statement/IfStatement.pv"
@@ -165,7 +164,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                 #line 64 "src/analyzer/statement/IfStatement.pv"
                 if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
                     #line 65 "src/analyzer/statement/IfStatement.pv"
-                    Context__error_token(context, expression->token, "If condition must be a bool expression");
+                    Context__error_expression(context, expression, "If condition must be a bool expression");
                     #line 66 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
@@ -173,7 +172,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
             #line 69 "src/analyzer/statement/IfStatement.pv"
             default: {
                 #line 70 "src/analyzer/statement/IfStatement.pv"
-                Context__error_token(context, expression->token, "If condition must be a bool expression");
+                Context__error_expression(context, expression, "If condition must be a bool expression");
                 #line 71 "src/analyzer/statement/IfStatement.pv"
                 return 0;
             } break;
@@ -277,7 +276,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                         #line 109 "src/analyzer/statement/IfStatement.pv"
                         if (!Type__eq(&else_expression->return_type, enum_type)) {
                             #line 110 "src/analyzer/statement/IfStatement.pv"
-                            Context__error_token(context, else_expression->token, "If let expression type does not match pattern enum type");
+                            Context__error_expression(context, else_expression, "If let expression type does not match pattern enum type");
                             #line 111 "src/analyzer/statement/IfStatement.pv"
                             Context__pop_scope(context);
                             #line 112 "src/analyzer/statement/IfStatement.pv"
@@ -289,7 +288,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                         #line 116 "src/analyzer/statement/IfStatement.pv"
                         if (!Type__is_enum(&else_expression->return_type)) {
                             #line 117 "src/analyzer/statement/IfStatement.pv"
-                            Context__error_token(context, else_expression->token, "If let expression must be an enum (discriminated union)");
+                            Context__error_expression(context, else_expression, "If let expression must be an enum (discriminated union)");
                             #line 118 "src/analyzer/statement/IfStatement.pv"
                             Context__pop_scope(context);
                             #line 119 "src/analyzer/statement/IfStatement.pv"
@@ -335,7 +334,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                         #line 132 "src/analyzer/statement/IfStatement.pv"
                         if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
                             #line 133 "src/analyzer/statement/IfStatement.pv"
-                            Context__error_token(context, else_expression->token, "If condition must be a bool expression");
+                            Context__error_expression(context, else_expression, "If condition must be a bool expression");
                             #line 134 "src/analyzer/statement/IfStatement.pv"
                             return 0;
                         }
@@ -343,7 +342,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                     #line 137 "src/analyzer/statement/IfStatement.pv"
                     default: {
                         #line 138 "src/analyzer/statement/IfStatement.pv"
-                        Context__error_token(context, else_expression->token, "If condition must be a bool expression");
+                        Context__error_expression(context, else_expression, "If condition must be a bool expression");
                         #line 139 "src/analyzer/statement/IfStatement.pv"
                         return 0;
                     } break;

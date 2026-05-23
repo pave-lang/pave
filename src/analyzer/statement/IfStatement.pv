@@ -40,14 +40,14 @@ impl IfStatement {
             match p {
                 MatchPattern::EnumVariant(enum_type, _, _) => {
                     if !expression.return_type.deref().eq(enum_type) {
-                        context.error_token(expression.token, "If let expression type does not match pattern enum type");
+                        context.error_expression(expression, "If let expression type does not match pattern enum type");
                         context.pop_scope();
                         return null;
                     }
                 },
                 _ => {
                     if !expression.return_type.deref().is_discriminated_union() {
-                        context.error_token(expression.token, "If let expression must be an enum (discriminated union)");
+                        context.error_expression(expression, "If let expression must be an enum (discriminated union)");
                         context.pop_scope();
                         return null;
                     }
@@ -62,12 +62,12 @@ impl IfStatement {
                 Type::Primitive(prim) => {
                     if prim == null { return null; }
                     if !prim.name.eq("bool") {
-                        context.error_token(expression.token, "If condition must be a bool expression");
+                        context.error_expression(expression, "If condition must be a bool expression");
                         return null;
                     }
                 },
                 _ => {
-                    context.error_token(expression.token, "If condition must be a bool expression");
+                    context.error_expression(expression, "If condition must be a bool expression");
                     return null;
                 },
             }
@@ -107,14 +107,14 @@ impl IfStatement {
                     match ep {
                         MatchPattern::EnumVariant(enum_type, _, _) => {
                             if !else_expression.return_type.eq(enum_type) {
-                                context.error_token(else_expression.token, "If let expression type does not match pattern enum type");
+                                context.error_expression(else_expression, "If let expression type does not match pattern enum type");
                                 context.pop_scope();
                                 return null;
                             }
                         },
                         _ => {
                             if !else_expression.return_type.is_enum() {
-                                context.error_token(else_expression.token, "If let expression must be an enum (discriminated union)");
+                                context.error_expression(else_expression, "If let expression must be an enum (discriminated union)");
                                 context.pop_scope();
                                 return null;
                             }
@@ -130,12 +130,12 @@ impl IfStatement {
                         Type::Primitive(prim) => {
                             if prim == null { return null; }
                             if !prim.name.eq("bool") {
-                                context.error_token(else_expression.token, "If condition must be a bool expression");
+                                context.error_expression(else_expression, "If condition must be a bool expression");
                                 return null;
                             }
                         },
                         _ => {
-                            context.error_token(else_expression.token, "If condition must be a bool expression");
+                            context.error_expression(else_expression, "If condition must be a bool expression");
                             return null;
                         },
                     }

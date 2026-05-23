@@ -35,6 +35,27 @@ struct Token {
     end_column: usize,
 }
 
+struct TokenBounds {
+    first: &Token,
+    last: &Token,
+}
+
+impl TokenBounds {
+    fn new(first: &Token, last: &Token) -> Self {
+        return Self { first, last };
+    }
+
+    fn include(&self, bounds: TokenBounds) {
+        if bounds.first.start_line < self.first.start_line || (bounds.first.start_line == self.first.start_line && bounds.first.start_column < self.first.start_column) {
+            self.first = bounds.first;
+        }
+
+        if bounds.last.end_line > self.last.end_line || (bounds.last.end_line == self.last.end_line && bounds.last.end_column > self.last.end_column) {
+            self.last = bounds.last;
+        }
+    }
+}
+
 impl Token {
     fn eq(&self, type: TokenType, value: *const char) -> bool {
         let v = self.value;

@@ -40,7 +40,7 @@ impl Expression {
                     }
 
                     if param_type == null {
-                        context.error_token(arg.value.token, "Unable to resolve field type");
+                        context.error_expression(arg.value, "Unable to resolve field type");
                         return false;
                     }
 
@@ -119,7 +119,7 @@ impl Expression {
                     }
 
                     if param_type == null {
-                        context.error_token(arg.value.token, "Unable to resolve parameter type");
+                        context.error_expression(arg.value, "Unable to resolve parameter type");
                         return false;
                     }
 
@@ -129,7 +129,7 @@ impl Expression {
                         let label = String::new(context.allocator);
                         label.append(param.name.value);
                         label.append(": ");
-                        context.inlay_hint_before(arg.value.token, label.c_str(), InlayHintKind::Parameter, false, true);
+                        context.inlay_hint_before_expression(arg.value, label.c_str(), InlayHintKind::Parameter, false, true);
                     }
                 }
 
@@ -183,7 +183,7 @@ impl Expression {
                 }
 
                 if param_type == null {
-                    context.error_token(arg.value.token, "Unable to resolve field type");
+                    context.error_expression(arg.value, "Unable to resolve field type");
                     return false;
                 }
 
@@ -205,7 +205,7 @@ impl Expression {
             }
 
             if param_type == null {
-                context.error_token(arg.value.token, "Unable to resolve parameter type");
+                context.error_expression(arg.value, "Unable to resolve parameter type");
                 return false;
             }
 

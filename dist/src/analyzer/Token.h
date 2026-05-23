@@ -20,10 +20,10 @@ struct Token {
 #include <analyzer/TokenType.h>
 struct Token;
 
-#line 39 "src/analyzer/Token.pv"
+#line 60 "src/analyzer/Token.pv"
 bool Token__eq(struct Token* self, enum TokenType type, char const* value);
 
-#line 45 "src/analyzer/Token.pv"
+#line 66 "src/analyzer/Token.pv"
 void Token__print(struct Token* self, char const* path, char const* message);
 
 #endif

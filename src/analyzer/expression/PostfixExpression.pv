@@ -279,7 +279,7 @@ impl Expression {
         }
 
         if element_type == null {
-            context.error_token(index_expr.token, "Type is not indexable");
+            context.error_expression(index_expr, "Type is not indexable");
             return null;
         }
 
@@ -325,7 +325,9 @@ impl Expression {
 
                     if func_info.generics.array.length > 0 {
                         let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                        inner.return_type = *context.root.make_type_usage(&inner.return_type, &func_generics.array);
+                        let inner_return_type = context.root.make_type_usage(&inner.return_type, &func_generics.array);
+                        if inner_return_type == null { return null; }
+                        inner.return_type = *inner_return_type;
 
                         match inner.data {
                             ExpressionData::Type(&type) => {

@@ -13,9 +13,14 @@ struct Statement {
 
 #include <analyzer/statement/StatementData.h>
 #include <analyzer/statement/Statement.h>
+#include <analyzer/TokenBounds.h>
 struct Token;
+struct Statement;
 
 #line 10 "src/analyzer/statement/Statement.pv"
 struct Statement Statement__new(struct Token* first_token, struct Token* last_token, struct StatementData data);
+
+#line 14 "src/analyzer/statement/Statement.pv"
+struct TokenBounds Statement__get_token_bounds(struct Statement* self);
 
 #endif

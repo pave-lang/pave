@@ -128,6 +128,10 @@ impl Context {
     }
 
     fn error_token(&self, token: &Token, message: *const char) {
+        self.error_token_bounds(TokenBounds::new(token, token), message);
+    }
+
+    fn error_token_bounds(&self, bounds: TokenBounds, message: *const char) {
         let diagnostics = &self.analysis.diagnostics;
         let file_diagnostics = diagnostics.find(&self.path);
         if file_diagnostics == null { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
@@ -138,18 +142,30 @@ impl Context {
             code: str { ptr: null, length: 0 },
             range: Range {
                 start: Position {
-                    line: token.start_line,
-                    character: token.start_column,
+                    line: bounds.first.start_line,
+                    character: bounds.first.start_column,
                 },
                 end: Position {
-                    line: token.end_line,
-                    character: token.end_column,
+                    line: bounds.last.end_line,
+                    character: bounds.last.end_column,
                 },
             }
         });
     }
 
+    fn error_expression(&self, expression: &Expression, message: *const char) {
+        self.error_token_bounds(expression.get_token_bounds(), message);
+    }
+
+    fn error_statement(&self, statement: &Statement, message: *const char) {
+        self.error_token_bounds(statement.get_token_bounds(), message);
+    }
+
     fn error_token_value(&self, token: &Token, message: *const char, value: str) {
+        self.error_token_bounds_value(TokenBounds::new(token, token), message, value);
+    }
+
+    fn error_token_bounds_value(&self, bounds: TokenBounds, message: *const char, value: str) {
         let diagnostics = &self.analysis.diagnostics;
         let file_diagnostics = diagnostics.find(&self.path);
         if file_diagnostics == null { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
@@ -160,15 +176,23 @@ impl Context {
             code: value,
             range: Range {
                 start: Position {
-                    line: token.start_line,
-                    character: token.start_column,
+                    line: bounds.first.start_line,
+                    character: bounds.first.start_column,
                 },
                 end: Position {
-                    line: token.end_line,
-                    character: token.end_column,
+                    line: bounds.last.end_line,
+                    character: bounds.last.end_column,
                 },
             }
         });
+    }
+
+    fn error_expression_value(&self, expression: &Expression, message: *const char, value: str) {
+        self.error_token_bounds_value(expression.get_token_bounds(), message, value);
+    }
+
+    fn error_statement_value(&self, statement: &Statement, message: *const char, value: str) {
+        self.error_token_bounds_value(statement.get_token_bounds(), message, value);
     }
 
     fn error(&self, message: *const char) {
@@ -218,6 +242,10 @@ impl Context {
     }
 
     fn inlay_hint(&self, token: &Token, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        self.inlay_hint_token_bounds(TokenBounds::new(token, token), label, kind, padding_left, padding_right);
+    }
+
+    fn inlay_hint_token_bounds(&self, bounds: TokenBounds, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
         let inlay_hints = &self.analysis.inlay_hints;
         let file_inlay_hints = inlay_hints.find(&self.path);
         if file_inlay_hints == null { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
@@ -225,8 +253,8 @@ impl Context {
 
         file_inlay_hints.append(InlayHint {
             position: Position {
-                line: token.end_line,
-                character: token.end_column,
+                line: bounds.last.end_line,
+                character: bounds.last.end_column,
             },
             label: label,
             kind,
@@ -235,7 +263,19 @@ impl Context {
         });
     }
 
+    fn inlay_hint_expression(&self, expression: &Expression, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        self.inlay_hint_token_bounds(expression.get_token_bounds(), label, kind, padding_left, padding_right);
+    }
+
+    fn inlay_hint_statement(&self, statement: &Statement, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        self.inlay_hint_token_bounds(statement.get_token_bounds(), label, kind, padding_left, padding_right);
+    }
+
     fn inlay_hint_before(&self, token: &Token, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        self.inlay_hint_before_token_bounds(TokenBounds::new(token, token), label, kind, padding_left, padding_right);
+    }
+
+    fn inlay_hint_before_token_bounds(&self, bounds: TokenBounds, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
         let inlay_hints = &self.analysis.inlay_hints;
         let file_inlay_hints = inlay_hints.find(&self.path);
         if file_inlay_hints == null { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
@@ -243,14 +283,22 @@ impl Context {
 
         file_inlay_hints.append(InlayHint {
             position: Position {
-                line: token.start_line,
-                character: token.start_column,
+                line: bounds.first.start_line,
+                character: bounds.first.start_column,
             },
             label: label,
             kind,
             padding_left,
             padding_right,
         });
+    }
+
+    fn inlay_hint_before_expression(&self, expression: &Expression, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        self.inlay_hint_before_token_bounds(expression.get_token_bounds(), label, kind, padding_left, padding_right);
+    }
+
+    fn inlay_hint_before_statement(&self, statement: &Statement, label: *const char, kind: InlayHintKind, padding_left: bool, padding_right: bool) {
+        self.inlay_hint_before_token_bounds(statement.get_token_bounds(), label, kind, padding_left, padding_right);
     }
 
     fn next_token(&self) -> bool {

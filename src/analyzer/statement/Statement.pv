@@ -10,4 +10,8 @@ impl Statement {
     fn new(first_token: &Token, last_token: &Token, data: StatementData) -> Self {
         return Self { first_token, last_token, data };
     }
+
+    fn get_token_bounds(&self) -> TokenBounds {
+        return TokenBounds::new(self.first_token, self.last_token);
+    }
 }
