@@ -63,7 +63,13 @@ impl Expression {
     }
 
     fn parse_instance_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
+        // let dot_token = context.current();
         if !context.expect_value(TokenType::Symbol, ".") { return null; }
+
+        // if inner.return_type.is_pointer() {
+        //     context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");
+        //     return null;
+        // }
 
         let member_name = context.current();
         if member_name == null { return null; }
