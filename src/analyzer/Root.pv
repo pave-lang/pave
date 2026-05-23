@@ -291,7 +291,7 @@ impl Root {
         let file_diagnostics = diagnostics.find(&path);
 
         let diagnostic = Diagnostic {
-            message: str { ptr: message, length: strlen(message) },
+            message: message,
             code: str { ptr: null, length: 0 },
             range: Range {
                 start: Position {

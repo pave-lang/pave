@@ -151,13 +151,23 @@ impl Module {
 
                 if include == null {
                     include = Include::new(self.root, path.value, self.mode_cpp);
-                    if include == null { return false; }
-                    include.process();
-                    includes.insert(path.value, include);
+                    if include == null || !include.process() {
+                        let error = path.value;
+
+                        if include != null && include.error.length > 0 {
+                            context.error_token(path, include.error.ptr);
+                        } else {
+                            context.error_token_value(path, "Failed to process include", error);
+                        }
+
+                        include = null;
+                    }
                 }
 
-                if self.includes.find(&path.value) == null {
-                    self.includes.insert(path.value, include);
+                if include != null {
+                    if self.includes.find(&path.value) == null {
+                        self.includes.insert(path.value, include);
+                    }
                 }
             } else if token.eq(TokenType::Keyword, "enum") {
                 let node: Enum = Enum::parse(context);

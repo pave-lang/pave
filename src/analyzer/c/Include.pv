@@ -15,6 +15,7 @@ struct Include {
     types: HashMap<str, Type>,
     values: HashMap<str, Type>,
     macro_values: HashMap<str, i64>,
+    error: str,
 }
 
 impl Include {
@@ -28,6 +29,7 @@ impl Include {
             types: HashMap<str, Type>::new(root.allocator),
             values: HashMap<str, Type>::new(root.allocator),
             macro_values: HashMap<str, i64>::new(root.allocator),
+            error: str { ptr: null, length: 0 },
         });
 
         if self == null {
@@ -122,7 +124,7 @@ impl Include {
             Length: file_content.length(),
         };
 
-        let index = clang_createIndex(0, 1);
+        let index = clang_createIndex(0, 0);
         if index == cast<CXIndex>(0) {
             self.root.error(self.path, 0, 0, 0, 0, "clang_createIndex failed\n");
             return false;
@@ -148,42 +150,71 @@ impl Include {
             return 0;
         } */
 
+        let success = true;
+
+        if unit != cast<CXTranslationUnit>(0) {
+            success = self.report_diagnostics(unit);
+        }
+
         match result {
             CXError_Failure => {
-                let num_errors: usize = clang_getNumDiagnostics(unit);
-                let display_options: usize = clang_defaultDiagnosticDisplayOptions();
-
-                if num_errors == 0 {
-                    self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure no errors");
-                } else {
-                    self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure has errors");
+                if success {
+                    self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Failure");
                 }
-
-                let i: usize = 0;
-                while i < num_errors {
-                    let diag: CXDiagnostic = clang_getDiagnostic(unit, i);
-                    let str: CXString = clang_formatDiagnostic(diag, display_options);
-
-                    self.root.error(self.path, 0, 0, 0, 0, clang_getCString(str));
-
-                    clang_disposeString(str);
-                    clang_disposeDiagnostic(diag);
-                    i += 1;
-                }
+                success = false;
             },
-            CXError_Crashed => { self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Crashed"); },
-            CXError_InvalidArguments => { self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_InvalidArguments"); },
-            CXError_ASTReadError => { self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_ASTReadError"); },
+            CXError_Crashed => {
+                self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_Crashed");
+                success = false;
+            },
+            CXError_InvalidArguments => {
+                self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_InvalidArguments");
+                success = false;
+            },
+            CXError_ASTReadError => {
+                self.root.error(self.path, 0, 0, 0, 0, "clang_parseTranslationUnit failed CXError_ASTReadError");
+                success = false;
+            },
             CXError_Success => {},
         }
 
-        let cursor = clang_getTranslationUnitCursor(unit);
-        clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: null, types: &self.types, values: &self.values, parent: ParentCpp::None });
+        if success {
+            let cursor = clang_getTranslationUnitCursor(unit);
+            clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: null, types: &self.types, values: &self.values, parent: ParentCpp::None });
+        }
 
-        clang_disposeTranslationUnit(unit);
+        if unit != cast<CXTranslationUnit>(0) {
+            clang_disposeTranslationUnit(unit);
+        }
         clang_disposeIndex(index);
 
-        return true;
+        return success;
+    }
+
+    fn report_diagnostics(&self, unit: CXTranslationUnit) -> bool {
+        let success = true;
+        let num_diagnostics: usize = clang_getNumDiagnostics(unit);
+        let display_options: usize = clang_defaultDiagnosticDisplayOptions();
+
+        let i: usize = 0;
+        while i < num_diagnostics {
+            let diag: CXDiagnostic = clang_getDiagnostic(unit, i);
+            let severity = clang_getDiagnosticSeverity(diag);
+
+            if cast<u32>(severity) >= 3 {
+                if self.error.length == 0 {
+                    let formatted: CXString = clang_formatDiagnostic(diag, display_options);
+                    self.error = self.make_str(formatted);
+                    clang_disposeString(formatted);
+                }
+                success = false;
+            }
+
+            clang_disposeDiagnostic(diag);
+            i += 1;
+        }
+
+        return success;
     }
 
     fn parse_type(&self, type: CXType) -> *Type {

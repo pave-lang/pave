@@ -60,49 +60,49 @@ struct Module* Module__new(struct Namespace* namespace, struct str path);
 #line 67 "src/analyzer/Module.pv"
 bool Module__parse(struct Module* self);
 
-#line 346 "src/analyzer/Module.pv"
+#line 356 "src/analyzer/Module.pv"
 bool Module__add_use_namespaces(struct Module* self);
 
-#line 356 "src/analyzer/Module.pv"
+#line 366 "src/analyzer/Module.pv"
 bool Module__add_use_namespace(struct Module* self, struct NamespacePath* path);
 
-#line 388 "src/analyzer/Module.pv"
+#line 398 "src/analyzer/Module.pv"
 bool Module__fill_namespace(struct Module* self);
 
-#line 446 "src/analyzer/Module.pv"
+#line 456 "src/analyzer/Module.pv"
 bool Module__prefill_types(struct Module* self);
 
-#line 491 "src/analyzer/Module.pv"
+#line 501 "src/analyzer/Module.pv"
 bool Module__prefill_types_impl(struct Module* self);
 
-#line 555 "src/analyzer/Module.pv"
+#line 565 "src/analyzer/Module.pv"
 bool Module__parse_declarations(struct Module* self);
 
-#line 607 "src/analyzer/Module.pv"
+#line 617 "src/analyzer/Module.pv"
 bool Module__parse_globals(struct Module* self);
 
-#line 623 "src/analyzer/Module.pv"
+#line 633 "src/analyzer/Module.pv"
 bool Module__parse_functions(struct Module* self);
 
-#line 652 "src/analyzer/Module.pv"
+#line 662 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name, uintptr_t arity);
 
-#line 675 "src/analyzer/Module.pv"
+#line 685 "src/analyzer/Module.pv"
 struct Trait* Module__find_trait(struct Module* self, struct str name, uintptr_t arity);
 
-#line 690 "src/analyzer/Module.pv"
+#line 700 "src/analyzer/Module.pv"
 struct Type* Module__find_function(struct Module* self, struct str name);
 
-#line 705 "src/analyzer/Module.pv"
+#line 715 "src/analyzer/Module.pv"
 struct Type* Module__find_value(struct Module* self, struct str name);
 
-#line 724 "src/analyzer/Module.pv"
+#line 734 "src/analyzer/Module.pv"
 int64_t* Module__find_macro_value(struct Module* self, struct str name);
 
-#line 732 "src/analyzer/Module.pv"
+#line 742 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
-#line 738 "src/analyzer/Module.pv"
+#line 748 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name);
 
 #endif

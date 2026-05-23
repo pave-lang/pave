@@ -538,7 +538,7 @@ void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintp
 
     #line 293 "src/analyzer/Root.pv"
     struct Diagnostic diagnostic = (struct Diagnostic) {
-        .message = (struct str) { .ptr = message, .length = strlen(message) },
+        .message = (struct str){ .ptr = message, .length = strlen(message) },
         .code = (struct str) { .ptr = 0, .length = 0 },
         .range = (struct Range) {
             .start = (struct Position) {
