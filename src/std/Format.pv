@@ -9,8 +9,22 @@ fn format(out: &dyn Writer, fmt: str, parts: ...&dyn Format) {
     while i < fmt.length {
         let start = i;
 
-        while i < fmt.length && fmt.ptr[i] != '{' && fmt.ptr[i] != '}' {
-            i += 1;
+        while i < fmt.length {
+            if fmt.ptr[i] == '{' {
+                if i + 1 < fmt.length && fmt.ptr[i + 1] == '{' {
+                    out.write(fmt.slice(start, i + 1));
+                    i += 2;
+                    start = i;
+                } else {
+                    break;
+                }
+            } else if fmt.ptr[i] == '}' && i + 1 < fmt.length && fmt.ptr[i + 1] == '}' {
+                out.write(fmt.slice(start, i + 1));
+                i += 2;
+                start = i;
+            } else {
+                i += 1;
+            }
         }
 
         if start < i {
@@ -19,24 +33,6 @@ fn format(out: &dyn Writer, fmt: str, parts: ...&dyn Format) {
 
         if i >= fmt.length {
             return;
-        }
-
-        if fmt.ptr[i] == '}' {
-            if i + 1 < fmt.length && fmt.ptr[i + 1] == '}' {
-                out.write_char('}');
-                i += 2;
-            } else {
-                out.write_char(fmt.ptr[i]);
-                i += 1;
-            }
-
-            continue;
-        }
-
-        if i + 1 < fmt.length && fmt.ptr[i + 1] == '{' {
-            out.write_char('{');
-            i += 2;
-            continue;
         }
 
         let end = i + 1;
@@ -53,14 +49,16 @@ fn format(out: &dyn Writer, fmt: str, parts: ...&dyn Format) {
 
         let info = fmt.slice(i + 1, end);
 
-        if part_i < parts.length {
-            parts.data[part_i].format(out, info);
-            part_i += 1;
-        } else {
+        if part_i >= parts.length {
             out.write_char('{');
             out.write(info);
             out.write_char('}');
+            i = end + 1;
+            continue;
         }
+
+        parts[part_i].format(out, info);
+        part_i += 1;
 
         i = end + 1;
     }
