@@ -352,7 +352,7 @@ bool DefinitionWriter__write_function_definition(struct DefinitionWriter* self, 
     } }
 
     #line 156 "src/compiler/DefinitionWriter.pv"
-    if (func_info->variadic) {
+    if (func_info->variadic && !func_info->typed_variadic) {
         #line 157 "src/compiler/DefinitionWriter.pv"
         if (!first) {
             #line 157 "src/compiler/DefinitionWriter.pv"

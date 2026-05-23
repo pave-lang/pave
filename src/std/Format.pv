@@ -1,0 +1,67 @@
+trait Format {
+    fn format(&self, out: &dyn Writer, info: str);
+}
+
+fn format(out: &dyn Writer, fmt: str, parts: ...&dyn Format) {
+    let part_i: usize = 0;
+    let i: usize = 0;
+
+    while i < fmt.length {
+        let start = i;
+
+        while i < fmt.length && fmt.ptr[i] != '{' && fmt.ptr[i] != '}' {
+            i += 1;
+        }
+
+        if start < i {
+            out.write(fmt.slice(start, i));
+        }
+
+        if i >= fmt.length {
+            return;
+        }
+
+        if fmt.ptr[i] == '}' {
+            if i + 1 < fmt.length && fmt.ptr[i + 1] == '}' {
+                out.write_char('}');
+                i += 2;
+            } else {
+                out.write_char(fmt.ptr[i]);
+                i += 1;
+            }
+
+            continue;
+        }
+
+        if i + 1 < fmt.length && fmt.ptr[i + 1] == '{' {
+            out.write_char('{');
+            i += 2;
+            continue;
+        }
+
+        let end = i + 1;
+
+        while end < fmt.length && fmt.ptr[end] != '}' {
+            end += 1;
+        }
+
+        if end >= fmt.length {
+            out.write_char(fmt.ptr[i]);
+            i += 1;
+            continue;
+        }
+
+        let info = fmt.slice(i + 1, end);
+
+        if part_i < parts.length {
+            parts.data[part_i].format(out, info);
+            part_i += 1;
+        } else {
+            out.write_char('{');
+            out.write(info);
+            out.write_char('}');
+        }
+
+        i = end + 1;
+    }
+}

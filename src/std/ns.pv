@@ -12,6 +12,8 @@ mod Iter
 mod Range
 mod Slice
 mod str
+mod Writer
+mod Format
 mod String
 mod TypeId
 

@@ -75,6 +75,9 @@
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <std/Iter_ref_Generic.h>
+#include <std/HashMap_str_ref_Trait.h>
+#include <tuple_ref_Trait_ref_Type.h>
+#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <std/HashMapBucket_str_StructField.h>
 #include <analyzer/InlayHintKind.h>
 #include <std/Array_str.h>
@@ -2621,496 +2624,682 @@ void Expression__resolve_generic_type(struct Context* context, struct Type* para
 }
 
 #line 7 "src/analyzer/expression/ExpressionValidate.pv"
-bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call) {
+bool Expression__type_implements_trait(struct Type* type, struct Trait* trait_info) {
     #line 8 "src/analyzer/expression/ExpressionValidate.pv"
-    uintptr_t arguments_length = arguments->length;
+    struct str trait_key = Trait__get_key(trait_info, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = trait_info->module->context.allocator });
 
     #line 10 "src/analyzer/expression/ExpressionValidate.pv"
     switch (type->type) {
         #line 11 "src/analyzer/expression/ExpressionValidate.pv"
-        case TYPE__SELF: {
+        case TYPE__PRIMITIVE: {
+            #line 11 "src/analyzer/expression/ExpressionValidate.pv"
+            struct Primitive* primitive_info = type->primitive_value;
             #line 12 "src/analyzer/expression/ExpressionValidate.pv"
-            if (context->type_self == 0) {
+            if (primitive_info == 0) {
                 #line 12 "src/analyzer/expression/ExpressionValidate.pv"
                 return false;
             }
             #line 13 "src/analyzer/expression/ExpressionValidate.pv"
-            type = context->type_self;
+            return HashMap_str_ref_Trait__find(&primitive_info->traits, &trait_key) != 0;
         } break;
         #line 15 "src/analyzer/expression/ExpressionValidate.pv"
+        case TYPE__STRUCT: {
+            #line 15 "src/analyzer/expression/ExpressionValidate.pv"
+            struct Struct* struct_info = type->struct_value._0;
+            #line 16 "src/analyzer/expression/ExpressionValidate.pv"
+            return HashMap_str_tuple_ref_Trait_ref_Type__find(&struct_info->traits, &trait_key) != 0;
+        } break;
+        #line 18 "src/analyzer/expression/ExpressionValidate.pv"
+        case TYPE__ENUM: {
+            #line 18 "src/analyzer/expression/ExpressionValidate.pv"
+            struct Enum* enum_info = type->enum_value._0;
+            #line 19 "src/analyzer/expression/ExpressionValidate.pv"
+            return HashMap_str_ref_Trait__find(&enum_info->traits, &trait_key) != 0;
+        } break;
+        #line 21 "src/analyzer/expression/ExpressionValidate.pv"
+        case TYPE__TYPEDEF_C: {
+            #line 21 "src/analyzer/expression/ExpressionValidate.pv"
+            struct TypedefC* typedef_info = type->typedefc_value;
+            #line 22 "src/analyzer/expression/ExpressionValidate.pv"
+            return Expression__type_implements_trait(typedef_info->type, trait_info);
+        } break;
+        #line 24 "src/analyzer/expression/ExpressionValidate.pv"
         default: {
         } break;
     }
 
-    #line 18 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 27 "src/analyzer/expression/ExpressionValidate.pv"
+    return false;
+}
+
+#line 30 "src/analyzer/expression/ExpressionValidate.pv"
+bool Expression__validate_typed_variadic_argument(struct Context* context, struct Expression* arg, struct Type* element_type) {
+    #line 31 "src/analyzer/expression/ExpressionValidate.pv"
+    switch (element_type->type) {
+        #line 32 "src/analyzer/expression/ExpressionValidate.pv"
+        case TYPE__INDIRECT: {
+            #line 32 "src/analyzer/expression/ExpressionValidate.pv"
+            struct Indirect* indirect = element_type->indirect_value;
+            #line 33 "src/analyzer/expression/ExpressionValidate.pv"
+            switch (indirect->to.type) {
+                #line 34 "src/analyzer/expression/ExpressionValidate.pv"
+                case TYPE__TRAIT: {
+                    #line 34 "src/analyzer/expression/ExpressionValidate.pv"
+                    struct Trait* trait_info = indirect->to.trait_value._0;
+                    #line 35 "src/analyzer/expression/ExpressionValidate.pv"
+                    if (Type__is_indirect(&arg->return_type)) {
+                        #line 36 "src/analyzer/expression/ExpressionValidate.pv"
+                        return Expression__validate_type(arg, context, element_type, true);
+                    }
+
+                    #line 39 "src/analyzer/expression/ExpressionValidate.pv"
+                    if (Expression__type_implements_trait(&arg->return_type, trait_info)) {
+                        #line 40 "src/analyzer/expression/ExpressionValidate.pv"
+                        return true;
+                    }
+                } break;
+                #line 43 "src/analyzer/expression/ExpressionValidate.pv"
+                default: {
+                } break;
+            }
+        } break;
+        #line 46 "src/analyzer/expression/ExpressionValidate.pv"
+        default: {
+        } break;
+    }
+
+    #line 49 "src/analyzer/expression/ExpressionValidate.pv"
+    return Expression__validate_type(arg, context, element_type, true);
+}
+
+#line 52 "src/analyzer/expression/ExpressionValidate.pv"
+bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call) {
+    #line 53 "src/analyzer/expression/ExpressionValidate.pv"
+    uintptr_t arguments_length = arguments->length;
+
+    #line 55 "src/analyzer/expression/ExpressionValidate.pv"
     switch (type->type) {
-        #line 19 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 56 "src/analyzer/expression/ExpressionValidate.pv"
+        case TYPE__SELF: {
+            #line 57 "src/analyzer/expression/ExpressionValidate.pv"
+            if (context->type_self == 0) {
+                #line 57 "src/analyzer/expression/ExpressionValidate.pv"
+                return false;
+            }
+            #line 58 "src/analyzer/expression/ExpressionValidate.pv"
+            type = context->type_self;
+        } break;
+        #line 60 "src/analyzer/expression/ExpressionValidate.pv"
+        default: {
+        } break;
+    }
+
+    #line 63 "src/analyzer/expression/ExpressionValidate.pv"
+    switch (type->type) {
+        #line 64 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__TYPEDEF_C: {
-            #line 19 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 64 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 20 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 65 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__UNION_C: {
-            #line 20 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 65 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 21 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 66 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__STRUCT_C: {
-            #line 21 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 66 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 22 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 67 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__TUPLE: {
-            #line 22 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 67 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 23 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 68 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__STRUCT: {
-            #line 23 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 68 "src/analyzer/expression/ExpressionValidate.pv"
             struct Struct* struct_info = type->struct_value._0;
-            #line 23 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 68 "src/analyzer/expression/ExpressionValidate.pv"
             struct GenericMap* generic_map2 = type->struct_value._1;
-            #line 24 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 69 "src/analyzer/expression/ExpressionValidate.pv"
             { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-            #line 24 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 69 "src/analyzer/expression/ExpressionValidate.pv"
             while (Iter_ref_InvokeArgument__next(&__iter)) {
-                #line 24 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 69 "src/analyzer/expression/ExpressionValidate.pv"
                 struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                #line 25 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 70 "src/analyzer/expression/ExpressionValidate.pv"
                 struct Token* arg_name = arg->name;
-                #line 26 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 71 "src/analyzer/expression/ExpressionValidate.pv"
                 if (arg_name == 0) {
-                    #line 26 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 71 "src/analyzer/expression/ExpressionValidate.pv"
                     return false;
                 }
-                #line 27 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 72 "src/analyzer/expression/ExpressionValidate.pv"
                 struct StructField* param = HashMap_str_StructField__find(&struct_info->fields, &arg_name->value);
 
-                #line 29 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 74 "src/analyzer/expression/ExpressionValidate.pv"
                 if (param == 0) {
-                    #line 30 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 75 "src/analyzer/expression/ExpressionValidate.pv"
                     Context__error_token(context, arg_name, "Unable to find field in struct");
-                    #line 31 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 76 "src/analyzer/expression/ExpressionValidate.pv"
                     return false;
                 }
 
-                #line 34 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 79 "src/analyzer/expression/ExpressionValidate.pv"
                 struct Type* param_type = &param->type;
 
-                #line 36 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 81 "src/analyzer/expression/ExpressionValidate.pv"
                 if (generic_map2 != 0 && generic_map2->map.length > 0) {
-                    #line 37 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 82 "src/analyzer/expression/ExpressionValidate.pv"
                     param_type = Context__resolve_type(context->allocator, param_type, generic_map2, generic_map);
                 } else if (generic_map != 0) {
-                    #line 39 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 84 "src/analyzer/expression/ExpressionValidate.pv"
                     param_type = Context__resolve_type(context->allocator, param_type, generic_map, 0);
                 }
 
-                #line 42 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 87 "src/analyzer/expression/ExpressionValidate.pv"
                 if (param_type == 0) {
-                    #line 43 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 88 "src/analyzer/expression/ExpressionValidate.pv"
                     Context__error_expression(context, arg->value, "Unable to resolve field type");
-                    #line 44 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 89 "src/analyzer/expression/ExpressionValidate.pv"
                     return false;
                 }
 
-                #line 47 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 92 "src/analyzer/expression/ExpressionValidate.pv"
                 Expression__validate_type(arg->value, context, param_type, true);
             } }
 
-            #line 50 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 95 "src/analyzer/expression/ExpressionValidate.pv"
             bool success = true;
-            #line 51 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 96 "src/analyzer/expression/ExpressionValidate.pv"
             uintptr_t field_i = 0;
-            #line 52 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 97 "src/analyzer/expression/ExpressionValidate.pv"
             while (field_i < struct_info->fields.length) {
-                #line 53 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 98 "src/analyzer/expression/ExpressionValidate.pv"
                 struct HashMapBucket_str_StructField* bucket = struct_info->fields.data + field_i;
-                #line 54 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 99 "src/analyzer/expression/ExpressionValidate.pv"
                 if (bucket == 0) {
-                    #line 54 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 99 "src/analyzer/expression/ExpressionValidate.pv"
                     return false;
                 }
-                #line 55 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 100 "src/analyzer/expression/ExpressionValidate.pv"
                 bool provided = false;
-                #line 56 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 101 "src/analyzer/expression/ExpressionValidate.pv"
                 uintptr_t arg_i = 0;
-                #line 57 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 102 "src/analyzer/expression/ExpressionValidate.pv"
                 while (arg_i < arguments->length) {
-                    #line 58 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 103 "src/analyzer/expression/ExpressionValidate.pv"
                     struct Token* arg_name = arguments->data[arg_i].name;
-                    #line 59 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 104 "src/analyzer/expression/ExpressionValidate.pv"
                     if (arg_name != 0 && str__Eq_str__eq(&arg_name->value, bucket->key)) {
-                        #line 60 "src/analyzer/expression/ExpressionValidate.pv"
+                        #line 105 "src/analyzer/expression/ExpressionValidate.pv"
                         provided = true;
-                        #line 61 "src/analyzer/expression/ExpressionValidate.pv"
+                        #line 106 "src/analyzer/expression/ExpressionValidate.pv"
                         break;
                     }
-                    #line 63 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 108 "src/analyzer/expression/ExpressionValidate.pv"
                     arg_i += 1;
                 }
-                #line 65 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 110 "src/analyzer/expression/ExpressionValidate.pv"
                 if (!provided) {
-                    #line 66 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 111 "src/analyzer/expression/ExpressionValidate.pv"
                     struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                    #line 67 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 112 "src/analyzer/expression/ExpressionValidate.pv"
                     String__append(&message, (struct str){ .ptr = "Missing field in struct construction: ", .length = strlen("Missing field in struct construction: ") });
-                    #line 68 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 113 "src/analyzer/expression/ExpressionValidate.pv"
                     String__append(&message, bucket->key);
-                    #line 69 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 114 "src/analyzer/expression/ExpressionValidate.pv"
                     Context__error_token(context, token, String__c_str(&message));
-                    #line 70 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 115 "src/analyzer/expression/ExpressionValidate.pv"
                     success = false;
                 }
-                #line 72 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 117 "src/analyzer/expression/ExpressionValidate.pv"
                 field_i += 1;
             }
 
-            #line 75 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 120 "src/analyzer/expression/ExpressionValidate.pv"
             return success;
         } break;
-        #line 77 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 122 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__FUNCTION: {
-            #line 77 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 122 "src/analyzer/expression/ExpressionValidate.pv"
             struct Function* function = type->function_value._0;
-            #line 77 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 122 "src/analyzer/expression/ExpressionValidate.pv"
             struct GenericMap* generic_map2 = type->function_value._1;
-            #line 78 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 123 "src/analyzer/expression/ExpressionValidate.pv"
             if ((struct Function*)(function) == 0 || function->type == FUNCTION_TYPE__METHOD_CPP) {
-                #line 78 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 123 "src/analyzer/expression/ExpressionValidate.pv"
                 return true;
             }
 
-            #line 80 "src/analyzer/expression/ExpressionValidate.pv"
-            if ((!function->variadic && function->parameters.length != arguments_length) || (function->variadic && arguments_length < function->parameters.length)) {
-                #line 81 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 125 "src/analyzer/expression/ExpressionValidate.pv"
+            uintptr_t required_parameters_length = function->parameters.length;
+            #line 126 "src/analyzer/expression/ExpressionValidate.pv"
+            if (function->typed_variadic) {
+                #line 127 "src/analyzer/expression/ExpressionValidate.pv"
+                required_parameters_length -= 1;
+            }
+
+            #line 130 "src/analyzer/expression/ExpressionValidate.pv"
+            if ((!function->variadic && function->parameters.length != arguments_length) || (function->variadic && arguments_length < required_parameters_length)) {
+                #line 131 "src/analyzer/expression/ExpressionValidate.pv"
                 struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 82 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 132 "src/analyzer/expression/ExpressionValidate.pv"
                 String__append(&message, (struct str){ .ptr = "Number of arguments does not match, expected ", .length = strlen("Number of arguments does not match, expected ") });
 
-                #line 84 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 134 "src/analyzer/expression/ExpressionValidate.pv"
                 if (is_member_call) {
-                    #line 85 "src/analyzer/expression/ExpressionValidate.pv"
-                    String__append_usize(&message, function->parameters.length - 1);
+                    #line 135 "src/analyzer/expression/ExpressionValidate.pv"
+                    String__append_usize(&message, required_parameters_length - 1);
                 } else {
-                    #line 87 "src/analyzer/expression/ExpressionValidate.pv"
-                    String__append_usize(&message, function->parameters.length);
+                    #line 137 "src/analyzer/expression/ExpressionValidate.pv"
+                    String__append_usize(&message, required_parameters_length);
                 }
 
-                #line 90 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 140 "src/analyzer/expression/ExpressionValidate.pv"
                 if (function->variadic) {
-                    #line 91 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 141 "src/analyzer/expression/ExpressionValidate.pv"
                     String__append(&message, (struct str){ .ptr = " or more", .length = strlen(" or more") });
                 }
 
-                #line 94 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 144 "src/analyzer/expression/ExpressionValidate.pv"
                 Context__error_token(context, token, String__c_str(&message));
-                #line 95 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 145 "src/analyzer/expression/ExpressionValidate.pv"
                 return false;
             }
 
-            #line 98 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 148 "src/analyzer/expression/ExpressionValidate.pv"
             struct Iter_ref_Parameter param_iter = Array_Parameter__iter(&function->parameters);
-            #line 99 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 149 "src/analyzer/expression/ExpressionValidate.pv"
             struct Iter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
+            #line 150 "src/analyzer/expression/ExpressionValidate.pv"
+            uintptr_t param_index = 0;
 
-            #line 101 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 152 "src/analyzer/expression/ExpressionValidate.pv"
             if (is_member_call) {
-                #line 102 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 153 "src/analyzer/expression/ExpressionValidate.pv"
                 Iter_ref_Parameter__next(&param_iter);
-                #line 103 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 154 "src/analyzer/expression/ExpressionValidate.pv"
                 Iter_ref_InvokeArgument__next(&args_iter);
+                #line 155 "src/analyzer/expression/ExpressionValidate.pv"
+                param_index += 1;
 
-                #line 105 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 157 "src/analyzer/expression/ExpressionValidate.pv"
                 struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args_iter);
-                #line 106 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 158 "src/analyzer/expression/ExpressionValidate.pv"
                 struct Type* param_type = &Iter_ref_Parameter__value(&param_iter)->type;
 
-                #line 108 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 160 "src/analyzer/expression/ExpressionValidate.pv"
                 if (Type__is_indirect(param_type) && !Type__is_indirect(&arg->value->return_type)) {
-                    #line 109 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 161 "src/analyzer/expression/ExpressionValidate.pv"
                     struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arg->value->return_type) }});
-                    #line 110 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 162 "src/analyzer/expression/ExpressionValidate.pv"
                     arg->value = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = (struct str){ .ptr = "&", .length = strlen("&") }, ._1 = arg->value} }, new_type);
                 }
             }
 
-            #line 114 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 166 "src/analyzer/expression/ExpressionValidate.pv"
             while (Iter_ref_Parameter__next(&param_iter) && Iter_ref_InvokeArgument__next(&args_iter)) {
-                #line 115 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 167 "src/analyzer/expression/ExpressionValidate.pv"
+                if (function->typed_variadic && param_index == function->parameters.length - 1) {
+                    #line 168 "src/analyzer/expression/ExpressionValidate.pv"
+                    break;
+                }
+
+                #line 171 "src/analyzer/expression/ExpressionValidate.pv"
                 struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args_iter);
-                #line 116 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 172 "src/analyzer/expression/ExpressionValidate.pv"
                 struct Parameter* param = Iter_ref_Parameter__value(&param_iter);
-                #line 117 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 173 "src/analyzer/expression/ExpressionValidate.pv"
                 struct Type* param_type = &param->type;
 
-                #line 119 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 175 "src/analyzer/expression/ExpressionValidate.pv"
                 if (generic_map2 != 0 && generic_map2->map.length > 0) {
-                    #line 120 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 176 "src/analyzer/expression/ExpressionValidate.pv"
                     param_type = Context__resolve_type(context->allocator, param_type, generic_map2, generic_map);
                 } else if (generic_map != 0) {
-                    #line 122 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 178 "src/analyzer/expression/ExpressionValidate.pv"
                     param_type = Context__resolve_type(context->allocator, param_type, generic_map, 0);
                 }
 
-                #line 125 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 181 "src/analyzer/expression/ExpressionValidate.pv"
                 if (param_type == 0) {
-                    #line 126 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 182 "src/analyzer/expression/ExpressionValidate.pv"
                     Context__error_expression(context, arg->value, "Unable to resolve parameter type");
-                    #line 127 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 183 "src/analyzer/expression/ExpressionValidate.pv"
                     return false;
                 }
 
-                #line 130 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 186 "src/analyzer/expression/ExpressionValidate.pv"
                 Expression__validate_type(arg->value, context, param_type, true);
 
-                #line 132 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 188 "src/analyzer/expression/ExpressionValidate.pv"
                 if (arg->name == 0 && param->name != 0 && !str__Eq_str__eq(&param->name->value, (struct str){ .ptr = "self", .length = strlen("self") }) && !str__Eq_str__eq(&param->name->value, arg->value->token->value)) {
-                    #line 133 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 189 "src/analyzer/expression/ExpressionValidate.pv"
                     struct String label = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                    #line 134 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 190 "src/analyzer/expression/ExpressionValidate.pv"
                     String__append(&label, param->name->value);
-                    #line 135 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 191 "src/analyzer/expression/ExpressionValidate.pv"
                     String__append(&label, (struct str){ .ptr = ": ", .length = strlen(": ") });
-                    #line 136 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 192 "src/analyzer/expression/ExpressionValidate.pv"
                     Context__inlay_hint_before_expression(context, arg->value, String__c_str(&label), INLAY_HINT_KIND__PARAMETER, false, true);
+                }
+
+                #line 195 "src/analyzer/expression/ExpressionValidate.pv"
+                param_index += 1;
+            }
+
+            #line 198 "src/analyzer/expression/ExpressionValidate.pv"
+            if (function->typed_variadic) {
+                #line 199 "src/analyzer/expression/ExpressionValidate.pv"
+                struct Parameter* variadic_param = Array_Parameter__get(&function->parameters, function->parameters.length - 1);
+                #line 200 "src/analyzer/expression/ExpressionValidate.pv"
+                if (variadic_param == 0) {
+                    #line 200 "src/analyzer/expression/ExpressionValidate.pv"
+                    return false;
+                }
+
+                #line 202 "src/analyzer/expression/ExpressionValidate.pv"
+                struct Type* variadic_type = &variadic_param->type;
+
+                #line 204 "src/analyzer/expression/ExpressionValidate.pv"
+                if (generic_map2 != 0 && generic_map2->map.length > 0) {
+                    #line 205 "src/analyzer/expression/ExpressionValidate.pv"
+                    variadic_type = Context__resolve_type(context->allocator, variadic_type, generic_map2, generic_map);
+                } else if (generic_map != 0) {
+                    #line 207 "src/analyzer/expression/ExpressionValidate.pv"
+                    variadic_type = Context__resolve_type(context->allocator, variadic_type, generic_map, 0);
+                }
+
+                #line 210 "src/analyzer/expression/ExpressionValidate.pv"
+                if (variadic_type == 0) {
+                    #line 211 "src/analyzer/expression/ExpressionValidate.pv"
+                    Context__error_token(context, token, "Unable to resolve variadic parameter type");
+                    #line 212 "src/analyzer/expression/ExpressionValidate.pv"
+                    return false;
+                }
+
+                #line 215 "src/analyzer/expression/ExpressionValidate.pv"
+                struct Type* element_type = 0;
+                #line 216 "src/analyzer/expression/ExpressionValidate.pv"
+                switch (variadic_type->type) {
+                    #line 217 "src/analyzer/expression/ExpressionValidate.pv"
+                    case TYPE__INDIRECT: {
+                        #line 217 "src/analyzer/expression/ExpressionValidate.pv"
+                        struct Indirect* indirect = variadic_type->indirect_value;
+                        #line 218 "src/analyzer/expression/ExpressionValidate.pv"
+                        switch (indirect->to.type) {
+                            #line 219 "src/analyzer/expression/ExpressionValidate.pv"
+                            case TYPE__SEQUENCE: {
+                                #line 219 "src/analyzer/expression/ExpressionValidate.pv"
+                                struct Sequence* sequence = indirect->to.sequence_value;
+                                #line 220 "src/analyzer/expression/ExpressionValidate.pv"
+                                element_type = &sequence->element;
+                            } break;
+                            #line 222 "src/analyzer/expression/ExpressionValidate.pv"
+                            default: {
+                            } break;
+                        }
+                    } break;
+                    #line 225 "src/analyzer/expression/ExpressionValidate.pv"
+                    default: {
+                    } break;
+                }
+
+                #line 228 "src/analyzer/expression/ExpressionValidate.pv"
+                if (element_type == 0) {
+                    #line 229 "src/analyzer/expression/ExpressionValidate.pv"
+                    Context__error_token(context, token, "Typed variadic parameter must lower to a slice");
+                    #line 230 "src/analyzer/expression/ExpressionValidate.pv"
+                    return false;
+                }
+
+                #line 233 "src/analyzer/expression/ExpressionValidate.pv"
+                uintptr_t arg_i = required_parameters_length;
+                #line 234 "src/analyzer/expression/ExpressionValidate.pv"
+                while (arg_i < arguments->length) {
+                    #line 235 "src/analyzer/expression/ExpressionValidate.pv"
+                    Expression__validate_typed_variadic_argument(context, arguments->data[arg_i].value, element_type);
+                    #line 236 "src/analyzer/expression/ExpressionValidate.pv"
+                    arg_i += 1;
                 }
             }
 
-            #line 140 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 240 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 142 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 242 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__FUNCTION_C: {
-            #line 142 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 242 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 143 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 243 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__CLASS_CPP: {
-            #line 143 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 243 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 144 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 244 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__UNKNOWN_C: {
-            #line 144 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 244 "src/analyzer/expression/ExpressionValidate.pv"
             return true;
         } break;
-        #line 145 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 245 "src/analyzer/expression/ExpressionValidate.pv"
         default: {
-            #line 145 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 245 "src/analyzer/expression/ExpressionValidate.pv"
             Context__error_token(context, token, "Type can't be called");
         } break;
     }
 
-    #line 148 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 248 "src/analyzer/expression/ExpressionValidate.pv"
     return false;
 }
 
-#line 151 "src/analyzer/expression/ExpressionValidate.pv"
+#line 251 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map) {
-    #line 152 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 252 "src/analyzer/expression/ExpressionValidate.pv"
     uintptr_t arguments_length = arguments->length;
 
-    #line 154 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 254 "src/analyzer/expression/ExpressionValidate.pv"
     if (variant->types.length != arguments_length) {
-        #line 155 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 255 "src/analyzer/expression/ExpressionValidate.pv"
         struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 156 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 256 "src/analyzer/expression/ExpressionValidate.pv"
         String__append(&message, (struct str){ .ptr = "Number of arguments does not match, expected ", .length = strlen("Number of arguments does not match, expected ") });
-        #line 157 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 257 "src/analyzer/expression/ExpressionValidate.pv"
         String__append_usize(&message, variant->types.length);
-        #line 158 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 258 "src/analyzer/expression/ExpressionValidate.pv"
         Context__error_token(context, token, String__c_str(&message));
-        #line 159 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 259 "src/analyzer/expression/ExpressionValidate.pv"
         return false;
     }
 
-    #line 162 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 262 "src/analyzer/expression/ExpressionValidate.pv"
     if (variant->names.length > 0) {
-        #line 163 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 263 "src/analyzer/expression/ExpressionValidate.pv"
         { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-        #line 163 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 263 "src/analyzer/expression/ExpressionValidate.pv"
         while (Iter_ref_InvokeArgument__next(&__iter)) {
-            #line 163 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 263 "src/analyzer/expression/ExpressionValidate.pv"
             struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-            #line 164 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 264 "src/analyzer/expression/ExpressionValidate.pv"
             if (arg->name == 0) {
-                #line 165 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 265 "src/analyzer/expression/ExpressionValidate.pv"
                 Context__error_token(context, token, "Expected named field argument");
-                #line 166 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 266 "src/analyzer/expression/ExpressionValidate.pv"
                 return false;
             }
 
-            #line 169 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 269 "src/analyzer/expression/ExpressionValidate.pv"
             uintptr_t field_i = 0;
-            #line 170 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 270 "src/analyzer/expression/ExpressionValidate.pv"
             bool found = false;
-            #line 171 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 271 "src/analyzer/expression/ExpressionValidate.pv"
             while (field_i < variant->names.length) {
-                #line 172 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 272 "src/analyzer/expression/ExpressionValidate.pv"
                 if (str__Eq_str__eq(&variant->names.data[field_i], arg->name->value)) {
-                    #line 173 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 273 "src/analyzer/expression/ExpressionValidate.pv"
                     found = true;
-                    #line 174 "src/analyzer/expression/ExpressionValidate.pv"
+                    #line 274 "src/analyzer/expression/ExpressionValidate.pv"
                     break;
                 }
-                #line 176 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 276 "src/analyzer/expression/ExpressionValidate.pv"
                 field_i += 1;
             }
 
-            #line 179 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 279 "src/analyzer/expression/ExpressionValidate.pv"
             if (!found) {
-                #line 180 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 280 "src/analyzer/expression/ExpressionValidate.pv"
                 Context__error_token(context, arg->name, "Field not found in enum variant");
-                #line 181 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 281 "src/analyzer/expression/ExpressionValidate.pv"
                 return false;
             }
 
-            #line 184 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 284 "src/analyzer/expression/ExpressionValidate.pv"
             struct Type* param_type = variant->types.data + field_i;
-            #line 185 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 285 "src/analyzer/expression/ExpressionValidate.pv"
             if (generic_map != 0) {
-                #line 186 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 286 "src/analyzer/expression/ExpressionValidate.pv"
                 param_type = Context__resolve_type(context->allocator, param_type, generic_map, 0);
             }
 
-            #line 189 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 289 "src/analyzer/expression/ExpressionValidate.pv"
             if (param_type == 0) {
-                #line 190 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 290 "src/analyzer/expression/ExpressionValidate.pv"
                 Context__error_expression(context, arg->value, "Unable to resolve field type");
-                #line 191 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 291 "src/analyzer/expression/ExpressionValidate.pv"
                 return false;
             }
 
-            #line 194 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 294 "src/analyzer/expression/ExpressionValidate.pv"
             Expression__validate_type(arg->value, context, param_type, true);
         } }
 
-        #line 197 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 297 "src/analyzer/expression/ExpressionValidate.pv"
         return true;
     }
 
-    #line 200 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 300 "src/analyzer/expression/ExpressionValidate.pv"
     struct Iter_ref_Type param_iter = Array_Type__iter(&variant->types);
-    #line 201 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 301 "src/analyzer/expression/ExpressionValidate.pv"
     struct Iter_ref_InvokeArgument args_iter = Array_InvokeArgument__iter(arguments);
 
-    #line 203 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 303 "src/analyzer/expression/ExpressionValidate.pv"
     while (Iter_ref_Type__next(&param_iter) && Iter_ref_InvokeArgument__next(&args_iter)) {
-        #line 204 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 304 "src/analyzer/expression/ExpressionValidate.pv"
         struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args_iter);
-        #line 205 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 305 "src/analyzer/expression/ExpressionValidate.pv"
         struct Type* param_type = Iter_ref_Type__value(&param_iter);
 
-        #line 207 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 307 "src/analyzer/expression/ExpressionValidate.pv"
         if (generic_map != 0) {
-            #line 208 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 308 "src/analyzer/expression/ExpressionValidate.pv"
             param_type = Context__resolve_type(context->allocator, param_type, generic_map, 0);
         }
 
-        #line 211 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 311 "src/analyzer/expression/ExpressionValidate.pv"
         if (param_type == 0) {
-            #line 212 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 312 "src/analyzer/expression/ExpressionValidate.pv"
             Context__error_expression(context, arg->value, "Unable to resolve parameter type");
-            #line 213 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 313 "src/analyzer/expression/ExpressionValidate.pv"
             return false;
         }
 
-        #line 216 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 316 "src/analyzer/expression/ExpressionValidate.pv"
         Expression__validate_type(arg->value, context, param_type, true);
     }
 
-    #line 219 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 319 "src/analyzer/expression/ExpressionValidate.pv"
     return true;
 }
 
-#line 222 "src/analyzer/expression/ExpressionValidate.pv"
+#line 322 "src/analyzer/expression/ExpressionValidate.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map) {
-    #line 223 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 323 "src/analyzer/expression/ExpressionValidate.pv"
     switch (type->type) {
-        #line 224 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 324 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__TUPLE: {
-            #line 224 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 324 "src/analyzer/expression/ExpressionValidate.pv"
             return type;
         } break;
-        #line 225 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 325 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__FUNCTION: {
-            #line 225 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 325 "src/analyzer/expression/ExpressionValidate.pv"
             struct Function* func_info = type->function_value._0;
-            #line 225 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 325 "src/analyzer/expression/ExpressionValidate.pv"
             struct GenericMap* func_generic_map = type->function_value._1;
-            #line 226 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 326 "src/analyzer/expression/ExpressionValidate.pv"
             if (func_info->type == FUNCTION_TYPE__COROUTINE) {
-                #line 227 "src/analyzer/expression/ExpressionValidate.pv"
+                #line 327 "src/analyzer/expression/ExpressionValidate.pv"
                 return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__COROUTINE_INSTANCE, .coroutineinstance_value = { ._0 = func_info, ._1 = func_generic_map} }});
             }
-            #line 229 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 329 "src/analyzer/expression/ExpressionValidate.pv"
             return Context__resolve_type(context->allocator, &func_info->return_type, func_generic_map, generic_map);
         } break;
-        #line 231 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 331 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__FUNCTION_C: {
-            #line 231 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 331 "src/analyzer/expression/ExpressionValidate.pv"
             struct FunctionC* func_info = type->functionc_value;
-            #line 231 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 331 "src/analyzer/expression/ExpressionValidate.pv"
             return &func_info->return_type;
         } break;
-        #line 232 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 332 "src/analyzer/expression/ExpressionValidate.pv"
         case TYPE__UNKNOWN_C: {
-            #line 232 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 332 "src/analyzer/expression/ExpressionValidate.pv"
             return type;
         } break;
-        #line 233 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 333 "src/analyzer/expression/ExpressionValidate.pv"
         default: {
-            #line 233 "src/analyzer/expression/ExpressionValidate.pv"
+            #line 333 "src/analyzer/expression/ExpressionValidate.pv"
             Context__error_token(context, token, "Type can't be called");
         } break;
     }
 
-    #line 236 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 336 "src/analyzer/expression/ExpressionValidate.pv"
     return 0;
 }
 
-#line 239 "src/analyzer/expression/ExpressionValidate.pv"
+#line 339 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map) {
-    #line 240 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 340 "src/analyzer/expression/ExpressionValidate.pv"
     if (!Expression__validate_arguments(context, token, type, &arguments, generic_map, true)) {
-        #line 240 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 340 "src/analyzer/expression/ExpressionValidate.pv"
         return 0;
     }
 
-    #line 242 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 342 "src/analyzer/expression/ExpressionValidate.pv"
     struct Type* func_return_type = Expression__get_return_type(context, type, token, generic_map);
-    #line 243 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 343 "src/analyzer/expression/ExpressionValidate.pv"
     if (func_return_type == 0) {
-        #line 243 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 343 "src/analyzer/expression/ExpressionValidate.pv"
         return 0;
     }
 
-    #line 245 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 345 "src/analyzer/expression/ExpressionValidate.pv"
     struct Expression* parent_expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = type }, type);
-    #line 246 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 346 "src/analyzer/expression/ExpressionValidate.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = parent_expression, ._1 = arguments} }, func_return_type);
 }
 
-#line 249 "src/analyzer/expression/ExpressionValidate.pv"
+#line 349 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map) {
-    #line 250 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 350 "src/analyzer/expression/ExpressionValidate.pv"
     if (!Expression__validate_arguments(context, token, type, &arguments, generic_map, true)) {
-        #line 250 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 350 "src/analyzer/expression/ExpressionValidate.pv"
         return 0;
     }
 
-    #line 252 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 352 "src/analyzer/expression/ExpressionValidate.pv"
     struct Type* func_return_type = Expression__get_return_type(context, type, token, generic_map);
-    #line 253 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 353 "src/analyzer/expression/ExpressionValidate.pv"
     if (func_return_type == 0) {
-        #line 253 "src/analyzer/expression/ExpressionValidate.pv"
+        #line 353 "src/analyzer/expression/ExpressionValidate.pv"
         return 0;
     }
 
-    #line 255 "src/analyzer/expression/ExpressionValidate.pv"
+    #line 355 "src/analyzer/expression/ExpressionValidate.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, func_return_type);
 }
 

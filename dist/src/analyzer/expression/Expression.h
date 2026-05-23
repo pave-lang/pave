@@ -32,6 +32,7 @@ struct Function;
 struct Array_Type;
 struct Array_InvokeArgument;
 struct GenericMap;
+struct Trait;
 struct EnumVariant;
 struct Array_NullNarrowing;
 
@@ -84,18 +85,24 @@ struct GenericMap* Expression__resolve_function_generics(struct Context* context
 void Expression__resolve_generic_type(struct Context* context, struct Type* param_type, struct Type* arg_type, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ExpressionValidate.pv"
+bool Expression__type_implements_trait(struct Type* type, struct Trait* trait_info);
+
+#line 30 "src/analyzer/expression/ExpressionValidate.pv"
+bool Expression__validate_typed_variadic_argument(struct Context* context, struct Expression* arg, struct Type* element_type);
+
+#line 52 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call);
 
-#line 151 "src/analyzer/expression/ExpressionValidate.pv"
+#line 251 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map);
 
-#line 222 "src/analyzer/expression/ExpressionValidate.pv"
+#line 322 "src/analyzer/expression/ExpressionValidate.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map);
 
-#line 239 "src/analyzer/expression/ExpressionValidate.pv"
+#line 339 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 249 "src/analyzer/expression/ExpressionValidate.pv"
+#line 349 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"

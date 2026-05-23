@@ -76,4 +76,12 @@ uintptr_t String__length(struct String* self);
 #line 170 "src/std/String.pv"
 int32_t String__len_i32(struct String* self);
 
+#line 176 "src/std/String.pv"
+void String__Writer__write(void* __self, struct str value);
+
+#line 180 "src/std/String.pv"
+void String__Writer__write_char(void* __self, char value);
+
+extern struct trait_WriterVTable STRING__VTABLE__WRITER;
+
 #endif

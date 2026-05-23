@@ -171,3 +171,13 @@ impl String {
         return self.array.length;
     }
 }
+
+impl Writer for String {
+    fn write(&self, value: str) {
+        self.append(value);
+    }
+
+    fn write_char(&self, value: char) {
+        self.append_char(value);
+    }
+}

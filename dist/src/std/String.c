@@ -7,6 +7,7 @@
 #include <std/String.h>
 #include <std/trait_Allocator.h>
 #include <std/str.h>
+#include <std/trait_Writer.h>
 #include <std/String.h>
 
 #include <std/String.h>
@@ -268,3 +269,19 @@ int32_t String__len_i32(struct String* self) {
     #line 171 "src/std/String.pv"
     return self->array.length;
 }
+
+#line 176 "src/std/String.pv"
+void String__Writer__write(void* __self, struct str value) {
+    struct String* self = __self; (void)self;
+    #line 177 "src/std/String.pv"
+    String__append(self, value);
+}
+
+#line 180 "src/std/String.pv"
+void String__Writer__write_char(void* __self, char value) {
+    struct String* self = __self; (void)self;
+    #line 181 "src/std/String.pv"
+    String__append_char(self, value);
+}
+
+struct trait_WriterVTable STRING__VTABLE__WRITER = { .fn_write = &String__Writer__write, .fn_write_char = &String__Writer__write_char };

@@ -1,0 +1,4 @@
+trait Writer {
+    fn write(&self, value: str);
+    fn write_char(&self, value: char);
+}

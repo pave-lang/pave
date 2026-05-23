@@ -4,6 +4,51 @@ use types
 use c
 
 impl Expression {
+    fn type_implements_trait(type: &Type, trait_info: &Trait) -> bool {
+        let trait_key = trait_info.get_key(trait_info.module.context.allocator);
+
+        match type {
+            Type::Primitive(primitive_info) => {
+                if primitive_info == null { return false; }
+                return primitive_info.traits.find(&trait_key) != null;
+            },
+            Type::Struct(struct_info, _) => {
+                return struct_info.traits.find(&trait_key) != null;
+            },
+            Type::Enum(enum_info, _) => {
+                return enum_info.traits.find(&trait_key) != null;
+            },
+            Type::TypedefC(typedef_info) => {
+                return Expression::type_implements_trait(typedef_info.type, trait_info);
+            },
+            _ => {},
+        }
+
+        return false;
+    }
+
+    fn validate_typed_variadic_argument(context: &Context, arg: &Expression, element_type: &Type) -> bool {
+        match element_type {
+            Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Trait(trait_info, _) => {
+                        if arg.return_type.is_indirect() {
+                            return arg.validate_type(context, element_type, true);
+                        }
+
+                        if Expression::type_implements_trait(&arg.return_type, trait_info) {
+                            return true;
+                        }
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        return arg.validate_type(context, element_type, true);
+    }
+
     fn validate_arguments(context: &Context, token: &Token, type: &Type, arguments: &Array<InvokeArgument>, generic_map: *GenericMap, is_member_call: bool) -> bool {
         let arguments_length = arguments.length;
 
@@ -77,14 +122,19 @@ impl Expression {
             Type::Function(function, generic_map2) => {
                 if cast<*Function>(function) == null || function.type == FunctionType::MethodCpp { return true; }
 
-                if (!function.variadic && function.parameters.length != arguments_length) || (function.variadic && arguments_length < function.parameters.length) {
+                let required_parameters_length = function.parameters.length;
+                if function.typed_variadic {
+                    required_parameters_length -= 1;
+                }
+
+                if (!function.variadic && function.parameters.length != arguments_length) || (function.variadic && arguments_length < required_parameters_length) {
                     let message = String::new(context.allocator);
                     message.append("Number of arguments does not match, expected ");
 
                     if is_member_call {
-                        message.append_usize(function.parameters.length - 1);
+                        message.append_usize(required_parameters_length - 1);
                     } else {
-                        message.append_usize(function.parameters.length);
+                        message.append_usize(required_parameters_length);
                     }
 
                     if function.variadic {
@@ -97,10 +147,12 @@ impl Expression {
 
                 let param_iter = function.parameters.iter();
                 let args_iter = arguments.iter();
+                let param_index: usize = 0;
 
                 if is_member_call {
                     param_iter.next();
                     args_iter.next();
+                    param_index += 1;
 
                     let arg = args_iter.value();
                     let param_type = &param_iter.value().type;
@@ -112,6 +164,10 @@ impl Expression {
                 }
 
                 while param_iter.next() && args_iter.next() {
+                    if function.typed_variadic && param_index == function.parameters.length - 1 {
+                        break;
+                    }
+
                     let arg = args_iter.value();
                     let param = param_iter.value();
                     let param_type: *Type = &param.type;
@@ -134,6 +190,50 @@ impl Expression {
                         label.append(param.name.value);
                         label.append(": ");
                         context.inlay_hint_before_expression(arg.value, label.c_str(), InlayHintKind::Parameter, false, true);
+                    }
+
+                    param_index += 1;
+                }
+
+                if function.typed_variadic {
+                    let variadic_param = function.parameters.get(function.parameters.length - 1);
+                    if variadic_param == null { return false; }
+
+                    let variadic_type: *Type = &variadic_param.type;
+
+                    if generic_map2 != null && generic_map2.map.length > 0 {
+                        variadic_type = Context::resolve_type(context.allocator, variadic_type, generic_map2, generic_map);
+                    } else if generic_map != null {
+                        variadic_type = Context::resolve_type(context.allocator, variadic_type, generic_map, null);
+                    }
+
+                    if variadic_type == null {
+                        context.error_token(token, "Unable to resolve variadic parameter type");
+                        return false;
+                    }
+
+                    let element_type: *Type = null;
+                    match variadic_type {
+                        Type::Indirect(indirect) => {
+                            match indirect.to {
+                                Type::Sequence(sequence) => {
+                                    element_type = &sequence.element;
+                                },
+                                _ => {},
+                            }
+                        },
+                        _ => {},
+                    }
+
+                    if element_type == null {
+                        context.error_token(token, "Typed variadic parameter must lower to a slice");
+                        return false;
+                    }
+
+                    let arg_i = required_parameters_length;
+                    while arg_i < arguments.length {
+                        Expression::validate_typed_variadic_argument(context, arguments.data[arg_i].value, element_type);
+                        arg_i += 1;
                     }
                 }
 

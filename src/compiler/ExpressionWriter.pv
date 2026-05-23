@@ -260,6 +260,55 @@ impl ExpressionWriter {
         }
     }
 
+    fn write_trait_value_cast(&self, file: &FILE, inner_expr: &Expression, type: &Type, generics: &GenericMap) -> bool {
+        let generator = self.generator;
+
+        match type {
+            Type::Trait(trait_info, _) => {
+                let trait_name = *trait_info.name;
+                fprintf(file, "(");
+                generator.write_type(file, type, generics);
+                fprintf(file, ") { .vtable = &");
+
+                let inner_type = Context::resolve_type(generator.allocator, &inner_expr.return_type, generics, null);
+                let inner_type_name = generator.naming_ident.get_type_name(inner_type, generics.array.data, generics);
+                generator.write_str_title(file, inner_type_name.as_str());
+
+                fprintf(file, "__VTABLE__");
+                generator.write_str_title(file, trait_name.value);
+                fprintf(file, ", .instance = (");
+                generator.write_type(file, &inner_expr.return_type, generics);
+                fprintf(file, "[]) {");
+                let success = self.write_expression(file, inner_expr, generics);
+                fprintf(file, "} }");
+                return success;
+            },
+            _ => {},
+        }
+
+        return self.write_expression(file, inner_expr, generics);
+    }
+
+    fn should_use_trait_value_cast(&self, element_type: &Type, arg: &Expression) -> *Type {
+        if arg.return_type.is_indirect() {
+            return null;
+        }
+
+        match element_type {
+            Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Trait(_, _) => {
+                        return &indirect.to;
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        return null;
+    }
+
     fn write_sequence_cast(&self, file: &FILE, inner_expr: &Expression, sequence: &Sequence, generics: &GenericMap) {
         let generator = self.generator;
         let inner_sequence: *Sequence = null;
@@ -538,6 +587,67 @@ impl ExpressionWriter {
         return true;
     }
 
+    fn get_typed_variadic_sequence(&self, func_info: &Function) -> *Sequence {
+        if !func_info.typed_variadic || func_info.parameters.length == 0 { return null; }
+
+        let param = func_info.parameters.get(func_info.parameters.length - 1);
+        if param == null { return null; }
+
+        match param.type {
+            Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Sequence(sequence) => {
+                        return sequence;
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        return null;
+    }
+
+    fn write_typed_variadic_slice(&self, file: &FILE, sequence: &Sequence, arguments: &Array<InvokeArgument>, start: usize, generics: &GenericMap) -> bool {
+        let generator = self.generator;
+        let sequence_type = Type::Sequence(sequence);
+        let sequence_name = generator.naming_c99.get_type_name(&sequence_type, &sequence_type, generics);
+        let success = true;
+        let length = arguments.length - start;
+
+        fprintf(file, "(");
+        generator.write_string(file, &sequence_name);
+        fprintf(file, ") { .data = ");
+
+        if length == 0 {
+            fprintf(file, "0");
+        } else {
+            fprintf(file, "(");
+            generator.write_type(file, &sequence.element, generics);
+            fprintf(file, "[]) {");
+
+            let i = start;
+            let first = true;
+            while i < arguments.length {
+                if first { first = false; } else { fprintf(file, ", "); }
+                let arg = arguments.data[i].value;
+                let trait_type = self.should_use_trait_value_cast(&sequence.element, arg);
+                if trait_type != null {
+                    success = self.write_trait_value_cast(file, arg, trait_type, generics) && success;
+                } else {
+                    success = self.write_expression(file, arg, generics) && success;
+                }
+                i += 1;
+            }
+
+            fprintf(file, "}");
+        }
+
+        fprintf(file, ", .length = %zu }", length);
+        sequence_name.release();
+        return success;
+    }
+
     fn write_invoke(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
         let generator = self.generator;
         let data: &ExpressionData = &expression.data;
@@ -618,6 +728,12 @@ impl ExpressionWriter {
                         let args = arguments.iter();
                         let success = true;
                         let first = true;
+                        let arg_index: usize = 0;
+                        let variadic_sequence = self.get_typed_variadic_sequence(func_info);
+                        let variadic_start = arguments.length;
+                        if variadic_sequence != null {
+                            variadic_start = func_info.parameters.length - 1;
+                        }
 
                         match func_info.parent {
                             FunctionParent::Trait(trait_info) => {
@@ -637,6 +753,7 @@ impl ExpressionWriter {
                                     success = self.write_expression(file, arg.value, generics) && success;
                                     fprintf(file, ".instance");
                                     first = false;
+                                    arg_index = 1;
                                 } else {
                                     let parent_name = generator.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
                                     success = generator.write_str(file, parent_name.as_str()) && success;
@@ -647,6 +764,7 @@ impl ExpressionWriter {
                                     fprintf(file, "(");
                                     success = self.write_expression(file, arg.value, generics) && success;
                                     first = false;
+                                    arg_index = 1;
                                 }
                             },
                             _ => {
@@ -656,8 +774,17 @@ impl ExpressionWriter {
                         }
 
                         for arg in args {
+                            if variadic_sequence != null && arg_index >= variadic_start {
+                                break;
+                            }
                             if first { first = false; } else { fprintf(file, ", "); }
                             success = self.write_expression(file, arg.value, generics) && success;
+                            arg_index += 1;
+                        }
+
+                        if variadic_sequence != null {
+                            if first { first = false; } else { fprintf(file, ", "); }
+                            success = self.write_typed_variadic_slice(file, variadic_sequence, arguments, variadic_start, generics) && success;
                         }
 
                         fprintf(file, ")");

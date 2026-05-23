@@ -35,6 +35,7 @@ struct Function {
     parent: FunctionParent,
     type: FunctionType,
     variadic: bool,
+    typed_variadic: bool,
     generics: Generics,
     parameters: Array<Parameter>,
     return_type: Type,
@@ -55,6 +56,7 @@ impl Function {
             parent: FunctionParent::None,
             type: FunctionType::Standard,
             variadic: false,
+            typed_variadic: false,
             return_type: Type::Primitive(null),
             body: null,
         };
@@ -73,6 +75,7 @@ impl Function {
             parent: FunctionParent::None,
             type: FunctionType::Standard,
             variadic: false,
+            typed_variadic: false,
             return_type: Type::Primitive(null),
             body: null,
         };
@@ -168,7 +171,27 @@ impl Function {
                 let has_type = false;
 
                 if context.check_next(TokenType::Symbol, ":") {
-                    if !context.parse_type(&parameter.type, generics) { return false; }
+                    if context.check_next(TokenType::Symbol, "...") {
+                        if self.variadic {
+                            context.error_token(parameter.name, "Only one variadic parameter is allowed");
+                            return false;
+                        }
+
+                        let element_type: Type;
+                        if !context.parse_type(&element_type, generics) { return false; }
+
+                        let sequence = context.allocator.store(&Sequence {
+                            type: SequenceType::Slice,
+                            element: element_type,
+                            element_pointer: Type::Indirect(context.allocator.store(&Indirect { type: IndirectType::Pointer, to: element_type })),
+                        });
+                        let sequence_type = Type::Sequence(sequence);
+                        parameter.type = Type::Indirect(Indirect::new_reference(context.allocator, sequence_type));
+                        self.variadic = true;
+                        self.typed_variadic = true;
+                    } else {
+                        if !context.parse_type(&parameter.type, generics) { return false; }
+                    }
                     has_type = true;
                 }
 
@@ -187,6 +210,9 @@ impl Function {
 
             if !context.check_next(TokenType::Symbol, ",") {
                 return context.expect_value(TokenType::Symbol, ")");
+            } else if self.typed_variadic {
+                context.error_token(&context.tokens[context.pos - 1], "Typed variadic parameter must be last");
+                return false;
             }
         }
 

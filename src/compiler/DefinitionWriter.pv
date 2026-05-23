@@ -153,7 +153,7 @@ impl DefinitionWriter {
             }
         }
 
-        if func_info.variadic {
+        if func_info.variadic && !func_info.typed_variadic {
             if !first { fprintf(file, ", "); }
             fprintf(file, "...");
         }
