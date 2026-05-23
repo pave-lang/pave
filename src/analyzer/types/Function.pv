@@ -34,6 +34,7 @@ struct Function {
     token_end: usize,
     parent: FunctionParent,
     type: FunctionType,
+    variadic: bool,
     generics: Generics,
     parameters: Array<Parameter>,
     return_type: Type,
@@ -53,6 +54,7 @@ impl Function {
             token_end: 0,
             parent: FunctionParent::None,
             type: FunctionType::Standard,
+            variadic: false,
             return_type: Type::Primitive(null),
             body: null,
         };
@@ -70,6 +72,7 @@ impl Function {
             token_end: 0,
             parent: FunctionParent::None,
             type: FunctionType::Standard,
+            variadic: false,
             return_type: Type::Primitive(null),
             body: null,
         };
@@ -125,6 +128,16 @@ impl Function {
         if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
         while context.pos < context.length && !context.check_value(TokenType::Symbol, ")") {
+            if context.check_next(TokenType::Symbol, "...") {
+                if self.parameters.length == 0 {
+                    context.error_token(&context.tokens[context.pos - 1], "Variadic functions require at least one named parameter");
+                    return false;
+                }
+
+                self.variadic = true;
+                return context.expect_value(TokenType::Symbol, ")");
+            }
+
             if context.check_next(TokenType::Symbol, "&") {
                 let name = &context.tokens[context.pos];
 

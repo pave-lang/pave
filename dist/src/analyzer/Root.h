@@ -63,55 +63,55 @@ struct Array_Type;
 #line 37 "src/analyzer/Root.pv"
 struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char* args, struct Array_ptrc_char* clang_args, struct Analysis* analysis);
 
-#line 153 "src/analyzer/Root.pv"
+#line 155 "src/analyzer/Root.pv"
 struct Primitive* Root__add_primitive(struct Root* self, char const* name);
 
-#line 157 "src/analyzer/Root.pv"
+#line 159 "src/analyzer/Root.pv"
 struct Primitive* Root__add_ctype(struct Root* self, char const* name);
 
-#line 164 "src/analyzer/Root.pv"
+#line 166 "src/analyzer/Root.pv"
 bool Root__add_namespace(struct Root* self, struct str name, struct str path);
 
-#line 178 "src/analyzer/Root.pv"
+#line 180 "src/analyzer/Root.pv"
 struct Namespace* Root__find_namespace(struct Root* self, struct str name);
 
-#line 185 "src/analyzer/Root.pv"
+#line 187 "src/analyzer/Root.pv"
 bool Root__add_use_namespaces(struct Root* self);
 
-#line 193 "src/analyzer/Root.pv"
+#line 195 "src/analyzer/Root.pv"
 bool Root__fill_namespace(struct Root* self);
 
-#line 201 "src/analyzer/Root.pv"
+#line 203 "src/analyzer/Root.pv"
 bool Root__prefill_types(struct Root* self);
 
-#line 209 "src/analyzer/Root.pv"
+#line 211 "src/analyzer/Root.pv"
 bool Root__prefill_types_impl(struct Root* self);
 
-#line 217 "src/analyzer/Root.pv"
+#line 219 "src/analyzer/Root.pv"
 bool Root__parse_declarations(struct Root* self);
 
-#line 236 "src/analyzer/Root.pv"
+#line 238 "src/analyzer/Root.pv"
 bool Root__parse_globals(struct Root* self);
 
-#line 244 "src/analyzer/Root.pv"
+#line 246 "src/analyzer/Root.pv"
 bool Root__parse_functions(struct Root* self);
 
-#line 258 "src/analyzer/Root.pv"
+#line 260 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name, uintptr_t arity);
 
-#line 269 "src/analyzer/Root.pv"
+#line 271 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name, uintptr_t arity);
 
-#line 281 "src/analyzer/Root.pv"
+#line 283 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name);
 
-#line 285 "src/analyzer/Root.pv"
+#line 287 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, struct str name);
 
-#line 289 "src/analyzer/Root.pv"
+#line 291 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
 
-#line 316 "src/analyzer/Root.pv"
+#line 318 "src/analyzer/Root.pv"
 struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types);
 
 #endif

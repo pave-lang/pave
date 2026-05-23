@@ -202,6 +202,7 @@ impl Tokenizer {
         symbols.append("*=");
         symbols.append("/=");
         symbols.append("|=");
+        symbols.append("...");
         symbols.append("..");
 
         return symbols;
@@ -339,7 +340,10 @@ impl Tokenizer {
 
                 token.type = TokenType::Comment;
             } else if tokenizer.is_symbol() {
-                if Tokenizer::is_in_array(&tokenizer.symbols, token.value.ptr, 2) {
+                if Tokenizer::is_in_array(&tokenizer.symbols, token.value.ptr, 3) {
+                    tokenizer.increase_pos();
+                    tokenizer.increase_pos();
+                } else if Tokenizer::is_in_array(&tokenizer.symbols, token.value.ptr, 2) {
                     tokenizer.increase_pos();
                 } 
                 

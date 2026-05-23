@@ -33,34 +33,40 @@ struct EnumC;
 #line 22 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp);
 
-#line 89 "src/analyzer/c/Include.pv"
+#line 93 "src/analyzer/c/Include.pv"
 void Include__add_cxtype_primitive(struct Include* self, enum CXTypeKind kind, char const* name);
 
-#line 95 "src/analyzer/c/Include.pv"
+#line 99 "src/analyzer/c/Include.pv"
 void Include__add_typedef_primitive(struct Include* self, char const* type, char const* name);
 
-#line 100 "src/analyzer/c/Include.pv"
+#line 104 "src/analyzer/c/Include.pv"
+void Include__add_opaque_typedef(struct Include* self, char const* name);
+
+#line 109 "src/analyzer/c/Include.pv"
+void Include__add_basic_function(struct Include* self, char const* name);
+
+#line 115 "src/analyzer/c/Include.pv"
 bool Include__process(struct Include* self);
 
-#line 194 "src/analyzer/c/Include.pv"
+#line 209 "src/analyzer/c/Include.pv"
 bool Include__report_diagnostics(struct Include* self, CXTranslationUnit unit);
 
-#line 220 "src/analyzer/c/Include.pv"
+#line 235 "src/analyzer/c/Include.pv"
 struct Type* Include__parse_type(struct Include* self, CXType type);
 
-#line 301 "src/analyzer/c/Include.pv"
+#line 316 "src/analyzer/c/Include.pv"
 struct EnumC* Include__find_enum(struct Include* self, char const* name);
 
-#line 312 "src/analyzer/c/Include.pv"
+#line 327 "src/analyzer/c/Include.pv"
 char* Include__make_string(struct Include* self, CXString s);
 
-#line 319 "src/analyzer/c/Include.pv"
+#line 334 "src/analyzer/c/Include.pv"
 struct str Include__make_str(struct Include* self, CXString s);
 
-#line 326 "src/analyzer/c/Include.pv"
+#line 341 "src/analyzer/c/Include.pv"
 bool Include__try_parse_int_macro(struct Include* self, CXCursor cursor, int64_t* out);
 
-#line 414 "src/analyzer/c/Include.pv"
+#line 429 "src/analyzer/c/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor);
 
 #endif

@@ -326,84 +326,86 @@ struct Array_ptrc_char Tokenizer__make_symbols(struct ArenaAllocator* allocator)
     #line 204 "src/analyzer/Tokenizer.pv"
     Array_ptrc_char__append(&symbols, "|=");
     #line 205 "src/analyzer/Tokenizer.pv"
+    Array_ptrc_char__append(&symbols, "...");
+    #line 206 "src/analyzer/Tokenizer.pv"
     Array_ptrc_char__append(&symbols, "..");
 
-    #line 207 "src/analyzer/Tokenizer.pv"
+    #line 208 "src/analyzer/Tokenizer.pv"
     return symbols;
 }
 
-#line 210 "src/analyzer/Tokenizer.pv"
+#line 211 "src/analyzer/Tokenizer.pv"
 struct str Tokenizer__read_file_into_string(struct ArenaAllocator* allocator, char const* filename) {
-    #line 211 "src/analyzer/Tokenizer.pv"
+    #line 212 "src/analyzer/Tokenizer.pv"
     FILE* file = fopen(filename, "rb");
 
-    #line 213 "src/analyzer/Tokenizer.pv"
+    #line 214 "src/analyzer/Tokenizer.pv"
     if (file == 0) {
-        #line 214 "src/analyzer/Tokenizer.pv"
-        fprintf(stderr, "Unable to open file: %s\n", filename);
         #line 215 "src/analyzer/Tokenizer.pv"
-        perror("fopen");
+        fprintf(stderr, "Unable to open file: %s\n", filename);
         #line 216 "src/analyzer/Tokenizer.pv"
+        perror("fopen");
+        #line 217 "src/analyzer/Tokenizer.pv"
         return (struct str) { .ptr = 0, .length = 0 };
     }
 
-    #line 219 "src/analyzer/Tokenizer.pv"
-    fseek(file, 0, SEEK_END);
     #line 220 "src/analyzer/Tokenizer.pv"
-    int32_t length = ftell(file);
+    fseek(file, 0, SEEK_END);
     #line 221 "src/analyzer/Tokenizer.pv"
+    int32_t length = ftell(file);
+    #line 222 "src/analyzer/Tokenizer.pv"
     rewind(file);
 
-    #line 223 "src/analyzer/Tokenizer.pv"
+    #line 224 "src/analyzer/Tokenizer.pv"
     char* buffer = ArenaAllocator__Allocator__alloc(allocator, length + 1);
 
-    #line 225 "src/analyzer/Tokenizer.pv"
+    #line 226 "src/analyzer/Tokenizer.pv"
     if (buffer == 0) {
-        #line 226 "src/analyzer/Tokenizer.pv"
-        perror("Memory allocation failed");
         #line 227 "src/analyzer/Tokenizer.pv"
-        fclose(file);
+        perror("Memory allocation failed");
         #line 228 "src/analyzer/Tokenizer.pv"
+        fclose(file);
+        #line 229 "src/analyzer/Tokenizer.pv"
         return (struct str) { .ptr = 0, .length = 0 };
     }
 
-    #line 231 "src/analyzer/Tokenizer.pv"
+    #line 232 "src/analyzer/Tokenizer.pv"
     uintptr_t read_length = fread(buffer, 1, length, file);
 
-    #line 233 "src/analyzer/Tokenizer.pv"
+    #line 234 "src/analyzer/Tokenizer.pv"
     if (read_length != length) {
-        #line 234 "src/analyzer/Tokenizer.pv"
-        perror("Error reading file");
         #line 235 "src/analyzer/Tokenizer.pv"
-        ArenaAllocator__Allocator__free(allocator, buffer);
+        perror("Error reading file");
         #line 236 "src/analyzer/Tokenizer.pv"
-        fclose(file);
+        ArenaAllocator__Allocator__free(allocator, buffer);
         #line 237 "src/analyzer/Tokenizer.pv"
+        fclose(file);
+        #line 238 "src/analyzer/Tokenizer.pv"
         return (struct str) { .ptr = 0, .length = 0 };
     }
 
-    #line 240 "src/analyzer/Tokenizer.pv"
+    #line 241 "src/analyzer/Tokenizer.pv"
     buffer[length] = '\0';
 
-    #line 242 "src/analyzer/Tokenizer.pv"
+    #line 243 "src/analyzer/Tokenizer.pv"
     fclose(file);
 
-    #line 244 "src/analyzer/Tokenizer.pv"
+    #line 245 "src/analyzer/Tokenizer.pv"
     return (struct str) { .ptr = buffer, .length = length };
 }
 
-#line 247 "src/analyzer/Tokenizer.pv"
+#line 248 "src/analyzer/Tokenizer.pv"
 struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char const* path) {
-    #line 248 "src/analyzer/Tokenizer.pv"
+    #line 249 "src/analyzer/Tokenizer.pv"
     struct str data = Tokenizer__read_file_into_string(allocator, path);
 
-    #line 250 "src/analyzer/Tokenizer.pv"
+    #line 251 "src/analyzer/Tokenizer.pv"
     if (data.length == 0) {
-        #line 251 "src/analyzer/Tokenizer.pv"
+        #line 252 "src/analyzer/Tokenizer.pv"
         return (struct Array_Token) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }, .data = 0, .length = 0, .capacity = 0 };
     }
 
-    #line 254 "src/analyzer/Tokenizer.pv"
+    #line 255 "src/analyzer/Tokenizer.pv"
     struct Tokenizer tokenizer = (struct Tokenizer) {
         .data = data,
         .pos = 0,
@@ -413,28 +415,28 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
         .symbols = Tokenizer__make_symbols(allocator),
     };
 
-    #line 263 "src/analyzer/Tokenizer.pv"
+    #line 264 "src/analyzer/Tokenizer.pv"
     struct Array_Token tokens = Array_Token__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
-    #line 265 "src/analyzer/Tokenizer.pv"
+    #line 266 "src/analyzer/Tokenizer.pv"
     Tokenizer__skip_whitespace(&tokenizer);
 
-    #line 267 "src/analyzer/Tokenizer.pv"
+    #line 268 "src/analyzer/Tokenizer.pv"
     while (tokenizer.pos < tokenizer.data.length) {
-        #line 268 "src/analyzer/Tokenizer.pv"
-        bool is_raw_identifier = tokenizer.data.ptr[tokenizer.pos] == 'r' && tokenizer.data.ptr[tokenizer.pos + 1] == '#';
         #line 269 "src/analyzer/Tokenizer.pv"
+        bool is_raw_identifier = tokenizer.data.ptr[tokenizer.pos] == 'r' && tokenizer.data.ptr[tokenizer.pos + 1] == '#';
+        #line 270 "src/analyzer/Tokenizer.pv"
         if (is_raw_identifier) {
-            #line 270 "src/analyzer/Tokenizer.pv"
-            Tokenizer__increase_pos(&tokenizer);
             #line 271 "src/analyzer/Tokenizer.pv"
+            Tokenizer__increase_pos(&tokenizer);
+            #line 272 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
         }
 
-        #line 274 "src/analyzer/Tokenizer.pv"
+        #line 275 "src/analyzer/Tokenizer.pv"
         uintptr_t start_pos = tokenizer.pos;
 
-        #line 276 "src/analyzer/Tokenizer.pv"
+        #line 277 "src/analyzer/Tokenizer.pv"
         struct Token token = (struct Token) {
             .type = TOKEN_TYPE__SYMBOL,
             .value = (struct str) {
@@ -447,125 +449,130 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
             .end_column = 0,
         };
 
-        #line 288 "src/analyzer/Tokenizer.pv"
+        #line 289 "src/analyzer/Tokenizer.pv"
         if (is_raw_identifier || Tokenizer__is_letter(&tokenizer) || tokenizer.data.ptr[tokenizer.pos] == '#') {
-            #line 289 "src/analyzer/Tokenizer.pv"
-            bool is_hash_keyword = !is_raw_identifier && tokenizer.data.ptr[tokenizer.pos] == '#';
             #line 290 "src/analyzer/Tokenizer.pv"
+            bool is_hash_keyword = !is_raw_identifier && tokenizer.data.ptr[tokenizer.pos] == '#';
+            #line 291 "src/analyzer/Tokenizer.pv"
             if (is_hash_keyword) {
-                #line 290 "src/analyzer/Tokenizer.pv"
+                #line 291 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
             }
 
-            #line 292 "src/analyzer/Tokenizer.pv"
+            #line 293 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_alphanumeric(&tokenizer);
 
-            #line 294 "src/analyzer/Tokenizer.pv"
+            #line 295 "src/analyzer/Tokenizer.pv"
             if (!is_raw_identifier && (is_hash_keyword || Tokenizer__is_in_array(&tokenizer.keywords, token.value.ptr, tokenizer.pos - start_pos))) {
-                #line 295 "src/analyzer/Tokenizer.pv"
+                #line 296 "src/analyzer/Tokenizer.pv"
                 token.type = TOKEN_TYPE__KEYWORD;
             } else {
-                #line 297 "src/analyzer/Tokenizer.pv"
+                #line 298 "src/analyzer/Tokenizer.pv"
                 token.type = TOKEN_TYPE__IDENTIFIER;
             }
         } else if (Tokenizer__is_digit(&tokenizer, 0)) {
-            #line 300 "src/analyzer/Tokenizer.pv"
+            #line 301 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
 
-            #line 302 "src/analyzer/Tokenizer.pv"
+            #line 303 "src/analyzer/Tokenizer.pv"
             if (tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'x' || tokenizer.data.ptr[tokenizer.pos] == 'X')) {
-                #line 303 "src/analyzer/Tokenizer.pv"
-                Tokenizer__increase_pos(&tokenizer);
                 #line 304 "src/analyzer/Tokenizer.pv"
+                Tokenizer__increase_pos(&tokenizer);
+                #line 305 "src/analyzer/Tokenizer.pv"
                 while (Tokenizer__is_digit(&tokenizer, 0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') || tokenizer.data.ptr[tokenizer.pos] == '_') {
-                    #line 305 "src/analyzer/Tokenizer.pv"
+                    #line 306 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
             } else if (tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'b' || tokenizer.data.ptr[tokenizer.pos] == 'B')) {
-                #line 308 "src/analyzer/Tokenizer.pv"
-                Tokenizer__increase_pos(&tokenizer);
                 #line 309 "src/analyzer/Tokenizer.pv"
+                Tokenizer__increase_pos(&tokenizer);
+                #line 310 "src/analyzer/Tokenizer.pv"
                 while (tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1' || tokenizer.data.ptr[tokenizer.pos] == '_') {
-                    #line 310 "src/analyzer/Tokenizer.pv"
+                    #line 311 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
             } else {
-                #line 313 "src/analyzer/Tokenizer.pv"
+                #line 314 "src/analyzer/Tokenizer.pv"
                 Tokenizer__skip_digits(&tokenizer);
 
-                #line 315 "src/analyzer/Tokenizer.pv"
+                #line 316 "src/analyzer/Tokenizer.pv"
                 if (tokenizer.data.ptr[tokenizer.pos] == '.' && Tokenizer__is_digit(&tokenizer, 1)) {
-                    #line 316 "src/analyzer/Tokenizer.pv"
-                    Tokenizer__increase_pos(&tokenizer);
                     #line 317 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                     #line 318 "src/analyzer/Tokenizer.pv"
+                    Tokenizer__increase_pos(&tokenizer);
+                    #line 319 "src/analyzer/Tokenizer.pv"
                     Tokenizer__skip_digits(&tokenizer);
                 }
 
-                #line 321 "src/analyzer/Tokenizer.pv"
+                #line 322 "src/analyzer/Tokenizer.pv"
                 if (tokenizer.data.ptr[tokenizer.pos] == 'f' || tokenizer.data.ptr[tokenizer.pos] == 'F') {
-                    #line 322 "src/analyzer/Tokenizer.pv"
+                    #line 323 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 } else if (tokenizer.data.ptr[tokenizer.pos] == 'u' || tokenizer.data.ptr[tokenizer.pos] == 'U') {
-                    #line 324 "src/analyzer/Tokenizer.pv"
+                    #line 325 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
             }
 
-            #line 328 "src/analyzer/Tokenizer.pv"
+            #line 329 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__NUMBER;
         } else if (Tokenizer__is_quote(&tokenizer)) {
-            #line 330 "src/analyzer/Tokenizer.pv"
+            #line 331 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_string(&tokenizer);
 
-            #line 332 "src/analyzer/Tokenizer.pv"
+            #line 333 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__STRING;
         } else if (Tokenizer__is_comment_line(&tokenizer)) {
-            #line 334 "src/analyzer/Tokenizer.pv"
+            #line 335 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_comment_line(&tokenizer);
 
-            #line 336 "src/analyzer/Tokenizer.pv"
+            #line 337 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__COMMENT;
         } else if (Tokenizer__is_comment_block(&tokenizer)) {
-            #line 338 "src/analyzer/Tokenizer.pv"
+            #line 339 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_comment_block(&tokenizer);
 
-            #line 340 "src/analyzer/Tokenizer.pv"
+            #line 341 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__COMMENT;
         } else if (Tokenizer__is_symbol(&tokenizer)) {
-            #line 342 "src/analyzer/Tokenizer.pv"
-            if (Tokenizer__is_in_array(&tokenizer.symbols, token.value.ptr, 2)) {
-                #line 343 "src/analyzer/Tokenizer.pv"
+            #line 343 "src/analyzer/Tokenizer.pv"
+            if (Tokenizer__is_in_array(&tokenizer.symbols, token.value.ptr, 3)) {
+                #line 344 "src/analyzer/Tokenizer.pv"
+                Tokenizer__increase_pos(&tokenizer);
+                #line 345 "src/analyzer/Tokenizer.pv"
+                Tokenizer__increase_pos(&tokenizer);
+            } else if (Tokenizer__is_in_array(&tokenizer.symbols, token.value.ptr, 2)) {
+                #line 347 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
             }
 
-            #line 346 "src/analyzer/Tokenizer.pv"
+            #line 350 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
 
-            #line 348 "src/analyzer/Tokenizer.pv"
+            #line 352 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__SYMBOL;
         } else {
-            #line 350 "src/analyzer/Tokenizer.pv"
+            #line 354 "src/analyzer/Tokenizer.pv"
             fprintf(stderr, "Tokenizer: Unknown token type: %.*s\n", 10, tokenizer.data.ptr + tokenizer.pos);
-            #line 351 "src/analyzer/Tokenizer.pv"
+            #line 355 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
         }
 
-        #line 354 "src/analyzer/Tokenizer.pv"
+        #line 358 "src/analyzer/Tokenizer.pv"
         token.value.length = tokenizer.pos - start_pos;
-        #line 355 "src/analyzer/Tokenizer.pv"
+        #line 359 "src/analyzer/Tokenizer.pv"
         token.end_line = tokenizer.line;
-        #line 356 "src/analyzer/Tokenizer.pv"
+        #line 360 "src/analyzer/Tokenizer.pv"
         token.end_column = tokenizer.column;
 
-        #line 358 "src/analyzer/Tokenizer.pv"
+        #line 362 "src/analyzer/Tokenizer.pv"
         Array_Token__append(&tokens, token);
 
-        #line 360 "src/analyzer/Tokenizer.pv"
+        #line 364 "src/analyzer/Tokenizer.pv"
         Tokenizer__skip_whitespace(&tokenizer);
     }
 
-    #line 363 "src/analyzer/Tokenizer.pv"
+    #line 367 "src/analyzer/Tokenizer.pv"
     return tokens;
 }

@@ -72,10 +72,10 @@ struct Array_ptrc_char Tokenizer__make_keywords(struct ArenaAllocator* allocator
 #line 187 "src/analyzer/Tokenizer.pv"
 struct Array_ptrc_char Tokenizer__make_symbols(struct ArenaAllocator* allocator);
 
-#line 210 "src/analyzer/Tokenizer.pv"
+#line 211 "src/analyzer/Tokenizer.pv"
 struct str Tokenizer__read_file_into_string(struct ArenaAllocator* allocator, char const* filename);
 
-#line 247 "src/analyzer/Tokenizer.pv"
+#line 248 "src/analyzer/Tokenizer.pv"
 struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char const* path);
 
 #endif

@@ -77,7 +77,7 @@ impl Expression {
             Type::Function(function, generic_map2) => {
                 if cast<*Function>(function) == null || function.type == FunctionType::MethodCpp { return true; }
 
-                if function.parameters.length != arguments_length {
+                if (!function.variadic && function.parameters.length != arguments_length) || (function.variadic && arguments_length < function.parameters.length) {
                     let message = String::new(context.allocator);
                     message.append("Number of arguments does not match, expected ");
 
@@ -85,6 +85,10 @@ impl Expression {
                         message.append_usize(function.parameters.length - 1);
                     } else {
                         message.append_usize(function.parameters.length);
+                    }
+
+                    if function.variadic {
+                        message.append(" or more");
                     }
 
                     context.error_token(token, message.c_str());

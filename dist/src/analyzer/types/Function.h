@@ -23,6 +23,7 @@ struct Function {
     uintptr_t token_end;
     struct FunctionParent parent;
     enum FunctionType type;
+    bool variadic;
     struct Generics generics;
     struct Array_Parameter parameters;
     struct Type return_type;
@@ -35,31 +36,31 @@ struct Context;
 struct Function;
 struct Generics;
 
-#line 44 "src/analyzer/types/Function.pv"
+#line 45 "src/analyzer/types/Function.pv"
 struct Function Function__new(struct Context* context);
 
-#line 61 "src/analyzer/types/Function.pv"
+#line 63 "src/analyzer/types/Function.pv"
 struct Function Function__new_allocator(struct trait_Allocator allocator);
 
-#line 78 "src/analyzer/types/Function.pv"
+#line 81 "src/analyzer/types/Function.pv"
 struct Function Function__parse(struct Context* context);
 
-#line 82 "src/analyzer/types/Function.pv"
+#line 85 "src/analyzer/types/Function.pv"
 struct Function Function__parse_optional_body(struct Context* context);
 
-#line 86 "src/analyzer/types/Function.pv"
+#line 89 "src/analyzer/types/Function.pv"
 struct Function Function__parse_inner(struct Context* context, bool body_optional);
 
-#line 122 "src/analyzer/types/Function.pv"
+#line 125 "src/analyzer/types/Function.pv"
 bool Function__parse_parameters(struct Function* self, struct Generics* generics);
 
-#line 185 "src/analyzer/types/Function.pv"
+#line 198 "src/analyzer/types/Function.pv"
 bool Function__parse_return_type(struct Function* self, struct Generics* generics);
 
-#line 197 "src/analyzer/types/Function.pv"
+#line 210 "src/analyzer/types/Function.pv"
 bool Function__fill_types(struct Function* self, struct Generics* generics);
 
-#line 222 "src/analyzer/types/Function.pv"
+#line 235 "src/analyzer/types/Function.pv"
 bool Function__parse_function(struct Function* self, struct Generics* generics);
 
 #endif

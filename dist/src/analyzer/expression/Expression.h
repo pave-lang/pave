@@ -86,16 +86,16 @@ void Expression__resolve_generic_type(struct Context* context, struct Type* para
 #line 7 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call);
 
-#line 147 "src/analyzer/expression/ExpressionValidate.pv"
+#line 151 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map);
 
-#line 218 "src/analyzer/expression/ExpressionValidate.pv"
+#line 222 "src/analyzer/expression/ExpressionValidate.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map);
 
-#line 235 "src/analyzer/expression/ExpressionValidate.pv"
+#line 239 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 245 "src/analyzer/expression/ExpressionValidate.pv"
+#line 249 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"

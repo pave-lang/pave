@@ -83,6 +83,10 @@ impl Include {
         self.add_typedef_primitive("Uint32", "u32");
         self.add_typedef_primitive("Uint64", "u64");
 
+        self.add_opaque_typedef("va_list");
+        self.add_basic_function("va_start");
+        self.add_basic_function("va_end");
+
         return self;
     }
 
@@ -95,6 +99,17 @@ impl Include {
     fn add_typedef_primitive(&self, type: *const char, name: *const char) {
         let primitives = &self.root.primitives;
         self.typedef_to_type.insert(type, Type::Primitive(primitives.find(name)));
+    }
+
+    fn add_opaque_typedef(&self, name: *const char) {
+        let unknown = Type::UnknownC(UnknownC::new(self, name));
+        self.types.insert(name, Type::TypedefC(TypedefC::new(self, name, self.root.allocator.store(&unknown))));
+    }
+
+    fn add_basic_function(&self, name: *const char) {
+        let return_type = Type::UnknownC(UnknownC::new(self, ""));
+        let func_info = FunctionC::new(self, name, self.root.allocator.store(&return_type));
+        self.values.insert(name, Type::FunctionC(func_info));
     }
 
     fn process(&self) -> bool {

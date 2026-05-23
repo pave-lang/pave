@@ -59,8 +59,8 @@ impl Root {
             type_self: Type::Primitive(null),
             type_ref_self: Type::Primitive(null),
             type_usize: Type::Primitive(null),
-            func_next: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
-            func_value: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
+            func_next: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, variadic: false, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
+            func_value: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, variadic: false, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
             hack_type_impl: null,
             mode_cpp: false,
         };
@@ -89,6 +89,7 @@ impl Root {
         self.type_usize = Type::Primitive(self.primitive_usize);
         self.func_next = Function {
             type: FunctionType::Standard,
+            variadic: false,
             name: allocator.store(&Token { type: TokenType::Identifier, value: "next", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }),
             parameters: Array<Parameter>::new(allocator),
             return_type: Type::Primitive(self.primitive_bool),
@@ -105,6 +106,7 @@ impl Root {
 
         self.func_value = Function {
             type: FunctionType::Standard,
+            variadic: false,
             name: allocator.store(&Token { type: TokenType::Identifier, value: "value", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }),
             parameters: Array<Parameter>::new(allocator),
             return_type: Type::Generic(allocator.store(&Generic { name: allocator.store(&Token { type: TokenType::Identifier, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), traits: Array<&Trait> { allocator, data: null, length: 0, capacity: 0 } })),
