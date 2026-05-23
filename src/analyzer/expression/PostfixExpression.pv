@@ -397,12 +397,6 @@ impl Expression {
             if next == result { break; }
             if next == null { return null; }
 
-            let expanded_token = context.allocator.store(next.token);
-            if expanded_token == null { return null; }
-            expanded_token.start_line = result.token.start_line;
-            expanded_token.start_column = result.token.start_column;
-            next.token = expanded_token;
-
             result = next;
         }
         return result;

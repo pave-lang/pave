@@ -4429,23 +4429,9 @@ struct Expression* Expression__parse_postfix_chain(struct Context* context, stru
         }
 
         #line 400 "src/analyzer/expression/PostfixExpression.pv"
-        struct Token* expanded_token = ArenaAllocator__store_Token(context->allocator, next->token);
-        #line 401 "src/analyzer/expression/PostfixExpression.pv"
-        if (expanded_token == 0) {
-            #line 401 "src/analyzer/expression/PostfixExpression.pv"
-            return 0;
-        }
-        #line 402 "src/analyzer/expression/PostfixExpression.pv"
-        expanded_token->start_line = result->token->start_line;
-        #line 403 "src/analyzer/expression/PostfixExpression.pv"
-        expanded_token->start_column = result->token->start_column;
-        #line 404 "src/analyzer/expression/PostfixExpression.pv"
-        next->token = expanded_token;
-
-        #line 406 "src/analyzer/expression/PostfixExpression.pv"
         result = next;
     }
-    #line 408 "src/analyzer/expression/PostfixExpression.pv"
+    #line 402 "src/analyzer/expression/PostfixExpression.pv"
     return result;
 }
 
