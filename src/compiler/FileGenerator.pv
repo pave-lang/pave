@@ -353,30 +353,32 @@ impl FileGenerator {
         if usage.impl_dynamic_usage {
             fprintf(code_file, "\n");
 
-            fprintf(code_file, "#include <tuple_usize_str_TypeId.h>\n");
-            fprintf(code_file, "#include <slice_tuple_usize_str_TypeId.h>\n");
-            fprintf(code_file, "struct slice_tuple_usize_str_TypeId ");
+            fprintf(code_file, "#include <std/StructFieldInfo.h>\n");
+            fprintf(code_file, "#include <slice_StructFieldInfo.h>\n");
+            fprintf(code_file, "struct slice_StructFieldInfo ");
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
 
             generator.indent += 1;
             generator.write_indent(code_file);
-            fprintf(code_file, "static struct tuple_usize_str_TypeId fields[] = { ");
+            fprintf(code_file, "static struct StructFieldInfo fields[] = { ");
 
             let field_index: usize = 0;
             for (_, &field) in struct_info.fields {
                 if field_index > 0 { fprintf(code_file, ", "); }
-                fprintf(code_file, "(struct tuple_usize_str_TypeId){ ._0 = %zu, ._1 = (struct str){ .ptr = \"", field_index);
+                fprintf(code_file, "(struct StructFieldInfo){ .index = %zu, .name = (struct str){ .ptr = \"", field_index);
                 generator.write_token(code_file, field.name);
-                fprintf(code_file, "\", .length = %zu }, ._2 = ", field.name.value.length);
+                fprintf(code_file, "\", .length = %zu }, .type_id = ", field.name.value.length);
                 generator.write_typeid(code_file, &field.type, generics);
+                fprintf(code_file, ", .type_name = ");
+                generator.write_typename(code_file, &field.type, generics);
                 fprintf(code_file, " }");
                 field_index += 1;
             }
 
             fprintf(code_file, " };\n");
             generator.write_indent(code_file);
-            fprintf(code_file, "return (struct slice_tuple_usize_str_TypeId){ .data = fields, .length = %zu };\n", struct_info.fields.length);
+            fprintf(code_file, "return (struct slice_StructFieldInfo){ .data = fields, .length = %zu };\n", struct_info.fields.length);
             generator.indent -= 1;
             fprintf(code_file, "}\n");
 

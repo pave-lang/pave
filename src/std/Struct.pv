@@ -1,5 +1,12 @@
+struct StructFieldInfo {
+    index: usize,
+    name: str,
+    type_id: TypeId,
+    type_name: *const char,
+}
+
 trait Struct {
-    fn get_fields(&self) -> &[(usize, str, TypeId)];
+    fn get_fields(&self) -> &[StructFieldInfo];
     fn get_field(&self, index: usize) -> &void;
     fn set_field(&self, index: usize, value: *void) -> bool;
 }

@@ -247,4 +247,4 @@ Enum variants support named fields in addition to tuple payloads:
 
 ## Meta
 
-At the end of a work session, always offer to update this file with any architecture details, gotchas, or invariants discovered during the work.
+At the end of a work session, offer to update this file only when the work revealed durable guidance that would help future agents avoid mistakes or understand the system faster. Good candidates are cross-cutting architecture rules, bootstrap/build gotchas, naming or ABI invariants, and non-obvious interactions between analyzer/compiler/std code. Skip one-off implementation details, ordinary local naming choices, facts already obvious from nearby code, and notes unlikely to matter after the current change.

@@ -5,19 +5,19 @@
 #include <stdbool.h>
 
 #include <std/trait_Struct.h>
-#include <slice_tuple_usize_str_TypeId.h>
+#include <slice_StructFieldInfo.h>
 
-#line 1 "src/std/Struct.pv"
+#line 8 "src/std/Struct.pv"
 struct trait_StructVTable {
-    #line 2 "src/std/Struct.pv"
-    struct slice_tuple_usize_str_TypeId (*fn_get_fields)(void* __self);
-    #line 3 "src/std/Struct.pv"
+    #line 9 "src/std/Struct.pv"
+    struct slice_StructFieldInfo (*fn_get_fields)(void* __self);
+    #line 10 "src/std/Struct.pv"
     void* (*fn_get_field)(void* __self, uintptr_t index);
-    #line 4 "src/std/Struct.pv"
+    #line 11 "src/std/Struct.pv"
     bool (*fn_set_field)(void* __self, uintptr_t index, void* value);
 };
 
-#line 1 "src/std/Struct.pv"
+#line 8 "src/std/Struct.pv"
 struct trait_Struct {
     const struct trait_StructVTable* vtable;
     void* instance;
