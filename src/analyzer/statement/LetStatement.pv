@@ -53,6 +53,7 @@ impl LetStatement {
                     let src_original = context.get_broadened_type(src_name);
                     if src_original != null {
                         let scope = context.scopes.back();
+                        if scope == null { return null; }
                         scope.narrow_originals.insert(name.value, *src_original);
                     }
                 },
@@ -61,6 +62,8 @@ impl LetStatement {
         }
 
         if !context.expect_value(TokenType::Symbol, ";") { return null; }
+
+        if type == null { return null; }
 
         if type.is_unknown() {
             context.error_token(first_token, "Let statement is unable to determine it's type, manually specify it");

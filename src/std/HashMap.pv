@@ -89,8 +89,10 @@ impl<K: Hash, V> HashMap<K, V> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets + bucket_index;
 
-        while *current_bucket_node != null {
-            current_bucket_node = &(*current_bucket_node).next;
+        let bucket_node = *current_bucket_node;
+        while bucket_node != null {
+            current_bucket_node = &bucket_node.next;
+            bucket_node = *current_bucket_node;
         }
 
         self.data[self.length] = HashMapBucket<K, V> { key, value, next: null };
@@ -99,7 +101,7 @@ impl<K: Hash, V> HashMap<K, V> {
 
         *current_bucket_node = data;
 
-        return &data.value;
+        return &(*data).value;
     }
 
     fn remove(&self, key: &K) -> bool {
@@ -140,13 +142,16 @@ impl<K: Hash, V> HashMap<K, V> {
 
         for i in 0..self.length {
             let node = self.data + i;
+            if node == null { return; }
             node.next = null;
             let hash = (*node).key.hash();
             let bucket_index: usize = hash._0 % self.capacity;
             let current_bucket_node = self.buckets + bucket_index;
 
-            while *current_bucket_node != null {
-                current_bucket_node = &(*current_bucket_node).next;
+            let bucket_node = *current_bucket_node;
+            while bucket_node != null {
+                current_bucket_node = &bucket_node.next;
+                bucket_node = *current_bucket_node;
             }
 
             *current_bucket_node = node;

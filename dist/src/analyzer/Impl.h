@@ -62,7 +62,7 @@ bool Impl__parse_consts(struct Impl* self);
 #line 238 "src/analyzer/Impl.pv"
 bool Impl__parse_typedefs(struct Impl* self);
 
-#line 277 "src/analyzer/Impl.pv"
+#line 281 "src/analyzer/Impl.pv"
 bool Impl__parse_functions(struct Impl* self);
 
 #endif

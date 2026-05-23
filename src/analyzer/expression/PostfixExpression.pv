@@ -63,16 +63,18 @@ impl Expression {
     }
 
     fn parse_instance_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
-        // let dot_token = context.current();
+        let dot_token = context.current();
         if !context.expect_value(TokenType::Symbol, ".") { return null; }
 
-        // if inner.return_type.is_pointer() {
-        //     context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");
-        //     return null;
-        // }
+        if inner.return_type.is_pointer() {
+            context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");
+        }
 
         let member_name = context.current();
-        if member_name == null { return null; }
+        if member_name == null {
+            context.error_token(dot_token, "no token found after .");
+            return null;
+        }
 
         if member_name.type != TokenType::Number && member_name.type != TokenType::Identifier {
             context.error("Unexpected token, expected Identifier or Number");
@@ -107,7 +109,15 @@ impl Expression {
 
             let arguments = Array<InvokeArgument>::new(context.allocator);
 
-            if func_info != null && func_info.parameters.length > 0 && func_info.parameters.data[0].name.value.eq("self") {
+            if func_info == null {
+                context.error_token(member_name, "Expected function type");
+                return null;
+            }
+
+            let name = if func_info.parameters.length > 0 { func_info.parameters.data[0].name } else { null };
+            if name == null { return null; }
+
+            if name.value.eq("self") {
                 arguments.append(InvokeArgument { name: null, value: inner });
             }
 
@@ -124,7 +134,7 @@ impl Expression {
 
             if !context.expect_value(TokenType::Symbol, ")") { return null; }
 
-            if func_info != null && func_info.generics.array.length > 0 {
+            if func_info.generics.array.length > 0 {
                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                 let combined_generics_val = func_generics.clone(context.allocator);
                 let combined_generics = context.allocator.store(&combined_generics_val);
@@ -133,6 +143,7 @@ impl Expression {
                     for (name, _) in generic_map.map {
                         let concrete_type = generic_map.get(name);
                         if concrete_type != null {
+                            if combined_generics == null { return null; }
                             combined_generics.insert(name, *concrete_type);
                         }
                     }
@@ -149,7 +160,7 @@ impl Expression {
                 }
             }
 
-            if func_info != null && (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {
+            if (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {
                 let member_expression = Expression::make(context.allocator, member_name, ExpressionData::MemberInstanceExpression(inner, member_name.value), member_type);
                 return Expression::make_member_function_call(context, member_expression, member_name, member_type, arguments, generic_map);
             } else {
@@ -160,7 +171,17 @@ impl Expression {
                 member_type = Context::resolve_type(context.allocator, member_type, generic_map, null);
             }
 
-            return Expression::make(context.allocator, member_name, ExpressionData::MemberInstanceExpression(inner, member_name.value), member_type);
+            // Apply path-based null-narrowing: if a parent guard recorded `<path>.<member>`
+            // as narrowed to `&T`, use that here so post-guard code sees the reference type.
+            let result_expr = Expression::make(context.allocator, member_name, ExpressionData::MemberInstanceExpression(inner, member_name.value), member_type);
+            let path = String::new(context.allocator);
+            if result_expr.build_narrow_path(&path) {
+                let narrowed = context.get_path_narrowing(path.as_str());
+                if narrowed != null {
+                    result_expr.return_type = *narrowed;
+                }
+            }
+            return result_expr;
         }
     }
 
@@ -176,12 +197,14 @@ impl Expression {
             ExpressionData::Invoke(target, args) => {
                 match target.return_type {
                     Type::Enum(enum_info, _) => {
-                        if enum_info.name.value.eq("Range") {
+                        let enum_name = enum_info.name;
+                        if enum_name != null && enum_name.value.eq("Range") {
                             let sequence = context.allocator.store(&Sequence {
                                 type: SequenceType::Slice,
                                 element: *inner.return_type.deref(),
                                 element_pointer: inner.return_type,
                             });
+                            if sequence == null { return null; }
 
                             let start = args.data[0].value;
                             let end = args.data[1].value;
@@ -189,10 +212,12 @@ impl Expression {
                             let arguments = Array<InvokeArgument>::new(context.allocator);
 
                             let argument_name_data = context.allocator.store(index_expr.token);
+                            if argument_name_data == null { return null; }
                             argument_name_data.type = TokenType::Identifier;
                             argument_name_data.value = "data";
 
                             let argument_name_length = context.allocator.store(argument_name_data);
+                            if argument_name_length == null { return null; }
                             argument_name_length.value = "length";
 
                             if start.is_zero() {
@@ -261,6 +286,7 @@ impl Expression {
 
     fn parse_postfix(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
         let token = context.current();
+        if token == null { return inner; }
 
         if token.eq(TokenType::Symbol, ".") {
             return Expression::parse_instance_member_expression(context, inner, generics);
@@ -370,6 +396,7 @@ impl Expression {
             if next == null { return null; }
 
             let expanded_token = context.allocator.store(next.token);
+            if expanded_token == null { return null; }
             expanded_token.start_line = result.token.start_line;
             expanded_token.start_column = result.token.start_column;
             next.token = expanded_token;

@@ -133,7 +133,7 @@ impl Root {
             } else {
                 let arg_str: str = arg;
                 let name = arg_str.slice(0, pos - arg);
-                let path = pos + 1;
+                let path: *const char = pos + 1;
 
                 self.add_namespace(name, path);
             }
@@ -289,10 +289,9 @@ impl Root {
     fn error(&self, path: str, start_line: usize, start_column: usize, end_line: usize, end_column: usize, message: *const char) {
         let diagnostics = &self.analysis.diagnostics;
         let file_diagnostics = diagnostics.find(&path);
-        if file_diagnostics == null { file_diagnostics = diagnostics.insert(path, Array<Diagnostic>::new(self.allocator)); }
 
-        file_diagnostics.append(Diagnostic {
-            message: message,
+        let diagnostic = Diagnostic {
+            message: str { ptr: message, length: strlen(message) },
             code: str { ptr: null, length: 0 },
             range: Range {
                 start: Position {
@@ -304,7 +303,14 @@ impl Root {
                     character: end_column,
                 },
             }
-        });
+        };
+
+        if file_diagnostics == null {
+            diagnostics.insert(path, Array<Diagnostic>::new(self.allocator)).append(diagnostic);
+            return;
+        }
+
+        file_diagnostics.append(diagnostic);
     }
 
     fn make_type_usage(&self, type: *Type, usage_types: &Array<Type>) -> *Type {

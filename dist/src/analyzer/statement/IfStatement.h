@@ -16,24 +16,15 @@ struct IfStatement {
     struct Array_ElseStatement else_statements;
 };
 
-#include <std/str.h>
-struct Context;
-struct Expression;
-struct Type;
 struct Block;
+struct Context;
 struct Generics;
 struct IfStatement;
 
-#line 17 "src/analyzer/statement/IfStatement.pv"
-struct Type* IfStatement__detect_null_narrowing(struct Context* context, struct Expression* expr, bool narrow_on_true);
-
-#line 88 "src/analyzer/statement/IfStatement.pv"
+#line 14 "src/analyzer/statement/IfStatement.pv"
 bool IfStatement__block_always_diverges(struct Block* block);
 
-#line 99 "src/analyzer/statement/IfStatement.pv"
-struct str IfStatement__narrowed_var_name(struct Expression* expr, bool narrow_on_true);
-
-#line 156 "src/analyzer/statement/IfStatement.pv"
+#line 25 "src/analyzer/statement/IfStatement.pv"
 struct IfStatement* IfStatement__parse(struct Context* context, struct Generics* generics);
 
 #endif

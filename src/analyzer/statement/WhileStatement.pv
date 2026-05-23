@@ -16,7 +16,18 @@ impl WhileStatement {
 
         let block = Block::new_ptr(context);
         block.is_loop = true;
-        if !block.parse(context, generics, true) { return null; }
+
+        // Apply null-narrowing inside the while body, same rules as `if cond { ... }`.
+        let narrow_true = Expression::detect_null_narrowing(context, expression, true);
+        if narrow_true != null {
+            let var_name = Expression::narrowed_var_name(context, expression, true);
+            context.push_scope(block);
+            context.set_narrowed(var_name, narrow_true);
+            if !block.parse(context, generics, false) { context.pop_scope(); return null; }
+            context.pop_scope();
+        } else {
+            if !block.parse(context, generics, true) { return null; }
+        }
 
         return context.allocator.store(&WhileStatement {
             expression,

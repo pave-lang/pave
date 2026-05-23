@@ -39,25 +39,25 @@ struct TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__find(struct HashMap_usize
 #line 77 "src/std/HashMap.pv"
 struct TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__insert(struct HashMap_usize_TypeUsage_Tuple* self, uintptr_t key, struct TypeUsage_Tuple value);
 
-#line 105 "src/std/HashMap.pv"
+#line 107 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Tuple__remove(struct HashMap_usize_TypeUsage_Tuple* self, uintptr_t* key);
 
-#line 129 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Tuple__release(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 138 "src/std/HashMap.pv"
+#line 140 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Tuple__fill_buckets(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 156 "src/std/HashMap.pv"
+#line 161 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Tuple HashMap_usize_TypeUsage_Tuple__clone(struct HashMap_usize_TypeUsage_Tuple* self, struct trait_Allocator allocator);
 
-#line 170 "src/std/HashMap.pv"
+#line 175 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Tuple HashMap_usize_TypeUsage_Tuple__iter(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 177 "src/std/HashMap.pv"
+#line 182 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Tuple__clear(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 186 "src/std/HashMap.pv"
+#line 191 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__Index__index(void* __self);
 
 

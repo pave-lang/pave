@@ -78,6 +78,8 @@ impl FunctionContext {
             if self.use_scopes {
                 let scope = self.scopes.back();
                 new_name.prepend("ctx->");
+
+                if scope == null { return; }
                 scope.variable_replacements.insert(name, new_name.as_str());
             }
 
@@ -103,6 +105,7 @@ impl FunctionContext {
 
                 if self.use_scopes {
                     let scope = self.scopes.back();
+                    if scope == null { return; }
                     scope.variable_replacements.insert(name, new_name.as_str());
                 }
                 return;

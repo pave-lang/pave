@@ -109,34 +109,45 @@ struct LetStatement* LetStatement__parse(struct Context* context, struct Generic
                     #line 55 "src/analyzer/statement/LetStatement.pv"
                     struct Scope* scope = Array_Scope__back(&context->scopes);
                     #line 56 "src/analyzer/statement/LetStatement.pv"
+                    if (scope == 0) {
+                        #line 56 "src/analyzer/statement/LetStatement.pv"
+                        return 0;
+                    }
+                    #line 57 "src/analyzer/statement/LetStatement.pv"
                     HashMap_str_Type__insert(&scope->narrow_originals, name->value, *src_original);
                 }
             } break;
-            #line 59 "src/analyzer/statement/LetStatement.pv"
+            #line 60 "src/analyzer/statement/LetStatement.pv"
             default: {
             } break;
         }
     }
 
-    #line 63 "src/analyzer/statement/LetStatement.pv"
+    #line 64 "src/analyzer/statement/LetStatement.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-        #line 63 "src/analyzer/statement/LetStatement.pv"
+        #line 64 "src/analyzer/statement/LetStatement.pv"
         return 0;
     }
 
-    #line 65 "src/analyzer/statement/LetStatement.pv"
-    if (Type__is_unknown(type)) {
+    #line 66 "src/analyzer/statement/LetStatement.pv"
+    if (type == 0) {
         #line 66 "src/analyzer/statement/LetStatement.pv"
+        return 0;
+    }
+
+    #line 68 "src/analyzer/statement/LetStatement.pv"
+    if (Type__is_unknown(type)) {
+        #line 69 "src/analyzer/statement/LetStatement.pv"
         Context__error_token(context, first_token, "Let statement is unable to determine it's type, manually specify it");
     }
 
-    #line 69 "src/analyzer/statement/LetStatement.pv"
+    #line 72 "src/analyzer/statement/LetStatement.pv"
     if (Type__is_void(type)) {
-        #line 70 "src/analyzer/statement/LetStatement.pv"
+        #line 73 "src/analyzer/statement/LetStatement.pv"
         Context__error_token(context, first_token, "Let statement cannot have void type");
     }
 
-    #line 73 "src/analyzer/statement/LetStatement.pv"
+    #line 76 "src/analyzer/statement/LetStatement.pv"
     return ArenaAllocator__store_LetStatement(context->allocator, (struct LetStatement[]){(struct LetStatement) {
         .is_static = is_static,
         .name = name,

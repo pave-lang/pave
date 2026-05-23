@@ -240,23 +240,28 @@ impl Usages {
     fn add_module(&self, module: &Module) {
         for (_, &func_info) in module.functions {
             self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
-            
-            if func_info.generics.array.length == 0 && self.usage_types.insert(func_info.name.value) {
-                let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
-                let self_type = self.allocator.store(&Type::Function(func_info, generic_map));
-                generic_map.self_type = self_type;
-                self.usages.append(Type::Function(func_info, generic_map));
-            }
+
+            let name = func_info.name;
+            if name == null || func_info.generics.array.length != 0 { continue; }
+
+            if !self.usage_types.insert(name.value) { continue; }
+
+            let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+            if generic_map == null { continue; }
+            let self_type = self.allocator.store(&Type::Function(func_info, generic_map));
+            generic_map.self_type = self_type;
+            self.usages.append(Type::Function(func_info, generic_map));
         }
 
         for (_, &enum_arr) in module.enums {
             for *enum_info in enum_arr {
                 self.enums.insert(cast<usize>(enum_info), TypeUsage<Enum>::new(self.allocator, enum_info));
-
-                if enum_info.generics.array.length == 0 && self.usage_types.insert(enum_info.name.value) {
+                
+                let name = enum_info.name;
+                if name != null && enum_info.generics.array.length == 0 && self.usage_types.insert(name.value) {
                     let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                     let self_type = self.allocator.store(&Type::Enum(enum_info, generic_map));
-                    generic_map.self_type = self_type;
+                    if generic_map != null { generic_map.self_type = self_type; }
                     self.usages.append(Type::Enum(enum_info, generic_map));
                 }
             }
@@ -266,10 +271,11 @@ impl Usages {
             for *struct_info in struct_arr {
                 self.structs.insert(cast<usize>(struct_info), TypeUsage<Struct>::new(self.allocator, struct_info));
 
-                if struct_info.generics.array.length == 0 && self.usage_types.insert(struct_info.name.value) {
+                let name = struct_info.name;
+                if name != null && struct_info.generics.array.length == 0 && self.usage_types.insert(name.value) {
                     let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                     let self_type = self.allocator.store(&Type::Struct(struct_info, generic_map));
-                    generic_map.self_type = self_type;
+                    if generic_map != null { generic_map.self_type = self_type; }
                     self.usages.append(Type::Struct(struct_info, generic_map));
                 }
             }
@@ -279,10 +285,11 @@ impl Usages {
             for *trait_info in trait_arr {
                 self.traits.insert(cast<usize>(trait_info), TypeUsage<Trait>::new(self.allocator, trait_info));
 
-                if trait_info.generics.array.length == 0 && self.usage_traits.insert(trait_info.name.value) {
+                let name = trait_info.name;
+                if name != null && trait_info.generics.array.length == 0 && self.usage_traits.insert(name.value) {
                     let generic_map = self.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
                     let self_type = self.allocator.store(&Type::Trait(trait_info, generic_map));
-                    generic_map.self_type = self_type;
+                    if generic_map != null { generic_map.self_type = self_type; }
                     self.usages.append(Type::Trait(trait_info, generic_map));
                 }
             }
@@ -291,11 +298,14 @@ impl Usages {
 
     fn add_type(&self, type: &Type, generic_map: &GenericMap) {
         let resolved_type = Context::resolve_type(self.allocator, type, generic_map, null);
+        if resolved_type == null { return; }
+
         let type_deref = resolved_type.deref();
         let type_deref_all = resolved_type.deref_all();
         let is_type = false;
         let is_trait = false;
         let usage_context = self.usage_context;
+        if usage_context == null { return; }
 
         match type_deref {
             Type::Global(g) => {
@@ -308,6 +318,7 @@ impl Usages {
             Type::Indirect(_) => {
                 match type_deref_all {
                     Type::Primitive(primitive_info) => {
+                        if primitive_info == null { return; }
                         if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {
                             usage_context.primitive_header.insert(primitive_info.name);
                         } else {
@@ -321,6 +332,7 @@ impl Usages {
                 }
             },
             Type::Primitive(primitive_info) => {
+                if primitive_info == null { return; }
                 if self.usage_mode == UsageMode::Layout || self.usage_mode == UsageMode::Signature {
                     usage_context.primitive_header.insert(primitive_info.name);
                 } else {
@@ -373,12 +385,17 @@ impl Usages {
             Type::EnumC(enum_c) => { is_type = !enum_c.include.mode_cpp; },
             Type::UnknownC(unknown_c) => { is_type = unknown_c.include != null; },
             Type::FunctionC(_) => { is_type = true; },
-            Type::TypedefC(typedef_c) => { is_type = !typedef_c.include.mode_cpp; },
+            Type::TypedefC(typedef_c) => {
+                let include = typedef_c.include;
+                if include == null { return; }
+                is_type = !include.mode_cpp;
+            },
             Type::ClassCpp(class_info) => {
                 if self.usage_mode != UsageMode::Body {
                     usage_context.cpp_usages.insert(class_info.name, *type);
                 } else {
-                    is_type = class_info.include.mode_cpp;
+                    let include = class_info.include;
+                    is_type = include.mode_cpp;
                 }
             },
             _ => {},
@@ -444,88 +461,113 @@ impl Usages {
     }
 
     fn process_primitive(&self, primitive_info: &Primitive) {
+        let entry_usage_context = self.usage_context;
         let self_type = self.allocator.store(&Type::Primitive(primitive_info));
         let generic_map = self.allocator.store(&GenericMap { self_type, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+        if generic_map == null { return; }
 
         let parent_ptr = cast<usize>(primitive_info);
         let parent_usage = self.primitives.find(&parent_ptr);
-        self.usage_context = parent_usage.add_usage(generic_map);
-        self.usage_context.populate_impls(self.allocator, &primitive_info.impls);
-        self.usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+        if parent_usage == null { return; }
+
+        let usage_context = parent_usage.add_usage(generic_map);
+        usage_context.populate_impls(self.allocator, &primitive_info.impls);
+        usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+
+        self.usage_context = usage_context;
 
         self.process_impls(&primitive_info.impls, generic_map);
 
-        self.usage_context = null;
+        self.usage_context = entry_usage_context;
     }
 
     fn process_sequence(&self, sequence: &Sequence) {
+        let entry_usage_context = self.usage_context;
         let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
+        if generic_map == null { return; }
         generic_map.insert("T", sequence.element);
         let sequence_type = Type::Sequence(sequence);
         let indirect = self.allocator.store(&Indirect { type: IndirectType::Reference, to: sequence_type });
+        if indirect == null { return; }
         generic_map.self_type = self.allocator.store(&Type::Indirect(indirect));
+        if generic_map.self_type == null { return; }
 
         let parent_ptr = cast<usize>(sequence);
         let parent_usage = self.sequences.find(&parent_ptr);
         if parent_usage == null {
             parent_usage = self.sequences.insert(parent_ptr, TypeUsage<Sequence>::new(self.allocator, sequence));
         }
-        self.usage_context = parent_usage.add_usage(generic_map);
+        if parent_usage == null { return; }
+
+        let usage_context = parent_usage.add_usage(generic_map);
+        self.usage_context = usage_context;
 
         self.add_type(&sequence.element, generic_map);
 
         if self.std_namespace != null {
             let iter_type = self.std_namespace.find_type("Iter", 1);
-            let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
-            let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1, allocator: self.allocator, capacity: 0 });
-            self.add_type(sequence_iter, generic_map);
-        }
-
-        let impl_info = self.root.hack_type_impl.impl_info;
-
-        match sequence.element.deref_all() {
-            Type::Generic(_) => {},
-            Type::GenericTypedef(_) => {},
-            _ => {
-                for (_, &func_info) in impl_info.functions {
-                    self.process_function(func_info, generic_map);
+            if iter_type != null {
+                let element_reference = Type::Indirect(Indirect::new_reference(self.allocator, sequence.element));
+                let sequence_iter = self.root.make_type_usage(iter_type, &Array<Type> { data: &element_reference, length: 1, allocator: self.allocator, capacity: 0 });
+                if sequence_iter != null {
+                    self.add_type(sequence_iter, generic_map);
                 }
-            },
+            }
         }
 
-        self.usage_context = null;
+        let root_hack_type = self.root.hack_type_impl;
+        if root_hack_type != null {
+            let impl_info = root_hack_type.impl_info;
+
+            match sequence.element.deref_all() {
+                Type::Generic(_) => {},
+                Type::GenericTypedef(_) => {},
+                _ => {
+                    for (_, &func_info) in impl_info.functions {
+                        self.process_function(func_info, generic_map);
+                    }
+                },
+            }
+        }
+
+        self.usage_context = entry_usage_context;
     }
 
     fn process_tuple(&self, tuple: &Tuple) {
+        let entry_usage_context = self.usage_context;
         let generic_map_val = GenericMap::new(self.allocator, &Generics { parent: null, array: Array<Generic> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } }, &Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 });
         let generic_map = self.allocator.store(&generic_map_val);
         let tuple_type = Type::Tuple(tuple);
 
         let parent_ptr = cast<usize>(tuple);
         let parent_usage = self.tuples.find(&parent_ptr);
-        if parent_usage == null {
-            parent_usage = self.tuples.insert(parent_ptr, TypeUsage<Tuple>::new(self.allocator, tuple));
-        }
+        if parent_usage == null { parent_usage = self.tuples.insert(parent_ptr, TypeUsage<Tuple>::new(self.allocator, tuple)); }
+        if parent_usage == null { return; }
+
         self.usage_context = parent_usage.add_usage(generic_map);
         self.usage_mode = UsageMode::Layout;
 
         let indirect = self.allocator.store(&Indirect { type: IndirectType::Reference, to: tuple_type });
-        generic_map.self_type = self.allocator.store(&Type::Indirect(indirect));
+        if generic_map != null { generic_map.self_type = self.allocator.store(&Type::Indirect(indirect)); }
 
         for element in tuple.elements {
             self.add_type(element, generic_map);
         }
 
-        self.usage_context = null;
+        self.usage_context = entry_usage_context;
     }
 
     fn process_struct(&self, struct_info: &Struct, generic_map: &GenericMap) {
+        let entry_usage_context = self.usage_context;
         let parent_ptr = cast<usize>(struct_info);
         let parent_usage = self.structs.find(&parent_ptr);
-        self.usage_context = parent_usage.add_usage(generic_map);
-        self.usage_context.populate_impls(self.allocator, &struct_info.impls);
-        self.usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+        if parent_usage == null { return; }
+        let usage_context = parent_usage.add_usage(generic_map);
+        usage_context.populate_impls(self.allocator, &struct_info.impls);
+        usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+
+        self.usage_context = usage_context;
         self.usage_mode = UsageMode::Layout;
 
         for (_, &field) in struct_info.fields {
@@ -533,6 +575,7 @@ impl Usages {
 
             match field.type.deref_all() {
                 Type::Function(param_func_info, param_generic_map) => {
+                    if param_generic_map == null { continue; }
                     let resolved_generic_map = param_generic_map.resolve_types(self.allocator, generic_map);
 
                     for param in param_func_info.parameters {
@@ -551,15 +594,19 @@ impl Usages {
 
         self.process_impls(&struct_info.impls, generic_map);
 
-        self.usage_context = null;
+        self.usage_context = entry_usage_context;
     }
 
     fn process_enum(&self, enum_info: &Enum, generic_map: &GenericMap) {
+        let entry_usage_context = self.usage_context;
         let parent_ptr = cast<usize>(enum_info);
         let parent_usage = self.enums.find(&parent_ptr);
-        self.usage_context = parent_usage.add_usage(generic_map);
-        self.usage_context.populate_impls(self.allocator, &enum_info.impls);
-        self.usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+        if parent_usage == null { return; }
+        let usage_context = parent_usage.add_usage(generic_map);
+        usage_context.populate_impls(self.allocator, &enum_info.impls);
+        usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+
+        self.usage_context = usage_context;
 
         self.usage_mode = UsageMode::Layout;
 
@@ -571,27 +618,34 @@ impl Usages {
 
         self.process_impls(&enum_info.impls, generic_map);
 
-        self.usage_context = null;
+        self.usage_context = entry_usage_context;
     }
 
     fn process_trait(&self, trait_info: &Trait, generic_map: &GenericMap) {
+        let entry_usage_context = self.usage_context;
         let parent_ptr = cast<usize>(trait_info);
         let parent_usage = self.traits.find(&parent_ptr);
-        self.usage_context = parent_usage.add_usage(generic_map);
-        self.usage_context.populate_trait_functions(self.allocator, trait_info);
+        if parent_usage == null { return; }
+        let usage_context = parent_usage.add_usage(generic_map);
+        usage_context.populate_trait_functions(self.allocator, trait_info);
+        
+        self.usage_context = usage_context;
 
         for (_, &func_info) in trait_info.functions {
             self.process_function(func_info, generic_map);
         }
 
-        self.usage_context = null;
+        self.usage_context = entry_usage_context;
     }
 
     fn usage_context_matches(uc: &UsageContext, generics: &Generics, generic_map: &GenericMap) -> bool {
         for *generic in generics.array {
-            let parent_v = uc.generic_map.get(generic.name.value);
-            let func_v = generic_map.get(generic.name.value);
-            if parent_v == null || func_v == null { return false; }
+            let generic_name = generic.name;
+            if generic_name == null { return false; }
+            let parent_v = uc.generic_map.get(generic_name.value);
+            let func_v = generic_map.get(generic_name.value);
+            if parent_v == null { return false; }
+            if func_v == null { return false; }
             let parent_t: Type = *parent_v;
             if !parent_t.eq(func_v) { return false; }
         }
@@ -642,8 +696,10 @@ impl Usages {
         match func_info.parent {
             FunctionParent::None => {
                 let func_usage = self.functions.find(&func_ptr);
-                self.usage_context = func_usage.add_usage(generic_map);
-                self.function_context = &self.usage_context.function_context;
+                if func_usage == null { return; }
+                let usage_context = func_usage.add_usage(generic_map);
+                self.usage_context = usage_context;
+                self.function_context = &usage_context.function_context;
             },
             FunctionParent::Primitive(primitive_info, impl_index, _) => {
                 if entry_usage_context != null && entry_usage_context.impl_functions.length > impl_index {
@@ -653,7 +709,9 @@ impl Usages {
                 }
                 if parent_usage_context == null { return; }
 
-                let func_usage = parent_usage_context.impl_functions.get(impl_index).find(&func_ptr);
+                let impl_functions = parent_usage_context.impl_functions.get(impl_index);
+                if impl_functions == null { return; }
+                let func_usage = impl_functions.find(&func_ptr);
                 if func_usage == null { self.usage_context = entry_usage_context; return; }
                 let function_usage_context = func_usage.add_usage(generic_map);
                 if func_info.generics.array.length > 0 || entry_usage_context == null {
@@ -671,7 +729,9 @@ impl Usages {
                 }
                 if parent_usage_context == null { return; }
 
-                let func_usage = parent_usage_context.impl_functions.get(impl_index).find(&func_ptr);
+                let impl_functions = parent_usage_context.impl_functions.get(impl_index);
+                if impl_functions == null { return; }
+                let func_usage = impl_functions.find(&func_ptr);
                 if func_usage == null { self.usage_context = entry_usage_context; return; }
                 let function_usage_context = func_usage.add_usage(generic_map);
                 if func_info.generics.array.length > 0 || entry_usage_context == null {
@@ -689,7 +749,9 @@ impl Usages {
                 }
                 if parent_usage_context == null { return; }
 
-                let func_usage = parent_usage_context.impl_functions.get(impl_index).find(&func_ptr);
+                let impl_functions = parent_usage_context.impl_functions.get(impl_index);
+                if impl_functions == null { return; }
+                let func_usage = impl_functions.find(&func_ptr);
                 if func_usage == null { self.usage_context = entry_usage_context; return; }
                 let function_usage_context = func_usage.add_usage(generic_map);
                 if func_info.generics.array.length > 0 || entry_usage_context == null {
@@ -705,7 +767,9 @@ impl Usages {
 
                 let impl_index = self.active_impl_index;
                 if parent_usage_context.impl_functions.length <= impl_index { impl_index = 0; }
-                let func_usage = parent_usage_context.impl_functions.get(impl_index).find(&func_ptr);
+                let impl_functions = parent_usage_context.impl_functions.get(impl_index);
+                if impl_functions == null { return; }
+                let func_usage = impl_functions.find(&func_ptr);
                 if func_usage == null { self.usage_context = entry_usage_context; return; }
                 let function_usage_context = func_usage.add_usage(generic_map);
                 if func_info.generics.array.length > 0 || entry_usage_context == null {
@@ -717,16 +781,21 @@ impl Usages {
             },
             FunctionParent::Type(_, _, _) => {
                 if entry_usage_context == null { return; }
+                entry_usage_context.function_context = FunctionContext::new(self.allocator, func_info, false);
+                self.function_context = &entry_usage_context.function_context;
                 self.usage_context = entry_usage_context;
-                self.usage_context.function_context = FunctionContext::new(self.allocator, func_info, false);
-                self.function_context = &self.usage_context.function_context;
             },
         }
 
-        if self.std_namespace && func_info.type == FunctionType::Coroutine {
-            let iter_trait = self.std_namespace.find_trait("Iter", 1);
-            let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, null), &Array<Type> { data: &func_info.return_type, length: 1, allocator: self.allocator, capacity: 0 });
-            self.add_type(sequence_iter, generic_map);
+        let std_namespace = self.std_namespace;
+        if std_namespace != null && func_info.type == FunctionType::Coroutine {
+            let iter_trait = std_namespace.find_trait("Iter", 1);
+            if iter_trait != null {
+                let sequence_iter = self.root.make_type_usage(&Type::Trait(iter_trait, null), &Array<Type> { data: &func_info.return_type, length: 1, allocator: self.allocator, capacity: 0 });
+                if sequence_iter != null {
+                    self.add_type(sequence_iter, generic_map);
+                }
+            }
         }
 
         self.usage_mode = UsageMode::Signature;
@@ -755,7 +824,9 @@ impl Usages {
                 },
                 StatementData::LetStatement(statement) => {
                     if !statement.is_static {
-                        self.function_context.add_variable(statement.name.value, statement.type);
+                        let function_context = self.function_context;
+                        if function_context == null { return; }
+                        function_context.add_variable(statement.name.value, statement.type);
                     }
 
                     self.add_type(statement.type, generic_map);
@@ -770,7 +841,9 @@ impl Usages {
                     }
                 },
                 StatementData::YieldStatement(statement) => {
-                    self.function_context.coroutine.yield_count += 1;
+                    let function_context = self.function_context;
+                    if function_context == null { return; }
+                    function_context.coroutine.yield_count += 1;
                     self.process_expression(statement.expression, generic_map);
                 },
                 StatementData::IfStatement(statement) => {
@@ -803,7 +876,9 @@ impl Usages {
                     match statement.type {
                         ForStatementType::Range(start, end) => {
                             let variable = &statement.variables.data[0];
-                            self.function_context.add_variable(variable.name.value, variable.type);
+                            let function_context = self.function_context;
+                            if function_context == null { return; }
+                            function_context.add_variable(variable.name.value, variable.type);
                             self.process_expression(start, generic_map);
                             self.process_expression(end, generic_map);
                         },
@@ -851,7 +926,9 @@ impl Usages {
 
                                     match type {
                                         Type::Generic(generic) => {
-                                            let name = generic.name.value;
+                                            let generic_name = generic.name;
+                                            if generic_name == null { return; }
+                                            let name = generic_name.value;
                                             let resolved_type = generic_map.get(name);
                                             if resolved_type != null { type = resolved_type; }
                                         },
@@ -860,9 +937,12 @@ impl Usages {
 
                                     let allocator = self.allocator;
                                     let usage_context = self.usage_context;
+                                    if usage_context == null { return; }
 
                                     match type {
                                         Type::Primitive(primitive_info) => {
+                                            if primitive_info == null { return; }
+
                                             match self.usage_mode {
                                                 UsageMode::Layout => { usage_context.layout.insert(primitive_info.name, *type); },
                                                 UsageMode::Signature => { usage_context.signature.insert(primitive_info.name, *type); },
@@ -871,6 +951,8 @@ impl Usages {
                                         },
                                         Type::TypedefC(typedef_c) => {
                                             let primitive_info = allocator.store(&Primitive { name: typedef_c.name, traits: HashMap<str, &Trait> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 }, impls: Array<&Impl> { allocator: self.allocator, data: null, length: 0, capacity: 0 } });
+                                            if primitive_info == null { return; }
+
                                             match self.usage_mode {
                                                 UsageMode::Layout => { usage_context.layout.insert(typedef_c.name, Type::Primitive(primitive_info)); },
                                                 UsageMode::Signature => { usage_context.signature.insert(typedef_c.name, Type::Primitive(primitive_info)); },
@@ -937,14 +1019,21 @@ impl Usages {
 
                 match expression.return_type {
                     Type::Struct(struct_info, _) => {
-                        if struct_info.name.value.eq("str") {
-                            self.usage_context.primitive_code.insert("str");
+                        let struct_name = struct_info.name;
+                        let usage_context = self.usage_context;
+                        if struct_name != null && struct_name.value.eq("str") {
+                            if usage_context != null {
+                                usage_context.primitive_code.insert("str");
+                            }
                         }
                     },
                     _ => {},
                 }
 
-                let return_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, null).deref();
+                let return_type_nullable = Context::resolve_type(self.allocator, &inner.return_type, generic_map, null);
+                if return_type_nullable == null { return; }
+                let return_type = return_type_nullable.deref();
+
                 match return_type {
                     Type::Function(func_info, _) => {
                         let func_ptr = cast<usize>(func_info);
@@ -952,6 +1041,8 @@ impl Usages {
                         match func_info.parent {
                             FunctionParent::None => {
                                 let usage = self.functions.find(&func_ptr);
+                                if usage == null { return; }
+
                                 if func_info.generics.array.length == 0 {
                                     usage.impl_dynamic_function = true;
                                 }
@@ -965,7 +1056,10 @@ impl Usages {
                                 let marked = false;
                                 if parent_usage != null {
                                     for *uc in parent_usage.usage_contexts {
-                                        let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
+                                        let usage_context_function = uc.impl_functions.get(impl_index);
+                                        if usage_context_function == null { continue; }
+
+                                        let impl_function = usage_context_function.find(&func_ptr);
                                         if impl_function != null {
                                             marked = true;
                                             if func_info.generics.array.length == 0 {
@@ -985,7 +1079,10 @@ impl Usages {
                                 let marked = false;
                                 if parent_usage != null {
                                     for *uc in parent_usage.usage_contexts {
-                                        let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
+                                        let usage_context_function = uc.impl_functions.get(impl_index);
+                                        if usage_context_function == null { continue; }
+
+                                        let impl_function = usage_context_function.find(&func_ptr);
                                         if impl_function != null {
                                             marked = true;
                                             if func_info.generics.array.length == 0 {
@@ -1005,7 +1102,10 @@ impl Usages {
                                 let marked = false;
                                 if parent_usage != null {
                                     for *uc in parent_usage.usage_contexts {
-                                        let impl_function = uc.impl_functions.get(impl_index).find(&func_ptr);
+                                        let usage_context_function = uc.impl_functions.get(impl_index);
+                                        if usage_context_function == null { continue; }
+                                        
+                                        let impl_function = usage_context_function.find(&func_ptr);
                                         if impl_function != null {
                                             marked = true;
                                             if func_info.generics.array.length == 0 {
@@ -1027,9 +1127,13 @@ impl Usages {
                             Type::Indirect(indirect) => {
                                 match indirect.to {
                                     Type::Trait(trait_info, _) => {
-                                        if trait_info.name.value.eq("Struct") {
+                                        let name = trait_info.name;
+                                        if name == null { return; }
+
+                                        if name.value.eq("Struct") {
                                             let ptr = cast<usize>(struct_info);
                                             let usage = self.structs.find(&ptr);
+                                            if usage == null { return; }
                                             usage.impl_dynamic_usage = true;
                                         }
                                     },

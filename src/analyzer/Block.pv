@@ -131,6 +131,10 @@ impl Block {
 
         while !context.check_value(TokenType::Symbol, "}") {
             let first_token = context.current();
+            if first_token == null {
+                if new_scope { context.pop_scope(); }
+                return false;
+            }
             let data: StatementData;
             let result = true;
 

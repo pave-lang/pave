@@ -212,7 +212,10 @@ impl Expression {
 
             let resolved_struct_type = struct_type;
             match struct_type {
-                Type::Self => { resolved_struct_type = context.type_self; },
+                Type::Self => {
+                    if context.type_self == null { return null; }
+                    resolved_struct_type = context.type_self;
+                },
                 _ => {},
             }
 
@@ -221,11 +224,13 @@ impl Expression {
                     let field_i: usize = 0;
                     while field_i < struct_info.fields.length {
                         let bucket = struct_info.fields.data + field_i;
+                        if bucket == null { return null; }
                         if bucket.value.default_token_start != 0 {
                             let already_provided = false;
                             let arg_i: usize = 0;
                             while arg_i < fields.length {
-                                if fields.data[arg_i].name.value.eq(bucket.key) {
+                                let arg_name = fields.data[arg_i].name;
+                                if arg_name != null && arg_name.value.eq(bucket.key) {
                                     already_provided = true;
                                     break;
                                 }
@@ -233,14 +238,16 @@ impl Expression {
                             }
 
                             if !already_provided {
-                                let struct_context = &struct_info.module.context;
+                                let module = struct_info.module;
+                                let struct_context = &module.context;
                                 let saved_pos = struct_context.pos;
                                 struct_context.pos = bucket.value.default_token_start;
                                 let default_expr = Expression::parse(struct_context, &struct_info.generics);
                                 struct_context.pos = saved_pos;
 
                                 if default_expr != null {
-                                    fields.append(InvokeArgument { name: bucket.value.name, value: default_expr });
+                                    let field_name = bucket.value.name;
+                                    fields.append(InvokeArgument { name: field_name, value: default_expr });
                                 }
                             }
                         }

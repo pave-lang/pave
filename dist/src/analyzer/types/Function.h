@@ -53,13 +53,13 @@ struct Function Function__parse_inner(struct Context* context, bool body_optiona
 #line 122 "src/analyzer/types/Function.pv"
 bool Function__parse_parameters(struct Function* self, struct Generics* generics);
 
-#line 184 "src/analyzer/types/Function.pv"
+#line 185 "src/analyzer/types/Function.pv"
 bool Function__parse_return_type(struct Function* self, struct Generics* generics);
 
-#line 195 "src/analyzer/types/Function.pv"
+#line 197 "src/analyzer/types/Function.pv"
 bool Function__fill_types(struct Function* self, struct Generics* generics);
 
-#line 218 "src/analyzer/types/Function.pv"
+#line 222 "src/analyzer/types/Function.pv"
 bool Function__parse_function(struct Function* self, struct Generics* generics);
 
 #endif

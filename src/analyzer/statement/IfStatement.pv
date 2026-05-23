@@ -11,80 +11,6 @@ struct IfStatement {
 }
 
 impl IfStatement {
-    // If `expr` is a null-comparison `var == null` / `null == var` (when narrow_on_true=false)
-    // or `var != null` / `null != var` (when narrow_on_true=true) where `var` has pointer type,
-    // returns (variable_name, narrowed &T reference type). Otherwise returns null.
-    fn detect_null_narrowing(context: &Context, expr: &Expression, narrow_on_true: bool) -> *Type {
-        let inner = expr;
-        match inner.data {
-            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
-            _ => {},
-        }
-
-        match inner.data {
-            ExpressionData::BinaryExpression(lhs, op, rhs) => {
-                // a || b is false only when both are false → safe to narrow either side's null-check
-                // when narrowing the false branch (narrow_on_true=false, e.g. post-guard).
-                if op.eq("||") && !narrow_on_true {
-                    let left = IfStatement::detect_null_narrowing(context, lhs, false);
-                    if left != null { return left; }
-                    return IfStatement::detect_null_narrowing(context, rhs, false);
-                }
-
-                // a && b is true only when both are true → safe to narrow either side's null-check
-                // inside the true branch (narrow_on_true=true, inside-if body).
-                if op.eq("&&") && narrow_on_true {
-                    let left = IfStatement::detect_null_narrowing(context, lhs, true);
-                    if left != null { return left; }
-                    return IfStatement::detect_null_narrowing(context, rhs, true);
-                }
-
-                let want_op: str = if narrow_on_true { "!=" } else { "==" };
-                if !op.eq(want_op) { return null; }
-
-                let var_expr: *Expression = null;
-                let other: *Expression = null;
-
-                match lhs.data {
-                    ExpressionData::Variable(_) => { var_expr = lhs; other = rhs; },
-                    _ => {},
-                }
-
-                if var_expr == null {
-                    match rhs.data {
-                        ExpressionData::Variable(_) => { var_expr = rhs; other = lhs; },
-                        _ => { return null; },
-                    }
-                }
-
-                let other_inner = other;
-                match other_inner.data {
-                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
-                    _ => {},
-                }
-
-                match other_inner.data {
-                    ExpressionData::NullLiteral => {},
-                    _ => { return null; },
-                }
-
-                match var_expr.return_type {
-                    Type::Indirect(indirect) => {
-                        if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
-                            return null;
-                        }
-                        let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
-                        return context.allocator.store(&Type::Indirect(ref_indirect));
-                    },
-                    _ => { return null; },
-                }
-            },
-            _ => { return null; },
-        }
-
-        return null;
-    }
-
     fn block_always_diverges(block: &Block) -> bool {
         if block.statements.length == 0 { return false; }
         let last = &block.statements.data[block.statements.length - 1];
@@ -94,63 +20,6 @@ impl IfStatement {
             StatementData::ContinueStatement(_) => { return true; },
             _ => { return false; },
         }
-    }
-
-    fn narrowed_var_name(expr: &Expression, narrow_on_true: bool) -> str {
-        let inner = expr;
-        match inner.data {
-            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
-            _ => {},
-        }
-
-        match inner.data {
-            ExpressionData::BinaryExpression(lhs, op, rhs) => {
-                if op.eq("||") && !narrow_on_true {
-                    let left = IfStatement::narrowed_var_name(lhs, false);
-                    if left.length > 0 { return left; }
-                    return IfStatement::narrowed_var_name(rhs, false);
-                }
-                if op.eq("&&") && narrow_on_true {
-                    let left = IfStatement::narrowed_var_name(lhs, true);
-                    if left.length > 0 { return left; }
-                    return IfStatement::narrowed_var_name(rhs, true);
-                }
-
-                let want_op: str = if narrow_on_true { "!=" } else { "==" };
-                if !op.eq(want_op) { return str { ptr: null, length: 0 }; }
-
-                // Pick the side that's a Variable; the other must be NullLiteral.
-                let var_expr: *Expression = null;
-                let other: *Expression = null;
-                match lhs.data {
-                    ExpressionData::Variable(_) => { var_expr = lhs; other = rhs; },
-                    _ => {},
-                }
-                if var_expr == null {
-                    match rhs.data {
-                        ExpressionData::Variable(_) => { var_expr = rhs; other = lhs; },
-                        _ => { return str { ptr: null, length: 0 }; },
-                    }
-                }
-
-                let other_inner = other;
-                match other_inner.data {
-                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
-                    _ => {},
-                }
-                match other_inner.data {
-                    ExpressionData::NullLiteral => {},
-                    _ => { return str { ptr: null, length: 0 }; },
-                }
-
-                match var_expr.data {
-                    ExpressionData::Variable(name) => { return name; },
-                    _ => {},
-                }
-            },
-            _ => {},
-        }
-        return str { ptr: null, length: 0 };
     }
 
     fn parse(context: &Context, generics: &Generics) -> *IfStatement {
@@ -191,6 +60,7 @@ impl IfStatement {
             if expression == null { return null; }
             match expression.return_type {
                 Type::Primitive(prim) => {
+                    if prim == null { return null; }
                     if !prim.name.eq("bool") {
                         context.error_token(expression.token, "If condition must be a bool expression");
                         return null;
@@ -202,9 +72,9 @@ impl IfStatement {
                 },
             }
 
-            let narrow_true = IfStatement::detect_null_narrowing(context, expression, true);
+            let narrow_true = Expression::detect_null_narrowing(context, expression, true);
             if narrow_true != null {
-                let var_name = IfStatement::narrowed_var_name(expression, true);
+                let var_name = Expression::narrowed_var_name(context, expression, true);
                 context.push_scope(block);
                 context.set_narrowed(var_name, narrow_true);
                 if !block.parse(context, generics, false) { context.pop_scope(); return null; }
@@ -250,6 +120,7 @@ impl IfStatement {
                             }
                         },
                     }
+                    if else_block == null { context.pop_scope(); return null; }
                     if !else_block.parse(context, generics, false) { context.pop_scope(); return null; }
                     context.pop_scope();
                 } else {
@@ -257,6 +128,7 @@ impl IfStatement {
                     if else_expression == null { return null; }
                     match else_expression.return_type {
                         Type::Primitive(prim) => {
+                            if prim == null { return null; }
                             if !prim.name.eq("bool") {
                                 context.error_token(else_expression.token, "If condition must be a bool expression");
                                 return null;
@@ -268,6 +140,7 @@ impl IfStatement {
                         },
                     }
                     else_block = Block::new_ptr(context);
+                    if else_block == null { return null; }
                     if !else_block.parse(context, generics, true) { return null; }
                 }
             } else {
@@ -276,16 +149,18 @@ impl IfStatement {
 
                 let narrow_false: *Type = null;
                 if pattern == null && expression != null {
-                    narrow_false = IfStatement::detect_null_narrowing(context, expression, false);
+                    narrow_false = Expression::detect_null_narrowing(context, expression, false);
                 }
 
                 if narrow_false != null {
-                    let var_name = IfStatement::narrowed_var_name(expression, false);
+                    let var_name = Expression::narrowed_var_name(context, expression, false);
                     context.push_scope(else_block);
                     context.set_narrowed(var_name, narrow_false);
+                    if else_block == null { context.pop_scope(); return null; }
                     if !else_block.parse(context, generics, false) { context.pop_scope(); return null; }
                     context.pop_scope();
                 } else {
+                    if else_block == null { return null; }
                     if !else_block.parse(context, generics, true) { return null; }
                 }
             }
@@ -299,9 +174,9 @@ impl IfStatement {
 
         if pattern == null && expression != null && else_statements.length == 0 {
             if IfStatement::block_always_diverges(block) {
-                let narrow_after = IfStatement::detect_null_narrowing(context, expression, false);
+                let narrow_after = Expression::detect_null_narrowing(context, expression, false);
                 if narrow_after != null {
-                    let var_name = IfStatement::narrowed_var_name(expression, false);
+                    let var_name = Expression::narrowed_var_name(context, expression, false);
                     context.set_narrowed(var_name, narrow_after);
                 }
             }

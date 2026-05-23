@@ -35,16 +35,16 @@ bool HashSet_str__has(struct HashSet_str* self, struct str* value);
 #line 73 "src/std/HashSet.pv"
 bool HashSet_str__insert(struct HashSet_str* self, struct str value);
 
-#line 97 "src/std/HashSet.pv"
+#line 99 "src/std/HashSet.pv"
 void HashSet_str__release(struct HashSet_str* self);
 
-#line 106 "src/std/HashSet.pv"
+#line 108 "src/std/HashSet.pv"
 void HashSet_str__fill_buckets(struct HashSet_str* self);
 
-#line 125 "src/std/HashSet.pv"
+#line 130 "src/std/HashSet.pv"
 struct HashSet_str HashSet_str__clone(struct HashSet_str* self, struct ArenaAllocator* allocator);
 
-#line 141 "src/std/HashSet.pv"
+#line 146 "src/std/HashSet.pv"
 struct HashSetIter_str HashSet_str__iter(struct HashSet_str* self);
 
 #endif

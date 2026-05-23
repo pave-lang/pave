@@ -8,7 +8,10 @@ impl Expression {
         let arguments_length = arguments.length;
 
         match type {
-            Type::Self => { { type = context.type_self; } },
+            Type::Self => {
+                if context.type_self == null { return false; }
+                type = context.type_self;
+            },
             _ => {},
         }
 
@@ -19,16 +22,18 @@ impl Expression {
             Type::Tuple(_) => { return true; },
             Type::Struct(struct_info, generic_map2) => {
                 for arg in arguments {
-                    let param = struct_info.fields.find(&arg.name.value);
+                    let arg_name = arg.name;
+                    if arg_name == null { return false; }
+                    let param = struct_info.fields.find(&arg_name.value);
 
                     if param == null {
-                        context.error_token(arg.name, "Unable to find field in struct");
+                        context.error_token(arg_name, "Unable to find field in struct");
                         return false;
                     }
 
                     let param_type: *Type = &param.type;
 
-                    if generic_map2.map.length > 0 {
+                    if generic_map2 != null && generic_map2.map.length > 0 {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
                     } else if generic_map != null {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map, null);
@@ -46,10 +51,12 @@ impl Expression {
                 let field_i: usize = 0;
                 while field_i < struct_info.fields.length {
                     let bucket = struct_info.fields.data + field_i;
+                    if bucket == null { return false; }
                     let provided = false;
                     let arg_i: usize = 0;
                     while arg_i < arguments.length {
-                        if arguments.data[arg_i].name.value.eq(bucket.key) {
+                        let arg_name = arguments.data[arg_i].name;
+                        if arg_name != null && arg_name.value.eq(bucket.key) {
                             provided = true;
                             break;
                         }
@@ -105,7 +112,7 @@ impl Expression {
                     let param = param_iter.value();
                     let param_type: *Type = &param.type;
 
-                    if generic_map2.map.length > 0 {
+                    if generic_map2 != null && generic_map2.map.length > 0 {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map2, generic_map);
                     } else if generic_map != null {
                         param_type = Context::resolve_type(context.allocator, param_type, generic_map, null);

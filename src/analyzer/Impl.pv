@@ -246,7 +246,9 @@ impl Impl {
         }
 
         if self.has_trait && self.trait_ != null {
-            for (name, _) in self.trait_.typedefs {
+            let trait_info = self.trait_;
+
+            for (name, _) in trait_info.typedefs {
                 if self.typedefs.find(&name) == null {
                     let message = String::new(self.context.allocator);
                     message.append("Implementation is missing trait typedef '");
@@ -259,8 +261,10 @@ impl Impl {
             if self.typedefs.length > 0 {
                 match self.trait_type {
                     Type::Trait(trait_info, generic_map) => {
+                        if generic_map == null { return false; }
                         let new_map_val = generic_map.clone(self.context.allocator);
                         let new_map = self.context.allocator.store(&new_map_val);
+                        if new_map == null { return false; }
                         for (name, &typedef_type) in self.typedefs {
                             new_map.insert(name, *typedef_type);
                         }
@@ -283,16 +287,20 @@ impl Impl {
         }
 
         if self.has_trait && self.trait_ != null {
-            for (_, &trait_func) in self.trait_.functions {
-                let has_default = trait_func.token_start < trait_func.token_end;
+            let trait_info = self.trait_;
 
-                let impl_func = self.functions.find(&trait_func.name.value);
+            for (_, &trait_func) in trait_info.functions {
+                let has_default = trait_func.token_start < trait_func.token_end;
+                let trait_func_name = trait_func.name;
+                if trait_func_name == null { return false; }
+
+                let impl_func = self.functions.find(&trait_func_name.value);
 
                 if impl_func == null {
                     if !has_default {
                         let message = String::new(self.context.allocator);
                         message.append("Implementation is missing trait function '");
-                        message.append(trait_func.name.value);
+                        message.append(trait_func_name.value);
                         message.append("'");
                         self.context.error_token(self.token, message.c_str());
                     }
@@ -301,8 +309,10 @@ impl Impl {
 
                 let generic_map = self.trait_type.get_generic_map(context);
                 if self.typedefs.length > 0 {
+                    if generic_map == null { return false; }
                     let aug_map_val = generic_map.clone(context.allocator);
                     let aug_map = context.allocator.store(&aug_map_val);
+                    if aug_map == null { return false; }
                     for (name, &typedef_type) in self.typedefs {
                         aug_map.insert(name, *typedef_type);
                     }
@@ -310,31 +320,39 @@ impl Impl {
                 }
 
                 if impl_func.parameters.length != trait_func.parameters.length {
+                    let impl_func_name = impl_func.name;
+                    if impl_func_name == null { return false; }
+
                     let message = String::new(self.context.allocator);
                     message.append("Implementation of trait function '");
-                    message.append(trait_func.name.value);
+                    message.append(trait_func_name.value);
                     message.append("' has wrong number of parameters");
-                    self.context.error_token(impl_func.name, message.c_str());
+                    self.context.error_token(impl_func_name, message.c_str());
                 } else {
                     let i: usize = 0;
                     while i < impl_func.parameters.length {
                         let impl_param = impl_func.parameters.get(i);
                         let trait_param = trait_func.parameters.get(i);
+                        if impl_param == null { return false; } // TODO combine once we support it
+                        if trait_param == null { return false; }
                         
                         let trait_param_type = &trait_param.type;
                         if !trait_param_type.deref().is_self() { trait_param_type = Context::resolve_type(context.allocator, trait_param_type, generic_map, null); }
 
                         if !impl_param.type.eq(trait_param_type) {
+                            let impl_param_name = impl_param.name;
+                            if impl_param_name == null { return false; }
+
                             let message = String::new(self.context.allocator);
                             message.append("Parameter ");
-                            message.append(impl_param.name.value);
+                            message.append(impl_param_name.value);
                             message.append(" has type ");
                             let impl_type_name = context.root.naming_decl.get_type_decl(&impl_param.type, context.type_self, null);
                             message.append(impl_type_name.as_str());
                             message.append(", expected ");
                             let trait_type_name = context.root.naming_decl.get_type_decl(trait_param_type, context.type_self, null);
                             message.append(trait_type_name.as_str());
-                            self.context.error_token(impl_param.name, message.c_str());
+                            self.context.error_token(impl_param_name, message.c_str());
                         }
                         i += 1;
                     }
@@ -346,14 +364,16 @@ impl Impl {
                 if !impl_func.return_type.eq(trait_func_return_type) {
                     let message = String::new(self.context.allocator);
                     message.append("Implementation of trait function ");
-                    message.append(trait_func.name.value);
+                    message.append(trait_func_name.value);
                     message.append(" has return type ");
                     let impl_return_name = context.root.naming_decl.get_type_decl(&impl_func.return_type, context.type_self, null);
                     message.append(impl_return_name.as_str());
                     message.append(", expected ");
                     let trait_return_name = context.root.naming_decl.get_type_decl(trait_func_return_type, context.type_self, null);
                     message.append(trait_return_name.as_str());
-                    self.context.error_token(impl_func.name, message.c_str());
+                    let impl_func_name = impl_func.name;
+                    if impl_func_name == null { return false; }
+                    self.context.error_token(impl_func_name, message.c_str());
                 }
             }
         }

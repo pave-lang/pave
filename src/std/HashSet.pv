@@ -81,8 +81,10 @@ impl<T: Hash> HashSet<T> {
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets + bucket_index;
 
-        while *current_bucket_node != null {
-            current_bucket_node = &(*current_bucket_node).next;
+        let bucket_node = *current_bucket_node;
+        while bucket_node != null {
+            current_bucket_node = &bucket_node.next;
+            bucket_node = *current_bucket_node;
         }
 
         self.data[self.length] = HashSetBucket<T> { value, next: null };
@@ -107,13 +109,16 @@ impl<T: Hash> HashSet<T> {
         let i: usize = 0;
         while i < self.length {
             let node = self.data + i;
+            if node == null { return; }
             node.next = null;
             let hash = (*node).value.hash();
             let bucket_index: usize = hash._0 % self.capacity;
             let current_bucket_node = self.buckets + bucket_index;
 
-            while *current_bucket_node != null {
-                current_bucket_node = &(*current_bucket_node).next;
+            let bucket_node = *current_bucket_node;
+            while bucket_node != null {
+                current_bucket_node = &bucket_node.next;
+                bucket_node = *current_bucket_node;
             }
 
             *current_bucket_node = node;

@@ -28,7 +28,10 @@ impl Expression {
         }
 
         for generic in func_info.generics.array {
-            let concrete_type = generic_map.get(generic.name.value);
+            let generic_name = generic.name;
+            if generic_name == null { continue; }
+
+            let concrete_type = generic_map.get(generic_name.value);
             if concrete_type == null { continue; }
 
             for *trait_info in generic.traits {
@@ -55,7 +58,10 @@ impl Expression {
     fn resolve_generic_type(context: &Context, param_type: &Type, arg_type: &Type, generic_map: &GenericMap) {
         match param_type {
             Type::Generic(generic) => {
-                let generic_type = generic_map.get(generic.name.value);
+                let generic_name = generic.name;
+                if generic_name == null { return; }
+
+                let generic_type = generic_map.get(generic_name.value);
                 if generic_type != null { *generic_type = *arg_type; }
             },
             Type::Indirect(indirect_type) => {

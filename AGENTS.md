@@ -6,6 +6,7 @@ Pave is a self-hosted systems language that compiles to C99. The compiler is wri
 
 ```sh
 make all        # full bootstrap: dist/pavec → build/1 → build/2, verifies build/2 == build/3, runs tests
+make clean      # if make all fails due to source build/2 !- build/3 then run make clean and make all
 make examples   # compile all examples using dist/pavec.exe
 ```
 

@@ -18,7 +18,9 @@ impl YieldStatement {
         if expression == null { return null; }
         if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
-        expression.validate_type(context, &context.function.return_type, true);
+        let function = context.function;
+        if function == null { return null; }
+        expression.validate_type(context, &function.return_type, true);
 
         return context.allocator.store(&YieldStatement { expression });
     }

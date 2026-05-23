@@ -66,6 +66,7 @@ impl ArenaBlock {
 
         let header: *ArenaAllocation = ptr;
         header -= 1;
+        if header == null { return 0; }
 
         return header.size;
     }
@@ -75,6 +76,7 @@ impl ArenaBlock {
 
         let header: *ArenaAllocation = ptr;
         header -= 1;
+        if header == null { return false; }
 
         let data: &u8 = ptr;
 
@@ -95,6 +97,7 @@ impl ArenaBlock {
     fn realloc(&self, ptr: *void, size: usize) -> *void {
         let header: *ArenaAllocation = ptr;
         header -= 1;
+        if header == null { return null; }
 
         let data: &u8 = ptr;
 
@@ -177,20 +180,24 @@ impl Allocator for ArenaAllocator {
         if size > self.block_size / 4 {
             let total_size = sizeof(ArenaOversize) + size;
             let oversize: *ArenaOversize = self.allocator.alloc(total_size);
+            if oversize == null { return null; }
             oversize.size = size;
             oversize.prev = self.last_oversize;
             self.last_oversize = oversize;
             return oversize + 1;
         }
 
-        let ptr = self.last_block.alloc(size);
+        let last_block = self.last_block;
+        if last_block == null { return null; }
+
+        let ptr = last_block.alloc(size);
         if ptr != null { return ptr; }
 
         let block = ArenaBlock::new(self.allocator, self.block_size, self.last_block);
         if block == null { return null; }
 
         self.last_block = block;
-        return self.last_block.alloc(size);
+        return block.alloc(size);
     }
 
     fn realloc(&self, ptr: *void, new_size: usize) -> *void {

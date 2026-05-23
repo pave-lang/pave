@@ -140,58 +140,69 @@ void FunctionContext__add_variable(struct FunctionContext* self, struct str name
             struct FunctionScope* scope = Array_FunctionScope__back(&self->scopes);
             #line 80 "src/compiler/FunctionContext.pv"
             String__prepend(&new_name, (struct str){ .ptr = "ctx->", .length = strlen("ctx->") });
-            #line 81 "src/compiler/FunctionContext.pv"
+
+            #line 82 "src/compiler/FunctionContext.pv"
+            if (scope == 0) {
+                #line 82 "src/compiler/FunctionContext.pv"
+                return;
+            }
+            #line 83 "src/compiler/FunctionContext.pv"
             HashMap_str_str__insert(&scope->variable_replacements, name, String__as_str(&new_name));
         }
 
-        #line 84 "src/compiler/FunctionContext.pv"
+        #line 86 "src/compiler/FunctionContext.pv"
         return;
     }
 
-    #line 87 "src/compiler/FunctionContext.pv"
-    String__append(&new_name, (struct str){ .ptr = "_x", .length = strlen("_x") });
-    #line 88 "src/compiler/FunctionContext.pv"
-    int32_t i = 1;
     #line 89 "src/compiler/FunctionContext.pv"
+    String__append(&new_name, (struct str){ .ptr = "_x", .length = strlen("_x") });
+    #line 90 "src/compiler/FunctionContext.pv"
+    int32_t i = 1;
+    #line 91 "src/compiler/FunctionContext.pv"
     while (true) {
-        #line 90 "src/compiler/FunctionContext.pv"
+        #line 92 "src/compiler/FunctionContext.pv"
         if (i == 10) {
-            #line 90 "src/compiler/FunctionContext.pv"
+            #line 92 "src/compiler/FunctionContext.pv"
             String__append(&new_name, (struct str){ .ptr = "x", .length = strlen("x") });
         }
-        #line 91 "src/compiler/FunctionContext.pv"
+        #line 93 "src/compiler/FunctionContext.pv"
         if (i > 9) {
-            #line 92 "src/compiler/FunctionContext.pv"
+            #line 94 "src/compiler/FunctionContext.pv"
             new_name.array.data[String__length(&new_name) - 2] = '0' + (i / 10);
-            #line 93 "src/compiler/FunctionContext.pv"
+            #line 95 "src/compiler/FunctionContext.pv"
             new_name.array.data[String__length(&new_name) - 1] = '0' + (i % 10);
         } else {
-            #line 95 "src/compiler/FunctionContext.pv"
+            #line 97 "src/compiler/FunctionContext.pv"
             new_name.array.data[String__length(&new_name) - 1] = '0' + i;
         }
 
-        #line 98 "src/compiler/FunctionContext.pv"
+        #line 100 "src/compiler/FunctionContext.pv"
         struct str new_name_str = String__as_str(&new_name);
-        #line 99 "src/compiler/FunctionContext.pv"
+        #line 101 "src/compiler/FunctionContext.pv"
         if (HashMap_str_ref_Type__find(&self->coroutine.variables, &new_name_str) == 0) {
-            #line 100 "src/compiler/FunctionContext.pv"
-            String__prepend(&new_name, (struct str){ .ptr = "ctx->", .length = strlen("ctx->") });
-            #line 101 "src/compiler/FunctionContext.pv"
-            new_name_str = String__as_str(&new_name);
             #line 102 "src/compiler/FunctionContext.pv"
+            String__prepend(&new_name, (struct str){ .ptr = "ctx->", .length = strlen("ctx->") });
+            #line 103 "src/compiler/FunctionContext.pv"
+            new_name_str = String__as_str(&new_name);
+            #line 104 "src/compiler/FunctionContext.pv"
             HashMap_str_ref_Type__insert(&self->coroutine.variables, str__slice(new_name_str, 5, new_name_str.length), type);
 
-            #line 104 "src/compiler/FunctionContext.pv"
+            #line 106 "src/compiler/FunctionContext.pv"
             if (self->use_scopes) {
-                #line 105 "src/compiler/FunctionContext.pv"
+                #line 107 "src/compiler/FunctionContext.pv"
                 struct FunctionScope* scope = Array_FunctionScope__back(&self->scopes);
-                #line 106 "src/compiler/FunctionContext.pv"
+                #line 108 "src/compiler/FunctionContext.pv"
+                if (scope == 0) {
+                    #line 108 "src/compiler/FunctionContext.pv"
+                    return;
+                }
+                #line 109 "src/compiler/FunctionContext.pv"
                 HashMap_str_str__insert(&scope->variable_replacements, name, String__as_str(&new_name));
             }
-            #line 108 "src/compiler/FunctionContext.pv"
+            #line 111 "src/compiler/FunctionContext.pv"
             return;
         }
-        #line 110 "src/compiler/FunctionContext.pv"
+        #line 113 "src/compiler/FunctionContext.pv"
         i += 1;
     }
 }

@@ -32,11 +32,12 @@ impl IncludeWriter {
 
         for (_, &type) in types {
             let resolved = Context::resolve_type(self.allocator, type, generics, null);
-            if deref { resolved = resolved.deref_all(); }
+            if resolved == null { continue; }
+            let resolved_nn: &Type = if deref { resolved.deref_all() } else { resolved };
 
-            match resolved {
+            match resolved_nn {
                 Type::Indirect(_) => {
-                    let type_deref = resolved.deref_all();
+                    let type_deref = resolved_nn.deref_all();
 
                     match type_deref {
                         Type::Trait(_, _) => {
@@ -85,7 +86,7 @@ impl IncludeWriter {
                             if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                         },
                         Type::TypedefC(info) => {
-                            if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                            if info.include != null && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                         },
                         Type::ClassCpp(info) => {
                             if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
@@ -103,8 +104,11 @@ impl IncludeWriter {
                 Type::Function(func_info, func_generic_map) => {
                     match func_info.parent {
                         FunctionParent::None => {
+                            if func_generic_map == null { continue; }
+                            let context = func_info.context;
+                            if context == null { continue; }
                             let name = generator.naming_ident.get_type_name(&Type::Function(func_info, func_generic_map), func_generic_map.self_type, func_generic_map);
-                            let module = func_info.context.module;
+                            let module = context.module;
                             let path = generator.make_rel_path(module, name.as_str(), "");
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                         },
@@ -134,7 +138,7 @@ impl IncludeWriter {
                     if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                 },
                 Type::TypedefC(info) => {
-                    if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
+                    if info.include != null && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                 },
                 Type::FunctionC(info) => {
                     if self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
@@ -146,8 +150,8 @@ impl IncludeWriter {
                     if info.include != null && self.c_includes.insert(info.include.path) { c_includes.insert(info.include.path); }
                 },
                 _ => {
-                    let name = generator.naming_ident.get_type_name(resolved, generics.self_type, generics);
-                    let module = resolved.get_module();
+                    let name = generator.naming_ident.get_type_name(resolved_nn, generics.self_type, generics);
+                    let module = resolved_nn.get_module();
 
                     let path = generator.make_rel_path(module, name.as_str(), "");
                     if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }

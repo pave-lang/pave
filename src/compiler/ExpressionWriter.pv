@@ -80,7 +80,7 @@ impl ExpressionWriter {
                     ExpressionData::Type(type) => {
                         match type.resolve_typedef() {
                             Type::Function(func_info, generic_map) => {
-                                let resolved_generics = generic_map.resolve_types(generator.allocator, generics);
+                                let resolved_generics = (*generic_map).resolve_types(generator.allocator, generics);
                                 let success = generator.write_function_name(file, func_info, &resolved_generics);
                                 fprintf(file, "(");
                                 let first = true;
@@ -241,6 +241,7 @@ impl ExpressionWriter {
 
         match type {
             Type::Trait(trait_info, _) => {
+                let trait_name = *trait_info.name;
                 fprintf(file, "(");
                 generator.write_type(file, type, generics);
                 fprintf(file, ") { .vtable = &");
@@ -250,7 +251,7 @@ impl ExpressionWriter {
                 generator.write_str_title(file, inner_type_name.as_str());
 
                 fprintf(file, "__VTABLE__");
-                generator.write_str_title(file, trait_info.name.value);
+                generator.write_str_title(file, trait_name.value);
                 fprintf(file, ", .instance = ");
                 self.write_expression(file, inner_expr, generics);
                 fprintf(file, " }");
@@ -344,7 +345,7 @@ impl ExpressionWriter {
                 fprintf(file, "expected a single field as a value into this struct");
             } else if fields.length == 1 {
                 let field = fields.data;
-                self.write_expression(file, field.value, generics);
+                self.write_expression(file, (*field).value, generics);
             } else {
                 fprintf(file, "0");
             }
@@ -457,7 +458,7 @@ impl ExpressionWriter {
             ExpressionData::Type(type) => {
                 match type {
                     Type::Function(func_info, generic_map) => {
-                        let resolved_generics = generic_map.resolve_types(generator.allocator, generics);
+                        let resolved_generics = (*generic_map).resolve_types(generator.allocator, generics);
 
                         fprintf(file, "(struct ");
                         generator.write_function_name(file, func_info, &resolved_generics);
@@ -495,7 +496,8 @@ impl ExpressionWriter {
 
     fn write_builtin_function_invoke(&self, file: &FILE, func_info: &Function, arguments: &Array<InvokeArgument>, func_generics: &GenericMap, generics: &GenericMap) -> bool {
         let generator = self.generator;
-        let name = func_info.name.value;
+        let func_name = *func_info.name;
+        let name = func_name.value;
 
         if name.eq("typeid") {
             let resolved_generics = func_generics.resolve_types(generator.allocator, generics);
@@ -599,14 +601,16 @@ impl ExpressionWriter {
                             _ => {},
                         }
 
-                        let name = func_info.name.value;
-                        let resolved_generics = generic_map.resolve_types(generator.allocator, generics);
+                        let func_name = *func_info.name;
+                        let name = func_name.value;
+                        let resolved_generics = (*generic_map).resolve_types(generator.allocator, generics);
                         let args = arguments.iter();
                         let success = true;
                         let first = true;
 
                         match func_info.parent {
                             FunctionParent::Trait(trait_info) => {
+                                let trait_name = *trait_info.name;
                                 if !args.next() {
                                     fprintf(stderr, "Trait function call missing instance argument\n");
                                     return false;
@@ -626,9 +630,9 @@ impl ExpressionWriter {
                                     let parent_name = generator.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
                                     success = generator.write_str(file, parent_name.as_str()) && success;
                                     fprintf(file, "__");
-                                    success = generator.write_str(file, trait_info.name.value) && success;
+                                    success = generator.write_str(file, trait_name.value) && success;
                                     fprintf(file, "__");
-                                    success = generator.write_str(file, func_info.name.value) && success;
+                                    success = generator.write_str(file, name) && success;
                                     fprintf(file, "(");
                                     success = self.write_expression(file, arg.value, generics) && success;
                                     first = false;
@@ -679,7 +683,8 @@ impl ExpressionWriter {
                                 let first = true;
                                 for arg in arguments {
                                     if first { first = false; fprintf(file, " ."); } else { fprintf(file, ", ."); }
-                                    success = generator.write_str(file, arg.name.value) && success;
+                                    let arg_name = *arg.name;
+                                    success = generator.write_str(file, arg_name.value) && success;
                                     fprintf(file, " = ");
                                     success = self.write_expression(file, arg.value, generics) && success;
                                 }
@@ -705,7 +710,8 @@ impl ExpressionWriter {
                             let first = true;
                             for arg in arguments {
                                 if first { first = false; fprintf(file, " ."); } else { fprintf(file, ", ."); }
-                                success = generator.write_str(file, arg.name.value) && success;
+                                let arg_name = *arg.name;
+                                success = generator.write_str(file, arg_name.value) && success;
                                 fprintf(file, " = ");
                                 success = self.write_expression(file, arg.value, generics) && success;
                             }
@@ -933,14 +939,16 @@ impl ExpressionWriter {
             ExpressionData::ImplicitCast(inner_expr) => {
                 match expression.return_type {
                     Type::Struct(struct_info, _) => {
-                        if struct_info.name.value.eq("str") {
+                        let struct_name = *struct_info.name;
+                        if struct_name.value.eq("str") {
                             self.write_str_cast(file, inner_expr, generics, false);
                         }
                     },
                     Type::Indirect(indirect) => {
                         match indirect.to {
                             Type::Struct(struct_info, _) => {
-                                if struct_info.name.value.eq("str") {
+                                let struct_name = *struct_info.name;
+                                if struct_name.value.eq("str") {
                                     self.write_str_cast(file, inner_expr, generics, true);
                                 } else {
                                     self.write_trait_cast(file, inner_expr, &indirect.to, generics);

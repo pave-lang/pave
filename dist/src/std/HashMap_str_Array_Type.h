@@ -41,25 +41,25 @@ struct Array_Type* HashMap_str_Array_Type__find(struct HashMap_str_Array_Type* s
 #line 77 "src/std/HashMap.pv"
 struct Array_Type* HashMap_str_Array_Type__insert(struct HashMap_str_Array_Type* self, struct str key, struct Array_Type value);
 
-#line 105 "src/std/HashMap.pv"
+#line 107 "src/std/HashMap.pv"
 bool HashMap_str_Array_Type__remove(struct HashMap_str_Array_Type* self, struct str* key);
 
-#line 129 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_Array_Type__release(struct HashMap_str_Array_Type* self);
 
-#line 138 "src/std/HashMap.pv"
+#line 140 "src/std/HashMap.pv"
 void HashMap_str_Array_Type__fill_buckets(struct HashMap_str_Array_Type* self);
 
-#line 156 "src/std/HashMap.pv"
+#line 161 "src/std/HashMap.pv"
 struct HashMap_str_Array_Type HashMap_str_Array_Type__clone(struct HashMap_str_Array_Type* self, struct trait_Allocator allocator);
 
-#line 170 "src/std/HashMap.pv"
+#line 175 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_Type HashMap_str_Array_Type__iter(struct HashMap_str_Array_Type* self);
 
-#line 177 "src/std/HashMap.pv"
+#line 182 "src/std/HashMap.pv"
 void HashMap_str_Array_Type__clear(struct HashMap_str_Array_Type* self);
 
-#line 186 "src/std/HashMap.pv"
+#line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_Type* HashMap_str_Array_Type__Index__index(void* __self);
 
 

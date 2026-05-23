@@ -46,7 +46,13 @@ impl FileGenerator {
             header_ext = ".test.h";
         }
 
-        let code = generator.make_path(func_info.context.module, name_str, code_ext);
+        let context = func_info.context;
+        if context == null {
+            fprintf(stderr, "Missing function context in generate_function\n");
+            return false;
+        }
+
+        let code = generator.make_path(context.module, name_str, code_ext);
         let code_file: *FILE = null;
         let code_tmp: *const char = null;
 
@@ -58,10 +64,10 @@ impl FileGenerator {
         if code_file == null { perror(code.c_str()); return false; }
 
         generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
-        generator.write_includes_raw(code_file, &func_info.context.module.includes);
+        generator.write_includes_raw(code_file, &context.module.includes);
         include_writer.write(code_file, generator, &usage_context.body, generics, true);
 
-        let header_rel = generator.make_rel_path(func_info.context.module, name_str, header_ext);
+        let header_rel = generator.make_rel_path(context.module, name_str, header_ext);
         fprintf(code_file, "#include <");
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
@@ -76,7 +82,7 @@ impl FileGenerator {
 
         include_writer = IncludeWriter::new(generator.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
-        let header = generator.make_path(func_info.context.module, name_str, header_ext);
+        let header = generator.make_path(context.module, name_str, header_ext);
         let header_file: *FILE = null;
         let header_tmp: *const char = null;
         header_tmp = tmpnam(0);
@@ -292,13 +298,15 @@ impl FileGenerator {
 
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
+            let trait_name = trait_info.name;
+            if trait_name == null { continue; }
             if !trait_info.has_dynamic_dispatch() { continue; }
             fprintf(code_file, "struct ");
             generator.write_type_name(code_file, trait_entry.1, generics);
             fprintf(code_file, "VTable ");
             generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__");
-            generator.write_str_title(code_file, trait_info.name.value);
+            generator.write_str_title(code_file, trait_name.value);
             fprintf(code_file, " = { ");
 
             let first = true;
@@ -539,8 +547,12 @@ impl FileGenerator {
         if !defs.write_impls(code_file, null, &primitive_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
 
         for *impl_info in primitive_info.impls {
-            if !impl_info.has_trait || impl_info.trait_ == null { continue; }
             let trait_info = impl_info.trait_;
+            if !impl_info.has_trait || trait_info == null { continue; }
+
+            let trait_name = trait_info.name;
+            if trait_name == null { continue; }
+
             if !trait_info.has_dynamic_dispatch() { continue; }
 
             fprintf(code_file, "\nstruct ");
@@ -548,7 +560,7 @@ impl FileGenerator {
             fprintf(code_file, "VTable ");
             generator.write_str_title(code_file, name);
             fprintf(code_file, "__VTABLE__");
-            generator.write_str_title(code_file, trait_info.name.value);
+            generator.write_str_title(code_file, trait_name.value);
             fprintf(code_file, " = { ");
 
             let first = true;
@@ -623,7 +635,13 @@ impl FileGenerator {
 
         fprintf(header_file, "; };\n");
 
-        defs.write_impl_definition(header_file, name.as_str(), generator.root.hack_type_impl.impl_info, generics);
+        let hack_type_impl = generator.root.hack_type_impl;
+        if hack_type_impl == null {
+            fprintf(stderr, "Missing hack type impl in generate_slice\n");
+            return false;
+        }
+
+        defs.write_impl_definition(header_file, name.as_str(), hack_type_impl.impl_info, generics);
 
         fprintf(header_file, "\n#endif\n");
 
@@ -643,7 +661,7 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        let impls_base = [generator.root.hack_type_impl.impl_info];
+        let impls_base = [hack_type_impl.impl_info];
         let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: self.generator.allocator, capacity: 0 };
         let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: null, length: 0, allocator: self.generator.allocator, capacity: 0 };
 
@@ -779,6 +797,10 @@ impl FileGenerator {
         let name = global.name.value;
 
         let blank_generics = generator.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: generator.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: generator.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+        if blank_generics == null {
+            fprintf(stderr, "Missing blank generics in generate_global\n");
+            return false;
+        }
         blank_generics.self_type = Type::Self.to_ptr(generator.allocator);
 
         let func_ctx = FunctionContext::new_const(generator.allocator);

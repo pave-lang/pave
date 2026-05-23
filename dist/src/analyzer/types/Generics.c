@@ -73,29 +73,42 @@ bool Generics__parse(struct Generics* self, struct Context* context) {
         #line 80 "src/analyzer/types/Generics.pv"
         struct Generic generic = Generic__new(self->array.allocator);
         #line 81 "src/analyzer/types/Generics.pv"
-        if (!Generic__parse(&generic, context) || Generics__has(self, generic.name->value)) {
+        if (!Generic__parse(&generic, context)) {
             #line 81 "src/analyzer/types/Generics.pv"
             return false;
         }
-
+        #line 82 "src/analyzer/types/Generics.pv"
+        struct Token* generic_name = generic.name;
         #line 83 "src/analyzer/types/Generics.pv"
-        uintptr_t index = Array_Generic__append(&self->array, generic);
-        #line 84 "src/analyzer/types/Generics.pv"
-        HashMap_str_usize__insert(&self->map, generic.name->value, index);
+        if (generic_name == 0 || Generics__has(self, generic_name->value)) {
+            #line 83 "src/analyzer/types/Generics.pv"
+            return false;
+        }
 
+        #line 85 "src/analyzer/types/Generics.pv"
+        uintptr_t index = Array_Generic__append(&self->array, generic);
         #line 86 "src/analyzer/types/Generics.pv"
+        HashMap_str_usize__insert(&self->map, generic_name->value, index);
+
+        #line 88 "src/analyzer/types/Generics.pv"
         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
-            #line 87 "src/analyzer/types/Generics.pv"
+            #line 89 "src/analyzer/types/Generics.pv"
             return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">");
         }
     }
 
-    #line 91 "src/analyzer/types/Generics.pv"
+    #line 93 "src/analyzer/types/Generics.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ">")) {
-        #line 91 "src/analyzer/types/Generics.pv"
+        #line 93 "src/analyzer/types/Generics.pv"
         return false;
     }
 
-    #line 93 "src/analyzer/types/Generics.pv"
+    #line 95 "src/analyzer/types/Generics.pv"
     return true;
+}
+
+#line 98 "src/analyzer/types/Generics.pv"
+bool Generics__is_empty(struct Generics* self) {
+    #line 99 "src/analyzer/types/Generics.pv"
+    return self->array.length == 0;
 }

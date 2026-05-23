@@ -159,79 +159,92 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent) {
 #line 88 "src/analyzer/types/Trait.pv"
 struct str Trait__get_key(struct Trait* self, struct trait_Allocator allocator) {
     #line 89 "src/analyzer/types/Trait.pv"
-    struct String key = String__new(allocator);
+    struct Token* name = self->name;
     #line 90 "src/analyzer/types/Trait.pv"
-    String__append(&key, self->name->value);
-    #line 91 "src/analyzer/types/Trait.pv"
-    String__append(&key, (struct str){ .ptr = "#", .length = strlen("#") });
+    if (name == 0) {
+        #line 90 "src/analyzer/types/Trait.pv"
+        return (struct str){ .ptr = "", .length = strlen("") };
+    }
+
     #line 92 "src/analyzer/types/Trait.pv"
-    String__append_usize(&key, self->generic_arity);
+    struct String key = String__new(allocator);
     #line 93 "src/analyzer/types/Trait.pv"
+    String__append(&key, name->value);
+    #line 94 "src/analyzer/types/Trait.pv"
+    String__append(&key, (struct str){ .ptr = "#", .length = strlen("#") });
+    #line 95 "src/analyzer/types/Trait.pv"
+    String__append_usize(&key, self->generic_arity);
+    #line 96 "src/analyzer/types/Trait.pv"
     return String__as_str(&key);
 }
 
-#line 96 "src/analyzer/types/Trait.pv"
+#line 99 "src/analyzer/types/Trait.pv"
 bool Trait__has_dynamic_dispatch(struct Trait* self) {
-    #line 97 "src/analyzer/types/Trait.pv"
+    #line 100 "src/analyzer/types/Trait.pv"
     if (self->typedefs.length != 0) {
-        #line 97 "src/analyzer/types/Trait.pv"
+        #line 100 "src/analyzer/types/Trait.pv"
         return false;
     }
 
-    #line 99 "src/analyzer/types/Trait.pv"
+    #line 102 "src/analyzer/types/Trait.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 99 "src/analyzer/types/Trait.pv"
+    #line 102 "src/analyzer/types/Trait.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 99 "src/analyzer/types/Trait.pv"
+        #line 102 "src/analyzer/types/Trait.pv"
         struct Function* func = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 100 "src/analyzer/types/Trait.pv"
+        #line 103 "src/analyzer/types/Trait.pv"
         if (func->parameters.length == 0) {
-            #line 100 "src/analyzer/types/Trait.pv"
+            #line 103 "src/analyzer/types/Trait.pv"
             continue;
         }
-        #line 101 "src/analyzer/types/Trait.pv"
+        #line 104 "src/analyzer/types/Trait.pv"
         struct Parameter* first_param = Array_Parameter__get(&func->parameters, 0);
-        #line 102 "src/analyzer/types/Trait.pv"
+        #line 105 "src/analyzer/types/Trait.pv"
+        if (first_param == 0) {
+            #line 105 "src/analyzer/types/Trait.pv"
+            continue;
+        }
+        #line 106 "src/analyzer/types/Trait.pv"
         if (Type__is_self(&first_param->type)) {
-            #line 102 "src/analyzer/types/Trait.pv"
+            #line 106 "src/analyzer/types/Trait.pv"
             return false;
         }
     } }
 
-    #line 105 "src/analyzer/types/Trait.pv"
+    #line 109 "src/analyzer/types/Trait.pv"
     return true;
 }
 
-#line 108 "src/analyzer/types/Trait.pv"
+#line 112 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self) {
-    #line 109 "src/analyzer/types/Trait.pv"
+    #line 113 "src/analyzer/types/Trait.pv"
     struct Context* context = &self->module->context;
-    #line 110 "src/analyzer/types/Trait.pv"
+    #line 114 "src/analyzer/types/Trait.pv"
     context->type_self = &self->type_self;
 
-    #line 112 "src/analyzer/types/Trait.pv"
+    #line 116 "src/analyzer/types/Trait.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 112 "src/analyzer/types/Trait.pv"
+    #line 116 "src/analyzer/types/Trait.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 112 "src/analyzer/types/Trait.pv"
+        #line 116 "src/analyzer/types/Trait.pv"
         struct Function* function = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 113 "src/analyzer/types/Trait.pv"
+        #line 117 "src/analyzer/types/Trait.pv"
         bool has_impl = function->token_start < function->token_end;
-        #line 114 "src/analyzer/types/Trait.pv"
+        #line 118 "src/analyzer/types/Trait.pv"
         if (!has_impl) {
-            #line 114 "src/analyzer/types/Trait.pv"
+            #line 118 "src/analyzer/types/Trait.pv"
             continue;
         }
 
-        #line 116 "src/analyzer/types/Trait.pv"
+        #line 120 "src/analyzer/types/Trait.pv"
         Function__parse_function(function, &self->generics);
     } }
 
-    #line 119 "src/analyzer/types/Trait.pv"
+    #line 123 "src/analyzer/types/Trait.pv"
     context->type_self = &context->root->type_self;
 
-    #line 121 "src/analyzer/types/Trait.pv"
+    #line 125 "src/analyzer/types/Trait.pv"
     return true;
 }

@@ -39,25 +39,25 @@ uintptr_t* HashMap_str_usize__find(struct HashMap_str_usize* self, struct str* k
 #line 77 "src/std/HashMap.pv"
 uintptr_t* HashMap_str_usize__insert(struct HashMap_str_usize* self, struct str key, uintptr_t value);
 
-#line 105 "src/std/HashMap.pv"
+#line 107 "src/std/HashMap.pv"
 bool HashMap_str_usize__remove(struct HashMap_str_usize* self, struct str* key);
 
-#line 129 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_usize__release(struct HashMap_str_usize* self);
 
-#line 138 "src/std/HashMap.pv"
+#line 140 "src/std/HashMap.pv"
 void HashMap_str_usize__fill_buckets(struct HashMap_str_usize* self);
 
-#line 156 "src/std/HashMap.pv"
+#line 161 "src/std/HashMap.pv"
 struct HashMap_str_usize HashMap_str_usize__clone(struct HashMap_str_usize* self, struct trait_Allocator allocator);
 
-#line 170 "src/std/HashMap.pv"
+#line 175 "src/std/HashMap.pv"
 struct HashMapIter_str_usize HashMap_str_usize__iter(struct HashMap_str_usize* self);
 
-#line 177 "src/std/HashMap.pv"
+#line 182 "src/std/HashMap.pv"
 void HashMap_str_usize__clear(struct HashMap_str_usize* self);
 
-#line 186 "src/std/HashMap.pv"
+#line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_usize* HashMap_str_usize__Index__index(void* __self);
 
 

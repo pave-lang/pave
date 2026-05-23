@@ -247,10 +247,15 @@ impl Naming {
                     EnumType::DiscriminatedUnion => { result.append(self.struct_prefix); },
                 }
 
-                result.append(enum_info.name.value);
+                let enum_name = enum_info.name;
+                if enum_name == null { return result; }
+                result.append(enum_name.value);
 
                 for gen in enum_info.generics.array {
-                    let value = generics2.get(gen.name.value);
+                    let gen_name = gen.name;
+                    if gen_name == null { continue; }
+                    if generics2 == null { continue; }
+                    let value = generics2.get(gen_name.value);
                     if value != null { generics.append(*value); }
                 }
             },
@@ -259,20 +264,30 @@ impl Naming {
                     result.append(self.struct_prefix);
                 }
 
-                result.append(struct_info.name.value);
+                let struct_name = struct_info.name;
+                if struct_name == null { return result; }
+                result.append(struct_name.value);
 
                 for gen in struct_info.generics.array {
-                    let value = generics2.get(gen.name.value);
+                    let gen_name = gen.name;
+                    if gen_name == null { continue; }
+                    if generics2 == null { continue; }
+                    let value = generics2.get(gen_name.value);
                     if value != null { generics.append(*value); }
                 }
             },
             Type::Trait(trait_info, generics2) => {
                 result.append(self.trait_prefix);
-                result.append(trait_info.name.value);
+                let trait_name = trait_info.name;
+                if trait_name == null { return result; }
+                result.append(trait_name.value);
+                if generics2 == null { return result; }
                 generics = generics2.array;
             },
             Type::Generic(generic) => {
-                let name = generic.name.value;
+                let generic_name = generic.name;
+                if generic_name == null { return result; }
+                let name = generic_name.value;
 
                 if generics_map == null {
                     result.append(name);
@@ -294,13 +309,16 @@ impl Naming {
                         return self.get_type_name(direct_type, type_self, generics_map);
                     }
 
-                    let concrete_type = generics_map.get(gt.generic.name.value);
+                    let generic_name = gt.generic.name;
+                    if generic_name == null { return result; }
+                    let concrete_type = generics_map.get(generic_name.value);
                     if concrete_type != null {
                         match concrete_type {
                             Type::Struct(struct_info, _) => {
                                 for *impl_info in struct_info.impls {
-                                    if impl_info.trait_ == null { continue; }
-                                    if impl_info.trait_.typedefs.find(&gt.typedef_name) == null { continue; }
+                                    let trait_info = impl_info.trait_;
+                                    if trait_info == null { continue; }
+                                    if trait_info.typedefs.find(&gt.typedef_name) == null { continue; }
                                     let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
                                     if typedef_type != null {
                                         return self.get_type_name(typedef_type, type_self, generics_map);
@@ -376,10 +394,13 @@ impl Naming {
                 }
 
                 if trait_info != null {
-                    result.append(trait_info.name.value);
+                    let trait_name = trait_info.name;
+                    if trait_name == null { return result; }
+                    result.append(trait_name.value);
                     if trait_impl_info != null {
                         match trait_impl_info.trait_type {
                             Type::Trait(ti, tmap) => {
+                                if tmap == null { return result; }
                                 for (gname, _) in ti.generics.map {
                                     if ti.typedefs.find(&gname) == null {
                                         let gtype = tmap.get(gname);
@@ -397,11 +418,15 @@ impl Naming {
                     result.append("__");
                 }
 
-                result.append(func_info.name.value);
+                let func_name = func_info.name;
+                if func_name == null { return result; }
+                result.append(func_name.value);
                 if func_info.generics.array.length > 0 && generics2 != null {
                     let own_generics = Array<Type>::new(self.allocator);
                     for *generic in func_info.generics.array {
-                        let gtype = generics2.get(generic.name.value);
+                        let generic_name = generic.name;
+                        if generic_name == null { continue; }
+                        let gtype = generics2.get(generic_name.value);
                         if gtype != null {
                             own_generics.append(*gtype);
                         }
@@ -451,7 +476,9 @@ impl Naming {
                     }
                 }
 
-                result.append(func_info.name.value);
+                let func_name = func_info.name;
+                if func_name == null { return result; }
+                result.append(func_name.value);
             },
             Type::Self => {
                 return self.get_type_name(type_self, type_self, generics_map);

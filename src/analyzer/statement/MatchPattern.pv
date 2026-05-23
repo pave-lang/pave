@@ -91,7 +91,9 @@ impl MatchPattern {
         type = context.parse_type2(generics);
         if type == null {
             return false;
-        } else if !type.is_enum() {
+        }
+
+        if !type.is_enum() {
             context.error_token(token, "Type is not an enum");
             return false;
         }
@@ -106,6 +108,7 @@ impl MatchPattern {
         match type {
             Type::Self => {
                 type = context.type_self;
+                if type == null { return false; }
             },
             _ => {},
         }
@@ -185,8 +188,10 @@ impl MatchPattern {
                         if context.check_next(TokenType::Symbol, ":") {
                             if ref { ref = false; ref = context.check_next(TokenType::Symbol, "&"); }
                             variable = context.expect(TokenType::Identifier);
-                            if variable == null { context.pop_scope(); return false; }
                         }
+
+                        if variable == null { context.pop_scope(); return false; }
+                        let variable_token = variable;
 
                         let field_i: usize = 0;
                         let found = false;
@@ -214,13 +219,13 @@ impl MatchPattern {
 
                         let variable_type_name = context.root.naming_decl.get_type_decl(variable_type, context.type_self, null);
                         variable_type_name.prepend(": ");
-                        context.inlay_hint(variable, variable_type_name.c_str(), InlayHintKind::Type, false, false);
+                        context.inlay_hint(variable_token, variable_type_name.c_str(), InlayHintKind::Type, false, false);
 
-                        if !variable.eq(TokenType::Identifier, "_") {
-                            if !context.set_value(variable, variable_type) { context.pop_scope(); return false; }
+                        if !variable_token.eq(TokenType::Identifier, "_") {
+                            if !context.set_value(variable_token, variable_type) { context.pop_scope(); return false; }
                         }
 
-                        parameters.append(EnumVariantParameter { ref, variable, field_name });
+                        parameters.append(EnumVariantParameter { ref, variable: variable_token, field_name });
 
                         if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {
                             context.pop_scope();

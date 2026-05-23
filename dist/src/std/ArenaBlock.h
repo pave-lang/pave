@@ -29,13 +29,13 @@ bool ArenaBlock__is_in_block(struct ArenaBlock* self, void* ptr);
 #line 64 "src/std/ArenaAllocator.pv"
 uintptr_t ArenaBlock__size(struct ArenaBlock* self, void* ptr);
 
-#line 73 "src/std/ArenaAllocator.pv"
+#line 74 "src/std/ArenaAllocator.pv"
 bool ArenaBlock__free(struct ArenaBlock* self, void* ptr);
 
-#line 91 "src/std/ArenaAllocator.pv"
+#line 93 "src/std/ArenaAllocator.pv"
 void ArenaBlock__destroy(struct ArenaBlock* self, struct trait_Allocator allocator);
 
-#line 95 "src/std/ArenaAllocator.pv"
+#line 97 "src/std/ArenaAllocator.pv"
 void* ArenaBlock__realloc(struct ArenaBlock* self, void* ptr, uintptr_t size);
 
 #endif

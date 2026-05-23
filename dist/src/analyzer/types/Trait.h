@@ -43,10 +43,10 @@ bool Trait__fill_types(struct Trait* self, struct FunctionParent parent);
 #line 88 "src/analyzer/types/Trait.pv"
 struct str Trait__get_key(struct Trait* self, struct trait_Allocator allocator);
 
-#line 96 "src/analyzer/types/Trait.pv"
+#line 99 "src/analyzer/types/Trait.pv"
 bool Trait__has_dynamic_dispatch(struct Trait* self);
 
-#line 108 "src/analyzer/types/Trait.pv"
+#line 112 "src/analyzer/types/Trait.pv"
 bool Trait__parse_functions(struct Trait* self);
 
 #endif

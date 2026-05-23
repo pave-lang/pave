@@ -18,7 +18,7 @@ struct Include {
 }
 
 impl Include {
-    fn new(root: &Root, path: str, mode_cpp: bool) -> &Self {
+    fn new(root: &Root, path: str, mode_cpp: bool) -> *Self {
         let self = root.allocator.store(&Self {
             root,
             mode_cpp,
@@ -29,6 +29,11 @@ impl Include {
             values: HashMap<str, Type>::new(root.allocator),
             macro_values: HashMap<str, i64>::new(root.allocator),
         });
+
+        if self == null {
+            root.error(path, 0, 0, 0, 0, "Failed to allocate Include");
+            return null;
+        }
 
         self.add_cxtype_primitive(CXType_Void, "void");
 

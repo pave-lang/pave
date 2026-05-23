@@ -33,4 +33,7 @@ struct Generic* Generics__find(struct Generics* self, struct str name);
 #line 76 "src/analyzer/types/Generics.pv"
 bool Generics__parse(struct Generics* self, struct Context* context);
 
+#line 98 "src/analyzer/types/Generics.pv"
+bool Generics__is_empty(struct Generics* self);
+
 #endif

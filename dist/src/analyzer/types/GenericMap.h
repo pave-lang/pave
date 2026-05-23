@@ -26,22 +26,22 @@ struct Type;
 #line 11 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__new(struct ArenaAllocator* allocator, struct Generics* generics, struct Array_Type* usage_types);
 
-#line 30 "src/analyzer/types/GenericMap.pv"
+#line 31 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__from_generics(struct ArenaAllocator* allocator, struct Generics* generics);
 
-#line 44 "src/analyzer/types/GenericMap.pv"
+#line 47 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__clone(struct GenericMap* self, struct ArenaAllocator* allocator);
 
-#line 52 "src/analyzer/types/GenericMap.pv"
+#line 55 "src/analyzer/types/GenericMap.pv"
 bool GenericMap__has(struct GenericMap* self, struct str name);
 
-#line 56 "src/analyzer/types/GenericMap.pv"
+#line 59 "src/analyzer/types/GenericMap.pv"
 bool GenericMap__insert(struct GenericMap* self, struct str name, struct Type type);
 
-#line 65 "src/analyzer/types/GenericMap.pv"
+#line 68 "src/analyzer/types/GenericMap.pv"
 struct Type* GenericMap__get(struct GenericMap* self, struct str name);
 
-#line 74 "src/analyzer/types/GenericMap.pv"
+#line 77 "src/analyzer/types/GenericMap.pv"
 struct GenericMap GenericMap__resolve_types(struct GenericMap* self, struct ArenaAllocator* allocator, struct GenericMap* generics);
 
 #endif

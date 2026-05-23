@@ -108,117 +108,130 @@ struct TypeFunctionUsage* HashMap_usize_TypeFunctionUsage__insert(struct HashMap
     struct HashMapBucket_usize_TypeFunctionUsage** current_bucket_node = self->buckets + bucket_index;
 
     #line 92 "src/std/HashMap.pv"
-    while (*current_bucket_node != 0) {
-        #line 93 "src/std/HashMap.pv"
-        current_bucket_node = &(*current_bucket_node)->next;
+    struct HashMapBucket_usize_TypeFunctionUsage* bucket_node = *current_bucket_node;
+    #line 93 "src/std/HashMap.pv"
+    while (bucket_node != 0) {
+        #line 94 "src/std/HashMap.pv"
+        current_bucket_node = &bucket_node->next;
+        #line 95 "src/std/HashMap.pv"
+        bucket_node = *current_bucket_node;
     }
 
-    #line 96 "src/std/HashMap.pv"
-    self->data[self->length] = (struct HashMapBucket_usize_TypeFunctionUsage) { .key = key, .value = value, .next = 0 };
-    #line 97 "src/std/HashMap.pv"
-    struct HashMapBucket_usize_TypeFunctionUsage* data = self->data + self->length;
     #line 98 "src/std/HashMap.pv"
+    self->data[self->length] = (struct HashMapBucket_usize_TypeFunctionUsage) { .key = key, .value = value, .next = 0 };
+    #line 99 "src/std/HashMap.pv"
+    struct HashMapBucket_usize_TypeFunctionUsage* data = self->data + self->length;
+    #line 100 "src/std/HashMap.pv"
     self->length += 1;
 
-    #line 100 "src/std/HashMap.pv"
+    #line 102 "src/std/HashMap.pv"
     *current_bucket_node = data;
 
-    #line 102 "src/std/HashMap.pv"
-    return &data->value;
+    #line 104 "src/std/HashMap.pv"
+    return &(*data).value;
 }
 
-#line 105 "src/std/HashMap.pv"
+#line 107 "src/std/HashMap.pv"
 bool HashMap_usize_TypeFunctionUsage__remove(struct HashMap_usize_TypeFunctionUsage* self, uintptr_t* key) {
-    #line 106 "src/std/HashMap.pv"
+    #line 108 "src/std/HashMap.pv"
     if (self->capacity == 0) {
-        #line 106 "src/std/HashMap.pv"
+        #line 108 "src/std/HashMap.pv"
         return false;
     }
 
-    #line 108 "src/std/HashMap.pv"
-    Hash hash = usize__Hash__hash(&(*key));
-    #line 109 "src/std/HashMap.pv"
-    uintptr_t bucket_index = hash % self->capacity;
     #line 110 "src/std/HashMap.pv"
+    Hash hash = usize__Hash__hash(&(*key));
+    #line 111 "src/std/HashMap.pv"
+    uintptr_t bucket_index = hash % self->capacity;
+    #line 112 "src/std/HashMap.pv"
     struct HashMapBucket_usize_TypeFunctionUsage* current_bucket_node = self->buckets[bucket_index];
 
-    #line 112 "src/std/HashMap.pv"
+    #line 114 "src/std/HashMap.pv"
     while (current_bucket_node != 0) {
-        #line 113 "src/std/HashMap.pv"
+        #line 115 "src/std/HashMap.pv"
         if (usize__Hash__hash(&current_bucket_node->key) == hash) {
-            #line 114 "src/std/HashMap.pv"
+            #line 116 "src/std/HashMap.pv"
             struct HashMapBucket_usize_TypeFunctionUsage* last = self->data + self->length - 1;
-            #line 115 "src/std/HashMap.pv"
+            #line 117 "src/std/HashMap.pv"
             if (current_bucket_node != last) {
-                #line 115 "src/std/HashMap.pv"
+                #line 117 "src/std/HashMap.pv"
                 *current_bucket_node = *last;
             }
 
-            #line 117 "src/std/HashMap.pv"
+            #line 119 "src/std/HashMap.pv"
             self->length -= 1;
-            #line 118 "src/std/HashMap.pv"
+            #line 120 "src/std/HashMap.pv"
             HashMap_usize_TypeFunctionUsage__fill_buckets(self);
 
-            #line 120 "src/std/HashMap.pv"
+            #line 122 "src/std/HashMap.pv"
             return true;
         }
 
-        #line 123 "src/std/HashMap.pv"
+        #line 125 "src/std/HashMap.pv"
         current_bucket_node = current_bucket_node->next;
     }
 
-    #line 126 "src/std/HashMap.pv"
+    #line 128 "src/std/HashMap.pv"
     return false;
 }
 
-#line 129 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_usize_TypeFunctionUsage__release(struct HashMap_usize_TypeFunctionUsage* self) {
-    #line 130 "src/std/HashMap.pv"
-    self->allocator.vtable->fn_free(self->allocator.instance, self->buckets);
-    #line 131 "src/std/HashMap.pv"
-    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 132 "src/std/HashMap.pv"
-    self->buckets = 0;
+    self->allocator.vtable->fn_free(self->allocator.instance, self->buckets);
     #line 133 "src/std/HashMap.pv"
-    self->data = 0;
+    self->allocator.vtable->fn_free(self->allocator.instance, self->data);
     #line 134 "src/std/HashMap.pv"
-    self->capacity = 0;
+    self->buckets = 0;
     #line 135 "src/std/HashMap.pv"
+    self->data = 0;
+    #line 136 "src/std/HashMap.pv"
+    self->capacity = 0;
+    #line 137 "src/std/HashMap.pv"
     self->length = 0;
 }
 
-#line 138 "src/std/HashMap.pv"
+#line 140 "src/std/HashMap.pv"
 void HashMap_usize_TypeFunctionUsage__fill_buckets(struct HashMap_usize_TypeFunctionUsage* self) {
-    #line 139 "src/std/HashMap.pv"
+    #line 141 "src/std/HashMap.pv"
     memset(self->buckets, 0, self->capacity * sizeof(struct HashMapBucket_usize_TypeFunctionUsage*));
 
-    #line 141 "src/std/HashMap.pv"
+    #line 143 "src/std/HashMap.pv"
     for (uintptr_t i = 0; i < self->length; i++) {
-        #line 142 "src/std/HashMap.pv"
-        struct HashMapBucket_usize_TypeFunctionUsage* node = self->data + i;
-        #line 143 "src/std/HashMap.pv"
-        node->next = 0;
         #line 144 "src/std/HashMap.pv"
-        Hash hash = usize__Hash__hash(&(*node).key);
+        struct HashMapBucket_usize_TypeFunctionUsage* node = self->data + i;
         #line 145 "src/std/HashMap.pv"
-        uintptr_t bucket_index = hash % self->capacity;
+        if (node == 0) {
+            #line 145 "src/std/HashMap.pv"
+            return;
+        }
         #line 146 "src/std/HashMap.pv"
+        node->next = 0;
+        #line 147 "src/std/HashMap.pv"
+        Hash hash = usize__Hash__hash(&(*node).key);
+        #line 148 "src/std/HashMap.pv"
+        uintptr_t bucket_index = hash % self->capacity;
+        #line 149 "src/std/HashMap.pv"
         struct HashMapBucket_usize_TypeFunctionUsage** current_bucket_node = self->buckets + bucket_index;
 
-        #line 148 "src/std/HashMap.pv"
-        while (*current_bucket_node != 0) {
-            #line 149 "src/std/HashMap.pv"
-            current_bucket_node = &(*current_bucket_node)->next;
+        #line 151 "src/std/HashMap.pv"
+        struct HashMapBucket_usize_TypeFunctionUsage* bucket_node = *current_bucket_node;
+        #line 152 "src/std/HashMap.pv"
+        while (bucket_node != 0) {
+            #line 153 "src/std/HashMap.pv"
+            current_bucket_node = &bucket_node->next;
+            #line 154 "src/std/HashMap.pv"
+            bucket_node = *current_bucket_node;
         }
 
-        #line 152 "src/std/HashMap.pv"
+        #line 157 "src/std/HashMap.pv"
         *current_bucket_node = node;
     }
 }
 
-#line 156 "src/std/HashMap.pv"
+#line 161 "src/std/HashMap.pv"
 struct HashMap_usize_TypeFunctionUsage HashMap_usize_TypeFunctionUsage__clone(struct HashMap_usize_TypeFunctionUsage* self, struct trait_Allocator allocator) {
-    #line 157 "src/std/HashMap.pv"
+    #line 162 "src/std/HashMap.pv"
     struct HashMap_usize_TypeFunctionUsage other = (struct HashMap_usize_TypeFunctionUsage) {
         .allocator = allocator,
         .buckets = allocator.vtable->fn_alloc(allocator.instance, self->capacity * sizeof(self->data)),
@@ -226,38 +239,38 @@ struct HashMap_usize_TypeFunctionUsage HashMap_usize_TypeFunctionUsage__clone(st
         .length = self->length,
         .capacity = self->capacity,
     };
-    #line 164 "src/std/HashMap.pv"
+    #line 169 "src/std/HashMap.pv"
     memcpy(other.data, self->data, self->capacity * sizeof(struct HashMapBucket_usize_TypeFunctionUsage));
-    #line 165 "src/std/HashMap.pv"
+    #line 170 "src/std/HashMap.pv"
     HashMap_usize_TypeFunctionUsage__fill_buckets(&other);
 
-    #line 167 "src/std/HashMap.pv"
+    #line 172 "src/std/HashMap.pv"
     return other;
 }
 
-#line 170 "src/std/HashMap.pv"
+#line 175 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeFunctionUsage HashMap_usize_TypeFunctionUsage__iter(struct HashMap_usize_TypeFunctionUsage* self) {
-    #line 171 "src/std/HashMap.pv"
+    #line 176 "src/std/HashMap.pv"
     return (struct HashMapIter_usize_TypeFunctionUsage) {
         .iter = self->data - 1,
         .end = self->data + self->length,
     };
 }
 
-#line 177 "src/std/HashMap.pv"
+#line 182 "src/std/HashMap.pv"
 void HashMap_usize_TypeFunctionUsage__clear(struct HashMap_usize_TypeFunctionUsage* self) {
-    #line 178 "src/std/HashMap.pv"
+    #line 183 "src/std/HashMap.pv"
     memset(self->data, 0, self->capacity * sizeof(struct HashMapBucket_usize_TypeFunctionUsage));
-    #line 179 "src/std/HashMap.pv"
+    #line 184 "src/std/HashMap.pv"
     memset(self->buckets, 0, self->capacity * sizeof(struct HashMapBucket_usize_TypeFunctionUsage*));
-    #line 180 "src/std/HashMap.pv"
+    #line 185 "src/std/HashMap.pv"
     self->length = 0;
 }
 
-#line 186 "src/std/HashMap.pv"
+#line 191 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeFunctionUsage* HashMap_usize_TypeFunctionUsage__Index__index(void* __self) {
     struct HashMap_usize_TypeFunctionUsage* self = __self; (void)self;
-    #line 187 "src/std/HashMap.pv"
+    #line 192 "src/std/HashMap.pv"
     return self->data;
 }
 

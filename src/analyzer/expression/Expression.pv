@@ -41,6 +41,11 @@ impl Expression {
 
     fn parse_primary(context: &Context, generics: &Generics) -> *Expression {
         let token = context.current();
+        if token == null {
+            context.error("Unexpected end of input");
+            return null;
+        }
+
         let token_type = token.type;
         let result: *Expression = null;
 
@@ -72,6 +77,7 @@ impl Expression {
                             data: ExpressionData::Variable(str { ptr: null, length: 0 }),
                         });
 
+                        if result == null { return null; }
                         result.data = ExpressionData::Type(&result.return_type);
                     } else {
                         context.error_token(token, "Unable to find variable or type with this name");
@@ -295,6 +301,11 @@ impl Expression {
                         let arguments = Array<InvokeArgument>::new(context.allocator);
 
                         let name = context.allocator.store(expr.token);
+                        if name == null {
+                            context.error("Failed to allocate token for tuple argument name");
+                            return null;
+                        }
+
                         name.value = "_0";
 
                         arguments.append(InvokeArgument { name, value: expr });
@@ -305,6 +316,10 @@ impl Expression {
                             name_string.append_usize(arguments.length);
 
                             let name = context.allocator.store(context.current());
+                            if name == null {
+                                context.error("Failed to allocate token for tuple argument name");
+                                return null;
+                            }
                             name.value = name_string.as_str();
 
                             let value = Expression::parse(context, generics);
@@ -319,6 +334,10 @@ impl Expression {
                         }
 
                         let tuple = context.allocator.store(&Tuple { elements: Array<Type>::new(context.allocator) });
+                        if tuple == null {
+                            context.error("Failed to allocate tuple type");
+                            return null;
+                        }
                         tuple.elements = Array<Type>::new_with_length(context.allocator, arguments.length);
                         for (i, *expr) in arguments.iter().enumerate() {
                             tuple.elements.data[i] = expr.value.return_type;
@@ -535,7 +554,13 @@ impl Expression {
                 rhs.append_ident_name(result);
             },
             ExpressionData::EnumVariant(variant) => {
-                result.append(variant.parent.name.value);
+                let name = variant.parent.name;
+                if name != null {
+                    result.append(name.value);
+                } else {
+                    result.append("unknown_enum");
+                }
+
                 result.append("_");
                 result.append(variant.name.value);
             },
@@ -576,7 +601,13 @@ impl Expression {
                 rhs.append_display_name(result);
             },
             ExpressionData::EnumVariant(variant) => {
-                result.append(variant.parent.name.value);
+                let name = variant.parent.name;
+                if name != null {
+                    result.append(name.value);
+                } else {
+                    result.append("unknown_enum");
+                }
+
                 result.append("::");
                 result.append(variant.name.value);
             },
@@ -734,6 +765,11 @@ impl Expression {
 
         match condition.return_type {
             Type::Primitive(prim) => {
+                if prim == null {
+                    context.error_token(condition.token, "If condition return type is blank");
+                    return null;
+                }
+
                 if !prim.name.eq("bool") {
                     context.error_token(condition.token, "If condition must be a bool expression");
                     return null;

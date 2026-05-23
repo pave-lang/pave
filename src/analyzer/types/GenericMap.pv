@@ -19,6 +19,7 @@ impl GenericMap {
         while i < generics.array.length && i < usage_types.length {
             let generic: &Generic = generics.array.data + i;
             let generic_name = generic.name;
+            if generic_name == null { return self; }
             let generic_type: Type = usage_types.data[i];
             GenericMap::insert(&self, generic_name.value, generic_type);
             i += 1;
@@ -35,7 +36,9 @@ impl GenericMap {
         };
 
         for generic in generics.array {
-            GenericMap::insert(&self, generic.name.value, Type::Generic(generic));
+            let generic_name = generic.name;
+            if generic_name == null { continue; }
+            GenericMap::insert(&self, generic_name.value, Type::Generic(generic));
         }
 
         return self;
@@ -78,7 +81,7 @@ impl GenericMap {
             self_type: self.self_type,
         };
 
-        if generics != null {
+        if generics != null && generics.self_type != null {
             result.self_type = Context::resolve_type(allocator, generics.self_type, generics, null);
         }
 

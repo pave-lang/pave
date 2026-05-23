@@ -148,7 +148,8 @@ impl DefinitionWriter {
             if Generator::has_void_self_replacement(parameter_iter, generics) {
                 success = generator.write_variable_decl(file, "__self", &parameter_iter.type, generics) && success;
             } else {
-                success = generator.write_variable_decl(file, parameter_iter.name.value, &parameter_iter.type, generics) && success;
+                let parameter_name = *parameter_iter.name;
+                success = generator.write_variable_decl(file, parameter_name.value, &parameter_iter.type, generics) && success;
             }
         }
 
@@ -170,7 +171,13 @@ impl DefinitionWriter {
         generator.write_type(file, &func_info.return_type, generics);
         fprintf(file, " _value;\n\n");
 
-        for (name, type) in generator.function_context.coroutine.variables {
+        let function_context = generator.function_context;
+        if function_context == null {
+            fprintf(stderr, "Missing function context in write_function_coroutine\n");
+            return false;
+        }
+
+        for (name, type) in function_context.coroutine.variables {
             generator.write_indent(file);
             generator.write_type(file, type, generics);
             fprintf(file, " ");
@@ -225,7 +232,9 @@ impl DefinitionWriter {
             generator.indent += 1;
 
             let yield_count: usize = 0;
-            if function_usage_context != null { yield_count = function_usage_context.function_context.coroutine.yield_count; }
+            if function_usage_context != null {
+                yield_count = function_usage_context.function_context.coroutine.yield_count;
+            }
             for i in 1..yield_count + 1 {
                 generator.write_indent(file);
                 fprintf(file, "case %zu: goto yield_%zu;\n", i, i);
@@ -238,7 +247,12 @@ impl DefinitionWriter {
             generator.write_indent(file);
             fprintf(file, "}\n\n");
 
-            generator.function_context.coroutine.yield_count = 0;
+            let function_context = generator.function_context;
+            if function_context == null {
+                fprintf(stderr, "Missing function context in write_function_block\n");
+                return false;
+            }
+            function_context.coroutine.yield_count = 0;
             if !blocks.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
                 let name_length: u32 = name.length;
                 fprintf(stderr, "Failed to write block for %.*s", name_length, name.ptr);
@@ -291,12 +305,12 @@ impl DefinitionWriter {
     fn write_enum_definition(&self, file: &FILE, enum_info: &Enum, usage: *TypeUsage<Enum>, usage_context: &UsageContext, include_writer: &IncludeWriter) -> bool {
         let generator = self.generator;
         let generics = usage_context.generic_map;
-        let enum_name = enum_info.name;
+        let enum_name = *enum_info.name;
         let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: u32 = name.array.length;
         let is_discriminated_union = enum_info.is_discriminated_union();
 
-        generator.write_line_directive(file, enum_info.context, enum_info.name);
+        generator.write_line_directive(file, enum_info.context, &enum_name);
 
         if !is_discriminated_union {
             fprintf(file, "enum ");
@@ -313,15 +327,15 @@ impl DefinitionWriter {
 
             if has_generics {
                 fprintf(file, "#ifndef PAVE_");
-                generator.write_str_title(file, enum_info.name.value);
+                generator.write_str_title(file, enum_name.value);
                 generator.write_str_title(file, generator.naming_ident.enum_generic_type_suffix);
                 fprintf(file, "\n#define PAVE_");
-                generator.write_str_title(file, enum_info.name.value);
+                generator.write_str_title(file, enum_name.value);
                 generator.write_str_title(file, generator.naming_ident.enum_generic_type_suffix);
                 fprintf(file, "\n");
 
                 fprintf(file, "enum ");
-                generator.write_token(file, enum_info.name);
+                generator.write_token(file, &enum_name);
                 generator.write_str(file, generator.naming_ident.enum_generic_type_suffix);
                 fprintf(file, " {\n");
 
@@ -440,20 +454,23 @@ impl DefinitionWriter {
                     fprintf(file, ";\n");
 
                     if function_usage != null && function_usage.impl_dynamic_function {
-                        self.write_dynamic_function_instance_header(file, func_info, enum_info.name.value, generics, func_info.type == FunctionType::Coroutine);
+                        self.write_dynamic_function_instance_header(file, func_info, enum_name.value, generics, func_info.type == FunctionType::Coroutine);
                     }
                 }
 
-                if impl_functions_for_impl != null && function_usage != null && func_info.generics.array.length > 0 {
-                    for usage_context in function_usage.usage_contexts {
-                        include_writer.write(file, generator, &usage_context.signature, usage_context.generic_map, false);
-                        usage_context.generic_map.self_type = generics.self_type;
-                        fprintf(file, "\n");
-                        if !self.write_function_definition(file, func_info, usage_context.generic_map, null) { return false; }
-                        fprintf(file, ";\n");
+                if impl_functions_for_impl != null && function_usage != null {
+                    let usage_info = *function_usage;
+                    if func_info.generics.array.length > 0 {
+                        for *usage_context in usage_info.usage_contexts {
+                            include_writer.write(file, generator, &usage_context.signature, usage_context.generic_map, false);
+                            usage_context.generic_map.self_type = generics.self_type;
+                            fprintf(file, "\n");
+                            if !self.write_function_definition(file, func_info, usage_context.generic_map, null) { return false; }
+                            fprintf(file, ";\n");
 
-                        if usage_context.impl_dynamic_function {
-                            self.write_dynamic_function_instance_header(file, func_info, enum_info.name.value, usage_context.generic_map, func_info.type == FunctionType::Coroutine);
+                            if usage_context.impl_dynamic_function {
+                                self.write_dynamic_function_instance_header(file, func_info, enum_name.value, usage_context.generic_map, func_info.type == FunctionType::Coroutine);
+                            }
                         }
                     }
                 }
@@ -465,7 +482,8 @@ impl DefinitionWriter {
                 fprintf(file, " ");
                 generator.write_str_title(file, name.as_str());
                 fprintf(file, "_");
-                generator.write_str_title(file, impl_const.name.value);
+                let impl_const_name = *impl_const.name;
+                generator.write_str_title(file, impl_const_name.value);
                 fprintf(file, ";\n");
             }
         }
@@ -476,12 +494,13 @@ impl DefinitionWriter {
     fn write_struct_definition(&self, file: &FILE, struct_info: &Struct, usage: *TypeUsage<Struct>, usage_context: &UsageContext) -> bool {
         let generator = self.generator;
         let generics = usage_context.generic_map;
+        let struct_name = *struct_info.name;
         let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let name_length: i32 = name.array.length;
         let impl_functions: *Array<HashMap<usize, TypeFunctionUsage>> = &usage_context.impl_functions;
         let include_writer = IncludeWriter::new(generator.allocator);
 
-        generator.write_line_directive(file, &struct_info.module.context, struct_info.name);
+        generator.write_line_directive(file, &struct_info.module.context, &struct_name);
 
         if struct_info.type == StructType::Incomplete {
             fprintf(file, "struct %.*s;\n", name_length, name.array.data);
@@ -496,7 +515,8 @@ impl DefinitionWriter {
 
             for (_, &field) in struct_info.fields {
                 generator.write_indent(file);
-                generator.write_variable_decl(file, field.name.value, &field.type, generics);
+                let field_name = *field.name;
+                generator.write_variable_decl(file, field_name.value, &field.type, generics);
                 fprintf(file, ";\n");
             }
 
@@ -549,13 +569,13 @@ impl DefinitionWriter {
                                 fprintf(file, ";\n");
 
                                 if usage_context.impl_dynamic_function {
-                                    self.write_dynamic_function_instance_header(file, func_info, struct_info.name.value, usage_context.generic_map, func_info.type == FunctionType::Coroutine);
+                                    self.write_dynamic_function_instance_header(file, func_info, struct_name.value, usage_context.generic_map, func_info.type == FunctionType::Coroutine);
                                 }
                             }
                         }
 
                         if function_usage.impl_dynamic_function && func_info.generics.array.length == 0 {
-                            self.write_dynamic_function_instance_header(file, func_info, struct_info.name.value, generics, func_info.type == FunctionType::Coroutine);
+                            self.write_dynamic_function_instance_header(file, func_info, struct_name.value, generics, func_info.type == FunctionType::Coroutine);
                         }
                     }
                 }
@@ -571,7 +591,8 @@ impl DefinitionWriter {
                 fprintf(file, " ");
                 generator.write_str_title(file, name.as_str());
                 fprintf(file, "_");
-                generator.write_str_title(file, impl_const.name.value);
+                let impl_const_name = *impl_const.name;
+                generator.write_str_title(file, impl_const_name.value);
                 fprintf(file, ";\n");
             }
         }
@@ -580,17 +601,19 @@ impl DefinitionWriter {
 
         for (_, trait_entry) in struct_info.traits {
             let trait_info = trait_entry.0;
+            let trait_name = trait_info.name;
+            if trait_name == null { continue; }
             if !trait_info.has_dynamic_dispatch() { continue; }
             fprintf(file, "extern struct ");
             generator.write_type_name(file, trait_entry.1, generics);
             fprintf(file, "VTable ");
             generator.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__");
-            generator.write_str_title(file, trait_info.name.value);
+            generator.write_str_title(file, trait_name.value);
             fprintf(file, ";\n");
         }
 
-        if usage.impl_dynamic_usage {
+        if usage != null && usage.impl_dynamic_usage {
             fprintf(file, "#include <std/trait_Struct.h>\n");
             fprintf(file, "extern struct trait_StructVTable ");
             generator.write_str_title(file, name.as_str());
@@ -635,15 +658,20 @@ impl DefinitionWriter {
         if primitive_info.impls.length > 0 { fprintf(file, "\n"); }
 
         for *impl_info in primitive_info.impls {
-            if !impl_info.has_trait || impl_info.trait_ == null { continue; }
             let trait_info = impl_info.trait_;
+            if !impl_info.has_trait || trait_info == null { continue; }
+
+            let trait_name = trait_info.name;
+            if trait_name == null { continue; }
+
             if !trait_info.has_dynamic_dispatch() { continue; }
+
             fprintf(file, "extern struct ");
             generator.write_type_name(file, &impl_info.trait_type, generics);
             fprintf(file, "VTable ");
             generator.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__");
-            generator.write_str_title(file, trait_info.name.value);
+            generator.write_str_title(file, trait_name.value);
             fprintf(file, ";\n");
         }
 
@@ -666,9 +694,15 @@ impl DefinitionWriter {
 
         for (_, &func_info) in trait_info.functions {
             if func_info.generics.array.length == 0 {
+                let name = func_info.name;
+                if name == null {
+                    fprintf(stderr, "Missing function name in write_trait_definition\n");
+                    return false;
+                }
+
                 let func_name = String::new(generator.allocator);
                 func_name.append("(*fn_");
-                func_name.append(func_info.name.value);
+                func_name.append(name.value);
                 func_name.append(")");
 
                 if !self.write_function_definition(file, func_info, &void_self_generics, &func_name) { return false; }
@@ -699,8 +733,9 @@ impl DefinitionWriter {
         let generator = self.generator;
         if !self.write_trait_function_decl(file, name, trait_info, impl_trait_type, func_info, generics) {
             let name_length: u32 = name.length;
-            let func_name_length: u32 = func_info.name.value.length;
-            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info.name.value.ptr);
+            let func_name = *func_info.name;
+            let func_name_length: u32 = func_name.value.length;
+            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_name.value.ptr);
             return false;
         }
 
@@ -713,13 +748,16 @@ impl DefinitionWriter {
         }
 
         let func_context = FunctionContext::new(generator.allocator, func_info, true);
-        if function_usage_context != null { func_context.coroutine.yield_count = function_usage_context.function_context.coroutine.yield_count; }
+        if function_usage_context != null {
+            func_context.coroutine.yield_count = function_usage_context.function_context.coroutine.yield_count;
+        }
         generator.function_context = &func_context;
 
         if !BlockWriter { generator }.write_block(file, &func_info.return_type, func_info.body, generics, false, true) {
             let name_length: u32 = name.length;
-            let func_name_length: u32 = func_info.name.value.length;
-            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_info.name.value.ptr);
+            let func_name = *func_info.name;
+            let func_name_length: u32 = func_name.value.length;
+            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.ptr, func_name_length, func_name.value.ptr);
             return false;
         }
 
@@ -969,7 +1007,12 @@ impl DefinitionWriter {
 
     fn write_impls(&self, file: &FILE, module: *Module, impls: &Array<&Impl>, impl_functions: *Array<HashMap<usize, TypeFunctionUsage>>, generics: &GenericMap, include_writer: &IncludeWriter) -> bool {
         let generator = self.generator;
-        let name = generator.naming_ident.get_type_name(generics.self_type.deref(), generics.self_type, generics);
+        let self_type = generics.self_type;
+        if self_type == null {
+            fprintf(stderr, "Missing self type in write_impls\n");
+            return false;
+        }
+        let name = generator.naming_ident.get_type_name(self_type.deref(), self_type, generics);
         let name_length: i32 = name.array.length;
         let path = generator.make_rel_path(module, name.as_str(), ".h");
 
@@ -998,18 +1041,22 @@ impl DefinitionWriter {
                         if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, &impl_info.trait_type, generics, module, function_usage_context) { return false; }
                     } else {
                         if !self.write_function_definition(file, func_info, generics, null) {
-                            let func_name_length: u32 = func_info.name.value.length;
-                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            let func_name = *func_info.name;
+                            let func_name_length: u32 = func_name.value.length;
+                            fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_name.value.ptr);
                             return false;
                         }
 
                         let func_context = FunctionContext::new(generator.allocator, func_info, true);
-                        if function_usage_context != null { func_context.coroutine.yield_count = function_usage_context.function_context.coroutine.yield_count; }
+                        if function_usage_context != null {
+                            func_context.coroutine.yield_count = function_usage_context.function_context.coroutine.yield_count;
+                        }
                         generator.function_context = &func_context;
 
                         if !self.write_function_block(file, name.as_str(), func_info, generics, function_usage_context) {
-                            let func_name_length: u32 = func_info.name.value.length;
-                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                            let func_name = *func_info.name;
+                            let func_name_length: u32 = func_name.value.length;
+                            fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_name.value.ptr);
                             return false;
                         }
 
@@ -1034,8 +1081,9 @@ impl DefinitionWriter {
                             include_writer.write(file, generator, &usage_context.body, generics3, true);
                             fprintf(file, "\n");
                             if !self.write_function_definition(file, func_info, generics3, null) {
-                                let func_name_length: u32 = func_info.name.value.length;
-                                fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_info.name.value.ptr);
+                                let func_name = *func_info.name;
+                                let func_name_length: u32 = func_name.value.length;
+                                fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_name.value.ptr);
                                 return false;
                             }
 
@@ -1070,7 +1118,8 @@ impl DefinitionWriter {
                 fprintf(file, " ");
                 generator.write_str_title(file, name.as_str());
                 fprintf(file, "_");
-                generator.write_str_title(file, impl_const.name.value);
+                let impl_const_name = *impl_const.name;
+                generator.write_str_title(file, impl_const_name.value);
                 fprintf(file, " = ");
                 ExpressionWriter { generator }.write_expression(file, impl_const.value, generics);
                 fprintf(file, ";\n");

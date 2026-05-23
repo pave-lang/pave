@@ -151,6 +151,7 @@ impl Module {
 
                 if include == null {
                     include = Include::new(self.root, path.value, self.mode_cpp);
+                    if include == null { return false; }
                     include.process();
                     includes.insert(path.value, include);
                 }
@@ -161,16 +162,17 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "enum") {
                 let node: Enum = Enum::parse(context);
 
-                if node.name == null {
+                let enum_name = node.name;
+                if enum_name == null {
                     result = false;
                 } else {
                     let enum_ptr: &Enum = allocator.alloc(sizeof(Enum));
                     *enum_ptr = node;
-                    let existing = enums.find(&enum_ptr.name.value);
+                    let existing = enums.find(&enum_name.value);
                     if existing == null {
                         let arr = Array<&Enum>::new(allocator);
                         arr.append(enum_ptr);
-                        enums.insert(enum_ptr.name.value, arr);
+                        enums.insert(enum_name.value, arr);
                     } else {
                         existing.append(enum_ptr);
                     }
@@ -178,16 +180,17 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "struct") {
                 let node: Struct = Struct::parse(self);
 
-                if node.name == null {
+                let struct_name = node.name;
+                if struct_name == null {
                     result = false;
                 } else {
                     let struct_ptr: &Struct = allocator.alloc(sizeof(Struct));
                     *struct_ptr = node;
-                    let existing = structs.find(&struct_ptr.name.value);
+                    let existing = structs.find(&struct_name.value);
                     if existing == null {
                         let arr = Array<&Struct>::new(allocator);
                         arr.append(struct_ptr);
-                        structs.insert(struct_ptr.name.value, arr);
+                        structs.insert(struct_name.value, arr);
                     } else {
                         existing.append(struct_ptr);
                     }
@@ -203,16 +206,17 @@ impl Module {
             } else if token.eq(TokenType::Keyword, "trait") {
                 let node: Trait = Trait::parse(self);
 
-                if node.name == null {
+                let trait_name = node.name;
+                if trait_name == null {
                     result = false;
                 } else {
                     let trait_ptr: &Trait = allocator.alloc(sizeof(Trait));
                     *trait_ptr = node;
-                    let existing = traits.find(&trait_ptr.name.value);
+                    let existing = traits.find(&trait_name.value);
                     if existing == null {
                         let arr = Array<&Trait>::new(allocator);
                         arr.append(trait_ptr);
-                        traits.insert(trait_ptr.name.value, arr);
+                        traits.insert(trait_name.value, arr);
                     } else {
                         existing.append(trait_ptr);
                     }
@@ -236,7 +240,7 @@ impl Module {
                 // Build namespace prefix by walking up the hierarchy
                 let ns_prefix = String::new(allocator);
                 let cur_ns: *Namespace = self.namespace;
-                while cur_ns.parent != null {
+                while cur_ns != null && cur_ns.parent != null {
                     ns_prefix.prepend("__");
                     ns_prefix.prepend(cur_ns.name);
                     cur_ns = cur_ns.parent;
@@ -284,6 +288,7 @@ impl Module {
                     end_column: 0,
                 };
                 let name_token = allocator.store(&name_token_val);
+                if name_token == null { return false; }
 
                 if !context.check_value(TokenType::Symbol, "{") {
                     context.error_token(description, "Expected { after test description");
@@ -384,16 +389,21 @@ impl Module {
         let namespace = self.namespace;
         let allocator = namespace.root.allocator;
         let blank_generics = allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+        if blank_generics == null { return false; }
         blank_generics.self_type = Type::Self.to_ptr(allocator);
 
         for (_, &func_info) in self.functions {
-            namespace.functions.insert(func_info.name.value, Type::Function(func_info, blank_generics));
+            let func_name = func_info.name;
+            if func_name == null { return false; }
+            namespace.functions.insert(func_name.value, Type::Function(func_info, blank_generics));
         }
 
         for (_, &enum_arr) in self.enums {
             for *enum_info in enum_arr {
-                if !namespace.add_type(enum_info.name.value, Type::Enum(enum_info, blank_generics)) {
-                    self.context.error_token(enum_info.name, "Duplicate type with this name and generic arity");
+                let enum_name = enum_info.name;
+                if enum_name == null { return false; }
+                if !namespace.add_type(enum_name.value, Type::Enum(enum_info, blank_generics)) {
+                    self.context.error_token(enum_name, "Duplicate type with this name and generic arity");
                     return false;
                 }
             }
@@ -403,10 +413,13 @@ impl Module {
             for *struct_info in struct_arr {
                 let generics_val = GenericMap::from_generics(allocator, &struct_info.generics);
                 let generics = allocator.store(&generics_val);
+                if generics == null { return false; }
                 generics.self_type = blank_generics.self_type;
 
-                if !namespace.add_type(struct_info.name.value, Type::Struct(struct_info, generics)) {
-                    self.context.error_token(struct_info.name, "Duplicate type with this name and generic arity");
+                let struct_name = struct_info.name;
+                if struct_name == null { return false; }
+                if !namespace.add_type(struct_name.value, Type::Struct(struct_info, generics)) {
+                    self.context.error_token(struct_name, "Duplicate type with this name and generic arity");
                     return false;
                 }
             }
@@ -414,8 +427,10 @@ impl Module {
 
         for (_, &trait_arr) in self.traits {
             for *trait_info in trait_arr {
-                if !namespace.add_trait(trait_info.name.value, trait_info) {
-                    self.context.error_token(trait_info.name, "Duplicate trait with this name and generic arity");
+                let trait_name = trait_info.name;
+                if trait_name == null { return false; }
+                if !namespace.add_trait(trait_name.value, trait_info) {
+                    self.context.error_token(trait_name, "Duplicate trait with this name and generic arity");
                     return false;
                 }
             }
@@ -485,35 +500,45 @@ impl Module {
 
             match impl_info.type {
                 Type::Enum(enum_info, _) => {
-                    if impl_info.trait_ != null { enum_info.traits.insert(impl_info.trait_.get_key(self.context.allocator), impl_info.trait_); }
+                    let trait_info = impl_info.trait_;
+                    if trait_info != null { enum_info.traits.insert(trait_info.get_key(self.context.allocator), trait_info); }
                     let impl_index = enum_info.impls.append(impl_info);
 
-                    let parent = FunctionParent::Enum(enum_info, impl_index, impl_info.trait_);
+                    let parent = FunctionParent::Enum(enum_info, impl_index, trait_info);
                     impl_info.fill_types(parent);
                 },
                 Type::Struct(struct_info, _) => {
-                    if impl_info.trait_ != null { struct_info.traits.insert(impl_info.trait_.get_key(self.context.allocator), (impl_info.trait_, &impl_info.trait_type)); }
+                    let trait_info = impl_info.trait_;
+                    if trait_info != null { struct_info.traits.insert(trait_info.get_key(self.context.allocator), (trait_info, &impl_info.trait_type)); }
                     let impl_index = struct_info.impls.append(impl_info);
-                    let parent = FunctionParent::Struct(struct_info, impl_index, impl_info.trait_);
+                    let parent = FunctionParent::Struct(struct_info, impl_index, trait_info);
                     impl_info.fill_types(parent);
                 },
                 Type::Primitive(primitive_info) => {
-                    if impl_info.trait_ != null { primitive_info.traits.insert(impl_info.trait_.get_key(self.context.allocator), impl_info.trait_); }
+                    if primitive_info == null { return false; }
+                    let trait_info = impl_info.trait_;
+                    if trait_info != null {
+                        let trait_key = trait_info.get_key(self.context.allocator);
+                        primitive_info.traits.insert(trait_key, trait_info);
+                    }
                     primitive_info.impls.append(impl_info);
                 },
                 Type::StructC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    if impl_info.trait_ != null { ctype.traits.insert(impl_info.trait_.get_key(self.context.allocator), impl_info.trait_); }
+                    let trait_info = impl_info.trait_;
+                    if trait_info != null { ctype.traits.insert(trait_info.get_key(self.context.allocator), trait_info); }
                     ctype.impls.append(impl_info);
                 },
                 Type::EnumC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    if impl_info.trait_ != null { ctype.traits.insert(impl_info.trait_.get_key(self.context.allocator), impl_info.trait_); }
+                    let trait_info = impl_info.trait_;
+                    if trait_info != null { ctype.traits.insert(trait_info.get_key(self.context.allocator), trait_info); }
                     ctype.impls.append(impl_info);
                 },
                 Type::TypedefC(info) => {
                     let ctype = self.root.add_ctype(info.name.ptr);
-                    if impl_info.trait_ != null { ctype.traits.insert(impl_info.trait_.get_key(self.context.allocator), impl_info.trait_); }
+                    let trait_info = impl_info.trait_;
+                    if trait_info != null { ctype.traits.insert(trait_info.get_key(self.context.allocator), trait_info); }
                     ctype.impls.append(impl_info);
                 },
                 Type::Indirect(_) => {
@@ -706,6 +731,7 @@ impl Module {
 
     fn find_make_type(&self, name: str, usage_types: &Array<Type>) -> *Type {
         let type = self.find_type(name, usage_types.length);
+        if type == null { return null; }
         return self.root.make_type_usage(type, usage_types);
     }
 

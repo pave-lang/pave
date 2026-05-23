@@ -96,75 +96,88 @@ bool HashSet_usize__insert(struct HashSet_usize* self, uintptr_t value) {
     struct HashSetBucket_usize** current_bucket_node = self->buckets + bucket_index;
 
     #line 84 "src/std/HashSet.pv"
-    while (*current_bucket_node != 0) {
-        #line 85 "src/std/HashSet.pv"
-        current_bucket_node = &(*current_bucket_node)->next;
+    struct HashSetBucket_usize* bucket_node = *current_bucket_node;
+    #line 85 "src/std/HashSet.pv"
+    while (bucket_node != 0) {
+        #line 86 "src/std/HashSet.pv"
+        current_bucket_node = &bucket_node->next;
+        #line 87 "src/std/HashSet.pv"
+        bucket_node = *current_bucket_node;
     }
 
-    #line 88 "src/std/HashSet.pv"
-    self->data[self->length] = (struct HashSetBucket_usize) { .value = value, .next = 0 };
-    #line 89 "src/std/HashSet.pv"
-    struct HashSetBucket_usize* data = self->data + self->length;
     #line 90 "src/std/HashSet.pv"
+    self->data[self->length] = (struct HashSetBucket_usize) { .value = value, .next = 0 };
+    #line 91 "src/std/HashSet.pv"
+    struct HashSetBucket_usize* data = self->data + self->length;
+    #line 92 "src/std/HashSet.pv"
     self->length += 1;
 
-    #line 92 "src/std/HashSet.pv"
+    #line 94 "src/std/HashSet.pv"
     *current_bucket_node = data;
 
-    #line 94 "src/std/HashSet.pv"
+    #line 96 "src/std/HashSet.pv"
     return true;
 }
 
-#line 97 "src/std/HashSet.pv"
+#line 99 "src/std/HashSet.pv"
 void HashSet_usize__release(struct HashSet_usize* self) {
-    #line 98 "src/std/HashSet.pv"
-    ArenaAllocator__Allocator__free(self->allocator, self->buckets);
-    #line 99 "src/std/HashSet.pv"
-    ArenaAllocator__Allocator__free(self->allocator, self->data);
     #line 100 "src/std/HashSet.pv"
-    self->buckets = 0;
+    ArenaAllocator__Allocator__free(self->allocator, self->buckets);
     #line 101 "src/std/HashSet.pv"
-    self->data = 0;
+    ArenaAllocator__Allocator__free(self->allocator, self->data);
     #line 102 "src/std/HashSet.pv"
-    self->capacity = 0;
+    self->buckets = 0;
     #line 103 "src/std/HashSet.pv"
+    self->data = 0;
+    #line 104 "src/std/HashSet.pv"
+    self->capacity = 0;
+    #line 105 "src/std/HashSet.pv"
     self->length = 0;
 }
 
-#line 106 "src/std/HashSet.pv"
+#line 108 "src/std/HashSet.pv"
 void HashSet_usize__fill_buckets(struct HashSet_usize* self) {
-    #line 107 "src/std/HashSet.pv"
+    #line 109 "src/std/HashSet.pv"
     uintptr_t i = 0;
-    #line 108 "src/std/HashSet.pv"
+    #line 110 "src/std/HashSet.pv"
     while (i < self->length) {
-        #line 109 "src/std/HashSet.pv"
-        struct HashSetBucket_usize* node = self->data + i;
-        #line 110 "src/std/HashSet.pv"
-        node->next = 0;
         #line 111 "src/std/HashSet.pv"
-        Hash hash = usize__Hash__hash(&(*node).value);
+        struct HashSetBucket_usize* node = self->data + i;
         #line 112 "src/std/HashSet.pv"
-        uintptr_t bucket_index = hash % self->capacity;
+        if (node == 0) {
+            #line 112 "src/std/HashSet.pv"
+            return;
+        }
         #line 113 "src/std/HashSet.pv"
+        node->next = 0;
+        #line 114 "src/std/HashSet.pv"
+        Hash hash = usize__Hash__hash(&(*node).value);
+        #line 115 "src/std/HashSet.pv"
+        uintptr_t bucket_index = hash % self->capacity;
+        #line 116 "src/std/HashSet.pv"
         struct HashSetBucket_usize** current_bucket_node = self->buckets + bucket_index;
 
-        #line 115 "src/std/HashSet.pv"
-        while (*current_bucket_node != 0) {
-            #line 116 "src/std/HashSet.pv"
-            current_bucket_node = &(*current_bucket_node)->next;
+        #line 118 "src/std/HashSet.pv"
+        struct HashSetBucket_usize* bucket_node = *current_bucket_node;
+        #line 119 "src/std/HashSet.pv"
+        while (bucket_node != 0) {
+            #line 120 "src/std/HashSet.pv"
+            current_bucket_node = &bucket_node->next;
+            #line 121 "src/std/HashSet.pv"
+            bucket_node = *current_bucket_node;
         }
 
-        #line 119 "src/std/HashSet.pv"
+        #line 124 "src/std/HashSet.pv"
         *current_bucket_node = node;
 
-        #line 121 "src/std/HashSet.pv"
+        #line 126 "src/std/HashSet.pv"
         i += 1;
     }
 }
 
-#line 125 "src/std/HashSet.pv"
+#line 130 "src/std/HashSet.pv"
 struct HashSet_usize HashSet_usize__clone(struct HashSet_usize* self, struct ArenaAllocator* allocator) {
-    #line 126 "src/std/HashSet.pv"
+    #line 131 "src/std/HashSet.pv"
     struct HashSet_usize other = (struct HashSet_usize) {
         .allocator = allocator,
         .buckets = ArenaAllocator__Allocator__alloc(allocator, self->capacity * sizeof(self->data)),
@@ -173,19 +186,19 @@ struct HashSet_usize HashSet_usize__clone(struct HashSet_usize* self, struct Are
         .capacity = self->capacity,
     };
 
-    #line 134 "src/std/HashSet.pv"
+    #line 139 "src/std/HashSet.pv"
     memcpy(other.data, self->data, self->capacity * sizeof(struct HashSetBucket_usize));
 
-    #line 136 "src/std/HashSet.pv"
+    #line 141 "src/std/HashSet.pv"
     HashSet_usize__fill_buckets(&other);
 
-    #line 138 "src/std/HashSet.pv"
+    #line 143 "src/std/HashSet.pv"
     return other;
 }
 
-#line 141 "src/std/HashSet.pv"
+#line 146 "src/std/HashSet.pv"
 struct HashSetIter_usize HashSet_usize__iter(struct HashSet_usize* self) {
-    #line 142 "src/std/HashSet.pv"
+    #line 147 "src/std/HashSet.pv"
     return (struct HashSetIter_usize) {
         .iter = self->data - 1,
         .end = self->data + self->length,

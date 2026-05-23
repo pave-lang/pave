@@ -40,25 +40,25 @@ struct Module** HashMap_str_ref_Module__find(struct HashMap_str_ref_Module* self
 #line 77 "src/std/HashMap.pv"
 struct Module** HashMap_str_ref_Module__insert(struct HashMap_str_ref_Module* self, struct str key, struct Module* value);
 
-#line 105 "src/std/HashMap.pv"
+#line 107 "src/std/HashMap.pv"
 bool HashMap_str_ref_Module__remove(struct HashMap_str_ref_Module* self, struct str* key);
 
-#line 129 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_ref_Module__release(struct HashMap_str_ref_Module* self);
 
-#line 138 "src/std/HashMap.pv"
+#line 140 "src/std/HashMap.pv"
 void HashMap_str_ref_Module__fill_buckets(struct HashMap_str_ref_Module* self);
 
-#line 156 "src/std/HashMap.pv"
+#line 161 "src/std/HashMap.pv"
 struct HashMap_str_ref_Module HashMap_str_ref_Module__clone(struct HashMap_str_ref_Module* self, struct trait_Allocator allocator);
 
-#line 170 "src/std/HashMap.pv"
+#line 175 "src/std/HashMap.pv"
 struct HashMapIter_str_ref_Module HashMap_str_ref_Module__iter(struct HashMap_str_ref_Module* self);
 
-#line 177 "src/std/HashMap.pv"
+#line 182 "src/std/HashMap.pv"
 void HashMap_str_ref_Module__clear(struct HashMap_str_ref_Module* self);
 
-#line 186 "src/std/HashMap.pv"
+#line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Module* HashMap_str_ref_Module__Index__index(void* __self);
 
 

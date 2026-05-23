@@ -78,10 +78,12 @@ impl Generics {
 
         while !context.check_next(TokenType::Symbol, ">") {
             let generic = Generic::new(self.array.allocator);
-            if !generic.parse(context) || self.has(generic.name.value) { return false; }
+            if !generic.parse(context) { return false; }
+            let generic_name = generic.name;
+            if generic_name == null || self.has(generic_name.value) { return false; }
 
             let index = self.array.append(generic);
-            self.map.insert(generic.name.value, index);
+            self.map.insert(generic_name.value, index);
 
             if !context.check_next(TokenType::Symbol, ",") {
                 return context.expect_value(TokenType::Symbol, ">");
@@ -91,5 +93,9 @@ impl Generics {
         if !context.expect_value(TokenType::Symbol, ">") { return false; }
 
         return true;
+    }
+
+    fn is_empty(&self) -> bool {
+        return self.array.length == 0;
     }
 }

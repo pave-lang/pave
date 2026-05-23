@@ -86,9 +86,14 @@ impl BlockWriter {
             param_i += 1;
         }
 
-        generator.function_context.push_scope(false, false);
+        let function_context = generator.function_context;
+        if function_context == null {
+            fprintf(stderr, "Missing function context in write_function_body\n");
+            return false;
+        }
+        function_context.push_scope(false, false);
         if !self.write_block(file, return_type, body, generics, true, true) { return false; }
-        generator.function_context.pop_scope();
+        function_context.pop_scope();
 
         generator.indent -= 1;
         generator.write_indent(file);
@@ -109,9 +114,14 @@ impl BlockWriter {
                 },
                 DeferStatement::Block(block) => {
                     generator.write_indent(file);
-                    generator.function_context.push_scope(false, false);
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in write_defer_statements\n");
+                        return false;
+                    }
+                    function_context.push_scope(false, false);
                     self.write_block(file, return_type, block, generics, false, false);
-                    generator.function_context.pop_scope();
+                    function_context.pop_scope();
                 },
             }
         }
@@ -157,11 +167,16 @@ impl BlockWriter {
             match statement.data {
                 StatementData::BlockStatement(child_block) => {
                     generator.write_indent(file);
-                    generator.function_context.push_scope(false, false);
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in write_block\n");
+                        return false;
+                    }
+                    function_context.push_scope(false, false);
                     if !self.write_block(file, return_type, child_block, generics, false, false) {
                         return false;
                     }
-                    generator.function_context.pop_scope();
+                    function_context.pop_scope();
                 },
                 StatementData::LetStatement(let_statement) => {
                     let name = let_statement.name;
@@ -171,7 +186,12 @@ impl BlockWriter {
                     generator.write_indent(file);
 
                     if !let_statement.is_static {
-                        generator.function_context.add_variable(name.value, type);
+                        let function_context = generator.function_context;
+                        if function_context == null {
+                            fprintf(stderr, "Missing function context in let statement\n");
+                            return false;
+                        }
+                        function_context.add_variable(name.value, type);
                     }
 
                     if let_statement.is_static {
@@ -207,10 +227,15 @@ impl BlockWriter {
                     fprintf(file, ";\n");
                 },
                 StatementData::YieldStatement(yield_stmt) => {
-                    generator.function_context.coroutine.yield_count += 1;
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in yield statement\n");
+                        return false;
+                    }
+                    function_context.coroutine.yield_count += 1;
 
                     generator.write_indent(file);
-                    let yield_number = generator.function_context.coroutine.yield_count;
+                    let yield_number = function_context.coroutine.yield_count;
                     fprintf(file, "ctx->_value = ");
                     expr.write_expression(file, yield_stmt.expression, generics);
                     fprintf(file, "; ctx->_state = %zu; return true; yield_%zu:;\n", yield_number, yield_number);
@@ -255,9 +280,14 @@ impl BlockWriter {
                         fprintf(file, "if (");
                         expr.write_expression(file, if_stmt.expression, generics);
                         fprintf(file, ") ");
-                        generator.function_context.push_scope(false, false);
+                        let function_context = generator.function_context;
+                        if function_context == null {
+                            fprintf(stderr, "Missing function context in if statement\n");
+                            return false;
+                        }
+                        function_context.push_scope(false, false);
                         if !self.write_block(file, return_type, if_stmt.block, generics, true, false) { return false; }
-                        generator.function_context.pop_scope();
+                        function_context.pop_scope();
                     }
 
                     for else_statement in if_stmt.else_statements {
@@ -274,13 +304,23 @@ impl BlockWriter {
                             fprintf(file, "if (");
                             expr.write_expression(file, else_statement.expression, generics);
                             fprintf(file, ") ");
-                            generator.function_context.push_scope(false, false);
+                            let function_context = generator.function_context;
+                            if function_context == null {
+                                fprintf(stderr, "Missing function context in else-if statement\n");
+                                return false;
+                            }
+                            function_context.push_scope(false, false);
                             if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
-                            generator.function_context.pop_scope();
+                            function_context.pop_scope();
                         } else {
-                            generator.function_context.push_scope(false, false);
+                            let function_context = generator.function_context;
+                            if function_context == null {
+                                fprintf(stderr, "Missing function context in else statement\n");
+                                return false;
+                            }
+                            function_context.push_scope(false, false);
                             if !self.write_block(file, return_type, else_statement.block, generics, true, false) { return false; }
-                            generator.function_context.pop_scope();
+                            function_context.pop_scope();
                         }
                     }
 
@@ -457,9 +497,14 @@ impl BlockWriter {
                             }
                         }
 
-                        generator.function_context.push_scope(true, false);
+                        let function_context = generator.function_context;
+                        if function_context == null {
+                            fprintf(stderr, "Missing function context in match case\n");
+                            return false;
+                        }
+                        function_context.push_scope(true, false);
                         if !self.write_block(file, return_type, case_info.body, generics, true, true) { return false; }
-                        generator.function_context.pop_scope();
+                        function_context.pop_scope();
 
                         generator.indent -= 1;
                         generator.write_indent(file);
@@ -475,9 +520,14 @@ impl BlockWriter {
                     fprintf(file, "while (");
                     expr.write_expression(file, while_stmt.expression, generics);
                     fprintf(file, ") ");
-                    generator.function_context.push_scope(true, true);
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in while statement\n");
+                        return false;
+                    }
+                    function_context.push_scope(true, true);
                     if !self.write_block(file, return_type, while_stmt.block, generics, false, false) { return false; }
-                    generator.function_context.pop_scope();
+                    function_context.pop_scope();
                 },
                 StatementData::ForStatement(for_statement) => {
                     let is_iterator = false;
@@ -494,7 +544,12 @@ impl BlockWriter {
                             generator.write_indent(file);
                             fprintf(file, "for (");
 
-                            generator.function_context.add_variable(variable_name, variable.type);
+                            let function_context = generator.function_context;
+                            if function_context == null {
+                                fprintf(stderr, "Missing function context in range for statement\n");
+                                return false;
+                            }
+                            function_context.add_variable(variable_name, variable.type);
 
                             if generator.is_coroutine() {
                                 generator.write_variable(file, variable_name);
@@ -516,7 +571,8 @@ impl BlockWriter {
                         ForStatementType::Sequence(iter_expression) => {
                             is_iterator = true;
                             generator.write_indent(file);
-                            match for_statement.iter_type.deref() {
+                            let iter_type = *for_statement.iter_type;
+                            match iter_type.deref() {
                                 Type::Sequence(sequence) => {
                                     match sequence.type {
                                         SequenceType::FixedArray(size) => {
@@ -547,7 +603,8 @@ impl BlockWriter {
                                     fprintf(file, " = ");
                                     if variable.ref { fprintf(file, "&"); }
                                     if variable.deref { fprintf(file, "*"); }
-                                    match for_statement.iter_type.deref() {
+                                    let iter_type = *for_statement.iter_type;
+                                    match iter_type.deref() {
                                         Type::Sequence(sequence) => {
                                             match sequence.type {
                                                 SequenceType::FixedArray(_) => {
@@ -575,7 +632,9 @@ impl BlockWriter {
                             }
                         },
                         ForStatementType::Iter(iter_expression) => {
-                            is_iterator = for_statement.iter_type.deref().is_iterator();
+                            let iter_type = *for_statement.iter_type;
+                            let value_type = *for_statement.value_type;
+                            is_iterator = iter_type.deref().is_iterator();
                             if is_iterator {
                                 generator.write_indent(file);
                                 fprintf(file, "while (");
@@ -639,12 +698,12 @@ impl BlockWriter {
                                         if variable.deref { fprintf(file, "*"); }
                                         generator.write_string(file, &iter_type_name);
                                         fprintf(file, "__value");
-                                        if !for_statement.value_type.deref().is_tuple() && for_statement.variables.length > 1 {
+                                        if !value_type.deref().is_tuple() && for_statement.variables.length > 1 {
                                             fprintf(file, "_%zu", i);
                                         }
                                         fprintf(file, "(&__iter)");
 
-                                        if for_statement.value_type.deref().is_tuple() && for_statement.variables.length > 1 {
+                                        if value_type.deref().is_tuple() && for_statement.variables.length > 1 {
                                             generator.write_instance_member_accessor(file, for_statement.value_type, generics);
                                             fprintf(file, "_%zu", i);
                                         }
@@ -660,9 +719,14 @@ impl BlockWriter {
 
                     fprintf(file, "\n");
 
-                    generator.function_context.push_scope(true, true);
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in for statement\n");
+                        return false;
+                    }
+                    function_context.push_scope(true, true);
                     if !self.write_block(file, return_type, for_statement.block, generics, false, true) { return false; }
-                    generator.function_context.pop_scope();
+                    function_context.pop_scope();
 
                     generator.indent -= 1;
                     generator.write_indent(file);

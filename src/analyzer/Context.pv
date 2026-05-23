@@ -95,6 +95,7 @@ impl Context {
 
     fn insert_builtin_function(&self, name: *const char, generics: *Array<Generic>, parameters: *Array<Parameter>, return_type: Type) -> bool {
         let scope = self.scopes.back();
+        if scope == null { return false; }
         let values = &scope.values;
 
         if values.find(name) != null { return true; }
@@ -107,7 +108,9 @@ impl Context {
         if generics != null {
             for *generic in generics {
                 let index = func_info.generics.array.append(generic);
-                func_info.generics.map.insert(generic.name.value, index);
+                let generic_name = generic.name;
+                if generic_name == null { return false; }
+                func_info.generics.map.insert(generic_name.value, index);
             }
         }
 
@@ -128,6 +131,7 @@ impl Context {
         let diagnostics = &self.analysis.diagnostics;
         let file_diagnostics = diagnostics.find(&self.path);
         if file_diagnostics == null { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
+        if file_diagnostics == null { return; }
 
         file_diagnostics.append(Diagnostic {
             message: message,
@@ -149,6 +153,7 @@ impl Context {
         let diagnostics = &self.analysis.diagnostics;
         let file_diagnostics = diagnostics.find(&self.path);
         if file_diagnostics == null { file_diagnostics = diagnostics.insert(self.path, Array<Diagnostic>::new(self.allocator)); }
+        if file_diagnostics == null { return; }
 
         file_diagnostics.append(Diagnostic {
             message: message,
@@ -216,6 +221,7 @@ impl Context {
         let inlay_hints = &self.analysis.inlay_hints;
         let file_inlay_hints = inlay_hints.find(&self.path);
         if file_inlay_hints == null { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
+        if file_inlay_hints == null { return; }
 
         file_inlay_hints.append(InlayHint {
             position: Position {
@@ -233,6 +239,7 @@ impl Context {
         let inlay_hints = &self.analysis.inlay_hints;
         let file_inlay_hints = inlay_hints.find(&self.path);
         if file_inlay_hints == null { file_inlay_hints = inlay_hints.insert(self.path, Array<InlayHint>::new(self.allocator)); }
+        if file_inlay_hints == null { return; }
 
         file_inlay_hints.append(InlayHint {
             position: Position {
@@ -410,6 +417,7 @@ impl Context {
             if self.check_next(TokenType::Keyword, "const") { indirect_type = IndirectType::ConstPointer; }
 
             let indirect = self.allocator.store(&Indirect { type: indirect_type, to: Type::Primitive(null) });
+            if indirect == null { return false; }
 
             if !self.parse_type(&indirect.to, generics) {
                 return false;
@@ -470,6 +478,8 @@ impl Context {
             let func_info_val = Function::new(self);
             let func_info = self.allocator.store(&func_info_val);
             let generic_map = self.allocator.store(&GenericMap { self_type: self.type_self, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+            if func_info == null { return false; }
+            if generic_map == null { return false; }
             
             if !func_info.parse_parameters(&func_info.generics) || !func_info.parse_return_type(&func_info.generics) { return false; }
 
@@ -507,6 +517,7 @@ impl Context {
 
         if generics != null && generics.has(name.value) {
             let generic_ref = generics.find(name.value);
+            if generic_ref == null { return false; }
 
             if self.check_next(TokenType::Symbol, "::") {
                 let typedef_name = self.expect(TokenType::Identifier);
@@ -677,19 +688,27 @@ impl Context {
     fn resolve_type(allocator: &ArenaAllocator, type: &Type, generics_map: *GenericMap, fallback_generics_map: *GenericMap) -> *Type {
         match type {
             Type::Indirect(indirect) => {
+                let resolved_to = Context::resolve_type(allocator, &indirect.to, generics_map, fallback_generics_map);
+                if resolved_to == null { return type; }
+
                 let resolved = allocator.store(&Indirect {
                     type: indirect.type,
-                    to: *Context::resolve_type(allocator, &indirect.to, generics_map, fallback_generics_map),
+                    to: *resolved_to,
                 });
+                if resolved == null { return type; }
 
                 return Type::Indirect(resolved).to_ptr(allocator);
             },
             Type::Sequence(sequence) => {
+                let resolved_element = Context::resolve_type(allocator, &sequence.element, generics_map, fallback_generics_map);
+                if resolved_element == null { return type; }
+
                 let resolved = allocator.store(&Sequence {
                     type: sequence.type,
-                    element: *Context::resolve_type(allocator, &sequence.element, generics_map, fallback_generics_map),
+                    element: *resolved_element,
                     element_pointer: Type::Primitive(null),
                 });
+                if resolved == null { return type; }
                 resolved.element_pointer = Type::Indirect(allocator.store(&Indirect { type: IndirectType::Pointer, to: resolved.element }));
 
                 return Type::Sequence(resolved).to_ptr(allocator);
@@ -698,7 +717,9 @@ impl Context {
                 let resolved = tuple.clone(allocator);
 
                 for element in resolved.elements {
-                    *element = *Context::resolve_type(allocator, element, generics_map, fallback_generics_map);
+                    let resolved_element = Context::resolve_type(allocator, element, generics_map, fallback_generics_map);
+                    if resolved_element == null { return type; }
+                    *element = *resolved_element;
                 }
 
                 return Type::Tuple(allocator.store(&resolved)).to_ptr(allocator);
@@ -707,10 +728,13 @@ impl Context {
                 return type;
             },
             Type::Enum(enum_info, generics) => {
+                if generics == null { return type; }
                 let resolved_generics = generics.clone(allocator);
                 
                 for generic in resolved_generics.array {
-                    *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    let resolved_generic = Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    if resolved_generic == null { return type; }
+                    *generic = *resolved_generic;
                 }
 
                 let self_type: &Type = allocator.alloc(sizeof(Type));
@@ -720,11 +744,15 @@ impl Context {
                 return self_type;
             },
             Type::Struct(struct_info, generics) => {
+                if generics == null { return type; }
                 let resolved_generics_val = generics.clone(allocator);
                 let resolved_generics = allocator.store(&resolved_generics_val);
+                if resolved_generics == null { return type; }
                 
                 for generic in resolved_generics.array {
-                    *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    let resolved_generic = Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    if resolved_generic == null { return type; }
+                    *generic = *resolved_generic;
                 }
 
                 let self_type: &Type = allocator.alloc(sizeof(Type));
@@ -734,11 +762,15 @@ impl Context {
                 return self_type;
             },
             Type::Trait(trait_info, generics) => {
+                if generics == null { return type; }
                 let resolved_generics_val = generics.clone(allocator);
                 let resolved_generics = allocator.store(&resolved_generics_val);
+                if resolved_generics == null { return type; }
                 
                 for generic in resolved_generics.array {
-                    *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    let resolved_generic = Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    if resolved_generic == null { return type; }
+                    *generic = *resolved_generic;
                 }
 
                 let self_type: &Type = allocator.alloc(sizeof(Type));
@@ -749,11 +781,15 @@ impl Context {
             },
             Type::Function(func_info, generics) => {
                 if func_info.type == FunctionType::MethodCpp { return type; }
+                if generics == null { return type; }
                 let resolved_generics_val = generics.clone(allocator);
                 let resolved_generics = allocator.store(&resolved_generics_val);
+                if resolved_generics == null { return type; }
                 
                 for generic in resolved_generics.array {
-                    *generic = *Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    let resolved_generic = Context::resolve_type(allocator, generic, generics_map, fallback_generics_map);
+                    if resolved_generic == null { return type; }
+                    *generic = *resolved_generic;
                 }
 
                 let self_type: &Type = allocator.alloc(sizeof(Type));
@@ -763,7 +799,9 @@ impl Context {
                 return self_type;
             },
             Type::GenericTypedef(gt) => {
-                let name = gt.generic.name.value;
+                let generic_name = gt.generic.name;
+                if generic_name == null { return type; }
+                let name = generic_name.value;
                 let concrete_type: *Type = null;
 
                 if generics_map != null { concrete_type = generics_map.get(name); }
@@ -773,8 +811,9 @@ impl Context {
                     match concrete_type {
                         Type::Struct(struct_info, _) => {
                             for *impl_info in struct_info.impls {
-                                if impl_info.trait_ == null { continue; }
-                                if impl_info.trait_.typedefs.find(&gt.typedef_name) == null { continue; }
+                                let trait_info = impl_info.trait_;
+                                if trait_info == null { continue; }
+                                if trait_info.typedefs.find(&gt.typedef_name) == null { continue; }
                                 let typedef_type = impl_info.typedefs.find(&gt.typedef_name);
                                 if typedef_type != null { return typedef_type; }
                             }
@@ -786,7 +825,9 @@ impl Context {
                 return type;
             },
             Type::Generic(generic) => {
-                let name = generic.name.value;
+                let generic_name = generic.name;
+                if generic_name == null { return type; }
+                let name = generic_name.value;
                 let generic_type: *Type = null;
 
                 if generic_type == null && generics_map != null {
@@ -806,13 +847,18 @@ impl Context {
                 return generic_type;
             },
             Type::Self => {
-                if generics_map.self_type != null {
-                    return generics_map.self_type;
-                } else if fallback_generics_map != null && fallback_generics_map.self_type != null {
-                    return fallback_generics_map.self_type;
-                } else {
+                if generics_map != null {
+                    let self_type = generics_map.self_type;
+                    if self_type != null { return self_type; }
+                }
+
+                if fallback_generics_map != null {
+                    let fallback_self_type = fallback_generics_map.self_type;
+                    if fallback_self_type != null { return fallback_self_type; }
                     return type;
                 }
+
+                return type;
             },
             _ => {},
         }
@@ -820,8 +866,20 @@ impl Context {
         return type;
     }
 
+    fn get_path_narrowing(&self, path: str) -> *Type {
+        if self.scopes.length == 0 { return null; }
+
+        for scope in self.scopes.iter().reverse() {
+            let t = scope.values.find(&path);
+            if t != null { return t; }
+        }
+
+        return null;
+    }
+
     fn set_narrowed(&self, name: str, type: &Type) {
         let scope = self.scopes.back();
+        if scope == null { return; }
         // Save the original type so the binding can be restored on reassignment.
         let existing = scope.values.find(&name);
         if existing != null && scope.narrow_originals.find(&name) == null {
@@ -832,12 +890,9 @@ impl Context {
 
     fn get_broadened_type(&self, name: str) -> *Type {
         if self.scopes.length == 0 { return null; }
-        let scope_front = self.scopes.data;
-        let scope = self.scopes.back();
-        while scope >= scope_front {
-            let original = scope.narrow_originals.find(&name);
-            if original != null { return original; }
-            scope -= 1;
+        for scope in self.scopes.iter().reverse() {
+            let type = scope.narrow_originals.find(&name);
+            if type != null { return type; }
         }
         return null;
     }
@@ -846,7 +901,7 @@ impl Context {
         if self.scopes.length == 0 { return false; }
         let scope_front = self.scopes.data;
         let scope = self.scopes.back();
-        while scope >= scope_front {
+        while scope != null && scope >= scope_front {
             let original = scope.narrow_originals.find(&name);
             if original != null {
                 let original_type = *original;
@@ -854,16 +909,16 @@ impl Context {
                 scope.values.insert(name, original_type);
                 return true;
             }
-            scope -= 1;
+            scope = scope - 1;
         }
         return false;
     }
 
     fn set_value(&self, name: &Token, type: &Type) -> bool {
         let scope = self.scopes.back();
-        let values: &HashMap<str, Type> = &scope.values;
+        if scope == null { return false; }
 
-        if values.find(&name.value) != null {
+        if scope.values.find(&name.value) != null {
             let message = String::new(self.allocator);
             message.append("Variable name already in use: ");
             message.append(name.value);
@@ -871,7 +926,7 @@ impl Context {
             return false;
         }
 
-        values.insert(name.value, *type);
+        scope.values.insert(name.value, *type);
 
         return true;
     }
@@ -881,11 +936,11 @@ impl Context {
             let scope_front = self.scopes.data;
             let scope = self.scopes.back();
 
-            while scope >= scope_front {
+            while scope != null && scope >= scope_front {
                 let type = scope.values.find(&name);
                 if type != null { return type; }
 
-                scope -= 1;
+                scope = scope - 1;
             }
         }
 
@@ -971,9 +1026,15 @@ impl Context {
                     _ => { implements = true; },
                 }
                 if !implements {
+                    let name = required_trait.name;
+                    if name == null {
+                        self.error("Type does not implement required trait");
+                        return false;
+                    }
+
                     let message = String::new(self.allocator);
                     message.append("Type does not implement required trait '");
-                    message.append(required_trait.name.value);
+                    message.append(name.value);
                     message.append("'");
                     self.error(message.c_str());
                     return false;

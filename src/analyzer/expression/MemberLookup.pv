@@ -12,6 +12,7 @@ impl Expression {
                 return Expression::get_enum_variant(context, &indirect.to, token);
             },
             Type::Self => {
+                if context.type_self == null { return EnumVariantResult::None; }
                 return Expression::get_enum_variant(context, context.type_self, token);
             },
             Type::Enum(enum_info, generic_map) => {
@@ -57,9 +58,11 @@ impl Expression {
                 return Expression::get_member_type(context, &indirect.to, member, output_error);
             },
             Type::Self => {
+                if context.type_self == null { return null; }
                 return Expression::get_member_type(context, context.type_self, member, output_error);
             },
             Type::Primitive(primitive_info) => {
+                if primitive_info == null { return null; }
                 for *impl_info in primitive_info.impls {
                     let function = impl_info.find_function(member.value);
                     if function != null {
@@ -82,8 +85,10 @@ impl Expression {
                         if impl_info.typedefs.length == 0 {
                             return context.allocator.store(&Type::Function(function, generic_map));
                         }
+                        if generic_map == null { return null; }
                         let aug_map_val = generic_map.clone(context.allocator);
                         let aug_map = context.allocator.store(&aug_map_val);
+                        if aug_map == null { return null; }
                         for (name, &typedef_type) in impl_info.typedefs {
                             aug_map.insert(name, *typedef_type);
                         }
@@ -107,12 +112,14 @@ impl Expression {
             Type::CoroutineInstance(func_info, generic_map) => {
                 if member.value.eq("next") {
                     let func_next = context.allocator.store(&context.root.func_next);
+                    if func_next == null { return null; }
                     func_next.parent = FunctionParent::Type(type, 0, null);
                     return context.allocator.store(&Type::Function(func_next, generic_map));
                 }
 
                 if member.value.eq("value") {
                     let func_value = context.allocator.store(&context.root.func_value);
+                    if func_value == null { return null; }
                     func_value.parent = FunctionParent::Type(type, 0, null);
                     func_value.return_type = func_info.return_type;
                     return context.allocator.store(&Type::Function(func_value, generic_map));
@@ -183,8 +190,10 @@ impl Expression {
                     if function != null {
                         let generic_map_val: GenericMap = GenericMap { self_type: null, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
                         let generic_map = context.allocator.store(&generic_map_val);
+                        if generic_map == null { return null; }
                         for (typedef_name, _) in trait_info.typedefs {
                             let gt = context.allocator.store(&GenericTypedef { generic, typedef_name });
+                            if gt == null { return null; }
                             generic_map.insert(typedef_name, Type::GenericTypedef(gt));
                         }
                         return context.allocator.store(&Type::Function(function, generic_map));
@@ -203,7 +212,9 @@ impl Expression {
                     return &context.root.type_usize;
                 }
 
-                let impl_info = context.root.hack_type_impl.impl_info;
+                let hack_type_impl = context.root.hack_type_impl;
+                if hack_type_impl == null { return null; }
+                let impl_info = hack_type_impl.impl_info;
 
                 let function = impl_info.find_function(member.value);
                 if function != null {

@@ -219,7 +219,10 @@ impl Type {
             Type::Struct(_, generics) => { return generics; },
             Type::Trait(_, generics) => { return generics; },
             Type::Indirect(indirect) => { return indirect.to.get_generic_map(context); },
-            Type::Self => { return context.type_self.get_generic_map(context); },
+            Type::Self => {
+                if context.type_self == null { return null; }
+                return context.type_self.get_generic_map(context);
+            },
             _ => {},
         }
 
@@ -239,9 +242,18 @@ impl Type {
             Type::Sequence(seq_info) => { return self.eq_sequence(seq_info); },
             Type::Tuple(tuple_info) => { return self.eq_tuple(tuple_info); },
             Type::Primitive(primitive_info) => { return self.eq_primitive(primitive_info); },
-            Type::Enum(enum_info, generics) => { return self.eq_enum(enum_info, generics.array); },
-            Type::Struct(struct_info, generics) => { return self.eq_struct(struct_info, generics.array); },
-            Type::Trait(trait_info, generics) => { return self.eq_trait(trait_info, generics.array); },
+            Type::Enum(enum_info, generics) => {
+                if generics == null { return false; }
+                return self.eq_enum(enum_info, generics.array);
+            },
+            Type::Struct(struct_info, generics) => {
+                if generics == null { return false; }
+                return self.eq_struct(struct_info, generics.array);
+            },
+            Type::Trait(trait_info, generics) => {
+                if generics == null { return false; }
+                return self.eq_trait(trait_info, generics.array);
+            },
             Type::Generic(generic) => { return self.eq_generic(generic); },
             Type::GenericTypedef(gt) => { return self.eq_generic_typedef(gt); },
             Type::UnknownC(_) => { return true; },
@@ -306,6 +318,7 @@ impl Type {
     fn eq_primitive(&self, other: &Primitive) -> bool {
         match self {
             Type::Primitive(primitive_info) => {
+                if primitive_info == null { return false; }
                 return (primitive_info.is_void() && other.is_void()) || (primitive_info.is_number() && other.is_number()) || (primitive_info && other && primitive_info.name.eq(other.name));
             },
             // Type::Indirect(_) => { return true; },
@@ -318,13 +331,17 @@ impl Type {
         match self {
             Type::Enum(enum_info, self_generics) => {
                 if enum_info != other_enum { return false; }
+                if self_generics == null { return false; }
                 if self_generics.array.length != generics.length { return false; }
                 for i in 0..self_generics.array.length {
                     if !self_generics.array.data[i].eq(&generics.data[i]) { return false; }
                 }
                 return true;
             },
-            Type::Primitive(primitive_info) => { return primitive_info.is_void(); },
+            Type::Primitive(primitive_info) => {
+                if primitive_info == null { return false; }
+                return primitive_info.is_void();
+            },
             Type::Self => { return true; },
             _ => { return false; },
         }
@@ -336,6 +353,7 @@ impl Type {
         match self {
             Type::Struct(struct_info, self_generics) => {
                 if struct_info != other_struct { return false; }
+                if self_generics == null { return false; }
                 if self_generics.array.length != generics.length { return false; }
                 for i in 0..self_generics.array.length {
                     if !self_generics.array.data[i].eq(&generics.data[i]) { return false; }
@@ -357,6 +375,7 @@ impl Type {
         match self {
             Type::Trait(trait_info, self_generics) => {
                 if trait_info != other_trait { return false; }
+                if self_generics == null { return false; }
                 if self_generics.array.length != generics.length { return false; }
                 for i in 0..self_generics.array.length {
                     if !self_generics.array.data[i].eq(&generics.data[i]) { return false; }
@@ -371,7 +390,11 @@ impl Type {
 
     fn eq_generic(&self, other_generic: &Generic) -> bool {
         match self {
-            Type::Generic(generic) => { return generic.name.value.eq(other_generic.name.value); },
+            Type::Generic(generic) => {
+                if generic.name == null { return false; }
+                if other_generic.name == null { return false; }
+                return generic.name.value.eq(other_generic.name.value);
+            },
             Type::Self => { return true; },
             _ => { return false; },
         }
@@ -495,6 +518,7 @@ impl Type {
 
     fn is_void(&self) -> bool {
         if let Type::Primitive(primitive_info) = self {
+            if primitive_info == null { return false; }
             return primitive_info.is_void();
         }
 
@@ -605,6 +629,7 @@ impl Type {
     fn is_iterator(&self) -> bool {
         match self {
             Type::Trait(trait_info, _) => {
+                if trait_info.name == null { return false; }
                 return trait_info.name.value.eq("Iter");
             },
             _ => { return false; },
@@ -617,13 +642,17 @@ impl Type {
 
         match self {
             Type::Struct(struct_info, _) => {
-                str_cast = struct_info.name.value.eq("str");
+                let struct_name = struct_info.name;
+                if struct_name == null { return false; }
+                str_cast = struct_name.value.eq("str");
                 if !str_cast { return false; }
             },
             Type::Indirect(indirect) => {
                 match indirect.to {
                     Type::Struct(struct_info, _) => {
-                        str_cast = struct_info.name.value.eq("str");
+                        let struct_name = struct_info.name;
+                        if struct_name == null { return false; }
+                        str_cast = struct_name.value.eq("str");
                         if !str_cast { return false; }
                     },
                     Type::Trait(_, _) => {},
@@ -664,6 +693,7 @@ impl Type {
 
     fn is_number(&self) -> bool {
         if let Type::Primitive(primitive_info) = self {
+            if primitive_info == null { return false; }
             return primitive_info.is_number();
         }
 
@@ -695,7 +725,10 @@ impl Type {
             Type::Generic(_) => { return null; },
             Type::UnknownC(_) => { return null; },
             Type::Function(func_info, _) => { if func_info.context != null { return func_info.context.module; } else { return null; } },
-            Type::CoroutineInstance(func_info, _) => { return func_info.context.module; },
+            Type::CoroutineInstance(func_info, _) => {
+                if func_info.context == null { return null; }
+                return func_info.context.module;
+            },
             Type::Self => { return null; },
             Type::TypedefC(_) => { return null; },
             Type::EnumC(_) => { return null; },

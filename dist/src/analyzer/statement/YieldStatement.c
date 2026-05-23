@@ -7,8 +7,8 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/types/Generics.h>
-#include <analyzer/types/Type.h>
 #include <analyzer/types/Function.h>
+#include <analyzer/types/Type.h>
 #include <analyzer/statement/YieldStatement.h>
 
 #include <analyzer/statement/YieldStatement.h>
@@ -41,8 +41,15 @@ struct YieldStatement* YieldStatement__parse(struct Context* context, struct Gen
     }
 
     #line 21 "src/analyzer/statement/YieldStatement.pv"
-    Expression__validate_type(expression, context, &context->function->return_type, true);
-
+    struct Function* function = context->function;
+    #line 22 "src/analyzer/statement/YieldStatement.pv"
+    if (function == 0) {
+        #line 22 "src/analyzer/statement/YieldStatement.pv"
+        return 0;
+    }
     #line 23 "src/analyzer/statement/YieldStatement.pv"
+    Expression__validate_type(expression, context, &function->return_type, true);
+
+    #line 25 "src/analyzer/statement/YieldStatement.pv"
     return ArenaAllocator__store_YieldStatement(context->allocator, (struct YieldStatement[]){(struct YieldStatement) { .expression = expression }});
 }

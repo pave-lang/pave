@@ -32,31 +32,31 @@ struct EnumC;
 #line 21 "src/analyzer/c/Include.pv"
 struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp);
 
-#line 82 "src/analyzer/c/Include.pv"
+#line 87 "src/analyzer/c/Include.pv"
 void Include__add_cxtype_primitive(struct Include* self, enum CXTypeKind kind, char const* name);
 
-#line 88 "src/analyzer/c/Include.pv"
+#line 93 "src/analyzer/c/Include.pv"
 void Include__add_typedef_primitive(struct Include* self, char const* type, char const* name);
 
-#line 93 "src/analyzer/c/Include.pv"
+#line 98 "src/analyzer/c/Include.pv"
 bool Include__process(struct Include* self);
 
-#line 184 "src/analyzer/c/Include.pv"
+#line 189 "src/analyzer/c/Include.pv"
 struct Type* Include__parse_type(struct Include* self, CXType type);
 
-#line 265 "src/analyzer/c/Include.pv"
+#line 270 "src/analyzer/c/Include.pv"
 struct EnumC* Include__find_enum(struct Include* self, char const* name);
 
-#line 276 "src/analyzer/c/Include.pv"
+#line 281 "src/analyzer/c/Include.pv"
 char* Include__make_string(struct Include* self, CXString s);
 
-#line 283 "src/analyzer/c/Include.pv"
+#line 288 "src/analyzer/c/Include.pv"
 struct str Include__make_str(struct Include* self, CXString s);
 
-#line 290 "src/analyzer/c/Include.pv"
+#line 295 "src/analyzer/c/Include.pv"
 bool Include__try_parse_int_macro(struct Include* self, CXCursor cursor, int64_t* out);
 
-#line 378 "src/analyzer/c/Include.pv"
+#line 383 "src/analyzer/c/Include.pv"
 bool Include__is_function_like_macro(struct Include* self, CXCursor cursor);
 
 #endif

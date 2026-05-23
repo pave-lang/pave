@@ -3,6 +3,155 @@ use analyzer
 use types
 
 impl Expression {
+    // Build the dotted access path of an expression (e.g. "self.parent.next") into `out`.
+    // Returns true if the expression is a Variable or a chain of MemberInstanceExpression
+    // rooted in a Variable; false otherwise. Parens are transparently unwrapped.
+    fn build_narrow_path(&self, out: &String) -> bool {
+        let inner = self;
+        match inner.data {
+            ExpressionData::ParenthesizedExpression(child) => { return child.build_narrow_path(out); },
+            ExpressionData::Variable(name) => {
+                out.append(name);
+                return true;
+            },
+            ExpressionData::MemberInstanceExpression(parent, member) => {
+                if !parent.build_narrow_path(out) { return false; }
+                out.append(".");
+                out.append(member);
+                return true;
+            },
+            _ => { return false; },
+        }
+    }
+
+    // If `expr` is a null-comparison `var == null` / `null == var` (when narrow_on_true=false)
+    // or `var != null` / `null != var` (when narrow_on_true=true) where `var` has pointer type,
+    // returns a freshly-allocated `&T` reference type. Recurses through `||` (false branch)
+    // and `&&` (true branch) so short-circuit chains narrow correctly. Returns null when no
+    // narrowing applies.
+    fn detect_null_narrowing(context: &Context, expr: &Expression, narrow_on_true: bool) -> *Type {
+        let inner = expr;
+        match inner.data {
+            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
+            _ => {},
+        }
+
+        match inner.data {
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                if op.eq("||") && !narrow_on_true {
+                    let left = Expression::detect_null_narrowing(context, lhs, false);
+                    if left != null { return left; }
+                    return Expression::detect_null_narrowing(context, rhs, false);
+                }
+                if op.eq("&&") && narrow_on_true {
+                    let left = Expression::detect_null_narrowing(context, lhs, true);
+                    if left != null { return left; }
+                    return Expression::detect_null_narrowing(context, rhs, true);
+                }
+
+                let want_op: str = if narrow_on_true { "!=" } else { "==" };
+                if !op.eq(want_op) { return null; }
+
+                let path_check = String::new(context.allocator);
+                let var_expr: *Expression = null;
+                let other: *Expression = null;
+
+                if lhs.build_narrow_path(&path_check) { var_expr = lhs; other = rhs; }
+
+                if var_expr == null {
+                    let path_check2 = String::new(context.allocator);
+                    if rhs.build_narrow_path(&path_check2) { var_expr = rhs; other = lhs; }
+                    else { return null; }
+                }
+
+                if other == null { return null; }
+                let other_inner = other;
+                match other_inner.data {
+                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
+                    _ => {},
+                }
+                if other_inner == null { return null; }
+
+                match other_inner.data {
+                    ExpressionData::NullLiteral => {},
+                    _ => { return null; },
+                }
+
+                if var_expr == null { return null; }
+                match var_expr.return_type {
+                    Type::Indirect(indirect) => {
+                        if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
+                            return null;
+                        }
+                        let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
+                        return context.allocator.store(&Type::Indirect(ref_indirect));
+                    },
+                    _ => { return null; },
+                }
+            },
+            _ => { return null; },
+        }
+
+        return null;
+    }
+
+    fn narrowed_var_name(context: &Context, expr: &Expression, narrow_on_true: bool) -> str {
+        let inner = expr;
+        match inner.data {
+            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
+            _ => {},
+        }
+
+        match inner.data {
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                if op.eq("||") && !narrow_on_true {
+                    let left = Expression::narrowed_var_name(context, lhs, false);
+                    if left.length > 0 { return left; }
+                    return Expression::narrowed_var_name(context, rhs, false);
+                }
+                if op.eq("&&") && narrow_on_true {
+                    let left = Expression::narrowed_var_name(context, lhs, true);
+                    if left.length > 0 { return left; }
+                    return Expression::narrowed_var_name(context, rhs, true);
+                }
+
+                let want_op: str = if narrow_on_true { "!=" } else { "==" };
+                if !op.eq(want_op) { return str { ptr: null, length: 0 }; }
+
+                // Find which side is a path (Variable or Variable.field.field...) and the other side null.
+                let path = String::new(context.allocator);
+                let other: *Expression = null;
+
+                if lhs.build_narrow_path(&path) { other = rhs; }
+                else {
+                    let path2 = String::new(context.allocator);
+                    if rhs.build_narrow_path(&path2) {
+                        other = lhs;
+                        path = path2;
+                    } else {
+                        return str { ptr: null, length: 0 };
+                    }
+                }
+
+                if other == null { return str { ptr: null, length: 0 }; }
+                let other_inner = other;
+                match other_inner.data {
+                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
+                    _ => {},
+                }
+                if other_inner == null { return str { ptr: null, length: 0 }; }
+                match other_inner.data {
+                    ExpressionData::NullLiteral => {},
+                    _ => { return str { ptr: null, length: 0 }; },
+                }
+
+                return path.as_str();
+            },
+            _ => {},
+        }
+        return str { ptr: null, length: 0 };
+    }
+
     fn parse_binary(context: &Context, lhs: &Expression, min_prec: usize, generics: &Generics) -> *Expression {
         let result = lhs;
 
@@ -14,11 +163,30 @@ impl Expression {
             let operator = context.expect(TokenType::Symbol);
             if operator == null { return null; }
 
+            // Short-circuit narrowing: when parsing the RHS of `||` we know the LHS was false,
+            // and for `&&` we know the LHS was true. If the LHS contains a null-check on a
+            // variable, narrow that variable to `&T` while parsing the RHS.
+            let pushed_narrow_scope = false;
+            if operator.value.eq("||") || operator.value.eq("&&") {
+                let narrow_on_true_for_rhs = operator.value.eq("&&");
+                let rhs_narrow_type = Expression::detect_null_narrowing(context, result, narrow_on_true_for_rhs);
+                if rhs_narrow_type != null {
+                    let var_name = Expression::narrowed_var_name(context, result, narrow_on_true_for_rhs);
+                    if var_name.length > 0 {
+                        context.push_scope(null);
+                        context.set_narrowed(var_name, rhs_narrow_type);
+                        pushed_narrow_scope = true;
+                    }
+                }
+            }
+
             let rhs = Expression::parse_primary(context, generics);
-            if rhs == null { return null; }
+            if rhs == null { if pushed_narrow_scope { context.pop_scope(); } return null; }
 
             let rhs_final = Expression::parse_binary(context, rhs, prec + 1, generics);
-            if rhs_final == null { return null; }
+            if rhs_final == null { if pushed_narrow_scope { context.pop_scope(); } return null; }
+
+            if pushed_narrow_scope { context.pop_scope(); }
 
             let is_arithmetic =
                 operator.value.eq("*") || operator.value.eq("+") ||
@@ -100,20 +268,26 @@ impl Expression {
             // },
             Type::Struct(struct_info, generic_map) => {
                 for *impl_info in struct_info.impls {
-                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
-                    if !impl_info.trait_.name.value.eq(trait_name) { continue; }
+                    let impl_trait = impl_info.trait_;
+                    if !impl_info.has_trait || impl_trait == null { continue; }
+                    let impl_trait_name = impl_trait.name;
+                    if impl_trait_name == null { continue; }
+                    if !impl_trait_name.value.eq(trait_name) { continue; }
 
                     let func = impl_info.functions.find(&func_name);
                     if func == null { continue; }
                     if func.parameters.length < 2 { continue; }
 
                     let other_param = func.parameters.get(1);
+                    if other_param == null { continue; }
                     if !other_param.type.eq(&rhs.return_type) { continue; }
 
                     let func_map: *GenericMap = generic_map;
                     if impl_info.typedefs.length > 0 {
+                        if generic_map == null { return null; }
                         let aug_map_val = generic_map.clone(context.allocator);
                         let aug_map = context.allocator.store(&aug_map_val);
+                        if aug_map == null { return null; }
                         for (name, &typedef_type) in impl_info.typedefs {
                             aug_map.insert(name, *typedef_type);
                         }
@@ -121,6 +295,7 @@ impl Expression {
                     }
 
                     let func_type = context.allocator.store(&Type::Function(func, func_map));
+                    if func_type == null { return null; }
 
                     let arguments = Array<InvokeArgument>::new(context.allocator);
                     arguments.append(InvokeArgument { name: null, value: lhs });
@@ -130,15 +305,20 @@ impl Expression {
                 }
             },
             Type::Primitive(primitive_info) => {
+                if primitive_info == null { return null; }
                 for *impl_info in primitive_info.impls {
-                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
-                    if !impl_info.trait_.name.value.eq(trait_name) { continue; }
+                    let impl_trait = impl_info.trait_;
+                    if !impl_info.has_trait || impl_trait == null { continue; }
+                    let impl_trait_name = impl_trait.name;
+                    if impl_trait_name == null { continue; }
+                    if !impl_trait_name.value.eq(trait_name) { continue; }
 
                     let func = impl_info.functions.find(&func_name);
                     if func == null { continue; }
                     if func.parameters.length < 2 { continue; }
 
                     let other_param = func.parameters.get(1);
+                    if other_param == null { continue; }
                     if rhs.return_type.is_self() { continue; }
                     if !other_param.type.eq(&rhs.return_type) { continue; }
 
@@ -165,13 +345,17 @@ impl Expression {
         match operand.return_type {
             Type::Self => {
                 if context.type_self != null {
-                    return Expression::find_unary_trait_call(context, token, operand);
+                    let concrete_operand = Expression { data: operand.data, return_type: *context.type_self, token: operand.token };
+                    return Expression::find_unary_trait_call(context, token, &concrete_operand);
                 }
             },
             Type::Struct(struct_info, generic_map) => {
                 for *impl_info in struct_info.impls {
-                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
-                    if !impl_info.trait_.name.value.eq("Neg") { continue; }
+                    let impl_trait = impl_info.trait_;
+                    if !impl_info.has_trait || impl_trait == null { continue; }
+                    let impl_trait_name = impl_trait.name;
+                    if impl_trait_name == null { continue; }
+                    if !impl_trait_name.value.eq("Neg") { continue; }
 
                     let func = impl_info.functions.find("neg");
                     if func == null { continue; }
@@ -179,10 +363,13 @@ impl Expression {
 
                     let func_map: *GenericMap = generic_map;
                     if impl_info.typedefs.length > 0 {
+                        if generic_map == null { return null; }
                         let aug_map_val = generic_map.clone(context.allocator);
                         let aug_map = context.allocator.store(&aug_map_val);
+                        if aug_map == null { return null; }
                         for (name, &typedef_type) in impl_info.typedefs {
                             let resolved = Context::resolve_type(context.allocator, typedef_type, generic_map, null);
+                            if resolved == null { return null; }
                             aug_map.insert(name, *resolved);
                         }
                         func_map = aug_map;
@@ -207,8 +394,11 @@ impl Expression {
         match inner.return_type.deref_reference() {
             Type::Struct(struct_info, generic_map) => {
                 for *impl_info in struct_info.impls {
-                    if !impl_info.has_trait || impl_info.trait_ == null { continue; }
-                    if !impl_info.trait_.name.value.eq("Index") { continue; }
+                    let impl_trait = impl_info.trait_;
+                    if !impl_info.has_trait || impl_trait == null { continue; }
+                    let impl_trait_name = impl_trait.name;
+                    if impl_trait_name == null { continue; }
+                    if !impl_trait_name.value.eq("Index") { continue; }
 
                     let func = impl_info.functions.find("index");
                     if func == null { continue; }
@@ -216,10 +406,13 @@ impl Expression {
 
                     let func_map: *GenericMap = generic_map;
                     if impl_info.typedefs.length > 0 {
+                        if generic_map == null { return null; }
                         let aug_map_val = generic_map.clone(context.allocator);
                         let aug_map = context.allocator.store(&aug_map_val);
+                        if aug_map == null { return null; }
                         for (name, &typedef_type) in impl_info.typedefs {
                             let resolved = Context::resolve_type(context.allocator, typedef_type, generic_map, null);
+                            if resolved == null { return null; }
                             aug_map.insert(name, *resolved);
                         }
                         func_map = aug_map;

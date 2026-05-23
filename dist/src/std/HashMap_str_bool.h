@@ -39,25 +39,25 @@ bool* HashMap_str_bool__find(struct HashMap_str_bool* self, struct str* key);
 #line 77 "src/std/HashMap.pv"
 bool* HashMap_str_bool__insert(struct HashMap_str_bool* self, struct str key, bool value);
 
-#line 105 "src/std/HashMap.pv"
+#line 107 "src/std/HashMap.pv"
 bool HashMap_str_bool__remove(struct HashMap_str_bool* self, struct str* key);
 
-#line 129 "src/std/HashMap.pv"
+#line 131 "src/std/HashMap.pv"
 void HashMap_str_bool__release(struct HashMap_str_bool* self);
 
-#line 138 "src/std/HashMap.pv"
+#line 140 "src/std/HashMap.pv"
 void HashMap_str_bool__fill_buckets(struct HashMap_str_bool* self);
 
-#line 156 "src/std/HashMap.pv"
+#line 161 "src/std/HashMap.pv"
 struct HashMap_str_bool HashMap_str_bool__clone(struct HashMap_str_bool* self, struct trait_Allocator allocator);
 
-#line 170 "src/std/HashMap.pv"
+#line 175 "src/std/HashMap.pv"
 struct HashMapIter_str_bool HashMap_str_bool__iter(struct HashMap_str_bool* self);
 
-#line 177 "src/std/HashMap.pv"
+#line 182 "src/std/HashMap.pv"
 void HashMap_str_bool__clear(struct HashMap_str_bool* self);
 
-#line 186 "src/std/HashMap.pv"
+#line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_bool* HashMap_str_bool__Index__index(void* __self);
 
 

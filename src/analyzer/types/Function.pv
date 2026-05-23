@@ -121,6 +121,7 @@ impl Function {
 
     fn parse_parameters(&self, generics: &Generics) -> bool {
         let context = self.context;
+        if context == null { return false; }
         if !context.expect_value(TokenType::Symbol, "(") { return false; }
 
         while context.pos < context.length && !context.check_value(TokenType::Symbol, ")") {
@@ -183,9 +184,10 @@ impl Function {
 
     fn parse_return_type(&self, generics: &Generics) -> bool {
         let context = self.context;
+        if context == null { return false; }
 
         if !context.check_next(TokenType::Symbol, "->") {
-            self.return_type = self.context.root.type_void;
+            self.return_type = context.root.type_void;
             return true;
         }
 
@@ -194,6 +196,8 @@ impl Function {
 
     fn fill_types(&self, generics: *Generics) -> bool {
         self.generics.parent = generics;
+
+        if self.context == null { return false; }
 
         if self.type == FunctionType::Test {
             self.return_type = self.context.root.type_void;
@@ -219,6 +223,7 @@ impl Function {
         self.generics.parent = generics;
 
         let context = self.context;
+        if context == null { return false; }
         context.pos = self.token_start;
         let block = Block::new_ptr(context);
         context.push_scope(null);
