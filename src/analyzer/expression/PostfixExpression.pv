@@ -119,9 +119,7 @@ impl Expression {
             }
 
             let name = if func_info.parameters.length > 0 { func_info.parameters.data[0].name } else { null };
-            if name == null { return null; }
-
-            if name.value.eq("self") {
+            if name != null && name.value.eq("self") {
                 arguments.append(InvokeArgument { name: null, value: inner });
             }
 

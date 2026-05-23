@@ -59,8 +59,6 @@ impl FileGenerator {
         code_tmp = tmpnam(0);
         code_file = fopen(code_tmp, "w+");
 
-        generator.code_files.append(code);
-
         if code_file == null { perror(code.c_str()); return false; }
 
         generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
@@ -72,13 +70,19 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_function_definition(code_file, func_info, generics, null) { fclose(code_file); return false; }
+        if !defs.write_function_definition(code_file, func_info, generics, null) {
+            fprintf(stderr, "Failed to write function definition for %s\n", name.c_str());
+            fclose(code_file);
+            return false;
+        }
 
         defs.write_function_block(code_file, name_str, func_info, generics, usage_context);
 
         generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
+
+        generator.code_files.append(code);
 
         include_writer = IncludeWriter::new(generator.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
@@ -103,7 +107,12 @@ impl FileGenerator {
             defs.write_function_coroutine(header_file, func_info, generics);
         }
 
-        if !defs.write_function_definition(header_file, func_info, generics, null) { fclose(header_file); return false; }
+        if !defs.write_function_definition(header_file, func_info, generics, null) {
+            fprintf(stderr, "Failed to write function definition for %s\n", name.c_str());
+            fclose(header_file);
+            return false;
+        }
+
         fprintf(header_file, ";\n");
 
         fprintf(header_file, "\n#endif\n");
@@ -148,7 +157,11 @@ impl FileGenerator {
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.layout, generics, false);
 
-        if !defs.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) { fclose(header_file); return false; }
+        if !defs.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) {
+            fprintf(stderr, "Failed to write enum definition for %s\n", name.c_str());
+            fclose(header_file);
+            return false;
+        }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -159,7 +172,6 @@ impl FileGenerator {
         if enum_info.impls.length == 0 { return true; }
 
         let code = generator.make_path(module, name.as_str(), ".c");
-        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
@@ -174,11 +186,17 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, module, &enum_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, module, &enum_info.impls, &usage_context.impl_functions, generics, &include_writer) {
+            fprintf(stderr, "Failed to write impls for enum %s\n", name.c_str());
+            fclose(code_file);
+            return false;
+        }
 
         generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
+
+        generator.code_files.append(code);
 
         return true;
     }
@@ -249,7 +267,12 @@ impl FileGenerator {
         include_writer.write(header_file, generator, &usage_context.layout, generics, false);
         if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
 
-        if !defs.write_struct_definition(header_file, struct_info, usage, usage_context) { fclose(header_file); return false; }
+        if !defs.write_struct_definition(header_file, struct_info, usage, usage_context) {
+            fprintf(stderr, "Failed to write struct definition for %s\n", name.c_str());
+
+            fclose(header_file);
+            return false;
+        }
 
         if struct_info.module.mode_cpp || generator.root.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");
@@ -275,7 +298,6 @@ impl FileGenerator {
         }
 
         let code = generator.make_path(struct_info.module, name.as_str(), ext);
-        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
@@ -290,7 +312,11 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, struct_info.module, &struct_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, struct_info.module, &struct_info.impls, &usage_context.impl_functions, generics, &include_writer) {
+            fprintf(stderr, "Failed to write impls for struct %s\n", name.c_str());
+            fclose(code_file);
+            return false;
+        }
 
         if struct_info.traits.length > 0 {
             fprintf(code_file, "\n");
@@ -482,6 +508,8 @@ impl FileGenerator {
         fclose(code_file);
         remove(code_tmp);
 
+        generator.code_files.append(code);
+
         return true;
     }
 
@@ -516,7 +544,11 @@ impl FileGenerator {
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.signature, generics, false);
 
-        if !defs.write_primitive_definition(header_file, primitive_info, generics) { fclose(header_file); return false; }
+        if !defs.write_primitive_definition(header_file, primitive_info, generics) {
+            fprintf(stderr, "Failed to write primitive definition for %.*s\n", cast<i32>(name.length), name.ptr);
+            fclose(header_file);
+            return false;
+        }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -529,7 +561,6 @@ impl FileGenerator {
         }
 
         let code = generator.make_path(null, name, ".c");
-        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
@@ -544,7 +575,11 @@ impl FileGenerator {
         generator.write_str(code_file, header_rel.as_str());
         fprintf(code_file, ">\n\n");
 
-        if !defs.write_impls(code_file, null, &primitive_info.impls, &usage_context.impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, null, &primitive_info.impls, &usage_context.impl_functions, generics, &include_writer) {
+            fprintf(stderr, "Failed to write impls for primitive %.*s\n", cast<i32>(name.length), name.ptr);
+            fclose(code_file);
+            return false;
+        }
 
         for *impl_info in primitive_info.impls {
             let trait_info = impl_info.trait_;
@@ -581,6 +616,8 @@ impl FileGenerator {
         generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
+
+        generator.code_files.append(code);
 
         return true;
     }
@@ -650,7 +687,6 @@ impl FileGenerator {
         remove(header_tmp);
 
         let code = generator.make_path(null, name.as_str(), ".c");
-        generator.code_files.append(code);
 
         let code_tmp: *const char = tmpnam(0);
         let code_file: *FILE = fopen(code_tmp, "w+");
@@ -665,11 +701,17 @@ impl FileGenerator {
         let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: self.generator.allocator, capacity: 0 };
         let impl_functions = Array<HashMap<usize, TypeFunctionUsage>> { data: null, length: 0, allocator: self.generator.allocator, capacity: 0 };
 
-        if !defs.write_impls(code_file, null, &impls, &impl_functions, generics, &include_writer) { fclose(code_file); return false; }
+        if !defs.write_impls(code_file, null, &impls, &impl_functions, generics, &include_writer) {
+            fprintf(stderr, "Failed to write impls for slice %s\n", name.c_str());
+            fclose(code_file);
+            return false;
+        }
 
         generator.overwrite_if_different(code.c_str(), code_file);
         fclose(code_file);
         remove(code_tmp);
+
+        generator.code_files.append(code);
 
         return true;
     }

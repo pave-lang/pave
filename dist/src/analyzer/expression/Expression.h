@@ -121,13 +121,13 @@ struct Expression* Expression__parse_instance_member_expression(struct Context* 
 #line 69 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_instance_member_expression_inner(struct Context* context, struct Expression* inner, struct Generics* generics, bool allow_pointer);
 
-#line 192 "src/analyzer/expression/PostfixExpression.pv"
+#line 190 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 291 "src/analyzer/expression/PostfixExpression.pv"
+#line 289 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 395 "src/analyzer/expression/PostfixExpression.pv"
+#line 393 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 14 "src/analyzer/expression/BinaryExpression.pv"

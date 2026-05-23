@@ -1321,110 +1321,121 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
     FileGenerator__create_directories(&file_gen, (struct str){ .ptr = path, .length = strlen(path) }, &root->children);
 
     #line 674 "src/compiler/Generator.pv"
+    bool success = true;
+
+    #line 676 "src/compiler/Generator.pv"
     struct Usages usages = Usages__new(&self);
-    #line 675 "src/compiler/Generator.pv"
+    #line 677 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Primitive __iter = HashMap_usize_TypeUsage_Primitive__iter(&usages.primitives);
-    #line 675 "src/compiler/Generator.pv"
+    #line 677 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Primitive__next(&__iter)) {
-        #line 675 "src/compiler/Generator.pv"
+        #line 677 "src/compiler/Generator.pv"
         struct TypeUsage_Primitive* usage = &HashMapIter_usize_TypeUsage_Primitive__value(&__iter)->_1;
 
-        #line 675 "src/compiler/Generator.pv"
-        FileGenerator__generate_primitive_loop(&file_gen, usage);
+        #line 677 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_primitive_loop(&file_gen, usage) && success;
     } }
-    #line 676 "src/compiler/Generator.pv"
+    #line 678 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Struct __iter = HashMap_usize_TypeUsage_Struct__iter(&usages.structs);
-    #line 676 "src/compiler/Generator.pv"
+    #line 678 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Struct__next(&__iter)) {
-        #line 676 "src/compiler/Generator.pv"
+        #line 678 "src/compiler/Generator.pv"
         struct TypeUsage_Struct* usage = &HashMapIter_usize_TypeUsage_Struct__value(&__iter)->_1;
 
-        #line 676 "src/compiler/Generator.pv"
-        FileGenerator__generate_struct_loop(&file_gen, usage);
+        #line 678 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_struct_loop(&file_gen, usage) && success;
     } }
-    #line 677 "src/compiler/Generator.pv"
+    #line 679 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Enum __iter = HashMap_usize_TypeUsage_Enum__iter(&usages.enums);
-    #line 677 "src/compiler/Generator.pv"
+    #line 679 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Enum__next(&__iter)) {
-        #line 677 "src/compiler/Generator.pv"
+        #line 679 "src/compiler/Generator.pv"
         struct TypeUsage_Enum* usage = &HashMapIter_usize_TypeUsage_Enum__value(&__iter)->_1;
 
-        #line 677 "src/compiler/Generator.pv"
-        FileGenerator__generate_enum_loop(&file_gen, usage);
+        #line 679 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_enum_loop(&file_gen, usage) && success;
     } }
-    #line 678 "src/compiler/Generator.pv"
+    #line 680 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeUsage_Trait __iter = HashMap_usize_TypeUsage_Trait__iter(&usages.traits);
-    #line 678 "src/compiler/Generator.pv"
+    #line 680 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeUsage_Trait__next(&__iter)) {
-        #line 678 "src/compiler/Generator.pv"
+        #line 680 "src/compiler/Generator.pv"
         struct TypeUsage_Trait* usage = &HashMapIter_usize_TypeUsage_Trait__value(&__iter)->_1;
 
-        #line 678 "src/compiler/Generator.pv"
-        FileGenerator__generate_trait_loop(&file_gen, usage);
+        #line 680 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_trait_loop(&file_gen, usage) && success;
     } }
-    #line 679 "src/compiler/Generator.pv"
+    #line 681 "src/compiler/Generator.pv"
     { struct HashMapIter_usize_TypeFunctionUsage __iter = HashMap_usize_TypeFunctionUsage__iter(&usages.functions);
-    #line 679 "src/compiler/Generator.pv"
+    #line 681 "src/compiler/Generator.pv"
     while (HashMapIter_usize_TypeFunctionUsage__next(&__iter)) {
-        #line 679 "src/compiler/Generator.pv"
+        #line 681 "src/compiler/Generator.pv"
         struct TypeFunctionUsage* usage = &HashMapIter_usize_TypeFunctionUsage__value(&__iter)->_1;
 
-        #line 679 "src/compiler/Generator.pv"
-        FileGenerator__generate_function_loop(&file_gen, usage);
-    } }
-    #line 680 "src/compiler/Generator.pv"
-    { struct HashMapIter_usize_TypeUsage_Sequence __iter = HashMap_usize_TypeUsage_Sequence__iter(&usages.sequences);
-    #line 680 "src/compiler/Generator.pv"
-    while (HashMapIter_usize_TypeUsage_Sequence__next(&__iter)) {
-        #line 680 "src/compiler/Generator.pv"
-        struct TypeUsage_Sequence* usage = &HashMapIter_usize_TypeUsage_Sequence__value(&__iter)->_1;
-
-        #line 680 "src/compiler/Generator.pv"
-        FileGenerator__generate_sequence(&file_gen, usage);
-    } }
-    #line 681 "src/compiler/Generator.pv"
-    { struct HashMapIter_usize_TypeUsage_Tuple __iter = HashMap_usize_TypeUsage_Tuple__iter(&usages.tuples);
-    #line 681 "src/compiler/Generator.pv"
-    while (HashMapIter_usize_TypeUsage_Tuple__next(&__iter)) {
         #line 681 "src/compiler/Generator.pv"
-        struct TypeUsage_Tuple* usage = &HashMapIter_usize_TypeUsage_Tuple__value(&__iter)->_1;
-
-        #line 681 "src/compiler/Generator.pv"
-        FileGenerator__generate_tuple_loop(&file_gen, usage);
+        success = FileGenerator__generate_function_loop(&file_gen, usage) && success;
     } }
     #line 682 "src/compiler/Generator.pv"
-    FileGenerator__generate_globals_namespace(&file_gen, &root->children);
+    { struct HashMapIter_usize_TypeUsage_Sequence __iter = HashMap_usize_TypeUsage_Sequence__iter(&usages.sequences);
+    #line 682 "src/compiler/Generator.pv"
+    while (HashMapIter_usize_TypeUsage_Sequence__next(&__iter)) {
+        #line 682 "src/compiler/Generator.pv"
+        struct TypeUsage_Sequence* usage = &HashMapIter_usize_TypeUsage_Sequence__value(&__iter)->_1;
+
+        #line 682 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_sequence(&file_gen, usage) && success;
+    } }
     #line 683 "src/compiler/Generator.pv"
+    { struct HashMapIter_usize_TypeUsage_Tuple __iter = HashMap_usize_TypeUsage_Tuple__iter(&usages.tuples);
+    #line 683 "src/compiler/Generator.pv"
+    while (HashMapIter_usize_TypeUsage_Tuple__next(&__iter)) {
+        #line 683 "src/compiler/Generator.pv"
+        struct TypeUsage_Tuple* usage = &HashMapIter_usize_TypeUsage_Tuple__value(&__iter)->_1;
+
+        #line 683 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_tuple_loop(&file_gen, usage) && success;
+    } }
+    #line 684 "src/compiler/Generator.pv"
+    FileGenerator__generate_globals_namespace(&file_gen, &root->children);
+    #line 685 "src/compiler/Generator.pv"
     FileGenerator__generate_test_runner(&file_gen, &root->children);
 
-    #line 685 "src/compiler/Generator.pv"
+    #line 687 "src/compiler/Generator.pv"
+    if (!success) {
+        #line 688 "src/compiler/Generator.pv"
+        fprintf(stderr, "Generation failed\n");
+        #line 689 "src/compiler/Generator.pv"
+        return false;
+    }
+
+    #line 692 "src/compiler/Generator.pv"
     if (self.code_files.length > 0) {
-        #line 686 "src/compiler/Generator.pv"
+        #line 693 "src/compiler/Generator.pv"
         struct String command = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
-        #line 688 "src/compiler/Generator.pv"
+        #line 695 "src/compiler/Generator.pv"
         { struct Iter_ref_String __iter = Array_String__iter(&self.code_files);
-        #line 688 "src/compiler/Generator.pv"
+        #line 695 "src/compiler/Generator.pv"
         while (Iter_ref_String__next(&__iter)) {
-            #line 688 "src/compiler/Generator.pv"
+            #line 695 "src/compiler/Generator.pv"
             struct String* code_file = Iter_ref_String__value(&__iter);
 
-            #line 689 "src/compiler/Generator.pv"
+            #line 696 "src/compiler/Generator.pv"
             if (command.array.length > 0) {
-                #line 690 "src/compiler/Generator.pv"
+                #line 697 "src/compiler/Generator.pv"
                 String__append(&command, (struct str){ .ptr = output_seperator, .length = strlen(output_seperator) });
             }
 
-            #line 693 "src/compiler/Generator.pv"
+            #line 700 "src/compiler/Generator.pv"
             String__append(&command, String__as_str(code_file));
         } }
 
-        #line 696 "src/compiler/Generator.pv"
+        #line 703 "src/compiler/Generator.pv"
         uint32_t length = command.array.length;
-        #line 697 "src/compiler/Generator.pv"
+        #line 704 "src/compiler/Generator.pv"
         printf("%.*s\n", length, command.array.data);
     }
 
-    #line 700 "src/compiler/Generator.pv"
+    #line 707 "src/compiler/Generator.pv"
     return result;
 }

@@ -671,16 +671,23 @@ impl Generator {
 
         file_gen.create_directories(path, &root.children);
 
+        let success = true;
+
         let usages = Usages::new(&self);
-        for (_, &usage) in usages.primitives { file_gen.generate_primitive_loop(usage); }
-        for (_, &usage) in usages.structs { file_gen.generate_struct_loop(usage); }
-        for (_, &usage) in usages.enums { file_gen.generate_enum_loop(usage); }
-        for (_, &usage) in usages.traits { file_gen.generate_trait_loop(usage); }
-        for (_, &usage) in usages.functions { file_gen.generate_function_loop(usage); }
-        for (_, &usage) in usages.sequences { file_gen.generate_sequence(usage); }
-        for (_, &usage) in usages.tuples { file_gen.generate_tuple_loop(usage); }
+        for (_, &usage) in usages.primitives { success = file_gen.generate_primitive_loop(usage) && success; }
+        for (_, &usage) in usages.structs { success = file_gen.generate_struct_loop(usage) && success; }
+        for (_, &usage) in usages.enums { success = file_gen.generate_enum_loop(usage) && success; }
+        for (_, &usage) in usages.traits { success = file_gen.generate_trait_loop(usage) && success; }
+        for (_, &usage) in usages.functions { success = file_gen.generate_function_loop(usage) && success; }
+        for (_, &usage) in usages.sequences { success = file_gen.generate_sequence(usage) && success; }
+        for (_, &usage) in usages.tuples { success = file_gen.generate_tuple_loop(usage) && success; }
         file_gen.generate_globals_namespace(&root.children);
         file_gen.generate_test_runner(&root.children);
+
+        if !success {
+            fprintf(stderr, "Generation failed\n");
+            return false;
+        }
 
         if self.code_files.length > 0 {
             let command = String::new(allocator);

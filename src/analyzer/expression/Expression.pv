@@ -431,7 +431,7 @@ impl Expression {
     }
 
     fn parse(context: &Context, generics: *Generics) -> *Expression {
-        let result: *Expression = Expression::parse_primary(context, generics);
+        let result = Expression::parse_primary(context, generics);
         if result == null { return null; }
 
         result = Expression::parse_binary(context, result, 1, generics);
