@@ -4,6 +4,43 @@ use types
 use c
 
 impl Expression {
+    fn make_optional_return_type(context: &Context, token: &Token, type: &Type) -> *Type {
+        match type {
+            Type::Indirect(indirect) => {
+                match indirect.type {
+                    IndirectType::Reference => {
+                        return context.allocator.store(&Type::Indirect(Indirect::new_pointer(context.allocator, indirect.to)));
+                    },
+                    IndirectType::Pointer => { return type; },
+                    IndirectType::ConstPointer => { return type; },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        context.error_token(token, "?. must return a pointer or reference");
+        return null;
+    }
+
+    fn parse_optional_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
+        let token = context.expect(TokenType::Symbol);
+        if token == null { return null; }
+
+        if !inner.return_type.is_pointer() {
+            context.error_token(token, "?. can only be used on pointer values");
+            return null;
+        }
+
+        let value = Expression::parse_instance_member_expression(context, inner, generics);
+        if value == null { return null; }
+
+        let return_type = Expression::make_optional_return_type(context, value.token, &value.return_type);
+        if return_type == null { return null; }
+
+        return Expression::make(context.allocator, token, ExpressionData::OptionalExpression(inner, value), return_type);
+    }
+
     fn parse_type_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
         if !context.expect_value(TokenType::Symbol, "::") { return null; }
 
@@ -221,6 +258,8 @@ impl Expression {
 
         if token.eq(TokenType::Symbol, ".") {
             return Expression::parse_instance_member_expression(context, inner, generics);
+        } else if token.eq(TokenType::Symbol, "?") {
+            return Expression::parse_optional_expression(context, inner, generics);
         } else if token.eq(TokenType::Symbol, "::") {
             return Expression::parse_type_member_expression(context, inner, generics);
         } else if token.eq(TokenType::Symbol, "[") {

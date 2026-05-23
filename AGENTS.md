@@ -9,6 +9,12 @@ make all        # full bootstrap: dist/pavec → build/1 → build/2, verifies b
 make examples   # compile all examples using dist/pavec.exe
 ```
 
+On Windows from Codex/PowerShell, run `make all` through Git Bash so the Makefile uses Unix tools like `mkdir -p`, `rm`, `cp`, and `diff`:
+
+```powershell
+& 'C:\Program Files\Git\bin\bash.exe' -lc 'cd /c/Users/logan-gyxos/Repos/pave && make all'
+```
+
 The bootstrap stages:
 1. `dist/pavec.exe` compiles `src/` → `build/1/pavec.exe`
 2. `build/1/pavec.exe` compiles `src/` → `build/2/pavec.exe`

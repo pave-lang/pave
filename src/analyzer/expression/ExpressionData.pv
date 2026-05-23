@@ -11,6 +11,7 @@ enum ExpressionData {
     BinaryExpression(&Expression, str, &Expression),
     UnaryExpression(str, &Expression),
     IfExpression(&Expression, &Expression, &Expression),
+    OptionalExpression(&Expression, &Expression),
     MemberStaticExpression(&Expression, str),
     MemberInstanceExpression(&Expression, str),
     IndexExpression(&Expression, &Expression),

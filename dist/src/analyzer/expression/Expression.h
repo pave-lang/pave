@@ -106,18 +106,24 @@ struct Expression* Expression__parse_class(struct Context* context, struct Token
 struct Expression* Expression__parse_cpp(struct Context* context, struct Generics* generics);
 
 #line 7 "src/analyzer/expression/PostfixExpression.pv"
+struct Type* Expression__make_optional_return_type(struct Context* context, struct Token* token, struct Type* type);
+
+#line 26 "src/analyzer/expression/PostfixExpression.pv"
+struct Expression* Expression__parse_optional_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
+
+#line 44 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_type_member_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 28 "src/analyzer/expression/PostfixExpression.pv"
+#line 65 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_instance_member_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 124 "src/analyzer/expression/PostfixExpression.pv"
+#line 161 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 219 "src/analyzer/expression/PostfixExpression.pv"
+#line 256 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 320 "src/analyzer/expression/PostfixExpression.pv"
+#line 359 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 6 "src/analyzer/expression/BinaryExpression.pv"

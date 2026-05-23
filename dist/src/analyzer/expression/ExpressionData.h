@@ -18,6 +18,7 @@ struct ExpressionData {
         EXPRESSION_DATA__BINARY_EXPRESSION,
         EXPRESSION_DATA__UNARY_EXPRESSION,
         EXPRESSION_DATA__IF_EXPRESSION,
+        EXPRESSION_DATA__OPTIONAL_EXPRESSION,
         EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION,
         EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION,
         EXPRESSION_DATA__INDEX_EXPRESSION,
@@ -35,6 +36,7 @@ struct ExpressionData {
         struct { struct Expression* _0; struct str _1; struct Expression* _2; } binaryexpression_value;
         struct { struct str _0; struct Expression* _1; } unaryexpression_value;
         struct { struct Expression* _0; struct Expression* _1; struct Expression* _2; } ifexpression_value;
+        struct { struct Expression* _0; struct Expression* _1; } optionalexpression_value;
         struct { struct Expression* _0; struct str _1; } memberstaticexpression_value;
         struct { struct Expression* _0; struct str _1; } memberinstanceexpression_value;
         struct { struct Expression* _0; struct Expression* _1; } indexexpression_value;

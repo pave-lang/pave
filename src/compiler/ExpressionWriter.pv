@@ -621,6 +621,14 @@ impl ExpressionWriter {
                 self.write_expression(file, b, generics);
                 return true;
             },
+            ExpressionData::OptionalExpression(receiver, value) => {
+                fprintf(file, "(");
+                self.write_expression(file, receiver, generics);
+                fprintf(file, " == 0 ? 0 : ");
+                self.write_expression(file, value, generics);
+                fprintf(file, ")");
+                return true;
+            },
             ExpressionData::MemberStaticExpression(parent, member) => {
                 let parent_type = &parent.return_type;
                 match parent_type {

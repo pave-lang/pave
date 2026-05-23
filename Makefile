@@ -71,6 +71,7 @@ examples:
 	$(call build_example,cpp)
 	mv examples/cpp/*.cpp examples/cpp/out/
 	$(call build_example,ops)
+	$(call build_example,optional_access)
 	$(call build_example,tests)
 
 clean:

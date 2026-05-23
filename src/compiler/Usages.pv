@@ -918,6 +918,9 @@ impl Usages {
                 self.process_expression(a, generic_map);
                 self.process_expression(b, generic_map);
             },
+            ExpressionData::OptionalExpression(_, value) => {
+                self.process_expression(value, generic_map);
+            },
             ExpressionData::CppExpression(cpp_expression) => {
                 match cpp_expression {
                     CppExpression::New { placement, expression: new_expression } => {
