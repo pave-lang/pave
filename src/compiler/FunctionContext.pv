@@ -7,6 +7,7 @@ struct FunctionContext {
     use_scopes: bool,
     scopes: Array<FunctionScope>,
     coroutine: FunctionCoroutine,
+    optional_temp_count: usize,
 }
 
 impl FunctionContext {
@@ -17,6 +18,7 @@ impl FunctionContext {
             use_scopes,
             scopes: Array<FunctionScope>::new(allocator),
             coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
+            optional_temp_count: 0,
         };
 
         if self.use_scopes {
@@ -41,6 +43,7 @@ impl FunctionContext {
             use_scopes: false,
             scopes: Array<FunctionScope>::new(allocator),
             coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
+            optional_temp_count: 0,
         };
     }
 

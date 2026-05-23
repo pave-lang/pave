@@ -185,6 +185,15 @@ impl BlockWriter {
                     }
 
                     if value != null {
+                        match value.data {
+                            ExpressionData::OptionalExpression(_, _) => {
+                                fprintf(file, ";\n");
+                                if !expr.write_optional_assignment(file, name.value, type, value, generics) { return false; }
+                                continue;
+                            },
+                            _ => {},
+                        }
+
                         fprintf(file, " = ");
                         expr.write_expression(file, value, generics);
                     }

@@ -15,6 +15,161 @@ impl ExpressionWriter {
         return Self { generator };
     }
 
+    fn make_optional_temp_name(&self) -> str {
+        let name = String::new(self.generator.allocator);
+        name.append("__optional_");
+        name.append_usize(self.generator.function_context.optional_temp_count);
+        self.generator.function_context.optional_temp_count += 1;
+        return name.as_str();
+    }
+
+    fn write_expression_replacing(&self, file: &FILE, expression: &Expression, replace: &Expression, replacement_name: str, replacement_type: &Type, generics: &GenericMap) -> bool {
+        let generator = self.generator;
+
+        if expression == replace {
+            generator.write_variable(file, replacement_name);
+            return true;
+        }
+
+        match expression.data {
+            ExpressionData::Variable(name) => {
+                generator.write_variable(file, name);
+                return true;
+            },
+            ExpressionData::Literal(value) => {
+                generator.write_literal(file, &expression.return_type, value);
+                return true;
+            },
+            ExpressionData::NullLiteral => {
+                fprintf(file, "0");
+                return true;
+            },
+            ExpressionData::Type(type) => {
+                generator.write_type(file, type, generics);
+                return true;
+            },
+            ExpressionData::UnaryExpression(operator, inner) => {
+                generator.write_str(file, operator);
+                self.write_expression_replacing(file, inner, replace, replacement_name, replacement_type, generics);
+                return true;
+            },
+            ExpressionData::BinaryExpression(left, operator, right) => {
+                self.write_expression_replacing(file, left, replace, replacement_name, replacement_type, generics);
+                fprintf(file, " %.*s ", cast<i32>(operator.length), operator.ptr);
+                self.write_expression_replacing(file, right, replace, replacement_name, replacement_type, generics);
+                return true;
+            },
+            ExpressionData::MemberInstanceExpression(parent, member) => {
+                if generator.is_type_single_value_struct(&parent.return_type, generics) {
+                    let is_ref = Generator::is_reference(&parent.return_type);
+                    if is_ref { fprintf(file, "(*"); }
+                    self.write_expression_replacing(file, parent, replace, replacement_name, replacement_type, generics);
+                    if is_ref { fprintf(file, ")"); }
+                    return true;
+                }
+
+                self.write_expression_replacing(file, parent, replace, replacement_name, replacement_type, generics);
+                let parent_type = if parent == replace { replacement_type } else { &parent.return_type };
+                generator.write_instance_member_accessor(file, parent_type, generics);
+                if member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9' { fprintf(file, "_"); }
+                generator.write_str(file, member);
+                return true;
+            },
+            ExpressionData::Invoke(target, &arguments) => {
+                match target.data {
+                    ExpressionData::Type(type) => {
+                        match type.resolve_typedef() {
+                            Type::Function(func_info, generic_map) => {
+                                let resolved_generics = generic_map.resolve_types(generator.allocator, generics);
+                                let success = generator.write_function_name(file, func_info, &resolved_generics);
+                                fprintf(file, "(");
+                                let first = true;
+                                for arg in arguments {
+                                    if first { first = false; } else { fprintf(file, ", "); }
+                                    success = self.write_expression_replacing(file, arg.value, replace, replacement_name, replacement_type, generics) && success;
+                                }
+                                fprintf(file, ")");
+                                return success;
+                            },
+                            Type::FunctionC(func_info) => {
+                                let success = generator.write_str(file, func_info.name);
+                                fprintf(file, "(");
+                                let first = true;
+                                for arg in arguments {
+                                    if first { first = false; } else { fprintf(file, ", "); }
+                                    success = self.write_expression_replacing(file, arg.value, replace, replacement_name, replacement_type, generics) && success;
+                                }
+                                fprintf(file, ")");
+                                return success;
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
+
+                return self.write_invoke(file, target, arguments, generics);
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                fprintf(file, "(");
+                self.write_expression_replacing(file, inner, replace, replacement_name, replacement_type, generics);
+                fprintf(file, ")");
+                return true;
+            },
+            _ => {
+                return self.write_expression(file, expression, generics);
+            },
+        }
+
+        return false;
+    }
+
+    fn write_optional_assignment(&self, file: &FILE, target_name: str, target_type: &Type, expression: &Expression, generics: &GenericMap) -> bool {
+        let generator = self.generator;
+
+        match expression.data {
+            ExpressionData::OptionalExpression(receiver, value) => {
+                let receiver_temp = self.make_optional_temp_name();
+
+                generator.write_indent(file);
+                generator.write_variable_decl(file, receiver_temp, &receiver.return_type, generics);
+                fprintf(file, ";\n");
+
+                match receiver.data {
+                    ExpressionData::OptionalExpression(_, _) => {
+                        if !self.write_optional_assignment(file, receiver_temp, &receiver.return_type, receiver, generics) { return false; }
+                    },
+                    _ => {
+                        generator.write_indent(file);
+                        generator.write_variable(file, receiver_temp);
+                        fprintf(file, " = ");
+                        self.write_expression(file, receiver, generics);
+                        fprintf(file, ";\n");
+                    },
+                }
+
+                generator.write_indent(file);
+                generator.write_variable(file, target_name);
+                fprintf(file, " = (");
+                generator.write_variable(file, receiver_temp);
+                fprintf(file, " == 0 ? 0 : ");
+                self.write_expression_replacing(file, value, receiver, receiver_temp, &receiver.return_type, generics);
+                fprintf(file, ");\n");
+                return true;
+            },
+            _ => {
+                generator.write_indent(file);
+                generator.write_variable(file, target_name);
+                fprintf(file, " = ");
+                self.write_expression(file, expression, generics);
+                fprintf(file, ";\n");
+                return true;
+            },
+        }
+
+        return false;
+    }
+
     fn write_str_cast(&self, file: &FILE, inner_expr: &Expression, generics: &GenericMap, reference: bool) {
         if reference { fprintf(file, "&"); }
         fprintf(file, "(struct str){ .ptr = ");
