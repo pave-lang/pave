@@ -36,6 +36,8 @@ impl LanguageServer {
             pipe_write: cast<pipe_t>(null),
         });
 
+        if self == null { return null; }
+
         let use_stdio = true;
         for *arg in args.iter().skip(1) {
             if strncmp(arg, "--pipe=", 7) == 0 {
@@ -78,6 +80,7 @@ impl LanguageServer {
 
         self.root = Root::new(&self.analysis_alloc, &self.args, &self.clang_args, analysis);
         let root = self.root;
+        if root == null { return analysis; }
 
         for (filename, _) in analysis.files {
             let uri = Uri::file(&self.analysis_alloc, filename);
