@@ -15,11 +15,11 @@ impl ExpressionWriter {
         return Self { generator };
     }
 
-    fn make_optional_temp_name(&self) -> str {
+    fn make_optional_temp_name(&self, count: &usize) -> str {
         let name = String::new(self.generator.allocator);
         name.append("__optional_");
-        name.append_usize(self.generator.function_context.optional_temp_count);
-        self.generator.function_context.optional_temp_count += 1;
+        name.append_usize(*count);
+        *count = *count + 1;
         return name.as_str();
     }
 
@@ -146,55 +146,63 @@ impl ExpressionWriter {
         return false;
     }
 
-    fn write_optional_assignment(&self, file: &FILE, target_name: str, target_type: &Type, expression: &Expression, generics: &GenericMap) -> bool {
+    fn lower_optional_to_temp(&self, file: &FILE, expression: &Expression, generics: &GenericMap, count: &usize) -> str {
         let generator = self.generator;
 
         match expression.data {
             ExpressionData::OptionalExpression(receiver, value) => {
-                if self.is_safe_to_duplicate(receiver) {
+                if !self.is_safe_to_duplicate(receiver) {
+                    let inner_temp = self.lower_optional_to_temp(file, receiver, generics, count);
+                    let temp = self.make_optional_temp_name(count);
                     generator.write_indent(file);
-                    generator.write_variable(file, target_name);
-                    fprintf(file, " = ");
-                    self.write_expression(file, expression, generics);
-                    fprintf(file, ";\n");
-                    return true;
+                    generator.write_variable_decl(file, temp, &expression.return_type, generics);
+                    fprintf(file, " = (");
+                    generator.write_variable(file, inner_temp);
+                    fprintf(file, " == 0 ? 0 : ");
+                    self.write_expression_replacing(file, value, receiver, inner_temp, &receiver.return_type, generics);
+                    fprintf(file, ");\n");
+                    return temp;
                 }
-
-                let receiver_temp = self.make_optional_temp_name();
-
-                if self.optional_needs_lowering(receiver) {
-                    generator.write_indent(file);
-                    generator.write_variable_decl(file, receiver_temp, &receiver.return_type, generics);
-                    fprintf(file, ";\n");
-                    if !self.write_optional_assignment(file, receiver_temp, &receiver.return_type, receiver, generics) { return false; }
-                } else {
-                    generator.write_indent(file);
-                    generator.write_variable_decl(file, receiver_temp, &receiver.return_type, generics);
-                    fprintf(file, " = ");
-                    self.write_expression(file, receiver, generics);
-                    fprintf(file, ";\n");
-                }
-
-                generator.write_indent(file);
-                generator.write_variable(file, target_name);
-                fprintf(file, " = (");
-                generator.write_variable(file, receiver_temp);
-                fprintf(file, " == 0 ? 0 : ");
-                self.write_expression_replacing(file, value, receiver, receiver_temp, &receiver.return_type, generics);
-                fprintf(file, ");\n");
-                return true;
             },
-            _ => {
-                generator.write_indent(file);
-                generator.write_variable(file, target_name);
-                fprintf(file, " = ");
-                self.write_expression(file, expression, generics);
-                fprintf(file, ";\n");
-                return true;
-            },
+            _ => {},
         }
 
-        return false;
+        let temp = self.make_optional_temp_name(count);
+        generator.write_indent(file);
+        generator.write_variable_decl(file, temp, &expression.return_type, generics);
+        fprintf(file, " = ");
+        self.write_expression(file, expression, generics);
+        fprintf(file, ";\n");
+        return temp;
+    }
+
+    fn write_optional_assignment(&self, file: &FILE, target_name: str, target_type: &Type, expression: &Expression, generics: &GenericMap) -> bool {
+        let generator = self.generator;
+        let count: usize = 0;
+
+        match expression.data {
+            ExpressionData::OptionalExpression(receiver, value) => {
+                if !self.is_safe_to_duplicate(receiver) {
+                    let temp = self.lower_optional_to_temp(file, receiver, generics, &count);
+                    generator.write_indent(file);
+                    generator.write_variable(file, target_name);
+                    fprintf(file, " = (");
+                    generator.write_variable(file, temp);
+                    fprintf(file, " == 0 ? 0 : ");
+                    self.write_expression_replacing(file, value, receiver, temp, &receiver.return_type, generics);
+                    fprintf(file, ");\n");
+                    return true;
+                }
+            },
+            _ => {},
+        }
+
+        generator.write_indent(file);
+        generator.write_variable(file, target_name);
+        fprintf(file, " = ");
+        self.write_expression(file, expression, generics);
+        fprintf(file, ";\n");
+        return true;
     }
 
     fn write_str_cast(&self, file: &FILE, inner_expr: &Expression, generics: &GenericMap, reference: bool) {

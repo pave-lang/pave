@@ -13,3 +13,7 @@ int32_t* Asset__data(struct Asset* self) {
 struct Asset* Asset__next(struct Asset* self) {
     return 0;
 }
+
+struct Asset* Asset__next2(struct Asset* self) {
+    return 0;
+}
