@@ -78,6 +78,9 @@
 #include <std/Array_str.h>
 #include <analyzer/expression/CppExpression.h>
 #include <analyzer/c/UnknownC.h>
+#include <std/Array_NullNarrowing.h>
+#include <analyzer/expression/NullNarrowing.h>
+#include <std/Iter_ref_NullNarrowing.h>
 #include <analyzer/expression/Expression.h>
 
 #include <analyzer/expression/Expression.h>
@@ -4452,1098 +4455,965 @@ struct Expression* Expression__parse_postfix_chain(struct Context* context, stru
     return result;
 }
 
-#line 9 "src/analyzer/expression/BinaryExpression.pv"
+#line 14 "src/analyzer/expression/BinaryExpression.pv"
 bool Expression__build_narrow_path(struct Expression* self, struct String* out) {
-    #line 10 "src/analyzer/expression/BinaryExpression.pv"
+    #line 15 "src/analyzer/expression/BinaryExpression.pv"
     struct Expression* inner = self;
-    #line 11 "src/analyzer/expression/BinaryExpression.pv"
+    #line 16 "src/analyzer/expression/BinaryExpression.pv"
     switch (inner->data.type) {
-        #line 12 "src/analyzer/expression/BinaryExpression.pv"
+        #line 17 "src/analyzer/expression/BinaryExpression.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 12 "src/analyzer/expression/BinaryExpression.pv"
+            #line 17 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* child = inner->data.parenthesizedexpression_value;
-            #line 12 "src/analyzer/expression/BinaryExpression.pv"
+            #line 17 "src/analyzer/expression/BinaryExpression.pv"
             return Expression__build_narrow_path(child, out);
         } break;
-        #line 13 "src/analyzer/expression/BinaryExpression.pv"
+        #line 18 "src/analyzer/expression/BinaryExpression.pv"
         case EXPRESSION_DATA__VARIABLE: {
-            #line 13 "src/analyzer/expression/BinaryExpression.pv"
+            #line 18 "src/analyzer/expression/BinaryExpression.pv"
             struct str name = inner->data.variable_value;
-            #line 14 "src/analyzer/expression/BinaryExpression.pv"
+            #line 19 "src/analyzer/expression/BinaryExpression.pv"
             String__append(out, name);
-            #line 15 "src/analyzer/expression/BinaryExpression.pv"
+            #line 20 "src/analyzer/expression/BinaryExpression.pv"
             return true;
         } break;
-        #line 17 "src/analyzer/expression/BinaryExpression.pv"
+        #line 22 "src/analyzer/expression/BinaryExpression.pv"
         case EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION: {
-            #line 17 "src/analyzer/expression/BinaryExpression.pv"
+            #line 22 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* parent = inner->data.memberinstanceexpression_value._0;
-            #line 17 "src/analyzer/expression/BinaryExpression.pv"
+            #line 22 "src/analyzer/expression/BinaryExpression.pv"
             struct str member = inner->data.memberinstanceexpression_value._1;
-            #line 18 "src/analyzer/expression/BinaryExpression.pv"
+            #line 23 "src/analyzer/expression/BinaryExpression.pv"
             if (!Expression__build_narrow_path(parent, out)) {
-                #line 18 "src/analyzer/expression/BinaryExpression.pv"
+                #line 23 "src/analyzer/expression/BinaryExpression.pv"
                 return false;
             }
-            #line 19 "src/analyzer/expression/BinaryExpression.pv"
+            #line 24 "src/analyzer/expression/BinaryExpression.pv"
             String__append(out, (struct str){ .ptr = ".", .length = strlen(".") });
-            #line 20 "src/analyzer/expression/BinaryExpression.pv"
+            #line 25 "src/analyzer/expression/BinaryExpression.pv"
             String__append(out, member);
-            #line 21 "src/analyzer/expression/BinaryExpression.pv"
+            #line 26 "src/analyzer/expression/BinaryExpression.pv"
             return true;
         } break;
-        #line 23 "src/analyzer/expression/BinaryExpression.pv"
+        #line 28 "src/analyzer/expression/BinaryExpression.pv"
         default: {
-            #line 23 "src/analyzer/expression/BinaryExpression.pv"
+            #line 28 "src/analyzer/expression/BinaryExpression.pv"
             return false;
         } break;
     }
 }
 
-#line 32 "src/analyzer/expression/BinaryExpression.pv"
-struct Type* Expression__detect_null_narrowing(struct Context* context, struct Expression* expr, bool narrow_on_true) {
-    #line 33 "src/analyzer/expression/BinaryExpression.pv"
+#line 36 "src/analyzer/expression/BinaryExpression.pv"
+void Expression__collect_null_narrowings(struct Context* context, struct Expression* expr, bool narrow_on_true, struct Array_NullNarrowing* out) {
+    #line 37 "src/analyzer/expression/BinaryExpression.pv"
     struct Expression* inner = expr;
-    #line 34 "src/analyzer/expression/BinaryExpression.pv"
+    #line 38 "src/analyzer/expression/BinaryExpression.pv"
     switch (inner->data.type) {
-        #line 35 "src/analyzer/expression/BinaryExpression.pv"
+        #line 39 "src/analyzer/expression/BinaryExpression.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 35 "src/analyzer/expression/BinaryExpression.pv"
+            #line 39 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* child = inner->data.parenthesizedexpression_value;
-            #line 35 "src/analyzer/expression/BinaryExpression.pv"
+            #line 39 "src/analyzer/expression/BinaryExpression.pv"
             inner = child;
         } break;
-        #line 36 "src/analyzer/expression/BinaryExpression.pv"
+        #line 40 "src/analyzer/expression/BinaryExpression.pv"
         default: {
         } break;
     }
 
-    #line 39 "src/analyzer/expression/BinaryExpression.pv"
+    #line 43 "src/analyzer/expression/BinaryExpression.pv"
     switch (inner->data.type) {
-        #line 40 "src/analyzer/expression/BinaryExpression.pv"
+        #line 44 "src/analyzer/expression/BinaryExpression.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 40 "src/analyzer/expression/BinaryExpression.pv"
+            #line 44 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* lhs = inner->data.binaryexpression_value._0;
-            #line 40 "src/analyzer/expression/BinaryExpression.pv"
+            #line 44 "src/analyzer/expression/BinaryExpression.pv"
             struct str op = inner->data.binaryexpression_value._1;
-            #line 40 "src/analyzer/expression/BinaryExpression.pv"
+            #line 44 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* rhs = inner->data.binaryexpression_value._2;
-            #line 41 "src/analyzer/expression/BinaryExpression.pv"
+            #line 45 "src/analyzer/expression/BinaryExpression.pv"
             if (str__Eq_str__eq(&op, (struct str){ .ptr = "||", .length = strlen("||") }) && !narrow_on_true) {
-                #line 42 "src/analyzer/expression/BinaryExpression.pv"
-                struct Type* left = Expression__detect_null_narrowing(context, lhs, false);
-                #line 43 "src/analyzer/expression/BinaryExpression.pv"
-                if (left != 0) {
-                    #line 43 "src/analyzer/expression/BinaryExpression.pv"
-                    return left;
-                }
-                #line 44 "src/analyzer/expression/BinaryExpression.pv"
-                return Expression__detect_null_narrowing(context, rhs, false);
-            }
-            #line 46 "src/analyzer/expression/BinaryExpression.pv"
-            if (str__Eq_str__eq(&op, (struct str){ .ptr = "&&", .length = strlen("&&") }) && narrow_on_true) {
+                #line 46 "src/analyzer/expression/BinaryExpression.pv"
+                Expression__collect_null_narrowings(context, lhs, false, out);
                 #line 47 "src/analyzer/expression/BinaryExpression.pv"
-                struct Type* left = Expression__detect_null_narrowing(context, lhs, true);
+                Expression__collect_null_narrowings(context, rhs, false, out);
                 #line 48 "src/analyzer/expression/BinaryExpression.pv"
-                if (left != 0) {
-                    #line 48 "src/analyzer/expression/BinaryExpression.pv"
-                    return left;
-                }
-                #line 49 "src/analyzer/expression/BinaryExpression.pv"
-                return Expression__detect_null_narrowing(context, rhs, true);
+                return;
             }
-
-            #line 52 "src/analyzer/expression/BinaryExpression.pv"
-            struct str want_op = (struct str){ .ptr = narrow_on_true ? "!=" : "==", .length = strlen(narrow_on_true ? "!=" : "==") };
-            #line 53 "src/analyzer/expression/BinaryExpression.pv"
-            if (!str__Eq_str__eq(&op, want_op)) {
+            #line 50 "src/analyzer/expression/BinaryExpression.pv"
+            if (str__Eq_str__eq(&op, (struct str){ .ptr = "&&", .length = strlen("&&") }) && narrow_on_true) {
+                #line 51 "src/analyzer/expression/BinaryExpression.pv"
+                Expression__collect_null_narrowings(context, lhs, true, out);
+                #line 52 "src/analyzer/expression/BinaryExpression.pv"
+                Expression__collect_null_narrowings(context, rhs, true, out);
                 #line 53 "src/analyzer/expression/BinaryExpression.pv"
-                return 0;
+                return;
             }
 
-            #line 55 "src/analyzer/expression/BinaryExpression.pv"
-            struct String path_check = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
             #line 56 "src/analyzer/expression/BinaryExpression.pv"
-            struct Expression* var_expr = 0;
+            struct str want_op = (struct str){ .ptr = narrow_on_true ? "!=" : "==", .length = strlen(narrow_on_true ? "!=" : "==") };
             #line 57 "src/analyzer/expression/BinaryExpression.pv"
-            struct Expression* other = 0;
+            if (!str__Eq_str__eq(&op, want_op)) {
+                #line 57 "src/analyzer/expression/BinaryExpression.pv"
+                return;
+            }
 
             #line 59 "src/analyzer/expression/BinaryExpression.pv"
-            if (Expression__build_narrow_path(lhs, &path_check)) {
-                #line 59 "src/analyzer/expression/BinaryExpression.pv"
-                var_expr = lhs;
-                #line 59 "src/analyzer/expression/BinaryExpression.pv"
-                other = rhs;
-            }
-
-            #line 61 "src/analyzer/expression/BinaryExpression.pv"
-            if (var_expr == 0) {
-                #line 62 "src/analyzer/expression/BinaryExpression.pv"
-                struct String path_check2 = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 63 "src/analyzer/expression/BinaryExpression.pv"
-                if (Expression__build_narrow_path(rhs, &path_check2)) {
-                    #line 63 "src/analyzer/expression/BinaryExpression.pv"
-                    var_expr = rhs;
-                    #line 63 "src/analyzer/expression/BinaryExpression.pv"
-                    other = lhs;
-                } else {
-                    #line 64 "src/analyzer/expression/BinaryExpression.pv"
-                    return 0;
-                }
-            }
-
-            #line 67 "src/analyzer/expression/BinaryExpression.pv"
-            if (other == 0) {
-                #line 67 "src/analyzer/expression/BinaryExpression.pv"
-                return 0;
-            }
-            #line 68 "src/analyzer/expression/BinaryExpression.pv"
-            struct Expression* other_inner = other;
-            #line 69 "src/analyzer/expression/BinaryExpression.pv"
-            switch (other_inner->data.type) {
-                #line 70 "src/analyzer/expression/BinaryExpression.pv"
-                case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-                    #line 70 "src/analyzer/expression/BinaryExpression.pv"
-                    struct Expression* c = other_inner->data.parenthesizedexpression_value;
-                    #line 70 "src/analyzer/expression/BinaryExpression.pv"
-                    other_inner = c;
-                } break;
-                #line 71 "src/analyzer/expression/BinaryExpression.pv"
-                default: {
-                } break;
-            }
-            #line 73 "src/analyzer/expression/BinaryExpression.pv"
-            if (other_inner == 0) {
-                #line 73 "src/analyzer/expression/BinaryExpression.pv"
-                return 0;
-            }
-
-            #line 75 "src/analyzer/expression/BinaryExpression.pv"
-            switch (other_inner->data.type) {
-                #line 76 "src/analyzer/expression/BinaryExpression.pv"
-                case EXPRESSION_DATA__NULL_LITERAL: {
-                } break;
-                #line 77 "src/analyzer/expression/BinaryExpression.pv"
-                default: {
-                    #line 77 "src/analyzer/expression/BinaryExpression.pv"
-                    return 0;
-                } break;
-            }
-
-            #line 80 "src/analyzer/expression/BinaryExpression.pv"
-            if (var_expr == 0) {
-                #line 80 "src/analyzer/expression/BinaryExpression.pv"
-                return 0;
-            }
-            #line 81 "src/analyzer/expression/BinaryExpression.pv"
-            switch (var_expr->return_type.type) {
-                #line 82 "src/analyzer/expression/BinaryExpression.pv"
-                case TYPE__INDIRECT: {
-                    #line 82 "src/analyzer/expression/BinaryExpression.pv"
-                    struct Indirect* indirect = var_expr->return_type.indirect_value;
-                    #line 83 "src/analyzer/expression/BinaryExpression.pv"
-                    if (indirect->type != INDIRECT_TYPE__POINTER && indirect->type != INDIRECT_TYPE__CONST_POINTER) {
-                        #line 84 "src/analyzer/expression/BinaryExpression.pv"
-                        return 0;
-                    }
-                    #line 86 "src/analyzer/expression/BinaryExpression.pv"
-                    struct Indirect* ref_indirect = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, indirect->to);
-                    #line 87 "src/analyzer/expression/BinaryExpression.pv"
-                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = ref_indirect }});
-                } break;
-                #line 89 "src/analyzer/expression/BinaryExpression.pv"
-                default: {
-                    #line 89 "src/analyzer/expression/BinaryExpression.pv"
-                    return 0;
-                } break;
-            }
-        } break;
-        #line 92 "src/analyzer/expression/BinaryExpression.pv"
-        default: {
-            #line 92 "src/analyzer/expression/BinaryExpression.pv"
-            return 0;
-        } break;
-    }
-
-    #line 95 "src/analyzer/expression/BinaryExpression.pv"
-    return 0;
-}
-
-#line 98 "src/analyzer/expression/BinaryExpression.pv"
-struct str Expression__narrowed_var_name(struct Context* context, struct Expression* expr, bool narrow_on_true) {
-    #line 99 "src/analyzer/expression/BinaryExpression.pv"
-    struct Expression* inner = expr;
-    #line 100 "src/analyzer/expression/BinaryExpression.pv"
-    switch (inner->data.type) {
-        #line 101 "src/analyzer/expression/BinaryExpression.pv"
-        case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 101 "src/analyzer/expression/BinaryExpression.pv"
-            struct Expression* child = inner->data.parenthesizedexpression_value;
-            #line 101 "src/analyzer/expression/BinaryExpression.pv"
-            inner = child;
-        } break;
-        #line 102 "src/analyzer/expression/BinaryExpression.pv"
-        default: {
-        } break;
-    }
-
-    #line 105 "src/analyzer/expression/BinaryExpression.pv"
-    switch (inner->data.type) {
-        #line 106 "src/analyzer/expression/BinaryExpression.pv"
-        case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 106 "src/analyzer/expression/BinaryExpression.pv"
-            struct Expression* lhs = inner->data.binaryexpression_value._0;
-            #line 106 "src/analyzer/expression/BinaryExpression.pv"
-            struct str op = inner->data.binaryexpression_value._1;
-            #line 106 "src/analyzer/expression/BinaryExpression.pv"
-            struct Expression* rhs = inner->data.binaryexpression_value._2;
-            #line 107 "src/analyzer/expression/BinaryExpression.pv"
-            if (str__Eq_str__eq(&op, (struct str){ .ptr = "||", .length = strlen("||") }) && !narrow_on_true) {
-                #line 108 "src/analyzer/expression/BinaryExpression.pv"
-                struct str left = Expression__narrowed_var_name(context, lhs, false);
-                #line 109 "src/analyzer/expression/BinaryExpression.pv"
-                if (left.length > 0) {
-                    #line 109 "src/analyzer/expression/BinaryExpression.pv"
-                    return left;
-                }
-                #line 110 "src/analyzer/expression/BinaryExpression.pv"
-                return Expression__narrowed_var_name(context, rhs, false);
-            }
-            #line 112 "src/analyzer/expression/BinaryExpression.pv"
-            if (str__Eq_str__eq(&op, (struct str){ .ptr = "&&", .length = strlen("&&") }) && narrow_on_true) {
-                #line 113 "src/analyzer/expression/BinaryExpression.pv"
-                struct str left = Expression__narrowed_var_name(context, lhs, true);
-                #line 114 "src/analyzer/expression/BinaryExpression.pv"
-                if (left.length > 0) {
-                    #line 114 "src/analyzer/expression/BinaryExpression.pv"
-                    return left;
-                }
-                #line 115 "src/analyzer/expression/BinaryExpression.pv"
-                return Expression__narrowed_var_name(context, rhs, true);
-            }
-
-            #line 118 "src/analyzer/expression/BinaryExpression.pv"
-            struct str want_op = (struct str){ .ptr = narrow_on_true ? "!=" : "==", .length = strlen(narrow_on_true ? "!=" : "==") };
-            #line 119 "src/analyzer/expression/BinaryExpression.pv"
-            if (!str__Eq_str__eq(&op, want_op)) {
-                #line 119 "src/analyzer/expression/BinaryExpression.pv"
-                return (struct str) { .ptr = 0, .length = 0 };
-            }
-            #line 122 "src/analyzer/expression/BinaryExpression.pv"
             struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-            #line 123 "src/analyzer/expression/BinaryExpression.pv"
+            #line 60 "src/analyzer/expression/BinaryExpression.pv"
+            struct Expression* var_expr = 0;
+            #line 61 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* other = 0;
 
-            #line 125 "src/analyzer/expression/BinaryExpression.pv"
+            #line 63 "src/analyzer/expression/BinaryExpression.pv"
             if (Expression__build_narrow_path(lhs, &path)) {
-                #line 125 "src/analyzer/expression/BinaryExpression.pv"
+                #line 63 "src/analyzer/expression/BinaryExpression.pv"
+                var_expr = lhs;
+                #line 63 "src/analyzer/expression/BinaryExpression.pv"
                 other = rhs;
             } else {
-                #line 127 "src/analyzer/expression/BinaryExpression.pv"
+                #line 65 "src/analyzer/expression/BinaryExpression.pv"
                 struct String path2 = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 128 "src/analyzer/expression/BinaryExpression.pv"
+                #line 66 "src/analyzer/expression/BinaryExpression.pv"
                 if (Expression__build_narrow_path(rhs, &path2)) {
-                    #line 129 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 66 "src/analyzer/expression/BinaryExpression.pv"
+                    var_expr = rhs;
+                    #line 66 "src/analyzer/expression/BinaryExpression.pv"
                     other = lhs;
-                    #line 130 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 66 "src/analyzer/expression/BinaryExpression.pv"
                     path = path2;
                 } else {
-                    #line 132 "src/analyzer/expression/BinaryExpression.pv"
-                    return (struct str) { .ptr = 0, .length = 0 };
+                    #line 67 "src/analyzer/expression/BinaryExpression.pv"
+                    return;
                 }
             }
 
-            #line 136 "src/analyzer/expression/BinaryExpression.pv"
+            #line 70 "src/analyzer/expression/BinaryExpression.pv"
             if (other == 0) {
-                #line 136 "src/analyzer/expression/BinaryExpression.pv"
-                return (struct str) { .ptr = 0, .length = 0 };
+                #line 70 "src/analyzer/expression/BinaryExpression.pv"
+                return;
             }
-            #line 137 "src/analyzer/expression/BinaryExpression.pv"
+            #line 71 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* other_inner = other;
-            #line 138 "src/analyzer/expression/BinaryExpression.pv"
+            #line 72 "src/analyzer/expression/BinaryExpression.pv"
             switch (other_inner->data.type) {
-                #line 139 "src/analyzer/expression/BinaryExpression.pv"
+                #line 73 "src/analyzer/expression/BinaryExpression.pv"
                 case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-                    #line 139 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 73 "src/analyzer/expression/BinaryExpression.pv"
                     struct Expression* c = other_inner->data.parenthesizedexpression_value;
-                    #line 139 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 73 "src/analyzer/expression/BinaryExpression.pv"
                     other_inner = c;
                 } break;
-                #line 140 "src/analyzer/expression/BinaryExpression.pv"
+                #line 74 "src/analyzer/expression/BinaryExpression.pv"
                 default: {
                 } break;
             }
-            #line 142 "src/analyzer/expression/BinaryExpression.pv"
+            #line 76 "src/analyzer/expression/BinaryExpression.pv"
             if (other_inner == 0) {
-                #line 142 "src/analyzer/expression/BinaryExpression.pv"
-                return (struct str) { .ptr = 0, .length = 0 };
+                #line 76 "src/analyzer/expression/BinaryExpression.pv"
+                return;
             }
-            #line 143 "src/analyzer/expression/BinaryExpression.pv"
+            #line 77 "src/analyzer/expression/BinaryExpression.pv"
             switch (other_inner->data.type) {
-                #line 144 "src/analyzer/expression/BinaryExpression.pv"
+                #line 78 "src/analyzer/expression/BinaryExpression.pv"
                 case EXPRESSION_DATA__NULL_LITERAL: {
                 } break;
-                #line 145 "src/analyzer/expression/BinaryExpression.pv"
+                #line 79 "src/analyzer/expression/BinaryExpression.pv"
                 default: {
-                    #line 145 "src/analyzer/expression/BinaryExpression.pv"
-                    return (struct str) { .ptr = 0, .length = 0 };
+                    #line 79 "src/analyzer/expression/BinaryExpression.pv"
+                    return;
                 } break;
             }
 
-            #line 148 "src/analyzer/expression/BinaryExpression.pv"
-            return String__as_str(&path);
+            #line 82 "src/analyzer/expression/BinaryExpression.pv"
+            if (var_expr == 0) {
+                #line 82 "src/analyzer/expression/BinaryExpression.pv"
+                return;
+            }
+            #line 83 "src/analyzer/expression/BinaryExpression.pv"
+            switch (var_expr->return_type.type) {
+                #line 84 "src/analyzer/expression/BinaryExpression.pv"
+                case TYPE__INDIRECT: {
+                    #line 84 "src/analyzer/expression/BinaryExpression.pv"
+                    struct Indirect* indirect = var_expr->return_type.indirect_value;
+                    #line 85 "src/analyzer/expression/BinaryExpression.pv"
+                    if (indirect->type != INDIRECT_TYPE__POINTER && indirect->type != INDIRECT_TYPE__CONST_POINTER) {
+                        #line 86 "src/analyzer/expression/BinaryExpression.pv"
+                        return;
+                    }
+                    #line 88 "src/analyzer/expression/BinaryExpression.pv"
+                    struct Indirect* ref_indirect = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, indirect->to);
+                    #line 89 "src/analyzer/expression/BinaryExpression.pv"
+                    struct Type type_val = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = ref_indirect };
+                    #line 90 "src/analyzer/expression/BinaryExpression.pv"
+                    struct Type* stored = ArenaAllocator__store_Type(context->allocator, &type_val);
+                    #line 91 "src/analyzer/expression/BinaryExpression.pv"
+                    if (stored == 0) {
+                        #line 91 "src/analyzer/expression/BinaryExpression.pv"
+                        return;
+                    }
+                    #line 92 "src/analyzer/expression/BinaryExpression.pv"
+                    Array_NullNarrowing__append(out, (struct NullNarrowing) { .path = String__as_str(&path), .type = stored });
+                } break;
+                #line 94 "src/analyzer/expression/BinaryExpression.pv"
+                default: {
+                } break;
+            }
         } break;
-        #line 150 "src/analyzer/expression/BinaryExpression.pv"
+        #line 97 "src/analyzer/expression/BinaryExpression.pv"
         default: {
         } break;
     }
-    #line 152 "src/analyzer/expression/BinaryExpression.pv"
-    return (struct str) { .ptr = 0, .length = 0 };
 }
 
-#line 155 "src/analyzer/expression/BinaryExpression.pv"
+#line 101 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics) {
-    #line 156 "src/analyzer/expression/BinaryExpression.pv"
+    #line 102 "src/analyzer/expression/BinaryExpression.pv"
     struct Expression* result = lhs;
 
-    #line 158 "src/analyzer/expression/BinaryExpression.pv"
+    #line 104 "src/analyzer/expression/BinaryExpression.pv"
     while (true) {
-        #line 159 "src/analyzer/expression/BinaryExpression.pv"
+        #line 105 "src/analyzer/expression/BinaryExpression.pv"
         struct Token* token = Context__current(context);
-        #line 160 "src/analyzer/expression/BinaryExpression.pv"
+        #line 106 "src/analyzer/expression/BinaryExpression.pv"
         uintptr_t prec = Expression__get_precedence(token);
-        #line 161 "src/analyzer/expression/BinaryExpression.pv"
+        #line 107 "src/analyzer/expression/BinaryExpression.pv"
         if (prec < min_prec) {
-            #line 161 "src/analyzer/expression/BinaryExpression.pv"
+            #line 107 "src/analyzer/expression/BinaryExpression.pv"
             break;
         }
 
-        #line 163 "src/analyzer/expression/BinaryExpression.pv"
+        #line 109 "src/analyzer/expression/BinaryExpression.pv"
         struct Token* operator = Context__expect(context, TOKEN_TYPE__SYMBOL);
-        #line 164 "src/analyzer/expression/BinaryExpression.pv"
+        #line 110 "src/analyzer/expression/BinaryExpression.pv"
         if (operator == 0) {
-            #line 164 "src/analyzer/expression/BinaryExpression.pv"
+            #line 110 "src/analyzer/expression/BinaryExpression.pv"
             return 0;
         }
-        #line 169 "src/analyzer/expression/BinaryExpression.pv"
+        #line 115 "src/analyzer/expression/BinaryExpression.pv"
         bool pushed_narrow_scope = false;
-        #line 170 "src/analyzer/expression/BinaryExpression.pv"
+        #line 116 "src/analyzer/expression/BinaryExpression.pv"
         if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "||", .length = strlen("||") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "&&", .length = strlen("&&") })) {
-            #line 171 "src/analyzer/expression/BinaryExpression.pv"
+            #line 117 "src/analyzer/expression/BinaryExpression.pv"
             bool narrow_on_true_for_rhs = str__Eq_str__eq(&operator->value, (struct str){ .ptr = "&&", .length = strlen("&&") });
-            #line 172 "src/analyzer/expression/BinaryExpression.pv"
-            struct Type* rhs_narrow_type = Expression__detect_null_narrowing(context, result, narrow_on_true_for_rhs);
-            #line 173 "src/analyzer/expression/BinaryExpression.pv"
-            if (rhs_narrow_type != 0) {
-                #line 174 "src/analyzer/expression/BinaryExpression.pv"
-                struct str var_name = Expression__narrowed_var_name(context, result, narrow_on_true_for_rhs);
-                #line 175 "src/analyzer/expression/BinaryExpression.pv"
-                if (var_name.length > 0) {
-                    #line 176 "src/analyzer/expression/BinaryExpression.pv"
-                    Context__push_scope(context, 0);
-                    #line 177 "src/analyzer/expression/BinaryExpression.pv"
-                    Context__set_narrowed(context, var_name, rhs_narrow_type);
-                    #line 178 "src/analyzer/expression/BinaryExpression.pv"
-                    pushed_narrow_scope = true;
-                }
+            #line 118 "src/analyzer/expression/BinaryExpression.pv"
+            struct Array_NullNarrowing narrowings = Array_NullNarrowing__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+            #line 119 "src/analyzer/expression/BinaryExpression.pv"
+            Expression__collect_null_narrowings(context, result, narrow_on_true_for_rhs, &narrowings);
+            #line 120 "src/analyzer/expression/BinaryExpression.pv"
+            if (narrowings.length > 0) {
+                #line 121 "src/analyzer/expression/BinaryExpression.pv"
+                Context__push_scope(context, 0);
+                #line 122 "src/analyzer/expression/BinaryExpression.pv"
+                { struct Iter_ref_NullNarrowing __iter = Array_NullNarrowing__iter(&narrowings);
+                #line 122 "src/analyzer/expression/BinaryExpression.pv"
+                while (Iter_ref_NullNarrowing__next(&__iter)) {
+                    #line 122 "src/analyzer/expression/BinaryExpression.pv"
+                    struct NullNarrowing* narrow = Iter_ref_NullNarrowing__value(&__iter);
+
+                    #line 123 "src/analyzer/expression/BinaryExpression.pv"
+                    Context__set_narrowed(context, narrow->path, narrow->type);
+                } }
+                #line 125 "src/analyzer/expression/BinaryExpression.pv"
+                pushed_narrow_scope = true;
             }
         }
 
-        #line 183 "src/analyzer/expression/BinaryExpression.pv"
+        #line 129 "src/analyzer/expression/BinaryExpression.pv"
         struct Expression* rhs = Expression__parse_primary(context, generics);
-        #line 184 "src/analyzer/expression/BinaryExpression.pv"
+        #line 130 "src/analyzer/expression/BinaryExpression.pv"
         if (rhs == 0) {
-            #line 184 "src/analyzer/expression/BinaryExpression.pv"
+            #line 130 "src/analyzer/expression/BinaryExpression.pv"
             if (pushed_narrow_scope) {
-                #line 184 "src/analyzer/expression/BinaryExpression.pv"
+                #line 130 "src/analyzer/expression/BinaryExpression.pv"
                 Context__pop_scope(context);
             }
-            #line 184 "src/analyzer/expression/BinaryExpression.pv"
+            #line 130 "src/analyzer/expression/BinaryExpression.pv"
             return 0;
         }
 
-        #line 186 "src/analyzer/expression/BinaryExpression.pv"
+        #line 132 "src/analyzer/expression/BinaryExpression.pv"
         struct Expression* rhs_final = Expression__parse_binary(context, rhs, prec + 1, generics);
-        #line 187 "src/analyzer/expression/BinaryExpression.pv"
+        #line 133 "src/analyzer/expression/BinaryExpression.pv"
         if (rhs_final == 0) {
-            #line 187 "src/analyzer/expression/BinaryExpression.pv"
+            #line 133 "src/analyzer/expression/BinaryExpression.pv"
             if (pushed_narrow_scope) {
-                #line 187 "src/analyzer/expression/BinaryExpression.pv"
+                #line 133 "src/analyzer/expression/BinaryExpression.pv"
                 Context__pop_scope(context);
             }
-            #line 187 "src/analyzer/expression/BinaryExpression.pv"
+            #line 133 "src/analyzer/expression/BinaryExpression.pv"
             return 0;
         }
 
-        #line 189 "src/analyzer/expression/BinaryExpression.pv"
+        #line 135 "src/analyzer/expression/BinaryExpression.pv"
         if (pushed_narrow_scope) {
-            #line 189 "src/analyzer/expression/BinaryExpression.pv"
+            #line 135 "src/analyzer/expression/BinaryExpression.pv"
             Context__pop_scope(context);
         }
 
-        #line 191 "src/analyzer/expression/BinaryExpression.pv"
+        #line 137 "src/analyzer/expression/BinaryExpression.pv"
         bool is_arithmetic = str__Eq_str__eq(&operator->value, (struct str){ .ptr = "*", .length = strlen("*") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "+", .length = strlen("+") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "-", .length = strlen("-") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "/", .length = strlen("/") });
 
-        #line 195 "src/analyzer/expression/BinaryExpression.pv"
+        #line 141 "src/analyzer/expression/BinaryExpression.pv"
         bool is_trait_op = is_arithmetic || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "<", .length = strlen("<") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = ">", .length = strlen(">") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "<=", .length = strlen("<=") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = ">=", .length = strlen(">=") });
 
-        #line 199 "src/analyzer/expression/BinaryExpression.pv"
+        #line 145 "src/analyzer/expression/BinaryExpression.pv"
         if (is_trait_op) {
-            #line 200 "src/analyzer/expression/BinaryExpression.pv"
+            #line 146 "src/analyzer/expression/BinaryExpression.pv"
             struct Expression* trait_result = Expression__find_operator_trait_call(context, token, result, &result->return_type, operator->value, rhs_final);
-            #line 201 "src/analyzer/expression/BinaryExpression.pv"
+            #line 147 "src/analyzer/expression/BinaryExpression.pv"
             if (trait_result != 0) {
-                #line 202 "src/analyzer/expression/BinaryExpression.pv"
+                #line 148 "src/analyzer/expression/BinaryExpression.pv"
                 result = trait_result;
-                #line 203 "src/analyzer/expression/BinaryExpression.pv"
+                #line 149 "src/analyzer/expression/BinaryExpression.pv"
                 continue;
             }
         }
 
-        #line 207 "src/analyzer/expression/BinaryExpression.pv"
+        #line 153 "src/analyzer/expression/BinaryExpression.pv"
         bool is_comparison = str__Eq_str__eq(&operator->value, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "!=", .length = strlen("!=") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "<=", .length = strlen("<=") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = ">=", .length = strlen(">=") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "<", .length = strlen("<") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = ">", .length = strlen(">") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "||", .length = strlen("||") }) || str__Eq_str__eq(&operator->value, (struct str){ .ptr = "&&", .length = strlen("&&") });
 
-        #line 213 "src/analyzer/expression/BinaryExpression.pv"
+        #line 159 "src/analyzer/expression/BinaryExpression.pv"
         struct Type* return_type = 0;
-        #line 214 "src/analyzer/expression/BinaryExpression.pv"
+        #line 160 "src/analyzer/expression/BinaryExpression.pv"
         if (is_comparison) {
-            #line 215 "src/analyzer/expression/BinaryExpression.pv"
+            #line 161 "src/analyzer/expression/BinaryExpression.pv"
             if (!str__Eq_str__eq(&operator->value, (struct str){ .ptr = "||", .length = strlen("||") }) && !str__Eq_str__eq(&operator->value, (struct str){ .ptr = "&&", .length = strlen("&&") })) {
-                #line 216 "src/analyzer/expression/BinaryExpression.pv"
+                #line 162 "src/analyzer/expression/BinaryExpression.pv"
                 if (!Expression__validate_type(result, context, &rhs_final->return_type, false)) {
-                    #line 216 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 162 "src/analyzer/expression/BinaryExpression.pv"
                     return 0;
                 }
-                #line 219 "src/analyzer/expression/BinaryExpression.pv"
+                #line 165 "src/analyzer/expression/BinaryExpression.pv"
                 switch (rhs_final->data.type) {
-                    #line 220 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 166 "src/analyzer/expression/BinaryExpression.pv"
                     case EXPRESSION_DATA__NULL_LITERAL: {
-                        #line 221 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 167 "src/analyzer/expression/BinaryExpression.pv"
                         Expression__validate_type(rhs_final, context, &result->return_type, false);
                     } break;
-                    #line 223 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 169 "src/analyzer/expression/BinaryExpression.pv"
                     case EXPRESSION_DATA__LITERAL: {
-                        #line 223 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 169 "src/analyzer/expression/BinaryExpression.pv"
                         struct str value = rhs_final->data.literal_value;
-                        #line 224 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 170 "src/analyzer/expression/BinaryExpression.pv"
                         if (str__Eq_str__eq(&value, (struct str){ .ptr = "0", .length = strlen("0") })) {
-                            #line 225 "src/analyzer/expression/BinaryExpression.pv"
+                            #line 171 "src/analyzer/expression/BinaryExpression.pv"
                             Expression__validate_type(rhs_final, context, &result->return_type, false);
                         }
                     } break;
-                    #line 228 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 174 "src/analyzer/expression/BinaryExpression.pv"
                     default: {
                     } break;
                 }
             }
 
-            #line 232 "src/analyzer/expression/BinaryExpression.pv"
+            #line 178 "src/analyzer/expression/BinaryExpression.pv"
             return_type = &context->root->type_bool;
         } else {
-            #line 234 "src/analyzer/expression/BinaryExpression.pv"
+            #line 180 "src/analyzer/expression/BinaryExpression.pv"
             return_type = &result->return_type;
         }
 
-        #line 237 "src/analyzer/expression/BinaryExpression.pv"
+        #line 183 "src/analyzer/expression/BinaryExpression.pv"
         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__BINARY_EXPRESSION, .binaryexpression_value = { ._0 = result, ._1 = operator->value, ._2 = rhs_final} }, return_type);
     }
 
-    #line 240 "src/analyzer/expression/BinaryExpression.pv"
+    #line 186 "src/analyzer/expression/BinaryExpression.pv"
     return result;
 }
 
-#line 243 "src/analyzer/expression/BinaryExpression.pv"
+#line 189 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_operator_trait_call(struct Context* context, struct Token* token, struct Expression* lhs, struct Type* lhs_type, struct str operator, struct Expression* rhs) {
-    #line 244 "src/analyzer/expression/BinaryExpression.pv"
+    #line 190 "src/analyzer/expression/BinaryExpression.pv"
     struct str trait_name = (struct str){ .ptr = "", .length = strlen("") };
-    #line 245 "src/analyzer/expression/BinaryExpression.pv"
+    #line 191 "src/analyzer/expression/BinaryExpression.pv"
     struct str func_name = (struct str){ .ptr = "", .length = strlen("") };
 
-    #line 247 "src/analyzer/expression/BinaryExpression.pv"
+    #line 193 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&operator, (struct str){ .ptr = "*", .length = strlen("*") })) {
-        #line 247 "src/analyzer/expression/BinaryExpression.pv"
+        #line 193 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Mul", .length = strlen("Mul") };
-        #line 247 "src/analyzer/expression/BinaryExpression.pv"
+        #line 193 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "mul", .length = strlen("mul") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = "+", .length = strlen("+") })) {
-        #line 248 "src/analyzer/expression/BinaryExpression.pv"
+        #line 194 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Add", .length = strlen("Add") };
-        #line 248 "src/analyzer/expression/BinaryExpression.pv"
+        #line 194 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "add", .length = strlen("add") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = "-", .length = strlen("-") })) {
-        #line 249 "src/analyzer/expression/BinaryExpression.pv"
+        #line 195 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Sub", .length = strlen("Sub") };
-        #line 249 "src/analyzer/expression/BinaryExpression.pv"
+        #line 195 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "sub", .length = strlen("sub") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = "/", .length = strlen("/") })) {
-        #line 250 "src/analyzer/expression/BinaryExpression.pv"
+        #line 196 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Div", .length = strlen("Div") };
-        #line 250 "src/analyzer/expression/BinaryExpression.pv"
+        #line 196 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "div", .length = strlen("div") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = "==", .length = strlen("==") })) {
-        #line 251 "src/analyzer/expression/BinaryExpression.pv"
+        #line 197 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Eq", .length = strlen("Eq") };
-        #line 251 "src/analyzer/expression/BinaryExpression.pv"
+        #line 197 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "eq", .length = strlen("eq") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = "<", .length = strlen("<") })) {
-        #line 252 "src/analyzer/expression/BinaryExpression.pv"
+        #line 198 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Ord", .length = strlen("Ord") };
-        #line 252 "src/analyzer/expression/BinaryExpression.pv"
+        #line 198 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "lt", .length = strlen("lt") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = ">", .length = strlen(">") })) {
-        #line 253 "src/analyzer/expression/BinaryExpression.pv"
+        #line 199 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Ord", .length = strlen("Ord") };
-        #line 253 "src/analyzer/expression/BinaryExpression.pv"
+        #line 199 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "gt", .length = strlen("gt") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = "<=", .length = strlen("<=") })) {
-        #line 254 "src/analyzer/expression/BinaryExpression.pv"
+        #line 200 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Ord", .length = strlen("Ord") };
-        #line 254 "src/analyzer/expression/BinaryExpression.pv"
+        #line 200 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "le", .length = strlen("le") };
     } else if (str__Eq_str__eq(&operator, (struct str){ .ptr = ">=", .length = strlen(">=") })) {
-        #line 255 "src/analyzer/expression/BinaryExpression.pv"
+        #line 201 "src/analyzer/expression/BinaryExpression.pv"
         trait_name = (struct str){ .ptr = "Ord", .length = strlen("Ord") };
-        #line 255 "src/analyzer/expression/BinaryExpression.pv"
+        #line 201 "src/analyzer/expression/BinaryExpression.pv"
         func_name = (struct str){ .ptr = "ge", .length = strlen("ge") };
     } else {
-        #line 256 "src/analyzer/expression/BinaryExpression.pv"
+        #line 202 "src/analyzer/expression/BinaryExpression.pv"
         return 0;
     }
 
-    #line 258 "src/analyzer/expression/BinaryExpression.pv"
+    #line 204 "src/analyzer/expression/BinaryExpression.pv"
     if (Type__is_unknown(lhs_type) || Type__is_unknown(&rhs->return_type)) {
-        #line 258 "src/analyzer/expression/BinaryExpression.pv"
+        #line 204 "src/analyzer/expression/BinaryExpression.pv"
         return 0;
     }
 
-    #line 260 "src/analyzer/expression/BinaryExpression.pv"
+    #line 206 "src/analyzer/expression/BinaryExpression.pv"
     switch (lhs_type->type) {
-        #line 261 "src/analyzer/expression/BinaryExpression.pv"
+        #line 207 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__SELF: {
-            #line 262 "src/analyzer/expression/BinaryExpression.pv"
+            #line 208 "src/analyzer/expression/BinaryExpression.pv"
             if (context->type_self != 0) {
-                #line 263 "src/analyzer/expression/BinaryExpression.pv"
+                #line 209 "src/analyzer/expression/BinaryExpression.pv"
                 return Expression__find_operator_trait_call(context, token, lhs, context->type_self, operator, rhs);
             }
         } break;
-        #line 269 "src/analyzer/expression/BinaryExpression.pv"
+        #line 215 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__STRUCT: {
-            #line 269 "src/analyzer/expression/BinaryExpression.pv"
+            #line 215 "src/analyzer/expression/BinaryExpression.pv"
             struct Struct* struct_info = lhs_type->struct_value._0;
-            #line 269 "src/analyzer/expression/BinaryExpression.pv"
+            #line 215 "src/analyzer/expression/BinaryExpression.pv"
             struct GenericMap* generic_map = lhs_type->struct_value._1;
-            #line 270 "src/analyzer/expression/BinaryExpression.pv"
+            #line 216 "src/analyzer/expression/BinaryExpression.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-            #line 270 "src/analyzer/expression/BinaryExpression.pv"
+            #line 216 "src/analyzer/expression/BinaryExpression.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 270 "src/analyzer/expression/BinaryExpression.pv"
+                #line 216 "src/analyzer/expression/BinaryExpression.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 271 "src/analyzer/expression/BinaryExpression.pv"
+                #line 217 "src/analyzer/expression/BinaryExpression.pv"
                 struct Trait* impl_trait = impl_info->trait_;
-                #line 272 "src/analyzer/expression/BinaryExpression.pv"
+                #line 218 "src/analyzer/expression/BinaryExpression.pv"
                 if (!impl_info->has_trait || impl_trait == 0) {
-                    #line 272 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 218 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 273 "src/analyzer/expression/BinaryExpression.pv"
+                #line 219 "src/analyzer/expression/BinaryExpression.pv"
                 struct Token* impl_trait_name = impl_trait->name;
-                #line 274 "src/analyzer/expression/BinaryExpression.pv"
+                #line 220 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_trait_name == 0) {
-                    #line 274 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 220 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 275 "src/analyzer/expression/BinaryExpression.pv"
+                #line 221 "src/analyzer/expression/BinaryExpression.pv"
                 if (!str__Eq_str__eq(&impl_trait_name->value, trait_name)) {
-                    #line 275 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 221 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 277 "src/analyzer/expression/BinaryExpression.pv"
+                #line 223 "src/analyzer/expression/BinaryExpression.pv"
                 struct Function* func = HashMap_str_Function__find(&impl_info->functions, &func_name);
-                #line 278 "src/analyzer/expression/BinaryExpression.pv"
+                #line 224 "src/analyzer/expression/BinaryExpression.pv"
                 if (func == 0) {
-                    #line 278 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 224 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 279 "src/analyzer/expression/BinaryExpression.pv"
+                #line 225 "src/analyzer/expression/BinaryExpression.pv"
                 if (func->parameters.length < 2) {
-                    #line 279 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 225 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 281 "src/analyzer/expression/BinaryExpression.pv"
+                #line 227 "src/analyzer/expression/BinaryExpression.pv"
                 struct Parameter* other_param = Array_Parameter__get(&func->parameters, 1);
-                #line 282 "src/analyzer/expression/BinaryExpression.pv"
+                #line 228 "src/analyzer/expression/BinaryExpression.pv"
                 if (other_param == 0) {
-                    #line 282 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 228 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 283 "src/analyzer/expression/BinaryExpression.pv"
+                #line 229 "src/analyzer/expression/BinaryExpression.pv"
                 if (!Type__eq(&other_param->type, &rhs->return_type)) {
-                    #line 283 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 229 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 285 "src/analyzer/expression/BinaryExpression.pv"
+                #line 231 "src/analyzer/expression/BinaryExpression.pv"
                 struct GenericMap* func_map = generic_map;
-                #line 286 "src/analyzer/expression/BinaryExpression.pv"
+                #line 232 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_info->typedefs.length > 0) {
-                    #line 287 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 233 "src/analyzer/expression/BinaryExpression.pv"
                     if (generic_map == 0) {
-                        #line 287 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 233 "src/analyzer/expression/BinaryExpression.pv"
                         return 0;
                     }
-                    #line 288 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 234 "src/analyzer/expression/BinaryExpression.pv"
                     struct GenericMap aug_map_val = GenericMap__clone(generic_map, context->allocator);
-                    #line 289 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 235 "src/analyzer/expression/BinaryExpression.pv"
                     struct GenericMap* aug_map = ArenaAllocator__store_GenericMap(context->allocator, &aug_map_val);
-                    #line 290 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 236 "src/analyzer/expression/BinaryExpression.pv"
                     if (aug_map == 0) {
-                        #line 290 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 236 "src/analyzer/expression/BinaryExpression.pv"
                         return 0;
                     }
-                    #line 291 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 237 "src/analyzer/expression/BinaryExpression.pv"
                     { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&impl_info->typedefs);
-                    #line 291 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 237 "src/analyzer/expression/BinaryExpression.pv"
                     while (HashMapIter_str_Type__next(&__iter)) {
-                        #line 291 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 237 "src/analyzer/expression/BinaryExpression.pv"
                         struct str name = HashMapIter_str_Type__value(&__iter)->_0;
-                        #line 291 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 237 "src/analyzer/expression/BinaryExpression.pv"
                         struct Type* typedef_type = &HashMapIter_str_Type__value(&__iter)->_1;
 
-                        #line 292 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 238 "src/analyzer/expression/BinaryExpression.pv"
                         GenericMap__insert(aug_map, name, *typedef_type);
                     } }
-                    #line 294 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 240 "src/analyzer/expression/BinaryExpression.pv"
                     func_map = aug_map;
                 }
 
-                #line 297 "src/analyzer/expression/BinaryExpression.pv"
+                #line 243 "src/analyzer/expression/BinaryExpression.pv"
                 struct Type* func_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func, ._1 = func_map} }});
-                #line 298 "src/analyzer/expression/BinaryExpression.pv"
+                #line 244 "src/analyzer/expression/BinaryExpression.pv"
                 if (func_type == 0) {
-                    #line 298 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 244 "src/analyzer/expression/BinaryExpression.pv"
                     return 0;
                 }
 
-                #line 300 "src/analyzer/expression/BinaryExpression.pv"
+                #line 246 "src/analyzer/expression/BinaryExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 301 "src/analyzer/expression/BinaryExpression.pv"
+                #line 247 "src/analyzer/expression/BinaryExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = lhs });
-                #line 302 "src/analyzer/expression/BinaryExpression.pv"
+                #line 248 "src/analyzer/expression/BinaryExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = rhs });
 
-                #line 304 "src/analyzer/expression/BinaryExpression.pv"
+                #line 250 "src/analyzer/expression/BinaryExpression.pv"
                 return Expression__make_type_function_call(context, token, func_type, arguments, 0);
             } }
         } break;
-        #line 307 "src/analyzer/expression/BinaryExpression.pv"
+        #line 253 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__PRIMITIVE: {
-            #line 307 "src/analyzer/expression/BinaryExpression.pv"
+            #line 253 "src/analyzer/expression/BinaryExpression.pv"
             struct Primitive* primitive_info = lhs_type->primitive_value;
-            #line 308 "src/analyzer/expression/BinaryExpression.pv"
+            #line 254 "src/analyzer/expression/BinaryExpression.pv"
             if (primitive_info == 0) {
-                #line 308 "src/analyzer/expression/BinaryExpression.pv"
+                #line 254 "src/analyzer/expression/BinaryExpression.pv"
                 return 0;
             }
-            #line 309 "src/analyzer/expression/BinaryExpression.pv"
+            #line 255 "src/analyzer/expression/BinaryExpression.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
-            #line 309 "src/analyzer/expression/BinaryExpression.pv"
+            #line 255 "src/analyzer/expression/BinaryExpression.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 309 "src/analyzer/expression/BinaryExpression.pv"
+                #line 255 "src/analyzer/expression/BinaryExpression.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 310 "src/analyzer/expression/BinaryExpression.pv"
+                #line 256 "src/analyzer/expression/BinaryExpression.pv"
                 struct Trait* impl_trait = impl_info->trait_;
-                #line 311 "src/analyzer/expression/BinaryExpression.pv"
+                #line 257 "src/analyzer/expression/BinaryExpression.pv"
                 if (!impl_info->has_trait || impl_trait == 0) {
-                    #line 311 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 257 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 312 "src/analyzer/expression/BinaryExpression.pv"
+                #line 258 "src/analyzer/expression/BinaryExpression.pv"
                 struct Token* impl_trait_name = impl_trait->name;
-                #line 313 "src/analyzer/expression/BinaryExpression.pv"
+                #line 259 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_trait_name == 0) {
-                    #line 313 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 259 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 314 "src/analyzer/expression/BinaryExpression.pv"
+                #line 260 "src/analyzer/expression/BinaryExpression.pv"
                 if (!str__Eq_str__eq(&impl_trait_name->value, trait_name)) {
-                    #line 314 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 260 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 316 "src/analyzer/expression/BinaryExpression.pv"
+                #line 262 "src/analyzer/expression/BinaryExpression.pv"
                 struct Function* func = HashMap_str_Function__find(&impl_info->functions, &func_name);
-                #line 317 "src/analyzer/expression/BinaryExpression.pv"
+                #line 263 "src/analyzer/expression/BinaryExpression.pv"
                 if (func == 0) {
-                    #line 317 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 263 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 318 "src/analyzer/expression/BinaryExpression.pv"
+                #line 264 "src/analyzer/expression/BinaryExpression.pv"
                 if (func->parameters.length < 2) {
-                    #line 318 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 264 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 320 "src/analyzer/expression/BinaryExpression.pv"
+                #line 266 "src/analyzer/expression/BinaryExpression.pv"
                 struct Parameter* other_param = Array_Parameter__get(&func->parameters, 1);
-                #line 321 "src/analyzer/expression/BinaryExpression.pv"
+                #line 267 "src/analyzer/expression/BinaryExpression.pv"
                 if (other_param == 0) {
-                    #line 321 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 267 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 322 "src/analyzer/expression/BinaryExpression.pv"
+                #line 268 "src/analyzer/expression/BinaryExpression.pv"
                 if (Type__is_self(&rhs->return_type)) {
-                    #line 322 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 268 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 323 "src/analyzer/expression/BinaryExpression.pv"
+                #line 269 "src/analyzer/expression/BinaryExpression.pv"
                 if (!Type__eq(&other_param->type, &rhs->return_type)) {
-                    #line 323 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 269 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 325 "src/analyzer/expression/BinaryExpression.pv"
+                #line 271 "src/analyzer/expression/BinaryExpression.pv"
                 struct GenericMap* func_map = Type__get_generic_map(&impl_info->trait_type, context);
 
-                #line 327 "src/analyzer/expression/BinaryExpression.pv"
+                #line 273 "src/analyzer/expression/BinaryExpression.pv"
                 struct Type* func_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func, ._1 = func_map} }});
 
-                #line 329 "src/analyzer/expression/BinaryExpression.pv"
+                #line 275 "src/analyzer/expression/BinaryExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 330 "src/analyzer/expression/BinaryExpression.pv"
+                #line 276 "src/analyzer/expression/BinaryExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = lhs });
-                #line 331 "src/analyzer/expression/BinaryExpression.pv"
+                #line 277 "src/analyzer/expression/BinaryExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = rhs });
 
-                #line 333 "src/analyzer/expression/BinaryExpression.pv"
+                #line 279 "src/analyzer/expression/BinaryExpression.pv"
                 return Expression__make_type_function_call(context, token, func_type, arguments, 0);
             } }
         } break;
-        #line 336 "src/analyzer/expression/BinaryExpression.pv"
+        #line 282 "src/analyzer/expression/BinaryExpression.pv"
         default: {
         } break;
     }
 
-    #line 339 "src/analyzer/expression/BinaryExpression.pv"
+    #line 285 "src/analyzer/expression/BinaryExpression.pv"
     return 0;
 }
 
-#line 342 "src/analyzer/expression/BinaryExpression.pv"
+#line 288 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_unary_trait_call(struct Context* context, struct Token* token, struct Expression* operand) {
-    #line 343 "src/analyzer/expression/BinaryExpression.pv"
+    #line 289 "src/analyzer/expression/BinaryExpression.pv"
     if (Type__is_unknown(&operand->return_type)) {
-        #line 343 "src/analyzer/expression/BinaryExpression.pv"
+        #line 289 "src/analyzer/expression/BinaryExpression.pv"
         return 0;
     }
 
-    #line 345 "src/analyzer/expression/BinaryExpression.pv"
+    #line 291 "src/analyzer/expression/BinaryExpression.pv"
     switch (operand->return_type.type) {
-        #line 346 "src/analyzer/expression/BinaryExpression.pv"
+        #line 292 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__SELF: {
-            #line 347 "src/analyzer/expression/BinaryExpression.pv"
+            #line 293 "src/analyzer/expression/BinaryExpression.pv"
             if (context->type_self != 0) {
-                #line 348 "src/analyzer/expression/BinaryExpression.pv"
+                #line 294 "src/analyzer/expression/BinaryExpression.pv"
                 struct Expression concrete_operand = (struct Expression) { .data = operand->data, .return_type = *context->type_self, .token = operand->token };
-                #line 349 "src/analyzer/expression/BinaryExpression.pv"
+                #line 295 "src/analyzer/expression/BinaryExpression.pv"
                 return Expression__find_unary_trait_call(context, token, &concrete_operand);
             }
         } break;
-        #line 352 "src/analyzer/expression/BinaryExpression.pv"
+        #line 298 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__STRUCT: {
-            #line 352 "src/analyzer/expression/BinaryExpression.pv"
+            #line 298 "src/analyzer/expression/BinaryExpression.pv"
             struct Struct* struct_info = operand->return_type.struct_value._0;
-            #line 352 "src/analyzer/expression/BinaryExpression.pv"
+            #line 298 "src/analyzer/expression/BinaryExpression.pv"
             struct GenericMap* generic_map = operand->return_type.struct_value._1;
-            #line 353 "src/analyzer/expression/BinaryExpression.pv"
+            #line 299 "src/analyzer/expression/BinaryExpression.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-            #line 353 "src/analyzer/expression/BinaryExpression.pv"
+            #line 299 "src/analyzer/expression/BinaryExpression.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 353 "src/analyzer/expression/BinaryExpression.pv"
+                #line 299 "src/analyzer/expression/BinaryExpression.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 354 "src/analyzer/expression/BinaryExpression.pv"
+                #line 300 "src/analyzer/expression/BinaryExpression.pv"
                 struct Trait* impl_trait = impl_info->trait_;
-                #line 355 "src/analyzer/expression/BinaryExpression.pv"
+                #line 301 "src/analyzer/expression/BinaryExpression.pv"
                 if (!impl_info->has_trait || impl_trait == 0) {
-                    #line 355 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 301 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 356 "src/analyzer/expression/BinaryExpression.pv"
+                #line 302 "src/analyzer/expression/BinaryExpression.pv"
                 struct Token* impl_trait_name = impl_trait->name;
-                #line 357 "src/analyzer/expression/BinaryExpression.pv"
+                #line 303 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_trait_name == 0) {
-                    #line 357 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 303 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 358 "src/analyzer/expression/BinaryExpression.pv"
+                #line 304 "src/analyzer/expression/BinaryExpression.pv"
                 if (!str__Eq_str__eq(&impl_trait_name->value, (struct str){ .ptr = "Neg", .length = strlen("Neg") })) {
-                    #line 358 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 304 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 360 "src/analyzer/expression/BinaryExpression.pv"
+                #line 306 "src/analyzer/expression/BinaryExpression.pv"
                 struct Function* func = HashMap_str_Function__find(&impl_info->functions, &(struct str){ .ptr = "neg", .length = strlen("neg") });
-                #line 361 "src/analyzer/expression/BinaryExpression.pv"
+                #line 307 "src/analyzer/expression/BinaryExpression.pv"
                 if (func == 0) {
-                    #line 361 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 307 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 362 "src/analyzer/expression/BinaryExpression.pv"
+                #line 308 "src/analyzer/expression/BinaryExpression.pv"
                 if (func->parameters.length < 1) {
-                    #line 362 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 308 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 364 "src/analyzer/expression/BinaryExpression.pv"
+                #line 310 "src/analyzer/expression/BinaryExpression.pv"
                 struct GenericMap* func_map = generic_map;
-                #line 365 "src/analyzer/expression/BinaryExpression.pv"
+                #line 311 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_info->typedefs.length > 0) {
-                    #line 366 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 312 "src/analyzer/expression/BinaryExpression.pv"
                     if (generic_map == 0) {
-                        #line 366 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 312 "src/analyzer/expression/BinaryExpression.pv"
                         return 0;
                     }
-                    #line 367 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 313 "src/analyzer/expression/BinaryExpression.pv"
                     struct GenericMap aug_map_val = GenericMap__clone(generic_map, context->allocator);
-                    #line 368 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 314 "src/analyzer/expression/BinaryExpression.pv"
                     struct GenericMap* aug_map = ArenaAllocator__store_GenericMap(context->allocator, &aug_map_val);
-                    #line 369 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 315 "src/analyzer/expression/BinaryExpression.pv"
                     if (aug_map == 0) {
-                        #line 369 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 315 "src/analyzer/expression/BinaryExpression.pv"
                         return 0;
                     }
-                    #line 370 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 316 "src/analyzer/expression/BinaryExpression.pv"
                     { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&impl_info->typedefs);
-                    #line 370 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 316 "src/analyzer/expression/BinaryExpression.pv"
                     while (HashMapIter_str_Type__next(&__iter)) {
-                        #line 370 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 316 "src/analyzer/expression/BinaryExpression.pv"
                         struct str name = HashMapIter_str_Type__value(&__iter)->_0;
-                        #line 370 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 316 "src/analyzer/expression/BinaryExpression.pv"
                         struct Type* typedef_type = &HashMapIter_str_Type__value(&__iter)->_1;
 
-                        #line 371 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 317 "src/analyzer/expression/BinaryExpression.pv"
                         struct Type* resolved = Context__resolve_type(context->allocator, typedef_type, generic_map, 0);
-                        #line 372 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 318 "src/analyzer/expression/BinaryExpression.pv"
                         if (resolved == 0) {
-                            #line 372 "src/analyzer/expression/BinaryExpression.pv"
+                            #line 318 "src/analyzer/expression/BinaryExpression.pv"
                             return 0;
                         }
-                        #line 373 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 319 "src/analyzer/expression/BinaryExpression.pv"
                         GenericMap__insert(aug_map, name, *resolved);
                     } }
-                    #line 375 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 321 "src/analyzer/expression/BinaryExpression.pv"
                     func_map = aug_map;
                 }
 
-                #line 378 "src/analyzer/expression/BinaryExpression.pv"
+                #line 324 "src/analyzer/expression/BinaryExpression.pv"
                 struct Type* func_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func, ._1 = func_map} }});
-                #line 379 "src/analyzer/expression/BinaryExpression.pv"
+                #line 325 "src/analyzer/expression/BinaryExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 380 "src/analyzer/expression/BinaryExpression.pv"
+                #line 326 "src/analyzer/expression/BinaryExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = operand });
 
-                #line 382 "src/analyzer/expression/BinaryExpression.pv"
+                #line 328 "src/analyzer/expression/BinaryExpression.pv"
                 return Expression__make_type_function_call(context, token, func_type, arguments, 0);
             } }
         } break;
-        #line 385 "src/analyzer/expression/BinaryExpression.pv"
+        #line 331 "src/analyzer/expression/BinaryExpression.pv"
         default: {
         } break;
     }
 
-    #line 388 "src/analyzer/expression/BinaryExpression.pv"
+    #line 334 "src/analyzer/expression/BinaryExpression.pv"
     return 0;
 }
 
-#line 391 "src/analyzer/expression/BinaryExpression.pv"
+#line 337 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_index_trait_call(struct Context* context, struct Token* token, struct Expression* inner, struct Expression* index_expr) {
-    #line 392 "src/analyzer/expression/BinaryExpression.pv"
+    #line 338 "src/analyzer/expression/BinaryExpression.pv"
     if (Type__is_unknown(&inner->return_type)) {
-        #line 392 "src/analyzer/expression/BinaryExpression.pv"
+        #line 338 "src/analyzer/expression/BinaryExpression.pv"
         return 0;
     }
 
-    #line 394 "src/analyzer/expression/BinaryExpression.pv"
+    #line 340 "src/analyzer/expression/BinaryExpression.pv"
     switch (Type__deref_reference(&inner->return_type)->type) {
-        #line 395 "src/analyzer/expression/BinaryExpression.pv"
+        #line 341 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__STRUCT: {
-            #line 395 "src/analyzer/expression/BinaryExpression.pv"
+            #line 341 "src/analyzer/expression/BinaryExpression.pv"
             struct Struct* struct_info = Type__deref_reference(&inner->return_type)->struct_value._0;
-            #line 395 "src/analyzer/expression/BinaryExpression.pv"
+            #line 341 "src/analyzer/expression/BinaryExpression.pv"
             struct GenericMap* generic_map = Type__deref_reference(&inner->return_type)->struct_value._1;
-            #line 396 "src/analyzer/expression/BinaryExpression.pv"
+            #line 342 "src/analyzer/expression/BinaryExpression.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-            #line 396 "src/analyzer/expression/BinaryExpression.pv"
+            #line 342 "src/analyzer/expression/BinaryExpression.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 396 "src/analyzer/expression/BinaryExpression.pv"
+                #line 342 "src/analyzer/expression/BinaryExpression.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 397 "src/analyzer/expression/BinaryExpression.pv"
+                #line 343 "src/analyzer/expression/BinaryExpression.pv"
                 struct Trait* impl_trait = impl_info->trait_;
-                #line 398 "src/analyzer/expression/BinaryExpression.pv"
+                #line 344 "src/analyzer/expression/BinaryExpression.pv"
                 if (!impl_info->has_trait || impl_trait == 0) {
-                    #line 398 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 344 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 399 "src/analyzer/expression/BinaryExpression.pv"
+                #line 345 "src/analyzer/expression/BinaryExpression.pv"
                 struct Token* impl_trait_name = impl_trait->name;
-                #line 400 "src/analyzer/expression/BinaryExpression.pv"
+                #line 346 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_trait_name == 0) {
-                    #line 400 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 346 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 401 "src/analyzer/expression/BinaryExpression.pv"
+                #line 347 "src/analyzer/expression/BinaryExpression.pv"
                 if (!str__Eq_str__eq(&impl_trait_name->value, (struct str){ .ptr = "Index", .length = strlen("Index") })) {
-                    #line 401 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 347 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 403 "src/analyzer/expression/BinaryExpression.pv"
+                #line 349 "src/analyzer/expression/BinaryExpression.pv"
                 struct Function* func = HashMap_str_Function__find(&impl_info->functions, &(struct str){ .ptr = "index", .length = strlen("index") });
-                #line 404 "src/analyzer/expression/BinaryExpression.pv"
+                #line 350 "src/analyzer/expression/BinaryExpression.pv"
                 if (func == 0) {
-                    #line 404 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 350 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
-                #line 405 "src/analyzer/expression/BinaryExpression.pv"
+                #line 351 "src/analyzer/expression/BinaryExpression.pv"
                 if (func->parameters.length < 1) {
-                    #line 405 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 351 "src/analyzer/expression/BinaryExpression.pv"
                     continue;
                 }
 
-                #line 407 "src/analyzer/expression/BinaryExpression.pv"
+                #line 353 "src/analyzer/expression/BinaryExpression.pv"
                 struct GenericMap* func_map = generic_map;
-                #line 408 "src/analyzer/expression/BinaryExpression.pv"
+                #line 354 "src/analyzer/expression/BinaryExpression.pv"
                 if (impl_info->typedefs.length > 0) {
-                    #line 409 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 355 "src/analyzer/expression/BinaryExpression.pv"
                     if (generic_map == 0) {
-                        #line 409 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 355 "src/analyzer/expression/BinaryExpression.pv"
                         return 0;
                     }
-                    #line 410 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 356 "src/analyzer/expression/BinaryExpression.pv"
                     struct GenericMap aug_map_val = GenericMap__clone(generic_map, context->allocator);
-                    #line 411 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 357 "src/analyzer/expression/BinaryExpression.pv"
                     struct GenericMap* aug_map = ArenaAllocator__store_GenericMap(context->allocator, &aug_map_val);
-                    #line 412 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 358 "src/analyzer/expression/BinaryExpression.pv"
                     if (aug_map == 0) {
-                        #line 412 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 358 "src/analyzer/expression/BinaryExpression.pv"
                         return 0;
                     }
-                    #line 413 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 359 "src/analyzer/expression/BinaryExpression.pv"
                     { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&impl_info->typedefs);
-                    #line 413 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 359 "src/analyzer/expression/BinaryExpression.pv"
                     while (HashMapIter_str_Type__next(&__iter)) {
-                        #line 413 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 359 "src/analyzer/expression/BinaryExpression.pv"
                         struct str name = HashMapIter_str_Type__value(&__iter)->_0;
-                        #line 413 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 359 "src/analyzer/expression/BinaryExpression.pv"
                         struct Type* typedef_type = &HashMapIter_str_Type__value(&__iter)->_1;
 
-                        #line 414 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 360 "src/analyzer/expression/BinaryExpression.pv"
                         struct Type* resolved = Context__resolve_type(context->allocator, typedef_type, generic_map, 0);
-                        #line 415 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 361 "src/analyzer/expression/BinaryExpression.pv"
                         if (resolved == 0) {
-                            #line 415 "src/analyzer/expression/BinaryExpression.pv"
+                            #line 361 "src/analyzer/expression/BinaryExpression.pv"
                             return 0;
                         }
-                        #line 416 "src/analyzer/expression/BinaryExpression.pv"
+                        #line 362 "src/analyzer/expression/BinaryExpression.pv"
                         GenericMap__insert(aug_map, name, *resolved);
                     } }
-                    #line 418 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 364 "src/analyzer/expression/BinaryExpression.pv"
                     func_map = aug_map;
                 }
 
-                #line 421 "src/analyzer/expression/BinaryExpression.pv"
+                #line 367 "src/analyzer/expression/BinaryExpression.pv"
                 struct Type* func_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func, ._1 = func_map} }});
-                #line 422 "src/analyzer/expression/BinaryExpression.pv"
+                #line 368 "src/analyzer/expression/BinaryExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 423 "src/analyzer/expression/BinaryExpression.pv"
+                #line 369 "src/analyzer/expression/BinaryExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = inner });
 
-                #line 425 "src/analyzer/expression/BinaryExpression.pv"
+                #line 371 "src/analyzer/expression/BinaryExpression.pv"
                 struct Expression* ptr_expr = Expression__make_type_function_call(context, token, func_type, arguments, 0);
-                #line 426 "src/analyzer/expression/BinaryExpression.pv"
+                #line 372 "src/analyzer/expression/BinaryExpression.pv"
                 if (ptr_expr == 0) {
-                    #line 426 "src/analyzer/expression/BinaryExpression.pv"
+                    #line 372 "src/analyzer/expression/BinaryExpression.pv"
                     return 0;
                 }
 
-                #line 428 "src/analyzer/expression/BinaryExpression.pv"
+                #line 374 "src/analyzer/expression/BinaryExpression.pv"
                 struct Type* element_type = Type__deref(&ptr_expr->return_type);
-                #line 429 "src/analyzer/expression/BinaryExpression.pv"
+                #line 375 "src/analyzer/expression/BinaryExpression.pv"
                 return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INDEX_EXPRESSION, .indexexpression_value = { ._0 = ptr_expr, ._1 = index_expr} }, element_type);
             } }
         } break;
-        #line 432 "src/analyzer/expression/BinaryExpression.pv"
+        #line 378 "src/analyzer/expression/BinaryExpression.pv"
         default: {
         } break;
     }
 
-    #line 435 "src/analyzer/expression/BinaryExpression.pv"
+    #line 381 "src/analyzer/expression/BinaryExpression.pv"
     return 0;
 }
 
-#line 438 "src/analyzer/expression/BinaryExpression.pv"
+#line 384 "src/analyzer/expression/BinaryExpression.pv"
 uintptr_t Expression__get_precedence(struct Token* token) {
-    #line 439 "src/analyzer/expression/BinaryExpression.pv"
+    #line 385 "src/analyzer/expression/BinaryExpression.pv"
     if (token->type != TOKEN_TYPE__SYMBOL) {
-        #line 439 "src/analyzer/expression/BinaryExpression.pv"
+        #line 385 "src/analyzer/expression/BinaryExpression.pv"
         return 0;
     }
 
-    #line 441 "src/analyzer/expression/BinaryExpression.pv"
+    #line 387 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "||", .length = strlen("||") })) {
-        #line 441 "src/analyzer/expression/BinaryExpression.pv"
+        #line 387 "src/analyzer/expression/BinaryExpression.pv"
         return 1;
     }
-    #line 442 "src/analyzer/expression/BinaryExpression.pv"
+    #line 388 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "&&", .length = strlen("&&") })) {
-        #line 442 "src/analyzer/expression/BinaryExpression.pv"
+        #line 388 "src/analyzer/expression/BinaryExpression.pv"
         return 2;
     }
-    #line 443 "src/analyzer/expression/BinaryExpression.pv"
+    #line 389 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "|", .length = strlen("|") })) {
-        #line 443 "src/analyzer/expression/BinaryExpression.pv"
+        #line 389 "src/analyzer/expression/BinaryExpression.pv"
         return 3;
     }
-    #line 444 "src/analyzer/expression/BinaryExpression.pv"
+    #line 390 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "^", .length = strlen("^") })) {
-        #line 444 "src/analyzer/expression/BinaryExpression.pv"
+        #line 390 "src/analyzer/expression/BinaryExpression.pv"
         return 4;
     }
-    #line 445 "src/analyzer/expression/BinaryExpression.pv"
+    #line 391 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "&", .length = strlen("&") })) {
-        #line 445 "src/analyzer/expression/BinaryExpression.pv"
+        #line 391 "src/analyzer/expression/BinaryExpression.pv"
         return 5;
     }
-    #line 446 "src/analyzer/expression/BinaryExpression.pv"
+    #line 392 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = "!=", .length = strlen("!=") })) {
-        #line 446 "src/analyzer/expression/BinaryExpression.pv"
+        #line 392 "src/analyzer/expression/BinaryExpression.pv"
         return 6;
     }
-    #line 447 "src/analyzer/expression/BinaryExpression.pv"
+    #line 393 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "<", .length = strlen("<") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = ">", .length = strlen(">") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = "<=", .length = strlen("<=") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = ">=", .length = strlen(">=") })) {
-        #line 447 "src/analyzer/expression/BinaryExpression.pv"
+        #line 393 "src/analyzer/expression/BinaryExpression.pv"
         return 7;
     }
-    #line 448 "src/analyzer/expression/BinaryExpression.pv"
+    #line 394 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "<<", .length = strlen("<<") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = ">>", .length = strlen(">>") })) {
-        #line 448 "src/analyzer/expression/BinaryExpression.pv"
+        #line 394 "src/analyzer/expression/BinaryExpression.pv"
         return 8;
     }
-    #line 449 "src/analyzer/expression/BinaryExpression.pv"
+    #line 395 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "+", .length = strlen("+") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = "-", .length = strlen("-") })) {
-        #line 449 "src/analyzer/expression/BinaryExpression.pv"
+        #line 395 "src/analyzer/expression/BinaryExpression.pv"
         return 9;
     }
-    #line 450 "src/analyzer/expression/BinaryExpression.pv"
+    #line 396 "src/analyzer/expression/BinaryExpression.pv"
     if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "*", .length = strlen("*") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = "/", .length = strlen("/") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = "%", .length = strlen("%") })) {
-        #line 450 "src/analyzer/expression/BinaryExpression.pv"
+        #line 396 "src/analyzer/expression/BinaryExpression.pv"
         return 10;
     }
 
-    #line 452 "src/analyzer/expression/BinaryExpression.pv"
+    #line 398 "src/analyzer/expression/BinaryExpression.pv"
     return 0;
 }

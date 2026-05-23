@@ -72,11 +72,11 @@ impl IfStatement {
                 },
             }
 
-            let narrow_true = Expression::detect_null_narrowing(context, expression, true);
-            if narrow_true != null {
-                let var_name = Expression::narrowed_var_name(context, expression, true);
+            let narrowings_true = Array<NullNarrowing>::new(context.allocator);
+            Expression::collect_null_narrowings(context, expression, true, &narrowings_true);
+            if narrowings_true.length > 0 {
                 context.push_scope(block);
-                context.set_narrowed(var_name, narrow_true);
+                for narrow in narrowings_true { context.set_narrowed(narrow.path, narrow.type); }
                 if !block.parse(context, generics, false) { context.pop_scope(); return null; }
                 context.pop_scope();
             } else {
@@ -147,15 +147,14 @@ impl IfStatement {
                 else_end = true;
                 else_block = Block::new_ptr(context);
 
-                let narrow_false: *Type = null;
+                let narrowings_false = Array<NullNarrowing>::new(context.allocator);
                 if pattern == null && expression != null {
-                    narrow_false = Expression::detect_null_narrowing(context, expression, false);
+                    Expression::collect_null_narrowings(context, expression, false, &narrowings_false);
                 }
 
-                if narrow_false != null {
-                    let var_name = Expression::narrowed_var_name(context, expression, false);
+                if narrowings_false.length > 0 {
                     context.push_scope(else_block);
-                    context.set_narrowed(var_name, narrow_false);
+                    for narrow in narrowings_false { context.set_narrowed(narrow.path, narrow.type); }
                     if else_block == null { context.pop_scope(); return null; }
                     if !else_block.parse(context, generics, false) { context.pop_scope(); return null; }
                     context.pop_scope();
@@ -174,11 +173,9 @@ impl IfStatement {
 
         if pattern == null && expression != null && else_statements.length == 0 {
             if IfStatement::block_always_diverges(block) {
-                let narrow_after = Expression::detect_null_narrowing(context, expression, false);
-                if narrow_after != null {
-                    let var_name = Expression::narrowed_var_name(context, expression, false);
-                    context.set_narrowed(var_name, narrow_after);
-                }
+                let narrowings_after = Array<NullNarrowing>::new(context.allocator);
+                Expression::collect_null_narrowings(context, expression, false, &narrowings_after);
+                for narrow in narrowings_after { context.set_narrowed(narrow.path, narrow.type); }
             }
         }
 

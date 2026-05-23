@@ -2,6 +2,11 @@ use std
 use analyzer
 use types
 
+struct NullNarrowing {
+    path: str,
+    type: &Type,
+}
+
 impl Expression {
     // Build the dotted access path of an expression (e.g. "self.parent.next") into `out`.
     // Returns true if the expression is a Variable or a chain of MemberInstanceExpression
@@ -24,12 +29,11 @@ impl Expression {
         }
     }
 
-    // If `expr` is a null-comparison `var == null` / `null == var` (when narrow_on_true=false)
-    // or `var != null` / `null != var` (when narrow_on_true=true) where `var` has pointer type,
-    // returns a freshly-allocated `&T` reference type. Recurses through `||` (false branch)
-    // and `&&` (true branch) so short-circuit chains narrow correctly. Returns null when no
-    // narrowing applies.
-    fn detect_null_narrowing(context: &Context, expr: &Expression, narrow_on_true: bool) -> *Type {
+    // Walks `expr` collecting every `var == null` (when narrow_on_true=false) or
+    // `var != null` (when narrow_on_true=true) site reachable via `||` (false branch)
+    // and `&&` (true branch) chains, where `var` has pointer type. Each match is
+    // appended to `out` as a NullNarrowing { path, &T }. Parens are transparent.
+    fn collect_null_narrowings(context: &Context, expr: &Expression, narrow_on_true: bool, out: &Array<NullNarrowing>) {
         let inner = expr;
         match inner.data {
             ExpressionData::ParenthesizedExpression(child) => { inner = child; },
@@ -39,117 +43,59 @@ impl Expression {
         match inner.data {
             ExpressionData::BinaryExpression(lhs, op, rhs) => {
                 if op.eq("||") && !narrow_on_true {
-                    let left = Expression::detect_null_narrowing(context, lhs, false);
-                    if left != null { return left; }
-                    return Expression::detect_null_narrowing(context, rhs, false);
+                    Expression::collect_null_narrowings(context, lhs, false, out);
+                    Expression::collect_null_narrowings(context, rhs, false, out);
+                    return;
                 }
                 if op.eq("&&") && narrow_on_true {
-                    let left = Expression::detect_null_narrowing(context, lhs, true);
-                    if left != null { return left; }
-                    return Expression::detect_null_narrowing(context, rhs, true);
+                    Expression::collect_null_narrowings(context, lhs, true, out);
+                    Expression::collect_null_narrowings(context, rhs, true, out);
+                    return;
                 }
 
                 let want_op: str = if narrow_on_true { "!=" } else { "==" };
-                if !op.eq(want_op) { return null; }
+                if !op.eq(want_op) { return; }
 
-                let path_check = String::new(context.allocator);
+                let path = String::new(context.allocator);
                 let var_expr: *Expression = null;
                 let other: *Expression = null;
 
-                if lhs.build_narrow_path(&path_check) { var_expr = lhs; other = rhs; }
-
-                if var_expr == null {
-                    let path_check2 = String::new(context.allocator);
-                    if rhs.build_narrow_path(&path_check2) { var_expr = rhs; other = lhs; }
-                    else { return null; }
+                if lhs.build_narrow_path(&path) { var_expr = lhs; other = rhs; }
+                else {
+                    let path2 = String::new(context.allocator);
+                    if rhs.build_narrow_path(&path2) { var_expr = rhs; other = lhs; path = path2; }
+                    else { return; }
                 }
 
-                if other == null { return null; }
+                if other == null { return; }
                 let other_inner = other;
                 match other_inner.data {
                     ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
                     _ => {},
                 }
-                if other_inner == null { return null; }
-
+                if other_inner == null { return; }
                 match other_inner.data {
                     ExpressionData::NullLiteral => {},
-                    _ => { return null; },
+                    _ => { return; },
                 }
 
-                if var_expr == null { return null; }
+                if var_expr == null { return; }
                 match var_expr.return_type {
                     Type::Indirect(indirect) => {
                         if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
-                            return null;
+                            return;
                         }
                         let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
-                        return context.allocator.store(&Type::Indirect(ref_indirect));
+                        let type_val = Type::Indirect(ref_indirect);
+                        let stored = context.allocator.store(&type_val);
+                        if stored == null { return; }
+                        out.append(NullNarrowing { path: path.as_str(), type: stored });
                     },
-                    _ => { return null; },
-                }
-            },
-            _ => { return null; },
-        }
-
-        return null;
-    }
-
-    fn narrowed_var_name(context: &Context, expr: &Expression, narrow_on_true: bool) -> str {
-        let inner = expr;
-        match inner.data {
-            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
-            _ => {},
-        }
-
-        match inner.data {
-            ExpressionData::BinaryExpression(lhs, op, rhs) => {
-                if op.eq("||") && !narrow_on_true {
-                    let left = Expression::narrowed_var_name(context, lhs, false);
-                    if left.length > 0 { return left; }
-                    return Expression::narrowed_var_name(context, rhs, false);
-                }
-                if op.eq("&&") && narrow_on_true {
-                    let left = Expression::narrowed_var_name(context, lhs, true);
-                    if left.length > 0 { return left; }
-                    return Expression::narrowed_var_name(context, rhs, true);
-                }
-
-                let want_op: str = if narrow_on_true { "!=" } else { "==" };
-                if !op.eq(want_op) { return str { ptr: null, length: 0 }; }
-
-                // Find which side is a path (Variable or Variable.field.field...) and the other side null.
-                let path = String::new(context.allocator);
-                let other: *Expression = null;
-
-                if lhs.build_narrow_path(&path) { other = rhs; }
-                else {
-                    let path2 = String::new(context.allocator);
-                    if rhs.build_narrow_path(&path2) {
-                        other = lhs;
-                        path = path2;
-                    } else {
-                        return str { ptr: null, length: 0 };
-                    }
-                }
-
-                if other == null { return str { ptr: null, length: 0 }; }
-                let other_inner = other;
-                match other_inner.data {
-                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
                     _ => {},
                 }
-                if other_inner == null { return str { ptr: null, length: 0 }; }
-                match other_inner.data {
-                    ExpressionData::NullLiteral => {},
-                    _ => { return str { ptr: null, length: 0 }; },
-                }
-
-                return path.as_str();
             },
             _ => {},
         }
-        return str { ptr: null, length: 0 };
     }
 
     fn parse_binary(context: &Context, lhs: &Expression, min_prec: usize, generics: &Generics) -> *Expression {
@@ -169,14 +115,14 @@ impl Expression {
             let pushed_narrow_scope = false;
             if operator.value.eq("||") || operator.value.eq("&&") {
                 let narrow_on_true_for_rhs = operator.value.eq("&&");
-                let rhs_narrow_type = Expression::detect_null_narrowing(context, result, narrow_on_true_for_rhs);
-                if rhs_narrow_type != null {
-                    let var_name = Expression::narrowed_var_name(context, result, narrow_on_true_for_rhs);
-                    if var_name.length > 0 {
-                        context.push_scope(null);
-                        context.set_narrowed(var_name, rhs_narrow_type);
-                        pushed_narrow_scope = true;
+                let narrowings = Array<NullNarrowing>::new(context.allocator);
+                Expression::collect_null_narrowings(context, result, narrow_on_true_for_rhs, &narrowings);
+                if narrowings.length > 0 {
+                    context.push_scope(null);
+                    for narrow in narrowings {
+                        context.set_narrowed(narrow.path, narrow.type);
                     }
+                    pushed_narrow_scope = true;
                 }
             }
 

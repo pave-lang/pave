@@ -1,3 +1,4 @@
+use std
 use analyzer
 use expression
 use types
@@ -18,11 +19,11 @@ impl WhileStatement {
         block.is_loop = true;
 
         // Apply null-narrowing inside the while body, same rules as `if cond { ... }`.
-        let narrow_true = Expression::detect_null_narrowing(context, expression, true);
-        if narrow_true != null {
-            let var_name = Expression::narrowed_var_name(context, expression, true);
+        let narrowings_true = Array<NullNarrowing>::new(context.allocator);
+        Expression::collect_null_narrowings(context, expression, true, &narrowings_true);
+        if narrowings_true.length > 0 {
             context.push_scope(block);
-            context.set_narrowed(var_name, narrow_true);
+            for narrow in narrowings_true { context.set_narrowed(narrow.path, narrow.type); }
             if !block.parse(context, generics, false) { context.pop_scope(); return null; }
             context.pop_scope();
         } else {

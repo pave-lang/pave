@@ -15,7 +15,10 @@
 #include <analyzer/Token.h>
 #include <analyzer/types/Primitive.h>
 #include <std/str.h>
+#include <std/Array_NullNarrowing.h>
 #include <std/trait_Allocator.h>
+#include <std/Iter_ref_NullNarrowing.h>
+#include <analyzer/expression/NullNarrowing.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <analyzer/statement/IfStatement.h>
 #include <analyzer/statement/IfStatement.h>
@@ -177,15 +180,23 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
         }
 
         #line 75 "src/analyzer/statement/IfStatement.pv"
-        struct Type* narrow_true = Expression__detect_null_narrowing(context, expression, true);
+        struct Array_NullNarrowing narrowings_true = Array_NullNarrowing__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 76 "src/analyzer/statement/IfStatement.pv"
-        if (narrow_true != 0) {
-            #line 77 "src/analyzer/statement/IfStatement.pv"
-            struct str var_name = Expression__narrowed_var_name(context, expression, true);
+        Expression__collect_null_narrowings(context, expression, true, &narrowings_true);
+        #line 77 "src/analyzer/statement/IfStatement.pv"
+        if (narrowings_true.length > 0) {
             #line 78 "src/analyzer/statement/IfStatement.pv"
             Context__push_scope(context, block);
             #line 79 "src/analyzer/statement/IfStatement.pv"
-            Context__set_narrowed(context, var_name, narrow_true);
+            { struct Iter_ref_NullNarrowing __iter = Array_NullNarrowing__iter(&narrowings_true);
+            #line 79 "src/analyzer/statement/IfStatement.pv"
+            while (Iter_ref_NullNarrowing__next(&__iter)) {
+                #line 79 "src/analyzer/statement/IfStatement.pv"
+                struct NullNarrowing* narrow = Iter_ref_NullNarrowing__value(&__iter);
+
+                #line 79 "src/analyzer/statement/IfStatement.pv"
+                Context__set_narrowed(context, narrow->path, narrow->type);
+            } }
             #line 80 "src/analyzer/statement/IfStatement.pv"
             if (!Block__parse(block, context, generics, false)) {
                 #line 80 "src/analyzer/statement/IfStatement.pv"
@@ -357,52 +368,58 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
             else_block = Block__new_ptr(context);
 
             #line 150 "src/analyzer/statement/IfStatement.pv"
-            struct Type* narrow_false = 0;
+            struct Array_NullNarrowing narrowings_false = Array_NullNarrowing__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
             #line 151 "src/analyzer/statement/IfStatement.pv"
             if (pattern == 0 && expression != 0) {
                 #line 152 "src/analyzer/statement/IfStatement.pv"
-                narrow_false = Expression__detect_null_narrowing(context, expression, false);
+                Expression__collect_null_narrowings(context, expression, false, &narrowings_false);
             }
 
             #line 155 "src/analyzer/statement/IfStatement.pv"
-            if (narrow_false != 0) {
+            if (narrowings_false.length > 0) {
                 #line 156 "src/analyzer/statement/IfStatement.pv"
-                struct str var_name = Expression__narrowed_var_name(context, expression, false);
-                #line 157 "src/analyzer/statement/IfStatement.pv"
                 Context__push_scope(context, else_block);
+                #line 157 "src/analyzer/statement/IfStatement.pv"
+                { struct Iter_ref_NullNarrowing __iter = Array_NullNarrowing__iter(&narrowings_false);
+                #line 157 "src/analyzer/statement/IfStatement.pv"
+                while (Iter_ref_NullNarrowing__next(&__iter)) {
+                    #line 157 "src/analyzer/statement/IfStatement.pv"
+                    struct NullNarrowing* narrow = Iter_ref_NullNarrowing__value(&__iter);
+
+                    #line 157 "src/analyzer/statement/IfStatement.pv"
+                    Context__set_narrowed(context, narrow->path, narrow->type);
+                } }
                 #line 158 "src/analyzer/statement/IfStatement.pv"
-                Context__set_narrowed(context, var_name, narrow_false);
-                #line 159 "src/analyzer/statement/IfStatement.pv"
                 if (else_block == 0) {
+                    #line 158 "src/analyzer/statement/IfStatement.pv"
+                    Context__pop_scope(context);
+                    #line 158 "src/analyzer/statement/IfStatement.pv"
+                    return 0;
+                }
+                #line 159 "src/analyzer/statement/IfStatement.pv"
+                if (!Block__parse(else_block, context, generics, false)) {
                     #line 159 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
                     #line 159 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
                 #line 160 "src/analyzer/statement/IfStatement.pv"
-                if (!Block__parse(else_block, context, generics, false)) {
-                    #line 160 "src/analyzer/statement/IfStatement.pv"
-                    Context__pop_scope(context);
-                    #line 160 "src/analyzer/statement/IfStatement.pv"
-                    return 0;
-                }
-                #line 161 "src/analyzer/statement/IfStatement.pv"
                 Context__pop_scope(context);
             } else {
-                #line 163 "src/analyzer/statement/IfStatement.pv"
+                #line 162 "src/analyzer/statement/IfStatement.pv"
                 if (else_block == 0) {
-                    #line 163 "src/analyzer/statement/IfStatement.pv"
+                    #line 162 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 164 "src/analyzer/statement/IfStatement.pv"
+                #line 163 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, true)) {
-                    #line 164 "src/analyzer/statement/IfStatement.pv"
+                    #line 163 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             }
         }
 
-        #line 168 "src/analyzer/statement/IfStatement.pv"
+        #line 167 "src/analyzer/statement/IfStatement.pv"
         Array_ElseStatement__append(&else_statements, (struct ElseStatement) {
             .pattern = else_pattern,
             .expression = else_expression,
@@ -410,23 +427,28 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
         });
     }
 
-    #line 175 "src/analyzer/statement/IfStatement.pv"
+    #line 174 "src/analyzer/statement/IfStatement.pv"
     if (pattern == 0 && expression != 0 && else_statements.length == 0) {
-        #line 176 "src/analyzer/statement/IfStatement.pv"
+        #line 175 "src/analyzer/statement/IfStatement.pv"
         if (IfStatement__block_always_diverges(block)) {
+            #line 176 "src/analyzer/statement/IfStatement.pv"
+            struct Array_NullNarrowing narrowings_after = Array_NullNarrowing__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
             #line 177 "src/analyzer/statement/IfStatement.pv"
-            struct Type* narrow_after = Expression__detect_null_narrowing(context, expression, false);
+            Expression__collect_null_narrowings(context, expression, false, &narrowings_after);
             #line 178 "src/analyzer/statement/IfStatement.pv"
-            if (narrow_after != 0) {
-                #line 179 "src/analyzer/statement/IfStatement.pv"
-                struct str var_name = Expression__narrowed_var_name(context, expression, false);
-                #line 180 "src/analyzer/statement/IfStatement.pv"
-                Context__set_narrowed(context, var_name, narrow_after);
-            }
+            { struct Iter_ref_NullNarrowing __iter = Array_NullNarrowing__iter(&narrowings_after);
+            #line 178 "src/analyzer/statement/IfStatement.pv"
+            while (Iter_ref_NullNarrowing__next(&__iter)) {
+                #line 178 "src/analyzer/statement/IfStatement.pv"
+                struct NullNarrowing* narrow = Iter_ref_NullNarrowing__value(&__iter);
+
+                #line 178 "src/analyzer/statement/IfStatement.pv"
+                Context__set_narrowed(context, narrow->path, narrow->type);
+            } }
         }
     }
 
-    #line 185 "src/analyzer/statement/IfStatement.pv"
+    #line 182 "src/analyzer/statement/IfStatement.pv"
     return ArenaAllocator__store_IfStatement(context->allocator, (struct IfStatement[]){(struct IfStatement) {
         .pattern = pattern,
         .expression = expression,
