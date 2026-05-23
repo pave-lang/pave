@@ -444,6 +444,17 @@ impl Generator {
         return true;
     }
 
+    fn write_typename(&self, file: &FILE, type: &Type, generics: &GenericMap) -> bool {
+        let type_name = self.naming_decl.get_type_decl(type, generics.self_type, generics);
+        defer type_name.release();
+
+        fprintf(file, "\"");
+        self.write_string(file, &type_name);
+        fprintf(file, "\"");
+
+        return true;
+    }
+
     fn write_line_directive(&self, file: &FILE, context: &Context, token: &Token) {
         if self.output_line_directives {
             self.write_indent(file);

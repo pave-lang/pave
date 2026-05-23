@@ -506,6 +506,13 @@ impl ExpressionWriter {
             return generator.write_typeid(file, type, generics);
         }
 
+        if name.eq("typename") {
+            let resolved_generics = func_generics.resolve_types(generator.allocator, generics);
+            let type = resolved_generics.get("T");
+            if type == null { return false; }
+            return generator.write_typename(file, type, generics);
+        }
+
         if name.eq("cast") {
             let resolved_generics = func_generics.resolve_types(generator.allocator, generics);
             let arg = arguments.get(0);
