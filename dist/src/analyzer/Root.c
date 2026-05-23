@@ -204,7 +204,7 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
             #line 135 "src/analyzer/Root.pv"
             struct str name = str__slice(arg_str, 0, pos - arg);
             #line 136 "src/analyzer/Root.pv"
-            char const* path = pos + 1;
+            char* path = pos + 1;
 
             #line 138 "src/analyzer/Root.pv"
             Root__add_namespace(self, name, (struct str){ .ptr = path, .length = strlen(path) });

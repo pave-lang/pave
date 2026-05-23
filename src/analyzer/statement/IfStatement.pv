@@ -11,6 +11,86 @@ struct IfStatement {
 }
 
 impl IfStatement {
+    // If `expr` is a null-comparison `var == null` / `null == var` (when narrow_on_true=false)
+    // or `var != null` / `null != var` (when narrow_on_true=true) where `var` has pointer type,
+    // returns (variable_name, narrowed &T reference type). Otherwise returns null.
+    fn detect_null_narrowing(context: &Context, expr: &Expression, narrow_on_true: bool) -> *Type {
+        let inner = expr;
+        match inner.data {
+            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
+            _ => {},
+        }
+
+        match inner.data {
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                let want_op: str = if narrow_on_true { "!=" } else { "==" };
+                if !op.eq(want_op) { return null; }
+
+                let var_expr: *Expression = null;
+                let other: *Expression = null;
+
+                match lhs.data {
+                    ExpressionData::Variable(_) => { var_expr = lhs; other = rhs; },
+                    _ => {},
+                }
+
+                if var_expr == null {
+                    match rhs.data {
+                        ExpressionData::Variable(_) => { var_expr = rhs; other = lhs; },
+                        _ => { return null; },
+                    }
+                }
+
+                let other_inner = other;
+                match other_inner.data {
+                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
+                    _ => {},
+                }
+
+                match other_inner.data {
+                    ExpressionData::NullLiteral => {},
+                    _ => { return null; },
+                }
+
+                match var_expr.return_type {
+                    Type::Indirect(indirect) => {
+                        if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
+                            return null;
+                        }
+                        let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
+                        return context.allocator.store(&Type::Indirect(ref_indirect));
+                    },
+                    _ => { return null; },
+                }
+            },
+            _ => { return null; },
+        }
+
+        return null;
+    }
+
+    fn narrowed_var_name(expr: &Expression) -> str {
+        let inner = expr;
+        match inner.data {
+            ExpressionData::ParenthesizedExpression(child) => { inner = child; },
+            _ => {},
+        }
+        match inner.data {
+            ExpressionData::BinaryExpression(lhs, _, rhs) => {
+                match lhs.data {
+                    ExpressionData::Variable(name) => { return name; },
+                    _ => {},
+                }
+                match rhs.data {
+                    ExpressionData::Variable(name) => { return name; },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+        return str { ptr: null, length: 0 };
+    }
+
     fn parse(context: &Context, generics: &Generics) -> *IfStatement {
         if !context.expect_value(TokenType::Keyword, "if") { return null; }
 
@@ -59,7 +139,17 @@ impl IfStatement {
                     return null;
                 },
             }
-            if !block.parse(context, generics, true) { return null; }
+
+            let narrow_true = IfStatement::detect_null_narrowing(context, expression, true);
+            if narrow_true != null {
+                let var_name = IfStatement::narrowed_var_name(expression);
+                context.push_scope(block);
+                context.set_narrowed(var_name, narrow_true);
+                if !block.parse(context, generics, false) { context.pop_scope(); return null; }
+                context.pop_scope();
+            } else {
+                if !block.parse(context, generics, true) { return null; }
+            }
         }
 
         let else_statements = Array<ElseStatement>::new(context.allocator);
@@ -121,7 +211,21 @@ impl IfStatement {
             } else {
                 else_end = true;
                 else_block = Block::new_ptr(context);
-                if !else_block.parse(context, generics, true) { return null; }
+
+                let narrow_false: *Type = null;
+                if pattern == null && expression != null {
+                    narrow_false = IfStatement::detect_null_narrowing(context, expression, false);
+                }
+
+                if narrow_false != null {
+                    let var_name = IfStatement::narrowed_var_name(expression);
+                    context.push_scope(else_block);
+                    context.set_narrowed(var_name, narrow_false);
+                    if !else_block.parse(context, generics, false) { context.pop_scope(); return null; }
+                    context.pop_scope();
+                } else {
+                    if !else_block.parse(context, generics, true) { return null; }
+                }
             }
 
             else_statements.append(ElseStatement {

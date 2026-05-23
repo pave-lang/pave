@@ -820,6 +820,11 @@ impl Context {
         return type;
     }
 
+    fn set_narrowed(&self, name: str, type: &Type) {
+        let scope = self.scopes.back();
+        scope.values.insert(name, *type);
+    }
+
     fn set_value(&self, name: &Token, type: &Type) -> bool {
         let scope = self.scopes.back();
         let values: &HashMap<str, Type> = &scope.values;
