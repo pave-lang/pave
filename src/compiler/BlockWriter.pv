@@ -187,9 +187,15 @@ impl BlockWriter {
                     if value != null {
                         match value.data {
                             ExpressionData::OptionalExpression(_, _) => {
-                                fprintf(file, ";\n");
-                                if !expr.write_optional_assignment(file, name.value, type, value, generics) { return false; }
-                                continue;
+                                if expr.optional_needs_lowering(value) {
+                                    fprintf(file, "; {\n");
+                                    generator.indent += 1;
+                                    if !expr.write_optional_assignment(file, name.value, type, value, generics) { return false; }
+                                    generator.indent -= 1;
+                                    generator.write_indent(file);
+                                    fprintf(file, "}\n");
+                                    continue;
+                                }
                             },
                             _ => {},
                         }
