@@ -555,7 +555,7 @@ impl Module {
                     self.type_impls.append(TypeImpl::new(allocator, impl_info.type, impl_info));
                     self.root.hack_type_impl = self.type_impls.back();
                 },
-                _ => { self.context.error_token(impl_info.token, "TODO: Currently unimplemented"); },
+                _ => { self.context.error_token(impl_info.token, "Impl blocks are not supported for this type"); },
             }
         }
 

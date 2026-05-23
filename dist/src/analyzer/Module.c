@@ -1095,7 +1095,7 @@ bool Module__prefill_types_impl(struct Module* self) {
             #line 558 "src/analyzer/Module.pv"
             default: {
                 #line 558 "src/analyzer/Module.pv"
-                Context__error_token(&self->context, impl_info->token, "TODO: Currently unimplemented");
+                Context__error_token(&self->context, impl_info->token, "Impl blocks are not supported for this type");
             } break;
         }
     } }

@@ -880,6 +880,8 @@ impl ExpressionWriter {
                             SequenceType::FixedArray(length) => {
                                 if member.eq("length") {
                                     self.write_expression(file, length, generics);
+                                } else if member.eq("data") {
+                                    self.write_expression(file, parent, generics);
                                 } else {
                                     fprintf(file, "!!ERROR NO MEMBER ");
                                     generator.write_str(file, member);
@@ -887,7 +889,9 @@ impl ExpressionWriter {
                                 }
                             },
                             SequenceType::Slice => {
-                                fprintf(file, "!!ERROR TODO MEMBERS FOR DYNAMIC SEQUENCES!!");
+                                self.write_expression(file, parent, generics);
+                                generator.write_instance_member_accessor(file, &parent.return_type, generics);
+                                generator.write_str(file, member);
                             },
                         }
                     },

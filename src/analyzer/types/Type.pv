@@ -294,25 +294,22 @@ impl Type {
     }
 
     fn eq_tuple(&self, other_tuple: &Tuple) -> bool {
-        // TODO get working
-        // match self {
-        //     Type::Indirect(indirect) => { return indirect.to.eq_tuple(other_tuple); },
-        //     Type::Tuple(tuple) => {
-        //         if tuple.elements.length != other_tuple.elements.length { return false; }
+        match self {
+            Type::Indirect(indirect) => { return indirect.to.eq_tuple(other_tuple); },
+            Type::Tuple(tuple) => {
+                if tuple.elements.length != other_tuple.elements.length { return false; }
 
-        //         for i in 0..tuple.elements.length {
-        //             if !tuple.elements.data[i].eq(&other_tuple.elements.data[i]) { return false; }
-        //         }
+                for i in 0..tuple.elements.length {
+                    if !tuple.elements.data[i].eq(&other_tuple.elements.data[i]) { return false; }
+                }
 
-        //         return true;
-        //     },
-        //     Type::Primitive(_) => { return true; },
-        //     _ => { return false; },
-        // }
+                return true;
+            },
+            Type::Primitive(_) => { return true; },
+            _ => { return false; },
+        }
 
-        // return false;
-
-        return true;
+        return false;
     }
 
     fn eq_primitive(&self, other: &Primitive) -> bool {
