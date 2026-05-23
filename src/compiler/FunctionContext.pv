@@ -27,7 +27,9 @@ impl FunctionContext {
         if func_info.type == FunctionType::Coroutine {
             self.coroutine = FunctionCoroutine::new(allocator);
             for param in func_info.parameters {
-                self.add_variable(param.name.value, &param.type);
+                let name = param.name;
+                if name == null { continue; }
+                self.add_variable(name.value, &param.type);
             }
         }
 
@@ -64,9 +66,8 @@ impl FunctionContext {
     }
 
     fn add_variable(&self, name: str, type: &Type) {
-        if self.func_info.type != FunctionType::Coroutine {
-            return;
-        }
+        let func_info = self.func_info;
+        if func_info == null || func_info.type != FunctionType::Coroutine { return; }
 
         let new_name = String::new(self.allocator);
         new_name.append(name);
