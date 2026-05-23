@@ -558,104 +558,99 @@ bool Impl__parse_functions(struct Impl* self) {
                     #line 335 "src/analyzer/Impl.pv"
                     struct Parameter* trait_param = Array_Parameter__get(&trait_func->parameters, i);
                     #line 336 "src/analyzer/Impl.pv"
-                    if (impl_param == 0) {
+                    if (impl_param == 0 || trait_param == 0) {
                         #line 336 "src/analyzer/Impl.pv"
                         return false;
                     }
-                    #line 337 "src/analyzer/Impl.pv"
-                    if (trait_param == 0) {
-                        #line 337 "src/analyzer/Impl.pv"
-                        return false;
-                    }
 
-                    #line 339 "src/analyzer/Impl.pv"
+                    #line 338 "src/analyzer/Impl.pv"
                     struct Type* trait_param_type = &trait_param->type;
-                    #line 340 "src/analyzer/Impl.pv"
+                    #line 339 "src/analyzer/Impl.pv"
                     if (!Type__is_self(Type__deref(trait_param_type))) {
-                        #line 340 "src/analyzer/Impl.pv"
+                        #line 339 "src/analyzer/Impl.pv"
                         trait_param_type = Context__resolve_type(context->allocator, trait_param_type, generic_map, 0);
                     }
 
-                    #line 342 "src/analyzer/Impl.pv"
+                    #line 341 "src/analyzer/Impl.pv"
                     if (!Type__eq(&impl_param->type, trait_param_type)) {
-                        #line 343 "src/analyzer/Impl.pv"
+                        #line 342 "src/analyzer/Impl.pv"
                         struct Token* impl_param_name = impl_param->name;
-                        #line 344 "src/analyzer/Impl.pv"
+                        #line 343 "src/analyzer/Impl.pv"
                         if (impl_param_name == 0) {
-                            #line 344 "src/analyzer/Impl.pv"
+                            #line 343 "src/analyzer/Impl.pv"
                             return false;
                         }
 
-                        #line 346 "src/analyzer/Impl.pv"
+                        #line 345 "src/analyzer/Impl.pv"
                         struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-                        #line 347 "src/analyzer/Impl.pv"
+                        #line 346 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = "Parameter ", .length = strlen("Parameter ") });
-                        #line 348 "src/analyzer/Impl.pv"
+                        #line 347 "src/analyzer/Impl.pv"
                         String__append(&message, impl_param_name->value);
-                        #line 349 "src/analyzer/Impl.pv"
+                        #line 348 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = " has type ", .length = strlen(" has type ") });
-                        #line 350 "src/analyzer/Impl.pv"
+                        #line 349 "src/analyzer/Impl.pv"
                         struct String impl_type_name = Naming__get_type_decl(&context->root->naming_decl, &impl_param->type, context->type_self, 0);
-                        #line 351 "src/analyzer/Impl.pv"
+                        #line 350 "src/analyzer/Impl.pv"
                         String__append(&message, String__as_str(&impl_type_name));
-                        #line 352 "src/analyzer/Impl.pv"
+                        #line 351 "src/analyzer/Impl.pv"
                         String__append(&message, (struct str){ .ptr = ", expected ", .length = strlen(", expected ") });
-                        #line 353 "src/analyzer/Impl.pv"
+                        #line 352 "src/analyzer/Impl.pv"
                         struct String trait_type_name = Naming__get_type_decl(&context->root->naming_decl, trait_param_type, context->type_self, 0);
-                        #line 354 "src/analyzer/Impl.pv"
+                        #line 353 "src/analyzer/Impl.pv"
                         String__append(&message, String__as_str(&trait_type_name));
-                        #line 355 "src/analyzer/Impl.pv"
+                        #line 354 "src/analyzer/Impl.pv"
                         Context__error_token(self->context, impl_param_name, String__c_str(&message));
                     }
-                    #line 357 "src/analyzer/Impl.pv"
+                    #line 356 "src/analyzer/Impl.pv"
                     i += 1;
                 }
             }
 
-            #line 361 "src/analyzer/Impl.pv"
+            #line 360 "src/analyzer/Impl.pv"
             struct Type* trait_func_return_type = &trait_func->return_type;
-            #line 362 "src/analyzer/Impl.pv"
+            #line 361 "src/analyzer/Impl.pv"
             if (!Type__is_self(Type__deref(trait_func_return_type))) {
-                #line 362 "src/analyzer/Impl.pv"
+                #line 361 "src/analyzer/Impl.pv"
                 trait_func_return_type = Context__resolve_type(context->allocator, trait_func_return_type, generic_map, 0);
             }
 
-            #line 364 "src/analyzer/Impl.pv"
+            #line 363 "src/analyzer/Impl.pv"
             if (!Type__eq(&impl_func->return_type, trait_func_return_type)) {
-                #line 365 "src/analyzer/Impl.pv"
+                #line 364 "src/analyzer/Impl.pv"
                 struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context->allocator });
-                #line 366 "src/analyzer/Impl.pv"
+                #line 365 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = "Implementation of trait function ", .length = strlen("Implementation of trait function ") });
-                #line 367 "src/analyzer/Impl.pv"
+                #line 366 "src/analyzer/Impl.pv"
                 String__append(&message, trait_func_name->value);
-                #line 368 "src/analyzer/Impl.pv"
+                #line 367 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = " has return type ", .length = strlen(" has return type ") });
-                #line 369 "src/analyzer/Impl.pv"
+                #line 368 "src/analyzer/Impl.pv"
                 struct String impl_return_name = Naming__get_type_decl(&context->root->naming_decl, &impl_func->return_type, context->type_self, 0);
-                #line 370 "src/analyzer/Impl.pv"
+                #line 369 "src/analyzer/Impl.pv"
                 String__append(&message, String__as_str(&impl_return_name));
-                #line 371 "src/analyzer/Impl.pv"
+                #line 370 "src/analyzer/Impl.pv"
                 String__append(&message, (struct str){ .ptr = ", expected ", .length = strlen(", expected ") });
-                #line 372 "src/analyzer/Impl.pv"
+                #line 371 "src/analyzer/Impl.pv"
                 struct String trait_return_name = Naming__get_type_decl(&context->root->naming_decl, trait_func_return_type, context->type_self, 0);
-                #line 373 "src/analyzer/Impl.pv"
+                #line 372 "src/analyzer/Impl.pv"
                 String__append(&message, String__as_str(&trait_return_name));
-                #line 374 "src/analyzer/Impl.pv"
+                #line 373 "src/analyzer/Impl.pv"
                 struct Token* impl_func_name = impl_func->name;
-                #line 375 "src/analyzer/Impl.pv"
+                #line 374 "src/analyzer/Impl.pv"
                 if (impl_func_name == 0) {
-                    #line 375 "src/analyzer/Impl.pv"
+                    #line 374 "src/analyzer/Impl.pv"
                     return false;
                 }
-                #line 376 "src/analyzer/Impl.pv"
+                #line 375 "src/analyzer/Impl.pv"
                 Context__error_token(self->context, impl_func_name, String__c_str(&message));
             }
         } }
     }
 
-    #line 381 "src/analyzer/Impl.pv"
+    #line 380 "src/analyzer/Impl.pv"
     self->context->type_self = &self->context->root->type_self;
 
-    #line 383 "src/analyzer/Impl.pv"
+    #line 382 "src/analyzer/Impl.pv"
     return true;
 }

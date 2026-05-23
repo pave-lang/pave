@@ -333,8 +333,7 @@ impl Impl {
                     while i < impl_func.parameters.length {
                         let impl_param = impl_func.parameters.get(i);
                         let trait_param = trait_func.parameters.get(i);
-                        if impl_param == null { return false; } // TODO combine once we support it
-                        if trait_param == null { return false; }
+                        if impl_param == null || trait_param == null { return false; }
                         
                         let trait_param_type = &trait_param.type;
                         if !trait_param_type.deref().is_self() { trait_param_type = Context::resolve_type(context.allocator, trait_param_type, generic_map, null); }

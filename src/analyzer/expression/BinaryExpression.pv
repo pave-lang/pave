@@ -8,6 +8,32 @@ struct NullNarrowing {
 }
 
 impl Expression {
+    fn is_null_literal_expression(expr: &Expression) -> bool {
+        match expr.data {
+            ExpressionData::ParenthesizedExpression(child) => { return Expression::is_null_literal_expression(child); },
+            ExpressionData::NullLiteral => { return true; },
+            _ => {},
+        }
+
+        return false;
+    }
+
+    fn append_null_narrowing(context: &Context, expr: &Expression, path: str, out: &Array<NullNarrowing>) {
+        match expr.return_type {
+            Type::Indirect(indirect) => {
+                if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
+                    return;
+                }
+                let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
+                let type_val = Type::Indirect(ref_indirect);
+                let stored = context.allocator.store(&type_val);
+                if stored == null { return; }
+                out.append(NullNarrowing { path, type: stored });
+            },
+            _ => {},
+        }
+    }
+
     // Build the dotted access path of an expression (e.g. "self.parent.next") into `out`.
     // Returns true if the expression is a Variable or a chain of MemberInstanceExpression
     // rooted in a Variable; false otherwise. Parens are transparently unwrapped.
@@ -68,33 +94,10 @@ impl Expression {
                 }
 
                 if other == null { return; }
-                let other_inner: *Expression = other;
-                if other_inner == null { return; }
-                match other_inner.data {
-                    ExpressionData::ParenthesizedExpression(c) => {
-                        match c.data {
-                            ExpressionData::NullLiteral => {},
-                            _ => { return; },
-                        }
-                    },
-                    ExpressionData::NullLiteral => {},
-                    _ => { return; },
-                }
+                if !Expression::is_null_literal_expression(other) { return; }
 
                 if var_expr == null { return; }
-                match var_expr.return_type {
-                    Type::Indirect(indirect) => {
-                        if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
-                            return;
-                        }
-                        let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
-                        let type_val = Type::Indirect(ref_indirect);
-                        let stored = context.allocator.store(&type_val);
-                        if stored == null { return; }
-                        out.append(NullNarrowing { path: path.as_str(), type: stored });
-                    },
-                    _ => {},
-                }
+                Expression::append_null_narrowing(context, var_expr, path.as_str(), out);
             },
             _ => {},
         }
