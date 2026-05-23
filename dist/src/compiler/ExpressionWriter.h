@@ -69,7 +69,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
 #line 534 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 735 "src/compiler/ExpressionWriter.pv"
+#line 739 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics);
 
 #endif

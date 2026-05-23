@@ -914,6 +914,22 @@ impl Context {
         return false;
     }
 
+    fn update_value_type(&self, name: str, type: &Type) -> bool {
+        if self.scopes.length == 0 { return false; }
+        let scope_front = self.scopes.data;
+        let scope = self.scopes.back();
+        while scope != null && scope >= scope_front {
+            let existing = scope.values.find(&name);
+            if existing != null {
+                scope.values.insert(name, *type);
+                return true;
+            }
+
+            scope = scope - 1;
+        }
+        return false;
+    }
+
     fn set_value(&self, name: &Token, type: &Type) -> bool {
         let scope = self.scopes.back();
         if scope == null { return false; }

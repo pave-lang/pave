@@ -572,23 +572,27 @@ impl ExpressionWriter {
                 return self.write_enum_variant(file, variant, &expression.return_type, arguments, generics);
             },
             ExpressionData::Type(type) => {
+                let invoke_type: *Type = type;
                 match type {
-                    Type::Self => { type = generics.self_type; },
+                    Type::Self => {
+                        invoke_type = generics.self_type;
+                    },
                     _ => {},
                 }
+                if invoke_type == null { return false; }
 
-                match type.resolve_typedef() {
+                match invoke_type.resolve_typedef() {
                     Type::Struct(_, _) => {
-                        return self.write_struct_construction(file, type, arguments, generics);
+                        return self.write_struct_construction(file, invoke_type, arguments, generics);
                     },
                     Type::StructC(_) => {
-                        return self.write_struct_construction(file, type, arguments, generics);
+                        return self.write_struct_construction(file, invoke_type, arguments, generics);
                     },
                     Type::UnionC(_) => {
-                        return self.write_struct_construction(file, type, arguments, generics);
+                        return self.write_struct_construction(file, invoke_type, arguments, generics);
                     },
                     Type::Tuple(_) => {
-                        return self.write_struct_construction(file, type, arguments, generics);
+                        return self.write_struct_construction(file, invoke_type, arguments, generics);
                     },
                     Type::Function(func_info, generic_map) => {
                         match func_info.type {

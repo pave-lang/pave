@@ -163,21 +163,24 @@ struct Type* Context__get_broadened_type(struct Context* self, struct str name);
 bool Context__broaden_if_narrowed(struct Context* self, struct str name);
 
 #line 917 "src/analyzer/Context.pv"
+bool Context__update_value_type(struct Context* self, struct str name, struct Type* type);
+
+#line 933 "src/analyzer/Context.pv"
 bool Context__set_value(struct Context* self, struct Token* name, struct Type* type);
 
-#line 934 "src/analyzer/Context.pv"
+#line 950 "src/analyzer/Context.pv"
 struct Type* Context__get_value(struct Context* self, struct str name);
 
-#line 953 "src/analyzer/Context.pv"
+#line 969 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_defer_statements(struct Context* self);
 
-#line 969 "src/analyzer/Context.pv"
+#line 985 "src/analyzer/Context.pv"
 struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* self);
 
-#line 987 "src/analyzer/Context.pv"
+#line 1003 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics);
 
-#line 1008 "src/analyzer/Context.pv"
+#line 1024 "src/analyzer/Context.pv"
 bool Context__validate_generic_constraints(struct Context* self, struct Generics* generics, struct Array_Type* usage_types);
 
 #endif

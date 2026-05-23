@@ -1,8 +1,57 @@
+use std
 use analyzer
 use expression
+use types
 
 struct AssignmentStatement {
     left: &Expression,
     operator: &Token,
     right: &Expression,
+}
+
+impl AssignmentStatement {
+    fn make_pointer_type_for_reference_assignment(context: &Context, left_type: &Type, right: &Expression) -> *Type {
+        match left_type {
+            Type::Indirect(left_indirect) => {
+                if left_indirect.type != IndirectType::Reference { return null; }
+
+                match right.data {
+                    ExpressionData::NullLiteral => {
+                        let pointer = Indirect::new_pointer(context.allocator, left_indirect.to);
+                        let pointer_type = Type::Indirect(pointer);
+                        return context.allocator.store(&pointer_type);
+                    },
+                    _ => {},
+                }
+
+                match right.return_type {
+                    Type::Indirect(right_indirect) => {
+                        if right_indirect.type != IndirectType::Pointer && right_indirect.type != IndirectType::ConstPointer {
+                            return null;
+                        }
+                        if !left_indirect.to.eq(&right_indirect.to) { return null; }
+                        return &right.return_type;
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        return null;
+    }
+
+    fn validate_and_update_scope(context: &Context, left: &Expression, right: &Expression) -> bool {
+        let pointer_type = AssignmentStatement::make_pointer_type_for_reference_assignment(context, &left.return_type, right);
+        if pointer_type != null {
+            let path = String::new(context.allocator);
+            if left.build_narrow_path(&path) {
+                context.update_value_type(path.as_str(), pointer_type);
+            }
+            right.return_type = *pointer_type;
+            return true;
+        }
+
+        return right.validate_type(context, &left.return_type, true);
+    }
 }

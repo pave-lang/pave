@@ -68,13 +68,15 @@ impl Expression {
                 }
 
                 if other == null { return; }
-                let other_inner = other;
-                match other_inner.data {
-                    ExpressionData::ParenthesizedExpression(c) => { other_inner = c; },
-                    _ => {},
-                }
+                let other_inner: *Expression = other;
                 if other_inner == null { return; }
                 match other_inner.data {
+                    ExpressionData::ParenthesizedExpression(c) => {
+                        match c.data {
+                            ExpressionData::NullLiteral => {},
+                            _ => { return; },
+                        }
+                    },
                     ExpressionData::NullLiteral => {},
                     _ => { return; },
                 }
