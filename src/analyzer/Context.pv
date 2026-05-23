@@ -822,7 +822,41 @@ impl Context {
 
     fn set_narrowed(&self, name: str, type: &Type) {
         let scope = self.scopes.back();
+        // Save the original type so the binding can be restored on reassignment.
+        let existing = scope.values.find(&name);
+        if existing != null && scope.narrow_originals.find(&name) == null {
+            scope.narrow_originals.insert(name, *existing);
+        }
         scope.values.insert(name, *type);
+    }
+
+    fn get_broadened_type(&self, name: str) -> *Type {
+        if self.scopes.length == 0 { return null; }
+        let scope_front = self.scopes.data;
+        let scope = self.scopes.back();
+        while scope >= scope_front {
+            let original = scope.narrow_originals.find(&name);
+            if original != null { return original; }
+            scope -= 1;
+        }
+        return null;
+    }
+
+    fn broaden_if_narrowed(&self, name: str) -> bool {
+        if self.scopes.length == 0 { return false; }
+        let scope_front = self.scopes.data;
+        let scope = self.scopes.back();
+        while scope >= scope_front {
+            let original = scope.narrow_originals.find(&name);
+            if original != null {
+                let original_type = *original;
+                scope.narrow_originals.remove(&name);
+                scope.values.insert(name, original_type);
+                return true;
+            }
+            scope -= 1;
+        }
+        return false;
     }
 
     fn set_value(&self, name: &Token, type: &Type) -> bool {

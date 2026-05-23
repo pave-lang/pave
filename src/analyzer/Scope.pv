@@ -3,6 +3,7 @@ use types
 
 struct Scope {
     values: HashMap<str, Type>,
+    narrow_originals: HashMap<str, Type>,
     block: *Block,
 }
 
@@ -10,6 +11,7 @@ impl Scope {
     fn new(allocator: &ArenaAllocator, block: *Block) -> Self {
         return Self {
             values: HashMap<str, Type>::new(allocator),
+            narrow_originals: HashMap<str, Type>::new(allocator),
             block,
         };
     }

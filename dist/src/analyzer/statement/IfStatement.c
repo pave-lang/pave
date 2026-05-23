@@ -10,9 +10,12 @@
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Context.h>
+#include <std/Array_Statement.h>
+#include <analyzer/Block.h>
+#include <analyzer/statement/Statement.h>
+#include <analyzer/statement/StatementData.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/statement/MatchPattern.h>
-#include <analyzer/Block.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/Token.h>
 #include <analyzer/types/Primitive.h>
@@ -159,378 +162,412 @@ struct Type* IfStatement__detect_null_narrowing(struct Context* context, struct 
 }
 
 #line 72 "src/analyzer/statement/IfStatement.pv"
-struct str IfStatement__narrowed_var_name(struct Expression* expr) {
+bool IfStatement__block_always_diverges(struct Block* block) {
     #line 73 "src/analyzer/statement/IfStatement.pv"
-    struct Expression* inner = expr;
+    if (block->statements.length == 0) {
+        #line 73 "src/analyzer/statement/IfStatement.pv"
+        return false;
+    }
     #line 74 "src/analyzer/statement/IfStatement.pv"
+    struct Statement* last = &block->statements.data[block->statements.length - 1];
+    #line 75 "src/analyzer/statement/IfStatement.pv"
+    switch (last->data.type) {
+        #line 76 "src/analyzer/statement/IfStatement.pv"
+        case STATEMENT_DATA__RETURN_STATEMENT: {
+            #line 76 "src/analyzer/statement/IfStatement.pv"
+            return true;
+        } break;
+        #line 77 "src/analyzer/statement/IfStatement.pv"
+        case STATEMENT_DATA__BREAK_STATEMENT: {
+            #line 77 "src/analyzer/statement/IfStatement.pv"
+            return true;
+        } break;
+        #line 78 "src/analyzer/statement/IfStatement.pv"
+        case STATEMENT_DATA__CONTINUE_STATEMENT: {
+            #line 78 "src/analyzer/statement/IfStatement.pv"
+            return true;
+        } break;
+        #line 79 "src/analyzer/statement/IfStatement.pv"
+        default: {
+            #line 79 "src/analyzer/statement/IfStatement.pv"
+            return false;
+        } break;
+    }
+}
+
+#line 83 "src/analyzer/statement/IfStatement.pv"
+struct str IfStatement__narrowed_var_name(struct Expression* expr) {
+    #line 84 "src/analyzer/statement/IfStatement.pv"
+    struct Expression* inner = expr;
+    #line 85 "src/analyzer/statement/IfStatement.pv"
     switch (inner->data.type) {
-        #line 75 "src/analyzer/statement/IfStatement.pv"
+        #line 86 "src/analyzer/statement/IfStatement.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 75 "src/analyzer/statement/IfStatement.pv"
+            #line 86 "src/analyzer/statement/IfStatement.pv"
             struct Expression* child = inner->data.parenthesizedexpression_value;
-            #line 75 "src/analyzer/statement/IfStatement.pv"
+            #line 86 "src/analyzer/statement/IfStatement.pv"
             inner = child;
         } break;
-        #line 76 "src/analyzer/statement/IfStatement.pv"
+        #line 87 "src/analyzer/statement/IfStatement.pv"
         default: {
         } break;
     }
-    #line 78 "src/analyzer/statement/IfStatement.pv"
+    #line 89 "src/analyzer/statement/IfStatement.pv"
     switch (inner->data.type) {
-        #line 79 "src/analyzer/statement/IfStatement.pv"
+        #line 90 "src/analyzer/statement/IfStatement.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 79 "src/analyzer/statement/IfStatement.pv"
+            #line 90 "src/analyzer/statement/IfStatement.pv"
             struct Expression* lhs = inner->data.binaryexpression_value._0;
-            #line 79 "src/analyzer/statement/IfStatement.pv"
+            #line 90 "src/analyzer/statement/IfStatement.pv"
             struct Expression* rhs = inner->data.binaryexpression_value._2;
-            #line 80 "src/analyzer/statement/IfStatement.pv"
+            #line 91 "src/analyzer/statement/IfStatement.pv"
             switch (lhs->data.type) {
-                #line 81 "src/analyzer/statement/IfStatement.pv"
+                #line 92 "src/analyzer/statement/IfStatement.pv"
                 case EXPRESSION_DATA__VARIABLE: {
-                    #line 81 "src/analyzer/statement/IfStatement.pv"
+                    #line 92 "src/analyzer/statement/IfStatement.pv"
                     struct str name = lhs->data.variable_value;
-                    #line 81 "src/analyzer/statement/IfStatement.pv"
+                    #line 92 "src/analyzer/statement/IfStatement.pv"
                     return name;
                 } break;
-                #line 82 "src/analyzer/statement/IfStatement.pv"
+                #line 93 "src/analyzer/statement/IfStatement.pv"
                 default: {
                 } break;
             }
-            #line 84 "src/analyzer/statement/IfStatement.pv"
+            #line 95 "src/analyzer/statement/IfStatement.pv"
             switch (rhs->data.type) {
-                #line 85 "src/analyzer/statement/IfStatement.pv"
+                #line 96 "src/analyzer/statement/IfStatement.pv"
                 case EXPRESSION_DATA__VARIABLE: {
-                    #line 85 "src/analyzer/statement/IfStatement.pv"
+                    #line 96 "src/analyzer/statement/IfStatement.pv"
                     struct str name = rhs->data.variable_value;
-                    #line 85 "src/analyzer/statement/IfStatement.pv"
+                    #line 96 "src/analyzer/statement/IfStatement.pv"
                     return name;
                 } break;
-                #line 86 "src/analyzer/statement/IfStatement.pv"
+                #line 97 "src/analyzer/statement/IfStatement.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 89 "src/analyzer/statement/IfStatement.pv"
+        #line 100 "src/analyzer/statement/IfStatement.pv"
         default: {
         } break;
     }
-    #line 91 "src/analyzer/statement/IfStatement.pv"
+    #line 102 "src/analyzer/statement/IfStatement.pv"
     return (struct str) { .ptr = 0, .length = 0 };
 }
 
-#line 94 "src/analyzer/statement/IfStatement.pv"
+#line 105 "src/analyzer/statement/IfStatement.pv"
 struct IfStatement* IfStatement__parse(struct Context* context, struct Generics* generics) {
-    #line 95 "src/analyzer/statement/IfStatement.pv"
+    #line 106 "src/analyzer/statement/IfStatement.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "if")) {
-        #line 95 "src/analyzer/statement/IfStatement.pv"
+        #line 106 "src/analyzer/statement/IfStatement.pv"
         return 0;
     }
 
-    #line 97 "src/analyzer/statement/IfStatement.pv"
+    #line 108 "src/analyzer/statement/IfStatement.pv"
     struct MatchPattern* pattern = 0;
-    #line 98 "src/analyzer/statement/IfStatement.pv"
+    #line 109 "src/analyzer/statement/IfStatement.pv"
     struct Expression* expression = 0;
-    #line 99 "src/analyzer/statement/IfStatement.pv"
+    #line 110 "src/analyzer/statement/IfStatement.pv"
     struct Block* block = Block__new_ptr(context);
 
-    #line 101 "src/analyzer/statement/IfStatement.pv"
+    #line 112 "src/analyzer/statement/IfStatement.pv"
     if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "let")) {
-        #line 102 "src/analyzer/statement/IfStatement.pv"
+        #line 113 "src/analyzer/statement/IfStatement.pv"
         Context__push_scope(context, block);
-        #line 103 "src/analyzer/statement/IfStatement.pv"
+        #line 114 "src/analyzer/statement/IfStatement.pv"
         struct MatchPattern p = (struct MatchPattern) { .type = MATCH_PATTERN__DEFAULT };
-        #line 104 "src/analyzer/statement/IfStatement.pv"
+        #line 115 "src/analyzer/statement/IfStatement.pv"
         if (!MatchPattern__parse(context, generics, &p)) {
-            #line 104 "src/analyzer/statement/IfStatement.pv"
+            #line 115 "src/analyzer/statement/IfStatement.pv"
             Context__pop_scope(context);
-            #line 104 "src/analyzer/statement/IfStatement.pv"
+            #line 115 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 105 "src/analyzer/statement/IfStatement.pv"
+        #line 116 "src/analyzer/statement/IfStatement.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "=")) {
-            #line 105 "src/analyzer/statement/IfStatement.pv"
+            #line 116 "src/analyzer/statement/IfStatement.pv"
             Context__pop_scope(context);
-            #line 105 "src/analyzer/statement/IfStatement.pv"
+            #line 116 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 106 "src/analyzer/statement/IfStatement.pv"
+        #line 117 "src/analyzer/statement/IfStatement.pv"
         pattern = ArenaAllocator__store_MatchPattern(context->allocator, &p);
-        #line 107 "src/analyzer/statement/IfStatement.pv"
+        #line 118 "src/analyzer/statement/IfStatement.pv"
         expression = Expression__parse(context, generics);
-        #line 108 "src/analyzer/statement/IfStatement.pv"
+        #line 119 "src/analyzer/statement/IfStatement.pv"
         if (expression == 0) {
-            #line 108 "src/analyzer/statement/IfStatement.pv"
+            #line 119 "src/analyzer/statement/IfStatement.pv"
             Context__pop_scope(context);
-            #line 108 "src/analyzer/statement/IfStatement.pv"
+            #line 119 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 109 "src/analyzer/statement/IfStatement.pv"
+        #line 120 "src/analyzer/statement/IfStatement.pv"
         switch (p.type) {
-            #line 110 "src/analyzer/statement/IfStatement.pv"
+            #line 121 "src/analyzer/statement/IfStatement.pv"
             case MATCH_PATTERN__ENUM_VARIANT: {
-                #line 110 "src/analyzer/statement/IfStatement.pv"
+                #line 121 "src/analyzer/statement/IfStatement.pv"
                 struct Type* enum_type = p.enumvariant_value._0;
-                #line 111 "src/analyzer/statement/IfStatement.pv"
+                #line 122 "src/analyzer/statement/IfStatement.pv"
                 if (!Type__eq(Type__deref(&expression->return_type), enum_type)) {
-                    #line 112 "src/analyzer/statement/IfStatement.pv"
+                    #line 123 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If let expression type does not match pattern enum type");
-                    #line 113 "src/analyzer/statement/IfStatement.pv"
+                    #line 124 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 114 "src/analyzer/statement/IfStatement.pv"
+                    #line 125 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             } break;
-            #line 117 "src/analyzer/statement/IfStatement.pv"
+            #line 128 "src/analyzer/statement/IfStatement.pv"
             default: {
-                #line 118 "src/analyzer/statement/IfStatement.pv"
+                #line 129 "src/analyzer/statement/IfStatement.pv"
                 if (!Type__is_discriminated_union(Type__deref(&expression->return_type))) {
-                    #line 119 "src/analyzer/statement/IfStatement.pv"
+                    #line 130 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If let expression must be an enum (discriminated union)");
-                    #line 120 "src/analyzer/statement/IfStatement.pv"
+                    #line 131 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 121 "src/analyzer/statement/IfStatement.pv"
+                    #line 132 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             } break;
         }
-        #line 125 "src/analyzer/statement/IfStatement.pv"
+        #line 136 "src/analyzer/statement/IfStatement.pv"
         if (!Block__parse(block, context, generics, false)) {
-            #line 125 "src/analyzer/statement/IfStatement.pv"
+            #line 136 "src/analyzer/statement/IfStatement.pv"
             Context__pop_scope(context);
-            #line 125 "src/analyzer/statement/IfStatement.pv"
+            #line 136 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 126 "src/analyzer/statement/IfStatement.pv"
+        #line 137 "src/analyzer/statement/IfStatement.pv"
         Context__pop_scope(context);
     } else {
-        #line 128 "src/analyzer/statement/IfStatement.pv"
+        #line 139 "src/analyzer/statement/IfStatement.pv"
         expression = Expression__parse(context, generics);
-        #line 129 "src/analyzer/statement/IfStatement.pv"
+        #line 140 "src/analyzer/statement/IfStatement.pv"
         if (expression == 0) {
-            #line 129 "src/analyzer/statement/IfStatement.pv"
+            #line 140 "src/analyzer/statement/IfStatement.pv"
             return 0;
         }
-        #line 130 "src/analyzer/statement/IfStatement.pv"
+        #line 141 "src/analyzer/statement/IfStatement.pv"
         switch (expression->return_type.type) {
-            #line 131 "src/analyzer/statement/IfStatement.pv"
+            #line 142 "src/analyzer/statement/IfStatement.pv"
             case TYPE__PRIMITIVE: {
-                #line 131 "src/analyzer/statement/IfStatement.pv"
+                #line 142 "src/analyzer/statement/IfStatement.pv"
                 struct Primitive* prim = expression->return_type.primitive_value;
-                #line 132 "src/analyzer/statement/IfStatement.pv"
+                #line 143 "src/analyzer/statement/IfStatement.pv"
                 if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
-                    #line 133 "src/analyzer/statement/IfStatement.pv"
+                    #line 144 "src/analyzer/statement/IfStatement.pv"
                     Context__error_token(context, expression->token, "If condition must be a bool expression");
-                    #line 134 "src/analyzer/statement/IfStatement.pv"
+                    #line 145 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             } break;
-            #line 137 "src/analyzer/statement/IfStatement.pv"
+            #line 148 "src/analyzer/statement/IfStatement.pv"
             default: {
-                #line 138 "src/analyzer/statement/IfStatement.pv"
+                #line 149 "src/analyzer/statement/IfStatement.pv"
                 Context__error_token(context, expression->token, "If condition must be a bool expression");
-                #line 139 "src/analyzer/statement/IfStatement.pv"
+                #line 150 "src/analyzer/statement/IfStatement.pv"
                 return 0;
             } break;
         }
 
-        #line 143 "src/analyzer/statement/IfStatement.pv"
+        #line 154 "src/analyzer/statement/IfStatement.pv"
         struct Type* narrow_true = IfStatement__detect_null_narrowing(context, expression, true);
-        #line 144 "src/analyzer/statement/IfStatement.pv"
+        #line 155 "src/analyzer/statement/IfStatement.pv"
         if (narrow_true != 0) {
-            #line 145 "src/analyzer/statement/IfStatement.pv"
+            #line 156 "src/analyzer/statement/IfStatement.pv"
             struct str var_name = IfStatement__narrowed_var_name(expression);
-            #line 146 "src/analyzer/statement/IfStatement.pv"
+            #line 157 "src/analyzer/statement/IfStatement.pv"
             Context__push_scope(context, block);
-            #line 147 "src/analyzer/statement/IfStatement.pv"
+            #line 158 "src/analyzer/statement/IfStatement.pv"
             Context__set_narrowed(context, var_name, narrow_true);
-            #line 148 "src/analyzer/statement/IfStatement.pv"
+            #line 159 "src/analyzer/statement/IfStatement.pv"
             if (!Block__parse(block, context, generics, false)) {
-                #line 148 "src/analyzer/statement/IfStatement.pv"
+                #line 159 "src/analyzer/statement/IfStatement.pv"
                 Context__pop_scope(context);
-                #line 148 "src/analyzer/statement/IfStatement.pv"
+                #line 159 "src/analyzer/statement/IfStatement.pv"
                 return 0;
             }
-            #line 149 "src/analyzer/statement/IfStatement.pv"
+            #line 160 "src/analyzer/statement/IfStatement.pv"
             Context__pop_scope(context);
         } else {
-            #line 151 "src/analyzer/statement/IfStatement.pv"
+            #line 162 "src/analyzer/statement/IfStatement.pv"
             if (!Block__parse(block, context, generics, true)) {
-                #line 151 "src/analyzer/statement/IfStatement.pv"
+                #line 162 "src/analyzer/statement/IfStatement.pv"
                 return 0;
             }
         }
     }
 
-    #line 155 "src/analyzer/statement/IfStatement.pv"
+    #line 166 "src/analyzer/statement/IfStatement.pv"
     struct Array_ElseStatement else_statements = Array_ElseStatement__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-    #line 156 "src/analyzer/statement/IfStatement.pv"
+    #line 167 "src/analyzer/statement/IfStatement.pv"
     struct Expression* else_expression = 0;
-    #line 157 "src/analyzer/statement/IfStatement.pv"
+    #line 168 "src/analyzer/statement/IfStatement.pv"
     struct MatchPattern* else_pattern = 0;
-    #line 158 "src/analyzer/statement/IfStatement.pv"
+    #line 169 "src/analyzer/statement/IfStatement.pv"
     struct Block* else_block = 0;
-    #line 159 "src/analyzer/statement/IfStatement.pv"
+    #line 170 "src/analyzer/statement/IfStatement.pv"
     bool else_end = false;
 
-    #line 161 "src/analyzer/statement/IfStatement.pv"
+    #line 172 "src/analyzer/statement/IfStatement.pv"
     while (!else_end && Context__check_next(context, TOKEN_TYPE__KEYWORD, "else")) {
-        #line 162 "src/analyzer/statement/IfStatement.pv"
+        #line 173 "src/analyzer/statement/IfStatement.pv"
         else_expression = 0;
-        #line 163 "src/analyzer/statement/IfStatement.pv"
+        #line 174 "src/analyzer/statement/IfStatement.pv"
         else_pattern = 0;
 
-        #line 165 "src/analyzer/statement/IfStatement.pv"
+        #line 176 "src/analyzer/statement/IfStatement.pv"
         if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "if")) {
-            #line 166 "src/analyzer/statement/IfStatement.pv"
+            #line 177 "src/analyzer/statement/IfStatement.pv"
             if (Context__check_next(context, TOKEN_TYPE__KEYWORD, "let")) {
-                #line 167 "src/analyzer/statement/IfStatement.pv"
+                #line 178 "src/analyzer/statement/IfStatement.pv"
                 else_block = Block__new_ptr(context);
-                #line 168 "src/analyzer/statement/IfStatement.pv"
+                #line 179 "src/analyzer/statement/IfStatement.pv"
                 Context__push_scope(context, else_block);
-                #line 169 "src/analyzer/statement/IfStatement.pv"
+                #line 180 "src/analyzer/statement/IfStatement.pv"
                 struct MatchPattern ep = (struct MatchPattern) { .type = MATCH_PATTERN__DEFAULT };
-                #line 170 "src/analyzer/statement/IfStatement.pv"
+                #line 181 "src/analyzer/statement/IfStatement.pv"
                 if (!MatchPattern__parse(context, generics, &ep)) {
-                    #line 170 "src/analyzer/statement/IfStatement.pv"
+                    #line 181 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 170 "src/analyzer/statement/IfStatement.pv"
+                    #line 181 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 171 "src/analyzer/statement/IfStatement.pv"
+                #line 182 "src/analyzer/statement/IfStatement.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "=")) {
-                    #line 171 "src/analyzer/statement/IfStatement.pv"
+                    #line 182 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 171 "src/analyzer/statement/IfStatement.pv"
+                    #line 182 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 172 "src/analyzer/statement/IfStatement.pv"
+                #line 183 "src/analyzer/statement/IfStatement.pv"
                 else_pattern = ArenaAllocator__store_MatchPattern(context->allocator, &ep);
-                #line 173 "src/analyzer/statement/IfStatement.pv"
+                #line 184 "src/analyzer/statement/IfStatement.pv"
                 else_expression = Expression__parse(context, generics);
-                #line 174 "src/analyzer/statement/IfStatement.pv"
+                #line 185 "src/analyzer/statement/IfStatement.pv"
                 if (else_expression == 0) {
-                    #line 174 "src/analyzer/statement/IfStatement.pv"
+                    #line 185 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 174 "src/analyzer/statement/IfStatement.pv"
+                    #line 185 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 175 "src/analyzer/statement/IfStatement.pv"
+                #line 186 "src/analyzer/statement/IfStatement.pv"
                 switch (ep.type) {
-                    #line 176 "src/analyzer/statement/IfStatement.pv"
+                    #line 187 "src/analyzer/statement/IfStatement.pv"
                     case MATCH_PATTERN__ENUM_VARIANT: {
-                        #line 176 "src/analyzer/statement/IfStatement.pv"
+                        #line 187 "src/analyzer/statement/IfStatement.pv"
                         struct Type* enum_type = ep.enumvariant_value._0;
-                        #line 177 "src/analyzer/statement/IfStatement.pv"
+                        #line 188 "src/analyzer/statement/IfStatement.pv"
                         if (!Type__eq(&else_expression->return_type, enum_type)) {
-                            #line 178 "src/analyzer/statement/IfStatement.pv"
+                            #line 189 "src/analyzer/statement/IfStatement.pv"
                             Context__error_token(context, else_expression->token, "If let expression type does not match pattern enum type");
-                            #line 179 "src/analyzer/statement/IfStatement.pv"
+                            #line 190 "src/analyzer/statement/IfStatement.pv"
                             Context__pop_scope(context);
-                            #line 180 "src/analyzer/statement/IfStatement.pv"
+                            #line 191 "src/analyzer/statement/IfStatement.pv"
                             return 0;
                         }
                     } break;
-                    #line 183 "src/analyzer/statement/IfStatement.pv"
+                    #line 194 "src/analyzer/statement/IfStatement.pv"
                     default: {
-                        #line 184 "src/analyzer/statement/IfStatement.pv"
+                        #line 195 "src/analyzer/statement/IfStatement.pv"
                         if (!Type__is_enum(&else_expression->return_type)) {
-                            #line 185 "src/analyzer/statement/IfStatement.pv"
+                            #line 196 "src/analyzer/statement/IfStatement.pv"
                             Context__error_token(context, else_expression->token, "If let expression must be an enum (discriminated union)");
-                            #line 186 "src/analyzer/statement/IfStatement.pv"
+                            #line 197 "src/analyzer/statement/IfStatement.pv"
                             Context__pop_scope(context);
-                            #line 187 "src/analyzer/statement/IfStatement.pv"
+                            #line 198 "src/analyzer/statement/IfStatement.pv"
                             return 0;
                         }
                     } break;
                 }
-                #line 191 "src/analyzer/statement/IfStatement.pv"
+                #line 202 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, false)) {
-                    #line 191 "src/analyzer/statement/IfStatement.pv"
+                    #line 202 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 191 "src/analyzer/statement/IfStatement.pv"
+                    #line 202 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 192 "src/analyzer/statement/IfStatement.pv"
+                #line 203 "src/analyzer/statement/IfStatement.pv"
                 Context__pop_scope(context);
             } else {
-                #line 194 "src/analyzer/statement/IfStatement.pv"
+                #line 205 "src/analyzer/statement/IfStatement.pv"
                 else_expression = Expression__parse(context, generics);
-                #line 195 "src/analyzer/statement/IfStatement.pv"
+                #line 206 "src/analyzer/statement/IfStatement.pv"
                 if (else_expression == 0) {
-                    #line 195 "src/analyzer/statement/IfStatement.pv"
+                    #line 206 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 196 "src/analyzer/statement/IfStatement.pv"
+                #line 207 "src/analyzer/statement/IfStatement.pv"
                 switch (else_expression->return_type.type) {
-                    #line 197 "src/analyzer/statement/IfStatement.pv"
+                    #line 208 "src/analyzer/statement/IfStatement.pv"
                     case TYPE__PRIMITIVE: {
-                        #line 197 "src/analyzer/statement/IfStatement.pv"
+                        #line 208 "src/analyzer/statement/IfStatement.pv"
                         struct Primitive* prim = else_expression->return_type.primitive_value;
-                        #line 198 "src/analyzer/statement/IfStatement.pv"
+                        #line 209 "src/analyzer/statement/IfStatement.pv"
                         if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
-                            #line 199 "src/analyzer/statement/IfStatement.pv"
+                            #line 210 "src/analyzer/statement/IfStatement.pv"
                             Context__error_token(context, else_expression->token, "If condition must be a bool expression");
-                            #line 200 "src/analyzer/statement/IfStatement.pv"
+                            #line 211 "src/analyzer/statement/IfStatement.pv"
                             return 0;
                         }
                     } break;
-                    #line 203 "src/analyzer/statement/IfStatement.pv"
+                    #line 214 "src/analyzer/statement/IfStatement.pv"
                     default: {
-                        #line 204 "src/analyzer/statement/IfStatement.pv"
+                        #line 215 "src/analyzer/statement/IfStatement.pv"
                         Context__error_token(context, else_expression->token, "If condition must be a bool expression");
-                        #line 205 "src/analyzer/statement/IfStatement.pv"
+                        #line 216 "src/analyzer/statement/IfStatement.pv"
                         return 0;
                     } break;
                 }
-                #line 208 "src/analyzer/statement/IfStatement.pv"
+                #line 219 "src/analyzer/statement/IfStatement.pv"
                 else_block = Block__new_ptr(context);
-                #line 209 "src/analyzer/statement/IfStatement.pv"
+                #line 220 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, true)) {
-                    #line 209 "src/analyzer/statement/IfStatement.pv"
+                    #line 220 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             }
         } else {
-            #line 212 "src/analyzer/statement/IfStatement.pv"
+            #line 223 "src/analyzer/statement/IfStatement.pv"
             else_end = true;
-            #line 213 "src/analyzer/statement/IfStatement.pv"
+            #line 224 "src/analyzer/statement/IfStatement.pv"
             else_block = Block__new_ptr(context);
 
-            #line 215 "src/analyzer/statement/IfStatement.pv"
+            #line 226 "src/analyzer/statement/IfStatement.pv"
             struct Type* narrow_false = 0;
-            #line 216 "src/analyzer/statement/IfStatement.pv"
+            #line 227 "src/analyzer/statement/IfStatement.pv"
             if (pattern == 0 && expression != 0) {
-                #line 217 "src/analyzer/statement/IfStatement.pv"
+                #line 228 "src/analyzer/statement/IfStatement.pv"
                 narrow_false = IfStatement__detect_null_narrowing(context, expression, false);
             }
 
-            #line 220 "src/analyzer/statement/IfStatement.pv"
+            #line 231 "src/analyzer/statement/IfStatement.pv"
             if (narrow_false != 0) {
-                #line 221 "src/analyzer/statement/IfStatement.pv"
+                #line 232 "src/analyzer/statement/IfStatement.pv"
                 struct str var_name = IfStatement__narrowed_var_name(expression);
-                #line 222 "src/analyzer/statement/IfStatement.pv"
+                #line 233 "src/analyzer/statement/IfStatement.pv"
                 Context__push_scope(context, else_block);
-                #line 223 "src/analyzer/statement/IfStatement.pv"
+                #line 234 "src/analyzer/statement/IfStatement.pv"
                 Context__set_narrowed(context, var_name, narrow_false);
-                #line 224 "src/analyzer/statement/IfStatement.pv"
+                #line 235 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, false)) {
-                    #line 224 "src/analyzer/statement/IfStatement.pv"
+                    #line 235 "src/analyzer/statement/IfStatement.pv"
                     Context__pop_scope(context);
-                    #line 224 "src/analyzer/statement/IfStatement.pv"
+                    #line 235 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
-                #line 225 "src/analyzer/statement/IfStatement.pv"
+                #line 236 "src/analyzer/statement/IfStatement.pv"
                 Context__pop_scope(context);
             } else {
-                #line 227 "src/analyzer/statement/IfStatement.pv"
+                #line 238 "src/analyzer/statement/IfStatement.pv"
                 if (!Block__parse(else_block, context, generics, true)) {
-                    #line 227 "src/analyzer/statement/IfStatement.pv"
+                    #line 238 "src/analyzer/statement/IfStatement.pv"
                     return 0;
                 }
             }
         }
 
-        #line 231 "src/analyzer/statement/IfStatement.pv"
+        #line 242 "src/analyzer/statement/IfStatement.pv"
         Array_ElseStatement__append(&else_statements, (struct ElseStatement) {
             .pattern = else_pattern,
             .expression = else_expression,
@@ -538,7 +575,23 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
         });
     }
 
-    #line 238 "src/analyzer/statement/IfStatement.pv"
+    #line 249 "src/analyzer/statement/IfStatement.pv"
+    if (pattern == 0 && expression != 0 && else_statements.length == 0) {
+        #line 250 "src/analyzer/statement/IfStatement.pv"
+        if (IfStatement__block_always_diverges(block)) {
+            #line 251 "src/analyzer/statement/IfStatement.pv"
+            struct Type* narrow_after = IfStatement__detect_null_narrowing(context, expression, false);
+            #line 252 "src/analyzer/statement/IfStatement.pv"
+            if (narrow_after != 0) {
+                #line 253 "src/analyzer/statement/IfStatement.pv"
+                struct str var_name = IfStatement__narrowed_var_name(expression);
+                #line 254 "src/analyzer/statement/IfStatement.pv"
+                Context__set_narrowed(context, var_name, narrow_after);
+            }
+        }
+    }
+
+    #line 259 "src/analyzer/statement/IfStatement.pv"
     return ArenaAllocator__store_IfStatement(context->allocator, (struct IfStatement[]){(struct IfStatement) {
         .pattern = pattern,
         .expression = expression,

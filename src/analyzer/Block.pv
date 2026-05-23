@@ -34,6 +34,20 @@ impl Block {
         if expression == null { return false; }
 
         if context.check_value(TokenType::Symbol, "=") || context.check_value(TokenType::Symbol, "+=") || context.check_value(TokenType::Symbol, "-=") || context.check_value(TokenType::Symbol, "*=") || context.check_value(TokenType::Symbol, "/=") || context.check_value(TokenType::Symbol, "|=") {
+            // Reassigning a null-narrowed variable broadens it back to its original type
+            // so the assignment type-checks against the broader type.
+            if context.check_value(TokenType::Symbol, "=") {
+                match expression.data {
+                    ExpressionData::Variable(var_name) => {
+                        if context.broaden_if_narrowed(var_name) {
+                            let restored = context.get_value(var_name);
+                            if restored != null { expression.return_type = *restored; }
+                        }
+                    },
+                    _ => {},
+                }
+            }
+
             let operator = context.expect(TokenType::Symbol);
             if operator == null { return false; }
 

@@ -69,6 +69,17 @@ impl IfStatement {
         return null;
     }
 
+    fn block_always_diverges(block: &Block) -> bool {
+        if block.statements.length == 0 { return false; }
+        let last = &block.statements.data[block.statements.length - 1];
+        match last.data {
+            StatementData::ReturnStatement(_) => { return true; },
+            StatementData::BreakStatement(_) => { return true; },
+            StatementData::ContinueStatement(_) => { return true; },
+            _ => { return false; },
+        }
+    }
+
     fn narrowed_var_name(expr: &Expression) -> str {
         let inner = expr;
         match inner.data {
@@ -233,6 +244,16 @@ impl IfStatement {
                 expression: else_expression,
                 block: else_block,
             });
+        }
+
+        if pattern == null && expression != null && else_statements.length == 0 {
+            if IfStatement::block_always_diverges(block) {
+                let narrow_after = IfStatement::detect_null_narrowing(context, expression, false);
+                if narrow_after != null {
+                    let var_name = IfStatement::narrowed_var_name(expression);
+                    context.set_narrowed(var_name, narrow_after);
+                }
+            }
         }
 
         return context.allocator.store(&IfStatement {

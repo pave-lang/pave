@@ -20,6 +20,7 @@ struct IfStatement {
 struct Context;
 struct Expression;
 struct Type;
+struct Block;
 struct Generics;
 struct IfStatement;
 
@@ -27,9 +28,12 @@ struct IfStatement;
 struct Type* IfStatement__detect_null_narrowing(struct Context* context, struct Expression* expr, bool narrow_on_true);
 
 #line 72 "src/analyzer/statement/IfStatement.pv"
+bool IfStatement__block_always_diverges(struct Block* block);
+
+#line 83 "src/analyzer/statement/IfStatement.pv"
 struct str IfStatement__narrowed_var_name(struct Expression* expr);
 
-#line 94 "src/analyzer/statement/IfStatement.pv"
+#line 105 "src/analyzer/statement/IfStatement.pv"
 struct IfStatement* IfStatement__parse(struct Context* context, struct Generics* generics);
 
 #endif

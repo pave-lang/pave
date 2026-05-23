@@ -44,6 +44,22 @@ impl LetStatement {
         }
 
         if !context.set_value(name, type) { context.error("set_value"); return null; }
+
+        // If the initializer is a null-narrowed variable, propagate the broadened original
+        // so the new binding can be reassigned to a value of the broader type later.
+        if expression != null {
+            match expression.data {
+                ExpressionData::Variable(src_name) => {
+                    let src_original = context.get_broadened_type(src_name);
+                    if src_original != null {
+                        let scope = context.scopes.back();
+                        scope.narrow_originals.insert(name.value, *src_original);
+                    }
+                },
+                _ => {},
+            }
+        }
+
         if !context.expect_value(TokenType::Symbol, ";") { return null; }
 
         if type.is_unknown() {

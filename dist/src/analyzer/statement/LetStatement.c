@@ -12,6 +12,10 @@
 #include <analyzer/Root.h>
 #include <std/str.h>
 #include <analyzer/InlayHintKind.h>
+#include <analyzer/expression/ExpressionData.h>
+#include <analyzer/Scope.h>
+#include <std/Array_Scope.h>
+#include <std/HashMap_str_Type.h>
 #include <analyzer/statement/LetStatement.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/statement/LetStatement.h>
@@ -90,25 +94,49 @@ struct LetStatement* LetStatement__parse(struct Context* context, struct Generic
         #line 46 "src/analyzer/statement/LetStatement.pv"
         return 0;
     }
-    #line 47 "src/analyzer/statement/LetStatement.pv"
+    #line 50 "src/analyzer/statement/LetStatement.pv"
+    if (expression != 0) {
+        #line 51 "src/analyzer/statement/LetStatement.pv"
+        switch (expression->data.type) {
+            #line 52 "src/analyzer/statement/LetStatement.pv"
+            case EXPRESSION_DATA__VARIABLE: {
+                #line 52 "src/analyzer/statement/LetStatement.pv"
+                struct str src_name = expression->data.variable_value;
+                #line 53 "src/analyzer/statement/LetStatement.pv"
+                struct Type* src_original = Context__get_broadened_type(context, src_name);
+                #line 54 "src/analyzer/statement/LetStatement.pv"
+                if (src_original != 0) {
+                    #line 55 "src/analyzer/statement/LetStatement.pv"
+                    struct Scope* scope = Array_Scope__back(&context->scopes);
+                    #line 56 "src/analyzer/statement/LetStatement.pv"
+                    HashMap_str_Type__insert(&scope->narrow_originals, name->value, *src_original);
+                }
+            } break;
+            #line 59 "src/analyzer/statement/LetStatement.pv"
+            default: {
+            } break;
+        }
+    }
+
+    #line 63 "src/analyzer/statement/LetStatement.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-        #line 47 "src/analyzer/statement/LetStatement.pv"
+        #line 63 "src/analyzer/statement/LetStatement.pv"
         return 0;
     }
 
-    #line 49 "src/analyzer/statement/LetStatement.pv"
+    #line 65 "src/analyzer/statement/LetStatement.pv"
     if (Type__is_unknown(type)) {
-        #line 50 "src/analyzer/statement/LetStatement.pv"
+        #line 66 "src/analyzer/statement/LetStatement.pv"
         Context__error_token(context, first_token, "Let statement is unable to determine it's type, manually specify it");
     }
 
-    #line 53 "src/analyzer/statement/LetStatement.pv"
+    #line 69 "src/analyzer/statement/LetStatement.pv"
     if (Type__is_void(type)) {
-        #line 54 "src/analyzer/statement/LetStatement.pv"
+        #line 70 "src/analyzer/statement/LetStatement.pv"
         Context__error_token(context, first_token, "Let statement cannot have void type");
     }
 
-    #line 57 "src/analyzer/statement/LetStatement.pv"
+    #line 73 "src/analyzer/statement/LetStatement.pv"
     return ArenaAllocator__store_LetStatement(context->allocator, (struct LetStatement[]){(struct LetStatement) {
         .is_static = is_static,
         .name = name,
