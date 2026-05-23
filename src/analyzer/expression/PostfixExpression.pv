@@ -32,7 +32,7 @@ impl Expression {
             return null;
         }
 
-        let value = Expression::parse_instance_member_expression(context, inner, generics);
+        let value = Expression::parse_instance_member_expression_inner(context, inner, generics, true);
         if value == null { return null; }
 
         let return_type = Expression::make_optional_return_type(context, value.token, &value.return_type);
@@ -63,10 +63,14 @@ impl Expression {
     }
 
     fn parse_instance_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
+        return Expression::parse_instance_member_expression_inner(context, inner, generics, false);
+    }
+
+    fn parse_instance_member_expression_inner(context: &Context, inner: &Expression, generics: &Generics, allow_pointer: bool) -> *Expression {
         let dot_token = context.current();
         if !context.expect_value(TokenType::Symbol, ".") { return null; }
 
-        if inner.return_type.is_pointer() {
+        if !allow_pointer && inner.return_type.is_pointer() {
             context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");
         }
 
