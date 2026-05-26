@@ -118,10 +118,10 @@ void Usages__process_function(struct Usages* self, struct Function* func_info, s
 #line 817 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 917 "src/compiler/Usages.pv"
+#line 919 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 1160 "src/compiler/Usages.pv"
+#line 1162 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

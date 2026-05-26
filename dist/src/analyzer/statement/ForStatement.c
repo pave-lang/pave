@@ -386,7 +386,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
         struct ForVariable* variable2 = Iter_ref_ForVariable__value(&__iter);
 
         #line 184 "src/analyzer/statement/ForStatement.pv"
-        if (str__Eq_str__eq(&variable2->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+        if (str__Eq_ptrc_char__eq(&variable2->name->value, "_")) {
             #line 184 "src/analyzer/statement/ForStatement.pv"
             continue;
         }

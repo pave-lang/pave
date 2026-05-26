@@ -10,7 +10,8 @@ struct DestructureBinding {
 
 struct LetStatement {
     is_static: bool,
-    name: &Token,
+    token: &Token,
+    name: *Token,
     type: &Type,
     value: *Expression,
     destructure: Array<DestructureBinding>,
@@ -86,6 +87,7 @@ impl LetStatement {
 
         return context.allocator.store(&LetStatement {
             is_static,
+            token: first_token,
             name,
             type,
             value: expression,
@@ -156,24 +158,10 @@ impl LetStatement {
             context.error_token(first_token, "Let statement is unable to determine it's type, manually specify it");
         }
 
-        let temp_name = String::new(context.allocator);
-        temp_name.append("__pave_destructure_");
-        temp_name.append_usize(first_token.start_line);
-        temp_name.append("_");
-        temp_name.append_usize(first_token.start_column);
-
-        let temp_token = context.allocator.store(&Token {
-            type: TokenType::Identifier,
-            value: temp_name.as_str(),
-            start_line: first_token.start_line,
-            start_column: first_token.start_column,
-            end_line: first_token.end_line,
-            end_column: first_token.end_column,
-        });
-
         return context.allocator.store(&LetStatement {
             is_static,
-            name: temp_token,
+            token: first_token,
+            name: null,
             type: value_type,
             value: expression,
             destructure: bindings,

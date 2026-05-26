@@ -58,9 +58,9 @@ Hash str__Hash__hash(void* __self);
 bool str__Eq_str__eq(void* __self, struct str other);
 
 #line 119 "src/std/str.pv"
-bool str__Eq_ref_str__eq(void* __self, struct str* other);
+bool str__Eq_ptrc_char__eq(void* __self, char const* other);
 
 extern struct trait_HashVTable STR__VTABLE__HASH;
-extern struct trait_Eq_ref_strVTable STR__VTABLE__EQ;
+extern struct trait_Eq_ptrc_charVTable STR__VTABLE__EQ;
 
 #endif

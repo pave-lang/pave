@@ -179,9 +179,26 @@ impl BlockWriter {
                     function_context.pop_scope();
                 },
                 StatementData::LetStatement(let_statement) => {
-                    let name = let_statement.name;
                     let type = let_statement.type;
                     let value = let_statement.value;
+                    let is_destructure = let_statement.destructure.length > 0;
+
+                    let temp_name = String::new(generator.allocator);
+                    let name_str: str;
+                    if is_destructure {
+                        temp_name.append("__pave_destructure_");
+                        temp_name.append_usize(let_statement.token.start_line);
+                        temp_name.append("_");
+                        temp_name.append_usize(let_statement.token.start_column);
+                        name_str = temp_name.as_str();
+                    } else {
+                        let name_token = let_statement.name;
+                        if name_token == null {
+                            fprintf(stderr, "Missing name in non-destructure let statement\n");
+                            return false;
+                        }
+                        name_str = name_token.value;
+                    }
 
                     generator.write_indent(file);
 
@@ -191,7 +208,7 @@ impl BlockWriter {
                             fprintf(stderr, "Missing function context in let statement\n");
                             return false;
                         }
-                        function_context.add_variable(name.value, type);
+                        function_context.add_variable(name_str, type);
 
                         for binding in let_statement.destructure {
                             if !binding.name.value.eq("_") {
@@ -205,9 +222,9 @@ impl BlockWriter {
                     }
 
                     if generator.is_coroutine() {
-                        generator.write_variable(file, name.value);
+                        generator.write_variable(file, name_str);
                     } else {
-                        generator.write_variable_decl(file, name.value, type, generics);
+                        generator.write_variable_decl(file, name_str, type, generics);
                     }
 
                     if value != null {
@@ -216,7 +233,7 @@ impl BlockWriter {
                                 if expr.optional_needs_lowering(value) {
                                     fprintf(file, "; {\n");
                                     generator.indent += 1;
-                                    if !expr.write_optional_assignment(file, name.value, type, value, generics) { return false; }
+                                    if !expr.write_optional_assignment(file, name_str, type, value, generics) { return false; }
                                     generator.indent -= 1;
                                     generator.write_indent(file);
                                     fprintf(file, "}\n");
@@ -253,7 +270,7 @@ impl BlockWriter {
                         generator.write_indent(file);
                         generator.write_variable_decl(file, binding.name.value, binding.type, generics);
                         fprintf(file, " = ");
-                        generator.write_variable(file, name.value);
+                        generator.write_variable(file, name_str);
                         generator.write_instance_member_accessor(file, type, generics);
                         fprintf(file, "_%zu;\n", binding_index);
                         binding_index += 1;

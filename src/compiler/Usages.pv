@@ -826,7 +826,9 @@ impl Usages {
                     if !statement.is_static {
                         let function_context = self.function_context;
                         if function_context == null { return; }
-                        function_context.add_variable(statement.name.value, statement.type);
+                        if statement.name != null {
+                            function_context.add_variable(statement.name.value, statement.type);
+                        }
 
                         for binding in statement.destructure {
                             function_context.add_variable(binding.name.value, binding.type);

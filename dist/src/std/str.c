@@ -12,7 +12,7 @@
 #include <std/Hash.h>
 #include <std/Fnv1a.h>
 #include <std/trait_Eq_str.h>
-#include <std/trait_Eq_ref_str.h>
+#include <std/trait_Eq_ptrc_char.h>
 #include <std/str.h>
 
 #include <std/str.h>
@@ -196,17 +196,19 @@ bool str__Eq_str__eq(void* __self, struct str other) {
 }
 
 #line 119 "src/std/str.pv"
-bool str__Eq_ref_str__eq(void* __self, struct str* other) {
+bool str__Eq_ptrc_char__eq(void* __self, char const* other) {
     struct str* self = __self; (void)self;
     #line 120 "src/std/str.pv"
-    if (self->length != other->length) {
-        #line 120 "src/std/str.pv"
+    uint64_t other_len = strlen(other);
+    #line 121 "src/std/str.pv"
+    if (self->length != other_len) {
+        #line 121 "src/std/str.pv"
         return false;
     }
 
-    #line 122 "src/std/str.pv"
-    return strncmp(self->ptr, other->ptr, self->length) == 0;
+    #line 123 "src/std/str.pv"
+    return strncmp(self->ptr, other, self->length) == 0;
 }
 
 struct trait_HashVTable STR__VTABLE__HASH = { .fn_hash = &str__Hash__hash };
-struct trait_Eq_ref_strVTable STR__VTABLE__EQ = { .fn_eq = &str__Eq_ref_str__eq };
+struct trait_Eq_ptrc_charVTable STR__VTABLE__EQ = { .fn_eq = &str__Eq_ptrc_char__eq };
