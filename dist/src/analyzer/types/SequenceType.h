@@ -2,7 +2,7 @@
 #define PAVE_SEQUENCE_TYPE
 
 struct Expression;
-#line 46 "src/analyzer/types/Type.pv"
+#line 53 "src/analyzer/types/Type.pv"
 struct SequenceType {
     enum {
         SEQUENCE_TYPE__FIXED_ARRAY,

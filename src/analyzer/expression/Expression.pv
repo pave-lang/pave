@@ -731,6 +731,10 @@ impl Expression {
                                     context.error_token(self.token, "use null instead of 0 for pointer types");
                                     return false;
                                 },
+                                IndirectType::DynamicDispatchPointer => {
+                                    context.error_token(self.token, "use null instead of 0 for pointer types");
+                                    return false;
+                                },
                                 _ => {},
                             }
                         },

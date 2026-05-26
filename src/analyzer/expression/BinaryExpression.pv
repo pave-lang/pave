@@ -21,11 +21,15 @@ impl Expression {
     fn append_null_narrowing(context: &Context, expr: &Expression, path: str, out: &Array<NullNarrowing>) {
         match expr.return_type {
             Type::Indirect(indirect) => {
-                if indirect.type != IndirectType::Pointer && indirect.type != IndirectType::ConstPointer {
+                let narrowed_indirect: &Indirect;
+                if indirect.type == IndirectType::Pointer || indirect.type == IndirectType::ConstPointer {
+                    narrowed_indirect = Indirect::new_reference(context.allocator, indirect.to);
+                } else if indirect.type == IndirectType::DynamicDispatchPointer {
+                    narrowed_indirect = Indirect::new_dynamic_dispatch(context.allocator, indirect.to);
+                } else {
                     return;
                 }
-                let ref_indirect = Indirect::new_reference(context.allocator, indirect.to);
-                let type_val = Type::Indirect(ref_indirect);
+                let type_val = Type::Indirect(narrowed_indirect);
                 let stored = context.allocator.store(&type_val);
                 if stored == null { return; }
                 out.append(NullNarrowing { path, type: stored });

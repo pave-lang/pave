@@ -8,6 +8,7 @@ use expression
 enum IndirectType {
     Reference,
     DynamicDispatch,
+    DynamicDispatchPointer,
     Pointer,
     ConstPointer,
 }
@@ -27,6 +28,12 @@ impl Indirect {
     fn new_dynamic_dispatch(allocator: &dyn Allocator, to: Type) -> &Self {
         let result: &Self = allocator.alloc(sizeof(Self));
         *result = Self { type: IndirectType::DynamicDispatch, to };
+        return result;
+    }
+
+    fn new_dynamic_dispatch_pointer(allocator: &dyn Allocator, to: Type) -> &Self {
+        let result: &Self = allocator.alloc(sizeof(Self));
+        *result = Self { type: IndirectType::DynamicDispatchPointer, to };
         return result;
     }
 
@@ -562,7 +569,7 @@ impl Type {
 
     fn is_pointer(&self) -> bool {
         match self {
-            Type::Indirect(indirect) => { return indirect.type == IndirectType::Pointer || indirect.type == IndirectType::ConstPointer; },
+            Type::Indirect(indirect) => { return indirect.type == IndirectType::Pointer || indirect.type == IndirectType::ConstPointer || indirect.type == IndirectType::DynamicDispatchPointer; },
             _ => { return false; },
         }
     }

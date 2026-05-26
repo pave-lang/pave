@@ -6,7 +6,7 @@
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/types/Type.h>
 
-#line 51 "src/analyzer/types/Type.pv"
+#line 58 "src/analyzer/types/Type.pv"
 struct Sequence {
     struct SequenceType type;
     struct Type element;
@@ -15,10 +15,10 @@ struct Sequence {
 
 struct Sequence;
 
-#line 58 "src/analyzer/types/Type.pv"
+#line 65 "src/analyzer/types/Type.pv"
 bool Sequence__is_slice(struct Sequence* self);
 
-#line 65 "src/analyzer/types/Type.pv"
+#line 72 "src/analyzer/types/Type.pv"
 bool Sequence__is_fixed_array(struct Sequence* self);
 
 #endif

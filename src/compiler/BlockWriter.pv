@@ -221,7 +221,19 @@ impl BlockWriter {
                         }
 
                         fprintf(file, " = ");
-                        expr.write_expression(file, value, generics);
+                        let wrote_null_fat_let = false;
+                        match value.data {
+                            ExpressionData::NullLiteral => {
+                                if type.is_fat_pointer() {
+                                    fprintf(file, "(");
+                                    generator.write_type(file, type, generics);
+                                    fprintf(file, "){0}");
+                                    wrote_null_fat_let = true;
+                                }
+                            },
+                            _ => {},
+                        }
+                        if !wrote_null_fat_let { expr.write_expression(file, value, generics); }
                     }
 
                     fprintf(file, ";\n");
@@ -742,7 +754,19 @@ impl BlockWriter {
                     fprintf(file, " ");
                     generator.write_str(file, assignment.operator.value);
                     fprintf(file, " ");
-                    expr.write_expression(file, assignment.right, generics);
+                    let wrote_null_fat = false;
+                    match assignment.right.data {
+                        ExpressionData::NullLiteral => {
+                            if assignment.left.return_type.is_fat_pointer() {
+                                fprintf(file, "(");
+                                generator.write_type(file, &assignment.left.return_type, generics);
+                                fprintf(file, "){0}");
+                                wrote_null_fat = true;
+                            }
+                        },
+                        _ => {},
+                    }
+                    if !wrote_null_fat { expr.write_expression(file, assignment.right, generics); }
                     fprintf(file, ";\n");
                 },
                 StatementData::ExpressionStatement(expression) => {

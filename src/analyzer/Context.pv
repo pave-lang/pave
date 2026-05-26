@@ -463,6 +463,14 @@ impl Context {
 
             return true;
         } else if self.check_next(TokenType::Symbol, "*") {
+            if self.check_next(TokenType::Keyword, "dyn") {
+                let target_type: Type;
+                if !self.parse_type_trait(&target_type, generics) { return false; }
+                let indirect = Indirect::new_dynamic_dispatch_pointer(self.allocator, target_type);
+                *type = Type::Indirect(indirect);
+                return true;
+            }
+
             let indirect_type = IndirectType::Pointer;
             if self.check_next(TokenType::Keyword, "const") { indirect_type = IndirectType::ConstPointer; }
 

@@ -69,7 +69,7 @@ void Expression__append_display_name(struct Expression* self, struct String* res
 #line 699 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast);
 
-#line 829 "src/analyzer/expression/Expression.pv"
+#line 833 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
@@ -147,25 +147,25 @@ bool Expression__is_null_literal_expression(struct Expression* expr);
 #line 21 "src/analyzer/expression/BinaryExpression.pv"
 void Expression__append_null_narrowing(struct Context* context, struct Expression* expr, struct str path, struct Array_NullNarrowing* out);
 
-#line 40 "src/analyzer/expression/BinaryExpression.pv"
+#line 44 "src/analyzer/expression/BinaryExpression.pv"
 bool Expression__build_narrow_path(struct Expression* self, struct String* out);
 
-#line 62 "src/analyzer/expression/BinaryExpression.pv"
+#line 66 "src/analyzer/expression/BinaryExpression.pv"
 void Expression__collect_null_narrowings(struct Context* context, struct Expression* expr, bool narrow_on_true, struct Array_NullNarrowing* out);
 
-#line 106 "src/analyzer/expression/BinaryExpression.pv"
+#line 110 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
 
-#line 194 "src/analyzer/expression/BinaryExpression.pv"
+#line 198 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_operator_trait_call(struct Context* context, struct Token* token, struct Expression* lhs, struct Type* lhs_type, struct str operator, struct Expression* rhs);
 
-#line 293 "src/analyzer/expression/BinaryExpression.pv"
+#line 297 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_unary_trait_call(struct Context* context, struct Token* token, struct Expression* operand);
 
-#line 342 "src/analyzer/expression/BinaryExpression.pv"
+#line 346 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_index_trait_call(struct Context* context, struct Token* token, struct Expression* inner, struct Expression* index_expr);
 
-#line 389 "src/analyzer/expression/BinaryExpression.pv"
+#line 393 "src/analyzer/expression/BinaryExpression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
 #endif

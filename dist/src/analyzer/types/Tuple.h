@@ -3,7 +3,7 @@
 
 #include <std/Array_Type.h>
 
-#line 73 "src/analyzer/types/Type.pv"
+#line 80 "src/analyzer/types/Type.pv"
 struct Tuple {
     struct Array_Type elements;
 };
@@ -12,7 +12,7 @@ struct Tuple {
 #include <analyzer/types/Tuple.h>
 struct Tuple;
 
-#line 83 "src/analyzer/types/Type.pv"
+#line 90 "src/analyzer/types/Type.pv"
 struct Tuple Tuple__clone(struct Tuple* self, struct trait_Allocator allocator);
 
 #endif

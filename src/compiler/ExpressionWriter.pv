@@ -927,10 +927,33 @@ impl ExpressionWriter {
             },
             ExpressionData::BinaryExpression(left, operator, right) => {
                 let is_eq_or_ne = operator.eq("==") || operator.eq("!=");
+
+                let left_is_null = false;
+                let right_is_null = false;
+                if is_eq_or_ne {
+                    match left.data {
+                        ExpressionData::NullLiteral => { left_is_null = true; },
+                        ExpressionData::Literal(v) => { if v.eq("0") { left_is_null = true; } },
+                        _ => {},
+                    }
+                    match right.data {
+                        ExpressionData::NullLiteral => { right_is_null = true; },
+                        ExpressionData::Literal(v) => { if v.eq("0") { right_is_null = true; } },
+                        _ => {},
+                    }
+                }
+
+                let left_fat_null_cmp = is_eq_or_ne && right_is_null && left.return_type.is_fat_pointer();
+                let right_fat_null_cmp = is_eq_or_ne && left_is_null && right.return_type.is_fat_pointer();
+
                 if is_eq_or_ne && generator.type_is_discriminated_union_no_indirect(&left.return_type, generics) {
                     fprintf(file, "(");
                     self.write_expression(file, left, generics);
                     fprintf(file, ").type");
+                } else if left_fat_null_cmp {
+                    fprintf(file, "(");
+                    self.write_expression(file, left, generics);
+                    fprintf(file, ").instance");
                 } else {
                     self.write_expression(file, left, generics);
                 }
@@ -941,6 +964,10 @@ impl ExpressionWriter {
                     fprintf(file, "(");
                     self.write_expression(file, right, generics);
                     fprintf(file, ").type");
+                } else if right_fat_null_cmp {
+                    fprintf(file, "(");
+                    self.write_expression(file, right, generics);
+                    fprintf(file, ").instance");
                 } else {
                     self.write_expression(file, right, generics);
                 }
