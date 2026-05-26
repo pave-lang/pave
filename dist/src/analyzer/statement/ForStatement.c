@@ -386,32 +386,37 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
         struct ForVariable* variable2 = Iter_ref_ForVariable__value(&__iter);
 
         #line 184 "src/analyzer/statement/ForStatement.pv"
+        if (str__Eq_str__eq(&variable2->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+            #line 184 "src/analyzer/statement/ForStatement.pv"
+            continue;
+        }
+        #line 185 "src/analyzer/statement/ForStatement.pv"
         if (!Context__set_value(context, variable2->name, variable2->type)) {
-            #line 184 "src/analyzer/statement/ForStatement.pv"
+            #line 185 "src/analyzer/statement/ForStatement.pv"
             Context__error(context, "set_value");
-            #line 184 "src/analyzer/statement/ForStatement.pv"
+            #line 185 "src/analyzer/statement/ForStatement.pv"
             return 0;
         }
     } }
 
-    #line 187 "src/analyzer/statement/ForStatement.pv"
-    for_statement.block = Block__new_ptr(context);
     #line 188 "src/analyzer/statement/ForStatement.pv"
+    for_statement.block = Block__new_ptr(context);
+    #line 189 "src/analyzer/statement/ForStatement.pv"
     if (for_statement.block == 0) {
-        #line 188 "src/analyzer/statement/ForStatement.pv"
+        #line 189 "src/analyzer/statement/ForStatement.pv"
         return 0;
     }
-    #line 189 "src/analyzer/statement/ForStatement.pv"
-    for_statement.block->is_loop = true;
     #line 190 "src/analyzer/statement/ForStatement.pv"
+    for_statement.block->is_loop = true;
+    #line 191 "src/analyzer/statement/ForStatement.pv"
     if (!Block__parse(for_statement.block, context, generics, false)) {
-        #line 190 "src/analyzer/statement/ForStatement.pv"
+        #line 191 "src/analyzer/statement/ForStatement.pv"
         return 0;
     }
 
-    #line 192 "src/analyzer/statement/ForStatement.pv"
+    #line 193 "src/analyzer/statement/ForStatement.pv"
     Context__pop_scope(context);
 
-    #line 194 "src/analyzer/statement/ForStatement.pv"
+    #line 195 "src/analyzer/statement/ForStatement.pv"
     return ArenaAllocator__store_ForStatement(context->allocator, &for_statement);
 }

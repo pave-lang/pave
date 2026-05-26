@@ -181,7 +181,7 @@ impl ForStatement {
         context.push_scope(parent_block);
 
         for variable2 in for_statement.variables {
-            if variable2.name == "_" { continue; }
+            if variable2.name.value.eq("_") { continue; }
             if !context.set_value(variable2.name, variable2.type) { context.error("set_value"); return null; }
         }
 

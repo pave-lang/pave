@@ -827,9 +827,17 @@ impl Usages {
                         let function_context = self.function_context;
                         if function_context == null { return; }
                         function_context.add_variable(statement.name.value, statement.type);
+
+                        for binding in statement.destructure {
+                            function_context.add_variable(binding.name.value, binding.type);
+                        }
                     }
 
                     self.add_type(statement.type, generic_map);
+
+                    for binding in statement.destructure {
+                        self.add_type(binding.type, generic_map);
+                    }
 
                     if statement.value != null {
                         self.process_expression(statement.value, generic_map);

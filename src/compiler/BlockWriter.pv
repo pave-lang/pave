@@ -192,6 +192,12 @@ impl BlockWriter {
                             return false;
                         }
                         function_context.add_variable(name.value, type);
+
+                        for binding in let_statement.destructure {
+                            if !binding.name.value.eq("_") {
+                                function_context.add_variable(binding.name.value, binding.type);
+                            }
+                        }
                     }
 
                     if let_statement.is_static {
@@ -237,6 +243,21 @@ impl BlockWriter {
                     }
 
                     fprintf(file, ";\n");
+
+                    let binding_index: usize = 0;
+                    for binding in let_statement.destructure {
+                        if binding.name.value.eq("_") {
+                            binding_index += 1;
+                            continue;
+                        }
+                        generator.write_indent(file);
+                        generator.write_variable_decl(file, binding.name.value, binding.type, generics);
+                        fprintf(file, " = ");
+                        generator.write_variable(file, name.value);
+                        generator.write_instance_member_accessor(file, type, generics);
+                        fprintf(file, "_%zu;\n", binding_index);
+                        binding_index += 1;
+                    }
                 },
                 StatementData::YieldStatement(yield_stmt) => {
                     let function_context = generator.function_context;
