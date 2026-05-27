@@ -62,7 +62,7 @@ src/
 │   │   ├── ForStatementType.pv
 │   │   ├── ForVariable.pv
 │   │   ├── IfStatement.pv
-│   │   ├── LetStatement.pv       # let / let static bindings
+│   │   ├── LetStatement.pv       # let / let static bindings; supports `let (a, b, c) = tuple` destructuring (`_` discards)
 │   │   ├── MatchCase.pv
 │   │   ├── MatchPattern.pv
 │   │   ├── MatchStatement.pv
@@ -155,6 +155,11 @@ src/
 ```
 
 ## Key Architecture Concepts
+
+### Analyzer Records Intent; Codegen Owns Lowering
+The analyzer records the semantic shape of what the user wrote. Codegen decides how to express it in C — including temporaries, helper names, and extra statements that have no analog in the source.
+
+If a name or line of C only exists to satisfy the target language, build it in `compiler/`, not `analyzer/`.
 
 ### Three-Phase Compilation
 1. `prefill_types` — quick scan, collect names and generic bounds
