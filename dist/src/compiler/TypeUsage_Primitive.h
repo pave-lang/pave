@@ -13,6 +13,7 @@ struct TypeUsage_Primitive {
     struct Primitive* type;
     struct Array_UsageContext usage_contexts;
     bool impl_dynamic_usage;
+    bool sized_usage;
 };
 
 #include <compiler/TypeUsage_Primitive.h>
@@ -22,10 +23,10 @@ struct TypeUsage_Primitive;
 struct GenericMap;
 struct UsageContext;
 
-#line 123 "src/compiler/Usages.pv"
+#line 124 "src/compiler/Usages.pv"
 struct TypeUsage_Primitive TypeUsage_Primitive__new(struct ArenaAllocator* allocator, struct Primitive* type);
 
-#line 132 "src/compiler/Usages.pv"
+#line 134 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Primitive__add_usage(struct TypeUsage_Primitive* self, struct GenericMap* generic_map);
 
 #endif

@@ -13,6 +13,7 @@ struct TypeUsage_Tuple {
     struct Tuple* type;
     struct Array_UsageContext usage_contexts;
     bool impl_dynamic_usage;
+    bool sized_usage;
 };
 
 #include <compiler/TypeUsage_Tuple.h>
@@ -22,10 +23,10 @@ struct TypeUsage_Tuple;
 struct GenericMap;
 struct UsageContext;
 
-#line 123 "src/compiler/Usages.pv"
+#line 124 "src/compiler/Usages.pv"
 struct TypeUsage_Tuple TypeUsage_Tuple__new(struct ArenaAllocator* allocator, struct Tuple* type);
 
-#line 132 "src/compiler/Usages.pv"
+#line 134 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Tuple__add_usage(struct TypeUsage_Tuple* self, struct GenericMap* generic_map);
 
 #endif

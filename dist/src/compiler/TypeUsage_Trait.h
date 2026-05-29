@@ -13,6 +13,7 @@ struct TypeUsage_Trait {
     struct Trait* type;
     struct Array_UsageContext usage_contexts;
     bool impl_dynamic_usage;
+    bool sized_usage;
 };
 
 #include <compiler/TypeUsage_Trait.h>
@@ -22,10 +23,10 @@ struct TypeUsage_Trait;
 struct GenericMap;
 struct UsageContext;
 
-#line 123 "src/compiler/Usages.pv"
+#line 124 "src/compiler/Usages.pv"
 struct TypeUsage_Trait TypeUsage_Trait__new(struct ArenaAllocator* allocator, struct Trait* type);
 
-#line 132 "src/compiler/Usages.pv"
+#line 134 "src/compiler/Usages.pv"
 struct UsageContext* TypeUsage_Trait__add_usage(struct TypeUsage_Trait* self, struct GenericMap* generic_map);
 
 #endif

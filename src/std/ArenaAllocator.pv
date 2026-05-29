@@ -173,6 +173,15 @@ impl ArenaAllocator {
         memcpy(new_memory, value, sizeof(T));
         return new_memory;
     }
+
+    fn store_dyn(&self, value: &dyn Sized) -> *void {
+        let size = value.size();
+        let new_memory = self.alloc(size);
+        if new_memory == null { return null; }
+
+        memcpy(new_memory, value.instance, size);
+        return new_memory;
+    }
 }
 
 impl Allocator for ArenaAllocator {

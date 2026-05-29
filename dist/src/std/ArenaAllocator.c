@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <std/ArenaBlock.h>
 #include <std/ArenaAllocator.h>
+#include <std/trait_Sized.h>
 #include <std/ArenaOversize.h>
 #include <std/ArenaAllocator.h>
 
@@ -588,219 +589,237 @@ struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, str
     return new_memory;
 }
 
-#line 179 "src/std/ArenaAllocator.pv"
+#line 177 "src/std/ArenaAllocator.pv"
+void* ArenaAllocator__store_dyn(struct ArenaAllocator* self, struct trait_Sized value) {
+    #line 178 "src/std/ArenaAllocator.pv"
+    uintptr_t size = value.vtable->fn_size(value.instance);
+    #line 179 "src/std/ArenaAllocator.pv"
+    void* new_memory = ArenaAllocator__Allocator__alloc(self, size);
+    #line 180 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 180 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 182 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value.instance, size);
+    #line 183 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
+
+#line 188 "src/std/ArenaAllocator.pv"
 void* ArenaAllocator__Allocator__alloc(void* __self, uintptr_t size) {
     struct ArenaAllocator* self = __self; (void)self;
-    #line 180 "src/std/ArenaAllocator.pv"
+    #line 189 "src/std/ArenaAllocator.pv"
     if (size > self->block_size / 4) {
-        #line 181 "src/std/ArenaAllocator.pv"
+        #line 190 "src/std/ArenaAllocator.pv"
         uintptr_t total_size = sizeof(struct ArenaOversize) + size;
-        #line 182 "src/std/ArenaAllocator.pv"
+        #line 191 "src/std/ArenaAllocator.pv"
         struct ArenaOversize* oversize = self->allocator.vtable->fn_alloc(self->allocator.instance, total_size);
-        #line 183 "src/std/ArenaAllocator.pv"
+        #line 192 "src/std/ArenaAllocator.pv"
         if (oversize == 0) {
-            #line 183 "src/std/ArenaAllocator.pv"
+            #line 192 "src/std/ArenaAllocator.pv"
             return 0;
         }
-        #line 184 "src/std/ArenaAllocator.pv"
+        #line 193 "src/std/ArenaAllocator.pv"
         oversize->size = size;
-        #line 185 "src/std/ArenaAllocator.pv"
+        #line 194 "src/std/ArenaAllocator.pv"
         oversize->prev = self->last_oversize;
-        #line 186 "src/std/ArenaAllocator.pv"
+        #line 195 "src/std/ArenaAllocator.pv"
         self->last_oversize = oversize;
-        #line 187 "src/std/ArenaAllocator.pv"
+        #line 196 "src/std/ArenaAllocator.pv"
         return oversize + 1;
     }
 
-    #line 190 "src/std/ArenaAllocator.pv"
+    #line 199 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* last_block = self->last_block;
-    #line 191 "src/std/ArenaAllocator.pv"
+    #line 200 "src/std/ArenaAllocator.pv"
     if (last_block == 0) {
-        #line 191 "src/std/ArenaAllocator.pv"
+        #line 200 "src/std/ArenaAllocator.pv"
         return 0;
     }
 
-    #line 193 "src/std/ArenaAllocator.pv"
+    #line 202 "src/std/ArenaAllocator.pv"
     void* ptr = ArenaBlock__alloc(last_block, size);
-    #line 194 "src/std/ArenaAllocator.pv"
+    #line 203 "src/std/ArenaAllocator.pv"
     if (ptr != 0) {
-        #line 194 "src/std/ArenaAllocator.pv"
+        #line 203 "src/std/ArenaAllocator.pv"
         return ptr;
     }
 
-    #line 196 "src/std/ArenaAllocator.pv"
+    #line 205 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* block = ArenaBlock__new(self->allocator, self->block_size, self->last_block);
-    #line 197 "src/std/ArenaAllocator.pv"
+    #line 206 "src/std/ArenaAllocator.pv"
     if (block == 0) {
-        #line 197 "src/std/ArenaAllocator.pv"
+        #line 206 "src/std/ArenaAllocator.pv"
         return 0;
     }
 
-    #line 199 "src/std/ArenaAllocator.pv"
+    #line 208 "src/std/ArenaAllocator.pv"
     self->last_block = block;
-    #line 200 "src/std/ArenaAllocator.pv"
+    #line 209 "src/std/ArenaAllocator.pv"
     return ArenaBlock__alloc(block, size);
 }
 
-#line 203 "src/std/ArenaAllocator.pv"
+#line 212 "src/std/ArenaAllocator.pv"
 void* ArenaAllocator__Allocator__realloc(void* __self, void* ptr, uintptr_t new_size) {
     struct ArenaAllocator* self = __self; (void)self;
-    #line 204 "src/std/ArenaAllocator.pv"
+    #line 213 "src/std/ArenaAllocator.pv"
     if (ptr == 0) {
-        #line 204 "src/std/ArenaAllocator.pv"
+        #line 213 "src/std/ArenaAllocator.pv"
         return ArenaAllocator__Allocator__alloc(self, new_size);
     }
 
-    #line 206 "src/std/ArenaAllocator.pv"
+    #line 215 "src/std/ArenaAllocator.pv"
     struct ArenaOversize* oversize = self->last_oversize;
-    #line 207 "src/std/ArenaAllocator.pv"
+    #line 216 "src/std/ArenaAllocator.pv"
     while (oversize != 0) {
-        #line 208 "src/std/ArenaAllocator.pv"
+        #line 217 "src/std/ArenaAllocator.pv"
         struct ArenaOversize* prev = oversize->prev;
 
-        #line 210 "src/std/ArenaAllocator.pv"
+        #line 219 "src/std/ArenaAllocator.pv"
         if (ptr == oversize + 1) {
-            #line 211 "src/std/ArenaAllocator.pv"
+            #line 220 "src/std/ArenaAllocator.pv"
             uintptr_t old_size = oversize->size;
 
-            #line 213 "src/std/ArenaAllocator.pv"
+            #line 222 "src/std/ArenaAllocator.pv"
             void* new_ptr = ArenaAllocator__Allocator__alloc(self, new_size);
-            #line 214 "src/std/ArenaAllocator.pv"
+            #line 223 "src/std/ArenaAllocator.pv"
             if (new_ptr == 0) {
-                #line 214 "src/std/ArenaAllocator.pv"
+                #line 223 "src/std/ArenaAllocator.pv"
                 return 0;
             }
 
-            #line 216 "src/std/ArenaAllocator.pv"
+            #line 225 "src/std/ArenaAllocator.pv"
             if (new_size < old_size) {
-                #line 217 "src/std/ArenaAllocator.pv"
+                #line 226 "src/std/ArenaAllocator.pv"
                 memcpy(new_ptr, ptr, new_size);
             } else {
-                #line 219 "src/std/ArenaAllocator.pv"
+                #line 228 "src/std/ArenaAllocator.pv"
                 memcpy(new_ptr, ptr, old_size);
             }
 
-            #line 222 "src/std/ArenaAllocator.pv"
+            #line 231 "src/std/ArenaAllocator.pv"
             ArenaAllocator__Allocator__free(self, ptr);
 
-            #line 224 "src/std/ArenaAllocator.pv"
+            #line 233 "src/std/ArenaAllocator.pv"
             return new_ptr;
         }
 
-        #line 227 "src/std/ArenaAllocator.pv"
+        #line 236 "src/std/ArenaAllocator.pv"
         oversize = prev;
     }
 
-    #line 230 "src/std/ArenaAllocator.pv"
+    #line 239 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* current_block = 0;
-    #line 231 "src/std/ArenaAllocator.pv"
+    #line 240 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* block = self->last_block;
-    #line 232 "src/std/ArenaAllocator.pv"
+    #line 241 "src/std/ArenaAllocator.pv"
     while (current_block == 0 && block != 0) {
-        #line 233 "src/std/ArenaAllocator.pv"
+        #line 242 "src/std/ArenaAllocator.pv"
         if (ArenaBlock__is_in_block(block, ptr)) {
-            #line 234 "src/std/ArenaAllocator.pv"
+            #line 243 "src/std/ArenaAllocator.pv"
             void* realloc_ptr = ArenaBlock__realloc(block, ptr, new_size);
-            #line 235 "src/std/ArenaAllocator.pv"
+            #line 244 "src/std/ArenaAllocator.pv"
             if (realloc_ptr != 0) {
-                #line 235 "src/std/ArenaAllocator.pv"
+                #line 244 "src/std/ArenaAllocator.pv"
                 return realloc_ptr;
             }
-            #line 236 "src/std/ArenaAllocator.pv"
+            #line 245 "src/std/ArenaAllocator.pv"
             current_block = block;
         }
 
-        #line 239 "src/std/ArenaAllocator.pv"
+        #line 248 "src/std/ArenaAllocator.pv"
         block = block->prev;
     }
 
-    #line 242 "src/std/ArenaAllocator.pv"
+    #line 251 "src/std/ArenaAllocator.pv"
     if (current_block == 0) {
-        #line 243 "src/std/ArenaAllocator.pv"
+        #line 252 "src/std/ArenaAllocator.pv"
         fprintf(stderr, "ArenaAllocator.realloc: No block found to reallocate from\n");
-        #line 244 "src/std/ArenaAllocator.pv"
+        #line 253 "src/std/ArenaAllocator.pv"
         return 0;
     }
 
-    #line 247 "src/std/ArenaAllocator.pv"
+    #line 256 "src/std/ArenaAllocator.pv"
     uintptr_t old_size = ArenaBlock__size(current_block, ptr);
 
-    #line 249 "src/std/ArenaAllocator.pv"
+    #line 258 "src/std/ArenaAllocator.pv"
     void* new_ptr = ArenaAllocator__Allocator__alloc(self, new_size);
-    #line 250 "src/std/ArenaAllocator.pv"
-    if (new_ptr == 0) {
-        #line 250 "src/std/ArenaAllocator.pv"
-        return 0;
-    }
-
-    #line 252 "src/std/ArenaAllocator.pv"
-    memcpy(new_ptr, ptr, new_size < old_size ? new_size : old_size);
-    #line 253 "src/std/ArenaAllocator.pv"
-    ArenaBlock__free(current_block, ptr);
-
-    #line 255 "src/std/ArenaAllocator.pv"
-    return new_ptr;
-}
-
-#line 258 "src/std/ArenaAllocator.pv"
-bool ArenaAllocator__Allocator__free(void* __self, void* ptr) {
-    struct ArenaAllocator* self = __self; (void)self;
     #line 259 "src/std/ArenaAllocator.pv"
-    if (ptr == 0) {
+    if (new_ptr == 0) {
         #line 259 "src/std/ArenaAllocator.pv"
-        return false;
+        return 0;
     }
 
     #line 261 "src/std/ArenaAllocator.pv"
-    struct ArenaOversize* oversize = self->last_oversize;
+    memcpy(new_ptr, ptr, new_size < old_size ? new_size : old_size);
     #line 262 "src/std/ArenaAllocator.pv"
+    ArenaBlock__free(current_block, ptr);
+
+    #line 264 "src/std/ArenaAllocator.pv"
+    return new_ptr;
+}
+
+#line 267 "src/std/ArenaAllocator.pv"
+bool ArenaAllocator__Allocator__free(void* __self, void* ptr) {
+    struct ArenaAllocator* self = __self; (void)self;
+    #line 268 "src/std/ArenaAllocator.pv"
+    if (ptr == 0) {
+        #line 268 "src/std/ArenaAllocator.pv"
+        return false;
+    }
+
+    #line 270 "src/std/ArenaAllocator.pv"
+    struct ArenaOversize* oversize = self->last_oversize;
+    #line 271 "src/std/ArenaAllocator.pv"
     struct ArenaOversize* next = 0;
-    #line 263 "src/std/ArenaAllocator.pv"
+    #line 272 "src/std/ArenaAllocator.pv"
     while (oversize != 0) {
-        #line 264 "src/std/ArenaAllocator.pv"
+        #line 273 "src/std/ArenaAllocator.pv"
         struct ArenaOversize* prev = oversize->prev;
 
-        #line 266 "src/std/ArenaAllocator.pv"
+        #line 275 "src/std/ArenaAllocator.pv"
         if (ptr == oversize + 1) {
-            #line 267 "src/std/ArenaAllocator.pv"
+            #line 276 "src/std/ArenaAllocator.pv"
             if (self->last_oversize == oversize) {
-                #line 267 "src/std/ArenaAllocator.pv"
+                #line 276 "src/std/ArenaAllocator.pv"
                 self->last_oversize = prev;
             }
-            #line 268 "src/std/ArenaAllocator.pv"
+            #line 277 "src/std/ArenaAllocator.pv"
             if (next != 0) {
-                #line 268 "src/std/ArenaAllocator.pv"
+                #line 277 "src/std/ArenaAllocator.pv"
                 next->prev = prev;
             }
 
-            #line 270 "src/std/ArenaAllocator.pv"
+            #line 279 "src/std/ArenaAllocator.pv"
             return self->allocator.vtable->fn_free(self->allocator.instance, oversize);
         }
 
-        #line 273 "src/std/ArenaAllocator.pv"
+        #line 282 "src/std/ArenaAllocator.pv"
         next = oversize;
-        #line 274 "src/std/ArenaAllocator.pv"
+        #line 283 "src/std/ArenaAllocator.pv"
         oversize = prev;
     }
 
-    #line 277 "src/std/ArenaAllocator.pv"
+    #line 286 "src/std/ArenaAllocator.pv"
     struct ArenaBlock* block = self->last_block;
-    #line 278 "src/std/ArenaAllocator.pv"
+    #line 287 "src/std/ArenaAllocator.pv"
     while (block != 0) {
-        #line 279 "src/std/ArenaAllocator.pv"
+        #line 288 "src/std/ArenaAllocator.pv"
         struct ArenaBlock* prev = block->prev;
 
-        #line 281 "src/std/ArenaAllocator.pv"
+        #line 290 "src/std/ArenaAllocator.pv"
         if (ArenaBlock__is_in_block(block, ptr)) {
-            #line 282 "src/std/ArenaAllocator.pv"
+            #line 291 "src/std/ArenaAllocator.pv"
             return ArenaBlock__free(block, ptr);
         }
 
-        #line 285 "src/std/ArenaAllocator.pv"
+        #line 294 "src/std/ArenaAllocator.pv"
         block = prev;
     }
 
-    #line 288 "src/std/ArenaAllocator.pv"
+    #line 297 "src/std/ArenaAllocator.pv"
     return false;
 }
 

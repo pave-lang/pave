@@ -10,6 +10,7 @@ struct FileGenerator {
     struct Generator* generator;
 };
 
+#include <stdio.h>
 #include <compiler/FileGenerator.h>
 #include <std/str.h>
 struct Generator;
@@ -18,6 +19,8 @@ struct TypeFunctionUsage;
 struct UsageContext;
 struct TypeUsage_Enum;
 struct TypeUsage_Struct;
+struct Type;
+struct GenericMap;
 struct TypeUsage_Primitive;
 struct TypeUsage_Sequence;
 struct TypeUsage_Tuple;
@@ -41,49 +44,55 @@ bool FileGenerator__generate_enum_loop(struct FileGenerator* self, struct TypeUs
 #line 137 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_Enum* usage, struct UsageContext* usage_context);
 
-#line 204 "src/compiler/FileGenerator.pv"
+#line 211 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_struct_loop(struct FileGenerator* self, struct TypeUsage_Struct* usage);
 
-#line 212 "src/compiler/FileGenerator.pv"
+#line 219 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context);
 
-#line 518 "src/compiler/FileGenerator.pv"
+#line 532 "src/compiler/FileGenerator.pv"
+void FileGenerator__write_sized_extern(struct FileGenerator* self, FILE* file, struct str name);
+
+#line 542 "src/compiler/FileGenerator.pv"
+void FileGenerator__write_sized_definition(struct FileGenerator* self, FILE* file, struct str name, struct Type* self_type, struct GenericMap* generics);
+
+#line 559 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive_loop(struct FileGenerator* self, struct TypeUsage_Primitive* usage);
 
-#line 526 "src/compiler/FileGenerator.pv"
+#line 567 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUsage_Primitive* usage, struct UsageContext* usage_context);
 
-#line 627 "src/compiler/FileGenerator.pv"
+#line 675 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_sequence(struct FileGenerator* self, struct TypeUsage_Sequence* usage);
 
-#line 640 "src/compiler/FileGenerator.pv"
+#line 688 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_Sequence* usage, struct UsageContext* usage_context);
 
-#line 721 "src/compiler/FileGenerator.pv"
+#line 769 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple_loop(struct FileGenerator* self, struct TypeUsage_Tuple* usage);
 
-#line 729 "src/compiler/FileGenerator.pv"
+#line 777 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_Tuple* usage, struct UsageContext* usage_context);
 
-#line 781 "src/compiler/FileGenerator.pv"
+#line 829 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait_loop(struct FileGenerator* self, struct TypeUsage_Trait* usage);
 
-#line 789 "src/compiler/FileGenerator.pv"
+#line 837 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
-#line 837 "src/compiler/FileGenerator.pv"
+#line 885 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* global);
 
-#line 914 "src/compiler/FileGenerator.pv"
+#line 962 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 926 "src/compiler/FileGenerator.pv"
+#line 974 "src/compiler/FileGenerator.pv"
 void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths, struct Array_str* module_paths);
 
-#line 948 "src/compiler/FileGenerator.pv"
+#line 996 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1014 "src/compiler/FileGenerator.pv"
+#line 1062 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif
