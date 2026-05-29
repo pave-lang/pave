@@ -1807,7 +1807,7 @@ void DefinitionWriter__write_dynamic_execute_or_init(struct DefinitionWriter* se
         #line 906 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 907 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
+        fprintf(file, "* instance = allocator.vtable->fn_alloc(allocator.instance, sizeof(struct ");
         #line 908 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 909 "src/compiler/DefinitionWriter.pv"

@@ -904,7 +904,7 @@ impl DefinitionWriter {
             generator.write_indent(file);
             fprintf(file, "struct ");
             generator.write_function_name(file, func_info, generics);
-            fprintf(file, "* instance = allocator.vtable->alloc(allocator.instance, sizeof(struct ");
+            fprintf(file, "* instance = allocator.vtable->fn_alloc(allocator.instance, sizeof(struct ");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "));\n");
 
