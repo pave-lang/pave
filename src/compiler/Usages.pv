@@ -117,7 +117,7 @@ struct TypeUsage<T> {
     type: &T,
     usage_contexts: Array<UsageContext>,
     impl_dynamic_usage: bool,
-    sized_usage: bool,
+    any_usage: bool,
 }
 
 impl<T> TypeUsage<T> {
@@ -127,7 +127,7 @@ impl<T> TypeUsage<T> {
             type,
             usage_contexts: Array<UsageContext>::new(allocator),
             impl_dynamic_usage: false,
-            sized_usage: false,
+            any_usage: false,
         };
     }
 
@@ -676,23 +676,23 @@ impl Usages {
         return null;
     }
 
-    fn mark_sized_usage(&self, type: &Type) {
+    fn mark_any_usage(&self, type: &Type) {
         match type {
             Type::Struct(struct_info, _) => {
                 let ptr = cast<usize>(struct_info);
                 let usage = self.structs.find(&ptr);
-                if usage != null { usage.sized_usage = true; }
+                if usage != null { usage.any_usage = true; }
             },
             Type::Enum(enum_info, _) => {
                 let ptr = cast<usize>(enum_info);
                 let usage = self.enums.find(&ptr);
-                if usage != null { usage.sized_usage = true; }
+                if usage != null { usage.any_usage = true; }
             },
             Type::Primitive(primitive_info) => {
                 if primitive_info == null { return; }
                 let ptr = cast<usize>(primitive_info);
                 let usage = self.primitives.find(&ptr);
-                if usage != null { usage.sized_usage = true; }
+                if usage != null { usage.any_usage = true; }
             },
             _ => {},
         }
@@ -1056,9 +1056,9 @@ impl Usages {
                         match target_indirect.to {
                             Type::Trait(target_trait, _) => {
                                 let target_trait_name = target_trait.name;
-                                if target_trait_name != null && target_trait_name.value.eq("Sized") {
+                                if target_trait_name != null && target_trait_name.value.eq("Any") {
                                     let source = Context::resolve_type(self.allocator, &inner.return_type, generic_map, null);
-                                    if source != null { self.mark_sized_usage(source.deref_all()); }
+                                    if source != null { self.mark_any_usage(source.deref_all()); }
                                 }
                             },
                             _ => {},

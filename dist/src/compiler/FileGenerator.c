@@ -377,9 +377,9 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     }
 
     #line 166 "src/compiler/FileGenerator.pv"
-    if (usage->sized_usage) {
+    if (usage->any_usage) {
         #line 166 "src/compiler/FileGenerator.pv"
-        FileGenerator__write_sized_extern(self, header_file, String__as_str(&name));
+        FileGenerator__write_any_extern(self, header_file, String__as_str(&name));
     }
 
     #line 168 "src/compiler/FileGenerator.pv"
@@ -393,7 +393,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     remove(header_tmp);
 
     #line 174 "src/compiler/FileGenerator.pv"
-    if (enum_info->impls.length == 0 && !usage->sized_usage) {
+    if (enum_info->impls.length == 0 && !usage->any_usage) {
         #line 174 "src/compiler/FileGenerator.pv"
         return true;
     }
@@ -440,11 +440,11 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     }
 
     #line 197 "src/compiler/FileGenerator.pv"
-    if (usage->sized_usage) {
+    if (usage->any_usage) {
         #line 198 "src/compiler/FileGenerator.pv"
-        fprintf(code_file, "#include <std/trait_Sized.h>\n");
+        fprintf(code_file, "#include <std/trait_Any.h>\n");
         #line 199 "src/compiler/FileGenerator.pv"
-        FileGenerator__write_sized_definition(self, code_file, String__as_str(&name), generics->self_type, generics);
+        FileGenerator__write_any_definition(self, code_file, String__as_str(&name), generics->self_type, generics);
     }
 
     #line 202 "src/compiler/FileGenerator.pv"
@@ -614,9 +614,9 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     }
 
     #line 284 "src/compiler/FileGenerator.pv"
-    if (usage->sized_usage) {
+    if (usage->any_usage) {
         #line 284 "src/compiler/FileGenerator.pv"
-        FileGenerator__write_sized_extern(self, header_file, String__as_str(&name));
+        FileGenerator__write_any_extern(self, header_file, String__as_str(&name));
     }
 
     #line 286 "src/compiler/FileGenerator.pv"
@@ -640,7 +640,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     remove(header_tmp);
 
     #line 298 "src/compiler/FileGenerator.pv"
-    if (struct_info->impls.length == 0 && !usage->impl_dynamic_usage && !usage->sized_usage) {
+    if (struct_info->impls.length == 0 && !usage->impl_dynamic_usage && !usage->any_usage) {
         #line 299 "src/compiler/FileGenerator.pv"
         return true;
     }
@@ -774,11 +774,11 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     } }
 
     #line 362 "src/compiler/FileGenerator.pv"
-    if (usage->sized_usage) {
+    if (usage->any_usage) {
         #line 363 "src/compiler/FileGenerator.pv"
-        fprintf(code_file, "#include <std/trait_Sized.h>\n");
+        fprintf(code_file, "#include <std/trait_Any.h>\n");
         #line 364 "src/compiler/FileGenerator.pv"
-        FileGenerator__write_sized_definition(self, code_file, String__as_str(&name), generics->self_type, generics);
+        FileGenerator__write_any_definition(self, code_file, String__as_str(&name), generics->self_type, generics);
     }
 
     #line 367 "src/compiler/FileGenerator.pv"
@@ -1083,25 +1083,25 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
 }
 
 #line 532 "src/compiler/FileGenerator.pv"
-void FileGenerator__write_sized_extern(struct FileGenerator* self, FILE* file, struct str name) {
+void FileGenerator__write_any_extern(struct FileGenerator* self, FILE* file, struct str name) {
     #line 533 "src/compiler/FileGenerator.pv"
     struct Generator* generator = self->generator;
     #line 534 "src/compiler/FileGenerator.pv"
-    fprintf(file, "#include <std/trait_Sized.h>\n");
+    fprintf(file, "#include <std/trait_Any.h>\n");
     #line 535 "src/compiler/FileGenerator.pv"
-    fprintf(file, "extern struct trait_SizedVTable ");
+    fprintf(file, "extern struct trait_AnyVTable ");
     #line 536 "src/compiler/FileGenerator.pv"
     Generator__write_str_title(generator, file, name);
     #line 537 "src/compiler/FileGenerator.pv"
     fprintf(file, "__VTABLE__");
     #line 538 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(generator, file, (struct str){ .ptr = "Sized", .length = strlen("Sized") });
+    Generator__write_str_title(generator, file, (struct str){ .ptr = "Any", .length = strlen("Any") });
     #line 539 "src/compiler/FileGenerator.pv"
     fprintf(file, ";\n");
 }
 
 #line 542 "src/compiler/FileGenerator.pv"
-void FileGenerator__write_sized_definition(struct FileGenerator* self, FILE* file, struct str name, struct Type* self_type, struct GenericMap* generics) {
+void FileGenerator__write_any_definition(struct FileGenerator* self, FILE* file, struct str name, struct Type* self_type, struct GenericMap* generics) {
     #line 543 "src/compiler/FileGenerator.pv"
     struct Generator* generator = self->generator;
     #line 544 "src/compiler/FileGenerator.pv"
@@ -1109,26 +1109,26 @@ void FileGenerator__write_sized_definition(struct FileGenerator* self, FILE* fil
     #line 545 "src/compiler/FileGenerator.pv"
     Generator__write_str(generator, file, name);
     #line 546 "src/compiler/FileGenerator.pv"
-    fprintf(file, "__Sized__size(void* __self) { (void)__self; return sizeof(");
+    fprintf(file, "__Any__size(void* __self) { (void)__self; return sizeof(");
     #line 547 "src/compiler/FileGenerator.pv"
     Generator__write_type(generator, file, self_type, generics);
     #line 548 "src/compiler/FileGenerator.pv"
     fprintf(file, "); }\n");
 
     #line 550 "src/compiler/FileGenerator.pv"
-    fprintf(file, "struct trait_SizedVTable ");
+    fprintf(file, "struct trait_AnyVTable ");
     #line 551 "src/compiler/FileGenerator.pv"
     Generator__write_str_title(generator, file, name);
     #line 552 "src/compiler/FileGenerator.pv"
     fprintf(file, "__VTABLE__");
     #line 553 "src/compiler/FileGenerator.pv"
-    Generator__write_str_title(generator, file, (struct str){ .ptr = "Sized", .length = strlen("Sized") });
+    Generator__write_str_title(generator, file, (struct str){ .ptr = "Any", .length = strlen("Any") });
     #line 554 "src/compiler/FileGenerator.pv"
     fprintf(file, " = { .fn_size = &");
     #line 555 "src/compiler/FileGenerator.pv"
     Generator__write_str(generator, file, name);
     #line 556 "src/compiler/FileGenerator.pv"
-    fprintf(file, "__Sized__size };\n");
+    fprintf(file, "__Any__size };\n");
 }
 
 #line 559 "src/compiler/FileGenerator.pv"
@@ -1207,9 +1207,9 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     }
 
     #line 596 "src/compiler/FileGenerator.pv"
-    if (usage->sized_usage) {
+    if (usage->any_usage) {
         #line 596 "src/compiler/FileGenerator.pv"
-        FileGenerator__write_sized_extern(self, header_file, name);
+        FileGenerator__write_any_extern(self, header_file, name);
     }
 
     #line 598 "src/compiler/FileGenerator.pv"
@@ -1348,11 +1348,11 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     } }
 
     #line 661 "src/compiler/FileGenerator.pv"
-    if (usage->sized_usage) {
+    if (usage->any_usage) {
         #line 662 "src/compiler/FileGenerator.pv"
-        fprintf(code_file, "#include <std/trait_Sized.h>\n");
+        fprintf(code_file, "#include <std/trait_Any.h>\n");
         #line 663 "src/compiler/FileGenerator.pv"
-        FileGenerator__write_sized_definition(self, code_file, name, generics->self_type, generics);
+        FileGenerator__write_any_definition(self, code_file, name, generics->self_type, generics);
     }
 
     #line 666 "src/compiler/FileGenerator.pv"

@@ -174,7 +174,7 @@ impl ArenaAllocator {
         return new_memory;
     }
 
-    fn store_dyn(&self, value: &dyn Sized) -> *void {
+    fn store_dyn(&self, value: &dyn Any) -> *void {
         let size = value.size();
         let new_memory = self.alloc(size);
         if new_memory == null { return null; }

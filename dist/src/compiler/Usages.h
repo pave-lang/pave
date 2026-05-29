@@ -110,7 +110,7 @@ struct UsageContext* Usages__find_parent_usage_context_struct(struct Usages* sel
 struct UsageContext* Usages__find_parent_usage_context_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
 #line 679 "src/compiler/Usages.pv"
-void Usages__mark_sized_usage(struct Usages* self, struct Type* type);
+void Usages__mark_any_usage(struct Usages* self, struct Type* type);
 
 #line 701 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_primitive(struct Usages* self, struct Primitive* primitive_info, struct GenericMap* generic_map);

@@ -20,7 +20,7 @@ struct TypeUsage_Sequence TypeUsage_Sequence__new(struct ArenaAllocator* allocat
         .type = type,
         .usage_contexts = Array_UsageContext__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .impl_dynamic_usage = false,
-        .sized_usage = false,
+        .any_usage = false,
     };
 }
 

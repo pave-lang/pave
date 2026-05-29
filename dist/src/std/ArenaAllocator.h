@@ -18,7 +18,7 @@ struct ArenaAllocator {
 
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
-#include <std/trait_Sized.h>
+#include <std/trait_Any.h>
 struct ArenaAllocator;
 
 #line 139 "src/std/ArenaAllocator.pv"
@@ -152,7 +152,7 @@ struct TypedefC;
 struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, struct TypedefC* value);
 
 #line 177 "src/std/ArenaAllocator.pv"
-void* ArenaAllocator__store_dyn(struct ArenaAllocator* self, struct trait_Sized value);
+void* ArenaAllocator__store_dyn(struct ArenaAllocator* self, struct trait_Any value);
 
 #line 188 "src/std/ArenaAllocator.pv"
 void* ArenaAllocator__Allocator__alloc(void* __self, uintptr_t size);

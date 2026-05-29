@@ -20,7 +20,7 @@ struct TypeUsage_Primitive TypeUsage_Primitive__new(struct ArenaAllocator* alloc
         .type = type,
         .usage_contexts = Array_UsageContext__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
         .impl_dynamic_usage = false,
-        .sized_usage = false,
+        .any_usage = false,
     };
 }
 

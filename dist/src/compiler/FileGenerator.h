@@ -51,10 +51,10 @@ bool FileGenerator__generate_struct_loop(struct FileGenerator* self, struct Type
 bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context);
 
 #line 532 "src/compiler/FileGenerator.pv"
-void FileGenerator__write_sized_extern(struct FileGenerator* self, FILE* file, struct str name);
+void FileGenerator__write_any_extern(struct FileGenerator* self, FILE* file, struct str name);
 
 #line 542 "src/compiler/FileGenerator.pv"
-void FileGenerator__write_sized_definition(struct FileGenerator* self, FILE* file, struct str name, struct Type* self_type, struct GenericMap* generics);
+void FileGenerator__write_any_definition(struct FileGenerator* self, FILE* file, struct str name, struct Type* self_type, struct GenericMap* generics);
 
 #line 559 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive_loop(struct FileGenerator* self, struct TypeUsage_Primitive* usage);

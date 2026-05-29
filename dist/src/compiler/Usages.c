@@ -1324,7 +1324,7 @@ struct UsageContext* Usages__find_parent_usage_context_enum(struct Usages* self,
 }
 
 #line 679 "src/compiler/Usages.pv"
-void Usages__mark_sized_usage(struct Usages* self, struct Type* type) {
+void Usages__mark_any_usage(struct Usages* self, struct Type* type) {
     #line 680 "src/compiler/Usages.pv"
     switch (type->type) {
         #line 681 "src/compiler/Usages.pv"
@@ -1338,7 +1338,7 @@ void Usages__mark_sized_usage(struct Usages* self, struct Type* type) {
             #line 684 "src/compiler/Usages.pv"
             if (usage != 0) {
                 #line 684 "src/compiler/Usages.pv"
-                usage->sized_usage = true;
+                usage->any_usage = true;
             }
         } break;
         #line 686 "src/compiler/Usages.pv"
@@ -1352,7 +1352,7 @@ void Usages__mark_sized_usage(struct Usages* self, struct Type* type) {
             #line 689 "src/compiler/Usages.pv"
             if (usage != 0) {
                 #line 689 "src/compiler/Usages.pv"
-                usage->sized_usage = true;
+                usage->any_usage = true;
             }
         } break;
         #line 691 "src/compiler/Usages.pv"
@@ -1371,7 +1371,7 @@ void Usages__mark_sized_usage(struct Usages* self, struct Type* type) {
             #line 695 "src/compiler/Usages.pv"
             if (usage != 0) {
                 #line 695 "src/compiler/Usages.pv"
-                usage->sized_usage = true;
+                usage->any_usage = true;
             }
         } break;
         #line 697 "src/compiler/Usages.pv"
@@ -2232,13 +2232,13 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                             #line 1058 "src/compiler/Usages.pv"
                             struct Token* target_trait_name = target_trait->name;
                             #line 1059 "src/compiler/Usages.pv"
-                            if (target_trait_name != 0 && str__Eq_str__eq(&target_trait_name->value, (struct str){ .ptr = "Sized", .length = strlen("Sized") })) {
+                            if (target_trait_name != 0 && str__Eq_str__eq(&target_trait_name->value, (struct str){ .ptr = "Any", .length = strlen("Any") })) {
                                 #line 1060 "src/compiler/Usages.pv"
                                 struct Type* source = Context__resolve_type(self->allocator, &inner->return_type, generic_map, 0);
                                 #line 1061 "src/compiler/Usages.pv"
                                 if (source != 0) {
                                     #line 1061 "src/compiler/Usages.pv"
-                                    Usages__mark_sized_usage(self, Type__deref_all(source));
+                                    Usages__mark_any_usage(self, Type__deref_all(source));
                                 }
                             }
                         } break;

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <std/ArenaBlock.h>
 #include <std/ArenaAllocator.h>
-#include <std/trait_Sized.h>
+#include <std/trait_Any.h>
 #include <std/ArenaOversize.h>
 #include <std/ArenaAllocator.h>
 
@@ -590,7 +590,7 @@ struct TypedefC* ArenaAllocator__store_TypedefC(struct ArenaAllocator* self, str
 }
 
 #line 177 "src/std/ArenaAllocator.pv"
-void* ArenaAllocator__store_dyn(struct ArenaAllocator* self, struct trait_Sized value) {
+void* ArenaAllocator__store_dyn(struct ArenaAllocator* self, struct trait_Any value) {
     #line 178 "src/std/ArenaAllocator.pv"
     uintptr_t size = value.vtable->fn_size(value.instance);
     #line 179 "src/std/ArenaAllocator.pv"

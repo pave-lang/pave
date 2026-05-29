@@ -13,7 +13,7 @@ struct TypeUsage_Sequence {
     struct Sequence* type;
     struct Array_UsageContext usage_contexts;
     bool impl_dynamic_usage;
-    bool sized_usage;
+    bool any_usage;
 };
 
 #include <compiler/TypeUsage_Sequence.h>

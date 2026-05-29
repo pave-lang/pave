@@ -163,7 +163,7 @@ impl FileGenerator {
             return false;
         }
 
-        if usage.sized_usage { self.write_sized_extern(header_file, name.as_str()); }
+        if usage.any_usage { self.write_any_extern(header_file, name.as_str()); }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -171,7 +171,7 @@ impl FileGenerator {
         fclose(header_file);
         remove(header_tmp);
 
-        if enum_info.impls.length == 0 && !usage.sized_usage { return true; }
+        if enum_info.impls.length == 0 && !usage.any_usage { return true; }
 
         let code = generator.make_path(module, name.as_str(), ".c");
 
@@ -194,9 +194,9 @@ impl FileGenerator {
             return false;
         }
 
-        if usage.sized_usage {
-            fprintf(code_file, "#include <std/trait_Sized.h>\n");
-            self.write_sized_definition(code_file, name.as_str(), generics.self_type, generics);
+        if usage.any_usage {
+            fprintf(code_file, "#include <std/trait_Any.h>\n");
+            self.write_any_definition(code_file, name.as_str(), generics.self_type, generics);
         }
 
         generator.overwrite_if_different(code.c_str(), code_file);
@@ -281,7 +281,7 @@ impl FileGenerator {
             return false;
         }
 
-        if usage.sized_usage { self.write_sized_extern(header_file, name.as_str()); }
+        if usage.any_usage { self.write_any_extern(header_file, name.as_str()); }
 
         if struct_info.module.mode_cpp || generator.root.mode_cpp {
             fprintf(header_file, "\n#ifdef __cplusplus\n");
@@ -295,7 +295,7 @@ impl FileGenerator {
         fclose(header_file);
         remove(header_tmp);
 
-        if struct_info.impls.length == 0 && !usage.impl_dynamic_usage && !usage.sized_usage {
+        if struct_info.impls.length == 0 && !usage.impl_dynamic_usage && !usage.any_usage {
             return true;
         }
 
@@ -359,9 +359,9 @@ impl FileGenerator {
             fprintf(code_file, " };\n");
         }
 
-        if usage.sized_usage {
-            fprintf(code_file, "#include <std/trait_Sized.h>\n");
-            self.write_sized_definition(code_file, name.as_str(), generics.self_type, generics);
+        if usage.any_usage {
+            fprintf(code_file, "#include <std/trait_Any.h>\n");
+            self.write_any_definition(code_file, name.as_str(), generics.self_type, generics);
         }
 
         if usage.impl_dynamic_usage {
@@ -529,31 +529,31 @@ impl FileGenerator {
         return true;
     }
 
-    fn write_sized_extern(&self, file: &FILE, name: str) {
+    fn write_any_extern(&self, file: &FILE, name: str) {
         let generator = self.generator;
-        fprintf(file, "#include <std/trait_Sized.h>\n");
-        fprintf(file, "extern struct trait_SizedVTable ");
+        fprintf(file, "#include <std/trait_Any.h>\n");
+        fprintf(file, "extern struct trait_AnyVTable ");
         generator.write_str_title(file, name);
         fprintf(file, "__VTABLE__");
-        generator.write_str_title(file, "Sized");
+        generator.write_str_title(file, "Any");
         fprintf(file, ";\n");
     }
 
-    fn write_sized_definition(&self, file: &FILE, name: str, self_type: &Type, generics: &GenericMap) {
+    fn write_any_definition(&self, file: &FILE, name: str, self_type: &Type, generics: &GenericMap) {
         let generator = self.generator;
         fprintf(file, "\nuintptr_t ");
         generator.write_str(file, name);
-        fprintf(file, "__Sized__size(void* __self) { (void)__self; return sizeof(");
+        fprintf(file, "__Any__size(void* __self) { (void)__self; return sizeof(");
         generator.write_type(file, self_type, generics);
         fprintf(file, "); }\n");
 
-        fprintf(file, "struct trait_SizedVTable ");
+        fprintf(file, "struct trait_AnyVTable ");
         generator.write_str_title(file, name);
         fprintf(file, "__VTABLE__");
-        generator.write_str_title(file, "Sized");
+        generator.write_str_title(file, "Any");
         fprintf(file, " = { .fn_size = &");
         generator.write_str(file, name);
-        fprintf(file, "__Sized__size };\n");
+        fprintf(file, "__Any__size };\n");
     }
 
     fn generate_primitive_loop(&self, usage: &TypeUsage<Primitive>) -> bool {
@@ -593,7 +593,7 @@ impl FileGenerator {
             return false;
         }
 
-        if usage.sized_usage { self.write_sized_extern(header_file, name); }
+        if usage.any_usage { self.write_any_extern(header_file, name); }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -658,9 +658,9 @@ impl FileGenerator {
             fprintf(code_file, " };\n");
         }
 
-        if usage.sized_usage {
-            fprintf(code_file, "#include <std/trait_Sized.h>\n");
-            self.write_sized_definition(code_file, name, generics.self_type, generics);
+        if usage.any_usage {
+            fprintf(code_file, "#include <std/trait_Any.h>\n");
+            self.write_any_definition(code_file, name, generics.self_type, generics);
         }
 
         generator.overwrite_if_different(code.c_str(), code_file);
