@@ -1782,11 +1782,11 @@ void DefinitionWriter__write_dynamic_execute_or_init(struct DefinitionWriter* se
     #line 892 "src/compiler/DefinitionWriter.pv"
     if (Generator__is_coroutine(generator)) {
         #line 893 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "struct Iter_CoroutineStatus ");
+        fprintf(file, "struct trait_Iter_CoroutineStatus ");
         #line 894 "src/compiler/DefinitionWriter.pv"
         Generator__write_function_name(generator, file, func_info, generics);
         #line 895 "src/compiler/DefinitionWriter.pv"
-        fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
+        fprintf(file, "__Co__init(void* __self, struct trait_Allocator allocator) {\n");
 
         #line 897 "src/compiler/DefinitionWriter.pv"
         generator->indent += 1;

@@ -890,9 +890,9 @@ impl DefinitionWriter {
     fn write_dynamic_execute_or_init(&self, file: &FILE, func_info: &Function, generics: &GenericMap, module: &Module) {
         let generator = self.generator;
         if generator.is_coroutine() {
-            fprintf(file, "struct Iter_CoroutineStatus ");
+            fprintf(file, "struct trait_Iter_CoroutineStatus ");
             generator.write_function_name(file, func_info, generics);
-            fprintf(file, "__Co__init(void* __self, struct Allocator allocator) {\n");
+            fprintf(file, "__Co__init(void* __self, struct trait_Allocator allocator) {\n");
 
             generator.indent += 1;
 
