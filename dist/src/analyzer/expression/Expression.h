@@ -51,25 +51,25 @@ struct str Expression__number_primitive(struct str value);
 #line 112 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 503 "src/analyzer/expression/Expression.pv"
+#line 510 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 550 "src/analyzer/expression/Expression.pv"
+#line 557 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 557 "src/analyzer/expression/Expression.pv"
+#line 564 "src/analyzer/expression/Expression.pv"
 bool Expression__is_const_expression(struct Expression* self, struct Context* context);
 
-#line 595 "src/analyzer/expression/Expression.pv"
+#line 602 "src/analyzer/expression/Expression.pv"
 void Expression__append_ident_name(struct Expression* self, struct String* result);
 
-#line 652 "src/analyzer/expression/Expression.pv"
+#line 659 "src/analyzer/expression/Expression.pv"
 void Expression__append_display_name(struct Expression* self, struct String* result);
 
-#line 699 "src/analyzer/expression/Expression.pv"
+#line 706 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast);
 
-#line 833 "src/analyzer/expression/Expression.pv"
+#line 840 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

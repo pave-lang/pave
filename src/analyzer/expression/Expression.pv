@@ -346,7 +346,14 @@ impl Expression {
                                     let new_type = context.allocator.store(&Type::Indirect(new_indirect));
                                     result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
                                 },
-                                _ => { result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), child.return_type.deref()); },
+                                _ => {
+                                    let deref_target = child.return_type.resolve_typedef();
+                                    if !deref_target.is_indirect() && !deref_target.is_unknown() {
+                                        context.error_token(token, "Cannot dereference a non-reference or non-pointer type");
+                                        return null;
+                                    }
+                                    result = Expression::make(context.allocator, token, ExpressionData::UnaryExpression(operator.value, child), child.return_type.deref());
+                                },
                             }
                         } else {
                             if operator.value.eq("-") {
