@@ -219,11 +219,16 @@ impl ExpressionWriter {
         match inner_expr.return_type.deref() {
             Type::Function(func_info, func_generics) => {
                 if func_info.type == FunctionType::Coroutine {
-                    fprintf(file, "(struct trait_Co_CoroutineStatus) { .vtable = &");
+                    let co_ret_name = generator.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+                    fprintf(file, "(struct trait_Co_");
+                    generator.write_string(file, &co_ret_name);
+                    fprintf(file, ") { .vtable = &");
                     generator.write_dynamic_vtable_name(file, func_info, func_generics);
                     fprintf(file, "__VTABLE__CO, .instance = &(struct ");
                     generator.write_function_name(file, func_info, func_generics);
-                    fprintf(file, "__Co_CoroutineStatus__Instance) {}");
+                    fprintf(file, "__Co_");
+                    generator.write_string(file, &co_ret_name);
+                    fprintf(file, "__Instance) {}");
                     fprintf(file, " }");
                 } else {
                     fprintf(file, "(struct trait_Fn) { .vtable = &");

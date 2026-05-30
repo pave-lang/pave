@@ -74,36 +74,45 @@ impl DefinitionWriter {
     fn write_dynamic_function_instance_header(&self, file: &FILE, func_info: &Function, struct_name: str, generics: &GenericMap, is_coroutine: bool) {
         let generator = self.generator;
         if is_coroutine {
-            fprintf(file, "#include <std/trait_Co_CoroutineStatus.h>\n");
-        } else {
-            fprintf(file, "#include <std/trait_Fn.h>\n");
-        }
-        fprintf(file, "struct ");
-        generator.write_function_name(file, func_info, generics);
-        if is_coroutine {
-            fprintf(file, "__Co_CoroutineStatus__Instance { ");
-        } else {
-            fprintf(file, "__Fn__Instance { ");
-        }
-        generator.indent += 1;
-        for param in func_info.parameters {
-            generator.write_type(file, &param.type, generics);
-            fprintf(file, " ");
-            generator.write_token(file, param.name);
-            fprintf(file, "; ");
-        }
-        generator.indent -= 1;
-        fprintf(file, "};\n");
-
-        if is_coroutine {
-            fprintf(file, "extern struct trait_Co_CoroutineStatusVTable ");
-        } else {
-            fprintf(file, "extern struct trait_FnVTable ");
-        }
-        generator.write_dynamic_vtable_name(file, func_info, generics);
-        if is_coroutine {
+            let co_ret_name = generator.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+            fprintf(file, "#include <std/trait_Co_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, ".h>\n");
+            fprintf(file, "struct ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Co_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, "__Instance { ");
+            generator.indent += 1;
+            for param in func_info.parameters {
+                generator.write_type(file, &param.type, generics);
+                fprintf(file, " ");
+                generator.write_token(file, param.name);
+                fprintf(file, "; ");
+            }
+            generator.indent -= 1;
+            fprintf(file, "};\n");
+            fprintf(file, "extern struct trait_Co_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, "VTable ");
+            generator.write_dynamic_vtable_name(file, func_info, generics);
             fprintf(file, "__VTABLE__CO;\n");
         } else {
+            fprintf(file, "#include <std/trait_Fn.h>\n");
+            fprintf(file, "struct ");
+            generator.write_function_name(file, func_info, generics);
+            fprintf(file, "__Fn__Instance { ");
+            generator.indent += 1;
+            for param in func_info.parameters {
+                generator.write_type(file, &param.type, generics);
+                fprintf(file, " ");
+                generator.write_token(file, param.name);
+                fprintf(file, "; ");
+            }
+            generator.indent -= 1;
+            fprintf(file, "};\n");
+            fprintf(file, "extern struct trait_FnVTable ");
+            generator.write_dynamic_vtable_name(file, func_info, generics);
             fprintf(file, "__VTABLE__DYN_FN;\n");
         }
     }
@@ -838,7 +847,10 @@ impl DefinitionWriter {
         generator.write_function_name(file, func_info, generics);
 
         if generator.is_coroutine() {
-            fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
+            fprintf(file, "__Co_");
+            let co_ret_name = generator.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, "__Instance* self = __self;\n");
         } else {
             if module.mode_cpp {
                 fprintf(file, "__Fn__Instance* self = (struct ");
@@ -890,7 +902,10 @@ impl DefinitionWriter {
     fn write_dynamic_execute_or_init(&self, file: &FILE, func_info: &Function, generics: &GenericMap, module: &Module) {
         let generator = self.generator;
         if generator.is_coroutine() {
-            fprintf(file, "struct trait_Iter_CoroutineStatus ");
+            let co_ret_name = generator.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+            fprintf(file, "struct trait_Iter_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, " ");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__Co__init(void* __self, struct trait_Allocator allocator) {\n");
 
@@ -899,7 +914,9 @@ impl DefinitionWriter {
             generator.write_indent(file);
             fprintf(file, "struct ");
             generator.write_function_name(file, func_info, generics);
-            fprintf(file, "__Co_CoroutineStatus__Instance* self = __self;\n");
+            fprintf(file, "__Co_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, "__Instance* self = __self;\n");
 
             generator.write_indent(file);
             fprintf(file, "struct ");
@@ -918,7 +935,9 @@ impl DefinitionWriter {
             }
 
             generator.write_indent(file);
-            fprintf(file, "return (struct trait_Iter_CoroutineStatus) { .vtable = &");
+            fprintf(file, "return (struct trait_Iter_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, ") { .vtable = &");
             generator.write_function_name(file, func_info, generics);
             fprintf(file, "__VTABLE__ITER, .instance = instance };\n");
 
@@ -963,7 +982,10 @@ impl DefinitionWriter {
     fn write_dynamic_vtable(&self, file: &FILE, func_info: &Function, generics: &GenericMap) {
         let generator = self.generator;
         if generator.is_coroutine() {
-            fprintf(file, "struct trait_Co_CoroutineStatusVTable ");
+            let co_ret_name = generator.naming_ident.get_type_name(&func_info.return_type, generics.self_type, generics);
+            fprintf(file, "struct trait_Co_");
+            generator.write_string(file, &co_ret_name);
+            fprintf(file, "VTable ");
         } else {
             fprintf(file, "struct trait_FnVTable ");
         }
