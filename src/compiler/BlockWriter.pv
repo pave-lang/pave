@@ -825,7 +825,7 @@ impl BlockWriter {
                     }
                     function_context.push_defer(defer_stmt);
                 },
-                StatementData::ContinueStatement(_) => {
+                StatementData::ContinueStatement => {
                     let function_context = generator.function_context;
                     if function_context == null {
                         fprintf(stderr, "Missing function context in continue statement\n");
@@ -836,7 +836,7 @@ impl BlockWriter {
                     generator.write_indent(file);
                     fprintf(file, "continue;\n");
                 },
-                StatementData::BreakStatement(_) => {
+                StatementData::BreakStatement => {
                     let function_context = generator.function_context;
                     if function_context == null {
                         fprintf(stderr, "Missing function context in break statement\n");

@@ -1,8 +1,6 @@
 #ifndef PAVE_STATEMENT_DATA
 #define PAVE_STATEMENT_DATA
 
-#include <stdbool.h>
-
 #include <analyzer/statement/DeferStatement.h>
 struct Block;
 struct LetStatement;
@@ -44,8 +42,6 @@ struct StatementData {
         struct AssignmentStatement* assignmentstatement_value;
         struct Expression* expressionstatement_value;
         struct DeferStatement deferstatement_value;
-        bool breakstatement_value;
-        bool continuestatement_value;
     };
 };
 

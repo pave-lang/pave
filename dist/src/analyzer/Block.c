@@ -181,7 +181,7 @@ bool Block__parse_keyword(struct Block* self, struct Context* context, struct Ge
             #line 100 "src/analyzer/Block.pv"
             Context__next_token(context);
             #line 101 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__CONTINUE_STATEMENT, .continuestatement_value = false };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__CONTINUE_STATEMENT };
             #line 102 "src/analyzer/Block.pv"
             return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";");
         } break;
@@ -190,7 +190,7 @@ bool Block__parse_keyword(struct Block* self, struct Context* context, struct Ge
             #line 105 "src/analyzer/Block.pv"
             Context__next_token(context);
             #line 106 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__BREAK_STATEMENT, .breakstatement_value = false };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__BREAK_STATEMENT };
             #line 107 "src/analyzer/Block.pv"
             return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";");
         } break;

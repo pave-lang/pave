@@ -934,8 +934,18 @@ impl Usages {
                 StatementData::ExpressionStatement(statement) => {
                     self.process_expression(statement, generic_map);
                 },
-                StatementData::ContinueStatement(_) => {},
-                StatementData::BreakStatement(_) => {},
+                StatementData::DeferStatement(defer_stmt) => {
+                    match defer_stmt {
+                        DeferStatement::Expression(expression) => {
+                            self.process_expression(expression, generic_map);
+                        },
+                        DeferStatement::Block(block) => {
+                            self.process_block(block, generic_map);
+                        },
+                    }
+                },
+                StatementData::ContinueStatement => {},
+                StatementData::BreakStatement => {},
             }
         }
     }

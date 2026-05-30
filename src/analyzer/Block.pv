@@ -98,12 +98,12 @@ impl Block {
             },
             hash("continue") => {
                 context.next_token();
-                *data = StatementData::ContinueStatement(false);
+                *data = StatementData::ContinueStatement;
                 return context.expect_value(TokenType::Symbol, ";");
             },
             hash("break") => {
                 context.next_token();
-                *data = StatementData::BreakStatement(false);
+                *data = StatementData::BreakStatement;
                 return context.expect_value(TokenType::Symbol, ";");
             },
             _ => {

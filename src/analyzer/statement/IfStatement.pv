@@ -16,8 +16,8 @@ impl IfStatement {
         let last = &block.statements.data[block.statements.length - 1];
         match last.data {
             StatementData::ReturnStatement(_) => { return true; },
-            StatementData::BreakStatement(_) => { return true; },
-            StatementData::ContinueStatement(_) => { return true; },
+            StatementData::BreakStatement => { return true; },
+            StatementData::ContinueStatement => { return true; },
             _ => { return false; },
         }
     }
