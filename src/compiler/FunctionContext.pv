@@ -1,5 +1,6 @@
 use std
 use analyzer::types
+use analyzer::statement
 
 struct FunctionContext {
     allocator: &ArenaAllocator,
@@ -52,6 +53,33 @@ impl FunctionContext {
 
     fn pop_scope(&self) {
         self.scopes.remove_back();
+    }
+
+    fn push_defer(&self, stmt: DeferStatement) {
+        let scope = self.scopes.back();
+        if scope == null { return; }
+        scope.defer_statements.append(stmt);
+    }
+
+    fn get_all_defer_statements(&self) -> Array<DeferStatement> {
+        let result = Array<DeferStatement>::new(self.allocator);
+        for scope in self.scopes.iter().reverse() {
+            for stmt in scope.defer_statements.iter().reverse() {
+                result.append(*stmt);
+            }
+        }
+        return result;
+    }
+
+    fn get_loop_defer_statements(&self) -> Array<DeferStatement> {
+        let result = Array<DeferStatement>::new(self.allocator);
+        for scope in self.scopes.iter().reverse() {
+            for stmt in scope.defer_statements.iter().reverse() {
+                result.append(*stmt);
+            }
+            if scope.break_target { return result; }
+        }
+        return result;
     }
 
     fn get_variable_replacement(&self, name: str) -> str {

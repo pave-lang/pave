@@ -408,6 +408,7 @@ bool Generator__write_function_name(struct Generator* self, FILE* file, struct F
 
     #line 197 "src/compiler/Generator.pv"
     struct String name = Naming__get_type_name(&self->naming_ident, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }}, generics->self_type, generics);
+    #line 198 "src/compiler/Generator.pv"
 
     #line 200 "src/compiler/Generator.pv"
     Generator__write_str(self, file, String__as_str(&name));
@@ -424,6 +425,7 @@ bool Generator__write_dynamic_vtable_name(struct Generator* self, FILE* file, st
 
     #line 206 "src/compiler/Generator.pv"
     struct String name = Naming__get_type_name(&self->naming_ident, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_info, ._1 = generics} }}, generics->self_type, generics);
+    #line 207 "src/compiler/Generator.pv"
 
     #line 209 "src/compiler/Generator.pv"
     Generator__write_str_title(self, file, String__as_str(&name));
@@ -856,6 +858,7 @@ bool Generator__write_typeid(struct Generator* self, FILE* file, struct Type* ty
 
     #line 437 "src/compiler/Generator.pv"
     struct String type_name = Naming__get_type_decl(self->naming_decl, type, generics->self_type, generics);
+    #line 438 "src/compiler/Generator.pv"
 
     #line 440 "src/compiler/Generator.pv"
     Hash type_id = Fnv1a__hash(type_name.array.data, String__length(&type_name));
@@ -875,6 +878,7 @@ bool Generator__write_typename(struct Generator* self, FILE* file, struct Type* 
 
     #line 448 "src/compiler/Generator.pv"
     struct String type_name = Naming__get_type_decl(self->naming_decl, type, generics->self_type, generics);
+    #line 449 "src/compiler/Generator.pv"
 
     #line 451 "src/compiler/Generator.pv"
     fprintf(file, "\"");
@@ -933,6 +937,7 @@ void Generator__write_includes_raw(struct Generator* self, FILE* file, struct Ha
 void Generator__write_impl_includes_raw(struct Generator* self, FILE* file, struct Array_ref_Impl* impls) {
     #line 481 "src/compiler/Generator.pv"
     struct HashSet_str written = HashSet_str__new(self->allocator);
+    #line 482 "src/compiler/Generator.pv"
 
     #line 484 "src/compiler/Generator.pv"
     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(impls);

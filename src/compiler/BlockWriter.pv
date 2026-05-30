@@ -292,9 +292,14 @@ impl BlockWriter {
                 },
                 StatementData::ReturnStatement(ret) => {
                     let value = ret.expression;
-                    let defer_statements = &ret.defer_statements;
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in return statement\n");
+                        return false;
+                    }
+                    let defer_statements = function_context.get_all_defer_statements();
                     if value == null {
-                        self.write_defer_statements(file, return_type, defer_statements, generics);
+                        self.write_defer_statements(file, return_type, &defer_statements, generics);
                         generator.write_indent(file);
                         fprintf(file, "return;\n");
                     } else if defer_statements.length > 0 {
@@ -303,7 +308,7 @@ impl BlockWriter {
                         expr.write_expression(file, value, generics);
                         fprintf(file, ";\n");
 
-                        self.write_defer_statements(file, return_type, defer_statements, generics);
+                        self.write_defer_statements(file, return_type, &defer_statements, generics);
 
                         generator.write_indent(file);
                         fprintf(file, "return __result;\n");
@@ -812,13 +817,33 @@ impl BlockWriter {
                     expr.write_expression(file, expression, generics);
                     fprintf(file, ";\n");
                 },
-                StatementData::ContinueStatement(&defer_statements) => {
-                    self.write_defer_statements(file, return_type, defer_statements, generics);
+                StatementData::DeferStatement(defer_stmt) => {
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in defer statement\n");
+                        return false;
+                    }
+                    function_context.push_defer(defer_stmt);
+                },
+                StatementData::ContinueStatement(_) => {
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in continue statement\n");
+                        return false;
+                    }
+                    let defer_statements = function_context.get_loop_defer_statements();
+                    self.write_defer_statements(file, return_type, &defer_statements, generics);
                     generator.write_indent(file);
                     fprintf(file, "continue;\n");
                 },
-                StatementData::BreakStatement(&defer_statements) => {
-                    self.write_defer_statements(file, return_type, defer_statements, generics);
+                StatementData::BreakStatement(_) => {
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in break statement\n");
+                        return false;
+                    }
+                    let defer_statements = function_context.get_loop_defer_statements();
+                    self.write_defer_statements(file, return_type, &defer_statements, generics);
                     generator.write_indent(file);
                     fprintf(file, "break;\n");
                 },
@@ -826,7 +851,13 @@ impl BlockWriter {
         }
 
         if !last_statement_is_return {
-            self.write_defer_statements(file, return_type, &block.defer_statements, generics);
+            let function_context = generator.function_context;
+            if function_context != null {
+                let scope = function_context.scopes.back();
+                if scope != null {
+                    self.write_defer_statements(file, return_type, &scope.defer_statements, generics);
+                }
+            }
         }
 
         if !no_brackets {

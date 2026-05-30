@@ -13,6 +13,7 @@ enum StatementData {
     ForStatement(&ForStatement),
     AssignmentStatement(&AssignmentStatement),
     ExpressionStatement(&Expression),
-    BreakStatement(Array<DeferStatement>),
-    ContinueStatement(Array<DeferStatement>),
+    DeferStatement(DeferStatement),
+    BreakStatement(bool),
+    ContinueStatement(bool),
 }

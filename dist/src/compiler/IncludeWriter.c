@@ -54,12 +54,13 @@ struct IncludeWriter IncludeWriter__new(struct ArenaAllocator* allocator) {
 void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generator* generator, struct HashMap_str_Type* types, struct GenericMap* generics, bool deref) {
     #line 26 "src/compiler/IncludeWriter.pv"
     struct HashSet_str c_includes = HashSet_str__new(self->allocator);
-
+    #line 27 "src/compiler/IncludeWriter.pv"
     #line 28 "src/compiler/IncludeWriter.pv"
     struct HashSet_str includes = HashSet_str__new(self->allocator);
-
+    #line 29 "src/compiler/IncludeWriter.pv"
     #line 30 "src/compiler/IncludeWriter.pv"
     struct HashSet_str type_declarations = HashSet_str__new(self->allocator);
+    #line 31 "src/compiler/IncludeWriter.pv"
 
     #line 33 "src/compiler/IncludeWriter.pv"
     { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(types);
@@ -73,12 +74,6 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
         #line 35 "src/compiler/IncludeWriter.pv"
         if (resolved == 0) {
             #line 35 "src/compiler/IncludeWriter.pv"
-            HashSet_str__release(&type_declarations);
-            HashSet_str__release(&includes);
-            HashSet_str__release(&c_includes);
-            HashSet_str__release(&type_declarations);
-            HashSet_str__release(&includes);
-            HashSet_str__release(&c_includes);
             continue;
         }
         #line 36 "src/compiler/IncludeWriter.pv"
@@ -262,12 +257,6 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
                         #line 107 "src/compiler/IncludeWriter.pv"
                         if (func_generic_map == 0) {
                             #line 107 "src/compiler/IncludeWriter.pv"
-                            HashSet_str__release(&type_declarations);
-                            HashSet_str__release(&includes);
-                            HashSet_str__release(&c_includes);
-                            HashSet_str__release(&type_declarations);
-                            HashSet_str__release(&includes);
-                            HashSet_str__release(&c_includes);
                             continue;
                         }
                         #line 108 "src/compiler/IncludeWriter.pv"
@@ -275,12 +264,6 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
                         #line 109 "src/compiler/IncludeWriter.pv"
                         if (context == 0) {
                             #line 109 "src/compiler/IncludeWriter.pv"
-                            HashSet_str__release(&type_declarations);
-                            HashSet_str__release(&includes);
-                            HashSet_str__release(&c_includes);
-                            HashSet_str__release(&type_declarations);
-                            HashSet_str__release(&includes);
-                            HashSet_str__release(&c_includes);
                             continue;
                         }
                         #line 110 "src/compiler/IncludeWriter.pv"

@@ -1,10 +1,11 @@
 use std
 use analyzer::expression
+use analyzer::statement
 
 struct FunctionScope {
     break_target: bool,
     continue_target: bool,
-    defer_statements: Array<&Expression>,
+    defer_statements: Array<DeferStatement>,
     variable_replacements: HashMap<str, str>,
 }
 
@@ -13,7 +14,7 @@ impl FunctionScope {
         return Self {
             break_target,
             continue_target,
-            defer_statements: Array<&Expression>::new(allocator),
+            defer_statements: Array<DeferStatement>::new(allocator),
             variable_replacements: HashMap<str, str>::new(allocator),
         };
     }

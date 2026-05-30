@@ -5,13 +5,10 @@ use types
 
 struct ReturnStatement {
     expression: *Expression,
-    defer_statements: Array<DeferStatement>,
 }
 
 impl ReturnStatement {
     fn parse(context: &Context, generics: &Generics) -> *ReturnStatement {
-        let defer_statements: Array<DeferStatement> = context.get_defer_statements();
-
         let first_token = context.current();
         if !context.expect_value(TokenType::Keyword, "return") { return null; }
 
@@ -25,7 +22,6 @@ impl ReturnStatement {
 
             return context.allocator.store(&ReturnStatement {
                 expression: null,
-                defer_statements,
             });
         }
 
@@ -41,7 +37,6 @@ impl ReturnStatement {
 
         return context.allocator.store(&ReturnStatement {
             expression,
-            defer_statements,
         });
     }
 }

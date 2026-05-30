@@ -374,6 +374,7 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
         char* type_name = Include__make_string(include, type_spelling);
         #line 220 "src/analyzer/c/IncludeContext.pv"
         clang_disposeString(type_spelling);
+        #line 221 "src/analyzer/c/IncludeContext.pv"
 
         #line 223 "src/analyzer/c/IncludeContext.pv"
         if (language == CXLanguage_CPlusPlus) {

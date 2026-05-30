@@ -43,7 +43,6 @@ struct Context {
 #include <analyzer/TokenBounds.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/InlayHintKind.h>
-#include <std/Array_DeferStatement.h>
 #include <std/Array_Type.h>
 struct ArenaAllocator;
 struct Array_Token;
@@ -211,15 +210,9 @@ bool Context__set_value(struct Context* self, struct Token* name, struct Type* t
 struct Type* Context__get_value(struct Context* self, struct str name);
 
 #line 1027 "src/analyzer/Context.pv"
-struct Array_DeferStatement Context__get_defer_statements(struct Context* self);
-
-#line 1043 "src/analyzer/Context.pv"
-struct Array_DeferStatement Context__get_loop_defer_statements(struct Context* self);
-
-#line 1061 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics);
 
-#line 1082 "src/analyzer/Context.pv"
+#line 1048 "src/analyzer/Context.pv"
 bool Context__validate_generic_constraints(struct Context* self, struct Generics* generics, struct Array_Type* usage_types);
 
 #endif

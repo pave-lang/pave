@@ -1810,7 +1810,7 @@ bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* g
 
     #line 901 "src/compiler/FileGenerator.pv"
     struct HashSet_str primitive_includes = HashSet_str__new(generator->allocator);
-
+    #line 902 "src/compiler/FileGenerator.pv"
     #line 903 "src/compiler/FileGenerator.pv"
     Generator__collect_primitive_includes(generator, &global->type, blank_generics, &primitive_includes);
 

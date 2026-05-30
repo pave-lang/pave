@@ -8,7 +8,6 @@ use types
 struct Block {
     context: &Context,
     statements: Array<Statement>,
-    defer_statements: Array<DeferStatement>,
     is_top_level_and_has_defer_statements_inside: bool,
     is_loop: bool,
 }
@@ -18,7 +17,6 @@ impl Block {
         return Self {
             context,
             statements: Array<Statement>::new(context.allocator),
-            defer_statements: Array<DeferStatement>::new(context.allocator),
             is_top_level_and_has_defer_statements_inside: false,
             is_loop: false,
         };
@@ -100,12 +98,12 @@ impl Block {
             },
             hash("continue") => {
                 context.next_token();
-                *data = StatementData::ContinueStatement(context.get_loop_defer_statements());
+                *data = StatementData::ContinueStatement(false);
                 return context.expect_value(TokenType::Symbol, ";");
             },
             hash("break") => {
                 context.next_token();
-                *data = StatementData::BreakStatement(context.get_loop_defer_statements());
+                *data = StatementData::BreakStatement(false);
                 return context.expect_value(TokenType::Symbol, ";");
             },
             _ => {
@@ -138,8 +136,7 @@ impl Block {
                     if new_scope { context.pop_scope(); }
                     return false;
                 }
-                self.defer_statements.append(*defer_stmt);
-                continue;
+                data = StatementData::DeferStatement(*defer_stmt);
             } else if first_token.type == TokenType::Keyword {
                 result = Block::parse_keyword(self, context, generics, first_token, &data);
             } else {

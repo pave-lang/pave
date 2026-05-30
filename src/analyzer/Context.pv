@@ -1024,40 +1024,6 @@ impl Context {
         return self.module.find_value(name);
     }
 
-    fn get_defer_statements(&self) -> Array<DeferStatement> {
-        let defer_statements = Array<DeferStatement>::new(self.allocator);
-
-        for scope in self.scopes.iter().reverse() {
-            let block = scope.block;
-
-            if block != null {
-                for defer_statement in block.defer_statements.iter().reverse() {
-                    defer_statements.append(*defer_statement);
-                }
-            }
-        }
-
-        return defer_statements;
-    }
-
-    fn get_loop_defer_statements(&self) -> Array<DeferStatement> {
-        let defer_statements = Array<DeferStatement>::new(self.allocator);
-
-        for scope in self.scopes.iter().reverse() {
-            let block = scope.block;
-
-            if block != null {
-                for defer_statement in block.defer_statements.iter().reverse() {
-                    defer_statements.append(*defer_statement);
-                }
-
-                if block.is_loop { return defer_statements; }
-            }
-        }
-
-        return defer_statements;
-    }
-
     fn parse_generics(&self, generics: &Generics) -> Array<Type> {
         let generic_inputs = Array<Type>::new(self.allocator);
 

@@ -23,6 +23,7 @@ int32_t main(int32_t argc, char const** argv) {
 
     #line 8 "src/compiler/main.pv"
     struct ArenaAllocator allocator = ArenaAllocator__new((struct trait_Allocator) { .vtable = &GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR, .instance = GeneralPurposeAllocator__default() }, 5 * 1024 * 1024);
+    #line 9 "src/compiler/main.pv"
 
     #line 11 "src/compiler/main.pv"
     struct Array_ptrc_char args = Array_ptrc_char__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = &allocator });
