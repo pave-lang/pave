@@ -2,11 +2,13 @@
 
 Pave is a self-hosted systems language that compiles to C99. The compiler is written in Pave itself and bootstrapped from `dist/pavec.exe`.
 
+For a tour of the language's surface syntax — structs, enums, traits (static/dynamic dispatch, default methods), generics, operators, coroutines, `defer`, `match`, and destructuring — see `examples/kitchen_sink.pv`. Note it showcases features ahead of the bootstrap compiler, so `dist/pavec.exe` cannot build it; use a freshly built `build/2/pavec.exe`.
+
 ## Build
 
 ```sh
 make all        # full bootstrap: dist/pavec → build/1 → build/2, verifies build/2 == build/3, runs tests
-make clean      # if make all fails due to source build/2 !- build/3 then run make clean and make all
+make clean      # remove build artifacts (see "Test Functions and the Build" for when stale artifacts force this)
 make examples   # compile all examples using dist/pavec.exe
 ```
 
@@ -54,22 +56,11 @@ src/
 │   │   ├── MemberLookup.pv       # get_enum_variant, parse_enum, parse_struct, parse_class; member access
 │   │   ├── ParseTypeExpression.pv # type-level expression parsing (struct/enum static members)
 │   │   └── PostfixExpression.pv  # parse_postfix_chain: member access, indexing, slice ranges
-│   ├── statement/
-│   │   ├── AssignmentStatement.pv
+│   ├── statement/                # one file per statement kind (Assignment, If/Else, While, Return, Match*, Statement(Data), …)
 │   │   ├── DeferStatement.pv     # defer <expr>; / defer { ... }
-│   │   ├── ElseStatement.pv
 │   │   ├── ForStatement.pv       # for / for * / for (a, b) / for (i, *v) in ... loops
-│   │   ├── ForStatementType.pv
-│   │   ├── ForVariable.pv
-│   │   ├── IfStatement.pv
 │   │   ├── LetStatement.pv       # let / let static bindings; supports `let (a, b, c) = tuple` destructuring (`_` discards)
-│   │   ├── MatchCase.pv
-│   │   ├── MatchPattern.pv
-│   │   ├── MatchStatement.pv
-│   │   ├── ReturnStatement.pv
-│   │   ├── Statement.pv
-│   │   ├── StatementData.pv
-│   │   ├── WhileStatement.pv
+│   │   ├── MatchPattern.pv       # match arms: enum/struct destructuring + numeric literal patterns
 │   │   └── YieldStatement.pv     # yield inside co functions
 │   ├── types/
 │   │   ├── Enum.pv               # Enum definition; variants support tuple payloads and named-field structs
@@ -82,21 +73,7 @@ src/
 │   │   ├── Trait.pv              # Trait definition; typedefs add generics to trait.generics
 │   │   ├── Type.pv               # Type enum and equality/resolution methods
 │   │   └── TypeImpl.pv           # impl block type representation
-│   ├── c/                        # C/C++ interop type representations
-│   │   ├── ClassCpp.pv
-│   │   ├── EnumC.pv
-│   │   ├── EnumCValue.pv
-│   │   ├── FunctionC.pv
-│   │   ├── Include.pv
-│   │   ├── IncludeContext.pv
-│   │   ├── IncludeEnumClass.pv
-│   │   ├── IncludeObjectContext.pv
-│   │   ├── NamespaceCpp.pv
-│   │   ├── ParentCpp.pv
-│   │   ├── StructC.pv
-│   │   ├── StructCField.pv
-│   │   ├── TypedefC.pv
-│   │   └── UnknownC.pv
+│   ├── c/                        # C/C++ interop type representations (StructC, EnumC, FunctionC, ClassCpp, NamespaceCpp, Include*, TypedefC, …)
 │   ├── Analysis.pv               # analysis entry point; Position, Range, Diagnostic, InlayHint
 │   ├── Block.pv                  # block-level statement parsing
 │   ├── Context.pv                # analysis context (allocator, scopes, modules)

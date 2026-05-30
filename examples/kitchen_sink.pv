@@ -89,12 +89,15 @@ impl Shape {
 
 trait Printable {
     fn print(&self);
+    // Default method — impls inherit this body unless they override it.
+    fn kind(&self) -> *const char { return "value"; }
 }
 
 impl Printable for Point {
     fn print(&self) {
         printf("Point(%.2f, %.2f)\n", self.x, self.y);
     }
+    fn kind(&self) -> *const char { return "point"; }   // overrides the default
 }
 
 impl Printable for Direction {
@@ -119,6 +122,13 @@ impl Add<Point> for Point {
     typedef Output = Point;
     fn add(self, other: Point) -> Point {
         return Point { x: self.x + other.x, y: self.y + other.y };
+    }
+}
+
+impl Sub<Point> for Point {
+    typedef Output = Point;
+    fn sub(self, other: Point) -> Point {
+        return Point { x: self.x - other.x, y: self.y - other.y };
     }
 }
 
@@ -218,6 +228,28 @@ fn next_id() -> u32 {
     return counter;
 }
 
+// --- 15. Tuple return + destructuring let (`_` discards a binding) ---
+
+fn divmod(a: i32, b: i32) -> (i32, i32) {
+    return (a / b, a % b);
+}
+
+// --- 16. defer (runs at scope exit, in LIFO order) ---
+
+fn sum_with_defer(allocator: &dyn Allocator) -> i32 {
+    let arr = Array<i32>::new(allocator);
+    defer arr.release();              // expr form — frees the array on return
+    defer { printf("(cleaning up)\n"); }  // block form
+    arr.append(3);
+    arr.append(4);
+    let total = 0;
+    for *v in arr {
+        total += v;
+    }
+    // Both defers run here, LIFO: the block prints first, then arr.release().
+    return total;
+}
+
 fn sum_slice(values: &[f32]) -> f32 {
     let total = 0.0f;
     for v in values {
@@ -237,8 +269,10 @@ fn main(argc: i32, argv: **const char) -> i32 {
 
     // Operator overloading
     let sum_pt = p1 + p2;
+    let diff_pt = p2 - p1;
     let scaled  = p1 * 3.0f;
     printf("sum:    %.2f, %.2f\n", sum_pt.x, sum_pt.y);
+    printf("diff:   %.2f, %.2f\n", diff_pt.x, diff_pt.y);
     printf("scaled: %.2f, %.2f\n", scaled.x,  scaled.y);
 
     // Tuple struct
@@ -261,6 +295,9 @@ fn main(argc: i32, argv: **const char) -> i32 {
     // Traits: dynamic dispatch and generic static dispatch
     print_dynamic(&p1);
     print_dynamic(&dir);
+
+    // Trait default method: Point overrides kind(), Direction inherits the default.
+    printf("kinds: %s, %s\n", p1.kind(), dir.kind());
 
     let pts = [Point::new(0.0f, 0.0f), Point::new(1.0f, 1.0f)];
     print_all(&pts);
@@ -356,6 +393,15 @@ fn main(argc: i32, argv: **const char) -> i32 {
     // Static counter
     printf("ids: %u %u %u\n", next_id(), next_id(), next_id());
 
+    // Tuple return + destructuring let
+    let (q, r) = divmod(17, 5);
+    printf("divmod(17, 5): q=%d r=%d\n", q, r);
+    let (q2, _) = divmod(20, 6);   // `_` discards the remainder
+    printf("20 / 6 = %d\n", q2);
+
+    // defer
+    printf("sum_with_defer: %d\n", sum_with_defer(GeneralPurposeAllocator::default()));
+
     arr.release();
     map.release();
 
@@ -378,11 +424,36 @@ test "operator overloading add" {
     assert(c.y == 6.0f);
 }
 
+test "operator overloading sub" {
+    let a = Point::new(5.0f, 7.0f);
+    let b = Point::new(2.0f, 3.0f);
+    let c = a - b;
+    assert(c.x == 3.0f);
+    assert(c.y == 4.0f);
+}
+
 test "operator overloading mul" {
     let p = Point::new(2.0f, 3.0f);
     let q = p * 2.0f;
     assert(q.x == 4.0f);
     assert(q.y == 6.0f);
+}
+
+test "trait default method" {
+    let p = Point::new(0.0f, 0.0f);
+    let d = Direction::North;
+    assert(p.kind()[0] == 'p');   // Point overrides kind()
+    assert(d.kind()[0] == 'v');   // Direction inherits the "value" default
+}
+
+test "tuple destructuring" {
+    let (q, r) = divmod(17, 5);
+    assert(q == 3);
+    assert(r == 2);
+}
+
+test "defer runs on scope exit" {
+    assert(sum_with_defer(GeneralPurposeAllocator::default()) == 7);
 }
 
 test "tuple struct" {
