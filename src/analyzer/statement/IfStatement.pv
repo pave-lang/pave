@@ -141,7 +141,17 @@ impl IfStatement {
                     }
                     else_block = Block::new_ptr(context);
                     if else_block == null { return null; }
-                    if !else_block.parse(context, generics, true) { return null; }
+
+                    let narrowings_true = Array<NullNarrowing>::new(context.allocator);
+                    Expression::collect_null_narrowings(context, else_expression, true, &narrowings_true);
+                    if narrowings_true.length > 0 {
+                        context.push_scope(else_block);
+                        for narrow in narrowings_true { context.set_narrowed(narrow.path, narrow.type); }
+                        if !else_block.parse(context, generics, false) { context.pop_scope(); return null; }
+                        context.pop_scope();
+                    } else {
+                        if !else_block.parse(context, generics, true) { return null; }
+                    }
                 }
             } else {
                 else_end = true;
