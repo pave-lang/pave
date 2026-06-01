@@ -121,24 +121,27 @@ struct Expression* Expression__parse_cpp(struct Context* context, struct Generic
 struct Type* Expression__make_optional_return_type(struct Context* context, struct Token* token, struct Type* type);
 
 #line 26 "src/analyzer/expression/PostfixExpression.pv"
+struct Type* Expression__make_optional_unwrap_return_type(struct Context* context, struct Token* token, struct Type* type);
+
+#line 48 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_optional_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 44 "src/analyzer/expression/PostfixExpression.pv"
+#line 79 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_type_member_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 65 "src/analyzer/expression/PostfixExpression.pv"
+#line 100 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_instance_member_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 69 "src/analyzer/expression/PostfixExpression.pv"
+#line 104 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_instance_member_expression_inner(struct Context* context, struct Expression* inner, struct Generics* generics, bool allow_pointer);
 
-#line 190 "src/analyzer/expression/PostfixExpression.pv"
+#line 225 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 289 "src/analyzer/expression/PostfixExpression.pv"
+#line 324 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 395 "src/analyzer/expression/PostfixExpression.pv"
+#line 430 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 11 "src/analyzer/expression/BinaryExpression.pv"

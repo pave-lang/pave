@@ -23,13 +23,48 @@ impl Expression {
         return null;
     }
 
+    fn make_optional_unwrap_return_type(context: &Context, token: &Token, type: &Type) -> *Type {
+        match type {
+            Type::Indirect(pointer) => {
+                if pointer.type == IndirectType::Pointer || pointer.type == IndirectType::ConstPointer {
+                    match pointer.to {
+                        Type::Indirect(reference) => {
+                            if reference.type == IndirectType::Reference {
+                                let indirect = context.allocator.store(&Indirect { type: pointer.type, to: reference.to });
+                                return context.allocator.store(&Type::Indirect(indirect));
+                            }
+                        },
+                        _ => {},
+                    }
+                }
+            },
+            _ => {},
+        }
+
+        context.error_token(token, "? can only be used on *&T values");
+        return null;
+    }
+
     fn parse_optional_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
         let token = context.expect(TokenType::Symbol);
         if token == null { return null; }
+        let is_member_access = context.check_value(TokenType::Symbol, ".");
 
         if !inner.return_type.is_pointer() {
-            context.error_token(token, "?. can only be used on pointer values");
+            if is_member_access {
+                context.error_token(token, "?. can only be used on pointer values");
+            } else {
+                context.error_token(token, "? can only be used on pointer values");
+            }
             return null;
+        }
+
+        if !is_member_access {
+            let return_type = Expression::make_optional_unwrap_return_type(context, token, &inner.return_type);
+            if return_type == null { return null; }
+
+            let value = Expression::make(context.allocator, token, ExpressionData::UnaryExpression("*", inner), return_type);
+            return Expression::make(context.allocator, token, ExpressionData::OptionalExpression(inner, value), return_type);
         }
 
         let value = Expression::parse_instance_member_expression_inner(context, inner, generics, true);
