@@ -659,6 +659,11 @@ impl Module {
         return true;
     }
 
+    fn parse_functions_if_path(&self, path: str) -> bool {
+        if !self.path.eq(path) { return true; }
+        return self.parse_functions();
+    }
+
     fn find_type(&self, name: str, arity: usize) -> *Type {
         let type: *Type = self.types.find(&name);
         if type != null { return type; }

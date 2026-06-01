@@ -259,6 +259,22 @@ impl Root {
         return true;
     }
 
+    fn parse_functions_if_path(&self, path: str) -> bool {
+        for (_, child) in self.children {
+            child.parse_functions_if_path(path);
+        }
+
+        for (_, &primitive_info) in self.primitives {
+            for *impl_info in primitive_info.impls {
+                if impl_info.context.path.eq(path) {
+                    impl_info.parse_functions();
+                }
+            }
+        }
+
+        return true;
+    }
+
     fn find_type(&self, name: str, arity: usize) -> *Type {
         let arr = self.types.find(&name);
         if arr == null { return null; }

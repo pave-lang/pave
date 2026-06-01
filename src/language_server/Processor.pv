@@ -329,13 +329,25 @@ impl Processor {
 
     fn inlay_hint(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
         let uri = params.key("textDocument").key("uri").string();
-        if uri.length == 0 { return; }
+        if uri.length == 0 {
+            self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
+            return;
+        }
 
+        ls.analyze();
         let filename = ls.file_map.find(&uri);
-        if filename == null { return; }
+        if filename == null {
+            self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
+            return;
+        }
+
+        ls.parse_functions_file(*filename);
 
         let inlay_hints = ls.analysis.inlay_hints.find(filename);
-        if inlay_hints == null { return; }
+        if inlay_hints == null {
+            self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
+            return;
+        }
 
         let result = Array<JsonNode>::new(self.allocator);
 
@@ -389,8 +401,21 @@ impl Processor {
         } else if method.eq("workspace/didChangeConfiguration") {
             self.did_change_configuration(ls, msg_json.key("params"));
         } else if method.eq("textDocument/didSave") {
+            let uri = msg_json.key("params").key("textDocument").key("uri").string();
+            if uri.length == 0 { return true; }
+
             let analysis = ls.analyze();
-            self.publish_diagnostics(analysis);
+            let filename = ls.file_map.find(&uri);
+            if filename == null { return true; }
+
+            ls.parse_functions_file(*filename);
+            let diagnostics = analysis.diagnostics.find(filename);
+            if diagnostics == null {
+                let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
+                self.publish_diagnostics_file(*filename, &blank_diagnostics);
+            } else {
+                self.publish_diagnostics_file(*filename, diagnostics);
+            }
             self.inlay_hint_refresh();
         } else if method.eq("textDocument/didChange") {
             self.did_change(ls, msg_json.key("params"));

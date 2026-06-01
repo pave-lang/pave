@@ -27,4 +27,38 @@ impl Uri {
 
         target.append_sized(value + pos, i - pos);
     }
+
+    fn path(allocator: &ArenaAllocator, uri: str) -> str {
+        let file_prefix: str = "file:///";
+        if !uri.starts_with(file_prefix.ptr) { return ""; }
+
+        let encoded = uri.slice(file_prefix.length, uri.length);
+        let decoded = String::new(allocator);
+
+        let i: usize = 0;
+        while i < encoded.length {
+            let c = encoded.ptr[i];
+            if c == '%' && i + 2 < encoded.length {
+                let hi = Uri::hex_value(encoded.ptr[i + 1]);
+                let lo = Uri::hex_value(encoded.ptr[i + 2]);
+                if hi >= 0 && lo >= 0 {
+                    decoded.append_char(cast<char>(hi * 16 + lo));
+                    i += 3;
+                    continue;
+                }
+            }
+
+            decoded.append_char(c);
+            i += 1;
+        }
+
+        return decoded.as_str();
+    }
+
+    fn hex_value(c: char) -> i32 {
+        if c >= '0' && c <= '9' { return cast<i32>(c - '0'); }
+        if c >= 'a' && c <= 'f' { return cast<i32>(c - 'a') + 10; }
+        if c >= 'A' && c <= 'F' { return cast<i32>(c - 'A') + 10; }
+        return -1;
+    }
 }

@@ -1359,235 +1359,246 @@ bool Module__parse_functions(struct Module* self) {
 }
 
 #line 662 "src/analyzer/Module.pv"
-struct Type* Module__find_type(struct Module* self, struct str name, uintptr_t arity) {
+bool Module__parse_functions_if_path(struct Module* self, struct str path) {
     #line 663 "src/analyzer/Module.pv"
-    struct Type* type = HashMap_str_Type__find(&self->types, &name);
+    if (!str__Eq_str__eq(&self->path, path)) {
+        #line 663 "src/analyzer/Module.pv"
+        return true;
+    }
     #line 664 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 664 "src/analyzer/Module.pv"
-        return type;
-    }
+    return Module__parse_functions(self);
+}
 
-    #line 666 "src/analyzer/Module.pv"
-    type = Namespace__find_type(self->namespace, name, arity);
-    #line 667 "src/analyzer/Module.pv"
+#line 667 "src/analyzer/Module.pv"
+struct Type* Module__find_type(struct Module* self, struct str name, uintptr_t arity) {
+    #line 668 "src/analyzer/Module.pv"
+    struct Type* type = HashMap_str_Type__find(&self->types, &name);
+    #line 669 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 667 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 669 "src/analyzer/Module.pv"
-    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 669 "src/analyzer/Module.pv"
-    while (Iter_ref_ref_Namespace__next(&__iter)) {
         #line 669 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
+        return type;
+    }
 
-        #line 670 "src/analyzer/Module.pv"
-        type = Namespace__find_type(namespace, name, arity);
-        #line 671 "src/analyzer/Module.pv"
-        if (type != 0) {
-            #line 671 "src/analyzer/Module.pv"
-            return type;
-        }
-    } }
+    #line 671 "src/analyzer/Module.pv"
+    type = Namespace__find_type(self->namespace, name, arity);
+    #line 672 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 672 "src/analyzer/Module.pv"
+        return type;
+    }
 
     #line 674 "src/analyzer/Module.pv"
-    type = Root__find_type(self->namespace->root, name, arity);
-    #line 675 "src/analyzer/Module.pv"
-    if (type != 0) {
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    #line 674 "src/analyzer/Module.pv"
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
+        #line 674 "src/analyzer/Module.pv"
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
+
         #line 675 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 677 "src/analyzer/Module.pv"
-    { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 677 "src/analyzer/Module.pv"
-    while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 677 "src/analyzer/Module.pv"
-        struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
-
-        #line 678 "src/analyzer/Module.pv"
-        type = HashMap_str_Type__find(&include->types, &name);
-        #line 679 "src/analyzer/Module.pv"
+        type = Namespace__find_type(namespace, name, arity);
+        #line 676 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 679 "src/analyzer/Module.pv"
+            #line 676 "src/analyzer/Module.pv"
             return type;
         }
     } }
+
+    #line 679 "src/analyzer/Module.pv"
+    type = Root__find_type(self->namespace->root, name, arity);
+    #line 680 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 680 "src/analyzer/Module.pv"
+        return type;
+    }
 
     #line 682 "src/analyzer/Module.pv"
-    return 0;
-}
+    { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
+    #line 682 "src/analyzer/Module.pv"
+    while (HashMapIter_str_ref_Include__next(&__iter)) {
+        #line 682 "src/analyzer/Module.pv"
+        struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-#line 685 "src/analyzer/Module.pv"
-struct Trait* Module__find_trait(struct Module* self, struct str name, uintptr_t arity) {
-    #line 686 "src/analyzer/Module.pv"
-    struct Trait* type = Root__find_trait(self->namespace->root, name, arity);
-    #line 687 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 687 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 689 "src/analyzer/Module.pv"
-    type = Namespace__find_trait(self->namespace, name, arity);
-    #line 690 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 690 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 692 "src/analyzer/Module.pv"
-    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 692 "src/analyzer/Module.pv"
-    while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 692 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
-
-        #line 693 "src/analyzer/Module.pv"
-        type = Namespace__find_trait(namespace, name, arity);
-        #line 694 "src/analyzer/Module.pv"
+        #line 683 "src/analyzer/Module.pv"
+        type = HashMap_str_Type__find(&include->types, &name);
+        #line 684 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 694 "src/analyzer/Module.pv"
+            #line 684 "src/analyzer/Module.pv"
             return type;
         }
     } }
+
+    #line 687 "src/analyzer/Module.pv"
+    return 0;
+}
+
+#line 690 "src/analyzer/Module.pv"
+struct Trait* Module__find_trait(struct Module* self, struct str name, uintptr_t arity) {
+    #line 691 "src/analyzer/Module.pv"
+    struct Trait* type = Root__find_trait(self->namespace->root, name, arity);
+    #line 692 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 692 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 694 "src/analyzer/Module.pv"
+    type = Namespace__find_trait(self->namespace, name, arity);
+    #line 695 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 695 "src/analyzer/Module.pv"
+        return type;
+    }
 
     #line 697 "src/analyzer/Module.pv"
-    return 0;
-}
-
-#line 700 "src/analyzer/Module.pv"
-struct Type* Module__find_function(struct Module* self, struct str name) {
-    #line 701 "src/analyzer/Module.pv"
-    struct Type* type = Root__find_function(self->namespace->root, name);
-    #line 702 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 702 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 704 "src/analyzer/Module.pv"
-    type = Namespace__find_function(self->namespace, name);
-    #line 705 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 705 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 707 "src/analyzer/Module.pv"
     { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 707 "src/analyzer/Module.pv"
+    #line 697 "src/analyzer/Module.pv"
     while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 707 "src/analyzer/Module.pv"
+        #line 697 "src/analyzer/Module.pv"
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
-        #line 708 "src/analyzer/Module.pv"
-        type = Namespace__find_function(namespace, name);
-        #line 709 "src/analyzer/Module.pv"
+        #line 698 "src/analyzer/Module.pv"
+        type = Namespace__find_trait(namespace, name, arity);
+        #line 699 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 709 "src/analyzer/Module.pv"
+            #line 699 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 712 "src/analyzer/Module.pv"
+    #line 702 "src/analyzer/Module.pv"
     return 0;
 }
 
-#line 715 "src/analyzer/Module.pv"
-struct Type* Module__find_value(struct Module* self, struct str name) {
-    #line 716 "src/analyzer/Module.pv"
-    struct Type* type = HashMap_str_Type__find(&self->global_types, &name);
-    #line 717 "src/analyzer/Module.pv"
+#line 705 "src/analyzer/Module.pv"
+struct Type* Module__find_function(struct Module* self, struct str name) {
+    #line 706 "src/analyzer/Module.pv"
+    struct Type* type = Root__find_function(self->namespace->root, name);
+    #line 707 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 717 "src/analyzer/Module.pv"
+        #line 707 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 719 "src/analyzer/Module.pv"
+    #line 709 "src/analyzer/Module.pv"
+    type = Namespace__find_function(self->namespace, name);
+    #line 710 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 710 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 712 "src/analyzer/Module.pv"
     { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 719 "src/analyzer/Module.pv"
+    #line 712 "src/analyzer/Module.pv"
     while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 719 "src/analyzer/Module.pv"
+        #line 712 "src/analyzer/Module.pv"
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
-        #line 720 "src/analyzer/Module.pv"
+        #line 713 "src/analyzer/Module.pv"
+        type = Namespace__find_function(namespace, name);
+        #line 714 "src/analyzer/Module.pv"
+        if (type != 0) {
+            #line 714 "src/analyzer/Module.pv"
+            return type;
+        }
+    } }
+
+    #line 717 "src/analyzer/Module.pv"
+    return 0;
+}
+
+#line 720 "src/analyzer/Module.pv"
+struct Type* Module__find_value(struct Module* self, struct str name) {
+    #line 721 "src/analyzer/Module.pv"
+    struct Type* type = HashMap_str_Type__find(&self->global_types, &name);
+    #line 722 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 722 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 724 "src/analyzer/Module.pv"
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    #line 724 "src/analyzer/Module.pv"
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
+        #line 724 "src/analyzer/Module.pv"
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
+
+        #line 725 "src/analyzer/Module.pv"
         { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&namespace->modules);
-        #line 720 "src/analyzer/Module.pv"
+        #line 725 "src/analyzer/Module.pv"
         while (HashMapIter_str_ref_Module__next(&__iter)) {
-            #line 720 "src/analyzer/Module.pv"
+            #line 725 "src/analyzer/Module.pv"
             struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-            #line 721 "src/analyzer/Module.pv"
+            #line 726 "src/analyzer/Module.pv"
             type = HashMap_str_Type__find(&module->global_types, &name);
-            #line 722 "src/analyzer/Module.pv"
+            #line 727 "src/analyzer/Module.pv"
             if (type != 0) {
-                #line 722 "src/analyzer/Module.pv"
+                #line 727 "src/analyzer/Module.pv"
                 return type;
             }
         } }
     } }
 
-    #line 726 "src/analyzer/Module.pv"
+    #line 731 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 726 "src/analyzer/Module.pv"
+    #line 731 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 726 "src/analyzer/Module.pv"
+        #line 731 "src/analyzer/Module.pv"
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-        #line 727 "src/analyzer/Module.pv"
+        #line 732 "src/analyzer/Module.pv"
         type = HashMap_str_Type__find(&include->values, &name);
-        #line 728 "src/analyzer/Module.pv"
+        #line 733 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 728 "src/analyzer/Module.pv"
+            #line 733 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 731 "src/analyzer/Module.pv"
+    #line 736 "src/analyzer/Module.pv"
     return 0;
 }
 
-#line 734 "src/analyzer/Module.pv"
+#line 739 "src/analyzer/Module.pv"
 int64_t* Module__find_macro_value(struct Module* self, struct str name) {
-    #line 735 "src/analyzer/Module.pv"
+    #line 740 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 735 "src/analyzer/Module.pv"
+    #line 740 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 735 "src/analyzer/Module.pv"
+        #line 740 "src/analyzer/Module.pv"
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-        #line 736 "src/analyzer/Module.pv"
+        #line 741 "src/analyzer/Module.pv"
         int64_t* value = HashMap_str_i64__find(&include->macro_values, &name);
-        #line 737 "src/analyzer/Module.pv"
+        #line 742 "src/analyzer/Module.pv"
         if (value != 0) {
-            #line 737 "src/analyzer/Module.pv"
+            #line 742 "src/analyzer/Module.pv"
             return value;
         }
     } }
-    #line 739 "src/analyzer/Module.pv"
+    #line 744 "src/analyzer/Module.pv"
     return 0;
 }
 
-#line 742 "src/analyzer/Module.pv"
+#line 747 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types) {
-    #line 743 "src/analyzer/Module.pv"
+    #line 748 "src/analyzer/Module.pv"
     struct Type* type = Module__find_type(self, name, usage_types->length);
-    #line 744 "src/analyzer/Module.pv"
+    #line 749 "src/analyzer/Module.pv"
     if (type == 0) {
-        #line 744 "src/analyzer/Module.pv"
+        #line 749 "src/analyzer/Module.pv"
         return 0;
     }
-    #line 745 "src/analyzer/Module.pv"
+    #line 750 "src/analyzer/Module.pv"
     return Root__make_type_usage(self->root, type, usage_types);
 }
 
-#line 748 "src/analyzer/Module.pv"
+#line 753 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name) {
-    #line 749 "src/analyzer/Module.pv"
+    #line 754 "src/analyzer/Module.pv"
     struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
-    #line 750 "src/analyzer/Module.pv"
+    #line 755 "src/analyzer/Module.pv"
     return HashMap_str_Primitive__find(primitives, &name);
 }

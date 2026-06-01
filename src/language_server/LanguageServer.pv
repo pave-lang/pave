@@ -107,9 +107,19 @@ impl LanguageServer {
         root.parse_globals();
         if analysis.diagnostics.length > 0 { return analysis; }
 
-        root.parse_functions();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        return analysis;
+    }
 
+    fn analyze_file(&self, path: str) -> &Analysis {
+        let analysis = self.analyze();
+        if analysis.diagnostics.length > 0 { return analysis; }
+        return self.parse_functions_file(path);
+    }
+
+    fn parse_functions_file(&self, path: str) -> &Analysis {
+        let analysis = &self.analysis;
+        if self.root == null { return analysis; }
+        self.root.parse_functions_if_path(path);
         return analysis;
     }
 

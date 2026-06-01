@@ -79,12 +79,15 @@ bool Namespace__parse_globals(struct Namespace* self);
 bool Namespace__parse_functions(struct Namespace* self);
 
 #line 209 "src/analyzer/Namespace.pv"
+bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path);
+
+#line 221 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity);
 
-#line 220 "src/analyzer/Namespace.pv"
+#line 232 "src/analyzer/Namespace.pv"
 struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uintptr_t arity);
 
-#line 232 "src/analyzer/Namespace.pv"
+#line 244 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_function(struct Namespace* self, struct str name);
 
 #endif
