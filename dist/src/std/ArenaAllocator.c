@@ -299,6 +299,23 @@ struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self,
     #line 174 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/expression/ParsedArguments.h>
+
+#line 169 "src/std/ArenaAllocator.pv"
+struct ParsedArguments* ArenaAllocator__store_ParsedArguments(struct ArenaAllocator* self, struct ParsedArguments* value) {
+    #line 170 "src/std/ArenaAllocator.pv"
+    struct ParsedArguments* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ParsedArguments));
+    #line 171 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 171 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 173 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct ParsedArguments));
+    #line 174 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/statement/DeferStatement.h>
 
 #line 169 "src/std/ArenaAllocator.pv"

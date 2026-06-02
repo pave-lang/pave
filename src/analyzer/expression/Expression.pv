@@ -202,33 +202,12 @@ impl Expression {
                                 parsed_generics = context.parse_generics(generics);
                             }
 
-                            if !context.expect_value(TokenType::Symbol, "(") { return null; }
-                            let open_paren_token = context.prev();
+                            let parsed = Expression::parse_call_arguments(context, generics);
+                            if parsed == null { return null; }
+                            let arguments = parsed.arguments;
 
-                            let arguments = Array<InvokeArgument>::new(context.allocator);
-                            let sig_commas = Array<Position>::new(context.allocator);
-
-                            while !context.check_value(TokenType::Symbol, ")") {
-                                let argument = Expression::parse(context, generics);
-                                if argument == null { return null; }
-                                arguments.append(InvokeArgument { name: null, value: argument });
-
-                                if context.check_next(TokenType::Symbol, ",") {
-                                    let comma_tok = context.prev();
-                                    if comma_tok != null {
-                                        sig_commas.append(Position { line: comma_tok.start_line, character: comma_tok.start_column });
-                                    }
-                                } else if !context.check_value(TokenType::Symbol, ")") {
-                                    context.expect_value(TokenType::Symbol, ")");
-                                    return null;
-                                }
-                            }
-
-                            if !context.expect_value(TokenType::Symbol, ")") { return null; }
-                            let close_paren_token = context.prev();
-
-                            if open_paren_token != null && close_paren_token != null {
-                                Expression::record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas, false);
+                            if parsed.open_paren != null && parsed.close_paren != null {
+                                Expression::record_function_signature(context, func_info, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
                             }
 
                             if func_info.generics.array.length > 0 {
@@ -322,25 +301,12 @@ impl Expression {
                         },
                         Type::FunctionC(func_info) => {
                             context.next_token();
-                            if !context.expect_value(TokenType::Symbol, "(") { return null; }
-
-                            let arguments = Array<InvokeArgument>::new(context.allocator);
-
-                            while !context.check_value(TokenType::Symbol, ")") {
-                                let argument = Expression::parse(context, generics);
-                                arguments.append(InvokeArgument { name: null, value: argument });
-
-                                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
-                                    context.expect_value(TokenType::Symbol, ")");
-                                    return null;
-                                }
-                            }
-
-                            if !context.expect_value(TokenType::Symbol, ")") { return null; }
+                            let parsed = Expression::parse_call_arguments(context, generics);
+                            if parsed == null { return null; }
 
                             let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(return_type), return_type);
 
-                            result = Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), &func_info.return_type);
+                            result = Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, parsed.arguments), &func_info.return_type);
                         },
                         _ => {
                             context.error("Expression::parse issue");

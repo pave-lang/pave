@@ -82,6 +82,10 @@ struct Expression;
 
 #line 169 "src/std/ArenaAllocator.pv"
 struct Expression* ArenaAllocator__store_Expression(struct ArenaAllocator* self, struct Expression* value);
+struct ParsedArguments;
+
+#line 169 "src/std/ArenaAllocator.pv"
+struct ParsedArguments* ArenaAllocator__store_ParsedArguments(struct ArenaAllocator* self, struct ParsedArguments* value);
 struct DeferStatement;
 
 #line 169 "src/std/ArenaAllocator.pv"

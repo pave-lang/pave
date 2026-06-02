@@ -1,0 +1,46 @@
+use std
+use analyzer
+use types
+
+struct ParsedArguments {
+    arguments: Array<InvokeArgument>,
+    open_paren: *Token,
+    close_paren: *Token,
+    comma_positions: Array<Position>,
+}
+
+impl Expression {
+    fn parse_call_arguments(context: &Context, generics: &Generics) -> *ParsedArguments {
+        if !context.expect_value(TokenType::Symbol, "(") { return null; }
+        let open_paren = context.prev();
+
+        let arguments = Array<InvokeArgument>::new(context.allocator);
+        let comma_positions = Array<Position>::new(context.allocator);
+
+        while !context.check_value(TokenType::Symbol, ")") {
+            let argument = Expression::parse(context, generics);
+            if argument == null { return null; }
+            arguments.append(InvokeArgument { name: null, value: argument });
+
+            if context.check_next(TokenType::Symbol, ",") {
+                let comma_tok = context.prev();
+                if comma_tok != null {
+                    comma_positions.append(Position { line: comma_tok.start_line, character: comma_tok.start_column });
+                }
+            } else if !context.check_value(TokenType::Symbol, ")") {
+                context.expect_value(TokenType::Symbol, ")");
+                return null;
+            }
+        }
+
+        if !context.expect_value(TokenType::Symbol, ")") { return null; }
+        let close_paren = context.prev();
+
+        return context.allocator.store(&ParsedArguments {
+            arguments,
+            open_paren,
+            close_paren,
+            comma_positions,
+        });
+    }
+}
