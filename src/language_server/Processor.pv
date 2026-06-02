@@ -1030,6 +1030,29 @@ impl Processor {
         return found;
     }
 
+    fn completion_separator_kind(&self, module: *Module, line: usize, character: usize) -> usize {
+        if module == null { return 0; }
+
+        let found = false;
+        let found_end: usize = 0;
+        let found_value: str = "";
+        for token in (*module).tokens {
+            if token.end_line != line { continue; }
+            if token.end_column > character { continue; }
+            if !found || token.end_column > found_end {
+                found = true;
+                found_end = token.end_column;
+                found_value = token.value;
+            }
+        }
+
+        if !found { return 0; }
+        if found_value.eq(".") { return 1; }
+        if found_value.eq("::") { return 2; }
+        if found_value.eq(":") { return 3; }
+        return 0;
+    }
+
     fn append_module_name_completions(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, module: &Module) {
         for (_, &func_info) in module.functions {
             if func_info.type == FunctionType::Test { continue; }
@@ -1088,10 +1111,18 @@ impl Processor {
         let module: *Module = null;
         if ls.root != null { module = ls.root.find_module_by_path(*filename); }
 
+        let separator_kind = self.completion_separator_kind(module, line, character);
+        if separator_kind == 3 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
         let member_infos = ls.analysis.member_completion_info.find(filename);
         let member_info = self.find_member_completion_at(member_infos, line, character);
-        if member_info != null && module != null {
-            self.append_type_member_completions(&result, &seen, &member_info.receiver_type, member_info.is_static, &(*module).context);
+        if separator_kind == 1 || separator_kind == 2 {
+            if member_info != null && module != null {
+                self.append_type_member_completions(&result, &seen, &member_info.receiver_type, member_info.is_static, &(*module).context);
+            }
             self.send_response(id, JsonNode::Array(result));
             return;
         }
