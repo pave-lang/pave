@@ -184,28 +184,9 @@ impl LanguageServer {
         path_copy.append(path);
         let path_str = path_copy.as_str();
 
-        // Save old hints — if parsing errors out and produces none, keep the old ones.
-        let old_hints = analysis.inlay_hints.find(&path_str);
-        let had_old_hints = old_hints != null && old_hints.length > 0;
-        let saved_hints = Array<InlayHint>::new(&self.analysis_alloc);
-        if had_old_hints {
-            for hint in old_hints {
-                saved_hints.append(*hint);
-            }
-        }
-
         analysis.inlay_hints.remove(&path_str);
         self.root.parse_functions_if_path(path_str);
         analysis.parsed_function_files.insert(path_str, true);
-
-        // If parsing produced no new hints but we had old ones, restore them.
-        if had_old_hints {
-            let new_hints = analysis.inlay_hints.find(&path_str);
-            if new_hints == null || new_hints.length == 0 {
-                analysis.inlay_hints.insert(path_str, saved_hints);
-            }
-        }
-
         return analysis;
     }
 

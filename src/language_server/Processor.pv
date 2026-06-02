@@ -356,6 +356,13 @@ impl Processor {
             return;
         }
 
+        // If there are diagnostics for this file, don't respond — the client
+        // keeps showing the last good hints until the file is error-free again.
+        let file_diagnostics = ls.analysis.diagnostics.find(filename);
+        if file_diagnostics != null && file_diagnostics.length > 0 {
+            return;
+        }
+
         ls.parse_functions_file(*filename);
 
         let inlay_hints = ls.analysis.inlay_hints.find(filename);
