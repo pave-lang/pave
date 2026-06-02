@@ -1098,10 +1098,12 @@ impl Processor {
         let found = false;
         let found_end: usize = 0;
         let found_value: str = "";
+        let prev_value: str = "";
         for token in (*module).tokens {
             if token.end_line != line { continue; }
             if token.end_column > character { continue; }
             if !found || token.end_column > found_end {
+                prev_value = found_value;
                 found = true;
                 found_end = token.end_column;
                 found_value = token.value;
@@ -1112,6 +1114,8 @@ impl Processor {
         if found_value.eq(".") { return 1; }
         if found_value.eq("::") { return 2; }
         if found_value.eq(":") { return 3; }
+        if prev_value.eq(".") { return 1; }
+        if prev_value.eq("::") { return 2; }
         return 0;
     }
 
