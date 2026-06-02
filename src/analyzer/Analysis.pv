@@ -32,10 +32,28 @@ struct InlayHint {
     padding_right: bool,
 }
 
+struct SymbolInfo {
+    range: Range,
+    type_label: str,
+    definition_path: str,
+    definition_position: Position,
+}
+
+struct SignatureInfo {
+    open_paren: Position,
+    close_paren: Position,
+    comma_positions: Array<Position>,
+    label: str,
+    parameters: Array<str>,
+}
+
 struct Analysis {
     files: HashMap<str, bool>,
     diagnostics: HashMap<str, Array<Diagnostic>>,
     inlay_hints: HashMap<str, Array<InlayHint>>,
+    symbol_info: HashMap<str, Array<SymbolInfo>>,
+    signature_info: HashMap<str, Array<SignatureInfo>>,
+    collect_symbols: bool,
     parsed_function_files: HashMap<str, bool>,
     file_overrides: HashMap<str, str>,
 }
@@ -46,6 +64,9 @@ impl Analysis {
             files: HashMap<str, bool>::new(allocator),
             diagnostics: HashMap<str, Array<Diagnostic>>::new(allocator),
             inlay_hints: HashMap<str, Array<InlayHint>>::new(allocator),
+            symbol_info: HashMap<str, Array<SymbolInfo>>::new(allocator),
+            signature_info: HashMap<str, Array<SignatureInfo>>::new(allocator),
+            collect_symbols: false,
             parsed_function_files: HashMap<str, bool>::new(allocator),
             file_overrides: HashMap<str, str>::new(allocator),
         };

@@ -1001,6 +1001,7 @@ impl Context {
         }
 
         scope.values.insert(name.value, *type);
+        scope.definition_tokens.insert(name.value, name);
 
         return true;
     }
@@ -1022,6 +1023,66 @@ impl Context {
         if func != null { return func; }
 
         return self.module.find_value(name);
+    }
+
+    fn get_definition_token(&self, name: str) -> *Token {
+        if self.scopes.length > 0 {
+            let scope_front = self.scopes.data;
+            let scope = self.scopes.back();
+
+            while scope != null && scope >= scope_front {
+                let token = scope.definition_tokens.find(&name);
+                if token != null { return *token; }
+                scope = scope - 1;
+            }
+        }
+
+        return null;
+    }
+
+    fn should_record_symbols(&self) -> bool {
+        return self.analysis.collect_symbols;
+    }
+
+    fn record_symbol(&self, token: &Token, type_label: str, def_path: str, def_token: *Token) {
+        if !self.analysis.collect_symbols { return; }
+
+        let symbols = &self.analysis.symbol_info;
+        let file_symbols = symbols.find(&self.path);
+        if file_symbols == null { file_symbols = symbols.insert(self.path, Array<SymbolInfo>::new(self.allocator)); }
+        if file_symbols == null { return; }
+
+        let def_position = Position { line: 0, character: 0 };
+        if def_token != null {
+            def_position = Position { line: def_token.start_line, character: def_token.start_column };
+        }
+
+        file_symbols.append(SymbolInfo {
+            range: Range {
+                start: Position { line: token.start_line, character: token.start_column },
+                end: Position { line: token.end_line, character: token.end_column },
+            },
+            type_label,
+            definition_path: def_path,
+            definition_position: def_position,
+        });
+    }
+
+    fn record_signature(&self, open_paren: &Token, close_paren: &Token, comma_positions: Array<Position>, label: str, parameters: Array<str>) {
+        if !self.analysis.collect_symbols { return; }
+
+        let sigs = &self.analysis.signature_info;
+        let file_sigs = sigs.find(&self.path);
+        if file_sigs == null { file_sigs = sigs.insert(self.path, Array<SignatureInfo>::new(self.allocator)); }
+        if file_sigs == null { return; }
+
+        file_sigs.append(SignatureInfo {
+            open_paren: Position { line: open_paren.start_line, character: open_paren.start_column },
+            close_paren: Position { line: close_paren.end_line, character: close_paren.end_column },
+            comma_positions,
+            label,
+            parameters,
+        });
     }
 
     fn parse_generics(&self, generics: &Generics) -> Array<Type> {

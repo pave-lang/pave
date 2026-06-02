@@ -4,6 +4,48 @@ use types
 use c
 
 impl Expression {
+    fn record_static_member_symbol(context: &Context, member: &Token, member_type: &Type, owner_type: &Type) {
+        if !context.should_record_symbols() { return; }
+
+        let member_def_token: *Token = null;
+        let member_def_path = context.path;
+
+        match member_type {
+            Type::Function(func_info, _) => {
+                member_def_token = func_info.name;
+                if func_info.context != null { member_def_path = func_info.context.path; }
+            },
+            _ => {
+                match owner_type.resolve_typedef() {
+                    Type::Struct(struct_info, _) => {
+                        for *impl_info in struct_info.impls {
+                            let impl_const_ptr = impl_info.consts.find(&member.value);
+                            if impl_const_ptr != null {
+                                let impl_const = *impl_const_ptr;
+                                member_def_token = impl_const.name;
+                                member_def_path = impl_const.context.path;
+                            }
+                        }
+                    },
+                    Type::Enum(enum_info, _) => {
+                        for *impl_info in enum_info.impls {
+                            let impl_const_ptr = impl_info.consts.find(&member.value);
+                            if impl_const_ptr != null {
+                                let impl_const = *impl_const_ptr;
+                                member_def_token = impl_const.name;
+                                member_def_path = impl_const.context.path;
+                            }
+                        }
+                    },
+                    _ => {},
+                }
+            },
+        }
+
+        let member_type_label = context.root.naming_decl.get_type_decl(member_type, context.type_self, null);
+        context.record_symbol(member, member_type_label.as_str(), member_def_path, member_def_token);
+    }
+
     fn parse_enum(context: &Context, token: &Token, enum_type: &Type, generics: &Generics) -> *Expression {
         if context.check_next(TokenType::Symbol, "::") {
             let variant_name = context.expect(TokenType::Identifier);
@@ -18,6 +60,7 @@ impl Expression {
                 },
                 EnumVariantResult::Function(function, generic_map) => {
                     let member_type = context.allocator.store(&Type::Function(function, generic_map));
+                    Expression::record_static_member_symbol(context, variant_name, member_type, enum_type);
 
                     if !context.check_value(TokenType::Symbol, "(") {
                         return Expression::make(context.allocator, token, ExpressionData::Type(member_type), member_type);
@@ -50,6 +93,9 @@ impl Expression {
                     return Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
                 },
                 EnumVariantResult::EnumVariant(variant) => {
+                    let variant_type_label = context.root.naming_decl.get_type_decl(enum_type, context.type_self, null);
+                    context.record_symbol(variant_name, variant_type_label.as_str(), variant.parent.context.path, variant.name);
+
                     let arguments = Array<InvokeArgument>::new(context.allocator);
 
                     if context.check_value(TokenType::Symbol, "(") {
@@ -108,10 +154,14 @@ impl Expression {
                     return Expression::make(context.allocator, token, ExpressionData::Invoke(enum_variant, arguments), enum_type);
                 },
                 EnumVariantResult::Const(impl_const) => {
+                    let const_type = context.allocator.store(&impl_const.type);
+                    Expression::record_static_member_symbol(context, variant_name, const_type, enum_type);
                     let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
-                    return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), context.allocator.store(&impl_const.type));
+                    return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), const_type);
                 },
                 EnumVariantResult::EnumCValue(_ /*variant*/) => {
+                    let variant_type_label = context.root.naming_decl.get_type_decl(enum_type, context.type_self, null);
+                    context.record_symbol(variant_name, variant_type_label.as_str(), context.path, null);
                     let enum_expr = Expression::make(context.allocator, token, ExpressionData::Type(enum_type), enum_type);
                     return Expression::make(context.allocator, variant_name, ExpressionData::MemberStaticExpression(enum_expr, variant_name.value), enum_type);
                     // let enum_info = variant.parent;
@@ -138,6 +188,7 @@ impl Expression {
 
             let member_type = Expression::get_member_type(context, struct_type, member, true);
             if member_type == null { return null; }
+            Expression::record_static_member_symbol(context, member, member_type, struct_type);
 
             let generic_map = struct_type.get_generic_map(context);
 

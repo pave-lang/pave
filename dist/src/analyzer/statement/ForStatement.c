@@ -397,26 +397,33 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
             #line 185 "src/analyzer/statement/ForStatement.pv"
             return 0;
         }
+        #line 186 "src/analyzer/statement/ForStatement.pv"
+        if (variable2->type != 0 && Context__should_record_symbols(context)) {
+            #line 187 "src/analyzer/statement/ForStatement.pv"
+            struct String variable_type_label = Naming__get_type_decl(&context->root->naming_decl, variable2->type, context->type_self, 0);
+            #line 188 "src/analyzer/statement/ForStatement.pv"
+            Context__record_symbol(context, variable2->name, String__as_str(&variable_type_label), context->path, variable2->name);
+        }
     } }
 
-    #line 188 "src/analyzer/statement/ForStatement.pv"
+    #line 192 "src/analyzer/statement/ForStatement.pv"
     for_statement.block = Block__new_ptr(context);
-    #line 189 "src/analyzer/statement/ForStatement.pv"
+    #line 193 "src/analyzer/statement/ForStatement.pv"
     if (for_statement.block == 0) {
-        #line 189 "src/analyzer/statement/ForStatement.pv"
+        #line 193 "src/analyzer/statement/ForStatement.pv"
         return 0;
     }
-    #line 190 "src/analyzer/statement/ForStatement.pv"
+    #line 194 "src/analyzer/statement/ForStatement.pv"
     for_statement.block->is_loop = true;
-    #line 191 "src/analyzer/statement/ForStatement.pv"
+    #line 195 "src/analyzer/statement/ForStatement.pv"
     if (!Block__parse(for_statement.block, context, generics, false)) {
-        #line 191 "src/analyzer/statement/ForStatement.pv"
+        #line 195 "src/analyzer/statement/ForStatement.pv"
         return 0;
     }
 
-    #line 193 "src/analyzer/statement/ForStatement.pv"
+    #line 197 "src/analyzer/statement/ForStatement.pv"
     Context__pop_scope(context);
 
-    #line 195 "src/analyzer/statement/ForStatement.pv"
+    #line 199 "src/analyzer/statement/ForStatement.pv"
     return ArenaAllocator__store_ForStatement(context->allocator, &for_statement);
 }

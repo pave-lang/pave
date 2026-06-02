@@ -128,6 +128,22 @@ impl Expression {
                 } else if return_type == null {
                     let type = context.parse_type2(generics);
                     if type != null {
+                        // Record type reference for go-to-definition
+                        if context.should_record_symbols() {
+                            let type_def_token: *Token = null;
+                            let type_def_path = context.path;
+                            match type.resolve_typedef() {
+                                Type::Struct(struct_info, _) => { type_def_token = struct_info.name; type_def_path = struct_info.module.path; },
+                                Type::Enum(enum_info, _) => { type_def_token = enum_info.name; type_def_path = enum_info.context.path; },
+                                Type::Trait(trait_info, _) => { type_def_token = trait_info.name; type_def_path = trait_info.module.path; },
+                                _ => {},
+                            }
+                            if type_def_token != null {
+                                let type_label_str = context.root.naming_decl.get_type_decl(type, context.type_self, null);
+                                context.record_symbol(token, type_label_str.as_str(), type_def_path, type_def_token);
+                            }
+                        }
+
                         match type.resolve_typedef() {
                             Type::Enum(_, _) => { result = Expression::parse_enum(context, token, type, generics); },
                             Type::EnumC(_) => { result = Expression::parse_enum(context, token, type, generics); },
@@ -154,6 +170,28 @@ impl Expression {
                         return null;
                     }
                 } else {
+                    // Record symbol info for go-to-definition and hover
+                    if context.should_record_symbols() {
+                        let type_label = context.root.naming_decl.get_type_decl(return_type, context.type_self, null);
+                        let def_token = context.get_definition_token(token.value);
+                        let def_path = context.path;
+                        if def_token == null {
+                            // Check if it's a function — use func_info.name
+                            match return_type {
+                                Type::Function(func_info, _) => {
+                                    def_token = func_info.name;
+                                    if func_info.context != null { def_path = func_info.context.path; }
+                                },
+                                Type::Global(global_info) => {
+                                    def_token = global_info.name;
+                                    def_path = global_info.module.path;
+                                },
+                                _ => {},
+                            }
+                        }
+                        context.record_symbol(token, type_label.as_str(), def_path, def_token);
+                    }
+
                     match return_type {
                         Type::Function(func_info, _) => {
                             context.next_token();
@@ -165,21 +203,29 @@ impl Expression {
                             }
 
                             if !context.expect_value(TokenType::Symbol, "(") { return null; }
+                            let open_paren_token = context.prev();
 
                             let arguments = Array<InvokeArgument>::new(context.allocator);
+                            let sig_commas = Array<Position>::new(context.allocator);
 
                             while !context.check_value(TokenType::Symbol, ")") {
                                 let argument = Expression::parse(context, generics);
                                 if argument == null { return null; }
                                 arguments.append(InvokeArgument { name: null, value: argument });
 
-                                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                                if context.check_next(TokenType::Symbol, ",") {
+                                    let comma_tok = context.prev();
+                                    if comma_tok != null {
+                                        sig_commas.append(Position { line: comma_tok.start_line, character: comma_tok.start_column });
+                                    }
+                                } else if !context.check_value(TokenType::Symbol, ")") {
                                     context.expect_value(TokenType::Symbol, ")");
                                     return null;
                                 }
                             }
 
                             if !context.expect_value(TokenType::Symbol, ")") { return null; }
+                            let close_paren_token = context.prev();
 
                             if func_info.generics.array.length > 0 {
                                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
@@ -187,6 +233,11 @@ impl Expression {
                             }
 
                             if !Expression::validate_arguments(context, token, func_type, &arguments, null, false) { return null; }
+
+                            // Record signature info for signature help
+                            if open_paren_token != null && close_paren_token != null {
+                                Expression::record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas);
+                            }
 
                             let func_return_type: *Type = null;
                             match func_type {
@@ -885,5 +936,42 @@ impl Expression {
         if !a.validate_type(context, &b.return_type, false) { return null; }
 
         return Expression::make(context.allocator, token, ExpressionData::IfExpression(condition, a, b), &a.return_type);
+    }
+
+    fn record_function_signature(context: &Context, func_info: &Function, open_paren: &Token, close_paren: &Token, comma_positions: Array<Position>) {
+        if !context.should_record_symbols() { return; }
+
+        let label = String::new(context.allocator);
+        label.append("fn ");
+        let name = func_info.name;
+        if name != null { label.append(name.value); }
+        label.append("(");
+
+        let params = Array<str>::new(context.allocator);
+        let first = true;
+        for param in func_info.parameters {
+            if !first { label.append(", "); }
+            first = false;
+
+            let param_str = String::new(context.allocator);
+            let pname = param.name;
+            if pname != null {
+                param_str.append(pname.value);
+                param_str.append(": ");
+            }
+            let type_decl = context.root.naming_decl.get_type_decl(&param.type, context.type_self, null);
+            param_str.append(type_decl.as_str());
+            label.append(param_str.as_str());
+            params.append(param_str.as_str());
+        }
+
+        label.append(")");
+        let ret_type_decl = context.root.naming_decl.get_type_decl(&func_info.return_type, context.type_self, null);
+        if !func_info.return_type.is_void() {
+            label.append(" -> ");
+            label.append(ret_type_decl.as_str());
+        }
+
+        context.record_signature(open_paren, close_paren, comma_positions, label.as_str(), params);
     }
 }

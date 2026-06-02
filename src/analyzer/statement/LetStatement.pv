@@ -57,6 +57,12 @@ impl LetStatement {
 
         if !context.set_value(name, type) { context.error("set_value"); return null; }
 
+        // Record symbol for the declared variable (hover shows its type)
+        if type != null && context.should_record_symbols() {
+            let let_type_label = context.root.naming_decl.get_type_decl(type, context.type_self, null);
+            context.record_symbol(name, let_type_label.as_str(), context.path, name);
+        }
+
         // If the initializer is a null-narrowed variable, propagate the broadened original
         // so the new binding can be reassigned to a value of the broader type later.
         if expression != null {

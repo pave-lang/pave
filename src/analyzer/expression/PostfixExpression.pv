@@ -124,6 +124,33 @@ impl Expression {
         let member_type = Expression::get_member_type(context, &inner.return_type, member_name, true);
         if member_type == null { return null; }
 
+        // Record symbol info for member access
+        if context.should_record_symbols() {
+            let member_def_token: *Token = null;
+            let member_def_path = context.path;
+            match member_type {
+                Type::Function(mfunc, _) => {
+                    member_def_token = mfunc.name;
+                    if mfunc.context != null { member_def_path = mfunc.context.path; }
+                },
+                _ => {
+                    // Try struct field
+                    match inner.return_type.deref_all() {
+                        Type::Struct(struct_info, _) => {
+                            let field = struct_info.fields.find(&member_name.value);
+                            if field != null {
+                                member_def_token = field.name;
+                                member_def_path = struct_info.module.path;
+                            }
+                        },
+                        _ => {},
+                    }
+                },
+            }
+            let member_type_label = context.root.naming_decl.get_type_decl(member_type, context.type_self, null);
+            context.record_symbol(member_name, member_type_label.as_str(), member_def_path, member_def_token);
+        }
+
         let generic_map = inner.return_type.get_generic_map(context);
         let parsed_generics = Array<Type> { allocator: context.allocator, data: null, length: 0, capacity: 0 };
         let func_info: *Function = null;
@@ -145,8 +172,10 @@ impl Expression {
 
         if is_function && context.check_value(TokenType::Symbol, "(") {
             if !context.expect_value(TokenType::Symbol, "("){ return null; }
+            let member_open_paren = context.prev();
 
             let arguments = Array<InvokeArgument>::new(context.allocator);
+            let member_sig_commas = Array<Position>::new(context.allocator);
 
             if func_info == null {
                 context.error_token(member_name, "Expected function type");
@@ -163,13 +192,23 @@ impl Expression {
                 if argument == null { return null; }
                 arguments.append(InvokeArgument { name: null, value: argument });
 
-                if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ")") {
+                if context.check_next(TokenType::Symbol, ",") {
+                    let comma_tok = context.prev();
+                    if comma_tok != null {
+                        member_sig_commas.append(Position { line: comma_tok.start_line, character: comma_tok.start_column });
+                    }
+                } else if !context.check_value(TokenType::Symbol, ")") {
                     context.expect_value(TokenType::Symbol, ")");
                     return null;
                 }
             }
 
             if !context.expect_value(TokenType::Symbol, ")") { return null; }
+            let member_close_paren = context.prev();
+
+            if member_open_paren != null && member_close_paren != null {
+                Expression::record_function_signature(context, func_info, member_open_paren, member_close_paren, member_sig_commas);
+            }
 
             if func_info.generics.array.length > 0 {
                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);

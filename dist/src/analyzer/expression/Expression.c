@@ -17,18 +17,25 @@
 #include <analyzer/TokenType.h>
 #include <analyzer/Module.h>
 #include <analyzer/types/Generics.h>
+#include <analyzer/types/Struct.h>
+#include <analyzer/types/Enum.h>
+#include <analyzer/types/Trait.h>
+#include <std/String.h>
+#include <analyzer/Naming.h>
+#include <analyzer/Root.h>
 #include <analyzer/types/Generic.h>
+#include <analyzer/types/Function.h>
+#include <analyzer/types/Global.h>
 #include <std/Array_Type.h>
 #include <std/trait_Allocator.h>
+#include <std/Array_Position.h>
+#include <analyzer/Position.h>
 #include <std/Array_Generic.h>
-#include <analyzer/types/Function.h>
 #include <analyzer/types/GenericMap.h>
-#include <analyzer/Root.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/Primitive.h>
-#include <std/String.h>
 #include <analyzer/types/Tuple.h>
 #include <std/IterEnumerate_ref_InvokeArgument.h>
 #include <tuple_usize_ref_InvokeArgument.h>
@@ -36,9 +43,11 @@
 #include <analyzer/types/SequenceType.h>
 #include <analyzer/expression/EnumVariantResult.h>
 #include <analyzer/types/EnumVariant.h>
-#include <analyzer/types/Enum.h>
 #include <analyzer/types/IndirectType.h>
-#include <analyzer/Naming.h>
+#include <std/Array_str.h>
+#include <std/Array_Parameter.h>
+#include <std/Iter_ref_Parameter.h>
+#include <analyzer/types/Parameter.h>
 #include <std/HashMap_str_EnumVariant.h>
 #include <std/Array_ref_Impl.h>
 #include <std/Iter_ref_ref_Impl.h>
@@ -51,13 +60,11 @@
 #include <std/HashMap_str_usize.h>
 #include <analyzer/types/StructField.h>
 #include <std/HashMap_str_StructField.h>
-#include <analyzer/types/Struct.h>
 #include <std/HashMap_str_Type.h>
 #include <std/HashMapIter_str_Type.h>
 #include <tuple_str_Type.h>
 #include <analyzer/types/FunctionParent.h>
 #include <std/HashMap_str_Function.h>
-#include <analyzer/types/Trait.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/StructCField.h>
 #include <std/HashMap_str_StructCField.h>
@@ -71,16 +78,12 @@
 #include <analyzer/types/GenericTypedef.h>
 #include <analyzer/types/TypeImpl.h>
 #include <analyzer/c/NamespaceCpp.h>
-#include <std/Iter_ref_Parameter.h>
-#include <std/Array_Parameter.h>
-#include <analyzer/types/Parameter.h>
 #include <std/Iter_ref_Generic.h>
 #include <std/HashMap_str_ref_Trait.h>
 #include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <std/HashMapBucket_str_StructField.h>
 #include <analyzer/InlayHintKind.h>
-#include <std/Array_str.h>
 #include <analyzer/c/UnknownC.h>
 #include <std/Array_NullNarrowing.h>
 #include <analyzer/expression/NullNarrowing.h>
@@ -323,1542 +326,1729 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                 struct Type* type = Context__parse_type2(context, generics);
                 #line 130 "src/analyzer/expression/Expression.pv"
                 if (type != 0) {
-                    #line 131 "src/analyzer/expression/Expression.pv"
-                    switch (Type__resolve_typedef(type)->type) {
-                        #line 132 "src/analyzer/expression/Expression.pv"
-                        case TYPE__ENUM: {
-                            #line 132 "src/analyzer/expression/Expression.pv"
-                            result = Expression__parse_enum(context, token, type, generics);
-                        } break;
+                    #line 132 "src/analyzer/expression/Expression.pv"
+                    if (Context__should_record_symbols(context)) {
                         #line 133 "src/analyzer/expression/Expression.pv"
-                        case TYPE__ENUM_C: {
-                            #line 133 "src/analyzer/expression/Expression.pv"
+                        struct Token* type_def_token = 0;
+                        #line 134 "src/analyzer/expression/Expression.pv"
+                        struct str type_def_path = context->path;
+                        #line 135 "src/analyzer/expression/Expression.pv"
+                        switch (Type__resolve_typedef(type)->type) {
+                            #line 136 "src/analyzer/expression/Expression.pv"
+                            case TYPE__STRUCT: {
+                                #line 136 "src/analyzer/expression/Expression.pv"
+                                struct Struct* struct_info = Type__resolve_typedef(type)->struct_value._0;
+                                #line 136 "src/analyzer/expression/Expression.pv"
+                                type_def_token = struct_info->name;
+                                #line 136 "src/analyzer/expression/Expression.pv"
+                                type_def_path = struct_info->module->path;
+                            } break;
+                            #line 137 "src/analyzer/expression/Expression.pv"
+                            case TYPE__ENUM: {
+                                #line 137 "src/analyzer/expression/Expression.pv"
+                                struct Enum* enum_info = Type__resolve_typedef(type)->enum_value._0;
+                                #line 137 "src/analyzer/expression/Expression.pv"
+                                type_def_token = enum_info->name;
+                                #line 137 "src/analyzer/expression/Expression.pv"
+                                type_def_path = enum_info->context->path;
+                            } break;
+                            #line 138 "src/analyzer/expression/Expression.pv"
+                            case TYPE__TRAIT: {
+                                #line 138 "src/analyzer/expression/Expression.pv"
+                                struct Trait* trait_info = Type__resolve_typedef(type)->trait_value._0;
+                                #line 138 "src/analyzer/expression/Expression.pv"
+                                type_def_token = trait_info->name;
+                                #line 138 "src/analyzer/expression/Expression.pv"
+                                type_def_path = trait_info->module->path;
+                            } break;
+                            #line 139 "src/analyzer/expression/Expression.pv"
+                            default: {
+                            } break;
+                        }
+                        #line 141 "src/analyzer/expression/Expression.pv"
+                        if (type_def_token != 0) {
+                            #line 142 "src/analyzer/expression/Expression.pv"
+                            struct String type_label_str = Naming__get_type_decl(&context->root->naming_decl, type, context->type_self, 0);
+                            #line 143 "src/analyzer/expression/Expression.pv"
+                            Context__record_symbol(context, token, String__as_str(&type_label_str), type_def_path, type_def_token);
+                        }
+                    }
+
+                    #line 147 "src/analyzer/expression/Expression.pv"
+                    switch (Type__resolve_typedef(type)->type) {
+                        #line 148 "src/analyzer/expression/Expression.pv"
+                        case TYPE__ENUM: {
+                            #line 148 "src/analyzer/expression/Expression.pv"
                             result = Expression__parse_enum(context, token, type, generics);
                         } break;
-                        #line 134 "src/analyzer/expression/Expression.pv"
+                        #line 149 "src/analyzer/expression/Expression.pv"
+                        case TYPE__ENUM_C: {
+                            #line 149 "src/analyzer/expression/Expression.pv"
+                            result = Expression__parse_enum(context, token, type, generics);
+                        } break;
+                        #line 150 "src/analyzer/expression/Expression.pv"
                         case TYPE__SELF: {
-                            #line 134 "src/analyzer/expression/Expression.pv"
+                            #line 150 "src/analyzer/expression/Expression.pv"
                             result = Expression__parse_struct(context, token, type, generics);
                         } break;
-                        #line 135 "src/analyzer/expression/Expression.pv"
+                        #line 151 "src/analyzer/expression/Expression.pv"
                         case TYPE__STRUCT: {
-                            #line 135 "src/analyzer/expression/Expression.pv"
+                            #line 151 "src/analyzer/expression/Expression.pv"
                             result = Expression__parse_struct(context, token, type, generics);
                         } break;
-                        #line 136 "src/analyzer/expression/Expression.pv"
+                        #line 152 "src/analyzer/expression/Expression.pv"
                         case TYPE__STRUCT_C: {
-                            #line 136 "src/analyzer/expression/Expression.pv"
+                            #line 152 "src/analyzer/expression/Expression.pv"
                             result = Expression__parse_struct(context, token, type, generics);
                         } break;
-                        #line 137 "src/analyzer/expression/Expression.pv"
+                        #line 153 "src/analyzer/expression/Expression.pv"
                         case TYPE__UNION_C: {
-                            #line 137 "src/analyzer/expression/Expression.pv"
+                            #line 153 "src/analyzer/expression/Expression.pv"
                             result = Expression__parse_struct(context, token, type, generics);
                         } break;
-                        #line 138 "src/analyzer/expression/Expression.pv"
+                        #line 154 "src/analyzer/expression/Expression.pv"
                         case TYPE__CLASS_CPP: {
-                            #line 138 "src/analyzer/expression/Expression.pv"
+                            #line 154 "src/analyzer/expression/Expression.pv"
                             result = Expression__parse_class(context, token, Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = type }, type), generics);
                         } break;
-                        #line 139 "src/analyzer/expression/Expression.pv"
+                        #line 155 "src/analyzer/expression/Expression.pv"
                         case TYPE__NAMESPACE_CPP: {
-                            #line 139 "src/analyzer/expression/Expression.pv"
+                            #line 155 "src/analyzer/expression/Expression.pv"
                             result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = type }, type);
                         } break;
-                        #line 140 "src/analyzer/expression/Expression.pv"
+                        #line 156 "src/analyzer/expression/Expression.pv"
                         default: {
-                            #line 140 "src/analyzer/expression/Expression.pv"
+                            #line 156 "src/analyzer/expression/Expression.pv"
                             result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = type }, type);
                         } break;
                     }
                 } else if (Generics__has(generics, token->value)) {
-                    #line 143 "src/analyzer/expression/Expression.pv"
+                    #line 159 "src/analyzer/expression/Expression.pv"
                     struct Generic* generic = Generics__find(generics, token->value);
-                    #line 144 "src/analyzer/expression/Expression.pv"
+                    #line 160 "src/analyzer/expression/Expression.pv"
                     result = Expression__make_next(context, (struct Expression) {
                         .token = token,
                         .return_type = (struct Type) { .type = TYPE__GENERIC, .generic_value = generic },
                         .data = (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = (struct str) { .ptr = 0, .length = 0 } },
                     });
 
-                    #line 150 "src/analyzer/expression/Expression.pv"
+                    #line 166 "src/analyzer/expression/Expression.pv"
                     if (result == 0) {
-                        #line 150 "src/analyzer/expression/Expression.pv"
+                        #line 166 "src/analyzer/expression/Expression.pv"
                         return 0;
                     }
-                    #line 151 "src/analyzer/expression/Expression.pv"
+                    #line 167 "src/analyzer/expression/Expression.pv"
                     result->data = (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = &result->return_type };
                 } else {
-                    #line 153 "src/analyzer/expression/Expression.pv"
+                    #line 169 "src/analyzer/expression/Expression.pv"
                     Context__error_token(context, token, "Unable to find variable or type with this name");
-                    #line 154 "src/analyzer/expression/Expression.pv"
+                    #line 170 "src/analyzer/expression/Expression.pv"
                     return 0;
                 }
             } else {
-                #line 157 "src/analyzer/expression/Expression.pv"
+                #line 174 "src/analyzer/expression/Expression.pv"
+                if (Context__should_record_symbols(context)) {
+                    #line 175 "src/analyzer/expression/Expression.pv"
+                    struct String type_label = Naming__get_type_decl(&context->root->naming_decl, return_type, context->type_self, 0);
+                    #line 176 "src/analyzer/expression/Expression.pv"
+                    struct Token* def_token = Context__get_definition_token(context, token->value);
+                    #line 177 "src/analyzer/expression/Expression.pv"
+                    struct str def_path = context->path;
+                    #line 178 "src/analyzer/expression/Expression.pv"
+                    if (def_token == 0) {
+                        #line 180 "src/analyzer/expression/Expression.pv"
+                        switch (return_type->type) {
+                            #line 181 "src/analyzer/expression/Expression.pv"
+                            case TYPE__FUNCTION: {
+                                #line 181 "src/analyzer/expression/Expression.pv"
+                                struct Function* func_info = return_type->function_value._0;
+                                #line 182 "src/analyzer/expression/Expression.pv"
+                                def_token = func_info->name;
+                                #line 183 "src/analyzer/expression/Expression.pv"
+                                if (func_info->context != 0) {
+                                    #line 183 "src/analyzer/expression/Expression.pv"
+                                    def_path = func_info->context->path;
+                                }
+                            } break;
+                            #line 185 "src/analyzer/expression/Expression.pv"
+                            case TYPE__GLOBAL: {
+                                #line 185 "src/analyzer/expression/Expression.pv"
+                                struct Global* global_info = return_type->global_value;
+                                #line 186 "src/analyzer/expression/Expression.pv"
+                                def_token = global_info->name;
+                                #line 187 "src/analyzer/expression/Expression.pv"
+                                def_path = global_info->module->path;
+                            } break;
+                            #line 189 "src/analyzer/expression/Expression.pv"
+                            default: {
+                            } break;
+                        }
+                    }
+                    #line 192 "src/analyzer/expression/Expression.pv"
+                    Context__record_symbol(context, token, String__as_str(&type_label), def_path, def_token);
+                }
+
+                #line 195 "src/analyzer/expression/Expression.pv"
                 switch (return_type->type) {
-                    #line 158 "src/analyzer/expression/Expression.pv"
+                    #line 196 "src/analyzer/expression/Expression.pv"
                     case TYPE__FUNCTION: {
-                        #line 158 "src/analyzer/expression/Expression.pv"
+                        #line 196 "src/analyzer/expression/Expression.pv"
                         struct Function* func_info = return_type->function_value._0;
-                        #line 159 "src/analyzer/expression/Expression.pv"
+                        #line 197 "src/analyzer/expression/Expression.pv"
                         Context__next_token(context);
-                        #line 160 "src/analyzer/expression/Expression.pv"
+                        #line 198 "src/analyzer/expression/Expression.pv"
                         struct Type* func_type = return_type;
-                        #line 161 "src/analyzer/expression/Expression.pv"
+                        #line 199 "src/analyzer/expression/Expression.pv"
                         struct Array_Type parsed_generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 };
 
-                        #line 163 "src/analyzer/expression/Expression.pv"
+                        #line 201 "src/analyzer/expression/Expression.pv"
                         if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "<")) {
-                            #line 164 "src/analyzer/expression/Expression.pv"
+                            #line 202 "src/analyzer/expression/Expression.pv"
                             parsed_generics = Context__parse_generics(context, generics);
                         }
 
-                        #line 167 "src/analyzer/expression/Expression.pv"
+                        #line 205 "src/analyzer/expression/Expression.pv"
                         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                            #line 167 "src/analyzer/expression/Expression.pv"
+                            #line 205 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
+                        #line 206 "src/analyzer/expression/Expression.pv"
+                        struct Token* open_paren_token = Context__prev(context);
 
-                        #line 169 "src/analyzer/expression/Expression.pv"
+                        #line 208 "src/analyzer/expression/Expression.pv"
                         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+                        #line 209 "src/analyzer/expression/Expression.pv"
+                        struct Array_Position sig_commas = Array_Position__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                        #line 171 "src/analyzer/expression/Expression.pv"
+                        #line 211 "src/analyzer/expression/Expression.pv"
                         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                            #line 172 "src/analyzer/expression/Expression.pv"
+                            #line 212 "src/analyzer/expression/Expression.pv"
                             struct Expression* argument = Expression__parse(context, generics);
-                            #line 173 "src/analyzer/expression/Expression.pv"
+                            #line 213 "src/analyzer/expression/Expression.pv"
                             if (argument == 0) {
-                                #line 173 "src/analyzer/expression/Expression.pv"
+                                #line 213 "src/analyzer/expression/Expression.pv"
                                 return 0;
                             }
-                            #line 174 "src/analyzer/expression/Expression.pv"
+                            #line 214 "src/analyzer/expression/Expression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                            #line 176 "src/analyzer/expression/Expression.pv"
-                            if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                                #line 177 "src/analyzer/expression/Expression.pv"
+                            #line 216 "src/analyzer/expression/Expression.pv"
+                            if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
+                                #line 217 "src/analyzer/expression/Expression.pv"
+                                struct Token* comma_tok = Context__prev(context);
+                                #line 218 "src/analyzer/expression/Expression.pv"
+                                if (comma_tok != 0) {
+                                    #line 219 "src/analyzer/expression/Expression.pv"
+                                    Array_Position__append(&sig_commas, (struct Position) { .line = comma_tok->start_line, .character = comma_tok->start_column });
+                                }
+                            } else if (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                                #line 222 "src/analyzer/expression/Expression.pv"
                                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                                #line 178 "src/analyzer/expression/Expression.pv"
+                                #line 223 "src/analyzer/expression/Expression.pv"
                                 return 0;
                             }
                         }
 
-                        #line 182 "src/analyzer/expression/Expression.pv"
+                        #line 227 "src/analyzer/expression/Expression.pv"
                         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                            #line 182 "src/analyzer/expression/Expression.pv"
+                            #line 227 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
+                        #line 228 "src/analyzer/expression/Expression.pv"
+                        struct Token* close_paren_token = Context__prev(context);
 
-                        #line 184 "src/analyzer/expression/Expression.pv"
+                        #line 230 "src/analyzer/expression/Expression.pv"
                         if (func_info->generics.array.length > 0) {
-                            #line 185 "src/analyzer/expression/Expression.pv"
+                            #line 231 "src/analyzer/expression/Expression.pv"
                             struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                            #line 186 "src/analyzer/expression/Expression.pv"
+                            #line 232 "src/analyzer/expression/Expression.pv"
                             func_type = Root__make_type_usage(context->root, func_type, &func_generics->array);
                         }
 
-                        #line 189 "src/analyzer/expression/Expression.pv"
+                        #line 235 "src/analyzer/expression/Expression.pv"
                         if (!Expression__validate_arguments(context, token, func_type, &arguments, 0, false)) {
-                            #line 189 "src/analyzer/expression/Expression.pv"
+                            #line 235 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
+                        #line 238 "src/analyzer/expression/Expression.pv"
+                        if (open_paren_token != 0 && close_paren_token != 0) {
+                            #line 239 "src/analyzer/expression/Expression.pv"
+                            Expression__record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas);
+                        }
 
-                        #line 191 "src/analyzer/expression/Expression.pv"
+                        #line 242 "src/analyzer/expression/Expression.pv"
                         struct Type* func_return_type = 0;
-                        #line 192 "src/analyzer/expression/Expression.pv"
+                        #line 243 "src/analyzer/expression/Expression.pv"
                         switch (func_type->type) {
-                            #line 193 "src/analyzer/expression/Expression.pv"
+                            #line 244 "src/analyzer/expression/Expression.pv"
                             case TYPE__FUNCTION: {
-                                #line 193 "src/analyzer/expression/Expression.pv"
+                                #line 244 "src/analyzer/expression/Expression.pv"
                                 struct GenericMap* func_generic_map = func_type->function_value._1;
-                                #line 194 "src/analyzer/expression/Expression.pv"
+                                #line 245 "src/analyzer/expression/Expression.pv"
                                 switch (func_info->type) {
-                                    #line 195 "src/analyzer/expression/Expression.pv"
+                                    #line 246 "src/analyzer/expression/Expression.pv"
                                     case FUNCTION_TYPE__COROUTINE: {
-                                        #line 196 "src/analyzer/expression/Expression.pv"
+                                        #line 247 "src/analyzer/expression/Expression.pv"
                                         func_return_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__COROUTINE_INSTANCE, .coroutineinstance_value = { ._0 = func_info, ._1 = func_generic_map} }});
                                     } break;
-                                    #line 198 "src/analyzer/expression/Expression.pv"
+                                    #line 249 "src/analyzer/expression/Expression.pv"
                                     default: {
-                                        #line 199 "src/analyzer/expression/Expression.pv"
+                                        #line 250 "src/analyzer/expression/Expression.pv"
                                         func_return_type = Context__resolve_type(context->allocator, &func_info->return_type, func_generic_map, 0);
                                     } break;
                                 }
                             } break;
-                            #line 203 "src/analyzer/expression/Expression.pv"
+                            #line 254 "src/analyzer/expression/Expression.pv"
                             default: {
                             } break;
                         }
 
-                        #line 206 "src/analyzer/expression/Expression.pv"
+                        #line 257 "src/analyzer/expression/Expression.pv"
                         struct Expression* func_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = func_type }, func_type);
-                        #line 207 "src/analyzer/expression/Expression.pv"
+                        #line 258 "src/analyzer/expression/Expression.pv"
                         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = func_expr, ._1 = arguments} }, func_return_type);
                     } break;
-                    #line 209 "src/analyzer/expression/Expression.pv"
+                    #line 260 "src/analyzer/expression/Expression.pv"
                     case TYPE__COROUTINE_INSTANCE: {
-                        #line 210 "src/analyzer/expression/Expression.pv"
+                        #line 261 "src/analyzer/expression/Expression.pv"
                         Context__next_token(context);
-                        #line 211 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 213 "src/analyzer/expression/Expression.pv"
-                    case TYPE__INDIRECT: {
-                        #line 214 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 215 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 217 "src/analyzer/expression/Expression.pv"
-                    case TYPE__SEQUENCE: {
-                        #line 218 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 219 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 221 "src/analyzer/expression/Expression.pv"
-                    case TYPE__TUPLE: {
-                        #line 222 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 223 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 225 "src/analyzer/expression/Expression.pv"
-                    case TYPE__PRIMITIVE: {
-                        #line 226 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 227 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 229 "src/analyzer/expression/Expression.pv"
-                    case TYPE__ENUM: {
-                        #line 230 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 231 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 233 "src/analyzer/expression/Expression.pv"
-                    case TYPE__STRUCT: {
-                        #line 234 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 235 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 237 "src/analyzer/expression/Expression.pv"
-                    case TYPE__GENERIC: {
-                        #line 238 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 239 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 241 "src/analyzer/expression/Expression.pv"
-                    case TYPE__UNKNOWN_C: {
-                        #line 242 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 243 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 245 "src/analyzer/expression/Expression.pv"
-                    case TYPE__SELF: {
-                        #line 246 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 247 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 249 "src/analyzer/expression/Expression.pv"
-                    case TYPE__TYPEDEF_C: {
-                        #line 250 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 251 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 253 "src/analyzer/expression/Expression.pv"
-                    case TYPE__STRUCT_C: {
-                        #line 254 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 255 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 257 "src/analyzer/expression/Expression.pv"
-                    case TYPE__UNION_C: {
-                        #line 258 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 259 "src/analyzer/expression/Expression.pv"
-                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
-                    } break;
-                    #line 261 "src/analyzer/expression/Expression.pv"
-                    case TYPE__CLASS_CPP: {
                         #line 262 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 263 "src/analyzer/expression/Expression.pv"
                         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
                     } break;
-                    #line 265 "src/analyzer/expression/Expression.pv"
-                    case TYPE__GLOBAL: {
+                    #line 264 "src/analyzer/expression/Expression.pv"
+                    case TYPE__INDIRECT: {
+                        #line 265 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
                         #line 266 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 267 "src/analyzer/expression/Expression.pv"
                         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
                     } break;
-                    #line 269 "src/analyzer/expression/Expression.pv"
-                    case TYPE__ENUM_C: {
+                    #line 268 "src/analyzer/expression/Expression.pv"
+                    case TYPE__SEQUENCE: {
+                        #line 269 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
                         #line 270 "src/analyzer/expression/Expression.pv"
-                        Context__next_token(context);
-                        #line 271 "src/analyzer/expression/Expression.pv"
                         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
                     } break;
-                    #line 273 "src/analyzer/expression/Expression.pv"
-                    case TYPE__FUNCTION_C: {
+                    #line 272 "src/analyzer/expression/Expression.pv"
+                    case TYPE__TUPLE: {
                         #line 273 "src/analyzer/expression/Expression.pv"
-                        struct FunctionC* func_info = return_type->functionc_value;
-                        #line 274 "src/analyzer/expression/Expression.pv"
                         Context__next_token(context);
-                        #line 275 "src/analyzer/expression/Expression.pv"
+                        #line 274 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 276 "src/analyzer/expression/Expression.pv"
+                    case TYPE__PRIMITIVE: {
+                        #line 277 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 278 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 280 "src/analyzer/expression/Expression.pv"
+                    case TYPE__ENUM: {
+                        #line 281 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 282 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 284 "src/analyzer/expression/Expression.pv"
+                    case TYPE__STRUCT: {
+                        #line 285 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 286 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 288 "src/analyzer/expression/Expression.pv"
+                    case TYPE__GENERIC: {
+                        #line 289 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 290 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 292 "src/analyzer/expression/Expression.pv"
+                    case TYPE__UNKNOWN_C: {
+                        #line 293 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 294 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 296 "src/analyzer/expression/Expression.pv"
+                    case TYPE__SELF: {
+                        #line 297 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 298 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 300 "src/analyzer/expression/Expression.pv"
+                    case TYPE__TYPEDEF_C: {
+                        #line 301 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 302 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 304 "src/analyzer/expression/Expression.pv"
+                    case TYPE__STRUCT_C: {
+                        #line 305 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 306 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 308 "src/analyzer/expression/Expression.pv"
+                    case TYPE__UNION_C: {
+                        #line 309 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 310 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 312 "src/analyzer/expression/Expression.pv"
+                    case TYPE__CLASS_CPP: {
+                        #line 313 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 314 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 316 "src/analyzer/expression/Expression.pv"
+                    case TYPE__GLOBAL: {
+                        #line 317 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 318 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 320 "src/analyzer/expression/Expression.pv"
+                    case TYPE__ENUM_C: {
+                        #line 321 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 322 "src/analyzer/expression/Expression.pv"
+                        result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = token->value }, return_type);
+                    } break;
+                    #line 324 "src/analyzer/expression/Expression.pv"
+                    case TYPE__FUNCTION_C: {
+                        #line 324 "src/analyzer/expression/Expression.pv"
+                        struct FunctionC* func_info = return_type->functionc_value;
+                        #line 325 "src/analyzer/expression/Expression.pv"
+                        Context__next_token(context);
+                        #line 326 "src/analyzer/expression/Expression.pv"
                         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                            #line 275 "src/analyzer/expression/Expression.pv"
+                            #line 326 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
 
-                        #line 277 "src/analyzer/expression/Expression.pv"
+                        #line 328 "src/analyzer/expression/Expression.pv"
                         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                        #line 279 "src/analyzer/expression/Expression.pv"
+                        #line 330 "src/analyzer/expression/Expression.pv"
                         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                            #line 280 "src/analyzer/expression/Expression.pv"
+                            #line 331 "src/analyzer/expression/Expression.pv"
                             struct Expression* argument = Expression__parse(context, generics);
-                            #line 281 "src/analyzer/expression/Expression.pv"
+                            #line 332 "src/analyzer/expression/Expression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                            #line 283 "src/analyzer/expression/Expression.pv"
+                            #line 334 "src/analyzer/expression/Expression.pv"
                             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                                #line 284 "src/analyzer/expression/Expression.pv"
+                                #line 335 "src/analyzer/expression/Expression.pv"
                                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                                #line 285 "src/analyzer/expression/Expression.pv"
+                                #line 336 "src/analyzer/expression/Expression.pv"
                                 return 0;
                             }
                         }
 
-                        #line 289 "src/analyzer/expression/Expression.pv"
+                        #line 340 "src/analyzer/expression/Expression.pv"
                         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                            #line 289 "src/analyzer/expression/Expression.pv"
+                            #line 340 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
 
-                        #line 291 "src/analyzer/expression/Expression.pv"
+                        #line 342 "src/analyzer/expression/Expression.pv"
                         struct Expression* func_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = return_type }, return_type);
 
-                        #line 293 "src/analyzer/expression/Expression.pv"
+                        #line 344 "src/analyzer/expression/Expression.pv"
                         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = func_expr, ._1 = arguments} }, &func_info->return_type);
                     } break;
-                    #line 295 "src/analyzer/expression/Expression.pv"
+                    #line 346 "src/analyzer/expression/Expression.pv"
                     default: {
-                        #line 296 "src/analyzer/expression/Expression.pv"
+                        #line 347 "src/analyzer/expression/Expression.pv"
                         Context__error(context, "Expression::parse issue");
                     } break;
                 }
             }
         } break;
-        #line 301 "src/analyzer/expression/Expression.pv"
+        #line 352 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__STRING: {
-            #line 302 "src/analyzer/expression/Expression.pv"
+            #line 353 "src/analyzer/expression/Expression.pv"
             struct Type return_type = str__starts_with(token->value, "'") ? context->type_char : (struct Type) { .type = TYPE__INDIRECT, .indirect_value = &context->pointer_const_char };
 
-            #line 304 "src/analyzer/expression/Expression.pv"
+            #line 355 "src/analyzer/expression/Expression.pv"
             result = Expression__make_next(context, (struct Expression) {
                 .token = token,
                 .data = (struct ExpressionData) { .type = EXPRESSION_DATA__LITERAL, .literal_value = token->value },
                 .return_type = return_type,
             });
         } break;
-        #line 310 "src/analyzer/expression/Expression.pv"
+        #line 361 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__NUMBER: {
-            #line 311 "src/analyzer/expression/Expression.pv"
+            #line 362 "src/analyzer/expression/Expression.pv"
             struct str primitive = Expression__number_primitive(token->value);
-            #line 312 "src/analyzer/expression/Expression.pv"
+            #line 363 "src/analyzer/expression/Expression.pv"
             result = Expression__make_next(context, (struct Expression) {
                 .token = token,
                 .data = (struct ExpressionData) { .type = EXPRESSION_DATA__LITERAL, .literal_value = token->value },
                 .return_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(context->module, primitive) },
             });
         } break;
-        #line 318 "src/analyzer/expression/Expression.pv"
+        #line 369 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__SYMBOL: {
-            #line 319 "src/analyzer/expression/Expression.pv"
+            #line 370 "src/analyzer/expression/Expression.pv"
             if (Token__eq(token, TOKEN_TYPE__SYMBOL, "-") || Token__eq(token, TOKEN_TYPE__SYMBOL, "+") || Token__eq(token, TOKEN_TYPE__SYMBOL, "!") || Token__eq(token, TOKEN_TYPE__SYMBOL, "&") || Token__eq(token, TOKEN_TYPE__SYMBOL, "*") || Token__eq(token, TOKEN_TYPE__SYMBOL, "/") || Token__eq(token, TOKEN_TYPE__SYMBOL, "%") || Token__eq(token, TOKEN_TYPE__SYMBOL, "~")) {
-                #line 320 "src/analyzer/expression/Expression.pv"
+                #line 371 "src/analyzer/expression/Expression.pv"
                 struct Token* operator = Context__expect(context, TOKEN_TYPE__SYMBOL);
-                #line 321 "src/analyzer/expression/Expression.pv"
-                if (operator == 0) {
-                    #line 321 "src/analyzer/expression/Expression.pv"
-                    return 0;
-                }
-
-                #line 323 "src/analyzer/expression/Expression.pv"
-                if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "*", .length = strlen("*") }) && Context__check_value(context, TOKEN_TYPE__KEYWORD, "const")) {
-                    #line 324 "src/analyzer/expression/Expression.pv"
-                    context->pos -= 1;
-                    #line 325 "src/analyzer/expression/Expression.pv"
-                    struct Type* new_type = Context__parse_type2(context, generics);
-                    #line 326 "src/analyzer/expression/Expression.pv"
-                    result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
-                } else {
-                    #line 328 "src/analyzer/expression/Expression.pv"
-                    struct Expression* child = Expression__parse_primary(context, generics);
-                    #line 329 "src/analyzer/expression/Expression.pv"
-                    if (child == 0) {
-                        #line 329 "src/analyzer/expression/Expression.pv"
-                        return 0;
-                    }
-
-                    #line 331 "src/analyzer/expression/Expression.pv"
-                    if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "&", .length = strlen("&") })) {
-                        #line 332 "src/analyzer/expression/Expression.pv"
-                        switch (child->data.type) {
-                            #line 333 "src/analyzer/expression/Expression.pv"
-                            case EXPRESSION_DATA__TYPE: {
-                                #line 333 "src/analyzer/expression/Expression.pv"
-                                struct Type* type = child->data.type_value;
-                                #line 334 "src/analyzer/expression/Expression.pv"
-                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type) }});
-                                #line 335 "src/analyzer/expression/Expression.pv"
-                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
-                            } break;
-                            #line 337 "src/analyzer/expression/Expression.pv"
-                            default: {
-                                #line 338 "src/analyzer/expression/Expression.pv"
-                                struct Type return_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, child->return_type) };
-                                #line 339 "src/analyzer/expression/Expression.pv"
-                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &return_type);
-                            } break;
-                        }
-                    } else if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "*", .length = strlen("*") })) {
-                        #line 343 "src/analyzer/expression/Expression.pv"
-                        switch (child->data.type) {
-                            #line 344 "src/analyzer/expression/Expression.pv"
-                            case EXPRESSION_DATA__TYPE: {
-                                #line 344 "src/analyzer/expression/Expression.pv"
-                                struct Type* type = child->data.type_value;
-                                #line 345 "src/analyzer/expression/Expression.pv"
-                                struct Indirect* new_indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type);
-                                #line 346 "src/analyzer/expression/Expression.pv"
-                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = new_indirect }});
-                                #line 347 "src/analyzer/expression/Expression.pv"
-                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
-                            } break;
-                            #line 349 "src/analyzer/expression/Expression.pv"
-                            default: {
-                                #line 350 "src/analyzer/expression/Expression.pv"
-                                struct Type* deref_target = Type__resolve_typedef(&child->return_type);
-                                #line 351 "src/analyzer/expression/Expression.pv"
-                                if (!Type__is_indirect(deref_target) && !Type__is_unknown(deref_target)) {
-                                    #line 352 "src/analyzer/expression/Expression.pv"
-                                    Context__error_token(context, token, "Cannot dereference a non-reference or non-pointer type");
-                                    #line 353 "src/analyzer/expression/Expression.pv"
-                                    return 0;
-                                }
-                                #line 355 "src/analyzer/expression/Expression.pv"
-                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, Type__deref(&child->return_type));
-                            } break;
-                        }
-                    } else {
-                        #line 359 "src/analyzer/expression/Expression.pv"
-                        if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "-", .length = strlen("-") })) {
-                            #line 360 "src/analyzer/expression/Expression.pv"
-                            struct Expression* trait_result = Expression__find_unary_trait_call(context, operator, child);
-                            #line 361 "src/analyzer/expression/Expression.pv"
-                            if (trait_result != 0) {
-                                #line 362 "src/analyzer/expression/Expression.pv"
-                                result = trait_result;
-                            } else {
-                                #line 364 "src/analyzer/expression/Expression.pv"
-                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &child->return_type);
-                            }
-                        } else {
-                            #line 367 "src/analyzer/expression/Expression.pv"
-                            result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &child->return_type);
-                        }
-                    }
-                }
-            } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "(")) {
                 #line 372 "src/analyzer/expression/Expression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
+                if (operator == 0) {
                     #line 372 "src/analyzer/expression/Expression.pv"
                     return 0;
                 }
 
                 #line 374 "src/analyzer/expression/Expression.pv"
-                struct Expression* expr = Expression__parse(context, generics);
-                #line 375 "src/analyzer/expression/Expression.pv"
-                if (expr == 0) {
+                if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "*", .length = strlen("*") }) && Context__check_value(context, TOKEN_TYPE__KEYWORD, "const")) {
                     #line 375 "src/analyzer/expression/Expression.pv"
+                    context->pos -= 1;
+                    #line 376 "src/analyzer/expression/Expression.pv"
+                    struct Type* new_type = Context__parse_type2(context, generics);
+                    #line 377 "src/analyzer/expression/Expression.pv"
+                    result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
+                } else {
+                    #line 379 "src/analyzer/expression/Expression.pv"
+                    struct Expression* child = Expression__parse_primary(context, generics);
+                    #line 380 "src/analyzer/expression/Expression.pv"
+                    if (child == 0) {
+                        #line 380 "src/analyzer/expression/Expression.pv"
+                        return 0;
+                    }
+
+                    #line 382 "src/analyzer/expression/Expression.pv"
+                    if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "&", .length = strlen("&") })) {
+                        #line 383 "src/analyzer/expression/Expression.pv"
+                        switch (child->data.type) {
+                            #line 384 "src/analyzer/expression/Expression.pv"
+                            case EXPRESSION_DATA__TYPE: {
+                                #line 384 "src/analyzer/expression/Expression.pv"
+                                struct Type* type = child->data.type_value;
+                                #line 385 "src/analyzer/expression/Expression.pv"
+                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type) }});
+                                #line 386 "src/analyzer/expression/Expression.pv"
+                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
+                            } break;
+                            #line 388 "src/analyzer/expression/Expression.pv"
+                            default: {
+                                #line 389 "src/analyzer/expression/Expression.pv"
+                                struct Type return_type = (struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, child->return_type) };
+                                #line 390 "src/analyzer/expression/Expression.pv"
+                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &return_type);
+                            } break;
+                        }
+                    } else if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "*", .length = strlen("*") })) {
+                        #line 394 "src/analyzer/expression/Expression.pv"
+                        switch (child->data.type) {
+                            #line 395 "src/analyzer/expression/Expression.pv"
+                            case EXPRESSION_DATA__TYPE: {
+                                #line 395 "src/analyzer/expression/Expression.pv"
+                                struct Type* type = child->data.type_value;
+                                #line 396 "src/analyzer/expression/Expression.pv"
+                                struct Indirect* new_indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, *type);
+                                #line 397 "src/analyzer/expression/Expression.pv"
+                                struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = new_indirect }});
+                                #line 398 "src/analyzer/expression/Expression.pv"
+                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type }, new_type);
+                            } break;
+                            #line 400 "src/analyzer/expression/Expression.pv"
+                            default: {
+                                #line 401 "src/analyzer/expression/Expression.pv"
+                                struct Type* deref_target = Type__resolve_typedef(&child->return_type);
+                                #line 402 "src/analyzer/expression/Expression.pv"
+                                if (!Type__is_indirect(deref_target) && !Type__is_unknown(deref_target)) {
+                                    #line 403 "src/analyzer/expression/Expression.pv"
+                                    Context__error_token(context, token, "Cannot dereference a non-reference or non-pointer type");
+                                    #line 404 "src/analyzer/expression/Expression.pv"
+                                    return 0;
+                                }
+                                #line 406 "src/analyzer/expression/Expression.pv"
+                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, Type__deref(&child->return_type));
+                            } break;
+                        }
+                    } else {
+                        #line 410 "src/analyzer/expression/Expression.pv"
+                        if (str__Eq_str__eq(&operator->value, (struct str){ .ptr = "-", .length = strlen("-") })) {
+                            #line 411 "src/analyzer/expression/Expression.pv"
+                            struct Expression* trait_result = Expression__find_unary_trait_call(context, operator, child);
+                            #line 412 "src/analyzer/expression/Expression.pv"
+                            if (trait_result != 0) {
+                                #line 413 "src/analyzer/expression/Expression.pv"
+                                result = trait_result;
+                            } else {
+                                #line 415 "src/analyzer/expression/Expression.pv"
+                                result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &child->return_type);
+                            }
+                        } else {
+                            #line 418 "src/analyzer/expression/Expression.pv"
+                            result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__UNARY_EXPRESSION, .unaryexpression_value = { ._0 = operator->value, ._1 = child} }, &child->return_type);
+                        }
+                    }
+                }
+            } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "(")) {
+                #line 423 "src/analyzer/expression/Expression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
+                    #line 423 "src/analyzer/expression/Expression.pv"
                     return 0;
                 }
 
-                #line 377 "src/analyzer/expression/Expression.pv"
+                #line 425 "src/analyzer/expression/Expression.pv"
+                struct Expression* expr = Expression__parse(context, generics);
+                #line 426 "src/analyzer/expression/Expression.pv"
+                if (expr == 0) {
+                    #line 426 "src/analyzer/expression/Expression.pv"
+                    return 0;
+                }
+
+                #line 428 "src/analyzer/expression/Expression.pv"
                 if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
-                    #line 378 "src/analyzer/expression/Expression.pv"
+                    #line 429 "src/analyzer/expression/Expression.pv"
                     struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                    #line 380 "src/analyzer/expression/Expression.pv"
+                    #line 431 "src/analyzer/expression/Expression.pv"
                     struct Token* name = ArenaAllocator__store_Token(context->allocator, expr->token);
-                    #line 381 "src/analyzer/expression/Expression.pv"
+                    #line 432 "src/analyzer/expression/Expression.pv"
                     if (name == 0) {
-                        #line 382 "src/analyzer/expression/Expression.pv"
+                        #line 433 "src/analyzer/expression/Expression.pv"
                         Context__error(context, "Failed to allocate token for tuple argument name");
-                        #line 383 "src/analyzer/expression/Expression.pv"
+                        #line 434 "src/analyzer/expression/Expression.pv"
                         return 0;
                     }
 
-                    #line 386 "src/analyzer/expression/Expression.pv"
+                    #line 437 "src/analyzer/expression/Expression.pv"
                     name->value = (struct str){ .ptr = "_0", .length = strlen("_0") };
 
-                    #line 388 "src/analyzer/expression/Expression.pv"
+                    #line 439 "src/analyzer/expression/Expression.pv"
                     Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = name, .value = expr });
 
-                    #line 390 "src/analyzer/expression/Expression.pv"
+                    #line 441 "src/analyzer/expression/Expression.pv"
                     while (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 391 "src/analyzer/expression/Expression.pv"
+                        #line 442 "src/analyzer/expression/Expression.pv"
                         struct String name_string = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                        #line 392 "src/analyzer/expression/Expression.pv"
+                        #line 443 "src/analyzer/expression/Expression.pv"
                         String__append(&name_string, (struct str){ .ptr = "_", .length = strlen("_") });
-                        #line 393 "src/analyzer/expression/Expression.pv"
+                        #line 444 "src/analyzer/expression/Expression.pv"
                         String__append_usize(&name_string, arguments.length);
 
-                        #line 395 "src/analyzer/expression/Expression.pv"
+                        #line 446 "src/analyzer/expression/Expression.pv"
                         struct Token* name = ArenaAllocator__store_Token(context->allocator, Context__current(context));
-                        #line 396 "src/analyzer/expression/Expression.pv"
+                        #line 447 "src/analyzer/expression/Expression.pv"
                         if (name == 0) {
-                            #line 397 "src/analyzer/expression/Expression.pv"
+                            #line 448 "src/analyzer/expression/Expression.pv"
                             Context__error(context, "Failed to allocate token for tuple argument name");
-                            #line 398 "src/analyzer/expression/Expression.pv"
+                            #line 449 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
-                        #line 400 "src/analyzer/expression/Expression.pv"
+                        #line 451 "src/analyzer/expression/Expression.pv"
                         name->value = String__as_str(&name_string);
 
-                        #line 402 "src/analyzer/expression/Expression.pv"
+                        #line 453 "src/analyzer/expression/Expression.pv"
                         struct Expression* value = Expression__parse(context, generics);
-                        #line 403 "src/analyzer/expression/Expression.pv"
+                        #line 454 "src/analyzer/expression/Expression.pv"
                         if (value == 0) {
-                            #line 403 "src/analyzer/expression/Expression.pv"
+                            #line 454 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
 
-                        #line 405 "src/analyzer/expression/Expression.pv"
+                        #line 456 "src/analyzer/expression/Expression.pv"
                         Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = name, .value = value });
 
-                        #line 407 "src/analyzer/expression/Expression.pv"
+                        #line 458 "src/analyzer/expression/Expression.pv"
                         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                            #line 408 "src/analyzer/expression/Expression.pv"
+                            #line 459 "src/analyzer/expression/Expression.pv"
                             Context__error(context, "Expected , or )");
-                            #line 409 "src/analyzer/expression/Expression.pv"
+                            #line 460 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
                     }
 
-                    #line 413 "src/analyzer/expression/Expression.pv"
+                    #line 464 "src/analyzer/expression/Expression.pv"
                     struct Tuple* tuple = ArenaAllocator__store_Tuple(context->allocator, (struct Tuple[]){(struct Tuple) { .elements = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }) }});
-                    #line 414 "src/analyzer/expression/Expression.pv"
+                    #line 465 "src/analyzer/expression/Expression.pv"
                     if (tuple == 0) {
-                        #line 415 "src/analyzer/expression/Expression.pv"
+                        #line 466 "src/analyzer/expression/Expression.pv"
                         Context__error(context, "Failed to allocate tuple type");
-                        #line 416 "src/analyzer/expression/Expression.pv"
+                        #line 467 "src/analyzer/expression/Expression.pv"
                         return 0;
                     }
-                    #line 418 "src/analyzer/expression/Expression.pv"
+                    #line 469 "src/analyzer/expression/Expression.pv"
                     tuple->elements = Array_Type__new_with_length((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, arguments.length);
-                    #line 419 "src/analyzer/expression/Expression.pv"
+                    #line 470 "src/analyzer/expression/Expression.pv"
                     { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(&arguments));
-                    #line 419 "src/analyzer/expression/Expression.pv"
+                    #line 470 "src/analyzer/expression/Expression.pv"
                     while (IterEnumerate_ref_InvokeArgument__next(&__iter)) {
-                        #line 419 "src/analyzer/expression/Expression.pv"
+                        #line 470 "src/analyzer/expression/Expression.pv"
                         uintptr_t i = IterEnumerate_ref_InvokeArgument__value(&__iter)._0;
-                        #line 419 "src/analyzer/expression/Expression.pv"
+                        #line 470 "src/analyzer/expression/Expression.pv"
                         struct InvokeArgument expr = *IterEnumerate_ref_InvokeArgument__value(&__iter)._1;
 
-                        #line 420 "src/analyzer/expression/Expression.pv"
+                        #line 471 "src/analyzer/expression/Expression.pv"
                         tuple->elements.data[i] = expr.value->return_type;
                     } }
 
-                    #line 423 "src/analyzer/expression/Expression.pv"
+                    #line 474 "src/analyzer/expression/Expression.pv"
                     result = Expression__make_type_function_call(context, token, ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__TUPLE, .tuple_value = tuple }}), arguments, 0);
                 } else {
-                    #line 425 "src/analyzer/expression/Expression.pv"
+                    #line 476 "src/analyzer/expression/Expression.pv"
                     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 425 "src/analyzer/expression/Expression.pv"
+                        #line 476 "src/analyzer/expression/Expression.pv"
                         return 0;
                     }
 
-                    #line 427 "src/analyzer/expression/Expression.pv"
+                    #line 478 "src/analyzer/expression/Expression.pv"
                     result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__PARENTHESIZED_EXPRESSION, .parenthesizedexpression_value = expr }, &expr->return_type);
                 }
             } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "[")) {
-                #line 430 "src/analyzer/expression/Expression.pv"
+                #line 481 "src/analyzer/expression/Expression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "[")) {
-                    #line 430 "src/analyzer/expression/Expression.pv"
+                    #line 481 "src/analyzer/expression/Expression.pv"
                     return 0;
                 }
 
-                #line 432 "src/analyzer/expression/Expression.pv"
+                #line 483 "src/analyzer/expression/Expression.pv"
                 struct Type* element_type = 0;
-                #line 433 "src/analyzer/expression/Expression.pv"
+                #line 484 "src/analyzer/expression/Expression.pv"
                 struct Array_InvokeArgument elements = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                #line 435 "src/analyzer/expression/Expression.pv"
+                #line 486 "src/analyzer/expression/Expression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "]")) {
-                    #line 436 "src/analyzer/expression/Expression.pv"
+                    #line 487 "src/analyzer/expression/Expression.pv"
                     struct Expression* element = Expression__parse(context, generics);
-                    #line 437 "src/analyzer/expression/Expression.pv"
+                    #line 488 "src/analyzer/expression/Expression.pv"
                     if (element == 0) {
-                        #line 437 "src/analyzer/expression/Expression.pv"
+                        #line 488 "src/analyzer/expression/Expression.pv"
                         return 0;
                     }
 
-                    #line 439 "src/analyzer/expression/Expression.pv"
+                    #line 490 "src/analyzer/expression/Expression.pv"
                     Array_InvokeArgument__append(&elements, (struct InvokeArgument) { .name = 0, .value = element });
 
-                    #line 441 "src/analyzer/expression/Expression.pv"
+                    #line 492 "src/analyzer/expression/Expression.pv"
                     if (element_type == 0) {
-                        #line 442 "src/analyzer/expression/Expression.pv"
+                        #line 493 "src/analyzer/expression/Expression.pv"
                         element_type = &element->return_type;
                     }
 
-                    #line 445 "src/analyzer/expression/Expression.pv"
+                    #line 496 "src/analyzer/expression/Expression.pv"
                     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ";")) {
-                        #line 446 "src/analyzer/expression/Expression.pv"
+                        #line 497 "src/analyzer/expression/Expression.pv"
                         struct Token* count_token = Context__expect(context, TOKEN_TYPE__NUMBER);
-                        #line 447 "src/analyzer/expression/Expression.pv"
+                        #line 498 "src/analyzer/expression/Expression.pv"
                         if (count_token == 0) {
-                            #line 447 "src/analyzer/expression/Expression.pv"
+                            #line 498 "src/analyzer/expression/Expression.pv"
                             return 0;
                         }
-                        #line 448 "src/analyzer/expression/Expression.pv"
+                        #line 499 "src/analyzer/expression/Expression.pv"
                         uintptr_t count = strtoul(count_token->value.ptr, 0, 10);
-                        #line 449 "src/analyzer/expression/Expression.pv"
+                        #line 500 "src/analyzer/expression/Expression.pv"
                         uintptr_t i = 1;
-                        #line 450 "src/analyzer/expression/Expression.pv"
+                        #line 501 "src/analyzer/expression/Expression.pv"
                         while (i < count) {
-                            #line 451 "src/analyzer/expression/Expression.pv"
+                            #line 502 "src/analyzer/expression/Expression.pv"
                             Array_InvokeArgument__append(&elements, (struct InvokeArgument) { .name = 0, .value = element });
-                            #line 452 "src/analyzer/expression/Expression.pv"
+                            #line 503 "src/analyzer/expression/Expression.pv"
                             i += 1;
                         }
-                        #line 454 "src/analyzer/expression/Expression.pv"
+                        #line 505 "src/analyzer/expression/Expression.pv"
                         break;
                     }
 
-                    #line 457 "src/analyzer/expression/Expression.pv"
+                    #line 508 "src/analyzer/expression/Expression.pv"
                     if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "]")) {
-                        #line 458 "src/analyzer/expression/Expression.pv"
+                        #line 509 "src/analyzer/expression/Expression.pv"
                         Context__expect_value(context, TOKEN_TYPE__SYMBOL, "]");
-                        #line 459 "src/analyzer/expression/Expression.pv"
+                        #line 510 "src/analyzer/expression/Expression.pv"
                         return 0;
                     }
                 }
 
-                #line 463 "src/analyzer/expression/Expression.pv"
+                #line 514 "src/analyzer/expression/Expression.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, "]");
 
-                #line 465 "src/analyzer/expression/Expression.pv"
+                #line 516 "src/analyzer/expression/Expression.pv"
                 if (element_type == 0) {
-                    #line 465 "src/analyzer/expression/Expression.pv"
+                    #line 516 "src/analyzer/expression/Expression.pv"
                     element_type = &context->root->type_void;
                 }
-                #line 466 "src/analyzer/expression/Expression.pv"
+                #line 517 "src/analyzer/expression/Expression.pv"
                 struct String length_str = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-                #line 467 "src/analyzer/expression/Expression.pv"
+                #line 518 "src/analyzer/expression/Expression.pv"
                 String__append_usize(&length_str, elements.length);
-                #line 468 "src/analyzer/expression/Expression.pv"
+                #line 519 "src/analyzer/expression/Expression.pv"
                 struct Token length_token_val = (struct Token) { .type = TOKEN_TYPE__NUMBER, .value = String__as_str(&length_str), .start_line = token->start_line, .start_column = token->start_column, .end_line = token->end_line, .end_column = token->end_column };
-                #line 469 "src/analyzer/expression/Expression.pv"
+                #line 520 "src/analyzer/expression/Expression.pv"
                 struct Token* length_token = ArenaAllocator__store_Token(context->allocator, &length_token_val);
-                #line 470 "src/analyzer/expression/Expression.pv"
+                #line 521 "src/analyzer/expression/Expression.pv"
                 struct Type length_primitive = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(context->module, (struct str){ .ptr = "usize", .length = strlen("usize") }) };
-                #line 471 "src/analyzer/expression/Expression.pv"
+                #line 522 "src/analyzer/expression/Expression.pv"
                 struct Expression* length_expression = Expression__make(context->allocator, length_token, (struct ExpressionData) { .type = EXPRESSION_DATA__LITERAL, .literal_value = String__as_str(&length_str) }, &length_primitive);
-                #line 472 "src/analyzer/expression/Expression.pv"
+                #line 523 "src/analyzer/expression/Expression.pv"
                 struct Sequence* parent_sequence = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) { .type = (struct SequenceType) { .type = SEQUENCE_TYPE__FIXED_ARRAY, .fixedarray_value = length_expression }, .element = *element_type, .element_pointer = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = 0 } }});
-                #line 473 "src/analyzer/expression/Expression.pv"
+                #line 524 "src/analyzer/expression/Expression.pv"
                 struct Type* parent_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = parent_sequence }});
-                #line 474 "src/analyzer/expression/Expression.pv"
+                #line 525 "src/analyzer/expression/Expression.pv"
                 struct Expression* parent_expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = parent_type }, parent_type);
 
-                #line 476 "src/analyzer/expression/Expression.pv"
+                #line 527 "src/analyzer/expression/Expression.pv"
                 result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = parent_expression, ._1 = elements} }, parent_type);
             } else {
-                #line 478 "src/analyzer/expression/Expression.pv"
+                #line 529 "src/analyzer/expression/Expression.pv"
                 Context__error(context, "Unhandled symbol");
             }
         } break;
-        #line 481 "src/analyzer/expression/Expression.pv"
+        #line 532 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__KEYWORD: {
-            #line 482 "src/analyzer/expression/Expression.pv"
+            #line 533 "src/analyzer/expression/Expression.pv"
             if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "true", .length = strlen("true") }) || str__Eq_str__eq(&token->value, (struct str){ .ptr = "false", .length = strlen("false") })) {
-                #line 483 "src/analyzer/expression/Expression.pv"
+                #line 534 "src/analyzer/expression/Expression.pv"
                 result = Expression__make_next(context, (struct Expression) {
                     .token = token,
                     .data = (struct ExpressionData) { .type = EXPRESSION_DATA__LITERAL, .literal_value = token->value },
                     .return_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(context->module, (struct str){ .ptr = "bool", .length = strlen("bool") }) },
                 });
             } else if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "null", .length = strlen("null") })) {
-                #line 489 "src/analyzer/expression/Expression.pv"
+                #line 540 "src/analyzer/expression/Expression.pv"
                 result = Expression__make_next(context, (struct Expression) {
                     .token = token,
                     .data = (struct ExpressionData) { .type = EXPRESSION_DATA__NULL_LITERAL },
                     .return_type = (struct Type) { .type = TYPE__PRIMITIVE, .primitive_value = Module__find_primitive(context->module, (struct str){ .ptr = "i32", .length = strlen("i32") }) },
                 });
             } else if (str__Eq_str__eq(&token->value, (struct str){ .ptr = "if", .length = strlen("if") })) {
-                #line 495 "src/analyzer/expression/Expression.pv"
+                #line 546 "src/analyzer/expression/Expression.pv"
                 result = Expression__parse_if_expression(context, generics);
             } else {
-                #line 497 "src/analyzer/expression/Expression.pv"
+                #line 548 "src/analyzer/expression/Expression.pv"
                 Context__error(context, "Only true + false keywords are valid in expressions");
             }
         } break;
-        #line 500 "src/analyzer/expression/Expression.pv"
+        #line 551 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__COMMENT: {
-            #line 501 "src/analyzer/expression/Expression.pv"
+            #line 552 "src/analyzer/expression/Expression.pv"
             Context__error(context, "Comment should be skipped");
         } break;
     }
 
-    #line 505 "src/analyzer/expression/Expression.pv"
+    #line 556 "src/analyzer/expression/Expression.pv"
     if (result == 0) {
-        #line 505 "src/analyzer/expression/Expression.pv"
+        #line 556 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 507 "src/analyzer/expression/Expression.pv"
+    #line 558 "src/analyzer/expression/Expression.pv"
     return Expression__parse_postfix_chain(context, result, generics);
 }
 
-#line 510 "src/analyzer/expression/Expression.pv"
+#line 561 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics) {
-    #line 511 "src/analyzer/expression/Expression.pv"
+    #line 562 "src/analyzer/expression/Expression.pv"
     struct Expression* result = Expression__parse_primary(context, generics);
-    #line 512 "src/analyzer/expression/Expression.pv"
+    #line 563 "src/analyzer/expression/Expression.pv"
     if (result == 0) {
-        #line 512 "src/analyzer/expression/Expression.pv"
+        #line 563 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 514 "src/analyzer/expression/Expression.pv"
+    #line 565 "src/analyzer/expression/Expression.pv"
     result = Expression__parse_binary(context, result, 1, generics);
-    #line 515 "src/analyzer/expression/Expression.pv"
+    #line 566 "src/analyzer/expression/Expression.pv"
     if (result == 0) {
-        #line 515 "src/analyzer/expression/Expression.pv"
+        #line 566 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 517 "src/analyzer/expression/Expression.pv"
+    #line 568 "src/analyzer/expression/Expression.pv"
     if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "..")) {
-        #line 518 "src/analyzer/expression/Expression.pv"
+        #line 569 "src/analyzer/expression/Expression.pv"
         struct Token* token = Context__expect(context, TOKEN_TYPE__SYMBOL);
 
-        #line 520 "src/analyzer/expression/Expression.pv"
+        #line 571 "src/analyzer/expression/Expression.pv"
         struct Expression* range_start = result;
-        #line 521 "src/analyzer/expression/Expression.pv"
+        #line 572 "src/analyzer/expression/Expression.pv"
         struct Expression* range_end = Expression__parse(context, generics);
-        #line 522 "src/analyzer/expression/Expression.pv"
+        #line 573 "src/analyzer/expression/Expression.pv"
         if (range_end == 0) {
-            #line 522 "src/analyzer/expression/Expression.pv"
+            #line 573 "src/analyzer/expression/Expression.pv"
             return 0;
         }
 
-        #line 524 "src/analyzer/expression/Expression.pv"
+        #line 575 "src/analyzer/expression/Expression.pv"
         struct Type* enum_type = Module__find_make_type(context->module, (struct str){ .ptr = "Range", .length = strlen("Range") }, (struct Array_Type[]){(struct Array_Type) { .data = &range_end->return_type, .length = 1, .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .capacity = 0 }});
-        #line 525 "src/analyzer/expression/Expression.pv"
+        #line 576 "src/analyzer/expression/Expression.pv"
         if (enum_type == 0) {
-            #line 526 "src/analyzer/expression/Expression.pv"
+            #line 577 "src/analyzer/expression/Expression.pv"
             Context__error_token(context, token, "Could not find Range type, include std library");
-            #line 527 "src/analyzer/expression/Expression.pv"
+            #line 578 "src/analyzer/expression/Expression.pv"
             return 0;
         }
 
-        #line 530 "src/analyzer/expression/Expression.pv"
+        #line 581 "src/analyzer/expression/Expression.pv"
         struct Token variant_name = *token;
-        #line 531 "src/analyzer/expression/Expression.pv"
+        #line 582 "src/analyzer/expression/Expression.pv"
         variant_name.type = TOKEN_TYPE__IDENTIFIER;
-        #line 532 "src/analyzer/expression/Expression.pv"
+        #line 583 "src/analyzer/expression/Expression.pv"
         variant_name.value = (struct str){ .ptr = "StartEnd", .length = strlen("StartEnd") };
 
-        #line 534 "src/analyzer/expression/Expression.pv"
+        #line 585 "src/analyzer/expression/Expression.pv"
         struct EnumVariantResult variant_result = Expression__get_enum_variant(context, enum_type, &variant_name);
-        #line 535 "src/analyzer/expression/Expression.pv"
+        #line 586 "src/analyzer/expression/Expression.pv"
         struct EnumVariant* variant = 0;
-        #line 536 "src/analyzer/expression/Expression.pv"
+        #line 587 "src/analyzer/expression/Expression.pv"
         switch (variant_result.type) {
-            #line 537 "src/analyzer/expression/Expression.pv"
+            #line 588 "src/analyzer/expression/Expression.pv"
             case ENUM_VARIANT_RESULT__ENUM_VARIANT: {
-                #line 537 "src/analyzer/expression/Expression.pv"
+                #line 588 "src/analyzer/expression/Expression.pv"
                 struct EnumVariant* enum_variant = variant_result.enumvariant_value;
-                #line 537 "src/analyzer/expression/Expression.pv"
+                #line 588 "src/analyzer/expression/Expression.pv"
                 variant = enum_variant;
             } break;
-            #line 538 "src/analyzer/expression/Expression.pv"
+            #line 589 "src/analyzer/expression/Expression.pv"
             default: {
             } break;
         }
-        #line 540 "src/analyzer/expression/Expression.pv"
+        #line 591 "src/analyzer/expression/Expression.pv"
         if (variant == 0) {
-            #line 541 "src/analyzer/expression/Expression.pv"
+            #line 592 "src/analyzer/expression/Expression.pv"
             Context__error_token(context, token, "Could not find Range StartEnd enum variant");
-            #line 542 "src/analyzer/expression/Expression.pv"
+            #line 593 "src/analyzer/expression/Expression.pv"
             return 0;
         }
 
-        #line 545 "src/analyzer/expression/Expression.pv"
+        #line 596 "src/analyzer/expression/Expression.pv"
         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 546 "src/analyzer/expression/Expression.pv"
+        #line 597 "src/analyzer/expression/Expression.pv"
         Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = range_start });
-        #line 547 "src/analyzer/expression/Expression.pv"
+        #line 598 "src/analyzer/expression/Expression.pv"
         Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = range_end });
 
-        #line 549 "src/analyzer/expression/Expression.pv"
+        #line 600 "src/analyzer/expression/Expression.pv"
         struct Expression* enum_variant = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__ENUM_VARIANT, .enumvariant_value = variant }, enum_type);
 
-        #line 551 "src/analyzer/expression/Expression.pv"
+        #line 602 "src/analyzer/expression/Expression.pv"
         result = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = enum_variant, ._1 = arguments} }, enum_type);
     }
 
-    #line 554 "src/analyzer/expression/Expression.pv"
+    #line 605 "src/analyzer/expression/Expression.pv"
     return result;
 }
 
-#line 557 "src/analyzer/expression/Expression.pv"
+#line 608 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self) {
-    #line 558 "src/analyzer/expression/Expression.pv"
+    #line 609 "src/analyzer/expression/Expression.pv"
     switch (self->data.type) {
-        #line 559 "src/analyzer/expression/Expression.pv"
+        #line 610 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__LITERAL: {
-            #line 559 "src/analyzer/expression/Expression.pv"
+            #line 610 "src/analyzer/expression/Expression.pv"
             struct str value = self->data.literal_value;
-            #line 559 "src/analyzer/expression/Expression.pv"
+            #line 610 "src/analyzer/expression/Expression.pv"
             return str__Eq_str__eq(&value, (struct str){ .ptr = "0", .length = strlen("0") });
         } break;
-        #line 560 "src/analyzer/expression/Expression.pv"
+        #line 611 "src/analyzer/expression/Expression.pv"
         default: {
-            #line 560 "src/analyzer/expression/Expression.pv"
+            #line 611 "src/analyzer/expression/Expression.pv"
             return false;
         } break;
     }
 }
 
-#line 564 "src/analyzer/expression/Expression.pv"
+#line 615 "src/analyzer/expression/Expression.pv"
 bool Expression__is_const_expression(struct Expression* self, struct Context* context) {
-    #line 565 "src/analyzer/expression/Expression.pv"
+    #line 616 "src/analyzer/expression/Expression.pv"
     switch (self->data.type) {
-        #line 566 "src/analyzer/expression/Expression.pv"
+        #line 617 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__LITERAL: {
-            #line 566 "src/analyzer/expression/Expression.pv"
+            #line 617 "src/analyzer/expression/Expression.pv"
             return true;
         } break;
-        #line 567 "src/analyzer/expression/Expression.pv"
+        #line 618 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 567 "src/analyzer/expression/Expression.pv"
+            #line 618 "src/analyzer/expression/Expression.pv"
             struct Expression* inner = self->data.parenthesizedexpression_value;
-            #line 568 "src/analyzer/expression/Expression.pv"
+            #line 619 "src/analyzer/expression/Expression.pv"
             return Expression__is_const_expression(inner, context);
         } break;
-        #line 570 "src/analyzer/expression/Expression.pv"
+        #line 621 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__UNARY_EXPRESSION: {
-            #line 570 "src/analyzer/expression/Expression.pv"
+            #line 621 "src/analyzer/expression/Expression.pv"
             struct str op = self->data.unaryexpression_value._0;
-            #line 570 "src/analyzer/expression/Expression.pv"
+            #line 621 "src/analyzer/expression/Expression.pv"
             struct Expression* inner = self->data.unaryexpression_value._1;
-            #line 571 "src/analyzer/expression/Expression.pv"
+            #line 622 "src/analyzer/expression/Expression.pv"
             if (!str__Eq_str__eq(&op, (struct str){ .ptr = "-", .length = strlen("-") }) && !str__Eq_str__eq(&op, (struct str){ .ptr = "+", .length = strlen("+") })) {
-                #line 571 "src/analyzer/expression/Expression.pv"
+                #line 622 "src/analyzer/expression/Expression.pv"
                 return false;
             }
-            #line 572 "src/analyzer/expression/Expression.pv"
+            #line 623 "src/analyzer/expression/Expression.pv"
             return Expression__is_const_expression(inner, context);
         } break;
-        #line 574 "src/analyzer/expression/Expression.pv"
+        #line 625 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 574 "src/analyzer/expression/Expression.pv"
+            #line 625 "src/analyzer/expression/Expression.pv"
             struct Expression* lhs = self->data.binaryexpression_value._0;
-            #line 574 "src/analyzer/expression/Expression.pv"
+            #line 625 "src/analyzer/expression/Expression.pv"
             struct str op = self->data.binaryexpression_value._1;
-            #line 574 "src/analyzer/expression/Expression.pv"
+            #line 625 "src/analyzer/expression/Expression.pv"
             struct Expression* rhs = self->data.binaryexpression_value._2;
-            #line 575 "src/analyzer/expression/Expression.pv"
+            #line 626 "src/analyzer/expression/Expression.pv"
             if (!str__Eq_str__eq(&op, (struct str){ .ptr = "+", .length = strlen("+") }) && !str__Eq_str__eq(&op, (struct str){ .ptr = "-", .length = strlen("-") }) && !str__Eq_str__eq(&op, (struct str){ .ptr = "*", .length = strlen("*") }) && !str__Eq_str__eq(&op, (struct str){ .ptr = "/", .length = strlen("/") }) && !str__Eq_str__eq(&op, (struct str){ .ptr = "%", .length = strlen("%") })) {
-                #line 575 "src/analyzer/expression/Expression.pv"
+                #line 626 "src/analyzer/expression/Expression.pv"
                 return false;
             }
-            #line 576 "src/analyzer/expression/Expression.pv"
+            #line 627 "src/analyzer/expression/Expression.pv"
             return Expression__is_const_expression(lhs, context) && Expression__is_const_expression(rhs, context);
         } break;
-        #line 578 "src/analyzer/expression/Expression.pv"
+        #line 629 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__ENUM_VARIANT: {
-            #line 578 "src/analyzer/expression/Expression.pv"
+            #line 629 "src/analyzer/expression/Expression.pv"
             return true;
         } break;
-        #line 579 "src/analyzer/expression/Expression.pv"
+        #line 630 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 579 "src/analyzer/expression/Expression.pv"
+            #line 630 "src/analyzer/expression/Expression.pv"
             struct Expression* target = self->data.invoke_value._0;
-            #line 579 "src/analyzer/expression/Expression.pv"
+            #line 630 "src/analyzer/expression/Expression.pv"
             struct Array_InvokeArgument arguments = self->data.invoke_value._1;
-            #line 580 "src/analyzer/expression/Expression.pv"
+            #line 631 "src/analyzer/expression/Expression.pv"
             if (arguments.length != 0) {
-                #line 580 "src/analyzer/expression/Expression.pv"
+                #line 631 "src/analyzer/expression/Expression.pv"
                 return false;
             }
-            #line 581 "src/analyzer/expression/Expression.pv"
+            #line 632 "src/analyzer/expression/Expression.pv"
             return Expression__is_const_expression(target, context);
         } break;
-        #line 583 "src/analyzer/expression/Expression.pv"
+        #line 634 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION: {
-            #line 584 "src/analyzer/expression/Expression.pv"
+            #line 635 "src/analyzer/expression/Expression.pv"
             switch (self->return_type.type) {
-                #line 585 "src/analyzer/expression/Expression.pv"
+                #line 636 "src/analyzer/expression/Expression.pv"
                 case TYPE__ENUM_C: {
-                    #line 585 "src/analyzer/expression/Expression.pv"
+                    #line 636 "src/analyzer/expression/Expression.pv"
                     return true;
                 } break;
-                #line 586 "src/analyzer/expression/Expression.pv"
+                #line 637 "src/analyzer/expression/Expression.pv"
                 default: {
-                    #line 586 "src/analyzer/expression/Expression.pv"
+                    #line 637 "src/analyzer/expression/Expression.pv"
                     return false;
                 } break;
             }
         } break;
-        #line 589 "src/analyzer/expression/Expression.pv"
+        #line 640 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__VARIABLE: {
-            #line 589 "src/analyzer/expression/Expression.pv"
+            #line 640 "src/analyzer/expression/Expression.pv"
             struct str name = self->data.variable_value;
-            #line 590 "src/analyzer/expression/Expression.pv"
+            #line 641 "src/analyzer/expression/Expression.pv"
             switch (self->return_type.type) {
-                #line 591 "src/analyzer/expression/Expression.pv"
+                #line 642 "src/analyzer/expression/Expression.pv"
                 case TYPE__ENUM_C: {
-                    #line 591 "src/analyzer/expression/Expression.pv"
+                    #line 642 "src/analyzer/expression/Expression.pv"
                     return true;
                 } break;
-                #line 592 "src/analyzer/expression/Expression.pv"
+                #line 643 "src/analyzer/expression/Expression.pv"
                 case TYPE__UNKNOWN_C: {
-                    #line 593 "src/analyzer/expression/Expression.pv"
+                    #line 644 "src/analyzer/expression/Expression.pv"
                     return Module__find_macro_value(context->module, name) != 0;
                 } break;
-                #line 595 "src/analyzer/expression/Expression.pv"
+                #line 646 "src/analyzer/expression/Expression.pv"
                 default: {
-                    #line 595 "src/analyzer/expression/Expression.pv"
+                    #line 646 "src/analyzer/expression/Expression.pv"
                     return false;
                 } break;
             }
         } break;
-        #line 598 "src/analyzer/expression/Expression.pv"
+        #line 649 "src/analyzer/expression/Expression.pv"
         default: {
-            #line 598 "src/analyzer/expression/Expression.pv"
+            #line 649 "src/analyzer/expression/Expression.pv"
             return false;
         } break;
     }
 }
 
-#line 602 "src/analyzer/expression/Expression.pv"
+#line 653 "src/analyzer/expression/Expression.pv"
 void Expression__append_ident_name(struct Expression* self, struct String* result) {
-    #line 603 "src/analyzer/expression/Expression.pv"
+    #line 654 "src/analyzer/expression/Expression.pv"
     switch (self->data.type) {
-        #line 604 "src/analyzer/expression/Expression.pv"
+        #line 655 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__LITERAL: {
-            #line 604 "src/analyzer/expression/Expression.pv"
+            #line 655 "src/analyzer/expression/Expression.pv"
             struct str value = self->data.literal_value;
-            #line 605 "src/analyzer/expression/Expression.pv"
+            #line 656 "src/analyzer/expression/Expression.pv"
             uintptr_t i = 0;
-            #line 606 "src/analyzer/expression/Expression.pv"
+            #line 657 "src/analyzer/expression/Expression.pv"
             while (i < value.length) {
-                #line 607 "src/analyzer/expression/Expression.pv"
+                #line 658 "src/analyzer/expression/Expression.pv"
                 char c = value.ptr[i];
-                #line 608 "src/analyzer/expression/Expression.pv"
+                #line 659 "src/analyzer/expression/Expression.pv"
                 if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-                    #line 609 "src/analyzer/expression/Expression.pv"
+                    #line 660 "src/analyzer/expression/Expression.pv"
                     String__append_char(result, c);
                 } else {
-                    #line 611 "src/analyzer/expression/Expression.pv"
+                    #line 662 "src/analyzer/expression/Expression.pv"
                     String__append_char(result, '_');
                 }
-                #line 613 "src/analyzer/expression/Expression.pv"
+                #line 664 "src/analyzer/expression/Expression.pv"
                 i += 1;
             }
         } break;
-        #line 616 "src/analyzer/expression/Expression.pv"
+        #line 667 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 616 "src/analyzer/expression/Expression.pv"
+            #line 667 "src/analyzer/expression/Expression.pv"
             struct Expression* inner = self->data.parenthesizedexpression_value;
-            #line 617 "src/analyzer/expression/Expression.pv"
+            #line 668 "src/analyzer/expression/Expression.pv"
             Expression__append_ident_name(inner, result);
         } break;
-        #line 619 "src/analyzer/expression/Expression.pv"
+        #line 670 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__UNARY_EXPRESSION: {
-            #line 619 "src/analyzer/expression/Expression.pv"
+            #line 670 "src/analyzer/expression/Expression.pv"
             struct str op = self->data.unaryexpression_value._0;
-            #line 619 "src/analyzer/expression/Expression.pv"
+            #line 670 "src/analyzer/expression/Expression.pv"
             struct Expression* inner = self->data.unaryexpression_value._1;
-            #line 620 "src/analyzer/expression/Expression.pv"
+            #line 671 "src/analyzer/expression/Expression.pv"
             if (str__Eq_str__eq(&op, (struct str){ .ptr = "-", .length = strlen("-") })) {
-                #line 620 "src/analyzer/expression/Expression.pv"
+                #line 671 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "neg_", .length = strlen("neg_") });
             }
-            #line 621 "src/analyzer/expression/Expression.pv"
+            #line 672 "src/analyzer/expression/Expression.pv"
             Expression__append_ident_name(inner, result);
         } break;
-        #line 623 "src/analyzer/expression/Expression.pv"
+        #line 674 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 623 "src/analyzer/expression/Expression.pv"
+            #line 674 "src/analyzer/expression/Expression.pv"
             struct Expression* lhs = self->data.binaryexpression_value._0;
-            #line 623 "src/analyzer/expression/Expression.pv"
+            #line 674 "src/analyzer/expression/Expression.pv"
             struct str op = self->data.binaryexpression_value._1;
-            #line 623 "src/analyzer/expression/Expression.pv"
+            #line 674 "src/analyzer/expression/Expression.pv"
             struct Expression* rhs = self->data.binaryexpression_value._2;
-            #line 624 "src/analyzer/expression/Expression.pv"
+            #line 675 "src/analyzer/expression/Expression.pv"
             Expression__append_ident_name(lhs, result);
-            #line 625 "src/analyzer/expression/Expression.pv"
+            #line 676 "src/analyzer/expression/Expression.pv"
             if (str__Eq_str__eq(&op, (struct str){ .ptr = "+", .length = strlen("+") })) {
-                #line 625 "src/analyzer/expression/Expression.pv"
+                #line 676 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "_add_", .length = strlen("_add_") });
             } else if (str__Eq_str__eq(&op, (struct str){ .ptr = "-", .length = strlen("-") })) {
-                #line 626 "src/analyzer/expression/Expression.pv"
+                #line 677 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "_sub_", .length = strlen("_sub_") });
             } else if (str__Eq_str__eq(&op, (struct str){ .ptr = "*", .length = strlen("*") })) {
-                #line 627 "src/analyzer/expression/Expression.pv"
+                #line 678 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "_mul_", .length = strlen("_mul_") });
             } else if (str__Eq_str__eq(&op, (struct str){ .ptr = "/", .length = strlen("/") })) {
-                #line 628 "src/analyzer/expression/Expression.pv"
+                #line 679 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "_div_", .length = strlen("_div_") });
             } else if (str__Eq_str__eq(&op, (struct str){ .ptr = "%", .length = strlen("%") })) {
-                #line 629 "src/analyzer/expression/Expression.pv"
+                #line 680 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "_mod_", .length = strlen("_mod_") });
             } else {
-                #line 630 "src/analyzer/expression/Expression.pv"
+                #line 681 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "_op_", .length = strlen("_op_") });
             }
-            #line 631 "src/analyzer/expression/Expression.pv"
+            #line 682 "src/analyzer/expression/Expression.pv"
             Expression__append_ident_name(rhs, result);
         } break;
-        #line 633 "src/analyzer/expression/Expression.pv"
+        #line 684 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__ENUM_VARIANT: {
-            #line 633 "src/analyzer/expression/Expression.pv"
+            #line 684 "src/analyzer/expression/Expression.pv"
             struct EnumVariant* variant = self->data.enumvariant_value;
-            #line 634 "src/analyzer/expression/Expression.pv"
+            #line 685 "src/analyzer/expression/Expression.pv"
             struct Token* name = variant->parent->name;
-            #line 635 "src/analyzer/expression/Expression.pv"
+            #line 686 "src/analyzer/expression/Expression.pv"
             if (name != 0) {
-                #line 636 "src/analyzer/expression/Expression.pv"
+                #line 687 "src/analyzer/expression/Expression.pv"
                 String__append(result, name->value);
             } else {
-                #line 638 "src/analyzer/expression/Expression.pv"
+                #line 689 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "unknown_enum", .length = strlen("unknown_enum") });
             }
 
-            #line 641 "src/analyzer/expression/Expression.pv"
+            #line 692 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = "_", .length = strlen("_") });
-            #line 642 "src/analyzer/expression/Expression.pv"
+            #line 693 "src/analyzer/expression/Expression.pv"
             String__append(result, variant->name->value);
         } break;
-        #line 644 "src/analyzer/expression/Expression.pv"
+        #line 695 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 644 "src/analyzer/expression/Expression.pv"
+            #line 695 "src/analyzer/expression/Expression.pv"
             struct Expression* target = self->data.invoke_value._0;
-            #line 645 "src/analyzer/expression/Expression.pv"
+            #line 696 "src/analyzer/expression/Expression.pv"
             Expression__append_ident_name(target, result);
         } break;
-        #line 647 "src/analyzer/expression/Expression.pv"
+        #line 698 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION: {
-            #line 647 "src/analyzer/expression/Expression.pv"
+            #line 698 "src/analyzer/expression/Expression.pv"
             struct str member_name = self->data.memberstaticexpression_value._1;
-            #line 648 "src/analyzer/expression/Expression.pv"
+            #line 699 "src/analyzer/expression/Expression.pv"
             String__append(result, member_name);
         } break;
-        #line 650 "src/analyzer/expression/Expression.pv"
+        #line 701 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__VARIABLE: {
-            #line 650 "src/analyzer/expression/Expression.pv"
+            #line 701 "src/analyzer/expression/Expression.pv"
             struct str name = self->data.variable_value;
-            #line 651 "src/analyzer/expression/Expression.pv"
+            #line 702 "src/analyzer/expression/Expression.pv"
             String__append(result, name);
         } break;
-        #line 653 "src/analyzer/expression/Expression.pv"
+        #line 704 "src/analyzer/expression/Expression.pv"
         default: {
-            #line 654 "src/analyzer/expression/Expression.pv"
+            #line 705 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = "expr", .length = strlen("expr") });
         } break;
     }
 }
 
-#line 659 "src/analyzer/expression/Expression.pv"
+#line 710 "src/analyzer/expression/Expression.pv"
 void Expression__append_display_name(struct Expression* self, struct String* result) {
-    #line 660 "src/analyzer/expression/Expression.pv"
+    #line 711 "src/analyzer/expression/Expression.pv"
     switch (self->data.type) {
-        #line 661 "src/analyzer/expression/Expression.pv"
+        #line 712 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__LITERAL: {
-            #line 661 "src/analyzer/expression/Expression.pv"
+            #line 712 "src/analyzer/expression/Expression.pv"
             struct str value = self->data.literal_value;
-            #line 662 "src/analyzer/expression/Expression.pv"
+            #line 713 "src/analyzer/expression/Expression.pv"
             String__append(result, value);
         } break;
-        #line 664 "src/analyzer/expression/Expression.pv"
+        #line 715 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 664 "src/analyzer/expression/Expression.pv"
+            #line 715 "src/analyzer/expression/Expression.pv"
             struct Expression* inner = self->data.parenthesizedexpression_value;
-            #line 665 "src/analyzer/expression/Expression.pv"
+            #line 716 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = "(", .length = strlen("(") });
-            #line 666 "src/analyzer/expression/Expression.pv"
+            #line 717 "src/analyzer/expression/Expression.pv"
             Expression__append_display_name(inner, result);
-            #line 667 "src/analyzer/expression/Expression.pv"
+            #line 718 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = ")", .length = strlen(")") });
         } break;
-        #line 669 "src/analyzer/expression/Expression.pv"
+        #line 720 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__UNARY_EXPRESSION: {
-            #line 669 "src/analyzer/expression/Expression.pv"
+            #line 720 "src/analyzer/expression/Expression.pv"
             struct str op = self->data.unaryexpression_value._0;
-            #line 669 "src/analyzer/expression/Expression.pv"
+            #line 720 "src/analyzer/expression/Expression.pv"
             struct Expression* inner = self->data.unaryexpression_value._1;
-            #line 670 "src/analyzer/expression/Expression.pv"
+            #line 721 "src/analyzer/expression/Expression.pv"
             String__append(result, op);
-            #line 671 "src/analyzer/expression/Expression.pv"
+            #line 722 "src/analyzer/expression/Expression.pv"
             Expression__append_display_name(inner, result);
         } break;
-        #line 673 "src/analyzer/expression/Expression.pv"
+        #line 724 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 673 "src/analyzer/expression/Expression.pv"
+            #line 724 "src/analyzer/expression/Expression.pv"
             struct Expression* lhs = self->data.binaryexpression_value._0;
-            #line 673 "src/analyzer/expression/Expression.pv"
+            #line 724 "src/analyzer/expression/Expression.pv"
             struct str op = self->data.binaryexpression_value._1;
-            #line 673 "src/analyzer/expression/Expression.pv"
+            #line 724 "src/analyzer/expression/Expression.pv"
             struct Expression* rhs = self->data.binaryexpression_value._2;
-            #line 674 "src/analyzer/expression/Expression.pv"
+            #line 725 "src/analyzer/expression/Expression.pv"
             Expression__append_display_name(lhs, result);
-            #line 675 "src/analyzer/expression/Expression.pv"
+            #line 726 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = " ", .length = strlen(" ") });
-            #line 676 "src/analyzer/expression/Expression.pv"
+            #line 727 "src/analyzer/expression/Expression.pv"
             String__append(result, op);
-            #line 677 "src/analyzer/expression/Expression.pv"
+            #line 728 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = " ", .length = strlen(" ") });
-            #line 678 "src/analyzer/expression/Expression.pv"
+            #line 729 "src/analyzer/expression/Expression.pv"
             Expression__append_display_name(rhs, result);
         } break;
-        #line 680 "src/analyzer/expression/Expression.pv"
+        #line 731 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__ENUM_VARIANT: {
-            #line 680 "src/analyzer/expression/Expression.pv"
+            #line 731 "src/analyzer/expression/Expression.pv"
             struct EnumVariant* variant = self->data.enumvariant_value;
-            #line 681 "src/analyzer/expression/Expression.pv"
+            #line 732 "src/analyzer/expression/Expression.pv"
             struct Token* name = variant->parent->name;
-            #line 682 "src/analyzer/expression/Expression.pv"
+            #line 733 "src/analyzer/expression/Expression.pv"
             if (name != 0) {
-                #line 683 "src/analyzer/expression/Expression.pv"
+                #line 734 "src/analyzer/expression/Expression.pv"
                 String__append(result, name->value);
             } else {
-                #line 685 "src/analyzer/expression/Expression.pv"
+                #line 736 "src/analyzer/expression/Expression.pv"
                 String__append(result, (struct str){ .ptr = "unknown_enum", .length = strlen("unknown_enum") });
             }
 
-            #line 688 "src/analyzer/expression/Expression.pv"
+            #line 739 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = "::", .length = strlen("::") });
-            #line 689 "src/analyzer/expression/Expression.pv"
+            #line 740 "src/analyzer/expression/Expression.pv"
             String__append(result, variant->name->value);
         } break;
-        #line 691 "src/analyzer/expression/Expression.pv"
+        #line 742 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 691 "src/analyzer/expression/Expression.pv"
+            #line 742 "src/analyzer/expression/Expression.pv"
             struct Expression* target = self->data.invoke_value._0;
-            #line 692 "src/analyzer/expression/Expression.pv"
+            #line 743 "src/analyzer/expression/Expression.pv"
             Expression__append_display_name(target, result);
         } break;
-        #line 694 "src/analyzer/expression/Expression.pv"
+        #line 745 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION: {
-            #line 694 "src/analyzer/expression/Expression.pv"
+            #line 745 "src/analyzer/expression/Expression.pv"
             struct str member_name = self->data.memberstaticexpression_value._1;
-            #line 695 "src/analyzer/expression/Expression.pv"
+            #line 746 "src/analyzer/expression/Expression.pv"
             String__append(result, member_name);
         } break;
-        #line 697 "src/analyzer/expression/Expression.pv"
+        #line 748 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__VARIABLE: {
-            #line 697 "src/analyzer/expression/Expression.pv"
+            #line 748 "src/analyzer/expression/Expression.pv"
             struct str name = self->data.variable_value;
-            #line 698 "src/analyzer/expression/Expression.pv"
+            #line 749 "src/analyzer/expression/Expression.pv"
             String__append(result, name);
         } break;
-        #line 700 "src/analyzer/expression/Expression.pv"
+        #line 751 "src/analyzer/expression/Expression.pv"
         default: {
-            #line 701 "src/analyzer/expression/Expression.pv"
+            #line 752 "src/analyzer/expression/Expression.pv"
             String__append(result, (struct str){ .ptr = "expr", .length = strlen("expr") });
         } break;
     }
 }
 
-#line 706 "src/analyzer/expression/Expression.pv"
+#line 757 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast) {
-    #line 707 "src/analyzer/expression/Expression.pv"
+    #line 758 "src/analyzer/expression/Expression.pv"
     bool success = true;
 
-    #line 709 "src/analyzer/expression/Expression.pv"
+    #line 760 "src/analyzer/expression/Expression.pv"
     switch (self->data.type) {
-        #line 710 "src/analyzer/expression/Expression.pv"
+        #line 761 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__NULL_LITERAL: {
-            #line 711 "src/analyzer/expression/Expression.pv"
+            #line 762 "src/analyzer/expression/Expression.pv"
             switch (Type__resolve_typedef(expected_type)->type) {
-                #line 712 "src/analyzer/expression/Expression.pv"
+                #line 763 "src/analyzer/expression/Expression.pv"
                 case TYPE__INDIRECT: {
-                    #line 712 "src/analyzer/expression/Expression.pv"
+                    #line 763 "src/analyzer/expression/Expression.pv"
                     struct Indirect* indirect = Type__resolve_typedef(expected_type)->indirect_value;
-                    #line 713 "src/analyzer/expression/Expression.pv"
+                    #line 764 "src/analyzer/expression/Expression.pv"
                     switch (indirect->type) {
-                        #line 714 "src/analyzer/expression/Expression.pv"
+                        #line 765 "src/analyzer/expression/Expression.pv"
                         case INDIRECT_TYPE__REFERENCE: {
-                            #line 715 "src/analyzer/expression/Expression.pv"
+                            #line 766 "src/analyzer/expression/Expression.pv"
                             Context__error_token(context, self->token, "null can only be used with * types, not & types");
-                            #line 716 "src/analyzer/expression/Expression.pv"
+                            #line 767 "src/analyzer/expression/Expression.pv"
                             return false;
                         } break;
-                        #line 718 "src/analyzer/expression/Expression.pv"
+                        #line 769 "src/analyzer/expression/Expression.pv"
                         case INDIRECT_TYPE__DYNAMIC_DISPATCH: {
-                            #line 719 "src/analyzer/expression/Expression.pv"
+                            #line 770 "src/analyzer/expression/Expression.pv"
                             Context__error_token(context, self->token, "null can only be used with * types, not & types");
-                            #line 720 "src/analyzer/expression/Expression.pv"
+                            #line 771 "src/analyzer/expression/Expression.pv"
                             return false;
                         } break;
-                        #line 722 "src/analyzer/expression/Expression.pv"
+                        #line 773 "src/analyzer/expression/Expression.pv"
                         default: {
-                            #line 722 "src/analyzer/expression/Expression.pv"
+                            #line 773 "src/analyzer/expression/Expression.pv"
                             return true;
                         } break;
                     }
                 } break;
-                #line 725 "src/analyzer/expression/Expression.pv"
+                #line 776 "src/analyzer/expression/Expression.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 728 "src/analyzer/expression/Expression.pv"
+        #line 779 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__LITERAL: {
-            #line 728 "src/analyzer/expression/Expression.pv"
+            #line 779 "src/analyzer/expression/Expression.pv"
             struct str value = self->data.literal_value;
-            #line 729 "src/analyzer/expression/Expression.pv"
+            #line 780 "src/analyzer/expression/Expression.pv"
             if (str__Eq_str__eq(&value, (struct str){ .ptr = "0", .length = strlen("0") })) {
-                #line 730 "src/analyzer/expression/Expression.pv"
+                #line 781 "src/analyzer/expression/Expression.pv"
                 switch (expected_type->type) {
-                    #line 731 "src/analyzer/expression/Expression.pv"
+                    #line 782 "src/analyzer/expression/Expression.pv"
                     case TYPE__INDIRECT: {
-                        #line 731 "src/analyzer/expression/Expression.pv"
+                        #line 782 "src/analyzer/expression/Expression.pv"
                         struct Indirect* indirect = expected_type->indirect_value;
-                        #line 732 "src/analyzer/expression/Expression.pv"
+                        #line 783 "src/analyzer/expression/Expression.pv"
                         switch (indirect->type) {
-                            #line 733 "src/analyzer/expression/Expression.pv"
+                            #line 784 "src/analyzer/expression/Expression.pv"
                             case INDIRECT_TYPE__POINTER: {
-                                #line 734 "src/analyzer/expression/Expression.pv"
+                                #line 785 "src/analyzer/expression/Expression.pv"
                                 Context__error_token(context, self->token, "use null instead of 0 for pointer types");
-                                #line 735 "src/analyzer/expression/Expression.pv"
+                                #line 786 "src/analyzer/expression/Expression.pv"
                                 return false;
                             } break;
-                            #line 737 "src/analyzer/expression/Expression.pv"
+                            #line 788 "src/analyzer/expression/Expression.pv"
                             case INDIRECT_TYPE__CONST_POINTER: {
-                                #line 738 "src/analyzer/expression/Expression.pv"
+                                #line 789 "src/analyzer/expression/Expression.pv"
                                 Context__error_token(context, self->token, "use null instead of 0 for pointer types");
-                                #line 739 "src/analyzer/expression/Expression.pv"
+                                #line 790 "src/analyzer/expression/Expression.pv"
                                 return false;
                             } break;
-                            #line 741 "src/analyzer/expression/Expression.pv"
+                            #line 792 "src/analyzer/expression/Expression.pv"
                             case INDIRECT_TYPE__DYNAMIC_DISPATCH_POINTER: {
-                                #line 742 "src/analyzer/expression/Expression.pv"
+                                #line 793 "src/analyzer/expression/Expression.pv"
                                 Context__error_token(context, self->token, "use null instead of 0 for pointer types");
-                                #line 743 "src/analyzer/expression/Expression.pv"
+                                #line 794 "src/analyzer/expression/Expression.pv"
                                 return false;
                             } break;
-                            #line 745 "src/analyzer/expression/Expression.pv"
+                            #line 796 "src/analyzer/expression/Expression.pv"
                             default: {
                             } break;
                         }
                     } break;
-                    #line 748 "src/analyzer/expression/Expression.pv"
+                    #line 799 "src/analyzer/expression/Expression.pv"
                     default: {
                     } break;
                 }
             }
         } break;
-        #line 752 "src/analyzer/expression/Expression.pv"
+        #line 803 "src/analyzer/expression/Expression.pv"
         default: {
         } break;
     }
 
-    #line 755 "src/analyzer/expression/Expression.pv"
+    #line 806 "src/analyzer/expression/Expression.pv"
     switch (self->data.type) {
-        #line 756 "src/analyzer/expression/Expression.pv"
+        #line 807 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__UNARY_EXPRESSION: {
-            #line 756 "src/analyzer/expression/Expression.pv"
+            #line 807 "src/analyzer/expression/Expression.pv"
             struct str operator = self->data.unaryexpression_value._0;
-            #line 756 "src/analyzer/expression/Expression.pv"
+            #line 807 "src/analyzer/expression/Expression.pv"
             struct Expression* child = self->data.unaryexpression_value._1;
-            #line 757 "src/analyzer/expression/Expression.pv"
+            #line 808 "src/analyzer/expression/Expression.pv"
             if (str__Eq_str__eq(&operator, (struct str){ .ptr = "&", .length = strlen("&") })) {
-                #line 758 "src/analyzer/expression/Expression.pv"
+                #line 809 "src/analyzer/expression/Expression.pv"
                 switch (expected_type->type) {
-                    #line 759 "src/analyzer/expression/Expression.pv"
+                    #line 810 "src/analyzer/expression/Expression.pv"
                     case TYPE__INDIRECT: {
-                        #line 759 "src/analyzer/expression/Expression.pv"
+                        #line 810 "src/analyzer/expression/Expression.pv"
                         struct Indirect* indirect = expected_type->indirect_value;
-                        #line 760 "src/analyzer/expression/Expression.pv"
+                        #line 811 "src/analyzer/expression/Expression.pv"
                         switch (indirect->to.type) {
-                            #line 761 "src/analyzer/expression/Expression.pv"
+                            #line 812 "src/analyzer/expression/Expression.pv"
                             case TYPE__SEQUENCE: {
-                                #line 762 "src/analyzer/expression/Expression.pv"
+                                #line 813 "src/analyzer/expression/Expression.pv"
                                 switch (child->data.type) {
-                                    #line 763 "src/analyzer/expression/Expression.pv"
+                                    #line 814 "src/analyzer/expression/Expression.pv"
                                     case EXPRESSION_DATA__INVOKE: {
-                                        #line 764 "src/analyzer/expression/Expression.pv"
+                                        #line 815 "src/analyzer/expression/Expression.pv"
                                         if (Type__is_sequence_fixed_array(&child->return_type)) {
-                                            #line 765 "src/analyzer/expression/Expression.pv"
+                                            #line 816 "src/analyzer/expression/Expression.pv"
                                             Expression__validate_type(child, context, &indirect->to, apply_implicit_cast);
                                         }
                                     } break;
-                                    #line 768 "src/analyzer/expression/Expression.pv"
+                                    #line 819 "src/analyzer/expression/Expression.pv"
                                     default: {
                                     } break;
                                 }
                             } break;
-                            #line 771 "src/analyzer/expression/Expression.pv"
+                            #line 822 "src/analyzer/expression/Expression.pv"
                             default: {
                             } break;
                         }
                     } break;
-                    #line 774 "src/analyzer/expression/Expression.pv"
+                    #line 825 "src/analyzer/expression/Expression.pv"
                     default: {
                     } break;
                 }
             }
         } break;
-        #line 778 "src/analyzer/expression/Expression.pv"
+        #line 829 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 778 "src/analyzer/expression/Expression.pv"
+            #line 829 "src/analyzer/expression/Expression.pv"
             struct Expression* invoke = self->data.invoke_value._0;
-            #line 778 "src/analyzer/expression/Expression.pv"
+            #line 829 "src/analyzer/expression/Expression.pv"
             struct Array_InvokeArgument* arguments = &self->data.invoke_value._1;
-            #line 779 "src/analyzer/expression/Expression.pv"
+            #line 830 "src/analyzer/expression/Expression.pv"
             switch (expected_type->type) {
-                #line 780 "src/analyzer/expression/Expression.pv"
+                #line 831 "src/analyzer/expression/Expression.pv"
                 case TYPE__TUPLE: {
-                    #line 780 "src/analyzer/expression/Expression.pv"
+                    #line 831 "src/analyzer/expression/Expression.pv"
                     struct Tuple* tuple = expected_type->tuple_value;
-                    #line 781 "src/analyzer/expression/Expression.pv"
+                    #line 832 "src/analyzer/expression/Expression.pv"
                     { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(arguments));
-                    #line 781 "src/analyzer/expression/Expression.pv"
+                    #line 832 "src/analyzer/expression/Expression.pv"
                     while (IterEnumerate_ref_InvokeArgument__next(&__iter)) {
-                        #line 781 "src/analyzer/expression/Expression.pv"
+                        #line 832 "src/analyzer/expression/Expression.pv"
                         uintptr_t i = IterEnumerate_ref_InvokeArgument__value(&__iter)._0;
-                        #line 781 "src/analyzer/expression/Expression.pv"
+                        #line 832 "src/analyzer/expression/Expression.pv"
                         struct InvokeArgument* argument = IterEnumerate_ref_InvokeArgument__value(&__iter)._1;
 
-                        #line 782 "src/analyzer/expression/Expression.pv"
+                        #line 833 "src/analyzer/expression/Expression.pv"
                         success = Expression__validate_type(argument->value, context, &tuple->elements.data[i], apply_implicit_cast) && success;
                     } }
 
-                    #line 785 "src/analyzer/expression/Expression.pv"
+                    #line 836 "src/analyzer/expression/Expression.pv"
                     invoke->data = (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = expected_type };
-                    #line 786 "src/analyzer/expression/Expression.pv"
+                    #line 837 "src/analyzer/expression/Expression.pv"
                     invoke->return_type = *expected_type;
-                    #line 787 "src/analyzer/expression/Expression.pv"
+                    #line 838 "src/analyzer/expression/Expression.pv"
                     self->return_type = *expected_type;
 
-                    #line 789 "src/analyzer/expression/Expression.pv"
+                    #line 840 "src/analyzer/expression/Expression.pv"
                     return success;
                 } break;
-                #line 791 "src/analyzer/expression/Expression.pv"
+                #line 842 "src/analyzer/expression/Expression.pv"
                 case TYPE__SEQUENCE: {
-                    #line 791 "src/analyzer/expression/Expression.pv"
+                    #line 842 "src/analyzer/expression/Expression.pv"
                     struct Sequence* sequence = expected_type->sequence_value;
-                    #line 792 "src/analyzer/expression/Expression.pv"
+                    #line 843 "src/analyzer/expression/Expression.pv"
                     if (Type__is_sequence_fixed_array(&self->return_type)) {
-                        #line 793 "src/analyzer/expression/Expression.pv"
+                        #line 844 "src/analyzer/expression/Expression.pv"
                         { struct IterEnumerate_ref_InvokeArgument __iter = Iter_ref_InvokeArgument__enumerate(Array_InvokeArgument__iter(arguments));
-                        #line 793 "src/analyzer/expression/Expression.pv"
+                        #line 844 "src/analyzer/expression/Expression.pv"
                         while (IterEnumerate_ref_InvokeArgument__next(&__iter)) {
-                            #line 793 "src/analyzer/expression/Expression.pv"
+                            #line 844 "src/analyzer/expression/Expression.pv"
                             struct InvokeArgument* argument = IterEnumerate_ref_InvokeArgument__value(&__iter)._1;
 
-                            #line 794 "src/analyzer/expression/Expression.pv"
+                            #line 845 "src/analyzer/expression/Expression.pv"
                             success = Expression__validate_type(argument->value, context, &sequence->element, apply_implicit_cast) && success;
                         } }
 
-                        #line 797 "src/analyzer/expression/Expression.pv"
+                        #line 848 "src/analyzer/expression/Expression.pv"
                         switch (self->return_type.type) {
-                            #line 798 "src/analyzer/expression/Expression.pv"
+                            #line 849 "src/analyzer/expression/Expression.pv"
                             case TYPE__SEQUENCE: {
-                                #line 798 "src/analyzer/expression/Expression.pv"
+                                #line 849 "src/analyzer/expression/Expression.pv"
                                 struct Sequence* self_seq = self->return_type.sequence_value;
-                                #line 799 "src/analyzer/expression/Expression.pv"
+                                #line 850 "src/analyzer/expression/Expression.pv"
                                 struct Sequence* new_seq = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) { .type = self_seq->type, .element = sequence->element, .element_pointer = self_seq->element_pointer }});
-                                #line 800 "src/analyzer/expression/Expression.pv"
+                                #line 851 "src/analyzer/expression/Expression.pv"
                                 struct Type* new_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = new_seq }});
-                                #line 801 "src/analyzer/expression/Expression.pv"
+                                #line 852 "src/analyzer/expression/Expression.pv"
                                 invoke->data = (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = new_type };
-                                #line 802 "src/analyzer/expression/Expression.pv"
+                                #line 853 "src/analyzer/expression/Expression.pv"
                                 invoke->return_type = *new_type;
-                                #line 803 "src/analyzer/expression/Expression.pv"
+                                #line 854 "src/analyzer/expression/Expression.pv"
                                 self->return_type = *new_type;
                             } break;
-                            #line 805 "src/analyzer/expression/Expression.pv"
+                            #line 856 "src/analyzer/expression/Expression.pv"
                             default: {
                             } break;
                         }
 
-                        #line 808 "src/analyzer/expression/Expression.pv"
+                        #line 859 "src/analyzer/expression/Expression.pv"
                         return success;
                     }
                 } break;
-                #line 811 "src/analyzer/expression/Expression.pv"
+                #line 862 "src/analyzer/expression/Expression.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 814 "src/analyzer/expression/Expression.pv"
+        #line 865 "src/analyzer/expression/Expression.pv"
         default: {
         } break;
     }
 
-    #line 817 "src/analyzer/expression/Expression.pv"
+    #line 868 "src/analyzer/expression/Expression.pv"
     if (apply_implicit_cast && Type__needs_implicit_cast(expected_type, &self->return_type)) {
-        #line 818 "src/analyzer/expression/Expression.pv"
+        #line 869 "src/analyzer/expression/Expression.pv"
         struct Expression* expression = ArenaAllocator__store_Expression(context->allocator, self);
-        #line 819 "src/analyzer/expression/Expression.pv"
+        #line 870 "src/analyzer/expression/Expression.pv"
         self->data = (struct ExpressionData) { .type = EXPRESSION_DATA__IMPLICIT_CAST, .implicitcast_value = expression };
-        #line 820 "src/analyzer/expression/Expression.pv"
+        #line 871 "src/analyzer/expression/Expression.pv"
         self->return_type = *expected_type;
-        #line 821 "src/analyzer/expression/Expression.pv"
+        #line 872 "src/analyzer/expression/Expression.pv"
         return true;
     }
 
-    #line 824 "src/analyzer/expression/Expression.pv"
+    #line 875 "src/analyzer/expression/Expression.pv"
     if (!Type__eq(expected_type, &self->return_type)) {
-        #line 825 "src/analyzer/expression/Expression.pv"
+        #line 876 "src/analyzer/expression/Expression.pv"
         struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 826 "src/analyzer/expression/Expression.pv"
+        #line 877 "src/analyzer/expression/Expression.pv"
         String__append(&message, (struct str){ .ptr = "Expected expression of type ", .length = strlen("Expected expression of type ") });
-        #line 827 "src/analyzer/expression/Expression.pv"
+        #line 878 "src/analyzer/expression/Expression.pv"
         struct String expected_type_name = Naming__get_type_decl(&context->root->naming_decl, expected_type, context->type_self, 0);
-        #line 828 "src/analyzer/expression/Expression.pv"
+        #line 879 "src/analyzer/expression/Expression.pv"
         String__append(&message, String__as_str(&expected_type_name));
-        #line 829 "src/analyzer/expression/Expression.pv"
+        #line 880 "src/analyzer/expression/Expression.pv"
         String__append(&message, (struct str){ .ptr = ", but found ", .length = strlen(", but found ") });
-        #line 830 "src/analyzer/expression/Expression.pv"
+        #line 881 "src/analyzer/expression/Expression.pv"
         struct String actual_type_name = Naming__get_type_decl(&context->root->naming_decl, &self->return_type, context->type_self, 0);
-        #line 831 "src/analyzer/expression/Expression.pv"
+        #line 882 "src/analyzer/expression/Expression.pv"
         String__append(&message, String__as_str(&actual_type_name));
-        #line 832 "src/analyzer/expression/Expression.pv"
+        #line 883 "src/analyzer/expression/Expression.pv"
         Context__error_expression(context, self, String__c_str(&message));
-        #line 833 "src/analyzer/expression/Expression.pv"
+        #line 884 "src/analyzer/expression/Expression.pv"
         return false;
     }
-    #line 837 "src/analyzer/expression/Expression.pv"
+    #line 888 "src/analyzer/expression/Expression.pv"
     return true;
 }
 
-#line 840 "src/analyzer/expression/Expression.pv"
+#line 891 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics) {
-    #line 841 "src/analyzer/expression/Expression.pv"
+    #line 892 "src/analyzer/expression/Expression.pv"
     struct Token* token = Context__current(context);
-    #line 842 "src/analyzer/expression/Expression.pv"
+    #line 893 "src/analyzer/expression/Expression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "if")) {
-        #line 842 "src/analyzer/expression/Expression.pv"
+        #line 893 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 844 "src/analyzer/expression/Expression.pv"
+    #line 895 "src/analyzer/expression/Expression.pv"
     struct Expression* condition = Expression__parse(context, generics);
-    #line 845 "src/analyzer/expression/Expression.pv"
+    #line 896 "src/analyzer/expression/Expression.pv"
     if (condition == 0) {
-        #line 845 "src/analyzer/expression/Expression.pv"
+        #line 896 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 847 "src/analyzer/expression/Expression.pv"
+    #line 898 "src/analyzer/expression/Expression.pv"
     switch (condition->return_type.type) {
-        #line 848 "src/analyzer/expression/Expression.pv"
+        #line 899 "src/analyzer/expression/Expression.pv"
         case TYPE__PRIMITIVE: {
-            #line 848 "src/analyzer/expression/Expression.pv"
+            #line 899 "src/analyzer/expression/Expression.pv"
             struct Primitive* prim = condition->return_type.primitive_value;
-            #line 849 "src/analyzer/expression/Expression.pv"
+            #line 900 "src/analyzer/expression/Expression.pv"
             if (prim == 0) {
-                #line 850 "src/analyzer/expression/Expression.pv"
+                #line 901 "src/analyzer/expression/Expression.pv"
                 Context__error_expression(context, condition, "If condition return type is blank");
-                #line 851 "src/analyzer/expression/Expression.pv"
+                #line 902 "src/analyzer/expression/Expression.pv"
                 return 0;
             }
 
-            #line 854 "src/analyzer/expression/Expression.pv"
+            #line 905 "src/analyzer/expression/Expression.pv"
             if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
-                #line 855 "src/analyzer/expression/Expression.pv"
+                #line 906 "src/analyzer/expression/Expression.pv"
                 Context__error_expression(context, condition, "If condition must be a bool expression");
-                #line 856 "src/analyzer/expression/Expression.pv"
+                #line 907 "src/analyzer/expression/Expression.pv"
                 return 0;
             }
         } break;
-        #line 859 "src/analyzer/expression/Expression.pv"
+        #line 910 "src/analyzer/expression/Expression.pv"
         default: {
-            #line 860 "src/analyzer/expression/Expression.pv"
+            #line 911 "src/analyzer/expression/Expression.pv"
             Context__error_expression(context, condition, "If condition must be a bool expression");
-            #line 861 "src/analyzer/expression/Expression.pv"
+            #line 912 "src/analyzer/expression/Expression.pv"
             return 0;
         } break;
     }
 
-    #line 865 "src/analyzer/expression/Expression.pv"
+    #line 916 "src/analyzer/expression/Expression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 865 "src/analyzer/expression/Expression.pv"
+        #line 916 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 867 "src/analyzer/expression/Expression.pv"
+    #line 918 "src/analyzer/expression/Expression.pv"
     struct Expression* a = Expression__parse(context, generics);
-    #line 868 "src/analyzer/expression/Expression.pv"
+    #line 919 "src/analyzer/expression/Expression.pv"
     if (a == 0) {
-        #line 868 "src/analyzer/expression/Expression.pv"
+        #line 919 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 870 "src/analyzer/expression/Expression.pv"
+    #line 921 "src/analyzer/expression/Expression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 870 "src/analyzer/expression/Expression.pv"
+        #line 921 "src/analyzer/expression/Expression.pv"
         return 0;
     }
-    #line 871 "src/analyzer/expression/Expression.pv"
+    #line 922 "src/analyzer/expression/Expression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "else")) {
-        #line 871 "src/analyzer/expression/Expression.pv"
+        #line 922 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 873 "src/analyzer/expression/Expression.pv"
+    #line 924 "src/analyzer/expression/Expression.pv"
     bool is_else_if = Context__check_value(context, TOKEN_TYPE__KEYWORD, "if");
 
-    #line 875 "src/analyzer/expression/Expression.pv"
+    #line 926 "src/analyzer/expression/Expression.pv"
     if (!is_else_if && !Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 876 "src/analyzer/expression/Expression.pv"
+        #line 927 "src/analyzer/expression/Expression.pv"
         Context__error(context, "Expected { or else if");
-        #line 877 "src/analyzer/expression/Expression.pv"
+        #line 928 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 880 "src/analyzer/expression/Expression.pv"
+    #line 931 "src/analyzer/expression/Expression.pv"
     struct Expression* b = Expression__parse(context, generics);
-    #line 881 "src/analyzer/expression/Expression.pv"
+    #line 932 "src/analyzer/expression/Expression.pv"
     if (b == 0) {
-        #line 881 "src/analyzer/expression/Expression.pv"
+        #line 932 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 883 "src/analyzer/expression/Expression.pv"
+    #line 934 "src/analyzer/expression/Expression.pv"
     if (!is_else_if && !Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 883 "src/analyzer/expression/Expression.pv"
+        #line 934 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 885 "src/analyzer/expression/Expression.pv"
+    #line 936 "src/analyzer/expression/Expression.pv"
     if (!Expression__validate_type(a, context, &b->return_type, false)) {
-        #line 885 "src/analyzer/expression/Expression.pv"
+        #line 936 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 887 "src/analyzer/expression/Expression.pv"
+    #line 938 "src/analyzer/expression/Expression.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__IF_EXPRESSION, .ifexpression_value = { ._0 = condition, ._1 = a, ._2 = b} }, &a->return_type);
+}
+
+#line 941 "src/analyzer/expression/Expression.pv"
+void Expression__record_function_signature(struct Context* context, struct Function* func_info, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions) {
+    #line 942 "src/analyzer/expression/Expression.pv"
+    if (!Context__should_record_symbols(context)) {
+        #line 942 "src/analyzer/expression/Expression.pv"
+        return;
+    }
+
+    #line 944 "src/analyzer/expression/Expression.pv"
+    struct String label = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+    #line 945 "src/analyzer/expression/Expression.pv"
+    String__append(&label, (struct str){ .ptr = "fn ", .length = strlen("fn ") });
+    #line 946 "src/analyzer/expression/Expression.pv"
+    struct Token* name = func_info->name;
+    #line 947 "src/analyzer/expression/Expression.pv"
+    if (name != 0) {
+        #line 947 "src/analyzer/expression/Expression.pv"
+        String__append(&label, name->value);
+    }
+    #line 948 "src/analyzer/expression/Expression.pv"
+    String__append(&label, (struct str){ .ptr = "(", .length = strlen("(") });
+
+    #line 950 "src/analyzer/expression/Expression.pv"
+    struct Array_str params = Array_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+    #line 951 "src/analyzer/expression/Expression.pv"
+    bool first = true;
+    #line 952 "src/analyzer/expression/Expression.pv"
+    { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
+    #line 952 "src/analyzer/expression/Expression.pv"
+    while (Iter_ref_Parameter__next(&__iter)) {
+        #line 952 "src/analyzer/expression/Expression.pv"
+        struct Parameter* param = Iter_ref_Parameter__value(&__iter);
+
+        #line 953 "src/analyzer/expression/Expression.pv"
+        if (!first) {
+            #line 953 "src/analyzer/expression/Expression.pv"
+            String__append(&label, (struct str){ .ptr = ", ", .length = strlen(", ") });
+        }
+        #line 954 "src/analyzer/expression/Expression.pv"
+        first = false;
+
+        #line 956 "src/analyzer/expression/Expression.pv"
+        struct String param_str = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        #line 957 "src/analyzer/expression/Expression.pv"
+        struct Token* pname = param->name;
+        #line 958 "src/analyzer/expression/Expression.pv"
+        if (pname != 0) {
+            #line 959 "src/analyzer/expression/Expression.pv"
+            String__append(&param_str, pname->value);
+            #line 960 "src/analyzer/expression/Expression.pv"
+            String__append(&param_str, (struct str){ .ptr = ": ", .length = strlen(": ") });
+        }
+        #line 962 "src/analyzer/expression/Expression.pv"
+        struct String type_decl = Naming__get_type_decl(&context->root->naming_decl, &param->type, context->type_self, 0);
+        #line 963 "src/analyzer/expression/Expression.pv"
+        String__append(&param_str, String__as_str(&type_decl));
+        #line 964 "src/analyzer/expression/Expression.pv"
+        String__append(&label, String__as_str(&param_str));
+        #line 965 "src/analyzer/expression/Expression.pv"
+        Array_str__append(&params, String__as_str(&param_str));
+    } }
+
+    #line 968 "src/analyzer/expression/Expression.pv"
+    String__append(&label, (struct str){ .ptr = ")", .length = strlen(")") });
+    #line 969 "src/analyzer/expression/Expression.pv"
+    struct String ret_type_decl = Naming__get_type_decl(&context->root->naming_decl, &func_info->return_type, context->type_self, 0);
+    #line 970 "src/analyzer/expression/Expression.pv"
+    if (!Type__is_void(&func_info->return_type)) {
+        #line 971 "src/analyzer/expression/Expression.pv"
+        String__append(&label, (struct str){ .ptr = " -> ", .length = strlen(" -> ") });
+        #line 972 "src/analyzer/expression/Expression.pv"
+        String__append(&label, String__as_str(&ret_type_decl));
+    }
+
+    #line 975 "src/analyzer/expression/Expression.pv"
+    Context__record_signature(context, open_paren, close_paren, comma_positions, String__as_str(&label), params);
 }
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
@@ -3320,726 +3510,835 @@ struct Expression* Expression__make_member_function_call(struct Context* context
 }
 
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"
-struct Expression* Expression__parse_enum(struct Context* context, struct Token* token, struct Type* enum_type, struct Generics* generics) {
+void Expression__record_static_member_symbol(struct Context* context, struct Token* member, struct Type* member_type, struct Type* owner_type) {
     #line 8 "src/analyzer/expression/ParseTypeExpression.pv"
+    if (!Context__should_record_symbols(context)) {
+        #line 8 "src/analyzer/expression/ParseTypeExpression.pv"
+        return;
+    }
+
+    #line 10 "src/analyzer/expression/ParseTypeExpression.pv"
+    struct Token* member_def_token = 0;
+    #line 11 "src/analyzer/expression/ParseTypeExpression.pv"
+    struct str member_def_path = context->path;
+
+    #line 13 "src/analyzer/expression/ParseTypeExpression.pv"
+    switch (member_type->type) {
+        #line 14 "src/analyzer/expression/ParseTypeExpression.pv"
+        case TYPE__FUNCTION: {
+            #line 14 "src/analyzer/expression/ParseTypeExpression.pv"
+            struct Function* func_info = member_type->function_value._0;
+            #line 15 "src/analyzer/expression/ParseTypeExpression.pv"
+            member_def_token = func_info->name;
+            #line 16 "src/analyzer/expression/ParseTypeExpression.pv"
+            if (func_info->context != 0) {
+                #line 16 "src/analyzer/expression/ParseTypeExpression.pv"
+                member_def_path = func_info->context->path;
+            }
+        } break;
+        #line 18 "src/analyzer/expression/ParseTypeExpression.pv"
+        default: {
+            #line 19 "src/analyzer/expression/ParseTypeExpression.pv"
+            switch (Type__resolve_typedef(owner_type)->type) {
+                #line 20 "src/analyzer/expression/ParseTypeExpression.pv"
+                case TYPE__STRUCT: {
+                    #line 20 "src/analyzer/expression/ParseTypeExpression.pv"
+                    struct Struct* struct_info = Type__resolve_typedef(owner_type)->struct_value._0;
+                    #line 21 "src/analyzer/expression/ParseTypeExpression.pv"
+                    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
+                    #line 21 "src/analyzer/expression/ParseTypeExpression.pv"
+                    while (Iter_ref_ref_Impl__next(&__iter)) {
+                        #line 21 "src/analyzer/expression/ParseTypeExpression.pv"
+                        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
+
+                        #line 22 "src/analyzer/expression/ParseTypeExpression.pv"
+                        struct ImplConst** impl_const_ptr = HashMap_str_ref_ImplConst__find(&impl_info->consts, &member->value);
+                        #line 23 "src/analyzer/expression/ParseTypeExpression.pv"
+                        if (impl_const_ptr != 0) {
+                            #line 24 "src/analyzer/expression/ParseTypeExpression.pv"
+                            struct ImplConst* impl_const = *impl_const_ptr;
+                            #line 25 "src/analyzer/expression/ParseTypeExpression.pv"
+                            member_def_token = impl_const->name;
+                            #line 26 "src/analyzer/expression/ParseTypeExpression.pv"
+                            member_def_path = impl_const->context->path;
+                        }
+                    } }
+                } break;
+                #line 30 "src/analyzer/expression/ParseTypeExpression.pv"
+                case TYPE__ENUM: {
+                    #line 30 "src/analyzer/expression/ParseTypeExpression.pv"
+                    struct Enum* enum_info = Type__resolve_typedef(owner_type)->enum_value._0;
+                    #line 31 "src/analyzer/expression/ParseTypeExpression.pv"
+                    { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
+                    #line 31 "src/analyzer/expression/ParseTypeExpression.pv"
+                    while (Iter_ref_ref_Impl__next(&__iter)) {
+                        #line 31 "src/analyzer/expression/ParseTypeExpression.pv"
+                        struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
+
+                        #line 32 "src/analyzer/expression/ParseTypeExpression.pv"
+                        struct ImplConst** impl_const_ptr = HashMap_str_ref_ImplConst__find(&impl_info->consts, &member->value);
+                        #line 33 "src/analyzer/expression/ParseTypeExpression.pv"
+                        if (impl_const_ptr != 0) {
+                            #line 34 "src/analyzer/expression/ParseTypeExpression.pv"
+                            struct ImplConst* impl_const = *impl_const_ptr;
+                            #line 35 "src/analyzer/expression/ParseTypeExpression.pv"
+                            member_def_token = impl_const->name;
+                            #line 36 "src/analyzer/expression/ParseTypeExpression.pv"
+                            member_def_path = impl_const->context->path;
+                        }
+                    } }
+                } break;
+                #line 40 "src/analyzer/expression/ParseTypeExpression.pv"
+                default: {
+                } break;
+            }
+        } break;
+    }
+
+    #line 45 "src/analyzer/expression/ParseTypeExpression.pv"
+    struct String member_type_label = Naming__get_type_decl(&context->root->naming_decl, member_type, context->type_self, 0);
+    #line 46 "src/analyzer/expression/ParseTypeExpression.pv"
+    Context__record_symbol(context, member, String__as_str(&member_type_label), member_def_path, member_def_token);
+}
+
+#line 49 "src/analyzer/expression/ParseTypeExpression.pv"
+struct Expression* Expression__parse_enum(struct Context* context, struct Token* token, struct Type* enum_type, struct Generics* generics) {
+    #line 50 "src/analyzer/expression/ParseTypeExpression.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 9 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 51 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Token* variant_name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-        #line 10 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 52 "src/analyzer/expression/ParseTypeExpression.pv"
         if (variant_name == 0) {
-            #line 10 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 52 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 12 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 54 "src/analyzer/expression/ParseTypeExpression.pv"
         struct EnumVariantResult variant_result = Expression__get_enum_variant(context, enum_type, variant_name);
 
-        #line 14 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 56 "src/analyzer/expression/ParseTypeExpression.pv"
         switch (variant_result.type) {
-            #line 15 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 57 "src/analyzer/expression/ParseTypeExpression.pv"
             case ENUM_VARIANT_RESULT__NONE: {
-                #line 16 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 58 "src/analyzer/expression/ParseTypeExpression.pv"
                 Context__error_token(context, variant_name, "Unable to find enum variant or function");
-                #line 17 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 59 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             } break;
-            #line 19 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 61 "src/analyzer/expression/ParseTypeExpression.pv"
             case ENUM_VARIANT_RESULT__FUNCTION: {
-                #line 19 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 61 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Function* function = variant_result.function_value._0;
-                #line 19 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 61 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct GenericMap* generic_map = variant_result.function_value._1;
-                #line 20 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 62 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Type* member_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
+                #line 63 "src/analyzer/expression/ParseTypeExpression.pv"
+                Expression__record_static_member_symbol(context, variant_name, member_type, enum_type);
 
-                #line 22 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 65 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 23 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 66 "src/analyzer/expression/ParseTypeExpression.pv"
                     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = member_type }, member_type);
                 }
 
-                #line 26 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 69 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 26 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 69 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 28 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 71 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                #line 30 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 73 "src/analyzer/expression/ParseTypeExpression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 31 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 74 "src/analyzer/expression/ParseTypeExpression.pv"
                     struct Expression* argument = Expression__parse(context, generics);
-                    #line 32 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 75 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (argument == 0) {
-                        #line 32 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 75 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
 
-                    #line 34 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 77 "src/analyzer/expression/ParseTypeExpression.pv"
                     Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                    #line 36 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 79 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 37 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 80 "src/analyzer/expression/ParseTypeExpression.pv"
                         Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 38 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 81 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
                 }
 
-                #line 42 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 85 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 42 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 85 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 44 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 87 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (!Expression__validate_arguments(context, token, member_type, &arguments, generic_map, false)) {
-                    #line 44 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 87 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 46 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 89 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Type* func_return_type = Expression__get_return_type(context, member_type, token, generic_map);
-                #line 47 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 90 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (func_return_type == 0) {
-                    #line 47 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 90 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 49 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 92 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Expression* func_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = member_type }, member_type);
-                #line 50 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 93 "src/analyzer/expression/ParseTypeExpression.pv"
                 return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = func_expr, ._1 = arguments} }, func_return_type);
             } break;
-            #line 52 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 95 "src/analyzer/expression/ParseTypeExpression.pv"
             case ENUM_VARIANT_RESULT__ENUM_VARIANT: {
-                #line 52 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 95 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct EnumVariant* variant = variant_result.enumvariant_value;
-                #line 53 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 96 "src/analyzer/expression/ParseTypeExpression.pv"
+                struct String variant_type_label = Naming__get_type_decl(&context->root->naming_decl, enum_type, context->type_self, 0);
+                #line 97 "src/analyzer/expression/ParseTypeExpression.pv"
+                Context__record_symbol(context, variant_name, String__as_str(&variant_type_label), variant->parent->context->path, variant->name);
+
+                #line 99 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                #line 55 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 101 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 56 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 102 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                        #line 56 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 102 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
 
-                    #line 58 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 104 "src/analyzer/expression/ParseTypeExpression.pv"
                     while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 59 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 105 "src/analyzer/expression/ParseTypeExpression.pv"
                         struct Expression* argument = Expression__parse(context, generics);
-                        #line 60 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 106 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (argument == 0) {
-                            #line 60 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 106 "src/analyzer/expression/ParseTypeExpression.pv"
                             return 0;
                         }
 
-                        #line 62 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 108 "src/analyzer/expression/ParseTypeExpression.pv"
                         Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                        #line 64 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 110 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                            #line 65 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 111 "src/analyzer/expression/ParseTypeExpression.pv"
                             Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                            #line 66 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 112 "src/analyzer/expression/ParseTypeExpression.pv"
                             return 0;
                         }
                     }
 
-                    #line 70 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 116 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 70 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 116 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
                 } else if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "{") && variant->names.length > 0) {
-                    #line 72 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 118 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-                        #line 72 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 118 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
 
-                    #line 74 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 120 "src/analyzer/expression/ParseTypeExpression.pv"
                     while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-                        #line 75 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 121 "src/analyzer/expression/ParseTypeExpression.pv"
                         struct Token* name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-                        #line 76 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 122 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (name == 0) {
-                            #line 76 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 122 "src/analyzer/expression/ParseTypeExpression.pv"
                             return 0;
                         }
 
-                        #line 78 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 124 "src/analyzer/expression/ParseTypeExpression.pv"
                         struct Expression* value = 0;
-                        #line 79 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 125 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ":")) {
-                            #line 80 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 126 "src/analyzer/expression/ParseTypeExpression.pv"
                             value = Expression__parse(context, generics);
                         } else {
-                            #line 82 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 128 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct Type* return_type = Context__get_value(context, name->value);
-                            #line 83 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 129 "src/analyzer/expression/ParseTypeExpression.pv"
                             if (return_type == 0) {
-                                #line 84 "src/analyzer/expression/ParseTypeExpression.pv"
+                                #line 130 "src/analyzer/expression/ParseTypeExpression.pv"
                                 Context__error_token(context, name, "Unable to find variable with this name");
-                                #line 85 "src/analyzer/expression/ParseTypeExpression.pv"
+                                #line 131 "src/analyzer/expression/ParseTypeExpression.pv"
                                 return 0;
                             }
-                            #line 87 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 133 "src/analyzer/expression/ParseTypeExpression.pv"
                             value = Expression__make(context->allocator, name, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = name->value }, return_type);
                         }
 
-                        #line 90 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 136 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (value == 0) {
-                            #line 90 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 136 "src/analyzer/expression/ParseTypeExpression.pv"
                             return 0;
                         }
 
-                        #line 92 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 138 "src/analyzer/expression/ParseTypeExpression.pv"
                         Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = name, .value = value });
 
-                        #line 94 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 140 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-                            #line 95 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 141 "src/analyzer/expression/ParseTypeExpression.pv"
                             Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
-                            #line 96 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 142 "src/analyzer/expression/ParseTypeExpression.pv"
                             return 0;
                         }
                     }
 
-                    #line 100 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 146 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-                        #line 100 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 146 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
                 }
 
-                #line 103 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 149 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Expression* enum_variant = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__ENUM_VARIANT, .enumvariant_value = variant }, enum_type);
 
-                #line 105 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 151 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct GenericMap* generic_map = Type__get_generic_map(enum_type, context);
-                #line 106 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 152 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (!Expression__validate_enum_arguments(context, token, variant, &arguments, generic_map)) {
-                    #line 106 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 152 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 108 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 154 "src/analyzer/expression/ParseTypeExpression.pv"
                 return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = enum_variant, ._1 = arguments} }, enum_type);
             } break;
-            #line 110 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 156 "src/analyzer/expression/ParseTypeExpression.pv"
             case ENUM_VARIANT_RESULT__CONST: {
-                #line 110 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 156 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct ImplConst* impl_const = variant_result.const_value;
-                #line 111 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 157 "src/analyzer/expression/ParseTypeExpression.pv"
+                struct Type* const_type = ArenaAllocator__store_Type(context->allocator, &impl_const->type);
+                #line 158 "src/analyzer/expression/ParseTypeExpression.pv"
+                Expression__record_static_member_symbol(context, variant_name, const_type, enum_type);
+                #line 159 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Expression* enum_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = enum_type }, enum_type);
-                #line 112 "src/analyzer/expression/ParseTypeExpression.pv"
-                return Expression__make(context->allocator, variant_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION, .memberstaticexpression_value = { ._0 = enum_expr, ._1 = variant_name->value} }, ArenaAllocator__store_Type(context->allocator, &impl_const->type));
+                #line 160 "src/analyzer/expression/ParseTypeExpression.pv"
+                return Expression__make(context->allocator, variant_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION, .memberstaticexpression_value = { ._0 = enum_expr, ._1 = variant_name->value} }, const_type);
             } break;
-            #line 114 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 162 "src/analyzer/expression/ParseTypeExpression.pv"
             case ENUM_VARIANT_RESULT__ENUM_CVALUE: {
-                #line 115 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 163 "src/analyzer/expression/ParseTypeExpression.pv"
+                struct String variant_type_label = Naming__get_type_decl(&context->root->naming_decl, enum_type, context->type_self, 0);
+                #line 164 "src/analyzer/expression/ParseTypeExpression.pv"
+                Context__record_symbol(context, variant_name, String__as_str(&variant_type_label), context->path, 0);
+                #line 165 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Expression* enum_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = enum_type }, enum_type);
-                #line 116 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 166 "src/analyzer/expression/ParseTypeExpression.pv"
                 return Expression__make(context->allocator, variant_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION, .memberstaticexpression_value = { ._0 = enum_expr, ._1 = variant_name->value} }, enum_type);
             } break;
         }
     }
 
-    #line 131 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 181 "src/analyzer/expression/ParseTypeExpression.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = enum_type }, enum_type);
 }
 
-#line 134 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 184 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_struct(struct Context* context, struct Token* token, struct Type* struct_type, struct Generics* generics) {
-    #line 135 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 185 "src/analyzer/expression/ParseTypeExpression.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 136 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 186 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Token* member = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-        #line 137 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 187 "src/analyzer/expression/ParseTypeExpression.pv"
         if (member == 0) {
-            #line 137 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 187 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 139 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 189 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Type* member_type = Expression__get_member_type(context, struct_type, member, true);
-        #line 140 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 190 "src/analyzer/expression/ParseTypeExpression.pv"
         if (member_type == 0) {
-            #line 140 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 190 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
+        #line 191 "src/analyzer/expression/ParseTypeExpression.pv"
+        Expression__record_static_member_symbol(context, member, member_type, struct_type);
 
-        #line 142 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 193 "src/analyzer/expression/ParseTypeExpression.pv"
         struct GenericMap* generic_map = Type__get_generic_map(struct_type, context);
 
-        #line 144 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 195 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-            #line 145 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 196 "src/analyzer/expression/ParseTypeExpression.pv"
             switch (member_type->type) {
-                #line 146 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 197 "src/analyzer/expression/ParseTypeExpression.pv"
                 case TYPE__FUNCTION: {
-                    #line 147 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 198 "src/analyzer/expression/ParseTypeExpression.pv"
                     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = member_type }, member_type);
                 } break;
-                #line 149 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 200 "src/analyzer/expression/ParseTypeExpression.pv"
                 default: {
-                    #line 150 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 201 "src/analyzer/expression/ParseTypeExpression.pv"
                     struct Expression* struct_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = struct_type }, struct_type);
-                    #line 151 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 202 "src/analyzer/expression/ParseTypeExpression.pv"
                     return Expression__make(context->allocator, member, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION, .memberstaticexpression_value = { ._0 = struct_expr, ._1 = member->value} }, member_type);
                 } break;
             }
         } else {
-            #line 155 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 206 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                #line 155 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 206 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 157 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 208 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-            #line 159 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 210 "src/analyzer/expression/ParseTypeExpression.pv"
             while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 160 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 211 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Expression* argument = Expression__parse(context, generics);
-                #line 161 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 212 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (argument == 0) {
-                    #line 161 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 212 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 163 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 214 "src/analyzer/expression/ParseTypeExpression.pv"
                 Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                #line 165 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 216 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 166 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 217 "src/analyzer/expression/ParseTypeExpression.pv"
                     Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                    #line 167 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 218 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
             }
 
-            #line 171 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 222 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 171 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 222 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 173 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 224 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Expression__validate_arguments(context, token, member_type, &arguments, generic_map, false)) {
-                #line 173 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 224 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 175 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 226 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Type* func_return_type = Expression__get_return_type(context, member_type, token, generic_map);
-            #line 176 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 227 "src/analyzer/expression/ParseTypeExpression.pv"
             if (func_return_type == 0) {
-                #line 176 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 227 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 178 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 229 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Expression* func_expr = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = member_type }, member_type);
-            #line 179 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 230 "src/analyzer/expression/ParseTypeExpression.pv"
             return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = func_expr, ._1 = arguments} }, func_return_type);
         }
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 182 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 233 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-        #line 184 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 235 "src/analyzer/expression/ParseTypeExpression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-            #line 185 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 236 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Token* name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-            #line 186 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 237 "src/analyzer/expression/ParseTypeExpression.pv"
             if (name == 0) {
-                #line 186 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 237 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 188 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 239 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Expression* value = 0;
-            #line 189 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 240 "src/analyzer/expression/ParseTypeExpression.pv"
             if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ":")) {
-                #line 190 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 241 "src/analyzer/expression/ParseTypeExpression.pv"
                 value = Expression__parse(context, generics);
             } else {
-                #line 192 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 243 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Type* return_type = Context__get_value(context, name->value);
-                #line 193 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 244 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (return_type == 0) {
-                    #line 194 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 245 "src/analyzer/expression/ParseTypeExpression.pv"
                     Context__error_token(context, name, "Unable to find variable with this name");
-                    #line 195 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 246 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 198 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 249 "src/analyzer/expression/ParseTypeExpression.pv"
                 value = Expression__make(context->allocator, name, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = name->value }, return_type);
             }
 
-            #line 201 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 252 "src/analyzer/expression/ParseTypeExpression.pv"
             if (value == 0) {
-                #line 201 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 252 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 203 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 254 "src/analyzer/expression/ParseTypeExpression.pv"
             Array_InvokeArgument__append(&fields, (struct InvokeArgument) { .name = name, .value = value });
 
-            #line 205 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 256 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-                #line 206 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 257 "src/analyzer/expression/ParseTypeExpression.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
-                #line 207 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 258 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
         }
 
-        #line 211 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 262 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-            #line 211 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 262 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 213 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 264 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Type* resolved_struct_type = struct_type;
-        #line 214 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 265 "src/analyzer/expression/ParseTypeExpression.pv"
         switch (struct_type->type) {
-            #line 215 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 266 "src/analyzer/expression/ParseTypeExpression.pv"
             case TYPE__SELF: {
-                #line 216 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 267 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (context->type_self == 0) {
-                    #line 216 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 267 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
-                #line 217 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 268 "src/analyzer/expression/ParseTypeExpression.pv"
                 resolved_struct_type = context->type_self;
             } break;
-            #line 219 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 270 "src/analyzer/expression/ParseTypeExpression.pv"
             default: {
             } break;
         }
 
-        #line 222 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 273 "src/analyzer/expression/ParseTypeExpression.pv"
         switch (resolved_struct_type->type) {
-            #line 223 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 274 "src/analyzer/expression/ParseTypeExpression.pv"
             case TYPE__STRUCT: {
-                #line 223 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 274 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Struct* struct_info = resolved_struct_type->struct_value._0;
-                #line 224 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 275 "src/analyzer/expression/ParseTypeExpression.pv"
                 uintptr_t field_i = 0;
-                #line 225 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 276 "src/analyzer/expression/ParseTypeExpression.pv"
                 while (field_i < struct_info->fields.length) {
-                    #line 226 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 277 "src/analyzer/expression/ParseTypeExpression.pv"
                     struct HashMapBucket_str_StructField* bucket = struct_info->fields.data + field_i;
-                    #line 227 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 278 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (bucket == 0) {
-                        #line 227 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 278 "src/analyzer/expression/ParseTypeExpression.pv"
                         return 0;
                     }
-                    #line 228 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 279 "src/analyzer/expression/ParseTypeExpression.pv"
                     if (bucket->value.default_token_start != 0) {
-                        #line 229 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 280 "src/analyzer/expression/ParseTypeExpression.pv"
                         bool already_provided = false;
-                        #line 230 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 281 "src/analyzer/expression/ParseTypeExpression.pv"
                         uintptr_t arg_i = 0;
-                        #line 231 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 282 "src/analyzer/expression/ParseTypeExpression.pv"
                         while (arg_i < fields.length) {
-                            #line 232 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 283 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct Token* arg_name = fields.data[arg_i].name;
-                            #line 233 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 284 "src/analyzer/expression/ParseTypeExpression.pv"
                             if (arg_name != 0 && str__Eq_str__eq(&arg_name->value, bucket->key)) {
-                                #line 234 "src/analyzer/expression/ParseTypeExpression.pv"
+                                #line 285 "src/analyzer/expression/ParseTypeExpression.pv"
                                 already_provided = true;
-                                #line 235 "src/analyzer/expression/ParseTypeExpression.pv"
+                                #line 286 "src/analyzer/expression/ParseTypeExpression.pv"
                                 break;
                             }
-                            #line 237 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 288 "src/analyzer/expression/ParseTypeExpression.pv"
                             arg_i += 1;
                         }
 
-                        #line 240 "src/analyzer/expression/ParseTypeExpression.pv"
+                        #line 291 "src/analyzer/expression/ParseTypeExpression.pv"
                         if (!already_provided) {
-                            #line 241 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 292 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct Module* module = struct_info->module;
-                            #line 242 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 293 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct Context* struct_context = &module->context;
-                            #line 243 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 294 "src/analyzer/expression/ParseTypeExpression.pv"
                             uintptr_t saved_pos = struct_context->pos;
-                            #line 244 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 295 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct_context->pos = bucket->value.default_token_start;
-                            #line 245 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 296 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct Expression* default_expr = Expression__parse(struct_context, &struct_info->generics);
-                            #line 246 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 297 "src/analyzer/expression/ParseTypeExpression.pv"
                             struct_context->pos = saved_pos;
 
-                            #line 248 "src/analyzer/expression/ParseTypeExpression.pv"
+                            #line 299 "src/analyzer/expression/ParseTypeExpression.pv"
                             if (default_expr != 0) {
-                                #line 249 "src/analyzer/expression/ParseTypeExpression.pv"
+                                #line 300 "src/analyzer/expression/ParseTypeExpression.pv"
                                 struct Token* field_name = bucket->value.name;
-                                #line 250 "src/analyzer/expression/ParseTypeExpression.pv"
+                                #line 301 "src/analyzer/expression/ParseTypeExpression.pv"
                                 Array_InvokeArgument__append(&fields, (struct InvokeArgument) { .name = field_name, .value = default_expr });
                             }
                         }
                     }
-                    #line 254 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 305 "src/analyzer/expression/ParseTypeExpression.pv"
                     field_i += 1;
                 }
             } break;
-            #line 257 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 308 "src/analyzer/expression/ParseTypeExpression.pv"
             default: {
             } break;
         }
 
-        #line 260 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 311 "src/analyzer/expression/ParseTypeExpression.pv"
         struct GenericMap* generic_map = Type__get_generic_map(struct_type, context);
-        #line 261 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 312 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Expression__validate_arguments(context, token, struct_type, &fields, generic_map, false)) {
-            #line 261 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 312 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 263 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 314 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Expression* struct_expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = struct_type }, struct_type);
-        #line 264 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 315 "src/analyzer/expression/ParseTypeExpression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = struct_expression, ._1 = fields} }, struct_type);
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
-        #line 266 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 317 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-        #line 268 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 319 "src/analyzer/expression/ParseTypeExpression.pv"
         uintptr_t field_index = 0;
-        #line 269 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 320 "src/analyzer/expression/ParseTypeExpression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 270 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 321 "src/analyzer/expression/ParseTypeExpression.pv"
             struct String name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-            #line 271 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 322 "src/analyzer/expression/ParseTypeExpression.pv"
             String__append(&name, (struct str){ .ptr = "_", .length = strlen("_") });
-            #line 272 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 323 "src/analyzer/expression/ParseTypeExpression.pv"
             String__append_usize(&name, field_index);
-            #line 273 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 324 "src/analyzer/expression/ParseTypeExpression.pv"
             struct str name_str = String__as_str(&name);
 
-            #line 275 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 326 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Token name_token = *Context__current(context);
-            #line 276 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 327 "src/analyzer/expression/ParseTypeExpression.pv"
             name_token.value = name_str;
 
-            #line 278 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 329 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Expression* value = Expression__parse(context, generics);
-            #line 279 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 330 "src/analyzer/expression/ParseTypeExpression.pv"
             if (value == 0) {
-                #line 279 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 330 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 281 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 332 "src/analyzer/expression/ParseTypeExpression.pv"
             Array_InvokeArgument__append(&fields, (struct InvokeArgument) {
                 .name = ArenaAllocator__store_Token(context->allocator, &name_token),
                 .value = value,
             });
 
-            #line 286 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 337 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 287 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 338 "src/analyzer/expression/ParseTypeExpression.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                #line 288 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 339 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 291 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 342 "src/analyzer/expression/ParseTypeExpression.pv"
             field_index += 1;
         }
 
-        #line 294 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 345 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 294 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 345 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 296 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 347 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Expression* struct_expression = Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = struct_type }, struct_type);
-        #line 297 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 348 "src/analyzer/expression/ParseTypeExpression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = struct_expression, ._1 = fields} }, struct_type);
     }
 
-    #line 300 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 351 "src/analyzer/expression/ParseTypeExpression.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = struct_type }, struct_type);
 }
 
-#line 303 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 354 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_class(struct Context* context, struct Token* token, struct Expression* parent, struct Generics* generics) {
-    #line 304 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 355 "src/analyzer/expression/ParseTypeExpression.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 305 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 356 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Array_InvokeArgument fields = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-        #line 307 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 358 "src/analyzer/expression/ParseTypeExpression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-            #line 308 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 359 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Token* name = Context__expect(context, TOKEN_TYPE__IDENTIFIER);
-            #line 309 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 360 "src/analyzer/expression/ParseTypeExpression.pv"
             if (name == 0) {
-                #line 309 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 360 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 311 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 362 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Expression* value = 0;
-            #line 312 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 363 "src/analyzer/expression/ParseTypeExpression.pv"
             if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ":")) {
-                #line 313 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 364 "src/analyzer/expression/ParseTypeExpression.pv"
                 value = Expression__parse(context, generics);
             } else {
-                #line 315 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 366 "src/analyzer/expression/ParseTypeExpression.pv"
                 struct Type* return_type = Context__get_value(context, name->value);
-                #line 316 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 367 "src/analyzer/expression/ParseTypeExpression.pv"
                 if (return_type == 0) {
-                    #line 317 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 368 "src/analyzer/expression/ParseTypeExpression.pv"
                     Context__error_token(context, name, "Unable to find variable with this name");
-                    #line 318 "src/analyzer/expression/ParseTypeExpression.pv"
+                    #line 369 "src/analyzer/expression/ParseTypeExpression.pv"
                     return 0;
                 }
 
-                #line 321 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 372 "src/analyzer/expression/ParseTypeExpression.pv"
                 value = Expression__make(context->allocator, name, (struct ExpressionData) { .type = EXPRESSION_DATA__VARIABLE, .variable_value = name->value }, return_type);
             }
 
-            #line 324 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 375 "src/analyzer/expression/ParseTypeExpression.pv"
             if (value == 0) {
-                #line 324 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 375 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 326 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 377 "src/analyzer/expression/ParseTypeExpression.pv"
             Array_InvokeArgument__append(&fields, (struct InvokeArgument) { .name = name, .value = value });
 
-            #line 328 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 379 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-                #line 329 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 380 "src/analyzer/expression/ParseTypeExpression.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
-                #line 330 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 381 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
         }
 
-        #line 334 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 385 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-            #line 334 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 385 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 336 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 387 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Expression__validate_arguments(context, token, &parent->return_type, &fields, 0, false)) {
-            #line 336 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 387 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 338 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 389 "src/analyzer/expression/ParseTypeExpression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = parent, ._1 = fields} }, &parent->return_type);
     } else if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
-        #line 340 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 391 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-        #line 342 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 393 "src/analyzer/expression/ParseTypeExpression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 343 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 394 "src/analyzer/expression/ParseTypeExpression.pv"
             struct Expression* argument = Expression__parse(context, generics);
-            #line 344 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 395 "src/analyzer/expression/ParseTypeExpression.pv"
             if (argument == 0) {
-                #line 344 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 395 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
 
-            #line 346 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 397 "src/analyzer/expression/ParseTypeExpression.pv"
             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-            #line 348 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 399 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 349 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 400 "src/analyzer/expression/ParseTypeExpression.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                #line 350 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 401 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
         }
 
-        #line 354 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 405 "src/analyzer/expression/ParseTypeExpression.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 354 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 405 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 356 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 407 "src/analyzer/expression/ParseTypeExpression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = parent, ._1 = arguments} }, &parent->return_type);
     }
 
-    #line 359 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 410 "src/analyzer/expression/ParseTypeExpression.pv"
     return parent;
 }
 
-#line 362 "src/analyzer/expression/ParseTypeExpression.pv"
+#line 413 "src/analyzer/expression/ParseTypeExpression.pv"
 struct Expression* Expression__parse_cpp(struct Context* context, struct Generics* generics) {
-    #line 363 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 414 "src/analyzer/expression/ParseTypeExpression.pv"
     struct Token* token = &context->tokens[context->pos];
 
-    #line 365 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 416 "src/analyzer/expression/ParseTypeExpression.pv"
     if (Context__check_next(context, TOKEN_TYPE__IDENTIFIER, "new")) {
-        #line 366 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 417 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Expression* placement = 0;
-        #line 367 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 418 "src/analyzer/expression/ParseTypeExpression.pv"
         if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "(")) {
-            #line 368 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 419 "src/analyzer/expression/ParseTypeExpression.pv"
             placement = Expression__parse(context, generics);
-            #line 369 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 420 "src/analyzer/expression/ParseTypeExpression.pv"
             if (placement == 0) {
-                #line 369 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 420 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
-            #line 370 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 421 "src/analyzer/expression/ParseTypeExpression.pv"
             if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 370 "src/analyzer/expression/ParseTypeExpression.pv"
+                #line 421 "src/analyzer/expression/ParseTypeExpression.pv"
                 return 0;
             }
         }
 
-        #line 373 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 424 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Expression* expression = Expression__parse(context, generics);
-        #line 374 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 425 "src/analyzer/expression/ParseTypeExpression.pv"
         if (expression == 0) {
-            #line 374 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 425 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 376 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 427 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Indirect* indirect = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, expression->return_type);
-        #line 377 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 428 "src/analyzer/expression/ParseTypeExpression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__NEW, .new_value = { .placement = placement, .expression = expression } } }, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = indirect }});
     } else if (Context__check_next(context, TOKEN_TYPE__IDENTIFIER, "delete")) {
-        #line 379 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 430 "src/analyzer/expression/ParseTypeExpression.pv"
         struct Expression* expression = Expression__parse(context, generics);
-        #line 380 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 431 "src/analyzer/expression/ParseTypeExpression.pv"
         if (expression == 0) {
-            #line 380 "src/analyzer/expression/ParseTypeExpression.pv"
+            #line 431 "src/analyzer/expression/ParseTypeExpression.pv"
             return 0;
         }
 
-        #line 382 "src/analyzer/expression/ParseTypeExpression.pv"
+        #line 433 "src/analyzer/expression/ParseTypeExpression.pv"
         return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__CPP_EXPRESSION, .cppexpression_value = (struct CppExpression) { .type = CPP_EXPRESSION__DELETE, .delete_value = expression } }, &context->root->type_unknown);
     }
 
-    #line 385 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 436 "src/analyzer/expression/ParseTypeExpression.pv"
     Context__error(context, "Expected new or delete in cpp expression");
-    #line 386 "src/analyzer/expression/ParseTypeExpression.pv"
+    #line 437 "src/analyzer/expression/ParseTypeExpression.pv"
     return 0;
 }
 
@@ -4280,604 +4579,673 @@ struct Expression* Expression__parse_instance_member_expression_inner(struct Con
         #line 125 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
-
-    #line 127 "src/analyzer/expression/PostfixExpression.pv"
-    struct GenericMap* generic_map = Type__get_generic_map(&inner->return_type, context);
     #line 128 "src/analyzer/expression/PostfixExpression.pv"
+    if (Context__should_record_symbols(context)) {
+        #line 129 "src/analyzer/expression/PostfixExpression.pv"
+        struct Token* member_def_token = 0;
+        #line 130 "src/analyzer/expression/PostfixExpression.pv"
+        struct str member_def_path = context->path;
+        #line 131 "src/analyzer/expression/PostfixExpression.pv"
+        switch (member_type->type) {
+            #line 132 "src/analyzer/expression/PostfixExpression.pv"
+            case TYPE__FUNCTION: {
+                #line 132 "src/analyzer/expression/PostfixExpression.pv"
+                struct Function* mfunc = member_type->function_value._0;
+                #line 133 "src/analyzer/expression/PostfixExpression.pv"
+                member_def_token = mfunc->name;
+                #line 134 "src/analyzer/expression/PostfixExpression.pv"
+                if (mfunc->context != 0) {
+                    #line 134 "src/analyzer/expression/PostfixExpression.pv"
+                    member_def_path = mfunc->context->path;
+                }
+            } break;
+            #line 136 "src/analyzer/expression/PostfixExpression.pv"
+            default: {
+                #line 138 "src/analyzer/expression/PostfixExpression.pv"
+                switch (Type__deref_all(&inner->return_type)->type) {
+                    #line 139 "src/analyzer/expression/PostfixExpression.pv"
+                    case TYPE__STRUCT: {
+                        #line 139 "src/analyzer/expression/PostfixExpression.pv"
+                        struct Struct* struct_info = Type__deref_all(&inner->return_type)->struct_value._0;
+                        #line 140 "src/analyzer/expression/PostfixExpression.pv"
+                        struct StructField* field = HashMap_str_StructField__find(&struct_info->fields, &member_name->value);
+                        #line 141 "src/analyzer/expression/PostfixExpression.pv"
+                        if (field != 0) {
+                            #line 142 "src/analyzer/expression/PostfixExpression.pv"
+                            member_def_token = field->name;
+                            #line 143 "src/analyzer/expression/PostfixExpression.pv"
+                            member_def_path = struct_info->module->path;
+                        }
+                    } break;
+                    #line 146 "src/analyzer/expression/PostfixExpression.pv"
+                    default: {
+                    } break;
+                }
+            } break;
+        }
+        #line 150 "src/analyzer/expression/PostfixExpression.pv"
+        struct String member_type_label = Naming__get_type_decl(&context->root->naming_decl, member_type, context->type_self, 0);
+        #line 151 "src/analyzer/expression/PostfixExpression.pv"
+        Context__record_symbol(context, member_name, String__as_str(&member_type_label), member_def_path, member_def_token);
+    }
+
+    #line 154 "src/analyzer/expression/PostfixExpression.pv"
+    struct GenericMap* generic_map = Type__get_generic_map(&inner->return_type, context);
+    #line 155 "src/analyzer/expression/PostfixExpression.pv"
     struct Array_Type parsed_generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 };
-    #line 129 "src/analyzer/expression/PostfixExpression.pv"
+    #line 156 "src/analyzer/expression/PostfixExpression.pv"
     struct Function* func_info = 0;
 
-    #line 131 "src/analyzer/expression/PostfixExpression.pv"
+    #line 158 "src/analyzer/expression/PostfixExpression.pv"
     bool is_function = false;
-    #line 132 "src/analyzer/expression/PostfixExpression.pv"
+    #line 159 "src/analyzer/expression/PostfixExpression.pv"
     switch (member_type->type) {
-        #line 133 "src/analyzer/expression/PostfixExpression.pv"
+        #line 160 "src/analyzer/expression/PostfixExpression.pv"
         case TYPE__FUNCTION: {
-            #line 133 "src/analyzer/expression/PostfixExpression.pv"
+            #line 160 "src/analyzer/expression/PostfixExpression.pv"
             struct Function* func_info2 = member_type->function_value._0;
-            #line 134 "src/analyzer/expression/PostfixExpression.pv"
+            #line 161 "src/analyzer/expression/PostfixExpression.pv"
             is_function = true;
-            #line 135 "src/analyzer/expression/PostfixExpression.pv"
+            #line 162 "src/analyzer/expression/PostfixExpression.pv"
             func_info = func_info2;
         } break;
-        #line 137 "src/analyzer/expression/PostfixExpression.pv"
+        #line 164 "src/analyzer/expression/PostfixExpression.pv"
         case TYPE__FUNCTION_C: {
-            #line 137 "src/analyzer/expression/PostfixExpression.pv"
+            #line 164 "src/analyzer/expression/PostfixExpression.pv"
             is_function = true;
         } break;
-        #line 138 "src/analyzer/expression/PostfixExpression.pv"
+        #line 165 "src/analyzer/expression/PostfixExpression.pv"
         case TYPE__UNKNOWN_C: {
-            #line 138 "src/analyzer/expression/PostfixExpression.pv"
+            #line 165 "src/analyzer/expression/PostfixExpression.pv"
             is_function = true;
         } break;
-        #line 139 "src/analyzer/expression/PostfixExpression.pv"
+        #line 166 "src/analyzer/expression/PostfixExpression.pv"
         default: {
         } break;
     }
 
-    #line 142 "src/analyzer/expression/PostfixExpression.pv"
+    #line 169 "src/analyzer/expression/PostfixExpression.pv"
     if (is_function && Context__check_value(context, TOKEN_TYPE__SYMBOL, "<")) {
-        #line 143 "src/analyzer/expression/PostfixExpression.pv"
+        #line 170 "src/analyzer/expression/PostfixExpression.pv"
         parsed_generics = Context__parse_generics(context, generics);
     }
 
-    #line 146 "src/analyzer/expression/PostfixExpression.pv"
+    #line 173 "src/analyzer/expression/PostfixExpression.pv"
     if (is_function && Context__check_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-        #line 147 "src/analyzer/expression/PostfixExpression.pv"
+        #line 174 "src/analyzer/expression/PostfixExpression.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-            #line 147 "src/analyzer/expression/PostfixExpression.pv"
+            #line 174 "src/analyzer/expression/PostfixExpression.pv"
             return 0;
         }
+        #line 175 "src/analyzer/expression/PostfixExpression.pv"
+        struct Token* member_open_paren = Context__prev(context);
 
-        #line 149 "src/analyzer/expression/PostfixExpression.pv"
+        #line 177 "src/analyzer/expression/PostfixExpression.pv"
         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        #line 178 "src/analyzer/expression/PostfixExpression.pv"
+        struct Array_Position member_sig_commas = Array_Position__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-        #line 151 "src/analyzer/expression/PostfixExpression.pv"
+        #line 180 "src/analyzer/expression/PostfixExpression.pv"
         if (func_info == 0) {
-            #line 152 "src/analyzer/expression/PostfixExpression.pv"
+            #line 181 "src/analyzer/expression/PostfixExpression.pv"
             Context__error_token(context, member_name, "Expected function type");
-            #line 153 "src/analyzer/expression/PostfixExpression.pv"
+            #line 182 "src/analyzer/expression/PostfixExpression.pv"
             return 0;
         }
 
-        #line 156 "src/analyzer/expression/PostfixExpression.pv"
+        #line 185 "src/analyzer/expression/PostfixExpression.pv"
         struct Token* name = func_info->parameters.length > 0 ? func_info->parameters.data[0].name : 0;
-        #line 157 "src/analyzer/expression/PostfixExpression.pv"
+        #line 186 "src/analyzer/expression/PostfixExpression.pv"
         if (name != 0 && str__Eq_str__eq(&name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
-            #line 158 "src/analyzer/expression/PostfixExpression.pv"
+            #line 187 "src/analyzer/expression/PostfixExpression.pv"
             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = inner });
         }
 
-        #line 161 "src/analyzer/expression/PostfixExpression.pv"
+        #line 190 "src/analyzer/expression/PostfixExpression.pv"
         while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 162 "src/analyzer/expression/PostfixExpression.pv"
+            #line 191 "src/analyzer/expression/PostfixExpression.pv"
             struct Expression* argument = Expression__parse(context, generics);
-            #line 163 "src/analyzer/expression/PostfixExpression.pv"
+            #line 192 "src/analyzer/expression/PostfixExpression.pv"
             if (argument == 0) {
-                #line 163 "src/analyzer/expression/PostfixExpression.pv"
+                #line 192 "src/analyzer/expression/PostfixExpression.pv"
                 return 0;
             }
-            #line 164 "src/analyzer/expression/PostfixExpression.pv"
+            #line 193 "src/analyzer/expression/PostfixExpression.pv"
             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-            #line 166 "src/analyzer/expression/PostfixExpression.pv"
-            if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                #line 167 "src/analyzer/expression/PostfixExpression.pv"
+            #line 195 "src/analyzer/expression/PostfixExpression.pv"
+            if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ",")) {
+                #line 196 "src/analyzer/expression/PostfixExpression.pv"
+                struct Token* comma_tok = Context__prev(context);
+                #line 197 "src/analyzer/expression/PostfixExpression.pv"
+                if (comma_tok != 0) {
+                    #line 198 "src/analyzer/expression/PostfixExpression.pv"
+                    Array_Position__append(&member_sig_commas, (struct Position) { .line = comma_tok->start_line, .character = comma_tok->start_column });
+                }
+            } else if (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                #line 201 "src/analyzer/expression/PostfixExpression.pv"
                 Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                #line 168 "src/analyzer/expression/PostfixExpression.pv"
+                #line 202 "src/analyzer/expression/PostfixExpression.pv"
                 return 0;
             }
         }
 
-        #line 172 "src/analyzer/expression/PostfixExpression.pv"
+        #line 206 "src/analyzer/expression/PostfixExpression.pv"
         if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 172 "src/analyzer/expression/PostfixExpression.pv"
+            #line 206 "src/analyzer/expression/PostfixExpression.pv"
             return 0;
         }
+        #line 207 "src/analyzer/expression/PostfixExpression.pv"
+        struct Token* member_close_paren = Context__prev(context);
 
-        #line 174 "src/analyzer/expression/PostfixExpression.pv"
+        #line 209 "src/analyzer/expression/PostfixExpression.pv"
+        if (member_open_paren != 0 && member_close_paren != 0) {
+            #line 210 "src/analyzer/expression/PostfixExpression.pv"
+            Expression__record_function_signature(context, func_info, member_open_paren, member_close_paren, member_sig_commas);
+        }
+
+        #line 213 "src/analyzer/expression/PostfixExpression.pv"
         if (func_info->generics.array.length > 0) {
-            #line 175 "src/analyzer/expression/PostfixExpression.pv"
+            #line 214 "src/analyzer/expression/PostfixExpression.pv"
             struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-            #line 176 "src/analyzer/expression/PostfixExpression.pv"
+            #line 215 "src/analyzer/expression/PostfixExpression.pv"
             struct GenericMap combined_generics_val = GenericMap__clone(func_generics, context->allocator);
-            #line 177 "src/analyzer/expression/PostfixExpression.pv"
+            #line 216 "src/analyzer/expression/PostfixExpression.pv"
             struct GenericMap* combined_generics = ArenaAllocator__store_GenericMap(context->allocator, &combined_generics_val);
 
-            #line 179 "src/analyzer/expression/PostfixExpression.pv"
+            #line 218 "src/analyzer/expression/PostfixExpression.pv"
             if (generic_map != 0) {
-                #line 180 "src/analyzer/expression/PostfixExpression.pv"
+                #line 219 "src/analyzer/expression/PostfixExpression.pv"
                 { struct HashMapIter_str_usize __iter = HashMap_str_usize__iter(&generic_map->map);
-                #line 180 "src/analyzer/expression/PostfixExpression.pv"
+                #line 219 "src/analyzer/expression/PostfixExpression.pv"
                 while (HashMapIter_str_usize__next(&__iter)) {
-                    #line 180 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 219 "src/analyzer/expression/PostfixExpression.pv"
                     struct str name = HashMapIter_str_usize__value(&__iter)->_0;
 
-                    #line 181 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 220 "src/analyzer/expression/PostfixExpression.pv"
                     struct Type* concrete_type = GenericMap__get(generic_map, name);
-                    #line 182 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 221 "src/analyzer/expression/PostfixExpression.pv"
                     if (concrete_type != 0) {
-                        #line 183 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 222 "src/analyzer/expression/PostfixExpression.pv"
                         if (combined_generics == 0) {
-                            #line 183 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 222 "src/analyzer/expression/PostfixExpression.pv"
                             return 0;
                         }
-                        #line 184 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 223 "src/analyzer/expression/PostfixExpression.pv"
                         GenericMap__insert(combined_generics, name, *concrete_type);
                     }
                 } }
             }
 
-            #line 189 "src/analyzer/expression/PostfixExpression.pv"
+            #line 228 "src/analyzer/expression/PostfixExpression.pv"
             switch (member_type->type) {
-                #line 190 "src/analyzer/expression/PostfixExpression.pv"
+                #line 229 "src/analyzer/expression/PostfixExpression.pv"
                 case TYPE__FUNCTION: {
-                    #line 190 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 229 "src/analyzer/expression/PostfixExpression.pv"
                     struct Function* function_info = member_type->function_value._0;
-                    #line 191 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 230 "src/analyzer/expression/PostfixExpression.pv"
                     struct Type function_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = combined_generics} };
-                    #line 192 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 231 "src/analyzer/expression/PostfixExpression.pv"
                     member_type = ArenaAllocator__store_Type(context->allocator, &function_type);
                 } break;
-                #line 194 "src/analyzer/expression/PostfixExpression.pv"
+                #line 233 "src/analyzer/expression/PostfixExpression.pv"
                 default: {
-                    #line 195 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 234 "src/analyzer/expression/PostfixExpression.pv"
                     member_type = Root__make_type_usage(context->root, member_type, &func_generics->array);
                 } break;
             }
         }
 
-        #line 200 "src/analyzer/expression/PostfixExpression.pv"
+        #line 239 "src/analyzer/expression/PostfixExpression.pv"
         if ((func_info->type == FUNCTION_TYPE__BUILTIN || func_info->type == FUNCTION_TYPE__METHOD_CPP)) {
-            #line 201 "src/analyzer/expression/PostfixExpression.pv"
+            #line 240 "src/analyzer/expression/PostfixExpression.pv"
             struct Expression* member_expression = Expression__make(context->allocator, member_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION, .memberinstanceexpression_value = { ._0 = inner, ._1 = member_name->value} }, member_type);
-            #line 202 "src/analyzer/expression/PostfixExpression.pv"
+            #line 241 "src/analyzer/expression/PostfixExpression.pv"
             return Expression__make_member_function_call(context, member_expression, member_name, member_type, arguments, generic_map);
         } else {
-            #line 204 "src/analyzer/expression/PostfixExpression.pv"
+            #line 243 "src/analyzer/expression/PostfixExpression.pv"
             return Expression__make_type_function_call(context, member_name, member_type, arguments, generic_map);
         }
     } else {
-        #line 207 "src/analyzer/expression/PostfixExpression.pv"
+        #line 246 "src/analyzer/expression/PostfixExpression.pv"
         if (generic_map != 0) {
-            #line 208 "src/analyzer/expression/PostfixExpression.pv"
+            #line 247 "src/analyzer/expression/PostfixExpression.pv"
             member_type = Context__resolve_type(context->allocator, member_type, generic_map, 0);
         }
-        #line 213 "src/analyzer/expression/PostfixExpression.pv"
+        #line 252 "src/analyzer/expression/PostfixExpression.pv"
         struct Expression* result_expr = Expression__make(context->allocator, member_name, (struct ExpressionData) { .type = EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION, .memberinstanceexpression_value = { ._0 = inner, ._1 = member_name->value} }, member_type);
-        #line 214 "src/analyzer/expression/PostfixExpression.pv"
+        #line 253 "src/analyzer/expression/PostfixExpression.pv"
         struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 215 "src/analyzer/expression/PostfixExpression.pv"
+        #line 254 "src/analyzer/expression/PostfixExpression.pv"
         if (Expression__build_narrow_path(result_expr, &path)) {
-            #line 216 "src/analyzer/expression/PostfixExpression.pv"
+            #line 255 "src/analyzer/expression/PostfixExpression.pv"
             struct Type* narrowed = Context__get_path_narrowing(context, String__as_str(&path));
-            #line 217 "src/analyzer/expression/PostfixExpression.pv"
+            #line 256 "src/analyzer/expression/PostfixExpression.pv"
             if (narrowed != 0) {
-                #line 218 "src/analyzer/expression/PostfixExpression.pv"
+                #line 257 "src/analyzer/expression/PostfixExpression.pv"
                 result_expr->return_type = *narrowed;
             }
         }
-        #line 221 "src/analyzer/expression/PostfixExpression.pv"
+        #line 260 "src/analyzer/expression/PostfixExpression.pv"
         return result_expr;
     }
 }
 
-#line 225 "src/analyzer/expression/PostfixExpression.pv"
+#line 264 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics) {
-    #line 226 "src/analyzer/expression/PostfixExpression.pv"
+    #line 265 "src/analyzer/expression/PostfixExpression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "[")) {
-        #line 226 "src/analyzer/expression/PostfixExpression.pv"
+        #line 265 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 228 "src/analyzer/expression/PostfixExpression.pv"
+    #line 267 "src/analyzer/expression/PostfixExpression.pv"
     struct Expression* index_expr = Expression__parse(context, generics);
-    #line 229 "src/analyzer/expression/PostfixExpression.pv"
+    #line 268 "src/analyzer/expression/PostfixExpression.pv"
     if (index_expr == 0) {
-        #line 229 "src/analyzer/expression/PostfixExpression.pv"
+        #line 268 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 231 "src/analyzer/expression/PostfixExpression.pv"
+    #line 270 "src/analyzer/expression/PostfixExpression.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "]")) {
-        #line 231 "src/analyzer/expression/PostfixExpression.pv"
+        #line 270 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 233 "src/analyzer/expression/PostfixExpression.pv"
+    #line 272 "src/analyzer/expression/PostfixExpression.pv"
     switch (index_expr->data.type) {
-        #line 234 "src/analyzer/expression/PostfixExpression.pv"
+        #line 273 "src/analyzer/expression/PostfixExpression.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 234 "src/analyzer/expression/PostfixExpression.pv"
+            #line 273 "src/analyzer/expression/PostfixExpression.pv"
             struct Expression* target = index_expr->data.invoke_value._0;
-            #line 234 "src/analyzer/expression/PostfixExpression.pv"
+            #line 273 "src/analyzer/expression/PostfixExpression.pv"
             struct Array_InvokeArgument args = index_expr->data.invoke_value._1;
-            #line 235 "src/analyzer/expression/PostfixExpression.pv"
+            #line 274 "src/analyzer/expression/PostfixExpression.pv"
             switch (target->return_type.type) {
-                #line 236 "src/analyzer/expression/PostfixExpression.pv"
+                #line 275 "src/analyzer/expression/PostfixExpression.pv"
                 case TYPE__ENUM: {
-                    #line 236 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 275 "src/analyzer/expression/PostfixExpression.pv"
                     struct Enum* enum_info = target->return_type.enum_value._0;
-                    #line 237 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 276 "src/analyzer/expression/PostfixExpression.pv"
                     struct Token* enum_name = enum_info->name;
-                    #line 238 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 277 "src/analyzer/expression/PostfixExpression.pv"
                     if (enum_name != 0 && str__Eq_str__eq(&enum_name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
-                        #line 239 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 278 "src/analyzer/expression/PostfixExpression.pv"
                         struct Sequence* sequence = ArenaAllocator__store_Sequence(context->allocator, (struct Sequence[]){(struct Sequence) {
                             .type = (struct SequenceType) { .type = SEQUENCE_TYPE__SLICE },
                             .element = *Type__deref(&inner->return_type),
                             .element_pointer = inner->return_type,
                         }});
-                        #line 244 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 283 "src/analyzer/expression/PostfixExpression.pv"
                         if (sequence == 0) {
-                            #line 244 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 283 "src/analyzer/expression/PostfixExpression.pv"
                             return 0;
                         }
 
-                        #line 246 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 285 "src/analyzer/expression/PostfixExpression.pv"
                         struct Expression* start = args.data[0].value;
-                        #line 247 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 286 "src/analyzer/expression/PostfixExpression.pv"
                         struct Expression* end = args.data[1].value;
 
-                        #line 249 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 288 "src/analyzer/expression/PostfixExpression.pv"
                         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                        #line 251 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 290 "src/analyzer/expression/PostfixExpression.pv"
                         struct Token* argument_name_data = ArenaAllocator__store_Token(context->allocator, index_expr->token);
-                        #line 252 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 291 "src/analyzer/expression/PostfixExpression.pv"
                         if (argument_name_data == 0) {
-                            #line 252 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 291 "src/analyzer/expression/PostfixExpression.pv"
                             return 0;
                         }
-                        #line 253 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 292 "src/analyzer/expression/PostfixExpression.pv"
                         argument_name_data->type = TOKEN_TYPE__IDENTIFIER;
-                        #line 254 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 293 "src/analyzer/expression/PostfixExpression.pv"
                         argument_name_data->value = (struct str){ .ptr = "data", .length = strlen("data") };
 
-                        #line 256 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 295 "src/analyzer/expression/PostfixExpression.pv"
                         struct Token* argument_name_length = ArenaAllocator__store_Token(context->allocator, argument_name_data);
-                        #line 257 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 296 "src/analyzer/expression/PostfixExpression.pv"
                         if (argument_name_length == 0) {
-                            #line 257 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 296 "src/analyzer/expression/PostfixExpression.pv"
                             return 0;
                         }
-                        #line 258 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 297 "src/analyzer/expression/PostfixExpression.pv"
                         argument_name_length->value = (struct str){ .ptr = "length", .length = strlen("length") };
 
-                        #line 260 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 299 "src/analyzer/expression/PostfixExpression.pv"
                         if (Expression__is_zero(start)) {
-                            #line 261 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 300 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = argument_name_data, .value = inner });
-                            #line 262 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 301 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = argument_name_length, .value = end });
                         } else {
-                            #line 264 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 303 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) {
                                 .name = argument_name_data,
                                 .value = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__BINARY_EXPRESSION, .binaryexpression_value = { ._0 = inner, ._1 = (struct str){ .ptr = "+", .length = strlen("+") }, ._2 = start} }, &sequence->element_pointer),
                             });
 
-                            #line 269 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 308 "src/analyzer/expression/PostfixExpression.pv"
                             Array_InvokeArgument__append(&arguments, (struct InvokeArgument) {
                                 .name = argument_name_length,
                                 .value = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__BINARY_EXPRESSION, .binaryexpression_value = { ._0 = end, ._1 = (struct str){ .ptr = "-", .length = strlen("-") }, ._2 = start} }, &context->root->type_usize),
                             });
                         }
 
-                        #line 275 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 314 "src/analyzer/expression/PostfixExpression.pv"
                         struct Type* sequence_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }});
-                        #line 276 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 315 "src/analyzer/expression/PostfixExpression.pv"
                         struct Expression* sequence_expr = Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__TYPE, .type_value = sequence_type }, sequence_type);
-                        #line 277 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 316 "src/analyzer/expression/PostfixExpression.pv"
                         return Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = sequence_expr, ._1 = arguments} }, sequence_type);
                     }
                 } break;
-                #line 280 "src/analyzer/expression/PostfixExpression.pv"
+                #line 319 "src/analyzer/expression/PostfixExpression.pv"
                 default: {
                 } break;
             }
         } break;
-        #line 283 "src/analyzer/expression/PostfixExpression.pv"
+        #line 322 "src/analyzer/expression/PostfixExpression.pv"
         default: {
         } break;
     }
 
-    #line 286 "src/analyzer/expression/PostfixExpression.pv"
+    #line 325 "src/analyzer/expression/PostfixExpression.pv"
     struct Expression* index_trait_result = Expression__find_index_trait_call(context, index_expr->token, inner, index_expr);
-    #line 287 "src/analyzer/expression/PostfixExpression.pv"
+    #line 326 "src/analyzer/expression/PostfixExpression.pv"
     if (index_trait_result != 0) {
-        #line 287 "src/analyzer/expression/PostfixExpression.pv"
+        #line 326 "src/analyzer/expression/PostfixExpression.pv"
         return index_trait_result;
     }
 
-    #line 289 "src/analyzer/expression/PostfixExpression.pv"
+    #line 328 "src/analyzer/expression/PostfixExpression.pv"
     struct Type* inner_return_type = &inner->return_type;
-    #line 290 "src/analyzer/expression/PostfixExpression.pv"
+    #line 329 "src/analyzer/expression/PostfixExpression.pv"
     struct Type* element_type = 0;
 
-    #line 292 "src/analyzer/expression/PostfixExpression.pv"
+    #line 331 "src/analyzer/expression/PostfixExpression.pv"
     if (Type__is_reference_sequence_dynamic(inner_return_type)) {
-        #line 293 "src/analyzer/expression/PostfixExpression.pv"
+        #line 332 "src/analyzer/expression/PostfixExpression.pv"
         switch (Type__deref_1(inner_return_type)->type) {
-            #line 294 "src/analyzer/expression/PostfixExpression.pv"
+            #line 333 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__SEQUENCE: {
-                #line 294 "src/analyzer/expression/PostfixExpression.pv"
+                #line 333 "src/analyzer/expression/PostfixExpression.pv"
                 struct Sequence* sequence = Type__deref_1(inner_return_type)->sequence_value;
-                #line 295 "src/analyzer/expression/PostfixExpression.pv"
+                #line 334 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &sequence->element;
             } break;
-            #line 297 "src/analyzer/expression/PostfixExpression.pv"
+            #line 336 "src/analyzer/expression/PostfixExpression.pv"
             default: {
             } break;
         }
     } else {
-        #line 300 "src/analyzer/expression/PostfixExpression.pv"
+        #line 339 "src/analyzer/expression/PostfixExpression.pv"
         switch (inner_return_type->type) {
-            #line 301 "src/analyzer/expression/PostfixExpression.pv"
+            #line 340 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__INDIRECT: {
-                #line 301 "src/analyzer/expression/PostfixExpression.pv"
+                #line 340 "src/analyzer/expression/PostfixExpression.pv"
                 struct Indirect* indirect = inner_return_type->indirect_value;
-                #line 302 "src/analyzer/expression/PostfixExpression.pv"
+                #line 341 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &indirect->to;
             } break;
-            #line 304 "src/analyzer/expression/PostfixExpression.pv"
+            #line 343 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__SEQUENCE: {
-                #line 304 "src/analyzer/expression/PostfixExpression.pv"
+                #line 343 "src/analyzer/expression/PostfixExpression.pv"
                 struct Sequence* sequence = inner_return_type->sequence_value;
-                #line 305 "src/analyzer/expression/PostfixExpression.pv"
+                #line 344 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &sequence->element;
             } break;
-            #line 307 "src/analyzer/expression/PostfixExpression.pv"
+            #line 346 "src/analyzer/expression/PostfixExpression.pv"
             default: {
             } break;
         }
     }
 
-    #line 311 "src/analyzer/expression/PostfixExpression.pv"
+    #line 350 "src/analyzer/expression/PostfixExpression.pv"
     if (element_type == 0 && context->module->mode_cpp) {
-        #line 312 "src/analyzer/expression/PostfixExpression.pv"
+        #line 351 "src/analyzer/expression/PostfixExpression.pv"
         struct UnknownC* unknown_c = ArenaAllocator__store_UnknownC(context->allocator, (struct UnknownC[]){(struct UnknownC) { .include = 0, .name = (struct str){ .ptr = "", .length = strlen("") }, .generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 } }});
-        #line 313 "src/analyzer/expression/PostfixExpression.pv"
+        #line 352 "src/analyzer/expression/PostfixExpression.pv"
         element_type = Type__to_ptr((struct Type[]){(struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = unknown_c }}, context->allocator);
     }
 
-    #line 316 "src/analyzer/expression/PostfixExpression.pv"
+    #line 355 "src/analyzer/expression/PostfixExpression.pv"
     if (element_type == 0) {
-        #line 317 "src/analyzer/expression/PostfixExpression.pv"
+        #line 356 "src/analyzer/expression/PostfixExpression.pv"
         Context__error_expression(context, index_expr, "Type is not indexable");
-        #line 318 "src/analyzer/expression/PostfixExpression.pv"
+        #line 357 "src/analyzer/expression/PostfixExpression.pv"
         return 0;
     }
 
-    #line 321 "src/analyzer/expression/PostfixExpression.pv"
+    #line 360 "src/analyzer/expression/PostfixExpression.pv"
     return Expression__make(context->allocator, index_expr->token, (struct ExpressionData) { .type = EXPRESSION_DATA__INDEX_EXPRESSION, .indexexpression_value = { ._0 = inner, ._1 = index_expr} }, element_type);
 }
 
-#line 324 "src/analyzer/expression/PostfixExpression.pv"
+#line 363 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics) {
-    #line 325 "src/analyzer/expression/PostfixExpression.pv"
+    #line 364 "src/analyzer/expression/PostfixExpression.pv"
     struct Token* token = Context__current(context);
-    #line 326 "src/analyzer/expression/PostfixExpression.pv"
+    #line 365 "src/analyzer/expression/PostfixExpression.pv"
     if (token == 0) {
-        #line 326 "src/analyzer/expression/PostfixExpression.pv"
+        #line 365 "src/analyzer/expression/PostfixExpression.pv"
         return inner;
     }
 
-    #line 328 "src/analyzer/expression/PostfixExpression.pv"
+    #line 367 "src/analyzer/expression/PostfixExpression.pv"
     if (Token__eq(token, TOKEN_TYPE__SYMBOL, ".")) {
-        #line 329 "src/analyzer/expression/PostfixExpression.pv"
+        #line 368 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_instance_member_expression(context, inner, generics);
     } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "?")) {
-        #line 331 "src/analyzer/expression/PostfixExpression.pv"
+        #line 370 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_optional_expression(context, inner, generics);
     } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "::")) {
-        #line 333 "src/analyzer/expression/PostfixExpression.pv"
+        #line 372 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_type_member_expression(context, inner, generics);
     } else if (Token__eq(token, TOKEN_TYPE__SYMBOL, "[")) {
-        #line 335 "src/analyzer/expression/PostfixExpression.pv"
+        #line 374 "src/analyzer/expression/PostfixExpression.pv"
         return Expression__parse_index_expression(context, inner, generics);
     } else if (Type__is_function(Type__resolve_typedef_function(&inner->return_type)) && (Token__eq(token, TOKEN_TYPE__SYMBOL, "<") || Token__eq(token, TOKEN_TYPE__SYMBOL, "("))) {
-        #line 337 "src/analyzer/expression/PostfixExpression.pv"
+        #line 376 "src/analyzer/expression/PostfixExpression.pv"
         switch (Type__resolve_typedef_function(&inner->return_type)->type) {
-            #line 338 "src/analyzer/expression/PostfixExpression.pv"
+            #line 377 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__FUNCTION: {
-                #line 338 "src/analyzer/expression/PostfixExpression.pv"
+                #line 377 "src/analyzer/expression/PostfixExpression.pv"
                 struct Function* func_info = Type__resolve_typedef_function(&inner->return_type)->function_value._0;
-                #line 339 "src/analyzer/expression/PostfixExpression.pv"
+                #line 378 "src/analyzer/expression/PostfixExpression.pv"
                 struct Array_Type parsed_generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 };
 
-                #line 341 "src/analyzer/expression/PostfixExpression.pv"
+                #line 380 "src/analyzer/expression/PostfixExpression.pv"
                 if (Context__check_value(context, TOKEN_TYPE__SYMBOL, "<")) {
-                    #line 342 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 381 "src/analyzer/expression/PostfixExpression.pv"
                     parsed_generics = Context__parse_generics(context, generics);
                 }
 
-                #line 345 "src/analyzer/expression/PostfixExpression.pv"
+                #line 384 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 345 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 384 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 347 "src/analyzer/expression/PostfixExpression.pv"
+                #line 386 "src/analyzer/expression/PostfixExpression.pv"
                 struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
-                #line 349 "src/analyzer/expression/PostfixExpression.pv"
+                #line 388 "src/analyzer/expression/PostfixExpression.pv"
                 while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 350 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 389 "src/analyzer/expression/PostfixExpression.pv"
                     struct Expression* argument = Expression__parse(context, generics);
-                    #line 351 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 390 "src/analyzer/expression/PostfixExpression.pv"
                     Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
 
-                    #line 353 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 392 "src/analyzer/expression/PostfixExpression.pv"
                     if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 354 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 393 "src/analyzer/expression/PostfixExpression.pv"
                         Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 355 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 394 "src/analyzer/expression/PostfixExpression.pv"
                         return 0;
                     }
                 }
 
-                #line 359 "src/analyzer/expression/PostfixExpression.pv"
+                #line 398 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 359 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 398 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 361 "src/analyzer/expression/PostfixExpression.pv"
+                #line 400 "src/analyzer/expression/PostfixExpression.pv"
                 if (func_info->generics.array.length > 0) {
-                    #line 362 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 401 "src/analyzer/expression/PostfixExpression.pv"
                     struct GenericMap* func_generics = Expression__resolve_function_generics(context, func_info, &parsed_generics, &arguments);
-                    #line 363 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 402 "src/analyzer/expression/PostfixExpression.pv"
                     struct Type* inner_return_type = Root__make_type_usage(context->root, &inner->return_type, &func_generics->array);
-                    #line 364 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 403 "src/analyzer/expression/PostfixExpression.pv"
                     if (inner_return_type == 0) {
-                        #line 364 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 403 "src/analyzer/expression/PostfixExpression.pv"
                         return 0;
                     }
-                    #line 365 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 404 "src/analyzer/expression/PostfixExpression.pv"
                     inner->return_type = *inner_return_type;
 
-                    #line 367 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 406 "src/analyzer/expression/PostfixExpression.pv"
                     switch (inner->data.type) {
-                        #line 368 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 407 "src/analyzer/expression/PostfixExpression.pv"
                         case EXPRESSION_DATA__TYPE: {
-                            #line 368 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 407 "src/analyzer/expression/PostfixExpression.pv"
                             struct Type** type = &inner->data.type_value;
-                            #line 369 "src/analyzer/expression/PostfixExpression.pv"
+                            #line 408 "src/analyzer/expression/PostfixExpression.pv"
                             *type = &inner->return_type;
                         } break;
-                        #line 371 "src/analyzer/expression/PostfixExpression.pv"
+                        #line 410 "src/analyzer/expression/PostfixExpression.pv"
                         default: {
                         } break;
                     }
                 }
 
-                #line 375 "src/analyzer/expression/PostfixExpression.pv"
+                #line 414 "src/analyzer/expression/PostfixExpression.pv"
                 if (!Expression__validate_arguments(context, token, &inner->return_type, &arguments, 0, false)) {
-                    #line 375 "src/analyzer/expression/PostfixExpression.pv"
+                    #line 414 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
-                }
-
-                #line 377 "src/analyzer/expression/PostfixExpression.pv"
-                return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
-            } break;
-            #line 379 "src/analyzer/expression/PostfixExpression.pv"
-            case TYPE__FUNCTION_C: {
-                #line 379 "src/analyzer/expression/PostfixExpression.pv"
-                struct FunctionC* func_info = Type__resolve_typedef_function(&inner->return_type)->functionc_value;
-                #line 380 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 380 "src/analyzer/expression/PostfixExpression.pv"
-                    return 0;
-                }
-
-                #line 382 "src/analyzer/expression/PostfixExpression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-
-                #line 384 "src/analyzer/expression/PostfixExpression.pv"
-                while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 385 "src/analyzer/expression/PostfixExpression.pv"
-                    struct Expression* argument = Expression__parse(context, generics);
-                    #line 386 "src/analyzer/expression/PostfixExpression.pv"
-                    Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
-
-                    #line 388 "src/analyzer/expression/PostfixExpression.pv"
-                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 389 "src/analyzer/expression/PostfixExpression.pv"
-                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 390 "src/analyzer/expression/PostfixExpression.pv"
-                        return 0;
-                    }
-                }
-
-                #line 394 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 394 "src/analyzer/expression/PostfixExpression.pv"
-                    return 0;
-                }
-
-                #line 396 "src/analyzer/expression/PostfixExpression.pv"
-                return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
-            } break;
-            #line 398 "src/analyzer/expression/PostfixExpression.pv"
-            case TYPE__CLASS_CPP: {
-                #line 399 "src/analyzer/expression/PostfixExpression.pv"
-                return Expression__parse_class(context, token, inner, generics);
-            } break;
-            #line 401 "src/analyzer/expression/PostfixExpression.pv"
-            case TYPE__UNKNOWN_C: {
-                #line 402 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-                    #line 402 "src/analyzer/expression/PostfixExpression.pv"
-                    return 0;
-                }
-
-                #line 404 "src/analyzer/expression/PostfixExpression.pv"
-                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-
-                #line 406 "src/analyzer/expression/PostfixExpression.pv"
-                while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 407 "src/analyzer/expression/PostfixExpression.pv"
-                    struct Expression* argument = Expression__parse(context, generics);
-                    #line 408 "src/analyzer/expression/PostfixExpression.pv"
-                    Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
-
-                    #line 410 "src/analyzer/expression/PostfixExpression.pv"
-                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                        #line 411 "src/analyzer/expression/PostfixExpression.pv"
-                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-                        #line 412 "src/analyzer/expression/PostfixExpression.pv"
-                        return 0;
-                    }
                 }
 
                 #line 416 "src/analyzer/expression/PostfixExpression.pv"
-                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-                    #line 416 "src/analyzer/expression/PostfixExpression.pv"
+                return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
+            } break;
+            #line 418 "src/analyzer/expression/PostfixExpression.pv"
+            case TYPE__FUNCTION_C: {
+                #line 418 "src/analyzer/expression/PostfixExpression.pv"
+                struct FunctionC* func_info = Type__resolve_typedef_function(&inner->return_type)->functionc_value;
+                #line 419 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
+                    #line 419 "src/analyzer/expression/PostfixExpression.pv"
                     return 0;
                 }
 
-                #line 418 "src/analyzer/expression/PostfixExpression.pv"
+                #line 421 "src/analyzer/expression/PostfixExpression.pv"
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+
+                #line 423 "src/analyzer/expression/PostfixExpression.pv"
+                while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 424 "src/analyzer/expression/PostfixExpression.pv"
+                    struct Expression* argument = Expression__parse(context, generics);
+                    #line 425 "src/analyzer/expression/PostfixExpression.pv"
+                    Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
+
+                    #line 427 "src/analyzer/expression/PostfixExpression.pv"
+                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                        #line 428 "src/analyzer/expression/PostfixExpression.pv"
+                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
+                        #line 429 "src/analyzer/expression/PostfixExpression.pv"
+                        return 0;
+                    }
+                }
+
+                #line 433 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 433 "src/analyzer/expression/PostfixExpression.pv"
+                    return 0;
+                }
+
+                #line 435 "src/analyzer/expression/PostfixExpression.pv"
+                return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &func_info->return_type);
+            } break;
+            #line 437 "src/analyzer/expression/PostfixExpression.pv"
+            case TYPE__CLASS_CPP: {
+                #line 438 "src/analyzer/expression/PostfixExpression.pv"
+                return Expression__parse_class(context, token, inner, generics);
+            } break;
+            #line 440 "src/analyzer/expression/PostfixExpression.pv"
+            case TYPE__UNKNOWN_C: {
+                #line 441 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
+                    #line 441 "src/analyzer/expression/PostfixExpression.pv"
+                    return 0;
+                }
+
+                #line 443 "src/analyzer/expression/PostfixExpression.pv"
+                struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+
+                #line 445 "src/analyzer/expression/PostfixExpression.pv"
+                while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 446 "src/analyzer/expression/PostfixExpression.pv"
+                    struct Expression* argument = Expression__parse(context, generics);
+                    #line 447 "src/analyzer/expression/PostfixExpression.pv"
+                    Array_InvokeArgument__append(&arguments, (struct InvokeArgument) { .name = 0, .value = argument });
+
+                    #line 449 "src/analyzer/expression/PostfixExpression.pv"
+                    if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                        #line 450 "src/analyzer/expression/PostfixExpression.pv"
+                        Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
+                        #line 451 "src/analyzer/expression/PostfixExpression.pv"
+                        return 0;
+                    }
+                }
+
+                #line 455 "src/analyzer/expression/PostfixExpression.pv"
+                if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+                    #line 455 "src/analyzer/expression/PostfixExpression.pv"
+                    return 0;
+                }
+
+                #line 457 "src/analyzer/expression/PostfixExpression.pv"
                 return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__INVOKE, .invoke_value = { ._0 = inner, ._1 = arguments} }, &context->root->type_unknown);
             } break;
-            #line 420 "src/analyzer/expression/PostfixExpression.pv"
+            #line 459 "src/analyzer/expression/PostfixExpression.pv"
             default: {
-                #line 421 "src/analyzer/expression/PostfixExpression.pv"
+                #line 460 "src/analyzer/expression/PostfixExpression.pv"
                 Context__error_token(context, token, "Unexpected token when parsing open bracket");
-                #line 422 "src/analyzer/expression/PostfixExpression.pv"
+                #line 461 "src/analyzer/expression/PostfixExpression.pv"
                 return 0;
             } break;
         }
     }
 
-    #line 427 "src/analyzer/expression/PostfixExpression.pv"
+    #line 466 "src/analyzer/expression/PostfixExpression.pv"
     return inner;
 }
 
-#line 430 "src/analyzer/expression/PostfixExpression.pv"
+#line 469 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics) {
-    #line 431 "src/analyzer/expression/PostfixExpression.pv"
+    #line 470 "src/analyzer/expression/PostfixExpression.pv"
     struct Expression* result = inner;
-    #line 432 "src/analyzer/expression/PostfixExpression.pv"
+    #line 471 "src/analyzer/expression/PostfixExpression.pv"
     while (true) {
-        #line 433 "src/analyzer/expression/PostfixExpression.pv"
+        #line 472 "src/analyzer/expression/PostfixExpression.pv"
         struct Expression* next = Expression__parse_postfix(context, result, generics);
-        #line 434 "src/analyzer/expression/PostfixExpression.pv"
+        #line 473 "src/analyzer/expression/PostfixExpression.pv"
         if (next == result) {
-            #line 434 "src/analyzer/expression/PostfixExpression.pv"
+            #line 473 "src/analyzer/expression/PostfixExpression.pv"
             break;
         }
-        #line 435 "src/analyzer/expression/PostfixExpression.pv"
+        #line 474 "src/analyzer/expression/PostfixExpression.pv"
         if (next == 0) {
-            #line 435 "src/analyzer/expression/PostfixExpression.pv"
+            #line 474 "src/analyzer/expression/PostfixExpression.pv"
             return 0;
         }
 
-        #line 437 "src/analyzer/expression/PostfixExpression.pv"
+        #line 476 "src/analyzer/expression/PostfixExpression.pv"
         result = next;
     }
-    #line 439 "src/analyzer/expression/PostfixExpression.pv"
+    #line 478 "src/analyzer/expression/PostfixExpression.pv"
     return result;
 }
 

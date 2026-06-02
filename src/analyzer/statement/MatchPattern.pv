@@ -157,6 +157,10 @@ impl MatchPattern {
 
                             if !variable.eq(TokenType::Identifier, "_") {
                                 if !context.set_value(variable, variable_type) { context.pop_scope(); return false; }
+                                if context.should_record_symbols() {
+                                    let variable_type_label = context.root.naming_decl.get_type_decl(variable_type, context.type_self, null);
+                                    context.record_symbol(variable, variable_type_label.as_str(), context.path, variable);
+                                }
                             }
                         }
 
@@ -225,6 +229,10 @@ impl MatchPattern {
 
                         if !variable_token.eq(TokenType::Identifier, "_") {
                             if !context.set_value(variable_token, variable_type) { context.pop_scope(); return false; }
+                            if context.should_record_symbols() {
+                                let variable_type_label = context.root.naming_decl.get_type_decl(variable_type, context.type_self, null);
+                                context.record_symbol(variable_token, variable_type_label.as_str(), context.path, variable_token);
+                            }
                         }
 
                         parameters.append(EnumVariantParameter { ref, variable: variable_token, field_name });

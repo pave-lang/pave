@@ -4,6 +4,7 @@ use types
 struct Scope {
     values: HashMap<str, Type>,
     narrow_originals: HashMap<str, Type>,
+    definition_tokens: HashMap<str, &Token>,
     block: *Block,
 }
 
@@ -12,6 +13,7 @@ impl Scope {
         return Self {
             values: HashMap<str, Type>::new(allocator),
             narrow_originals: HashMap<str, Type>::new(allocator),
+            definition_tokens: HashMap<str, &Token>::new(allocator),
             block,
         };
     }

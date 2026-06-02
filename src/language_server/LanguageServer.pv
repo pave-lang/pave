@@ -34,6 +34,9 @@ impl LanguageServer {
                 files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 diagnostics: HashMap<str, Array<Diagnostic>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 inlay_hints: HashMap<str, Array<InlayHint>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                symbol_info: HashMap<str, Array<SymbolInfo>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                signature_info: HashMap<str, Array<SignatureInfo>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                collect_symbols: true,
                 parsed_function_files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 file_overrides: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
             },
@@ -86,6 +89,7 @@ impl LanguageServer {
         self.analysis_alloc.destroy();
         self.analysis_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
         self.analysis = Analysis::new(&self.analysis_alloc);
+        self.analysis.collect_symbols = true;
         self.file_map = HashMap<str, str>::new(&self.analysis_alloc);
         let analysis = &self.analysis;
         for (path, content) in self.file_overrides {
@@ -185,6 +189,8 @@ impl LanguageServer {
         let path_str = path_copy.as_str();
 
         analysis.inlay_hints.remove(&path_str);
+        analysis.symbol_info.remove(&path_str);
+        analysis.signature_info.remove(&path_str);
         self.root.parse_functions_if_path(path_str);
         analysis.parsed_function_files.insert(path_str, true);
         return analysis;

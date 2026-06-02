@@ -26,7 +26,7 @@ struct Token;
 #line 21 "src/analyzer/statement/LetStatement.pv"
 struct LetStatement* LetStatement__parse(struct Context* context, struct Generics* generics);
 
-#line 98 "src/analyzer/statement/LetStatement.pv"
+#line 104 "src/analyzer/statement/LetStatement.pv"
 struct LetStatement* LetStatement__parse_destructure(struct Context* context, struct Generics* generics, struct Token* first_token, bool is_static);
 
 #endif

@@ -137,6 +137,16 @@ impl Processor {
         inlay_hint_provider.insert("resolveProvider", JsonNode::Boolean(false));
         capabilities.insert("inlayHintProvider", JsonNode::Object(inlay_hint_provider));
 
+        capabilities.insert("definitionProvider", JsonNode::Boolean(true));
+        capabilities.insert("hoverProvider", JsonNode::Boolean(true));
+
+        let sig_help = HashMap<str, JsonNode>::new(self.allocator);
+        let trigger_chars = Array<JsonNode>::new(self.allocator);
+        trigger_chars.append(JsonNode::String("("));
+        trigger_chars.append(JsonNode::String(","));
+        sig_help.insert("triggerCharacters", JsonNode::Array(trigger_chars));
+        capabilities.insert("signatureHelpProvider", JsonNode::Object(sig_help));
+
         let has_workspace_folder_capability = true;
         if has_workspace_folder_capability {
             let workspace = HashMap<str, JsonNode>::new(self.allocator);
@@ -409,6 +419,176 @@ impl Processor {
         self.send_message_no_params("workspace/inlayHint/refresh");
     }
 
+    fn find_symbol_at(&self, symbols: *Array<SymbolInfo>, line: usize, character: usize) -> *SymbolInfo {
+        if symbols == null { return null; }
+
+        for symbol in symbols {
+            let before_start = line < symbol.range.start.line || (line == symbol.range.start.line && character < symbol.range.start.character);
+            if before_start { continue; }
+            let after_end = line > symbol.range.end.line || (line == symbol.range.end.line && character >= symbol.range.end.character);
+            if after_end { continue; }
+            return symbol;
+        }
+
+        return null;
+    }
+
+    fn make_position_json(&self, line: usize, character: usize) -> JsonNode {
+        let pos = HashMap<str, JsonNode>::new(self.allocator);
+        pos.insert("line", JsonNode::Number(line));
+        pos.insert("character", JsonNode::Number(character));
+        return JsonNode::Object(pos);
+    }
+
+    fn make_range_json(&self, range: &Range) -> JsonNode {
+        let r = HashMap<str, JsonNode>::new(self.allocator);
+        r.insert("start", self.make_position_json(range.start.line, range.start.character));
+        r.insert("end", self.make_position_json(range.end.line, range.end.character));
+        return JsonNode::Object(r);
+    }
+
+    fn definition(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        let line: usize = params.key("position").key("line").number();
+        let character: usize = params.key("position").key("character").number();
+
+        if uri.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let filename = ls.file_map.find(&uri);
+        if filename == null {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        ls.parse_functions_file(*filename);
+
+        let symbols = ls.analysis.symbol_info.find(filename);
+        let symbol = self.find_symbol_at(symbols, line, character);
+
+        if symbol == null || symbol.definition_path.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let def_uri = Uri::file(self.allocator, symbol.definition_path);
+        let def_range = Range {
+            start: symbol.definition_position,
+            end: Position { line: symbol.definition_position.line, character: symbol.definition_position.character + 1 },
+        };
+
+        let location = HashMap<str, JsonNode>::new(self.allocator);
+        location.insert("uri", JsonNode::String(def_uri));
+        location.insert("range", self.make_range_json(&def_range));
+
+        self.send_response(id, JsonNode::Object(location));
+    }
+
+    fn hover(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        let line: usize = params.key("position").key("line").number();
+        let character: usize = params.key("position").key("character").number();
+
+        if uri.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let filename = ls.file_map.find(&uri);
+        if filename == null {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        ls.parse_functions_file(*filename);
+
+        let symbols = ls.analysis.symbol_info.find(filename);
+        let symbol = self.find_symbol_at(symbols, line, character);
+
+        if symbol == null || symbol.type_label.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let contents = HashMap<str, JsonNode>::new(self.allocator);
+        contents.insert("kind", JsonNode::String("plaintext"));
+        contents.insert("value", JsonNode::String(symbol.type_label));
+
+        let result = HashMap<str, JsonNode>::new(self.allocator);
+        result.insert("contents", JsonNode::Object(contents));
+        result.insert("range", self.make_range_json(&symbol.range));
+
+        self.send_response(id, JsonNode::Object(result));
+    }
+
+    fn signature_help(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        let line: usize = params.key("position").key("line").number();
+        let character: usize = params.key("position").key("character").number();
+
+        if uri.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let filename = ls.file_map.find(&uri);
+        if filename == null {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        ls.parse_functions_file(*filename);
+
+        let sigs = ls.analysis.signature_info.find(filename);
+        if sigs == null {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let found: *SignatureInfo = null;
+        for sig in sigs {
+            let after_open = line > sig.open_paren.line || (line == sig.open_paren.line && character > sig.open_paren.character);
+            let before_close = line < sig.close_paren.line || (line == sig.close_paren.line && character <= sig.close_paren.character);
+            if after_open && before_close {
+                found = sig;
+            }
+        }
+
+        if found == null {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+
+        let active_param: usize = 0;
+        for comma in found.comma_positions {
+            let after_comma = line > comma.line || (line == comma.line && character > comma.character);
+            if after_comma { active_param += 1; }
+        }
+
+        let param_infos = Array<JsonNode>::new(self.allocator);
+        for param_label in found.parameters {
+            let pi = HashMap<str, JsonNode>::new(self.allocator);
+            pi.insert("label", JsonNode::String(*param_label));
+            param_infos.append(JsonNode::Object(pi));
+        }
+
+        let sig_obj = HashMap<str, JsonNode>::new(self.allocator);
+        sig_obj.insert("label", JsonNode::String(found.label));
+        sig_obj.insert("parameters", JsonNode::Array(param_infos));
+
+        let signatures = Array<JsonNode>::new(self.allocator);
+        signatures.append(JsonNode::Object(sig_obj));
+
+        let result = HashMap<str, JsonNode>::new(self.allocator);
+        result.insert("signatures", JsonNode::Array(signatures));
+        result.insert("activeSignature", JsonNode::Number(0));
+        result.insert("activeParameter", JsonNode::Number(active_param));
+
+        self.send_response(id, JsonNode::Object(result));
+    }
+
     fn process(&self, ls: &LanguageServer) -> bool {
         let msg_str = self.read_message();
         defer msg_str.release();
@@ -459,6 +639,12 @@ impl Processor {
             self.did_close(ls, msg_json.key("params"));
         } else if method.eq("textDocument/inlayHint") {
             self.inlay_hint(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/definition") {
+            self.definition(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/hover") {
+            self.hover(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/signatureHelp") {
+            self.signature_help(id, ls, msg_json.key("params"));
         } else if method.eq("exit") {
             return false;
         }
