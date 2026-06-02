@@ -295,7 +295,8 @@ impl Processor {
 
         let text = text_document.key("text").string();
 
-        ls.analyze();
+        // Ensure we have an initial analysis for the file_map
+        if ls.root == null { ls.analyze(); }
         let filename = ls.file_map.find(&uri);
         if filename == null {
             let fallback_path = Uri::path(self.allocator, uri);
@@ -305,8 +306,19 @@ impl Processor {
             return;
         }
 
-        ls.set_override_file(*filename, text);
+        let filename_copy = String::new(self.allocator);
+        filename_copy.append(*filename);
+        let filename_str = filename_copy.as_str();
+
+        ls.set_override_file(filename_str, text);
         ls.set_dirty_uri(uri, true);
+
+        let analysis = ls.analyze_file(filename_str);
+        let diagnostics = analysis.diagnostics.find(&filename_str);
+
+        let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
+        if diagnostics == null { self.publish_diagnostics_file(filename_str, &blank_diagnostics); }
+        else { self.publish_diagnostics_file(filename_str, diagnostics); }
     }
 
     fn did_close(&self, ls: &LanguageServer, params: &JsonNode) {

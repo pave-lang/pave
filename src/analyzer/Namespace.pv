@@ -218,6 +218,17 @@ impl Namespace {
         return true;
     }
 
+    fn find_module_by_path(&self, path: str) -> *Module {
+        for (_, module) in self.modules {
+            if module.path.eq(path) { return module; }
+        }
+        for (_, child) in self.children {
+            let result = child.find_module_by_path(path);
+            if result != null { return result; }
+        }
+        return null;
+    }
+
     fn find_type(&self, name: str, arity: usize) -> *Type {
         let arr = self.types.find(&name);
         if arr == null { return null; }

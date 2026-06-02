@@ -31,6 +31,7 @@ struct Namespace {
 struct Root;
 struct Namespace;
 struct Trait;
+struct Module;
 struct Type;
 
 #line 19 "src/analyzer/Namespace.pv"
@@ -82,12 +83,15 @@ bool Namespace__parse_functions(struct Namespace* self);
 bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path);
 
 #line 221 "src/analyzer/Namespace.pv"
-struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity);
+struct Module* Namespace__find_module_by_path(struct Namespace* self, struct str path);
 
 #line 232 "src/analyzer/Namespace.pv"
+struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity);
+
+#line 243 "src/analyzer/Namespace.pv"
 struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uintptr_t arity);
 
-#line 244 "src/analyzer/Namespace.pv"
+#line 255 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_function(struct Namespace* self, struct str name);
 
 #endif

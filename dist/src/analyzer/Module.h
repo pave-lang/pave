@@ -49,6 +49,7 @@ struct Module {
 struct Namespace;
 struct Module;
 struct NamespacePath;
+struct Array_Token;
 struct Type;
 struct Trait;
 struct Array_Type;
@@ -87,25 +88,37 @@ bool Module__parse_functions(struct Module* self);
 #line 667 "src/analyzer/Module.pv"
 bool Module__parse_functions_if_path(struct Module* self, struct str path);
 
-#line 672 "src/analyzer/Module.pv"
+#line 673 "src/analyzer/Module.pv"
+uint64_t Module__compute_declaration_fingerprint(struct Array_Token* tokens);
+
+#line 726 "src/analyzer/Module.pv"
+uint64_t Module__declaration_fingerprint(struct Module* self);
+
+#line 733 "src/analyzer/Module.pv"
+void Module__retokenize_for_bodies(struct Module* self);
+
+#line 888 "src/analyzer/Module.pv"
+void Module__update_function_tokens(struct Module* self, struct str name, uintptr_t token_start, uintptr_t token_end);
+
+#line 908 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name, uintptr_t arity);
 
-#line 695 "src/analyzer/Module.pv"
+#line 931 "src/analyzer/Module.pv"
 struct Trait* Module__find_trait(struct Module* self, struct str name, uintptr_t arity);
 
-#line 710 "src/analyzer/Module.pv"
+#line 946 "src/analyzer/Module.pv"
 struct Type* Module__find_function(struct Module* self, struct str name);
 
-#line 725 "src/analyzer/Module.pv"
+#line 961 "src/analyzer/Module.pv"
 struct Type* Module__find_value(struct Module* self, struct str name);
 
-#line 744 "src/analyzer/Module.pv"
+#line 980 "src/analyzer/Module.pv"
 int64_t* Module__find_macro_value(struct Module* self, struct str name);
 
-#line 752 "src/analyzer/Module.pv"
+#line 988 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types);
 
-#line 758 "src/analyzer/Module.pv"
+#line 994 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name);
 
 #endif

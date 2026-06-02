@@ -16,6 +16,8 @@ struct LanguageServer {
     file_map: HashMap<str, str>,
     dirty_files: HashMap<str, bool>,
     file_overrides: HashMap<str, str>,
+    decl_fingerprints: HashMap<str, u64>,
+    global_phases_ok: bool,
     pipe_read: pipe_t,
     pipe_write: pipe_t,
 }
@@ -38,6 +40,8 @@ impl LanguageServer {
             file_map: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
             dirty_files: HashMap<str, bool>::new(allocator),
             file_overrides: HashMap<str, str>::new(allocator),
+            decl_fingerprints: HashMap<str, u64>::new(allocator),
+            global_phases_ok: false,
             pipe_read: cast<pipe_t>(null),
             pipe_write: cast<pipe_t>(null),
         });
@@ -78,6 +82,7 @@ impl LanguageServer {
     }
 
     fn analyze(&self) -> &Analysis {
+        self.global_phases_ok = false;
         self.analysis_alloc.destroy();
         self.analysis_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
         self.analysis = Analysis::new(&self.analysis_alloc);
@@ -89,38 +94,83 @@ impl LanguageServer {
 
         self.root = Root::new(&self.analysis_alloc, &self.args, &self.clang_args, analysis);
         let root = self.root;
-        if root == null { return analysis; }
+        if root == null { self.store_fingerprints(); return analysis; }
 
         for (filename, _) in analysis.files {
             let uri = Uri::file(&self.analysis_alloc, filename);
             self.file_map.insert(uri, filename);
         }
 
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
         root.add_use_namespaces();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
         root.fill_namespace();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
         root.prefill_types();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
         root.prefill_types_impl();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
         root.parse_declarations();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
         root.parse_globals();
-        if analysis.diagnostics.length > 0 { return analysis; }
+        if analysis.diagnostics.length > 0 { self.store_fingerprints(); return analysis; }
 
+        self.global_phases_ok = true;
+        self.store_fingerprints();
         return analysis;
     }
 
     fn analyze_file(&self, path: str) -> &Analysis {
+        // Fast path: if we have a valid snapshot from a clean global phase and the
+        // changed file's declarations haven't changed, skip the full rebuild —
+        // just retokenize and reparse bodies.  Function-body errors from a previous
+        // keystroke do NOT invalidate global state, so global_phases_ok stays true.
+        if self.root != null && self.global_phases_ok {
+            let override_text = self.file_overrides.find(&path);
+            if override_text != null {
+                let old_fp = self.decl_fingerprints.find(&path);
+                if old_fp != null {
+                    // Quick-tokenize the new content on a temporary allocator to compute fingerprint
+                    let tmp_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 256 * 1024);
+                    let tmp_tokens = Tokenizer::tokenize_data(&tmp_alloc, *override_text);
+                    let new_fp = Module::compute_declaration_fingerprint(&tmp_tokens);
+                    tmp_alloc.destroy();
+
+                    if new_fp == *old_fp {
+                        // Declarations unchanged — reuse existing snapshot
+                        let analysis = &self.analysis;
+
+                        // Copy fresh override text into analysis arena
+                        analysis.file_overrides.remove(&path);
+                        let path_arena = String::new(&self.analysis_alloc);
+                        path_arena.append(path);
+                        let text_arena = String::new(&self.analysis_alloc);
+                        text_arena.append(*override_text);
+                        analysis.file_overrides.insert(path_arena.as_str(), text_arena.as_str());
+
+                        // Find the module and retokenize + update function boundaries
+                        let module = self.root.find_module_by_path(path);
+                        if module != null {
+                            module.retokenize_for_bodies();
+                        }
+
+                        // Clear parsed state and old diagnostics for this file
+                        analysis.parsed_function_files.remove(&path);
+                        analysis.diagnostics.remove(&path);
+                        return self.parse_functions_file(path);
+                    }
+                }
+            }
+        }
+
         let analysis = self.analyze();
+        self.store_fingerprints();
         if analysis.diagnostics.length > 0 { return analysis; }
         return self.parse_functions_file(path);
     }
@@ -134,13 +184,62 @@ impl LanguageServer {
         path_copy.append(path);
         let path_str = path_copy.as_str();
 
+        // Save old hints — if parsing errors out and produces none, keep the old ones.
+        let old_hints = analysis.inlay_hints.find(&path_str);
+        let had_old_hints = old_hints != null && old_hints.length > 0;
+        let saved_hints = Array<InlayHint>::new(&self.analysis_alloc);
+        if had_old_hints {
+            for hint in old_hints {
+                saved_hints.append(*hint);
+            }
+        }
+
         analysis.inlay_hints.remove(&path_str);
         self.root.parse_functions_if_path(path_str);
         analysis.parsed_function_files.insert(path_str, true);
+
+        // If parsing produced no new hints but we had old ones, restore them.
+        if had_old_hints {
+            let new_hints = analysis.inlay_hints.find(&path_str);
+            if new_hints == null || new_hints.length == 0 {
+                analysis.inlay_hints.insert(path_str, saved_hints);
+            }
+        }
+
         return analysis;
     }
 
+    // Walk all modules in a namespace tree and compute/store declaration fingerprints.
+    fn store_fingerprints(&self) {
+        if self.root == null { return; }
+        for (_, child) in self.root.children {
+            self.store_fingerprints_namespace(child);
+        }
+    }
+
+    fn store_fingerprints_namespace(&self, namespace: &Namespace) {
+        for (_, module) in namespace.modules {
+            let fp = module.declaration_fingerprint();
+            let existing = self.decl_fingerprints.find(&module.path);
+            if existing != null {
+                *existing = fp;
+            } else {
+                let key = String::new(self.allocator);
+                key.append(module.path);
+                self.decl_fingerprints.insert(key.as_str(), fp);
+            }
+        }
+        for (_, child) in namespace.children {
+            self.store_fingerprints_namespace(child);
+        }
+    }
+
     fn set_dirty_uri(&self, uri: str, dirty: bool) {
+        let existing = self.dirty_files.find(&uri);
+        if existing != null {
+            *existing = dirty;
+            return;
+        }
         let key = String::new(self.allocator);
         key.append(uri);
         self.dirty_files.insert(key.as_str(), dirty);
@@ -153,6 +252,16 @@ impl LanguageServer {
     }
 
     fn set_override_file(&self, path: str, text: str) {
+        let existing = self.file_overrides.find(&path);
+        if existing != null {
+            // Key already exists — just replace the value.
+            // The old text string leaks on the persistent allocator,
+            // but we avoid leaking a new key string on every keystroke.
+            let text_copy = String::new(self.allocator);
+            text_copy.append(text);
+            *existing = text_copy.as_str();
+            return;
+        }
         let path_copy = String::new(self.allocator);
         path_copy.append(path);
         let text_copy = String::new(self.allocator);

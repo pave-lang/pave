@@ -426,34 +426,43 @@ bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path)
 }
 
 #line 221 "src/analyzer/Namespace.pv"
-struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity) {
+struct Module* Namespace__find_module_by_path(struct Namespace* self, struct str path) {
     #line 222 "src/analyzer/Namespace.pv"
-    struct Array_Type* arr = HashMap_str_Array_Type__find(&self->types, &name);
-    #line 223 "src/analyzer/Namespace.pv"
-    if (arr == 0) {
+    { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
+    #line 222 "src/analyzer/Namespace.pv"
+    while (HashMapIter_str_ref_Module__next(&__iter)) {
+        #line 222 "src/analyzer/Namespace.pv"
+        struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
+
         #line 223 "src/analyzer/Namespace.pv"
-        return 0;
-    }
-    #line 224 "src/analyzer/Namespace.pv"
-    uintptr_t i = 0;
-    #line 225 "src/analyzer/Namespace.pv"
-    while (i < arr->length) {
-        #line 226 "src/analyzer/Namespace.pv"
-        if (Type__get_arity(&arr->data[i]) == arity) {
-            #line 226 "src/analyzer/Namespace.pv"
-            return &arr->data[i];
+        if (str__Eq_str__eq(&module->path, path)) {
+            #line 223 "src/analyzer/Namespace.pv"
+            return module;
         }
+    } }
+    #line 225 "src/analyzer/Namespace.pv"
+    { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
+    #line 225 "src/analyzer/Namespace.pv"
+    while (HashMapIter_str_ref_Namespace__next(&__iter)) {
+        #line 225 "src/analyzer/Namespace.pv"
+        struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
+
+        #line 226 "src/analyzer/Namespace.pv"
+        struct Module* result = Namespace__find_module_by_path(child, path);
         #line 227 "src/analyzer/Namespace.pv"
-        i += 1;
-    }
+        if (result != 0) {
+            #line 227 "src/analyzer/Namespace.pv"
+            return result;
+        }
+    } }
     #line 229 "src/analyzer/Namespace.pv"
     return 0;
 }
 
 #line 232 "src/analyzer/Namespace.pv"
-struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uintptr_t arity) {
+struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity) {
     #line 233 "src/analyzer/Namespace.pv"
-    struct Array_ref_Trait* arr = HashMap_str_Array_ref_Trait__find(&self->traits, &name);
+    struct Array_Type* arr = HashMap_str_Array_Type__find(&self->types, &name);
     #line 234 "src/analyzer/Namespace.pv"
     if (arr == 0) {
         #line 234 "src/analyzer/Namespace.pv"
@@ -464,21 +473,46 @@ struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uin
     #line 236 "src/analyzer/Namespace.pv"
     while (i < arr->length) {
         #line 237 "src/analyzer/Namespace.pv"
-        struct Trait* trait_info = arr->data[i];
-        #line 238 "src/analyzer/Namespace.pv"
-        if (trait_info->generic_arity == arity) {
-            #line 238 "src/analyzer/Namespace.pv"
-            return trait_info;
+        if (Type__get_arity(&arr->data[i]) == arity) {
+            #line 237 "src/analyzer/Namespace.pv"
+            return &arr->data[i];
         }
-        #line 239 "src/analyzer/Namespace.pv"
+        #line 238 "src/analyzer/Namespace.pv"
         i += 1;
     }
-    #line 241 "src/analyzer/Namespace.pv"
+    #line 240 "src/analyzer/Namespace.pv"
     return 0;
 }
 
-#line 244 "src/analyzer/Namespace.pv"
-struct Type* Namespace__find_function(struct Namespace* self, struct str name) {
+#line 243 "src/analyzer/Namespace.pv"
+struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uintptr_t arity) {
+    #line 244 "src/analyzer/Namespace.pv"
+    struct Array_ref_Trait* arr = HashMap_str_Array_ref_Trait__find(&self->traits, &name);
     #line 245 "src/analyzer/Namespace.pv"
+    if (arr == 0) {
+        #line 245 "src/analyzer/Namespace.pv"
+        return 0;
+    }
+    #line 246 "src/analyzer/Namespace.pv"
+    uintptr_t i = 0;
+    #line 247 "src/analyzer/Namespace.pv"
+    while (i < arr->length) {
+        #line 248 "src/analyzer/Namespace.pv"
+        struct Trait* trait_info = arr->data[i];
+        #line 249 "src/analyzer/Namespace.pv"
+        if (trait_info->generic_arity == arity) {
+            #line 249 "src/analyzer/Namespace.pv"
+            return trait_info;
+        }
+        #line 250 "src/analyzer/Namespace.pv"
+        i += 1;
+    }
+    #line 252 "src/analyzer/Namespace.pv"
+    return 0;
+}
+
+#line 255 "src/analyzer/Namespace.pv"
+struct Type* Namespace__find_function(struct Namespace* self, struct str name) {
+    #line 256 "src/analyzer/Namespace.pv"
     return HashMap_str_Type__find(&self->functions, &name);
 }
