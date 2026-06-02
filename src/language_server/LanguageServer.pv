@@ -14,6 +14,8 @@ struct LanguageServer {
     analysis_alloc: ArenaAllocator,
     analysis: Analysis,
     file_map: HashMap<str, str>,
+    dirty_files: HashMap<str, bool>,
+    file_overrides: HashMap<str, str>,
     pipe_read: pipe_t,
     pipe_write: pipe_t,
 }
@@ -30,8 +32,12 @@ impl LanguageServer {
                 files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 diagnostics: HashMap<str, Array<Diagnostic>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 inlay_hints: HashMap<str, Array<InlayHint>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                parsed_function_files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                file_overrides: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
             },
             file_map: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+            dirty_files: HashMap<str, bool>::new(allocator),
+            file_overrides: HashMap<str, str>::new(allocator),
             pipe_read: cast<pipe_t>(null),
             pipe_write: cast<pipe_t>(null),
         });
@@ -77,6 +83,9 @@ impl LanguageServer {
         self.analysis = Analysis::new(&self.analysis_alloc);
         self.file_map = HashMap<str, str>::new(&self.analysis_alloc);
         let analysis = &self.analysis;
+        for (path, content) in self.file_overrides {
+            analysis.file_overrides.insert(path, content);
+        }
 
         self.root = Root::new(&self.analysis_alloc, &self.args, &self.clang_args, analysis);
         let root = self.root;
@@ -119,8 +128,40 @@ impl LanguageServer {
     fn parse_functions_file(&self, path: str) -> &Analysis {
         let analysis = &self.analysis;
         if self.root == null { return analysis; }
-        self.root.parse_functions_if_path(path);
+        if analysis.parsed_function_files.find(&path) != null { return analysis; }
+
+        let path_copy = String::new(&self.analysis_alloc);
+        path_copy.append(path);
+        let path_str = path_copy.as_str();
+
+        analysis.inlay_hints.remove(&path_str);
+        self.root.parse_functions_if_path(path_str);
+        analysis.parsed_function_files.insert(path_str, true);
         return analysis;
+    }
+
+    fn set_dirty_uri(&self, uri: str, dirty: bool) {
+        let key = String::new(self.allocator);
+        key.append(uri);
+        self.dirty_files.insert(key.as_str(), dirty);
+    }
+
+    fn is_dirty_uri(&self, uri: str) -> bool {
+        let dirty = self.dirty_files.find(&uri);
+        if dirty == null { return false; }
+        return *dirty;
+    }
+
+    fn set_override_file(&self, path: str, text: str) {
+        let path_copy = String::new(self.allocator);
+        path_copy.append(path);
+        let text_copy = String::new(self.allocator);
+        text_copy.append(text);
+        self.file_overrides.insert(path_copy.as_str(), text_copy.as_str());
+    }
+
+    fn clear_override_file(&self, path: str) {
+        self.file_overrides.remove(&path);
     }
 
     fn alloc(&self, size: usize) -> &void {

@@ -78,4 +78,7 @@ struct str Tokenizer__read_file_into_string(struct ArenaAllocator* allocator, ch
 #line 248 "src/analyzer/Tokenizer.pv"
 struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char const* path);
 
+#line 253 "src/analyzer/Tokenizer.pv"
+struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, struct str data);
+
 #endif

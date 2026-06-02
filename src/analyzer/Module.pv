@@ -74,7 +74,12 @@ impl Module {
         let functions = &self.functions;
         let context = &self.context;
 
-        self.tokens = Tokenizer::tokenize(allocator, self.path.ptr);
+        let file_override = self.context.analysis.file_overrides.find(&self.path);
+        if file_override == null {
+            self.tokens = Tokenizer::tokenize(allocator, self.path.ptr);
+        } else {
+            self.tokens = Tokenizer::tokenize_data(allocator, *file_override);
+        }
         self.context.tokens = self.tokens.data;
         self.context.length = self.tokens.length;
 

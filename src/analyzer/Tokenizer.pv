@@ -247,7 +247,10 @@ impl Tokenizer {
 
     fn tokenize(allocator: &ArenaAllocator, path: *const char) -> Array<Token> {
         let data = Tokenizer::read_file_into_string(allocator, path);
+        return Tokenizer::tokenize_data(allocator, data);
+    }
 
+    fn tokenize_data(allocator: &ArenaAllocator, data: str) -> Array<Token> {
         if data.length == 0 {
             return Array<Token> { allocator, data: null, length: 0, capacity: 0 };
         }

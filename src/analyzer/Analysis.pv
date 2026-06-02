@@ -36,6 +36,8 @@ struct Analysis {
     files: HashMap<str, bool>,
     diagnostics: HashMap<str, Array<Diagnostic>>,
     inlay_hints: HashMap<str, Array<InlayHint>>,
+    parsed_function_files: HashMap<str, bool>,
+    file_overrides: HashMap<str, str>,
 }
 
 impl Analysis {
@@ -44,6 +46,8 @@ impl Analysis {
             files: HashMap<str, bool>::new(allocator),
             diagnostics: HashMap<str, Array<Diagnostic>>::new(allocator),
             inlay_hints: HashMap<str, Array<InlayHint>>::new(allocator),
+            parsed_function_files: HashMap<str, bool>::new(allocator),
+            file_overrides: HashMap<str, str>::new(allocator),
         };
     }
 

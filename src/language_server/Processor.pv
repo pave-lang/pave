@@ -125,7 +125,7 @@ impl Processor {
 
         let text_document_sync = HashMap<str, JsonNode>::new(self.allocator);
         text_document_sync.insert("openClose", JsonNode::Boolean(true));
-        text_document_sync.insert("change", JsonNode::Number(2));
+        text_document_sync.insert("change", JsonNode::Number(1));
     
         let save = HashMap<str, JsonNode>::new(self.allocator);
         save.insert("includeText", JsonNode::Boolean(false));
@@ -263,68 +263,67 @@ impl Processor {
     fn did_change(&self, ls: &LanguageServer, params: &JsonNode) {
         let uri = params.key("textDocument").key("uri").string();
         if uri.length == 0 { return; }
-
         let filename = ls.file_map.find(&uri);
         if filename == null { return; }
+        let filename_copy = String::new(self.allocator);
+        filename_copy.append(*filename);
+        let filename_str = filename_copy.as_str();
 
-        let diagnostics = ls.analysis.diagnostics.find(filename);
-        let inlay_hints = ls.analysis.inlay_hints.find(filename);
+        ls.set_dirty_uri(uri, true);
 
         let content_changes = params.key("contentChanges").array();
-        if content_changes == null { return; }
-
-        for change in content_changes {
-            let range = change.key("range");
-            let start_line = range.key("start").key("line").number();
-            let start_character = range.key("start").key("character").number();
-            let end_line = range.key("end").key("line").number();
-            // let end_character = range.key("end").key("character").number();
-            let range_length = change.key("rangeLength").number();
-            let text = change.key("text").string();
-
-            let change_lines: isize = start_line - end_line;
-
-            let change_characters: isize = 0;
-            for i in 0..text.length {
-                if text.ptr[i] == '\n' { change_lines += 1; change_characters = -1; }
-                change_characters += 1;
-            }
-
-            change_characters -= range_length;
-
-            if diagnostics != null {
-                for diagnostic in diagnostics {
-                    if start_line == diagnostic.range.start.line && start_character <= diagnostic.range.start.character {
-                        diagnostic.range.start.character += change_characters;
-                        diagnostic.range.start.line += change_lines;
-                    } else if start_line < diagnostic.range.start.line {
-                        diagnostic.range.start.line += change_lines;
-                    }
-
-                    if start_line == diagnostic.range.end.line && start_character <= diagnostic.range.end.character {
-                        diagnostic.range.end.character += change_characters;
-                        diagnostic.range.end.line += change_lines;
-                    } else if start_line < diagnostic.range.end.line {
-                        diagnostic.range.end.line += change_lines;
-                    }
-                }
-            }
-
-            if inlay_hints != null {
-                for inlay_hint in inlay_hints {
-                    if start_line == inlay_hint.position.line && start_character <= inlay_hint.position.character {
-                        inlay_hint.position.character += change_characters;
-                        inlay_hint.position.line += change_lines;
-                    } else if start_line < inlay_hint.position.line {
-                        inlay_hint.position.line += change_lines;
-                    }
-                }
+        if content_changes != null && content_changes.length > 0 {
+            let latest_change = content_changes.back();
+            if latest_change != null {
+                let latest_text = latest_change.key("text").string();
+                ls.set_override_file(filename_str, latest_text);
             }
         }
 
-        if diagnostics != null {
-            self.publish_diagnostics_file(*filename, diagnostics);
+        let analysis = ls.analyze_file(filename_str);
+        let diagnostics = analysis.diagnostics.find(&filename_str);
+
+        let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
+        if diagnostics == null { self.publish_diagnostics_file(filename_str, &blank_diagnostics); }
+        else { self.publish_diagnostics_file(filename_str, diagnostics); }
+    }
+
+    fn did_open(&self, ls: &LanguageServer, params: &JsonNode) {
+        let text_document = params.key("textDocument");
+        let uri = text_document.key("uri").string();
+        if uri.length == 0 { return; }
+
+        let text = text_document.key("text").string();
+
+        ls.analyze();
+        let filename = ls.file_map.find(&uri);
+        if filename == null {
+            let fallback_path = Uri::path(self.allocator, uri);
+            if fallback_path.length == 0 { return; }
+            ls.set_override_file(fallback_path, text);
+            ls.set_dirty_uri(uri, true);
+            return;
         }
+
+        ls.set_override_file(*filename, text);
+        ls.set_dirty_uri(uri, true);
+    }
+
+    fn did_close(&self, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        if uri.length == 0 { return; }
+
+        let filename = ls.file_map.find(&uri);
+        if filename != null {
+            ls.clear_override_file(*filename);
+        } else {
+            let fallback_path = Uri::path(self.allocator, uri);
+            if fallback_path.length > 0 {
+                ls.clear_override_file(fallback_path);
+            }
+        }
+
+        ls.set_dirty_uri(uri, false);
     }
 
     fn inlay_hint(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
@@ -333,8 +332,12 @@ impl Processor {
             self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
             return;
         }
+        let range = params.key("range");
+        let start_line = range.key("start").key("line").number();
+        let start_character = range.key("start").key("character").number();
+        let end_line = range.key("end").key("line").number();
+        let end_character = range.key("end").key("character").number();
 
-        ls.analyze();
         let filename = ls.file_map.find(&uri);
         if filename == null {
             self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
@@ -352,6 +355,13 @@ impl Processor {
         let result = Array<JsonNode>::new(self.allocator);
 
         for inlay_hint in inlay_hints {
+            let hint_line = inlay_hint.position.line;
+            let hint_character = inlay_hint.position.character;
+            let before_start = hint_line < start_line || (hint_line == start_line && hint_character < start_character);
+            if before_start { continue; }
+            let after_end = hint_line > end_line || (hint_line == end_line && hint_character > end_character);
+            if after_end { continue; }
+
             let item = HashMap<str, JsonNode>::new(self.allocator);
 
             let position = HashMap<str, JsonNode>::new(self.allocator);
@@ -403,22 +413,31 @@ impl Processor {
         } else if method.eq("textDocument/didSave") {
             let uri = msg_json.key("params").key("textDocument").key("uri").string();
             if uri.length == 0 { return true; }
-
-            let analysis = ls.analyze();
             let filename = ls.file_map.find(&uri);
             if filename == null { return true; }
+            let filename_copy = String::new(self.allocator);
+            filename_copy.append(*filename);
+            let filename_str = filename_copy.as_str();
 
-            ls.parse_functions_file(*filename);
-            let diagnostics = analysis.diagnostics.find(filename);
+            ls.clear_override_file(filename_str);
+            ls.set_dirty_uri(uri, false);
+
+            let analysis = ls.analyze();
+            ls.parse_functions_file(filename_str);
+            let diagnostics = analysis.diagnostics.find(&filename_str);
             if diagnostics == null {
                 let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
-                self.publish_diagnostics_file(*filename, &blank_diagnostics);
+                self.publish_diagnostics_file(filename_str, &blank_diagnostics);
             } else {
-                self.publish_diagnostics_file(*filename, diagnostics);
+                self.publish_diagnostics_file(filename_str, diagnostics);
             }
             self.inlay_hint_refresh();
+        } else if method.eq("textDocument/didOpen") {
+            self.did_open(ls, msg_json.key("params"));
         } else if method.eq("textDocument/didChange") {
             self.did_change(ls, msg_json.key("params"));
+        } else if method.eq("textDocument/didClose") {
+            self.did_close(ls, msg_json.key("params"));
         } else if method.eq("textDocument/inlayHint") {
             self.inlay_hint(id, ls, msg_json.key("params"));
         } else if method.eq("exit") {
