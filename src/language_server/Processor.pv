@@ -835,7 +835,7 @@ impl Processor {
         return *fallback;
     }
 
-    fn append_function_completion(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, func_info: &Function, kind: usize, context: &Context) {
+    fn append_function_completion(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, func_info: &Function, kind: usize, context: &Context, skip_self: bool) {
         let name = func_info.name;
         if name == null { return; }
         let self_type = self.function_self_type(func_info, context.type_self);
@@ -845,16 +845,30 @@ impl Processor {
         detail.append(name.value);
         detail.append("(");
         let first = true;
+        let i: usize = 0;
         for param in func_info.parameters {
+            if skip_self && i == 0 && self.function_has_self_parameter(func_info) {
+                i += 1;
+                continue;
+            }
             if !first { detail.append(", "); }
             first = false;
-            let pname = param.name;
-            if pname != null {
-                detail.append(pname.value);
-                detail.append(": ");
+            if i == 0 && self.function_has_self_parameter(func_info) {
+                if param.type.deref().is_self() && !param.type.is_self() {
+                    detail.append("&self");
+                } else {
+                    detail.append("self");
+                }
+            } else {
+                let pname = param.name;
+                if pname != null {
+                    detail.append(pname.value);
+                    detail.append(": ");
+                }
+                let type_decl = context.root.naming_decl.get_type_decl(&param.type, &self_type, null);
+                detail.append(type_decl.as_str());
             }
-            let type_decl = context.root.naming_decl.get_type_decl(&param.type, &self_type, null);
-            detail.append(type_decl.as_str());
+            i += 1;
         }
         detail.append(")");
         if !func_info.return_type.is_void() {
@@ -880,7 +894,7 @@ impl Processor {
                 if primitive_info == null || is_static { return; }
                 for *impl_info in primitive_info.impls {
                     for (_, &func_info) in impl_info.functions {
-                        self.append_function_completion(result, seen, func_info, 2, context);
+                        self.append_function_completion(result, seen, func_info, 2, context, !is_static);
                     }
                 }
             },
@@ -895,7 +909,8 @@ impl Processor {
 
                 for *impl_info in struct_info.impls {
                     for (_, &func_info) in impl_info.functions {
-                        self.append_function_completion(result, seen, func_info, 2, context);
+                        if !is_static && !self.function_has_self_parameter(func_info) { continue; }
+                        self.append_function_completion(result, seen, func_info, 2, context, !is_static);
                     }
                     if is_static {
                         for (_, impl_const) in impl_info.consts {
@@ -914,7 +929,8 @@ impl Processor {
 
                 for *impl_info in enum_info.impls {
                     for (_, &func_info) in impl_info.functions {
-                        self.append_function_completion(result, seen, func_info, 2, context);
+                        if !is_static && !self.function_has_self_parameter(func_info) { continue; }
+                        self.append_function_completion(result, seen, func_info, 2, context, !is_static);
                     }
                     if is_static {
                         for (_, impl_const) in impl_info.consts {
@@ -929,7 +945,7 @@ impl Processor {
                     self.append_completion_item(result, seen, "instance", 5, "*void");
                 }
                 for (_, &func_info) in trait_info.functions {
-                    self.append_function_completion(result, seen, func_info, 2, context);
+                    self.append_function_completion(result, seen, func_info, 2, context, !is_static);
                 }
             },
             Type::Sequence(sequence) => {
@@ -943,7 +959,7 @@ impl Processor {
                 if hack_type_impl != null {
                     let impl_info = hack_type_impl.impl_info;
                     for (_, &func_info) in impl_info.functions {
-                        self.append_function_completion(result, seen, func_info, 2, context);
+                        self.append_function_completion(result, seen, func_info, 2, context, !is_static);
                     }
                 }
             },
@@ -989,7 +1005,7 @@ impl Processor {
                 if is_static { return; }
                 for *trait_info in generic.traits {
                     for (_, &func_info) in trait_info.functions {
-                        self.append_function_completion(result, seen, func_info, 2, context);
+                        self.append_function_completion(result, seen, func_info, 2, context, !is_static);
                     }
                 }
             },
@@ -1054,7 +1070,7 @@ impl Processor {
     fn append_module_name_completions(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, module: &Module) {
         for (_, &func_info) in module.functions {
             if func_info.type == FunctionType::Test { continue; }
-            self.append_function_completion(result, seen, func_info, 3, &module.context);
+            self.append_function_completion(result, seen, func_info, 3, &module.context, false);
         }
 
         for (_, global) in module.globals {
