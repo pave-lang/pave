@@ -236,7 +236,7 @@ impl Expression {
 
                             // Record signature info for signature help
                             if open_paren_token != null && close_paren_token != null {
-                                Expression::record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas);
+                                Expression::record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas, false);
                             }
 
                             let func_return_type: *Type = null;
@@ -938,7 +938,7 @@ impl Expression {
         return Expression::make(context.allocator, token, ExpressionData::IfExpression(condition, a, b), &a.return_type);
     }
 
-    fn record_function_signature(context: &Context, func_info: &Function, open_paren: &Token, close_paren: &Token, comma_positions: Array<Position>) {
+    fn record_function_signature(context: &Context, func_info: &Function, open_paren: &Token, close_paren: &Token, comma_positions: Array<Position>, skip_self: bool) {
         if !context.should_record_symbols() { return; }
 
         let label = String::new(context.allocator);
@@ -949,7 +949,12 @@ impl Expression {
 
         let params = Array<str>::new(context.allocator);
         let first = true;
+        let i: usize = 0;
         for param in func_info.parameters {
+            if skip_self && i == 0 {
+                i += 1;
+                continue;
+            }
             if !first { label.append(", "); }
             first = false;
 
@@ -963,6 +968,7 @@ impl Expression {
             param_str.append(type_decl.as_str());
             label.append(param_str.as_str());
             params.append(param_str.as_str());
+            i += 1;
         }
 
         label.append(")");

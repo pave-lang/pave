@@ -210,7 +210,7 @@ impl Expression {
             let member_close_paren = context.prev();
 
             if member_open_paren != null && member_close_paren != null {
-                Expression::record_function_signature(context, func_info, member_open_paren, member_close_paren, member_sig_commas);
+                Expression::record_function_signature(context, func_info, member_open_paren, member_close_paren, member_sig_commas, true);
             }
 
             if func_info.generics.array.length > 0 {
