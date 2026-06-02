@@ -77,7 +77,9 @@ impl Expression {
     }
 
     fn parse_type_member_expression(context: &Context, inner: &Expression, generics: &Generics) -> *Expression {
+        let dot_token = context.current();
         if !context.expect_value(TokenType::Symbol, "::") { return null; }
+        if dot_token != null { context.record_member_completion(dot_token, &inner.return_type, true); }
 
         match inner.return_type {
             Type::NamespaceCpp(_) => {},
@@ -104,6 +106,7 @@ impl Expression {
     fn parse_instance_member_expression_inner(context: &Context, inner: &Expression, generics: &Generics, allow_pointer: bool) -> *Expression {
         let dot_token = context.current();
         if !context.expect_value(TokenType::Symbol, ".") { return null; }
+        if dot_token != null { context.record_member_completion(dot_token, &inner.return_type, false); }
 
         if !allow_pointer && inner.return_type.is_pointer() {
             context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");

@@ -3,7 +3,7 @@
 
 #include <analyzer/Position.h>
 
-#line 10 "src/analyzer/Analysis.pv"
+#line 11 "src/analyzer/Analysis.pv"
 struct Range {
     struct Position start;
     struct Position end;

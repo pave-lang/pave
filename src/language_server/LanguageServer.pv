@@ -36,6 +36,8 @@ impl LanguageServer {
                 inlay_hints: HashMap<str, Array<InlayHint>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 symbol_info: HashMap<str, Array<SymbolInfo>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 signature_info: HashMap<str, Array<SignatureInfo>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                completion_info: HashMap<str, Array<CompletionInfo>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+                member_completion_info: HashMap<str, Array<MemberCompletionInfo>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 collect_symbols: true,
                 parsed_function_files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 file_overrides: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
@@ -191,6 +193,8 @@ impl LanguageServer {
         analysis.inlay_hints.remove(&path_str);
         analysis.symbol_info.remove(&path_str);
         analysis.signature_info.remove(&path_str);
+        analysis.completion_info.remove(&path_str);
+        analysis.member_completion_info.remove(&path_str);
         self.root.parse_functions_if_path(path_str);
         analysis.parsed_function_files.insert(path_str, true);
         return analysis;

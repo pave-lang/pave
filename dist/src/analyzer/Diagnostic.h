@@ -4,7 +4,7 @@
 #include <std/str.h>
 #include <analyzer/Range.h>
 
-#line 15 "src/analyzer/Analysis.pv"
+#line 16 "src/analyzer/Analysis.pv"
 struct Diagnostic {
     struct str message;
     struct str code;

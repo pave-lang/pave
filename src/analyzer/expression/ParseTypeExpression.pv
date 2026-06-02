@@ -47,7 +47,10 @@ impl Expression {
     }
 
     fn parse_enum(context: &Context, token: &Token, enum_type: &Type, generics: &Generics) -> *Expression {
-        if context.check_next(TokenType::Symbol, "::") {
+        if context.check_value(TokenType::Symbol, "::") {
+            let dot_token = context.current();
+            context.next_token();
+            if dot_token != null { context.record_member_completion(dot_token, enum_type, true); }
             let variant_name = context.expect(TokenType::Identifier);
             if variant_name == null { return null; }
 
@@ -182,7 +185,10 @@ impl Expression {
     }
 
     fn parse_struct(context: &Context, token: &Token, struct_type: &Type, generics: &Generics) -> *Expression {
-        if context.check_next(TokenType::Symbol, "::") {
+        if context.check_value(TokenType::Symbol, "::") {
+            let dot_token = context.current();
+            context.next_token();
+            if dot_token != null { context.record_member_completion(dot_token, struct_type, true); }
             let member = context.expect(TokenType::Identifier);
             if member == null { return null; }
 

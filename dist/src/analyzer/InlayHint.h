@@ -7,7 +7,7 @@
 #include <std/str.h>
 #include <analyzer/InlayHintKind.h>
 
-#line 27 "src/analyzer/Analysis.pv"
+#line 28 "src/analyzer/Analysis.pv"
 struct InlayHint {
     struct Position position;
     struct str label;

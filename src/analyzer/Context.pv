@@ -1002,6 +1002,7 @@ impl Context {
 
         scope.values.insert(name.value, *type);
         scope.definition_tokens.insert(name.value, name);
+        self.record_completion(name, type, 6);
 
         return true;
     }
@@ -1082,6 +1083,49 @@ impl Context {
             comma_positions,
             label,
             parameters,
+        });
+    }
+
+    fn record_completion(&self, name: &Token, type: &Type, kind: usize) {
+        if !self.analysis.collect_symbols { return; }
+
+        let function = self.function;
+        if function == null { return; }
+        if function.token_start >= self.length || function.token_end == 0 || function.token_end > self.length { return; }
+
+        let items = &self.analysis.completion_info;
+        let file_items = items.find(&self.path);
+        if file_items == null { file_items = items.insert(self.path, Array<CompletionInfo>::new(self.allocator)); }
+        if file_items == null { return; }
+
+        let type_label = self.root.naming_decl.get_type_decl(type, self.type_self, null);
+        let first = &self.tokens[function.token_start];
+        let last = &self.tokens[function.token_end - 1];
+
+        file_items.append(CompletionInfo {
+            range: Range {
+                start: Position { line: first.start_line, character: first.start_column },
+                end: Position { line: last.end_line, character: last.end_column },
+            },
+            name: name.value,
+            type_label: type_label.as_str(),
+            kind,
+            definition_position: Position { line: name.start_line, character: name.start_column },
+        });
+    }
+
+    fn record_member_completion(&self, dot: &Token, receiver_type: &Type, is_static: bool) {
+        if !self.analysis.collect_symbols { return; }
+
+        let infos = &self.analysis.member_completion_info;
+        let file_infos = infos.find(&self.path);
+        if file_infos == null { file_infos = infos.insert(self.path, Array<MemberCompletionInfo>::new(self.allocator)); }
+        if file_infos == null { return; }
+
+        file_infos.append(MemberCompletionInfo {
+            dot_position: Position { line: dot.start_line, character: dot.start_column },
+            receiver_type: *receiver_type,
+            is_static,
         });
     }
 

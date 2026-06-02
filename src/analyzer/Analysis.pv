@@ -1,6 +1,7 @@
 #include "stdio.h"
 
 use std
+use types
 
 struct Position {
     line: usize,
@@ -47,12 +48,28 @@ struct SignatureInfo {
     parameters: Array<str>,
 }
 
+struct CompletionInfo {
+    range: Range,
+    name: str,
+    type_label: str,
+    kind: usize,
+    definition_position: Position,
+}
+
+struct MemberCompletionInfo {
+    dot_position: Position,
+    receiver_type: Type,
+    is_static: bool,
+}
+
 struct Analysis {
     files: HashMap<str, bool>,
     diagnostics: HashMap<str, Array<Diagnostic>>,
     inlay_hints: HashMap<str, Array<InlayHint>>,
     symbol_info: HashMap<str, Array<SymbolInfo>>,
     signature_info: HashMap<str, Array<SignatureInfo>>,
+    completion_info: HashMap<str, Array<CompletionInfo>>,
+    member_completion_info: HashMap<str, Array<MemberCompletionInfo>>,
     collect_symbols: bool,
     parsed_function_files: HashMap<str, bool>,
     file_overrides: HashMap<str, str>,
@@ -66,6 +83,8 @@ impl Analysis {
             inlay_hints: HashMap<str, Array<InlayHint>>::new(allocator),
             symbol_info: HashMap<str, Array<SymbolInfo>>::new(allocator),
             signature_info: HashMap<str, Array<SignatureInfo>>::new(allocator),
+            completion_info: HashMap<str, Array<CompletionInfo>>::new(allocator),
+            member_completion_info: HashMap<str, Array<MemberCompletionInfo>>::new(allocator),
             collect_symbols: false,
             parsed_function_files: HashMap<str, bool>::new(allocator),
             file_overrides: HashMap<str, str>::new(allocator),

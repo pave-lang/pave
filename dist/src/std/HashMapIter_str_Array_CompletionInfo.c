@@ -1,0 +1,25 @@
+#include <stdint.h>
+
+#include <stdio.h>
+#include <string.h>
+
+#include <std/HashMapBucket_str_Array_CompletionInfo.h>
+#include <std/HashMapIter_str_Array_CompletionInfo.h>
+#include <tuple_str_Array_CompletionInfo.h>
+#include <std/HashMapIter_str_Array_CompletionInfo.h>
+
+#include <std/HashMapIter_str_Array_CompletionInfo.h>
+
+#line 16 "src/std/HashMap.pv"
+bool HashMapIter_str_Array_CompletionInfo__next(struct HashMapIter_str_Array_CompletionInfo* self) {
+    #line 17 "src/std/HashMap.pv"
+    self->iter += 1;
+    #line 18 "src/std/HashMap.pv"
+    return self->iter < self->end;
+}
+
+#line 21 "src/std/HashMap.pv"
+struct tuple_str_Array_CompletionInfo* HashMapIter_str_Array_CompletionInfo__value(struct HashMapIter_str_Array_CompletionInfo* self) {
+    #line 22 "src/std/HashMap.pv"
+    return (struct tuple_str_Array_CompletionInfo*)(self->iter);
+}

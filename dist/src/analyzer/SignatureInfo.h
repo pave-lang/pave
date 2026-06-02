@@ -6,7 +6,7 @@
 #include <std/str.h>
 #include <std/Array_str.h>
 
-#line 42 "src/analyzer/Analysis.pv"
+#line 43 "src/analyzer/Analysis.pv"
 struct SignatureInfo {
     struct Position open_paren;
     struct Position close_paren;

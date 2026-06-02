@@ -143,6 +143,14 @@ impl Processor {
         capabilities.insert("documentSymbolProvider", JsonNode::Boolean(true));
         capabilities.insert("workspaceSymbolProvider", JsonNode::Boolean(true));
 
+        let completion_provider = HashMap<str, JsonNode>::new(self.allocator);
+        completion_provider.insert("resolveProvider", JsonNode::Boolean(false));
+        let completion_triggers = Array<JsonNode>::new(self.allocator);
+        completion_triggers.append(JsonNode::String("."));
+        completion_triggers.append(JsonNode::String(":"));
+        completion_provider.insert("triggerCharacters", JsonNode::Array(completion_triggers));
+        capabilities.insert("completionProvider", JsonNode::Object(completion_provider));
+
         let sig_help = HashMap<str, JsonNode>::new(self.allocator);
         let trigger_chars = Array<JsonNode>::new(self.allocator);
         trigger_chars.append(JsonNode::String("("));
@@ -775,6 +783,335 @@ impl Processor {
         }
     }
 
+    fn position_in_range(&self, range: &Range, line: usize, character: usize) -> bool {
+        let before_start = line < range.start.line || (line == range.start.line && character < range.start.character);
+        if before_start { return false; }
+        let after_end = line > range.end.line || (line == range.end.line && character > range.end.character);
+        return !after_end;
+    }
+
+    fn position_before_or_equal(&self, position: &Position, line: usize, character: usize) -> bool {
+        return position.line < line || (position.line == line && position.character <= character);
+    }
+
+    fn make_completion_item_json(&self, label: str, kind: usize, detail: str, insert_text: str) -> JsonNode {
+        let item = HashMap<str, JsonNode>::new(self.allocator);
+        item.insert("label", JsonNode::String(label));
+        item.insert("kind", JsonNode::Number(kind));
+        if detail.length > 0 { item.insert("detail", JsonNode::String(detail)); }
+        item.insert("insertText", JsonNode::String(insert_text));
+        return JsonNode::Object(item);
+    }
+
+    fn append_completion_item(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, label: str, kind: usize, detail: str) {
+        if label.length == 0 { return; }
+        if seen.find(&label) != null { return; }
+        seen.insert(label, true);
+        result.append(self.make_completion_item_json(label, kind, detail, label));
+    }
+
+    fn function_has_self_parameter(&self, func_info: &Function) -> bool {
+        if func_info.parameters.length == 0 { return false; }
+        let first = &func_info.parameters.data[0];
+        let name = first.name;
+        if name != null && name.value.eq("self") { return true; }
+        return first.type.deref().is_self();
+    }
+
+    fn function_self_type(&self, func_info: &Function, fallback: &Type) -> Type {
+        match func_info.parent {
+            FunctionParent::Primitive(primitive, _, _) => { return Type::Primitive(primitive); },
+            FunctionParent::Enum(enum_info, _, _) => { return Type::Enum(enum_info, null); },
+            FunctionParent::Struct(struct_info, _, _) => { return Type::Struct(struct_info, null); },
+            FunctionParent::Type(type, _, _) => {
+                if type.is_fat_pointer() {
+                    let deref = type.deref_1();
+                    if deref != null { return *deref; }
+                }
+                return *type;
+            },
+            _ => {},
+        }
+        return *fallback;
+    }
+
+    fn append_function_completion(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, func_info: &Function, kind: usize, context: &Context) {
+        let name = func_info.name;
+        if name == null { return; }
+        let self_type = self.function_self_type(func_info, context.type_self);
+
+        let detail = String::new(self.allocator);
+        detail.append("fn ");
+        detail.append(name.value);
+        detail.append("(");
+        let first = true;
+        for param in func_info.parameters {
+            if !first { detail.append(", "); }
+            first = false;
+            let pname = param.name;
+            if pname != null {
+                detail.append(pname.value);
+                detail.append(": ");
+            }
+            let type_decl = context.root.naming_decl.get_type_decl(&param.type, &self_type, null);
+            detail.append(type_decl.as_str());
+        }
+        detail.append(")");
+        if !func_info.return_type.is_void() {
+            detail.append(" -> ");
+            let ret_decl = context.root.naming_decl.get_type_decl(&func_info.return_type, &self_type, null);
+            detail.append(ret_decl.as_str());
+        }
+
+        self.append_completion_item(result, seen, name.value, kind, detail.as_str());
+    }
+
+    fn append_type_member_completions(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, type: &Type, is_static: bool, context: &Context) {
+        match type.resolve_typedef() {
+            Type::Indirect(indirect) => {
+                self.append_type_member_completions(result, seen, &indirect.to, is_static, context);
+            },
+            Type::Self => {
+                if context.type_self != null {
+                    self.append_type_member_completions(result, seen, context.type_self, is_static, context);
+                }
+            },
+            Type::Primitive(primitive_info) => {
+                if primitive_info == null || is_static { return; }
+                for *impl_info in primitive_info.impls {
+                    for (_, &func_info) in impl_info.functions {
+                        self.append_function_completion(result, seen, func_info, 2, context);
+                    }
+                }
+            },
+            Type::Struct(struct_info, generic_map) => {
+                if !is_static {
+                    for (_, &field) in struct_info.fields {
+                        let field_type = Context::resolve_type(self.allocator, &field.type, generic_map, null);
+                        let detail = context.root.naming_decl.get_type_decl(field_type, context.type_self, null);
+                        self.append_completion_item(result, seen, field.name.value, 5, detail.as_str());
+                    }
+                }
+
+                for *impl_info in struct_info.impls {
+                    for (_, &func_info) in impl_info.functions {
+                        if is_static && self.function_has_self_parameter(func_info) { continue; }
+                        self.append_function_completion(result, seen, func_info, 2, context);
+                    }
+                    if is_static {
+                        for (_, impl_const) in impl_info.consts {
+                            let detail = context.root.naming_decl.get_type_decl(&impl_const.type, context.type_self, null);
+                            self.append_completion_item(result, seen, impl_const.name.value, 21, detail.as_str());
+                        }
+                    }
+                }
+            },
+            Type::Enum(enum_info, _) => {
+                if is_static {
+                    for (_, &variant) in enum_info.variants {
+                        self.append_completion_item(result, seen, variant.name.value, 20, "enum variant");
+                    }
+                }
+
+                for *impl_info in enum_info.impls {
+                    for (_, &func_info) in impl_info.functions {
+                        if is_static && self.function_has_self_parameter(func_info) { continue; }
+                        self.append_function_completion(result, seen, func_info, 2, context);
+                    }
+                    if is_static {
+                        for (_, impl_const) in impl_info.consts {
+                            let detail = context.root.naming_decl.get_type_decl(&impl_const.type, context.type_self, null);
+                            self.append_completion_item(result, seen, impl_const.name.value, 21, detail.as_str());
+                        }
+                    }
+                }
+            },
+            Type::Trait(trait_info, _) => {
+                if !is_static {
+                    self.append_completion_item(result, seen, "instance", 5, "*void");
+                }
+                for (_, &func_info) in trait_info.functions {
+                    self.append_function_completion(result, seen, func_info, 2, context);
+                }
+            },
+            Type::Sequence(sequence) => {
+                if is_static { return; }
+                let data_detail = context.root.naming_decl.get_type_decl(&sequence.element_pointer, context.type_self, null);
+                self.append_completion_item(result, seen, "data", 5, data_detail.as_str());
+                let length_detail = context.root.naming_decl.get_type_decl(&context.root.type_usize, context.type_self, null);
+                self.append_completion_item(result, seen, "length", 5, length_detail.as_str());
+
+                let hack_type_impl = context.root.hack_type_impl;
+                if hack_type_impl != null {
+                    let impl_info = hack_type_impl.impl_info;
+                    for (_, &func_info) in impl_info.functions {
+                        self.append_function_completion(result, seen, func_info, 2, context);
+                    }
+                }
+            },
+            Type::Tuple(tuple) => {
+                if is_static { return; }
+                let i: usize = 0;
+                while i < tuple.elements.length {
+                    let label = String::new(self.allocator);
+                    label.append_usize(i);
+                    let detail = context.root.naming_decl.get_type_decl(&tuple.elements.data[i], context.type_self, null);
+                    self.append_completion_item(result, seen, label.as_str(), 5, detail.as_str());
+                    i += 1;
+                }
+            },
+            Type::StructC(struct_info) => {
+                if is_static { return; }
+                for (_, &field) in struct_info.fields {
+                    let detail = context.root.naming_decl.get_type_decl(&field.type, context.type_self, null);
+                    self.append_completion_item(result, seen, field.name, 5, detail.as_str());
+                }
+            },
+            Type::UnionC(union_info) => {
+                if is_static { return; }
+                for (_, &field) in union_info.fields {
+                    let detail = context.root.naming_decl.get_type_decl(&field.type, context.type_self, null);
+                    self.append_completion_item(result, seen, field.name, 5, detail.as_str());
+                }
+            },
+            Type::ClassCpp(class_info) => {
+                for (name, &field_type) in class_info.fields {
+                    let detail = context.root.naming_decl.get_type_decl(field_type, context.type_self, null);
+                    self.append_completion_item(result, seen, name, 5, detail.as_str());
+                }
+                for (name, &value_type) in class_info.values {
+                    let detail = context.root.naming_decl.get_type_decl(value_type, context.type_self, null);
+                    self.append_completion_item(result, seen, name, 6, detail.as_str());
+                }
+                for base in class_info.bases {
+                    self.append_type_member_completions(result, seen, base, is_static, context);
+                }
+            },
+            Type::Generic(generic) => {
+                if is_static { return; }
+                for *trait_info in generic.traits {
+                    for (_, &func_info) in trait_info.functions {
+                        self.append_function_completion(result, seen, func_info, 2, context);
+                    }
+                }
+            },
+            Type::CoroutineInstance(_, _) => {
+                if is_static { return; }
+                self.append_completion_item(result, seen, "next", 2, "fn next()");
+                self.append_completion_item(result, seen, "value", 2, "fn value()");
+            },
+            Type::NamespaceCpp(ns_info) => {
+                for (name, &member_type) in ns_info.types {
+                    let detail = context.root.naming_decl.get_type_decl(member_type, context.type_self, null);
+                    self.append_completion_item(result, seen, name, 7, detail.as_str());
+                }
+                for (name, &member_type) in ns_info.values {
+                    let detail = context.root.naming_decl.get_type_decl(member_type, context.type_self, null);
+                    self.append_completion_item(result, seen, name, 6, detail.as_str());
+                }
+            },
+            _ => {},
+        }
+    }
+
+    fn find_member_completion_at(&self, infos: *Array<MemberCompletionInfo>, line: usize, character: usize) -> *MemberCompletionInfo {
+        if infos == null { return null; }
+        let found: *MemberCompletionInfo = null;
+        for info in infos {
+            if info.dot_position.line != line { continue; }
+            if info.dot_position.line > line { continue; }
+            if info.dot_position.line == line && info.dot_position.character + 1 > character { continue; }
+            if found == null {
+                found = info;
+            } else if info.dot_position.line > (*found).dot_position.line || (info.dot_position.line == (*found).dot_position.line && info.dot_position.character > (*found).dot_position.character) {
+                found = info;
+            }
+        }
+        return found;
+    }
+
+    fn append_module_name_completions(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, module: &Module) {
+        for (_, &func_info) in module.functions {
+            if func_info.type == FunctionType::Test { continue; }
+            self.append_function_completion(result, seen, func_info, 3, &module.context);
+        }
+
+        for (_, global) in module.globals {
+            let detail = module.context.root.naming_decl.get_type_decl(&global.type, module.context.type_self, null);
+            let kind: usize = 6;
+            if global.is_const { kind = 21; }
+            self.append_completion_item(result, seen, global.name.value, kind, detail.as_str());
+        }
+
+        for (_, &struct_arr) in module.structs {
+            for *struct_info in struct_arr {
+                let name = struct_info.name;
+                if name != null { self.append_completion_item(result, seen, name.value, 22, "struct"); }
+            }
+        }
+
+        for (_, &enum_arr) in module.enums {
+            for *enum_info in enum_arr {
+                let name = enum_info.name;
+                if name != null { self.append_completion_item(result, seen, name.value, 13, "enum"); }
+            }
+        }
+
+        for (_, &trait_arr) in module.traits {
+            for *trait_info in trait_arr {
+                let name = trait_info.name;
+                if name != null { self.append_completion_item(result, seen, name.value, 8, "trait"); }
+            }
+        }
+    }
+
+    fn completion(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        let line: usize = params.key("position").key("line").number();
+        let character: usize = params.key("position").key("character").number();
+        let result = Array<JsonNode>::new(self.allocator);
+
+        if uri.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let filename = ls.file_map.find(&uri);
+        if filename == null {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        ls.parse_functions_file(*filename);
+
+        let seen = HashMap<str, bool>::new(self.allocator);
+        let module: *Module = null;
+        if ls.root != null { module = ls.root.find_module_by_path(*filename); }
+
+        let member_infos = ls.analysis.member_completion_info.find(filename);
+        let member_info = self.find_member_completion_at(member_infos, line, character);
+        if member_info != null && module != null {
+            self.append_type_member_completions(&result, &seen, &member_info.receiver_type, member_info.is_static, &(*module).context);
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let completion_items = ls.analysis.completion_info.find(filename);
+        if completion_items != null {
+            for item in completion_items {
+                if !self.position_in_range(&item.range, line, character) { continue; }
+                if !self.position_before_or_equal(&item.definition_position, line, character) { continue; }
+                self.append_completion_item(&result, &seen, item.name, item.kind, item.type_label);
+            }
+        }
+
+        if module != null {
+            self.append_module_name_completions(&result, &seen, module);
+        }
+
+        self.send_response(id, JsonNode::Array(result));
+    }
+
     fn document_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
         let uri = params.key("textDocument").key("uri").string();
         let result = Array<JsonNode>::new(self.allocator);
@@ -1025,6 +1362,8 @@ impl Processor {
             self.document_symbol(id, ls, msg_json.key("params"));
         } else if method.eq("workspace/symbol") {
             self.workspace_symbol(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/completion") {
+            self.completion(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/definition") {
             self.definition(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/hover") {
