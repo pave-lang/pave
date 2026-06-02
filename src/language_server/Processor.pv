@@ -2,6 +2,7 @@
 
 use std
 use analyzer
+use analyzer::types
 
 struct Processor {
     allocator: &ArenaAllocator,
@@ -139,6 +140,8 @@ impl Processor {
 
         capabilities.insert("definitionProvider", JsonNode::Boolean(true));
         capabilities.insert("hoverProvider", JsonNode::Boolean(true));
+        capabilities.insert("documentSymbolProvider", JsonNode::Boolean(true));
+        capabilities.insert("workspaceSymbolProvider", JsonNode::Boolean(true));
 
         let sig_help = HashMap<str, JsonNode>::new(self.allocator);
         let trigger_chars = Array<JsonNode>::new(self.allocator);
@@ -447,6 +450,385 @@ impl Processor {
         return JsonNode::Object(r);
     }
 
+    fn make_token_range(&self, token: &Token) -> Range {
+        return Range {
+            start: Position { line: token.start_line, character: token.start_column },
+            end: Position { line: token.end_line, character: token.end_column },
+        };
+    }
+
+    fn make_token_span_range(&self, first: &Token, last: &Token) -> Range {
+        return Range {
+            start: Position { line: first.start_line, character: first.start_column },
+            end: Position { line: last.end_line, character: last.end_column },
+        };
+    }
+
+    fn token_at_or_name(&self, module: &Module, token_index: usize, name: &Token) -> &Token {
+        if token_index > 0 && token_index <= module.tokens.length {
+            return &module.tokens.data[token_index - 1];
+        }
+        return name;
+    }
+
+    fn make_document_symbol_json(&self, name: str, kind: usize, range: &Range, selection_range: &Range, children: Array<JsonNode>) -> JsonNode {
+        let item = HashMap<str, JsonNode>::new(self.allocator);
+        item.insert("name", JsonNode::String(name));
+        item.insert("kind", JsonNode::Number(kind));
+        item.insert("range", self.make_range_json(range));
+        item.insert("selectionRange", self.make_range_json(selection_range));
+        if children.length > 0 {
+            item.insert("children", JsonNode::Array(children));
+        }
+        return JsonNode::Object(item);
+    }
+
+    fn make_location_json(&self, uri: str, range: &Range) -> JsonNode {
+        let location = HashMap<str, JsonNode>::new(self.allocator);
+        location.insert("uri", JsonNode::String(uri));
+        location.insert("range", self.make_range_json(range));
+        return JsonNode::Object(location);
+    }
+
+    fn make_workspace_symbol_json(&self, name: str, kind: usize, container_name: str, uri: str, range: &Range) -> JsonNode {
+        let item = HashMap<str, JsonNode>::new(self.allocator);
+        item.insert("name", JsonNode::String(name));
+        item.insert("kind", JsonNode::Number(kind));
+        if container_name.length > 0 {
+            item.insert("containerName", JsonNode::String(container_name));
+        }
+        item.insert("location", self.make_location_json(uri, range));
+        return JsonNode::Object(item);
+    }
+
+    fn ascii_lower(&self, c: char) -> char {
+        if c >= 'A' && c <= 'Z' { return c + 32; }
+        return c;
+    }
+
+    fn symbol_matches_query(&self, name: str, query: str) -> bool {
+        if query.length == 0 { return true; }
+        if query.length > name.length { return false; }
+
+        let i: usize = 0;
+        while i <= name.length - query.length {
+            let matched = true;
+            let j: usize = 0;
+            while j < query.length {
+                if self.ascii_lower(name.ptr[i + j]) != self.ascii_lower(query.ptr[j]) {
+                    matched = false;
+                    break;
+                }
+                j += 1;
+            }
+            if matched { return true; }
+            i += 1;
+        }
+
+        return false;
+    }
+
+    fn append_workspace_symbol_if_matches(&self, result: &Array<JsonNode>, name: str, kind: usize, container_name: str, uri: str, range: &Range, query: str) {
+        if !self.symbol_matches_query(name, query) { return; }
+        result.append(self.make_workspace_symbol_json(name, kind, container_name, uri, range));
+    }
+
+    fn function_kind(&self, func_info: &Function, parent_kind: usize) -> usize {
+        match func_info.parent {
+            FunctionParent::None => {
+                if func_info.type == FunctionType::Test { return 24; }
+                return 12;
+            },
+            _ => { return parent_kind; },
+        }
+    }
+
+    fn function_range(&self, func_info: &Function) -> Range {
+        let name = func_info.name;
+        if name == null { return Range { start: Position { line: 0, character: 0 }, end: Position { line: 0, character: 0 } }; }
+
+        if func_info.context != null && func_info.token_end > 0 && func_info.token_end <= func_info.context.length {
+            return self.make_token_span_range(name, &func_info.context.tokens[func_info.token_end - 1]);
+        }
+
+        return self.make_token_range(name);
+    }
+
+    fn append_function_document_symbol(&self, result: &Array<JsonNode>, func_info: &Function, kind: usize) {
+        let name = func_info.name;
+        if name == null { return; }
+        let range = self.function_range(func_info);
+        let selection_range = self.make_token_range(name);
+        let children = Array<JsonNode>::new(self.allocator);
+        result.append(self.make_document_symbol_json(name.value, kind, &range, &selection_range, children));
+    }
+
+    fn append_impl_document_symbols(&self, result: &Array<JsonNode>, impls: &Array<&Impl>) {
+        for *impl_info in impls {
+            for (_, &func_info) in impl_info.functions {
+                self.append_function_document_symbol(result, func_info, 6);
+            }
+            for (_, impl_const) in impl_info.consts {
+                let range = self.make_token_range(impl_const.name);
+                let children = Array<JsonNode>::new(self.allocator);
+                result.append(self.make_document_symbol_json(impl_const.name.value, 14, &range, &range, children));
+            }
+        }
+    }
+
+    fn append_struct_document_symbol(&self, result: &Array<JsonNode>, struct_info: &Struct) {
+        let name = struct_info.name;
+        if name == null { return; }
+        let last = self.token_at_or_name(struct_info.module, struct_info.token_end, name);
+        let range = self.make_token_span_range(name, last);
+        let selection_range = self.make_token_range(name);
+        let children = Array<JsonNode>::new(self.allocator);
+
+        for (_, &field) in struct_info.fields {
+            let field_range = self.make_token_range(field.name);
+            let field_children = Array<JsonNode>::new(self.allocator);
+            children.append(self.make_document_symbol_json(field.name.value, 8, &field_range, &field_range, field_children));
+        }
+
+        self.append_impl_document_symbols(&children, &struct_info.impls);
+        result.append(self.make_document_symbol_json(name.value, 23, &range, &selection_range, children));
+    }
+
+    fn append_enum_document_symbol(&self, result: &Array<JsonNode>, enum_info: &Enum) {
+        let name = enum_info.name;
+        if name == null { return; }
+        let module = enum_info.context.module;
+        let last = self.token_at_or_name(module, enum_info.token_end, name);
+        let range = self.make_token_span_range(name, last);
+        let selection_range = self.make_token_range(name);
+        let children = Array<JsonNode>::new(self.allocator);
+
+        for (_, &variant) in enum_info.variants {
+            let variant_range = self.make_token_range(variant.name);
+            let variant_children = Array<JsonNode>::new(self.allocator);
+            children.append(self.make_document_symbol_json(variant.name.value, 22, &variant_range, &variant_range, variant_children));
+        }
+
+        self.append_impl_document_symbols(&children, &enum_info.impls);
+        result.append(self.make_document_symbol_json(name.value, 10, &range, &selection_range, children));
+    }
+
+    fn append_trait_document_symbol(&self, result: &Array<JsonNode>, trait_info: &Trait) {
+        let name = trait_info.name;
+        if name == null { return; }
+        let last = self.token_at_or_name(trait_info.module, trait_info.token_end, name);
+        let range = self.make_token_span_range(name, last);
+        let selection_range = self.make_token_range(name);
+        let children = Array<JsonNode>::new(self.allocator);
+
+        for (_, &func_info) in trait_info.functions {
+            self.append_function_document_symbol(&children, func_info, 6);
+        }
+
+        result.append(self.make_document_symbol_json(name.value, 11, &range, &selection_range, children));
+    }
+
+    fn append_module_document_symbols(&self, result: &Array<JsonNode>, module: &Module) {
+        for (_, &struct_arr) in module.structs {
+            for *struct_info in struct_arr {
+                self.append_struct_document_symbol(result, struct_info);
+            }
+        }
+
+        for (_, &enum_arr) in module.enums {
+            for *enum_info in enum_arr {
+                self.append_enum_document_symbol(result, enum_info);
+            }
+        }
+
+        for (_, &trait_arr) in module.traits {
+            for *trait_info in trait_arr {
+                self.append_trait_document_symbol(result, trait_info);
+            }
+        }
+
+        for (_, &func_info) in module.functions {
+            if func_info.type == FunctionType::Test { continue; }
+            self.append_function_document_symbol(result, func_info, self.function_kind(func_info, 12));
+        }
+
+        for (_, global) in module.globals {
+            let kind: usize = 13;
+            if global.is_const { kind = 14; }
+            let range = self.make_token_range(global.name);
+            let children = Array<JsonNode>::new(self.allocator);
+            result.append(self.make_document_symbol_json(global.name.value, kind, &range, &range, children));
+        }
+
+        for test_info in module.tests {
+            let range = self.make_token_range(test_info.description);
+            let children = Array<JsonNode>::new(self.allocator);
+            let display_name = test_info.description.value;
+            if display_name.length >= 2 {
+                display_name = display_name.slice(1, display_name.length - 1);
+            }
+            result.append(self.make_document_symbol_json(display_name, 12, &range, &range, children));
+        }
+    }
+
+    fn append_impl_workspace_symbols(&self, result: &Array<JsonNode>, impls: &Array<&Impl>, container_name: str, uri: str, query: str) {
+        for *impl_info in impls {
+            for (_, &func_info) in impl_info.functions {
+                let name = func_info.name;
+                if name == null { continue; }
+                let range = self.function_range(func_info);
+                self.append_workspace_symbol_if_matches(result, name.value, 6, container_name, uri, &range, query);
+            }
+            for (_, impl_const) in impl_info.consts {
+                let range = self.make_token_range(impl_const.name);
+                self.append_workspace_symbol_if_matches(result, impl_const.name.value, 14, container_name, uri, &range, query);
+            }
+        }
+    }
+
+    fn append_module_workspace_symbols(&self, result: &Array<JsonNode>, module: &Module, query: str) {
+        let uri = Uri::file(self.allocator, module.path);
+
+        for (_, &struct_arr) in module.structs {
+            for *struct_info in struct_arr {
+                let name = struct_info.name;
+                if name == null { continue; }
+                let last = self.token_at_or_name(module, struct_info.token_end, name);
+                let range = self.make_token_span_range(name, last);
+                self.append_workspace_symbol_if_matches(result, name.value, 23, "", uri, &range, query);
+
+                for (_, &field) in struct_info.fields {
+                    let field_range = self.make_token_range(field.name);
+                    self.append_workspace_symbol_if_matches(result, field.name.value, 8, name.value, uri, &field_range, query);
+                }
+
+                self.append_impl_workspace_symbols(result, &struct_info.impls, name.value, uri, query);
+            }
+        }
+
+        for (_, &enum_arr) in module.enums {
+            for *enum_info in enum_arr {
+                let name = enum_info.name;
+                if name == null { continue; }
+                let last = self.token_at_or_name(module, enum_info.token_end, name);
+                let range = self.make_token_span_range(name, last);
+                self.append_workspace_symbol_if_matches(result, name.value, 10, "", uri, &range, query);
+
+                for (_, &variant) in enum_info.variants {
+                    let variant_range = self.make_token_range(variant.name);
+                    self.append_workspace_symbol_if_matches(result, variant.name.value, 22, name.value, uri, &variant_range, query);
+                }
+
+                self.append_impl_workspace_symbols(result, &enum_info.impls, name.value, uri, query);
+            }
+        }
+
+        for (_, &trait_arr) in module.traits {
+            for *trait_info in trait_arr {
+                let name = trait_info.name;
+                if name == null { continue; }
+                let last = self.token_at_or_name(module, trait_info.token_end, name);
+                let range = self.make_token_span_range(name, last);
+                self.append_workspace_symbol_if_matches(result, name.value, 11, "", uri, &range, query);
+
+                for (_, &func_info) in trait_info.functions {
+                    let func_name = func_info.name;
+                    if func_name == null { continue; }
+                    let func_range = self.function_range(func_info);
+                    self.append_workspace_symbol_if_matches(result, func_name.value, 6, name.value, uri, &func_range, query);
+                }
+            }
+        }
+
+        for (_, &func_info) in module.functions {
+            if func_info.type == FunctionType::Test { continue; }
+            let name = func_info.name;
+            if name == null { continue; }
+            let range = self.function_range(func_info);
+            self.append_workspace_symbol_if_matches(result, name.value, self.function_kind(func_info, 12), "", uri, &range, query);
+        }
+
+        for (_, global) in module.globals {
+            let kind: usize = 13;
+            if global.is_const { kind = 14; }
+            let range = self.make_token_range(global.name);
+            self.append_workspace_symbol_if_matches(result, global.name.value, kind, "", uri, &range, query);
+        }
+
+        for test_info in module.tests {
+            let range = self.make_token_range(test_info.description);
+            let display_name = test_info.description.value;
+            if display_name.length >= 2 {
+                display_name = display_name.slice(1, display_name.length - 1);
+            }
+            self.append_workspace_symbol_if_matches(result, display_name, 12, "", uri, &range, query);
+        }
+    }
+
+    fn append_namespace_workspace_symbols(&self, result: &Array<JsonNode>, namespace: &Namespace, query: str) {
+        for (_, module) in namespace.modules {
+            self.append_module_workspace_symbols(result, module, query);
+        }
+
+        for (_, child) in namespace.children {
+            self.append_namespace_workspace_symbols(result, child, query);
+        }
+    }
+
+    fn document_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri = params.key("textDocument").key("uri").string();
+        let result = Array<JsonNode>::new(self.allocator);
+
+        if uri.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let filename_ptr = ls.file_map.find(&uri);
+        if filename_ptr == null {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let filename_copy = String::new(self.allocator);
+        filename_copy.append(*filename_ptr);
+        let filename = filename_copy.as_str();
+
+        if ls.root == null {
+            ls.analyze();
+        }
+
+        if ls.root == null {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let module = ls.root.find_module_by_path(filename);
+        if module == null {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        self.append_module_document_symbols(&result, module);
+        self.send_response(id, JsonNode::Array(result));
+    }
+
+    fn workspace_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let result = Array<JsonNode>::new(self.allocator);
+        let query = params.key("query").string();
+
+        if ls.root == null {
+            ls.analyze();
+        }
+        if ls.root != null {
+            for (_, child) in ls.root.children {
+                self.append_namespace_workspace_symbols(&result, child, query);
+            }
+        }
+
+        self.send_response(id, JsonNode::Array(result));
+    }
+
     fn definition(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
         let uri = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
@@ -639,6 +1021,10 @@ impl Processor {
             self.did_close(ls, msg_json.key("params"));
         } else if method.eq("textDocument/inlayHint") {
             self.inlay_hint(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/documentSymbol") {
+            self.document_symbol(id, ls, msg_json.key("params"));
+        } else if method.eq("workspace/symbol") {
+            self.workspace_symbol(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/definition") {
             self.definition(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/hover") {
