@@ -573,7 +573,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                         #line 238 "src/analyzer/expression/Expression.pv"
                         if (open_paren_token != 0 && close_paren_token != 0) {
                             #line 239 "src/analyzer/expression/Expression.pv"
-                            Expression__record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas);
+                            Expression__record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas, false);
                         }
 
                         #line 242 "src/analyzer/expression/Expression.pv"
@@ -1974,7 +1974,7 @@ struct Expression* Expression__parse_if_expression(struct Context* context, stru
 }
 
 #line 941 "src/analyzer/expression/Expression.pv"
-void Expression__record_function_signature(struct Context* context, struct Function* func_info, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions) {
+void Expression__record_function_signature(struct Context* context, struct Function* func_info, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self) {
     #line 942 "src/analyzer/expression/Expression.pv"
     if (!Context__should_record_symbols(context)) {
         #line 942 "src/analyzer/expression/Expression.pv"
@@ -2000,54 +2000,65 @@ void Expression__record_function_signature(struct Context* context, struct Funct
     #line 951 "src/analyzer/expression/Expression.pv"
     bool first = true;
     #line 952 "src/analyzer/expression/Expression.pv"
+    uintptr_t i = 0;
+    #line 953 "src/analyzer/expression/Expression.pv"
     { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-    #line 952 "src/analyzer/expression/Expression.pv"
+    #line 953 "src/analyzer/expression/Expression.pv"
     while (Iter_ref_Parameter__next(&__iter)) {
-        #line 952 "src/analyzer/expression/Expression.pv"
+        #line 953 "src/analyzer/expression/Expression.pv"
         struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-        #line 953 "src/analyzer/expression/Expression.pv"
+        #line 954 "src/analyzer/expression/Expression.pv"
+        if (skip_self && i == 0) {
+            #line 955 "src/analyzer/expression/Expression.pv"
+            i += 1;
+            #line 956 "src/analyzer/expression/Expression.pv"
+            continue;
+        }
+        #line 958 "src/analyzer/expression/Expression.pv"
         if (!first) {
-            #line 953 "src/analyzer/expression/Expression.pv"
+            #line 958 "src/analyzer/expression/Expression.pv"
             String__append(&label, (struct str){ .ptr = ", ", .length = strlen(", ") });
         }
-        #line 954 "src/analyzer/expression/Expression.pv"
+        #line 959 "src/analyzer/expression/Expression.pv"
         first = false;
 
-        #line 956 "src/analyzer/expression/Expression.pv"
+        #line 961 "src/analyzer/expression/Expression.pv"
         struct String param_str = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 957 "src/analyzer/expression/Expression.pv"
+        #line 962 "src/analyzer/expression/Expression.pv"
         struct Token* pname = param->name;
-        #line 958 "src/analyzer/expression/Expression.pv"
+        #line 963 "src/analyzer/expression/Expression.pv"
         if (pname != 0) {
-            #line 959 "src/analyzer/expression/Expression.pv"
+            #line 964 "src/analyzer/expression/Expression.pv"
             String__append(&param_str, pname->value);
-            #line 960 "src/analyzer/expression/Expression.pv"
+            #line 965 "src/analyzer/expression/Expression.pv"
             String__append(&param_str, (struct str){ .ptr = ": ", .length = strlen(": ") });
         }
-        #line 962 "src/analyzer/expression/Expression.pv"
+        #line 967 "src/analyzer/expression/Expression.pv"
         struct String type_decl = Naming__get_type_decl(&context->root->naming_decl, &param->type, context->type_self, 0);
-        #line 963 "src/analyzer/expression/Expression.pv"
+        #line 968 "src/analyzer/expression/Expression.pv"
         String__append(&param_str, String__as_str(&type_decl));
-        #line 964 "src/analyzer/expression/Expression.pv"
+        #line 969 "src/analyzer/expression/Expression.pv"
         String__append(&label, String__as_str(&param_str));
-        #line 965 "src/analyzer/expression/Expression.pv"
+        #line 970 "src/analyzer/expression/Expression.pv"
         Array_str__append(&params, String__as_str(&param_str));
+        #line 971 "src/analyzer/expression/Expression.pv"
+        i += 1;
     } }
 
-    #line 968 "src/analyzer/expression/Expression.pv"
+    #line 974 "src/analyzer/expression/Expression.pv"
     String__append(&label, (struct str){ .ptr = ")", .length = strlen(")") });
-    #line 969 "src/analyzer/expression/Expression.pv"
+    #line 975 "src/analyzer/expression/Expression.pv"
     struct String ret_type_decl = Naming__get_type_decl(&context->root->naming_decl, &func_info->return_type, context->type_self, 0);
-    #line 970 "src/analyzer/expression/Expression.pv"
+    #line 976 "src/analyzer/expression/Expression.pv"
     if (!Type__is_void(&func_info->return_type)) {
-        #line 971 "src/analyzer/expression/Expression.pv"
+        #line 977 "src/analyzer/expression/Expression.pv"
         String__append(&label, (struct str){ .ptr = " -> ", .length = strlen(" -> ") });
-        #line 972 "src/analyzer/expression/Expression.pv"
+        #line 978 "src/analyzer/expression/Expression.pv"
         String__append(&label, String__as_str(&ret_type_decl));
     }
 
-    #line 975 "src/analyzer/expression/Expression.pv"
+    #line 981 "src/analyzer/expression/Expression.pv"
     Context__record_signature(context, open_paren, close_paren, comma_positions, String__as_str(&label), params);
 }
 
@@ -4771,7 +4782,7 @@ struct Expression* Expression__parse_instance_member_expression_inner(struct Con
         #line 212 "src/analyzer/expression/PostfixExpression.pv"
         if (member_open_paren != 0 && member_close_paren != 0) {
             #line 213 "src/analyzer/expression/PostfixExpression.pv"
-            Expression__record_function_signature(context, func_info, member_open_paren, member_close_paren, member_sig_commas);
+            Expression__record_function_signature(context, func_info, member_open_paren, member_close_paren, member_sig_commas, true);
         }
 
         #line 216 "src/analyzer/expression/PostfixExpression.pv"

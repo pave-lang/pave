@@ -794,12 +794,13 @@ impl Processor {
         return position.line < line || (position.line == line && position.character <= character);
     }
 
-    fn make_completion_item_json(&self, label: str, kind: usize, detail: str, insert_text: str, sort_prefix: str, label_detail: str, label_description: str) -> JsonNode {
+    fn make_completion_item_json(&self, label: str, kind: usize, detail: str, insert_text: str, insert_text_format: usize, sort_prefix: str, label_detail: str, label_description: str, trigger_signature_help: bool) -> JsonNode {
         let item = HashMap<str, JsonNode>::new(self.allocator);
         item.insert("label", JsonNode::String(label));
         item.insert("kind", JsonNode::Number(kind));
         if detail.length > 0 { item.insert("detail", JsonNode::String(detail)); }
         item.insert("insertText", JsonNode::String(insert_text));
+        if insert_text_format > 1 { item.insert("insertTextFormat", JsonNode::Number(insert_text_format)); }
         let sort_text = String::new(self.allocator);
         sort_text.append(sort_prefix);
         sort_text.append(label);
@@ -810,6 +811,12 @@ impl Processor {
             if label_description.length > 0 { label_details.insert("description", JsonNode::String(label_description)); }
             item.insert("labelDetails", JsonNode::Object(label_details));
         }
+        if trigger_signature_help {
+            let cmd = HashMap<str, JsonNode>::new(self.allocator);
+            cmd.insert("title", JsonNode::String("signature help"));
+            cmd.insert("command", JsonNode::String("editor.action.triggerParameterHints"));
+            item.insert("command", JsonNode::Object(cmd));
+        }
         return JsonNode::Object(item);
     }
 
@@ -817,7 +824,7 @@ impl Processor {
         if label.length == 0 { return; }
         if seen.find(&label) != null { return; }
         seen.insert(label, true);
-        result.append(self.make_completion_item_json(label, kind, detail, label, sort_prefix, "", ""));
+        result.append(self.make_completion_item_json(label, kind, detail, label, 1, sort_prefix, "", "", false));
     }
 
     fn function_has_self_parameter(&self, func_info: &Function) -> bool {
@@ -905,11 +912,20 @@ impl Processor {
             label_description.append(ret_decl.as_str());
         }
 
+        let visible_params = func_info.parameters.length;
+        if skip_self && visible_params > 0 { visible_params -= 1; }
+
         let insert_text = String::new(self.allocator);
         insert_text.append(name.value);
-        insert_text.append("()");
+        let insert_text_format: usize = 1;
+        if visible_params > 0 {
+            insert_text.append("($0)");
+            insert_text_format = 2;
+        } else {
+            insert_text.append("()");
+        }
 
-        result.append(self.make_completion_item_json(name.value, kind, detail.as_str(), insert_text.as_str(), "1", label_detail.as_str(), label_description.as_str()));
+        result.append(self.make_completion_item_json(name.value, kind, detail.as_str(), insert_text.as_str(), insert_text_format, "1", label_detail.as_str(), label_description.as_str(), visible_params > 0));
     }
 
     fn append_type_member_completions(&self, result: &Array<JsonNode>, seen: &HashMap<str, bool>, type: &Type, is_static: bool, context: &Context) {

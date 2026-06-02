@@ -74,7 +74,7 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
 #line 941 "src/analyzer/expression/Expression.pv"
-void Expression__record_function_signature(struct Context* context, struct Function* func_info, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions);
+void Expression__record_function_signature(struct Context* context, struct Function* func_info, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
 struct EnumVariantResult Expression__get_enum_variant(struct Context* context, struct Type* type, struct Token* token);

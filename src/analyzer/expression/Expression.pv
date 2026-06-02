@@ -227,17 +227,16 @@ impl Expression {
                             if !context.expect_value(TokenType::Symbol, ")") { return null; }
                             let close_paren_token = context.prev();
 
+                            if open_paren_token != null && close_paren_token != null {
+                                Expression::record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas, false);
+                            }
+
                             if func_info.generics.array.length > 0 {
                                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                                 func_type = context.root.make_type_usage(func_type, &func_generics.array);
                             }
 
                             if !Expression::validate_arguments(context, token, func_type, &arguments, null, false) { return null; }
-
-                            // Record signature info for signature help
-                            if open_paren_token != null && close_paren_token != null {
-                                Expression::record_function_signature(context, func_info, open_paren_token, close_paren_token, sig_commas, false);
-                            }
 
                             let func_return_type: *Type = null;
                             match func_type {
