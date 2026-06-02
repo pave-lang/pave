@@ -2169,136 +2169,172 @@ void Context__record_member_completion(struct Context* self, struct Token* dot, 
     }
 
     #line 1125 "src/analyzer/Context.pv"
+    struct Type* resolved_type = receiver_type;
+    #line 1126 "src/analyzer/Context.pv"
+    switch (receiver_type->type) {
+        #line 1127 "src/analyzer/Context.pv"
+        case TYPE__SELF: {
+            #line 1128 "src/analyzer/Context.pv"
+            if (self->type_self != 0 && !Type__is_self(self->type_self)) {
+                #line 1129 "src/analyzer/Context.pv"
+                resolved_type = self->type_self;
+            }
+        } break;
+        #line 1132 "src/analyzer/Context.pv"
+        case TYPE__INDIRECT: {
+            #line 1132 "src/analyzer/Context.pv"
+            struct Indirect* indirect = receiver_type->indirect_value;
+            #line 1133 "src/analyzer/Context.pv"
+            switch (indirect->to.type) {
+                #line 1134 "src/analyzer/Context.pv"
+                case TYPE__SELF: {
+                    #line 1135 "src/analyzer/Context.pv"
+                    if (self->type_self != 0 && !Type__is_self(self->type_self)) {
+                        #line 1136 "src/analyzer/Context.pv"
+                        resolved_type = self->type_self;
+                    }
+                } break;
+                #line 1139 "src/analyzer/Context.pv"
+                default: {
+                } break;
+            }
+        } break;
+        #line 1142 "src/analyzer/Context.pv"
+        default: {
+        } break;
+    }
+
+    #line 1145 "src/analyzer/Context.pv"
     Array_MemberCompletionInfo__append(file_infos, (struct MemberCompletionInfo) {
         .dot_position = (struct Position) { .line = dot->start_line, .character = dot->start_column },
-        .receiver_type = *receiver_type,
+        .receiver_type = *resolved_type,
         .is_static = is_static,
     });
 }
 
-#line 1132 "src/analyzer/Context.pv"
+#line 1152 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics) {
-    #line 1133 "src/analyzer/Context.pv"
+    #line 1153 "src/analyzer/Context.pv"
     struct Array_Type generic_inputs = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
 
-    #line 1135 "src/analyzer/Context.pv"
+    #line 1155 "src/analyzer/Context.pv"
     if (!Context__expect_value(self, TOKEN_TYPE__SYMBOL, "<")) {
-        #line 1135 "src/analyzer/Context.pv"
+        #line 1155 "src/analyzer/Context.pv"
         return (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 };
     }
 
-    #line 1137 "src/analyzer/Context.pv"
+    #line 1157 "src/analyzer/Context.pv"
     while (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ">")) {
-        #line 1138 "src/analyzer/Context.pv"
+        #line 1158 "src/analyzer/Context.pv"
         struct Type child_type;
 
-        #line 1140 "src/analyzer/Context.pv"
+        #line 1160 "src/analyzer/Context.pv"
         if (!Context__parse_type(self, &child_type, generics)) {
-            #line 1140 "src/analyzer/Context.pv"
+            #line 1160 "src/analyzer/Context.pv"
             return (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 };
         }
 
-        #line 1142 "src/analyzer/Context.pv"
+        #line 1162 "src/analyzer/Context.pv"
         Array_Type__append(&generic_inputs, child_type);
 
-        #line 1144 "src/analyzer/Context.pv"
+        #line 1164 "src/analyzer/Context.pv"
         if (!Context__check_next(self, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(self, TOKEN_TYPE__SYMBOL, ">")) {
-            #line 1145 "src/analyzer/Context.pv"
+            #line 1165 "src/analyzer/Context.pv"
             Context__error(self, "Expected , or >");
-            #line 1146 "src/analyzer/Context.pv"
+            #line 1166 "src/analyzer/Context.pv"
             return (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 };
         }
     }
 
-    #line 1150 "src/analyzer/Context.pv"
+    #line 1170 "src/analyzer/Context.pv"
     return generic_inputs;
 }
 
-#line 1153 "src/analyzer/Context.pv"
+#line 1173 "src/analyzer/Context.pv"
 bool Context__validate_generic_constraints(struct Context* self, struct Generics* generics, struct Array_Type* usage_types) {
-    #line 1154 "src/analyzer/Context.pv"
+    #line 1174 "src/analyzer/Context.pv"
     uintptr_t i = 0;
-    #line 1155 "src/analyzer/Context.pv"
+    #line 1175 "src/analyzer/Context.pv"
     while (i < generics->array.length && i < usage_types->length) {
-        #line 1156 "src/analyzer/Context.pv"
+        #line 1176 "src/analyzer/Context.pv"
         struct Generic* generic = &generics->array.data[i];
-        #line 1157 "src/analyzer/Context.pv"
+        #line 1177 "src/analyzer/Context.pv"
         struct Type* usage_type = &usage_types->data[i];
 
-        #line 1159 "src/analyzer/Context.pv"
+        #line 1179 "src/analyzer/Context.pv"
         { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic->traits);
-        #line 1159 "src/analyzer/Context.pv"
+        #line 1179 "src/analyzer/Context.pv"
         while (Iter_ref_ref_Trait__next(&__iter)) {
-            #line 1159 "src/analyzer/Context.pv"
+            #line 1179 "src/analyzer/Context.pv"
             struct Trait* required_trait = *Iter_ref_ref_Trait__value(&__iter);
 
-            #line 1160 "src/analyzer/Context.pv"
+            #line 1180 "src/analyzer/Context.pv"
             bool implements = false;
-            #line 1161 "src/analyzer/Context.pv"
+            #line 1181 "src/analyzer/Context.pv"
             switch (usage_type->type) {
-                #line 1162 "src/analyzer/Context.pv"
+                #line 1182 "src/analyzer/Context.pv"
                 case TYPE__STRUCT: {
-                    #line 1162 "src/analyzer/Context.pv"
+                    #line 1182 "src/analyzer/Context.pv"
                     struct Struct* struct_info = usage_type->struct_value._0;
-                    #line 1163 "src/analyzer/Context.pv"
+                    #line 1183 "src/analyzer/Context.pv"
                     struct str trait_key = Trait__get_key(required_trait, (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
-                    #line 1164 "src/analyzer/Context.pv"
+                    #line 1184 "src/analyzer/Context.pv"
                     implements = HashMap_str_tuple_ref_Trait_ref_Type__find(&struct_info->traits, &trait_key) != 0;
                 } break;
-                #line 1166 "src/analyzer/Context.pv"
+                #line 1186 "src/analyzer/Context.pv"
                 case TYPE__GENERIC: {
-                    #line 1166 "src/analyzer/Context.pv"
+                    #line 1186 "src/analyzer/Context.pv"
                     struct Generic* generic_info = usage_type->generic_value;
-                    #line 1167 "src/analyzer/Context.pv"
+                    #line 1187 "src/analyzer/Context.pv"
                     { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(&generic_info->traits);
-                    #line 1167 "src/analyzer/Context.pv"
+                    #line 1187 "src/analyzer/Context.pv"
                     while (Iter_ref_ref_Trait__next(&__iter)) {
-                        #line 1167 "src/analyzer/Context.pv"
+                        #line 1187 "src/analyzer/Context.pv"
                         struct Trait* generic_trait = *Iter_ref_ref_Trait__value(&__iter);
 
-                        #line 1168 "src/analyzer/Context.pv"
+                        #line 1188 "src/analyzer/Context.pv"
                         if (generic_trait == required_trait) {
-                            #line 1168 "src/analyzer/Context.pv"
+                            #line 1188 "src/analyzer/Context.pv"
                             implements = true;
                         }
                     } }
                 } break;
-                #line 1171 "src/analyzer/Context.pv"
+                #line 1191 "src/analyzer/Context.pv"
                 default: {
-                    #line 1171 "src/analyzer/Context.pv"
+                    #line 1191 "src/analyzer/Context.pv"
                     implements = true;
                 } break;
             }
-            #line 1173 "src/analyzer/Context.pv"
+            #line 1193 "src/analyzer/Context.pv"
             if (!implements) {
-                #line 1174 "src/analyzer/Context.pv"
+                #line 1194 "src/analyzer/Context.pv"
                 struct Token* name = required_trait->name;
-                #line 1175 "src/analyzer/Context.pv"
+                #line 1195 "src/analyzer/Context.pv"
                 if (name == 0) {
-                    #line 1176 "src/analyzer/Context.pv"
+                    #line 1196 "src/analyzer/Context.pv"
                     Context__error(self, "Type does not implement required trait");
-                    #line 1177 "src/analyzer/Context.pv"
+                    #line 1197 "src/analyzer/Context.pv"
                     return false;
                 }
 
-                #line 1180 "src/analyzer/Context.pv"
+                #line 1200 "src/analyzer/Context.pv"
                 struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator });
-                #line 1181 "src/analyzer/Context.pv"
+                #line 1201 "src/analyzer/Context.pv"
                 String__append(&message, (struct str){ .ptr = "Type does not implement required trait '", .length = strlen("Type does not implement required trait '") });
-                #line 1182 "src/analyzer/Context.pv"
+                #line 1202 "src/analyzer/Context.pv"
                 String__append(&message, name->value);
-                #line 1183 "src/analyzer/Context.pv"
+                #line 1203 "src/analyzer/Context.pv"
                 String__append(&message, (struct str){ .ptr = "'", .length = strlen("'") });
-                #line 1184 "src/analyzer/Context.pv"
+                #line 1204 "src/analyzer/Context.pv"
                 Context__error(self, String__c_str(&message));
-                #line 1185 "src/analyzer/Context.pv"
+                #line 1205 "src/analyzer/Context.pv"
                 return false;
             }
         } }
 
-        #line 1189 "src/analyzer/Context.pv"
+        #line 1209 "src/analyzer/Context.pv"
         i += 1;
     }
-    #line 1191 "src/analyzer/Context.pv"
+    #line 1211 "src/analyzer/Context.pv"
     return true;
 }

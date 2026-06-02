@@ -1122,9 +1122,29 @@ impl Context {
         if file_infos == null { file_infos = infos.insert(self.path, Array<MemberCompletionInfo>::new(self.allocator)); }
         if file_infos == null { return; }
 
+        let resolved_type = receiver_type;
+        match receiver_type {
+            Type::Self => {
+                if self.type_self != null && !self.type_self.is_self() {
+                    resolved_type = self.type_self;
+                }
+            },
+            Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Self => {
+                        if self.type_self != null && !self.type_self.is_self() {
+                            resolved_type = self.type_self;
+                        }
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
         file_infos.append(MemberCompletionInfo {
             dot_position: Position { line: dot.start_line, character: dot.start_column },
-            receiver_type: *receiver_type,
+            receiver_type: *resolved_type,
             is_static,
         });
     }

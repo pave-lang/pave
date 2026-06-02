@@ -872,7 +872,7 @@ impl Processor {
                 self.append_type_member_completions(result, seen, &indirect.to, is_static, context);
             },
             Type::Self => {
-                if context.type_self != null {
+                if context.type_self != null && !context.type_self.is_self() {
                     self.append_type_member_completions(result, seen, context.type_self, is_static, context);
                 }
             },
@@ -895,7 +895,6 @@ impl Processor {
 
                 for *impl_info in struct_info.impls {
                     for (_, &func_info) in impl_info.functions {
-                        if is_static && self.function_has_self_parameter(func_info) { continue; }
                         self.append_function_completion(result, seen, func_info, 2, context);
                     }
                     if is_static {
@@ -915,7 +914,6 @@ impl Processor {
 
                 for *impl_info in enum_info.impls {
                     for (_, &func_info) in impl_info.functions {
-                        if is_static && self.function_has_self_parameter(func_info) { continue; }
                         self.append_function_completion(result, seen, func_info, 2, context);
                     }
                     if is_static {

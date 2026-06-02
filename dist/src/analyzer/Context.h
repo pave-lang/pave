@@ -229,10 +229,10 @@ void Context__record_completion(struct Context* self, struct Token* name, struct
 #line 1117 "src/analyzer/Context.pv"
 void Context__record_member_completion(struct Context* self, struct Token* dot, struct Type* receiver_type, bool is_static);
 
-#line 1132 "src/analyzer/Context.pv"
+#line 1152 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics);
 
-#line 1153 "src/analyzer/Context.pv"
+#line 1173 "src/analyzer/Context.pv"
 bool Context__validate_generic_constraints(struct Context* self, struct Generics* generics, struct Array_Type* usage_types);
 
 #endif
