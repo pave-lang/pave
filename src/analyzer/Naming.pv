@@ -492,6 +492,10 @@ impl Naming {
                 result.append(func_name.value);
             },
             Type::Self => {
+                if type_self.is_self() {
+                    result.append("Self");
+                    return result;
+                }
                 return self.get_type_name(type_self, type_self, generics_map);
             },
             Type::TypedefC(info) => {
@@ -550,19 +554,28 @@ impl Naming {
     
     fn get_type_decl(&self, type: &Type, type_self: &Type, generics_map: *GenericMap) -> String {
         match type {
-            Type::Function(func_info, _) => {
+            Type::Function(func_info, func_generics) => {
                 let result = String::new(self.allocator);
                 result.append("fn(");
+
+                let function_type_self = type_self;
+                let function_generics = generics_map;
+                if func_generics != null {
+                    function_generics = func_generics;
+                    if func_generics.self_type != null {
+                        function_type_self = func_generics.self_type;
+                    }
+                }
 
                 let first = true;
                 for param in func_info.parameters {
                     if first { first = false; } else { result.append(", "); }
-                    let param_name = self.get_type_decl(&param.type, type_self, generics_map);
+                    let param_name = self.get_type_decl(&param.type, function_type_self, function_generics);
                     result.append_string(&param_name);
                 }
                 result.append(")");
 
-                let return_name = self.get_type_decl(&func_info.return_type, type_self, generics_map);
+                let return_name = self.get_type_decl(&func_info.return_type, function_type_self, function_generics);
                 if !return_name.as_str().eq("void") {
                     result.append(") -> ");
                     result.append_string(&return_name);

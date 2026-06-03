@@ -206,13 +206,13 @@ impl Expression {
                             if parsed == null { return null; }
                             let arguments = parsed.arguments;
 
-                            if parsed.open_paren != null && parsed.close_paren != null {
-                                Expression::record_function_signature(context, func_info, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
-                            }
-
                             if func_info.generics.array.length > 0 {
                                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                                 func_type = context.root.make_type_usage(func_type, &func_generics.array);
+                            }
+
+                            if parsed.open_paren != null && parsed.close_paren != null {
+                                Expression::record_function_signature(context, func_type, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
                             }
 
                             if !Expression::validate_arguments(context, token, func_type, &arguments, null, false) { return null; }
@@ -903,8 +903,24 @@ impl Expression {
         return Expression::make(context.allocator, token, ExpressionData::IfExpression(condition, a, b), &a.return_type);
     }
 
-    fn record_function_signature(context: &Context, func_info: &Function, open_paren: &Token, close_paren: &Token, comma_positions: Array<Position>, skip_self: bool) {
+    fn record_function_signature(context: &Context, function_type: &Type, open_paren: &Token, close_paren: &Token, comma_positions: Array<Position>, skip_self: bool) {
         if !context.should_record_symbols() { return; }
+
+        let func_info: *Function = null;
+        let function_type_self = context.type_self;
+        let function_generics: *GenericMap = null;
+
+        match function_type {
+            Type::Function(info, generics) => {
+                func_info = info;
+                function_generics = generics;
+                if generics != null && generics.self_type != null {
+                    function_type_self = generics.self_type;
+                }
+            },
+            _ => { return; },
+        }
+        if func_info == null { return; }
 
         let label = String::new(context.allocator);
         label.append("fn ");
@@ -929,7 +945,7 @@ impl Expression {
                 param_str.append(pname.value);
                 param_str.append(": ");
             }
-            let type_decl = context.root.naming_decl.get_type_decl(&param.type, context.type_self, null);
+            let type_decl = context.root.naming_decl.get_type_decl(&param.type, function_type_self, function_generics);
             param_str.append(type_decl.as_str());
             label.append(param_str.as_str());
             params.append(param_str.as_str());
@@ -937,7 +953,7 @@ impl Expression {
         }
 
         label.append(")");
-        let ret_type_decl = context.root.naming_decl.get_type_decl(&func_info.return_type, context.type_self, null);
+        let ret_type_decl = context.root.naming_decl.get_type_decl(&func_info.return_type, function_type_self, function_generics);
         if !func_info.return_type.is_void() {
             label.append(" -> ");
             label.append(ret_type_decl.as_str());
