@@ -22,4 +22,5 @@ mod Ops
 mod Co
 mod Fn
 mod Struct
+mod Enum
 mod Any

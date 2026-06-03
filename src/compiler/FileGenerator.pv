@@ -140,6 +140,7 @@ impl FileGenerator {
         let generics = usage_context.generic_map;
         let enum_info = usage.type;
         let module = enum_info.context.module;
+        let is_discriminated_union = enum_info.is_discriminated_union();
         let include_writer = IncludeWriter::new(generator.allocator);
 
         let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
@@ -171,7 +172,7 @@ impl FileGenerator {
         fclose(header_file);
         remove(header_tmp);
 
-        if enum_info.impls.length == 0 && !usage.any_usage { return true; }
+        if enum_info.impls.length == 0 && !usage.any_usage && !usage.impl_dynamic_usage { return true; }
 
         let code = generator.make_path(module, name.as_str(), ".c");
 
@@ -197,6 +198,72 @@ impl FileGenerator {
         if usage.any_usage {
             fprintf(code_file, "#include <std/trait_Any.h>\n");
             self.write_any_definition(code_file, name.as_str(), generics.self_type, generics);
+        }
+
+        if usage.impl_dynamic_usage {
+            fprintf(code_file, "\n");
+
+            fprintf(code_file, "#include <std/EnumVariantInfo.h>\n");
+            fprintf(code_file, "#include <slice_EnumVariantInfo.h>\n");
+            fprintf(code_file, "struct slice_EnumVariantInfo ");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__get_variants(void* __self) {\n");
+
+            generator.indent += 1;
+            generator.write_indent(code_file);
+            fprintf(code_file, "(void)__self;\n");
+            generator.write_indent(code_file);
+            fprintf(code_file, "static struct EnumVariantInfo variants[] = { ");
+
+            let variant_index: usize = 0;
+            for (_, &variant) in enum_info.variants {
+                if variant_index > 0 { fprintf(code_file, ", "); }
+                fprintf(code_file, "(struct EnumVariantInfo){ .index = %zu, .name = (struct str){ .ptr = \"", variant_index);
+                generator.write_token(code_file, variant.name);
+                fprintf(code_file, "\", .length = %zu } }", variant.name.value.length);
+                variant_index += 1;
+            }
+
+            fprintf(code_file, " };\n");
+            generator.write_indent(code_file);
+            fprintf(code_file, "return (struct slice_EnumVariantInfo){ .data = variants, .length = %zu };\n", enum_info.variants.length);
+            generator.indent -= 1;
+            fprintf(code_file, "}\n");
+
+            fprintf(code_file, "uintptr_t ");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__get_variant_index(void* __self) {\n");
+
+            generator.indent += 1;
+            generator.write_indent(code_file);
+            generator.write_type(code_file, &Type::Self, generics);
+
+            if module.mode_cpp {
+                fprintf(code_file, "* self = (");
+                generator.write_type(code_file, &Type::Self, generics);
+                fprintf(code_file, "*)__self;\n");
+            } else {
+                fprintf(code_file, "* self = __self;\n");
+            }
+
+            generator.write_indent(code_file);
+            if is_discriminated_union {
+                fprintf(code_file, "return (uintptr_t)self->type;\n");
+            } else {
+                fprintf(code_file, "return (uintptr_t)*self;\n");
+            }
+
+            generator.indent -= 1;
+            fprintf(code_file, "}\n");
+
+            fprintf(code_file, "struct trait_EnumVTable ");
+            generator.write_str_title(code_file, name.as_str());
+            fprintf(code_file, "__VTABLE__ENUM");
+            fprintf(code_file, " = { .fn_get_variants = &");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__get_variants, .fn_get_variant_index = &");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__get_variant_index };\n");
         }
 
         generator.overwrite_if_different(code.c_str(), code_file);

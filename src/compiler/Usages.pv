@@ -1203,6 +1203,27 @@ impl Usages {
                             _ => {},
                         }
                     },
+                    Type::Enum(enum_info, _) => {
+                        match expression.return_type {
+                            Type::Indirect(indirect) => {
+                                match indirect.to {
+                                    Type::Trait(trait_info, _) => {
+                                        let name = trait_info.name;
+                                        if name == null { return; }
+
+                                        if name.value.eq("Enum") {
+                                            let ptr = cast<usize>(enum_info);
+                                            let usage = self.enums.find(&ptr);
+                                            if usage == null { return; }
+                                            usage.impl_dynamic_usage = true;
+                                        }
+                                    },
+                                    _ => {},
+                                }
+                            },
+                            _ => {},
+                        }
+                    },
                     _ => {},
                 }
             },

@@ -2578,6 +2578,55 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                     }
                 } break;
                 #line 1206 "src/compiler/Usages.pv"
+                case TYPE__ENUM: {
+                    #line 1206 "src/compiler/Usages.pv"
+                    struct Enum* enum_info = return_type->enum_value._0;
+                    #line 1207 "src/compiler/Usages.pv"
+                    switch (expression->return_type.type) {
+                        #line 1208 "src/compiler/Usages.pv"
+                        case TYPE__INDIRECT: {
+                            #line 1208 "src/compiler/Usages.pv"
+                            struct Indirect* indirect = expression->return_type.indirect_value;
+                            #line 1209 "src/compiler/Usages.pv"
+                            switch (indirect->to.type) {
+                                #line 1210 "src/compiler/Usages.pv"
+                                case TYPE__TRAIT: {
+                                    #line 1210 "src/compiler/Usages.pv"
+                                    struct Trait* trait_info = indirect->to.trait_value._0;
+                                    #line 1211 "src/compiler/Usages.pv"
+                                    struct Token* name = trait_info->name;
+                                    #line 1212 "src/compiler/Usages.pv"
+                                    if (name == 0) {
+                                        #line 1212 "src/compiler/Usages.pv"
+                                        return;
+                                    }
+
+                                    #line 1214 "src/compiler/Usages.pv"
+                                    if (str__Eq_str__eq(&name->value, (struct str){ .ptr = "Enum", .length = strlen("Enum") })) {
+                                        #line 1215 "src/compiler/Usages.pv"
+                                        uintptr_t ptr = (uintptr_t)(enum_info);
+                                        #line 1216 "src/compiler/Usages.pv"
+                                        struct TypeUsage_Enum* usage = HashMap_usize_TypeUsage_Enum__find(&self->enums, &ptr);
+                                        #line 1217 "src/compiler/Usages.pv"
+                                        if (usage == 0) {
+                                            #line 1217 "src/compiler/Usages.pv"
+                                            return;
+                                        }
+                                        #line 1218 "src/compiler/Usages.pv"
+                                        usage->impl_dynamic_usage = true;
+                                    }
+                                } break;
+                                #line 1221 "src/compiler/Usages.pv"
+                                default: {
+                                } break;
+                            }
+                        } break;
+                        #line 1224 "src/compiler/Usages.pv"
+                        default: {
+                        } break;
+                    }
+                } break;
+                #line 1227 "src/compiler/Usages.pv"
                 default: {
                 } break;
             }
@@ -2585,6 +2634,6 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
     }
 }
 
-#line 1212 "src/compiler/Usages.pv"
+#line 1233 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self) {
 }
