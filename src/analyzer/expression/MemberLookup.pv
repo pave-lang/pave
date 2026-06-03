@@ -55,6 +55,21 @@ impl Expression {
     fn get_member_type(context: &Context, type: &Type, member: &Token, output_error: bool) -> *Type {
         match type {
             Type::Indirect(indirect) => {
+                match indirect.to {
+                    Type::Self => {},
+                    Type::Generic(_) => {},
+                    Type::GenericTypedef(_) => {},
+                    _ => {
+                        let function = context.root.find_type_impl_function(type, member.value, null);
+                        if function != null {
+                            let generic_map_val: GenericMap = GenericMap { self_type: type, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
+                            let generic_map = context.allocator.store(&generic_map_val);
+                            if generic_map == null { return null; }
+                            return context.allocator.store(&Type::Function(function, generic_map));
+                        }
+                    },
+                }
+
                 return Expression::get_member_type(context, &indirect.to, member, output_error);
             },
             Type::Self => {

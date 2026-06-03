@@ -60,6 +60,64 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::MemberInstanceExpression(parent, member) => {
+                match expression.return_type {
+                    Type::Function(func_info, _) => {
+                        match func_info.parent {
+                            FunctionParent::Type(type, impl_index, trait_info) => {
+                                let named_type = type;
+                                if type.is_fat_pointer() {
+                                    named_type = type.deref_1();
+                                    if named_type == null { named_type = type; }
+                                }
+                                let parent_name = generator.naming_ident.get_type_name(named_type, type, generics);
+                                if trait_info != null {
+                                    let type_impl = generator.root.get_type_impl(type, impl_index);
+                                    let impl_trait_type: *Type = null;
+                                    if type_impl != null { impl_trait_type = &type_impl.impl_info.trait_type; }
+                                    let function_name = generator.get_trait_function_name(parent_name.as_str(), trait_info, impl_trait_type, func_info, generics);
+                                    return generator.write_string(file, &function_name);
+                                }
+                                generator.write_string(file, &parent_name);
+                                fprintf(file, "__");
+                                generator.write_str(file, member);
+                                return true;
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
+
+                let parent_type = if parent == replace { replacement_type } else { &parent.return_type };
+                let type_impl_function = generator.root.find_type_impl_function(parent_type, member, null);
+                if type_impl_function != null {
+                    match type_impl_function.parent {
+                        FunctionParent::Type(type, impl_index, trait_info) => {
+                            let named_type = type;
+                            if type.is_fat_pointer() {
+                                named_type = type.deref_1();
+                                if named_type == null { named_type = type; }
+                            }
+                            let parent_name = generator.naming_ident.get_type_name(named_type, parent_type, generics);
+                            if trait_info != null {
+                                let type_impl = generator.root.get_type_impl(type, impl_index);
+                                let impl_trait_type: *Type = null;
+                                if type_impl != null { impl_trait_type = &type_impl.impl_info.trait_type; }
+                                let function_name = generator.get_trait_function_name(parent_name.as_str(), trait_info, impl_trait_type, type_impl_function, generics);
+                                return generator.write_string(file, &function_name);
+                            }
+                            generator.write_string(file, &parent_name);
+                            fprintf(file, "__");
+                            generator.write_str(file, member);
+                            return true;
+                        },
+                        _ => {},
+                    }
+
+                    let type_impl_generics = GenericMap { self_type: parent_type, array: Array<Type> { allocator: generator.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: generator.allocator, buckets: null, data: null, capacity: 0, length: 0 } };
+                    return generator.write_function_name(file, type_impl_function, &type_impl_generics);
+                }
+
                 if generator.is_type_single_value_struct(&parent.return_type, generics) {
                     let is_ref = Generator::is_reference(&parent.return_type);
                     if is_ref { fprintf(file, "(*"); }
@@ -69,7 +127,6 @@ impl ExpressionWriter {
                 }
 
                 self.write_expression_replacing(file, parent, replace, replacement_name, replacement_type, generics);
-                let parent_type = if parent == replace { replacement_type } else { &parent.return_type };
                 generator.write_instance_member_accessor(file, parent_type, generics);
                 if member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9' { fprintf(file, "_"); }
                 generator.write_str(file, member);
@@ -760,12 +817,17 @@ impl ExpressionWriter {
                                     first = false;
                                     arg_index = 1;
                                 } else {
-                                    let parent_name = generator.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
-                                    success = generator.write_str(file, parent_name.as_str()) && success;
-                                    fprintf(file, "__");
-                                    success = generator.write_str(file, trait_name.value) && success;
-                                    fprintf(file, "__");
-                                    success = generator.write_str(file, name) && success;
+                                    let type_impl_function = generator.root.find_type_impl_function(&arg.value.return_type, name, null);
+                                    if type_impl_function != null {
+                                        success = generator.write_function_name(file, type_impl_function, &resolved_generics) && success;
+                                    } else {
+                                        let parent_name = generator.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
+                                        success = generator.write_str(file, parent_name.as_str()) && success;
+                                        fprintf(file, "__");
+                                        success = generator.write_str(file, trait_name.value) && success;
+                                        fprintf(file, "__");
+                                        success = generator.write_str(file, name) && success;
+                                    }
                                     fprintf(file, "(");
                                     success = self.write_expression(file, arg.value, generics) && success;
                                     first = false;
@@ -1030,7 +1092,63 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::MemberInstanceExpression(parent, member) => {
+                match expression.return_type {
+                    Type::Function(func_info, _) => {
+                        match func_info.parent {
+                            FunctionParent::Type(type, impl_index, trait_info) => {
+                                let named_type = type;
+                                if type.is_fat_pointer() {
+                                    named_type = type.deref_1();
+                                    if named_type == null { named_type = type; }
+                                }
+                                let parent_name = generator.naming_ident.get_type_name(named_type, type, generics);
+                                if trait_info != null {
+                                    let type_impl = generator.root.get_type_impl(type, impl_index);
+                                    let impl_trait_type: *Type = null;
+                                    if type_impl != null { impl_trait_type = &type_impl.impl_info.trait_type; }
+                                    let function_name = generator.get_trait_function_name(parent_name.as_str(), trait_info, impl_trait_type, func_info, generics);
+                                    return generator.write_string(file, &function_name);
+                                }
+                                generator.write_string(file, &parent_name);
+                                fprintf(file, "__");
+                                generator.write_str(file, member);
+                                return true;
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
+
                 let parent_type = &parent.return_type;
+                let type_impl_function = generator.root.find_type_impl_function(parent_type, member, null);
+                if type_impl_function != null {
+                    match type_impl_function.parent {
+                        FunctionParent::Type(type, impl_index, trait_info) => {
+                            let named_type = type;
+                            if type.is_fat_pointer() {
+                                named_type = type.deref_1();
+                                if named_type == null { named_type = type; }
+                            }
+                            let parent_name = generator.naming_ident.get_type_name(named_type, parent_type, generics);
+                            if trait_info != null {
+                                let type_impl = generator.root.get_type_impl(type, impl_index);
+                                let impl_trait_type: *Type = null;
+                                if type_impl != null { impl_trait_type = &type_impl.impl_info.trait_type; }
+                                let function_name = generator.get_trait_function_name(parent_name.as_str(), trait_info, impl_trait_type, type_impl_function, generics);
+                                return generator.write_string(file, &function_name);
+                            }
+                            generator.write_string(file, &parent_name);
+                            fprintf(file, "__");
+                            generator.write_str(file, member);
+                            return true;
+                        },
+                        _ => {},
+                    }
+
+                    let type_impl_generics = GenericMap { self_type: parent_type, array: Array<Type> { allocator: generator.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: generator.allocator, buckets: null, data: null, capacity: 0, length: 0 } };
+                    return generator.write_function_name(file, type_impl_function, &type_impl_generics);
+                }
 
                 if generator.is_type_single_value_struct(parent_type, generics) {
                     let is_ref = Generator::is_reference(parent_type);

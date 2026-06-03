@@ -119,8 +119,13 @@ impl IncludeWriter {
                         },
                         FunctionParent::Trait(_) => {},
                         FunctionParent::Type(type_info, _, _) => {
-                            let name = generator.naming_ident.get_type_name(type_info, generics.self_type, generics);
-                            let module = type_info.get_module();
+                            let include_type = type_info;
+                            if type_info.is_fat_pointer() {
+                                include_type = type_info.deref_1();
+                                if include_type == null { include_type = type_info; }
+                            }
+                            let name = generator.naming_ident.get_type_name(include_type, generics.self_type, generics);
+                            let module = include_type?.get_module();
                             let path = generator.make_rel_path(module, name.as_str(), "");
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                         },

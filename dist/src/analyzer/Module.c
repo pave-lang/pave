@@ -1098,185 +1098,178 @@ bool Module__prefill_types_impl(struct Module* self) {
             #line 559 "src/analyzer/Module.pv"
             case TYPE__INDIRECT: {
                 #line 560 "src/analyzer/Module.pv"
-                Array_TypeImpl__append(&self->type_impls, TypeImpl__new(allocator, impl_info->type, impl_info));
+                uintptr_t impl_index = Root__add_type_impl(self->root, impl_info->type, impl_info);
                 #line 561 "src/analyzer/Module.pv"
+                Array_TypeImpl__append(&self->type_impls, TypeImpl__new(allocator, impl_info->type, impl_info, impl_index));
+                #line 562 "src/analyzer/Module.pv"
                 self->root->hack_type_impl = Array_TypeImpl__back(&self->type_impls);
             } break;
-            #line 563 "src/analyzer/Module.pv"
+            #line 564 "src/analyzer/Module.pv"
             default: {
-                #line 563 "src/analyzer/Module.pv"
-                Context__error_token(&self->context, impl_info->token, "Impl blocks are not supported for this type");
+                #line 565 "src/analyzer/Module.pv"
+                uintptr_t impl_index = Root__add_type_impl(self->root, impl_info->type, impl_info);
+                #line 566 "src/analyzer/Module.pv"
+                Array_TypeImpl__append(&self->type_impls, TypeImpl__new(allocator, impl_info->type, impl_info, impl_index));
             } break;
         }
     } }
 
-    #line 567 "src/analyzer/Module.pv"
+    #line 571 "src/analyzer/Module.pv"
     return success;
 }
 
-#line 570 "src/analyzer/Module.pv"
+#line 574 "src/analyzer/Module.pv"
 bool Module__parse_declarations(struct Module* self) {
-    #line 571 "src/analyzer/Module.pv"
+    #line 575 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 571 "src/analyzer/Module.pv"
+    #line 575 "src/analyzer/Module.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 571 "src/analyzer/Module.pv"
+        #line 575 "src/analyzer/Module.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 572 "src/analyzer/Module.pv"
+        #line 576 "src/analyzer/Module.pv"
         Function__fill_types(func_info, 0);
     } }
 
-    #line 576 "src/analyzer/Module.pv"
+    #line 580 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Array_ref_Enum __iter = HashMap_str_Array_ref_Enum__iter(&self->enums);
-    #line 576 "src/analyzer/Module.pv"
+    #line 580 "src/analyzer/Module.pv"
     while (HashMapIter_str_Array_ref_Enum__next(&__iter)) {
-        #line 576 "src/analyzer/Module.pv"
+        #line 580 "src/analyzer/Module.pv"
         struct Array_ref_Enum* enum_arr = &HashMapIter_str_Array_ref_Enum__value(&__iter)->_1;
 
-        #line 577 "src/analyzer/Module.pv"
+        #line 581 "src/analyzer/Module.pv"
         { struct Iter_ref_ref_Enum __iter = Array_ref_Enum__iter(enum_arr);
-        #line 577 "src/analyzer/Module.pv"
+        #line 581 "src/analyzer/Module.pv"
         while (Iter_ref_ref_Enum__next(&__iter)) {
-            #line 577 "src/analyzer/Module.pv"
+            #line 581 "src/analyzer/Module.pv"
             struct Enum* enum_info = *Iter_ref_ref_Enum__value(&__iter);
 
-            #line 578 "src/analyzer/Module.pv"
+            #line 582 "src/analyzer/Module.pv"
             Enum__fill_variants(enum_info);
         } }
     } }
 
-    #line 582 "src/analyzer/Module.pv"
+    #line 586 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Array_ref_Struct __iter = HashMap_str_Array_ref_Struct__iter(&self->structs);
-    #line 582 "src/analyzer/Module.pv"
+    #line 586 "src/analyzer/Module.pv"
     while (HashMapIter_str_Array_ref_Struct__next(&__iter)) {
-        #line 582 "src/analyzer/Module.pv"
+        #line 586 "src/analyzer/Module.pv"
         struct Array_ref_Struct* struct_arr = &HashMapIter_str_Array_ref_Struct__value(&__iter)->_1;
 
-        #line 583 "src/analyzer/Module.pv"
+        #line 587 "src/analyzer/Module.pv"
         { struct Iter_ref_ref_Struct __iter = Array_ref_Struct__iter(struct_arr);
-        #line 583 "src/analyzer/Module.pv"
+        #line 587 "src/analyzer/Module.pv"
         while (Iter_ref_ref_Struct__next(&__iter)) {
-            #line 583 "src/analyzer/Module.pv"
+            #line 587 "src/analyzer/Module.pv"
             struct Struct* struct_info = *Iter_ref_ref_Struct__value(&__iter);
 
-            #line 584 "src/analyzer/Module.pv"
+            #line 588 "src/analyzer/Module.pv"
             Struct__fill_types(struct_info);
         } }
     } }
 
-    #line 588 "src/analyzer/Module.pv"
+    #line 592 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Array_ref_Trait __iter = HashMap_str_Array_ref_Trait__iter(&self->traits);
-    #line 588 "src/analyzer/Module.pv"
+    #line 592 "src/analyzer/Module.pv"
     while (HashMapIter_str_Array_ref_Trait__next(&__iter)) {
-        #line 588 "src/analyzer/Module.pv"
+        #line 592 "src/analyzer/Module.pv"
         struct Array_ref_Trait* trait_arr = &HashMapIter_str_Array_ref_Trait__value(&__iter)->_1;
 
-        #line 589 "src/analyzer/Module.pv"
+        #line 593 "src/analyzer/Module.pv"
         { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(trait_arr);
-        #line 589 "src/analyzer/Module.pv"
+        #line 593 "src/analyzer/Module.pv"
         while (Iter_ref_ref_Trait__next(&__iter)) {
-            #line 589 "src/analyzer/Module.pv"
+            #line 593 "src/analyzer/Module.pv"
             struct Trait* trait_info = *Iter_ref_ref_Trait__value(&__iter);
 
-            #line 590 "src/analyzer/Module.pv"
+            #line 594 "src/analyzer/Module.pv"
             struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TRAIT, .trait_value = trait_info };
-            #line 591 "src/analyzer/Module.pv"
+            #line 595 "src/analyzer/Module.pv"
             Trait__fill_types(trait_info, parent);
 
-            #line 594 "src/analyzer/Module.pv"
+            #line 598 "src/analyzer/Module.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-            #line 594 "src/analyzer/Module.pv"
+            #line 598 "src/analyzer/Module.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 594 "src/analyzer/Module.pv"
+                #line 598 "src/analyzer/Module.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 595 "src/analyzer/Module.pv"
+                #line 599 "src/analyzer/Module.pv"
                 Function__fill_types(func_info, &trait_info->generics);
             } }
         } }
     } }
 
-    #line 600 "src/analyzer/Module.pv"
+    #line 604 "src/analyzer/Module.pv"
     { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
-    #line 600 "src/analyzer/Module.pv"
+    #line 604 "src/analyzer/Module.pv"
     while (Iter_ref_Impl__next(&__iter)) {
-        #line 600 "src/analyzer/Module.pv"
+        #line 604 "src/analyzer/Module.pv"
         struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
-        #line 601 "src/analyzer/Module.pv"
+        #line 605 "src/analyzer/Module.pv"
         switch (impl_info->type.type) {
-            #line 602 "src/analyzer/Module.pv"
+            #line 606 "src/analyzer/Module.pv"
             case TYPE__PRIMITIVE: {
-                #line 602 "src/analyzer/Module.pv"
+                #line 606 "src/analyzer/Module.pv"
                 continue;
             } break;
-            #line 603 "src/analyzer/Module.pv"
+            #line 607 "src/analyzer/Module.pv"
             default: {
             } break;
         }
-        #line 605 "src/analyzer/Module.pv"
+        #line 609 "src/analyzer/Module.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 605 "src/analyzer/Module.pv"
+        #line 609 "src/analyzer/Module.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 605 "src/analyzer/Module.pv"
+            #line 609 "src/analyzer/Module.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 606 "src/analyzer/Module.pv"
+            #line 610 "src/analyzer/Module.pv"
             Function__fill_types(func_info, &impl_info->generics);
         } }
     } }
 
-    #line 610 "src/analyzer/Module.pv"
+    #line 614 "src/analyzer/Module.pv"
     { struct Iter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
-    #line 610 "src/analyzer/Module.pv"
+    #line 614 "src/analyzer/Module.pv"
     while (Iter_ref_TypeImpl__next(&__iter)) {
-        #line 610 "src/analyzer/Module.pv"
+        #line 614 "src/analyzer/Module.pv"
         struct TypeImpl* type_impl = Iter_ref_TypeImpl__value(&__iter);
 
-        #line 611 "src/analyzer/Module.pv"
-        struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = &type_impl->type, ._1 = 0, ._2 = 0} };
-        #line 612 "src/analyzer/Module.pv"
+        #line 615 "src/analyzer/Module.pv"
+        struct FunctionParent parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = &type_impl->type, ._1 = type_impl->impl_index, ._2 = type_impl->impl_info->trait_} };
+        #line 616 "src/analyzer/Module.pv"
         Impl__fill_types(type_impl->impl_info, parent);
 
-        #line 614 "src/analyzer/Module.pv"
+        #line 618 "src/analyzer/Module.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&type_impl->impl_info->functions);
-        #line 614 "src/analyzer/Module.pv"
+        #line 618 "src/analyzer/Module.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 614 "src/analyzer/Module.pv"
+            #line 618 "src/analyzer/Module.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 615 "src/analyzer/Module.pv"
+            #line 619 "src/analyzer/Module.pv"
             Function__fill_types(func_info, &type_impl->impl_info->generics);
         } }
     } }
 
-    #line 619 "src/analyzer/Module.pv"
+    #line 623 "src/analyzer/Module.pv"
     return true;
 }
 
-#line 622 "src/analyzer/Module.pv"
+#line 626 "src/analyzer/Module.pv"
 bool Module__parse_globals(struct Module* self) {
-    #line 623 "src/analyzer/Module.pv"
+    #line 627 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Global __iter = HashMap_str_ref_Global__iter(&self->globals);
-    #line 623 "src/analyzer/Module.pv"
+    #line 627 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Global__next(&__iter)) {
-        #line 623 "src/analyzer/Module.pv"
+        #line 627 "src/analyzer/Module.pv"
         struct Global* global = HashMapIter_str_ref_Global__value(&__iter)->_1;
 
-        #line 624 "src/analyzer/Module.pv"
-        Global__parse_types(global);
-    } }
-
-    #line 627 "src/analyzer/Module.pv"
-    { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
-    #line 627 "src/analyzer/Module.pv"
-    while (Iter_ref_Impl__next(&__iter)) {
-        #line 627 "src/analyzer/Module.pv"
-        struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
-
         #line 628 "src/analyzer/Module.pv"
-        Impl__parse_consts(impl_info);
+        Global__parse_types(global);
     } }
 
     #line 631 "src/analyzer/Module.pv"
@@ -1287,728 +1280,739 @@ bool Module__parse_globals(struct Module* self) {
         struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
         #line 632 "src/analyzer/Module.pv"
-        Impl__parse_typedefs(impl_info);
+        Impl__parse_consts(impl_info);
     } }
 
     #line 635 "src/analyzer/Module.pv"
+    { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
+    #line 635 "src/analyzer/Module.pv"
+    while (Iter_ref_Impl__next(&__iter)) {
+        #line 635 "src/analyzer/Module.pv"
+        struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
+
+        #line 636 "src/analyzer/Module.pv"
+        Impl__parse_typedefs(impl_info);
+    } }
+
+    #line 639 "src/analyzer/Module.pv"
     return true;
 }
 
-#line 638 "src/analyzer/Module.pv"
+#line 642 "src/analyzer/Module.pv"
 bool Module__parse_functions(struct Module* self) {
-    #line 639 "src/analyzer/Module.pv"
+    #line 643 "src/analyzer/Module.pv"
     struct ArenaAllocator* allocator = self->namespace->root->allocator;
 
-    #line 641 "src/analyzer/Module.pv"
+    #line 645 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 641 "src/analyzer/Module.pv"
+    #line 645 "src/analyzer/Module.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 641 "src/analyzer/Module.pv"
+        #line 645 "src/analyzer/Module.pv"
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 642 "src/analyzer/Module.pv"
+        #line 646 "src/analyzer/Module.pv"
         struct Generics generics = Generics__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
-        #line 643 "src/analyzer/Module.pv"
+        #line 647 "src/analyzer/Module.pv"
         Function__parse_function(func_info, &generics);
     } }
 
-    #line 646 "src/analyzer/Module.pv"
+    #line 650 "src/analyzer/Module.pv"
     { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
-    #line 646 "src/analyzer/Module.pv"
+    #line 650 "src/analyzer/Module.pv"
     while (Iter_ref_Impl__next(&__iter)) {
-        #line 646 "src/analyzer/Module.pv"
+        #line 650 "src/analyzer/Module.pv"
         struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
-        #line 647 "src/analyzer/Module.pv"
+        #line 651 "src/analyzer/Module.pv"
         switch (impl_info->type.type) {
-            #line 648 "src/analyzer/Module.pv"
+            #line 652 "src/analyzer/Module.pv"
             case TYPE__PRIMITIVE: {
-                #line 648 "src/analyzer/Module.pv"
+                #line 652 "src/analyzer/Module.pv"
                 continue;
             } break;
-            #line 649 "src/analyzer/Module.pv"
+            #line 653 "src/analyzer/Module.pv"
             default: {
             } break;
         }
-        #line 651 "src/analyzer/Module.pv"
+        #line 655 "src/analyzer/Module.pv"
         Impl__parse_functions(impl_info);
     } }
 
-    #line 654 "src/analyzer/Module.pv"
+    #line 658 "src/analyzer/Module.pv"
     { struct HashMapIter_str_Array_ref_Trait __iter = HashMap_str_Array_ref_Trait__iter(&self->traits);
-    #line 654 "src/analyzer/Module.pv"
+    #line 658 "src/analyzer/Module.pv"
     while (HashMapIter_str_Array_ref_Trait__next(&__iter)) {
-        #line 654 "src/analyzer/Module.pv"
+        #line 658 "src/analyzer/Module.pv"
         struct Array_ref_Trait* trait_arr = &HashMapIter_str_Array_ref_Trait__value(&__iter)->_1;
 
-        #line 655 "src/analyzer/Module.pv"
+        #line 659 "src/analyzer/Module.pv"
         { struct Iter_ref_ref_Trait __iter = Array_ref_Trait__iter(trait_arr);
-        #line 655 "src/analyzer/Module.pv"
+        #line 659 "src/analyzer/Module.pv"
         while (Iter_ref_ref_Trait__next(&__iter)) {
-            #line 655 "src/analyzer/Module.pv"
+            #line 659 "src/analyzer/Module.pv"
             struct Trait* trait_info = *Iter_ref_ref_Trait__value(&__iter);
 
-            #line 656 "src/analyzer/Module.pv"
+            #line 660 "src/analyzer/Module.pv"
             Trait__parse_functions(trait_info);
         } }
     } }
 
-    #line 660 "src/analyzer/Module.pv"
+    #line 664 "src/analyzer/Module.pv"
     { struct Iter_ref_TypeImpl __iter = Array_TypeImpl__iter(&self->type_impls);
-    #line 660 "src/analyzer/Module.pv"
+    #line 664 "src/analyzer/Module.pv"
     while (Iter_ref_TypeImpl__next(&__iter)) {
-        #line 660 "src/analyzer/Module.pv"
+        #line 664 "src/analyzer/Module.pv"
         struct TypeImpl* type_impl = Iter_ref_TypeImpl__value(&__iter);
 
-        #line 661 "src/analyzer/Module.pv"
+        #line 665 "src/analyzer/Module.pv"
         Impl__parse_functions(type_impl->impl_info);
     } }
 
-    #line 664 "src/analyzer/Module.pv"
+    #line 668 "src/analyzer/Module.pv"
     return true;
 }
 
-#line 667 "src/analyzer/Module.pv"
+#line 671 "src/analyzer/Module.pv"
 bool Module__parse_functions_if_path(struct Module* self, struct str path) {
-    #line 668 "src/analyzer/Module.pv"
+    #line 672 "src/analyzer/Module.pv"
     if (!str__Eq_str__eq(&self->path, path)) {
-        #line 668 "src/analyzer/Module.pv"
+        #line 672 "src/analyzer/Module.pv"
         return true;
     }
-    #line 669 "src/analyzer/Module.pv"
+    #line 673 "src/analyzer/Module.pv"
     return Module__parse_functions(self);
 }
 
-#line 673 "src/analyzer/Module.pv"
+#line 677 "src/analyzer/Module.pv"
 uint64_t Module__compute_declaration_fingerprint(struct Array_Token* tokens) {
-    #line 674 "src/analyzer/Module.pv"
+    #line 678 "src/analyzer/Module.pv"
     uintptr_t len = tokens->length;
-    #line 675 "src/analyzer/Module.pv"
+    #line 679 "src/analyzer/Module.pv"
     uint64_t fnv_prime = 1099511628211u;
-    #line 676 "src/analyzer/Module.pv"
+    #line 680 "src/analyzer/Module.pv"
     uint64_t hash = 14695981039346656037u;
-    #line 677 "src/analyzer/Module.pv"
+    #line 681 "src/analyzer/Module.pv"
     uintptr_t pos = 0;
 
-    #line 679 "src/analyzer/Module.pv"
+    #line 683 "src/analyzer/Module.pv"
     while (pos < len) {
-        #line 680 "src/analyzer/Module.pv"
+        #line 684 "src/analyzer/Module.pv"
         struct Token* token = &tokens->data[pos];
 
-        #line 682 "src/analyzer/Module.pv"
+        #line 686 "src/analyzer/Module.pv"
         bool is_fn = Token__eq(token, TOKEN_TYPE__KEYWORD, "fn") || Token__eq(token, TOKEN_TYPE__KEYWORD, "co");
-        #line 683 "src/analyzer/Module.pv"
+        #line 687 "src/analyzer/Module.pv"
         bool is_test = Token__eq(token, TOKEN_TYPE__KEYWORD, "test");
 
-        #line 685 "src/analyzer/Module.pv"
+        #line 689 "src/analyzer/Module.pv"
         if (is_fn || is_test) {
-            #line 686 "src/analyzer/Module.pv"
+            #line 690 "src/analyzer/Module.pv"
             while (pos < len) {
-                #line 687 "src/analyzer/Module.pv"
+                #line 691 "src/analyzer/Module.pv"
                 struct Token* t = &tokens->data[pos];
-                #line 688 "src/analyzer/Module.pv"
+                #line 692 "src/analyzer/Module.pv"
                 if (Token__eq(t, TOKEN_TYPE__SYMBOL, "{")) {
-                    #line 689 "src/analyzer/Module.pv"
+                    #line 693 "src/analyzer/Module.pv"
                     uintptr_t depth = 1;
-                    #line 690 "src/analyzer/Module.pv"
+                    #line 694 "src/analyzer/Module.pv"
                     pos += 1;
-                    #line 691 "src/analyzer/Module.pv"
+                    #line 695 "src/analyzer/Module.pv"
                     while (pos < len && depth > 0) {
-                        #line 692 "src/analyzer/Module.pv"
+                        #line 696 "src/analyzer/Module.pv"
                         if (Token__eq(&tokens->data[pos], TOKEN_TYPE__SYMBOL, "{")) {
-                            #line 692 "src/analyzer/Module.pv"
+                            #line 696 "src/analyzer/Module.pv"
                             depth += 1;
                         } else if (Token__eq(&tokens->data[pos], TOKEN_TYPE__SYMBOL, "}")) {
-                            #line 693 "src/analyzer/Module.pv"
+                            #line 697 "src/analyzer/Module.pv"
                             depth -= 1;
                         }
-                        #line 694 "src/analyzer/Module.pv"
+                        #line 698 "src/analyzer/Module.pv"
                         pos += 1;
                     }
-                    #line 696 "src/analyzer/Module.pv"
+                    #line 700 "src/analyzer/Module.pv"
                     break;
                 }
-                #line 698 "src/analyzer/Module.pv"
+                #line 702 "src/analyzer/Module.pv"
                 struct str v = t->value;
-                #line 699 "src/analyzer/Module.pv"
+                #line 703 "src/analyzer/Module.pv"
                 uintptr_t i = 0;
-                #line 700 "src/analyzer/Module.pv"
+                #line 704 "src/analyzer/Module.pv"
                 while (i < v.length) {
-                    #line 701 "src/analyzer/Module.pv"
+                    #line 705 "src/analyzer/Module.pv"
                     hash = hash ^ v.ptr[i];
-                    #line 702 "src/analyzer/Module.pv"
+                    #line 706 "src/analyzer/Module.pv"
                     hash = hash * fnv_prime;
-                    #line 703 "src/analyzer/Module.pv"
+                    #line 707 "src/analyzer/Module.pv"
                     i += 1;
                 }
-                #line 705 "src/analyzer/Module.pv"
+                #line 709 "src/analyzer/Module.pv"
                 pos += 1;
             }
-            #line 707 "src/analyzer/Module.pv"
+            #line 711 "src/analyzer/Module.pv"
             continue;
         }
 
-        #line 710 "src/analyzer/Module.pv"
+        #line 714 "src/analyzer/Module.pv"
         struct str v = token->value;
-        #line 711 "src/analyzer/Module.pv"
+        #line 715 "src/analyzer/Module.pv"
         uintptr_t i = 0;
-        #line 712 "src/analyzer/Module.pv"
+        #line 716 "src/analyzer/Module.pv"
         while (i < v.length) {
-            #line 713 "src/analyzer/Module.pv"
+            #line 717 "src/analyzer/Module.pv"
             hash = hash ^ v.ptr[i];
-            #line 714 "src/analyzer/Module.pv"
+            #line 718 "src/analyzer/Module.pv"
             hash = hash * fnv_prime;
-            #line 715 "src/analyzer/Module.pv"
+            #line 719 "src/analyzer/Module.pv"
             i += 1;
         }
-        #line 717 "src/analyzer/Module.pv"
+        #line 721 "src/analyzer/Module.pv"
         pos += 1;
     }
 
-    #line 720 "src/analyzer/Module.pv"
+    #line 724 "src/analyzer/Module.pv"
     return hash;
 }
 
-#line 726 "src/analyzer/Module.pv"
+#line 730 "src/analyzer/Module.pv"
 uint64_t Module__declaration_fingerprint(struct Module* self) {
-    #line 727 "src/analyzer/Module.pv"
+    #line 731 "src/analyzer/Module.pv"
     return Module__compute_declaration_fingerprint(&self->tokens);
 }
 
-#line 733 "src/analyzer/Module.pv"
+#line 737 "src/analyzer/Module.pv"
 void Module__retokenize_for_bodies(struct Module* self) {
-    #line 734 "src/analyzer/Module.pv"
+    #line 738 "src/analyzer/Module.pv"
     struct ArenaAllocator* allocator = self->namespace->root->allocator;
-    #line 735 "src/analyzer/Module.pv"
+    #line 739 "src/analyzer/Module.pv"
     struct str* file_override = HashMap_str_str__find(&self->context.analysis->file_overrides, &self->path);
-    #line 736 "src/analyzer/Module.pv"
+    #line 740 "src/analyzer/Module.pv"
     if (file_override == 0) {
-        #line 736 "src/analyzer/Module.pv"
+        #line 740 "src/analyzer/Module.pv"
         return;
     }
 
-    #line 738 "src/analyzer/Module.pv"
+    #line 742 "src/analyzer/Module.pv"
     self->tokens = Tokenizer__tokenize_data(allocator, *file_override);
-    #line 739 "src/analyzer/Module.pv"
+    #line 743 "src/analyzer/Module.pv"
     self->context.tokens = self->tokens.data;
-    #line 740 "src/analyzer/Module.pv"
+    #line 744 "src/analyzer/Module.pv"
     self->context.length = self->tokens.length;
-    #line 745 "src/analyzer/Module.pv"
+    #line 749 "src/analyzer/Module.pv"
     uintptr_t pos = 0;
-    #line 746 "src/analyzer/Module.pv"
+    #line 750 "src/analyzer/Module.pv"
     uintptr_t len = self->tokens.length;
 
-    #line 748 "src/analyzer/Module.pv"
+    #line 752 "src/analyzer/Module.pv"
     while (pos < len) {
-        #line 749 "src/analyzer/Module.pv"
+        #line 753 "src/analyzer/Module.pv"
         struct Token* token = &self->tokens.data[pos];
 
-        #line 751 "src/analyzer/Module.pv"
+        #line 755 "src/analyzer/Module.pv"
         if (Token__eq(token, TOKEN_TYPE__KEYWORD, "fn") || Token__eq(token, TOKEN_TYPE__KEYWORD, "co")) {
-            #line 752 "src/analyzer/Module.pv"
+            #line 756 "src/analyzer/Module.pv"
             pos += 1;
-            #line 753 "src/analyzer/Module.pv"
+            #line 757 "src/analyzer/Module.pv"
             if (pos >= len) {
-                #line 753 "src/analyzer/Module.pv"
+                #line 757 "src/analyzer/Module.pv"
                 break;
             }
 
-            #line 755 "src/analyzer/Module.pv"
-            struct str name = self->tokens.data[pos].value;
-            #line 756 "src/analyzer/Module.pv"
-            pos += 1;
             #line 759 "src/analyzer/Module.pv"
+            struct str name = self->tokens.data[pos].value;
+            #line 760 "src/analyzer/Module.pv"
+            pos += 1;
+            #line 763 "src/analyzer/Module.pv"
             while (pos < len && !Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{") && !Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, ";")) {
-                #line 760 "src/analyzer/Module.pv"
+                #line 764 "src/analyzer/Module.pv"
                 pos += 1;
             }
 
-            #line 763 "src/analyzer/Module.pv"
+            #line 767 "src/analyzer/Module.pv"
             if (pos < len && Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, ";")) {
-                #line 765 "src/analyzer/Module.pv"
+                #line 769 "src/analyzer/Module.pv"
                 pos += 1;
-                #line 766 "src/analyzer/Module.pv"
+                #line 770 "src/analyzer/Module.pv"
                 continue;
             }
 
-            #line 769 "src/analyzer/Module.pv"
+            #line 773 "src/analyzer/Module.pv"
             if (pos >= len) {
-                #line 769 "src/analyzer/Module.pv"
+                #line 773 "src/analyzer/Module.pv"
                 break;
             }
 
-            #line 771 "src/analyzer/Module.pv"
+            #line 775 "src/analyzer/Module.pv"
             uintptr_t token_start = pos;
-            #line 772 "src/analyzer/Module.pv"
+            #line 776 "src/analyzer/Module.pv"
             uintptr_t depth = 1;
-            #line 773 "src/analyzer/Module.pv"
+            #line 777 "src/analyzer/Module.pv"
             pos += 1;
-            #line 774 "src/analyzer/Module.pv"
+            #line 778 "src/analyzer/Module.pv"
             while (pos < len && depth > 0) {
-                #line 775 "src/analyzer/Module.pv"
+                #line 779 "src/analyzer/Module.pv"
                 if (Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{")) {
-                    #line 775 "src/analyzer/Module.pv"
+                    #line 779 "src/analyzer/Module.pv"
                     depth += 1;
                 } else if (Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "}")) {
-                    #line 776 "src/analyzer/Module.pv"
+                    #line 780 "src/analyzer/Module.pv"
                     depth -= 1;
                 }
-                #line 777 "src/analyzer/Module.pv"
+                #line 781 "src/analyzer/Module.pv"
                 pos += 1;
             }
-            #line 779 "src/analyzer/Module.pv"
-            uintptr_t token_end = pos;
-            #line 782 "src/analyzer/Module.pv"
-            Module__update_function_tokens(self, name, token_start, token_end);
             #line 783 "src/analyzer/Module.pv"
+            uintptr_t token_end = pos;
+            #line 786 "src/analyzer/Module.pv"
+            Module__update_function_tokens(self, name, token_start, token_end);
+            #line 787 "src/analyzer/Module.pv"
             continue;
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "impl") || Token__eq(token, TOKEN_TYPE__KEYWORD, "trait")) {
-            #line 785 "src/analyzer/Module.pv"
+            #line 789 "src/analyzer/Module.pv"
             pos += 1;
-            #line 788 "src/analyzer/Module.pv"
+            #line 792 "src/analyzer/Module.pv"
             while (pos < len && !Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{")) {
-                #line 789 "src/analyzer/Module.pv"
+                #line 793 "src/analyzer/Module.pv"
                 pos += 1;
             }
-            #line 791 "src/analyzer/Module.pv"
+            #line 795 "src/analyzer/Module.pv"
             if (pos >= len) {
-                #line 791 "src/analyzer/Module.pv"
+                #line 795 "src/analyzer/Module.pv"
                 break;
             }
-            #line 792 "src/analyzer/Module.pv"
-            pos += 1;
-            #line 795 "src/analyzer/Module.pv"
-            uintptr_t block_depth = 1;
             #line 796 "src/analyzer/Module.pv"
+            pos += 1;
+            #line 799 "src/analyzer/Module.pv"
+            uintptr_t block_depth = 1;
+            #line 800 "src/analyzer/Module.pv"
             while (pos < len && block_depth > 0) {
-                #line 797 "src/analyzer/Module.pv"
+                #line 801 "src/analyzer/Module.pv"
                 struct Token* inner = &self->tokens.data[pos];
 
-                #line 799 "src/analyzer/Module.pv"
+                #line 803 "src/analyzer/Module.pv"
                 if (Token__eq(inner, TOKEN_TYPE__SYMBOL, "}")) {
-                    #line 800 "src/analyzer/Module.pv"
+                    #line 804 "src/analyzer/Module.pv"
                     block_depth -= 1;
-                    #line 801 "src/analyzer/Module.pv"
+                    #line 805 "src/analyzer/Module.pv"
                     pos += 1;
-                    #line 802 "src/analyzer/Module.pv"
-                    continue;
-                }
-
-                #line 805 "src/analyzer/Module.pv"
-                if (Token__eq(inner, TOKEN_TYPE__SYMBOL, "{")) {
                     #line 806 "src/analyzer/Module.pv"
-                    block_depth += 1;
-                    #line 807 "src/analyzer/Module.pv"
-                    pos += 1;
-                    #line 808 "src/analyzer/Module.pv"
                     continue;
                 }
 
-                #line 811 "src/analyzer/Module.pv"
-                if (Token__eq(inner, TOKEN_TYPE__KEYWORD, "fn") || Token__eq(inner, TOKEN_TYPE__KEYWORD, "co")) {
-                    #line 812 "src/analyzer/Module.pv"
+                #line 809 "src/analyzer/Module.pv"
+                if (Token__eq(inner, TOKEN_TYPE__SYMBOL, "{")) {
+                    #line 810 "src/analyzer/Module.pv"
+                    block_depth += 1;
+                    #line 811 "src/analyzer/Module.pv"
                     pos += 1;
-                    #line 813 "src/analyzer/Module.pv"
+                    #line 812 "src/analyzer/Module.pv"
+                    continue;
+                }
+
+                #line 815 "src/analyzer/Module.pv"
+                if (Token__eq(inner, TOKEN_TYPE__KEYWORD, "fn") || Token__eq(inner, TOKEN_TYPE__KEYWORD, "co")) {
+                    #line 816 "src/analyzer/Module.pv"
+                    pos += 1;
+                    #line 817 "src/analyzer/Module.pv"
                     if (pos >= len) {
-                        #line 813 "src/analyzer/Module.pv"
+                        #line 817 "src/analyzer/Module.pv"
                         break;
                     }
 
-                    #line 815 "src/analyzer/Module.pv"
-                    struct str method_name = self->tokens.data[pos].value;
-                    #line 816 "src/analyzer/Module.pv"
-                    pos += 1;
                     #line 819 "src/analyzer/Module.pv"
+                    struct str method_name = self->tokens.data[pos].value;
+                    #line 820 "src/analyzer/Module.pv"
+                    pos += 1;
+                    #line 823 "src/analyzer/Module.pv"
                     while (pos < len && !Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{") && !Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, ";")) {
-                        #line 820 "src/analyzer/Module.pv"
+                        #line 824 "src/analyzer/Module.pv"
                         pos += 1;
                     }
 
-                    #line 823 "src/analyzer/Module.pv"
+                    #line 827 "src/analyzer/Module.pv"
                     if (pos < len && Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, ";")) {
-                        #line 824 "src/analyzer/Module.pv"
+                        #line 828 "src/analyzer/Module.pv"
                         pos += 1;
-                        #line 825 "src/analyzer/Module.pv"
+                        #line 829 "src/analyzer/Module.pv"
                         continue;
                     }
 
-                    #line 828 "src/analyzer/Module.pv"
+                    #line 832 "src/analyzer/Module.pv"
                     if (pos >= len) {
-                        #line 828 "src/analyzer/Module.pv"
+                        #line 832 "src/analyzer/Module.pv"
                         break;
                     }
 
-                    #line 830 "src/analyzer/Module.pv"
+                    #line 834 "src/analyzer/Module.pv"
                     uintptr_t fn_token_start = pos;
-                    #line 831 "src/analyzer/Module.pv"
+                    #line 835 "src/analyzer/Module.pv"
                     uintptr_t fn_depth = 1;
-                    #line 832 "src/analyzer/Module.pv"
+                    #line 836 "src/analyzer/Module.pv"
                     pos += 1;
-                    #line 833 "src/analyzer/Module.pv"
+                    #line 837 "src/analyzer/Module.pv"
                     while (pos < len && fn_depth > 0) {
-                        #line 834 "src/analyzer/Module.pv"
+                        #line 838 "src/analyzer/Module.pv"
                         if (Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{")) {
-                            #line 834 "src/analyzer/Module.pv"
+                            #line 838 "src/analyzer/Module.pv"
                             fn_depth += 1;
                         } else if (Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "}")) {
-                            #line 835 "src/analyzer/Module.pv"
+                            #line 839 "src/analyzer/Module.pv"
                             fn_depth -= 1;
                         }
-                        #line 836 "src/analyzer/Module.pv"
+                        #line 840 "src/analyzer/Module.pv"
                         pos += 1;
                     }
-                    #line 838 "src/analyzer/Module.pv"
+                    #line 842 "src/analyzer/Module.pv"
                     uintptr_t fn_token_end = pos;
 
-                    #line 840 "src/analyzer/Module.pv"
+                    #line 844 "src/analyzer/Module.pv"
                     Module__update_function_tokens(self, method_name, fn_token_start, fn_token_end);
-                    #line 841 "src/analyzer/Module.pv"
+                    #line 845 "src/analyzer/Module.pv"
                     continue;
                 }
 
-                #line 844 "src/analyzer/Module.pv"
+                #line 848 "src/analyzer/Module.pv"
                 pos += 1;
             }
-            #line 846 "src/analyzer/Module.pv"
+            #line 850 "src/analyzer/Module.pv"
             continue;
         } else if (Token__eq(token, TOKEN_TYPE__KEYWORD, "test")) {
-            #line 848 "src/analyzer/Module.pv"
-            pos += 1;
-            #line 849 "src/analyzer/Module.pv"
-            if (pos >= len) {
-                #line 849 "src/analyzer/Module.pv"
-                break;
-            }
-            #line 851 "src/analyzer/Module.pv"
-            pos += 1;
             #line 852 "src/analyzer/Module.pv"
+            pos += 1;
+            #line 853 "src/analyzer/Module.pv"
             if (pos >= len) {
-                #line 852 "src/analyzer/Module.pv"
+                #line 853 "src/analyzer/Module.pv"
                 break;
             }
-
-            #line 854 "src/analyzer/Module.pv"
-            if (!Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{")) {
-                #line 855 "src/analyzer/Module.pv"
-                continue;
+            #line 855 "src/analyzer/Module.pv"
+            pos += 1;
+            #line 856 "src/analyzer/Module.pv"
+            if (pos >= len) {
+                #line 856 "src/analyzer/Module.pv"
+                break;
             }
 
             #line 858 "src/analyzer/Module.pv"
+            if (!Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{")) {
+                #line 859 "src/analyzer/Module.pv"
+                continue;
+            }
+
+            #line 862 "src/analyzer/Module.pv"
             uintptr_t test_token_start = pos;
-            #line 859 "src/analyzer/Module.pv"
+            #line 863 "src/analyzer/Module.pv"
             uintptr_t depth = 1;
-            #line 860 "src/analyzer/Module.pv"
+            #line 864 "src/analyzer/Module.pv"
             pos += 1;
-            #line 861 "src/analyzer/Module.pv"
+            #line 865 "src/analyzer/Module.pv"
             while (pos < len && depth > 0) {
-                #line 862 "src/analyzer/Module.pv"
+                #line 866 "src/analyzer/Module.pv"
                 if (Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "{")) {
-                    #line 862 "src/analyzer/Module.pv"
+                    #line 866 "src/analyzer/Module.pv"
                     depth += 1;
                 } else if (Token__eq(&self->tokens.data[pos], TOKEN_TYPE__SYMBOL, "}")) {
-                    #line 863 "src/analyzer/Module.pv"
+                    #line 867 "src/analyzer/Module.pv"
                     depth -= 1;
                 }
-                #line 864 "src/analyzer/Module.pv"
+                #line 868 "src/analyzer/Module.pv"
                 pos += 1;
             }
-            #line 866 "src/analyzer/Module.pv"
+            #line 870 "src/analyzer/Module.pv"
             uintptr_t test_token_end = pos;
-            #line 871 "src/analyzer/Module.pv"
+            #line 875 "src/analyzer/Module.pv"
             { struct Iter_ref_TestInfo __iter = Array_TestInfo__iter(&self->tests);
-            #line 871 "src/analyzer/Module.pv"
+            #line 875 "src/analyzer/Module.pv"
             while (Iter_ref_TestInfo__next(&__iter)) {
-                #line 871 "src/analyzer/Module.pv"
+                #line 875 "src/analyzer/Module.pv"
                 struct TestInfo* test_info = Iter_ref_TestInfo__value(&__iter);
 
-                #line 872 "src/analyzer/Module.pv"
+                #line 876 "src/analyzer/Module.pv"
                 struct Function* func = HashMap_str_Function__find(&self->functions, &test_info->func_name);
-                #line 873 "src/analyzer/Module.pv"
+                #line 877 "src/analyzer/Module.pv"
                 if (func != 0) {
-                    #line 874 "src/analyzer/Module.pv"
+                    #line 878 "src/analyzer/Module.pv"
                     if (func->token_start != test_token_start || func->token_end != test_token_end) {
-                        #line 875 "src/analyzer/Module.pv"
+                        #line 879 "src/analyzer/Module.pv"
                         func->token_start = test_token_start;
-                        #line 876 "src/analyzer/Module.pv"
+                        #line 880 "src/analyzer/Module.pv"
                         func->token_end = test_token_end;
-                        #line 877 "src/analyzer/Module.pv"
+                        #line 881 "src/analyzer/Module.pv"
                         break;
                     }
                 }
             } }
-            #line 881 "src/analyzer/Module.pv"
+            #line 885 "src/analyzer/Module.pv"
             continue;
         }
 
-        #line 884 "src/analyzer/Module.pv"
+        #line 888 "src/analyzer/Module.pv"
         pos += 1;
     }
 }
 
-#line 888 "src/analyzer/Module.pv"
+#line 892 "src/analyzer/Module.pv"
 void Module__update_function_tokens(struct Module* self, struct str name, uintptr_t token_start, uintptr_t token_end) {
-    #line 890 "src/analyzer/Module.pv"
+    #line 894 "src/analyzer/Module.pv"
     struct Function* func = HashMap_str_Function__find(&self->functions, &name);
-    #line 891 "src/analyzer/Module.pv"
+    #line 895 "src/analyzer/Module.pv"
     if (func != 0) {
-        #line 892 "src/analyzer/Module.pv"
+        #line 896 "src/analyzer/Module.pv"
         func->token_start = token_start;
-        #line 893 "src/analyzer/Module.pv"
+        #line 897 "src/analyzer/Module.pv"
         func->token_end = token_end;
-        #line 894 "src/analyzer/Module.pv"
+        #line 898 "src/analyzer/Module.pv"
         return;
     }
-    #line 898 "src/analyzer/Module.pv"
+    #line 902 "src/analyzer/Module.pv"
     { struct Iter_ref_Impl __iter = Array_Impl__iter(&self->impls);
-    #line 898 "src/analyzer/Module.pv"
+    #line 902 "src/analyzer/Module.pv"
     while (Iter_ref_Impl__next(&__iter)) {
-        #line 898 "src/analyzer/Module.pv"
+        #line 902 "src/analyzer/Module.pv"
         struct Impl* impl_info = Iter_ref_Impl__value(&__iter);
 
-        #line 899 "src/analyzer/Module.pv"
+        #line 903 "src/analyzer/Module.pv"
         struct Function* impl_func = HashMap_str_Function__find(&impl_info->functions, &name);
-        #line 900 "src/analyzer/Module.pv"
+        #line 904 "src/analyzer/Module.pv"
         if (impl_func != 0) {
-            #line 901 "src/analyzer/Module.pv"
+            #line 905 "src/analyzer/Module.pv"
             impl_func->token_start = token_start;
-            #line 902 "src/analyzer/Module.pv"
+            #line 906 "src/analyzer/Module.pv"
             impl_func->token_end = token_end;
-            #line 903 "src/analyzer/Module.pv"
+            #line 907 "src/analyzer/Module.pv"
             return;
         }
     } }
 }
 
-#line 908 "src/analyzer/Module.pv"
+#line 912 "src/analyzer/Module.pv"
 struct Type* Module__find_type(struct Module* self, struct str name, uintptr_t arity) {
-    #line 909 "src/analyzer/Module.pv"
-    struct Type* type = HashMap_str_Type__find(&self->types, &name);
-    #line 910 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 910 "src/analyzer/Module.pv"
-        return type;
-    }
-
-    #line 912 "src/analyzer/Module.pv"
-    type = Namespace__find_type(self->namespace, name, arity);
     #line 913 "src/analyzer/Module.pv"
+    struct Type* type = HashMap_str_Type__find(&self->types, &name);
+    #line 914 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 913 "src/analyzer/Module.pv"
+        #line 914 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 915 "src/analyzer/Module.pv"
+    #line 916 "src/analyzer/Module.pv"
+    type = Namespace__find_type(self->namespace, name, arity);
+    #line 917 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 917 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 919 "src/analyzer/Module.pv"
     { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 915 "src/analyzer/Module.pv"
+    #line 919 "src/analyzer/Module.pv"
     while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 915 "src/analyzer/Module.pv"
+        #line 919 "src/analyzer/Module.pv"
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
-        #line 916 "src/analyzer/Module.pv"
+        #line 920 "src/analyzer/Module.pv"
         type = Namespace__find_type(namespace, name, arity);
-        #line 917 "src/analyzer/Module.pv"
+        #line 921 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 917 "src/analyzer/Module.pv"
+            #line 921 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 920 "src/analyzer/Module.pv"
+    #line 924 "src/analyzer/Module.pv"
     type = Root__find_type(self->namespace->root, name, arity);
-    #line 921 "src/analyzer/Module.pv"
+    #line 925 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 921 "src/analyzer/Module.pv"
+        #line 925 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 923 "src/analyzer/Module.pv"
+    #line 927 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 923 "src/analyzer/Module.pv"
+    #line 927 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 923 "src/analyzer/Module.pv"
+        #line 927 "src/analyzer/Module.pv"
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-        #line 924 "src/analyzer/Module.pv"
+        #line 928 "src/analyzer/Module.pv"
         type = HashMap_str_Type__find(&include->types, &name);
-        #line 925 "src/analyzer/Module.pv"
+        #line 929 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 925 "src/analyzer/Module.pv"
+            #line 929 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 928 "src/analyzer/Module.pv"
-    return 0;
-}
-
-#line 931 "src/analyzer/Module.pv"
-struct Trait* Module__find_trait(struct Module* self, struct str name, uintptr_t arity) {
     #line 932 "src/analyzer/Module.pv"
-    struct Trait* type = Root__find_trait(self->namespace->root, name, arity);
-    #line 933 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 933 "src/analyzer/Module.pv"
-        return type;
-    }
+    return 0;
+}
 
-    #line 935 "src/analyzer/Module.pv"
-    type = Namespace__find_trait(self->namespace, name, arity);
+#line 935 "src/analyzer/Module.pv"
+struct Trait* Module__find_trait(struct Module* self, struct str name, uintptr_t arity) {
     #line 936 "src/analyzer/Module.pv"
+    struct Trait* type = Root__find_trait(self->namespace->root, name, arity);
+    #line 937 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 936 "src/analyzer/Module.pv"
+        #line 937 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 938 "src/analyzer/Module.pv"
-    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 938 "src/analyzer/Module.pv"
-    while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 938 "src/analyzer/Module.pv"
-        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
-
-        #line 939 "src/analyzer/Module.pv"
-        type = Namespace__find_trait(namespace, name, arity);
+    #line 939 "src/analyzer/Module.pv"
+    type = Namespace__find_trait(self->namespace, name, arity);
+    #line 940 "src/analyzer/Module.pv"
+    if (type != 0) {
         #line 940 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 942 "src/analyzer/Module.pv"
+    { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
+    #line 942 "src/analyzer/Module.pv"
+    while (Iter_ref_ref_Namespace__next(&__iter)) {
+        #line 942 "src/analyzer/Module.pv"
+        struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
+
+        #line 943 "src/analyzer/Module.pv"
+        type = Namespace__find_trait(namespace, name, arity);
+        #line 944 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 940 "src/analyzer/Module.pv"
+            #line 944 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 943 "src/analyzer/Module.pv"
-    return 0;
-}
-
-#line 946 "src/analyzer/Module.pv"
-struct Type* Module__find_function(struct Module* self, struct str name) {
     #line 947 "src/analyzer/Module.pv"
-    struct Type* type = Root__find_function(self->namespace->root, name);
-    #line 948 "src/analyzer/Module.pv"
-    if (type != 0) {
-        #line 948 "src/analyzer/Module.pv"
-        return type;
-    }
+    return 0;
+}
 
-    #line 950 "src/analyzer/Module.pv"
-    type = Namespace__find_function(self->namespace, name);
+#line 950 "src/analyzer/Module.pv"
+struct Type* Module__find_function(struct Module* self, struct str name) {
     #line 951 "src/analyzer/Module.pv"
+    struct Type* type = Root__find_function(self->namespace->root, name);
+    #line 952 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 951 "src/analyzer/Module.pv"
+        #line 952 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 953 "src/analyzer/Module.pv"
+    #line 954 "src/analyzer/Module.pv"
+    type = Namespace__find_function(self->namespace, name);
+    #line 955 "src/analyzer/Module.pv"
+    if (type != 0) {
+        #line 955 "src/analyzer/Module.pv"
+        return type;
+    }
+
+    #line 957 "src/analyzer/Module.pv"
     { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 953 "src/analyzer/Module.pv"
+    #line 957 "src/analyzer/Module.pv"
     while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 953 "src/analyzer/Module.pv"
+        #line 957 "src/analyzer/Module.pv"
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
-        #line 954 "src/analyzer/Module.pv"
+        #line 958 "src/analyzer/Module.pv"
         type = Namespace__find_function(namespace, name);
-        #line 955 "src/analyzer/Module.pv"
+        #line 959 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 955 "src/analyzer/Module.pv"
+            #line 959 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 958 "src/analyzer/Module.pv"
+    #line 962 "src/analyzer/Module.pv"
     return 0;
 }
 
-#line 961 "src/analyzer/Module.pv"
+#line 965 "src/analyzer/Module.pv"
 struct Type* Module__find_value(struct Module* self, struct str name) {
-    #line 962 "src/analyzer/Module.pv"
+    #line 966 "src/analyzer/Module.pv"
     struct Type* type = HashMap_str_Type__find(&self->global_types, &name);
-    #line 963 "src/analyzer/Module.pv"
+    #line 967 "src/analyzer/Module.pv"
     if (type != 0) {
-        #line 963 "src/analyzer/Module.pv"
+        #line 967 "src/analyzer/Module.pv"
         return type;
     }
 
-    #line 965 "src/analyzer/Module.pv"
+    #line 969 "src/analyzer/Module.pv"
     { struct Iter_ref_ref_Namespace __iter = Array_ref_Namespace__iter(&self->used_namespaces);
-    #line 965 "src/analyzer/Module.pv"
+    #line 969 "src/analyzer/Module.pv"
     while (Iter_ref_ref_Namespace__next(&__iter)) {
-        #line 965 "src/analyzer/Module.pv"
+        #line 969 "src/analyzer/Module.pv"
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
-        #line 966 "src/analyzer/Module.pv"
+        #line 970 "src/analyzer/Module.pv"
         { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&namespace->modules);
-        #line 966 "src/analyzer/Module.pv"
+        #line 970 "src/analyzer/Module.pv"
         while (HashMapIter_str_ref_Module__next(&__iter)) {
-            #line 966 "src/analyzer/Module.pv"
+            #line 970 "src/analyzer/Module.pv"
             struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-            #line 967 "src/analyzer/Module.pv"
+            #line 971 "src/analyzer/Module.pv"
             type = HashMap_str_Type__find(&module->global_types, &name);
-            #line 968 "src/analyzer/Module.pv"
+            #line 972 "src/analyzer/Module.pv"
             if (type != 0) {
-                #line 968 "src/analyzer/Module.pv"
+                #line 972 "src/analyzer/Module.pv"
                 return type;
             }
         } }
     } }
 
-    #line 972 "src/analyzer/Module.pv"
+    #line 976 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 972 "src/analyzer/Module.pv"
+    #line 976 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 972 "src/analyzer/Module.pv"
+        #line 976 "src/analyzer/Module.pv"
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-        #line 973 "src/analyzer/Module.pv"
+        #line 977 "src/analyzer/Module.pv"
         type = HashMap_str_Type__find(&include->values, &name);
-        #line 974 "src/analyzer/Module.pv"
+        #line 978 "src/analyzer/Module.pv"
         if (type != 0) {
-            #line 974 "src/analyzer/Module.pv"
+            #line 978 "src/analyzer/Module.pv"
             return type;
         }
     } }
 
-    #line 977 "src/analyzer/Module.pv"
+    #line 981 "src/analyzer/Module.pv"
     return 0;
 }
 
-#line 980 "src/analyzer/Module.pv"
+#line 984 "src/analyzer/Module.pv"
 int64_t* Module__find_macro_value(struct Module* self, struct str name) {
-    #line 981 "src/analyzer/Module.pv"
+    #line 985 "src/analyzer/Module.pv"
     { struct HashMapIter_str_ref_Include __iter = HashMap_str_ref_Include__iter(&self->includes);
-    #line 981 "src/analyzer/Module.pv"
+    #line 985 "src/analyzer/Module.pv"
     while (HashMapIter_str_ref_Include__next(&__iter)) {
-        #line 981 "src/analyzer/Module.pv"
+        #line 985 "src/analyzer/Module.pv"
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
-        #line 982 "src/analyzer/Module.pv"
+        #line 986 "src/analyzer/Module.pv"
         int64_t* value = HashMap_str_i64__find(&include->macro_values, &name);
-        #line 983 "src/analyzer/Module.pv"
+        #line 987 "src/analyzer/Module.pv"
         if (value != 0) {
-            #line 983 "src/analyzer/Module.pv"
+            #line 987 "src/analyzer/Module.pv"
             return value;
         }
     } }
-    #line 985 "src/analyzer/Module.pv"
+    #line 989 "src/analyzer/Module.pv"
     return 0;
 }
 
-#line 988 "src/analyzer/Module.pv"
+#line 992 "src/analyzer/Module.pv"
 struct Type* Module__find_make_type(struct Module* self, struct str name, struct Array_Type* usage_types) {
-    #line 989 "src/analyzer/Module.pv"
+    #line 993 "src/analyzer/Module.pv"
     struct Type* type = Module__find_type(self, name, usage_types->length);
-    #line 990 "src/analyzer/Module.pv"
+    #line 994 "src/analyzer/Module.pv"
     if (type == 0) {
-        #line 990 "src/analyzer/Module.pv"
+        #line 994 "src/analyzer/Module.pv"
         return 0;
     }
-    #line 991 "src/analyzer/Module.pv"
+    #line 995 "src/analyzer/Module.pv"
     return Root__make_type_usage(self->root, type, usage_types);
 }
 
-#line 994 "src/analyzer/Module.pv"
+#line 998 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name) {
-    #line 995 "src/analyzer/Module.pv"
+    #line 999 "src/analyzer/Module.pv"
     struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
-    #line 996 "src/analyzer/Module.pv"
+    #line 1000 "src/analyzer/Module.pv"
     return HashMap_str_Primitive__find(primitives, &name);
 }

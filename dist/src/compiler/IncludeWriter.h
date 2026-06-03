@@ -28,7 +28,7 @@ struct IncludeWriter IncludeWriter__new(struct ArenaAllocator* allocator);
 #line 25 "src/compiler/IncludeWriter.pv"
 void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generator* generator, struct HashMap_str_Type* types, struct GenericMap* generics, bool deref);
 
-#line 175 "src/compiler/IncludeWriter.pv"
+#line 180 "src/compiler/IncludeWriter.pv"
 void IncludeWriter__release(struct IncludeWriter* self);
 
 #endif

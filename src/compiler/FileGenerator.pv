@@ -834,6 +834,81 @@ impl FileGenerator {
         return success;
     }
 
+    fn generate_type_impl_loop(&self, usage: &TypeUsage<TypeImpl>) -> bool {
+        let success = true;
+        for usage_context in usage.usage_contexts {
+            success = self.generate_type_impl(usage, usage_context) && success;
+        }
+        return success;
+    }
+
+    fn generate_type_impl(&self, usage: &TypeUsage<TypeImpl>, usage_context: &UsageContext) -> bool {
+        let generator = self.generator;
+        let defs = DefinitionWriter { generator: generator };
+        let include_writer = IncludeWriter::new(generator.allocator);
+        let type_impl = usage.type;
+        let impl_info = type_impl.impl_info;
+        let context = impl_info.context;
+        let module = context.module;
+        let generics = usage_context.generic_map;
+        let self_type = generics.self_type;
+        if self_type == null { return false; }
+
+        let named_self_type = self_type;
+        if self_type.is_fat_pointer() {
+            named_self_type = self_type.deref_1();
+            if named_self_type == null { named_self_type = self_type; }
+        }
+        let name = generator.naming_ident.get_type_name(named_self_type, self_type, generics);
+
+        let header = generator.make_path(module, name.as_str(), ".h");
+        let header_tmp: *const char = tmpnam(0);
+        let header_file: *FILE = fopen(header_tmp, "w+");
+        if header_file == null { perror(header.c_str()); return false; }
+
+        fprintf(header_file, "#ifndef PAVE_");
+        generator.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n#define PAVE_");
+        generator.write_str_title(header_file, name.as_str());
+        fprintf(header_file, "\n\n");
+
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
+        defs.write_impl_definition(header_file, name.as_str(), impl_info, generics);
+
+        fprintf(header_file, "\n#endif\n");
+
+        generator.overwrite_if_different(header.c_str(), header_file);
+        fclose(header_file);
+        remove(header_tmp);
+
+        let code = generator.make_path(module, name.as_str(), ".c");
+        let code_tmp: *const char = tmpnam(0);
+        let code_file: *FILE = fopen(code_tmp, "w+");
+        if code_file == null { perror(code.c_str()); return false; }
+
+        generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        generator.write_includes_raw(code_file, &module.includes);
+        include_writer.write(code_file, generator, &usage_context.body, generics, true);
+
+        let impls_base = [impl_info];
+        let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: generator.allocator, capacity: 0 };
+
+        if !defs.write_impls(code_file, module, &impls, &usage_context.impl_functions, generics, &include_writer) {
+            fprintf(stderr, "Failed to write impls for type %s\n", name.c_str());
+            fclose(code_file);
+            return false;
+        }
+
+        generator.overwrite_if_different(code.c_str(), code_file);
+        fclose(code_file);
+        remove(code_tmp);
+
+        generator.code_files.append(code);
+
+        return true;
+    }
+
     fn generate_trait(&self, usage: &TypeUsage<Trait>, usage_context: &UsageContext) -> bool {
         let generator = self.generator;
         let defs = DefinitionWriter { generator: generator };

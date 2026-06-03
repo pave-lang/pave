@@ -87,6 +87,10 @@
 #include <std/HashMapIter_usize_TypeUsage_Tuple.h>
 #include <tuple_usize_TypeUsage_Tuple.h>
 #include <compiler/TypeUsage_Tuple.h>
+#include <std/HashMap_usize_TypeUsage_TypeImpl.h>
+#include <std/HashMapIter_usize_TypeUsage_TypeImpl.h>
+#include <tuple_usize_TypeUsage_TypeImpl.h>
+#include <compiler/TypeUsage_TypeImpl.h>
 #include <std/Iter_ref_String.h>
 #include <compiler/Generator.h>
 
@@ -1426,46 +1430,56 @@ bool Generator__generate(struct ArenaAllocator* allocator, char const* path, boo
         success = FileGenerator__generate_tuple_loop(&file_gen, usage) && success;
     } }
     #line 698 "src/compiler/Generator.pv"
-    FileGenerator__generate_globals_namespace(&file_gen, &root->children);
+    { struct HashMapIter_usize_TypeUsage_TypeImpl __iter = HashMap_usize_TypeUsage_TypeImpl__iter(&usages.type_impls);
+    #line 698 "src/compiler/Generator.pv"
+    while (HashMapIter_usize_TypeUsage_TypeImpl__next(&__iter)) {
+        #line 698 "src/compiler/Generator.pv"
+        struct TypeUsage_TypeImpl* usage = &HashMapIter_usize_TypeUsage_TypeImpl__value(&__iter)->_1;
+
+        #line 698 "src/compiler/Generator.pv"
+        success = FileGenerator__generate_type_impl_loop(&file_gen, usage) && success;
+    } }
     #line 699 "src/compiler/Generator.pv"
+    FileGenerator__generate_globals_namespace(&file_gen, &root->children);
+    #line 700 "src/compiler/Generator.pv"
     FileGenerator__generate_test_runner(&file_gen, &root->children);
 
-    #line 701 "src/compiler/Generator.pv"
+    #line 702 "src/compiler/Generator.pv"
     if (!success) {
-        #line 702 "src/compiler/Generator.pv"
-        fprintf(stderr, "Generation failed\n");
         #line 703 "src/compiler/Generator.pv"
+        fprintf(stderr, "Generation failed\n");
+        #line 704 "src/compiler/Generator.pv"
         return false;
     }
 
-    #line 706 "src/compiler/Generator.pv"
+    #line 707 "src/compiler/Generator.pv"
     if (self.code_files.length > 0) {
-        #line 707 "src/compiler/Generator.pv"
+        #line 708 "src/compiler/Generator.pv"
         struct String command = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
-        #line 709 "src/compiler/Generator.pv"
+        #line 710 "src/compiler/Generator.pv"
         { struct Iter_ref_String __iter = Array_String__iter(&self.code_files);
-        #line 709 "src/compiler/Generator.pv"
+        #line 710 "src/compiler/Generator.pv"
         while (Iter_ref_String__next(&__iter)) {
-            #line 709 "src/compiler/Generator.pv"
+            #line 710 "src/compiler/Generator.pv"
             struct String* code_file = Iter_ref_String__value(&__iter);
 
-            #line 710 "src/compiler/Generator.pv"
+            #line 711 "src/compiler/Generator.pv"
             if (command.array.length > 0) {
-                #line 711 "src/compiler/Generator.pv"
+                #line 712 "src/compiler/Generator.pv"
                 String__append(&command, (struct str){ .ptr = output_seperator, .length = strlen(output_seperator) });
             }
 
-            #line 714 "src/compiler/Generator.pv"
+            #line 715 "src/compiler/Generator.pv"
             String__append(&command, String__as_str(code_file));
         } }
 
-        #line 717 "src/compiler/Generator.pv"
-        uint32_t length = command.array.length;
         #line 718 "src/compiler/Generator.pv"
+        uint32_t length = command.array.length;
+        #line 719 "src/compiler/Generator.pv"
         printf("%.*s\n", length, command.array.data);
     }
 
-    #line 721 "src/compiler/Generator.pv"
+    #line 722 "src/compiler/Generator.pv"
     return result;
 }

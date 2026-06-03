@@ -372,11 +372,20 @@ impl Naming {
                         }
                     },
                     FunctionParent::Trait(_) => {},
-                    FunctionParent::Type(type, _, _) => {
+                    FunctionParent::Type(type, impl_index, trait_info2) => {
                         if type.is_fat_pointer() {
                             parent_type = *type.deref_1();
                         } else {
                             parent_type = *type;
+                        }
+
+                        trait_info = trait_info2;
+                        let context = func_info.context;
+                        if context != null {
+                            let type_impl = context.root.get_type_impl(type, impl_index);
+                            if type_impl != null {
+                                trait_impl_info = type_impl.impl_info;
+                            }
                         }
 
                         has_parent = true;

@@ -1039,7 +1039,12 @@ impl DefinitionWriter {
             fprintf(stderr, "Missing self type in write_impls\n");
             return false;
         }
-        let name = generator.naming_ident.get_type_name(self_type.deref(), self_type, generics);
+        let named_self_type = self_type;
+        if self_type.is_fat_pointer() {
+            named_self_type = self_type.deref_1();
+            if named_self_type == null { named_self_type = self_type; }
+        }
+        let name = generator.naming_ident.get_type_name(named_self_type, self_type, generics);
         let name_length: i32 = name.array.length;
         let path = generator.make_rel_path(module, name.as_str(), ".h");
 

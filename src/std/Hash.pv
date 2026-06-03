@@ -74,3 +74,5 @@ impl Hash for usize {}
 
 impl Hash for f32 {}
 impl Hash for f64 {}
+
+impl Hash for *void {}

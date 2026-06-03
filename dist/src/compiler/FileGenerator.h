@@ -25,6 +25,7 @@ struct TypeUsage_Primitive;
 struct TypeUsage_Sequence;
 struct TypeUsage_Tuple;
 struct TypeUsage_Trait;
+struct TypeUsage_TypeImpl;
 struct Global;
 struct HashMap_str_ref_Namespace;
 struct Array_str;
@@ -78,21 +79,27 @@ bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_
 bool FileGenerator__generate_trait_loop(struct FileGenerator* self, struct TypeUsage_Trait* usage);
 
 #line 837 "src/compiler/FileGenerator.pv"
+bool FileGenerator__generate_type_impl_loop(struct FileGenerator* self, struct TypeUsage_TypeImpl* usage);
+
+#line 845 "src/compiler/FileGenerator.pv"
+bool FileGenerator__generate_type_impl(struct FileGenerator* self, struct TypeUsage_TypeImpl* usage, struct UsageContext* usage_context);
+
+#line 912 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
-#line 885 "src/compiler/FileGenerator.pv"
+#line 960 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* global);
 
-#line 962 "src/compiler/FileGenerator.pv"
+#line 1037 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 974 "src/compiler/FileGenerator.pv"
+#line 1049 "src/compiler/FileGenerator.pv"
 void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths, struct Array_str* module_paths);
 
-#line 996 "src/compiler/FileGenerator.pv"
+#line 1071 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1062 "src/compiler/FileGenerator.pv"
+#line 1137 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif

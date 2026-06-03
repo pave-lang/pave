@@ -2075,227 +2075,239 @@ bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, st
         return false;
     }
     #line 1042 "src/compiler/DefinitionWriter.pv"
-    struct String name = Naming__get_type_name(&generator->naming_ident, Type__deref(self_type), self_type, generics);
+    struct Type* named_self_type = self_type;
     #line 1043 "src/compiler/DefinitionWriter.pv"
+    if (Type__is_fat_pointer(self_type)) {
+        #line 1044 "src/compiler/DefinitionWriter.pv"
+        named_self_type = Type__deref_1(self_type);
+        #line 1045 "src/compiler/DefinitionWriter.pv"
+        if (named_self_type == 0) {
+            #line 1045 "src/compiler/DefinitionWriter.pv"
+            named_self_type = self_type;
+        }
+    }
+    #line 1047 "src/compiler/DefinitionWriter.pv"
+    struct String name = Naming__get_type_name(&generator->naming_ident, named_self_type, self_type, generics);
+    #line 1048 "src/compiler/DefinitionWriter.pv"
     int32_t name_length = name.array.length;
-    #line 1044 "src/compiler/DefinitionWriter.pv"
+    #line 1049 "src/compiler/DefinitionWriter.pv"
     struct String path = Generator__make_rel_path(generator, module, String__as_str(&name), (struct str){ .ptr = ".h", .length = strlen(".h") });
 
-    #line 1046 "src/compiler/DefinitionWriter.pv"
+    #line 1051 "src/compiler/DefinitionWriter.pv"
     fprintf(file, "#include <%.*s>\n", (int32_t)(path.array.length), path.array.data);
 
-    #line 1048 "src/compiler/DefinitionWriter.pv"
+    #line 1053 "src/compiler/DefinitionWriter.pv"
     { struct IterEnumerate_ref_ref_Impl __iter = Iter_ref_ref_Impl__enumerate(Array_ref_Impl__iter(impls));
-    #line 1048 "src/compiler/DefinitionWriter.pv"
+    #line 1053 "src/compiler/DefinitionWriter.pv"
     while (IterEnumerate_ref_ref_Impl__next(&__iter)) {
-        #line 1048 "src/compiler/DefinitionWriter.pv"
+        #line 1053 "src/compiler/DefinitionWriter.pv"
         uintptr_t impl_index = IterEnumerate_ref_ref_Impl__value(&__iter)._0;
-        #line 1048 "src/compiler/DefinitionWriter.pv"
+        #line 1053 "src/compiler/DefinitionWriter.pv"
         struct Impl* impl_info = *IterEnumerate_ref_ref_Impl__value(&__iter)._1;
 
-        #line 1049 "src/compiler/DefinitionWriter.pv"
+        #line 1054 "src/compiler/DefinitionWriter.pv"
         struct Trait* trait_info = impl_info->trait_;
-        #line 1050 "src/compiler/DefinitionWriter.pv"
+        #line 1055 "src/compiler/DefinitionWriter.pv"
         struct HashMap_usize_TypeFunctionUsage* impl_functions_for_impl = 0;
-        #line 1051 "src/compiler/DefinitionWriter.pv"
+        #line 1056 "src/compiler/DefinitionWriter.pv"
         if (impl_functions != 0) {
-            #line 1051 "src/compiler/DefinitionWriter.pv"
+            #line 1056 "src/compiler/DefinitionWriter.pv"
             impl_functions_for_impl = Array_HashMap_usize_TypeFunctionUsage__get(impl_functions, impl_index);
         }
 
-        #line 1053 "src/compiler/DefinitionWriter.pv"
+        #line 1058 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&impl_info->functions);
-        #line 1053 "src/compiler/DefinitionWriter.pv"
+        #line 1058 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_Function__next(&__iter)) {
-            #line 1053 "src/compiler/DefinitionWriter.pv"
+            #line 1058 "src/compiler/DefinitionWriter.pv"
             struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-            #line 1054 "src/compiler/DefinitionWriter.pv"
+            #line 1059 "src/compiler/DefinitionWriter.pv"
             uintptr_t func_ptr = (uintptr_t)(func_info);
-            #line 1055 "src/compiler/DefinitionWriter.pv"
+            #line 1060 "src/compiler/DefinitionWriter.pv"
             struct TypeFunctionUsage* function_usage = 0;
-            #line 1056 "src/compiler/DefinitionWriter.pv"
+            #line 1061 "src/compiler/DefinitionWriter.pv"
             if (impl_functions_for_impl != 0) {
-                #line 1056 "src/compiler/DefinitionWriter.pv"
+                #line 1061 "src/compiler/DefinitionWriter.pv"
                 function_usage = HashMap_usize_TypeFunctionUsage__find(impl_functions_for_impl, &func_ptr);
             }
 
-            #line 1058 "src/compiler/DefinitionWriter.pv"
+            #line 1063 "src/compiler/DefinitionWriter.pv"
             if (func_info->generics.array.length == 0) {
-                #line 1061 "src/compiler/DefinitionWriter.pv"
+                #line 1066 "src/compiler/DefinitionWriter.pv"
                 struct UsageContext* function_usage_context = 0;
-                #line 1062 "src/compiler/DefinitionWriter.pv"
+                #line 1067 "src/compiler/DefinitionWriter.pv"
                 if (function_usage != 0 && function_usage->usage_contexts.length > 0) {
-                    #line 1063 "src/compiler/DefinitionWriter.pv"
+                    #line 1068 "src/compiler/DefinitionWriter.pv"
                     function_usage_context = &function_usage->usage_contexts.data[0];
                 }
 
-                #line 1066 "src/compiler/DefinitionWriter.pv"
+                #line 1071 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
-                #line 1067 "src/compiler/DefinitionWriter.pv"
+                #line 1072 "src/compiler/DefinitionWriter.pv"
                 if (trait_info != 0) {
-                    #line 1068 "src/compiler/DefinitionWriter.pv"
+                    #line 1073 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, function_usage_context)) {
-                        #line 1068 "src/compiler/DefinitionWriter.pv"
+                        #line 1073 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
                 } else {
-                    #line 1070 "src/compiler/DefinitionWriter.pv"
+                    #line 1075 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_function_definition(self, file, func_info, generics, 0)) {
-                        #line 1071 "src/compiler/DefinitionWriter.pv"
+                        #line 1076 "src/compiler/DefinitionWriter.pv"
                         struct Token func_name = *func_info->name;
-                        #line 1072 "src/compiler/DefinitionWriter.pv"
+                        #line 1077 "src/compiler/DefinitionWriter.pv"
                         uint32_t func_name_length = func_name.value.length;
-                        #line 1073 "src/compiler/DefinitionWriter.pv"
+                        #line 1078 "src/compiler/DefinitionWriter.pv"
                         fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_name.value.ptr);
-                        #line 1074 "src/compiler/DefinitionWriter.pv"
+                        #line 1079 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
 
-                    #line 1077 "src/compiler/DefinitionWriter.pv"
+                    #line 1082 "src/compiler/DefinitionWriter.pv"
                     struct FunctionContext func_context = FunctionContext__new(generator->allocator, func_info, true);
-                    #line 1078 "src/compiler/DefinitionWriter.pv"
+                    #line 1083 "src/compiler/DefinitionWriter.pv"
                     if (function_usage_context != 0) {
-                        #line 1079 "src/compiler/DefinitionWriter.pv"
+                        #line 1084 "src/compiler/DefinitionWriter.pv"
                         func_context.coroutine.yield_count = function_usage_context->function_context.coroutine.yield_count;
                     }
-                    #line 1081 "src/compiler/DefinitionWriter.pv"
+                    #line 1086 "src/compiler/DefinitionWriter.pv"
                     generator->function_context = &func_context;
 
-                    #line 1083 "src/compiler/DefinitionWriter.pv"
+                    #line 1088 "src/compiler/DefinitionWriter.pv"
                     if (!DefinitionWriter__write_function_block(self, file, String__as_str(&name), func_info, generics, function_usage_context)) {
-                        #line 1084 "src/compiler/DefinitionWriter.pv"
+                        #line 1089 "src/compiler/DefinitionWriter.pv"
                         struct Token func_name = *func_info->name;
-                        #line 1085 "src/compiler/DefinitionWriter.pv"
+                        #line 1090 "src/compiler/DefinitionWriter.pv"
                         uint32_t func_name_length = func_name.value.length;
-                        #line 1086 "src/compiler/DefinitionWriter.pv"
+                        #line 1091 "src/compiler/DefinitionWriter.pv"
                         fprintf(stderr, "Failed to write block for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_name.value.ptr);
-                        #line 1087 "src/compiler/DefinitionWriter.pv"
+                        #line 1092 "src/compiler/DefinitionWriter.pv"
                         return false;
                     }
 
-                    #line 1090 "src/compiler/DefinitionWriter.pv"
+                    #line 1095 "src/compiler/DefinitionWriter.pv"
                     if (function_usage != 0 && function_usage->impl_dynamic_function) {
-                        #line 1091 "src/compiler/DefinitionWriter.pv"
+                        #line 1096 "src/compiler/DefinitionWriter.pv"
                         DefinitionWriter__write_dynamic_function_impl(self, file, func_info, generics, module);
                     }
 
-                    #line 1094 "src/compiler/DefinitionWriter.pv"
+                    #line 1099 "src/compiler/DefinitionWriter.pv"
                     generator->function_context = 0;
                 }
             } else if (impl_functions_for_impl != 0) {
-                #line 1097 "src/compiler/DefinitionWriter.pv"
+                #line 1102 "src/compiler/DefinitionWriter.pv"
                 if (function_usage != 0) {
-                    #line 1098 "src/compiler/DefinitionWriter.pv"
+                    #line 1103 "src/compiler/DefinitionWriter.pv"
                     struct Function* func2 = ArenaAllocator__Allocator__alloc(generator->allocator, sizeof(struct Function));
-                    #line 1099 "src/compiler/DefinitionWriter.pv"
+                    #line 1104 "src/compiler/DefinitionWriter.pv"
                     *func2 = *func_info;
 
-                    #line 1101 "src/compiler/DefinitionWriter.pv"
+                    #line 1106 "src/compiler/DefinitionWriter.pv"
                     for (uintptr_t i = 0; i < function_usage->usage_contexts.length; i++) {
-                        #line 1102 "src/compiler/DefinitionWriter.pv"
+                        #line 1107 "src/compiler/DefinitionWriter.pv"
                         struct UsageContext* usage_context = &function_usage->usage_contexts.data[i];
-                        #line 1103 "src/compiler/DefinitionWriter.pv"
+                        #line 1108 "src/compiler/DefinitionWriter.pv"
                         struct GenericMap* generics3 = usage_context->generic_map;
-                        #line 1106 "src/compiler/DefinitionWriter.pv"
+                        #line 1111 "src/compiler/DefinitionWriter.pv"
                         generics3->self_type = generics->self_type;
 
-                        #line 1108 "src/compiler/DefinitionWriter.pv"
+                        #line 1113 "src/compiler/DefinitionWriter.pv"
                         IncludeWriter__write(include_writer, file, generator, &usage_context->body, generics3, true);
-                        #line 1109 "src/compiler/DefinitionWriter.pv"
+                        #line 1114 "src/compiler/DefinitionWriter.pv"
                         fprintf(file, "\n");
-                        #line 1110 "src/compiler/DefinitionWriter.pv"
+                        #line 1115 "src/compiler/DefinitionWriter.pv"
                         if (!DefinitionWriter__write_function_definition(self, file, func_info, generics3, 0)) {
-                            #line 1111 "src/compiler/DefinitionWriter.pv"
+                            #line 1116 "src/compiler/DefinitionWriter.pv"
                             struct Token func_name = *func_info->name;
-                            #line 1112 "src/compiler/DefinitionWriter.pv"
+                            #line 1117 "src/compiler/DefinitionWriter.pv"
                             uint32_t func_name_length = func_name.value.length;
-                            #line 1113 "src/compiler/DefinitionWriter.pv"
+                            #line 1118 "src/compiler/DefinitionWriter.pv"
                             fprintf(stderr, "Failed to write definition for %.*s::%.*s\n ", name_length, name.array.data, func_name_length, func_name.value.ptr);
-                            #line 1114 "src/compiler/DefinitionWriter.pv"
+                            #line 1119 "src/compiler/DefinitionWriter.pv"
                             return false;
                         }
 
-                        #line 1117 "src/compiler/DefinitionWriter.pv"
+                        #line 1122 "src/compiler/DefinitionWriter.pv"
                         struct FunctionContext func_context = FunctionContext__new(generator->allocator, func_info, true);
-                        #line 1118 "src/compiler/DefinitionWriter.pv"
+                        #line 1123 "src/compiler/DefinitionWriter.pv"
                         func_context.coroutine.yield_count = usage_context->function_context.coroutine.yield_count;
-                        #line 1119 "src/compiler/DefinitionWriter.pv"
+                        #line 1124 "src/compiler/DefinitionWriter.pv"
                         generator->function_context = &func_context;
 
-                        #line 1121 "src/compiler/DefinitionWriter.pv"
+                        #line 1126 "src/compiler/DefinitionWriter.pv"
                         DefinitionWriter__write_function_block(self, file, String__as_str(&name), func_info, generics3, usage_context);
 
-                        #line 1123 "src/compiler/DefinitionWriter.pv"
+                        #line 1128 "src/compiler/DefinitionWriter.pv"
                         if (usage_context->impl_dynamic_function) {
-                            #line 1124 "src/compiler/DefinitionWriter.pv"
+                            #line 1129 "src/compiler/DefinitionWriter.pv"
                             DefinitionWriter__write_dynamic_function_impl(self, file, func_info, generics3, module);
                         }
 
-                        #line 1127 "src/compiler/DefinitionWriter.pv"
+                        #line 1132 "src/compiler/DefinitionWriter.pv"
                         generator->function_context = 0;
                     }
                 }
             }
         } }
 
-        #line 1133 "src/compiler/DefinitionWriter.pv"
+        #line 1138 "src/compiler/DefinitionWriter.pv"
         if (trait_info != 0) {
-            #line 1134 "src/compiler/DefinitionWriter.pv"
+            #line 1139 "src/compiler/DefinitionWriter.pv"
             { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&trait_info->functions);
-            #line 1134 "src/compiler/DefinitionWriter.pv"
+            #line 1139 "src/compiler/DefinitionWriter.pv"
             while (HashMapIter_str_Function__next(&__iter)) {
-                #line 1134 "src/compiler/DefinitionWriter.pv"
+                #line 1139 "src/compiler/DefinitionWriter.pv"
                 struct str func_base_name = HashMapIter_str_Function__value(&__iter)->_0;
-                #line 1134 "src/compiler/DefinitionWriter.pv"
+                #line 1139 "src/compiler/DefinitionWriter.pv"
                 struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
-                #line 1135 "src/compiler/DefinitionWriter.pv"
+                #line 1140 "src/compiler/DefinitionWriter.pv"
                 if (HashMap_str_Function__find(&impl_info->functions, &func_base_name) != 0) {
-                    #line 1135 "src/compiler/DefinitionWriter.pv"
+                    #line 1140 "src/compiler/DefinitionWriter.pv"
                     continue;
                 }
 
-                #line 1137 "src/compiler/DefinitionWriter.pv"
+                #line 1142 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
-                #line 1138 "src/compiler/DefinitionWriter.pv"
+                #line 1143 "src/compiler/DefinitionWriter.pv"
                 if (!DefinitionWriter__write_trait_function_with_body(self, file, String__as_str(&name), func_info, trait_info, &impl_info->trait_type, generics, module, 0)) {
-                    #line 1138 "src/compiler/DefinitionWriter.pv"
+                    #line 1143 "src/compiler/DefinitionWriter.pv"
                     return false;
                 }
             } }
         }
 
-        #line 1142 "src/compiler/DefinitionWriter.pv"
+        #line 1147 "src/compiler/DefinitionWriter.pv"
         { struct HashMapIter_str_ref_ImplConst __iter = HashMap_str_ref_ImplConst__iter(&impl_info->consts);
-        #line 1142 "src/compiler/DefinitionWriter.pv"
+        #line 1147 "src/compiler/DefinitionWriter.pv"
         while (HashMapIter_str_ref_ImplConst__next(&__iter)) {
-            #line 1142 "src/compiler/DefinitionWriter.pv"
+            #line 1147 "src/compiler/DefinitionWriter.pv"
             struct ImplConst* impl_const = HashMapIter_str_ref_ImplConst__value(&__iter)->_1;
 
-            #line 1143 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "\nconst ");
-            #line 1144 "src/compiler/DefinitionWriter.pv"
-            Generator__write_type(generator, file, &impl_const->type, generics);
-            #line 1145 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, " ");
-            #line 1146 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, String__as_str(&name));
-            #line 1147 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, "_");
             #line 1148 "src/compiler/DefinitionWriter.pv"
-            struct Token impl_const_name = *impl_const->name;
+            fprintf(file, "\nconst ");
             #line 1149 "src/compiler/DefinitionWriter.pv"
-            Generator__write_str_title(generator, file, impl_const_name.value);
+            Generator__write_type(generator, file, &impl_const->type, generics);
             #line 1150 "src/compiler/DefinitionWriter.pv"
-            fprintf(file, " = ");
+            fprintf(file, " ");
             #line 1151 "src/compiler/DefinitionWriter.pv"
-            ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = generator }}, file, impl_const->value, generics);
+            Generator__write_str_title(generator, file, String__as_str(&name));
             #line 1152 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, "_");
+            #line 1153 "src/compiler/DefinitionWriter.pv"
+            struct Token impl_const_name = *impl_const->name;
+            #line 1154 "src/compiler/DefinitionWriter.pv"
+            Generator__write_str_title(generator, file, impl_const_name.value);
+            #line 1155 "src/compiler/DefinitionWriter.pv"
+            fprintf(file, " = ");
+            #line 1156 "src/compiler/DefinitionWriter.pv"
+            ExpressionWriter__write_expression((struct ExpressionWriter[]){(struct ExpressionWriter) { .generator = generator }}, file, impl_const->value, generics);
+            #line 1157 "src/compiler/DefinitionWriter.pv"
             fprintf(file, ";\n");
         } }
     } }
 
-    #line 1156 "src/compiler/DefinitionWriter.pv"
+    #line 1161 "src/compiler/DefinitionWriter.pv"
     return true;
 }
