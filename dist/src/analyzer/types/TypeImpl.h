@@ -1,6 +1,8 @@
 #ifndef PAVE_TYPE_IMPL
 #define PAVE_TYPE_IMPL
 
+#include <stdint.h>
+
 #include <analyzer/types/Type.h>
 struct Impl;
 
@@ -8,6 +10,7 @@ struct Impl;
 struct TypeImpl {
     struct Type type;
     struct Impl* impl_info;
+    uintptr_t impl_index;
 };
 
 #include <analyzer/types/Type.h>
@@ -15,7 +18,7 @@ struct TypeImpl {
 struct ArenaAllocator;
 struct Impl;
 
-#line 10 "src/analyzer/types/TypeImpl.pv"
-struct TypeImpl TypeImpl__new(struct ArenaAllocator* allocator, struct Type type, struct Impl* impl_info);
+#line 11 "src/analyzer/types/TypeImpl.pv"
+struct TypeImpl TypeImpl__new(struct ArenaAllocator* allocator, struct Type type, struct Impl* impl_info, uintptr_t impl_index);
 
 #endif

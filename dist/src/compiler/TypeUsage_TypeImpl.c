@@ -1,0 +1,35 @@
+#include <stdint.h>
+
+#include <stdio.h>
+
+#include <compiler/TypeUsage_TypeImpl.h>
+#include <std/ArenaAllocator.h>
+#include <analyzer/types/TypeImpl.h>
+#include <std/trait_Allocator.h>
+#include <compiler/UsageContext.h>
+#include <analyzer/types/GenericMap.h>
+#include <compiler/TypeUsage_TypeImpl.h>
+
+#include <compiler/TypeUsage_TypeImpl.h>
+
+#line 124 "src/compiler/Usages.pv"
+struct TypeUsage_TypeImpl TypeUsage_TypeImpl__new(struct ArenaAllocator* allocator, struct TypeImpl* type) {
+    #line 125 "src/compiler/Usages.pv"
+    return (struct TypeUsage_TypeImpl) {
+        .allocator = allocator,
+        .type = type,
+        .usage_contexts = Array_UsageContext__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
+        .impl_dynamic_usage = false,
+        .any_usage = false,
+    };
+}
+
+#line 134 "src/compiler/Usages.pv"
+struct UsageContext* TypeUsage_TypeImpl__add_usage(struct TypeUsage_TypeImpl* self, struct GenericMap* generic_map) {
+    #line 135 "src/compiler/Usages.pv"
+    struct UsageContext usage_context = UsageContext__new(self->allocator, generic_map);
+    #line 136 "src/compiler/Usages.pv"
+    uintptr_t index = Array_UsageContext__append(&self->usage_contexts, usage_context);
+    #line 137 "src/compiler/Usages.pv"
+    return &self->usage_contexts.data[index];
+}

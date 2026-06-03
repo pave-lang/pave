@@ -695,6 +695,7 @@ impl Generator {
         for (_, &usage) in usages.functions { success = file_gen.generate_function_loop(usage) && success; }
         for (_, &usage) in usages.sequences { success = file_gen.generate_sequence(usage) && success; }
         for (_, &usage) in usages.tuples { success = file_gen.generate_tuple_loop(usage) && success; }
+        for (_, &usage) in usages.type_impls { success = file_gen.generate_type_impl_loop(usage) && success; }
         file_gen.generate_globals_namespace(&root.children);
         file_gen.generate_test_runner(&root.children);
 

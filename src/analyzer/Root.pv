@@ -27,6 +27,7 @@ struct Root {
     func_next: Function,
     func_value: Function,
     naming_decl: Naming,
+    type_impls: Array<TypeImpl>,
     hack_type_impl: *TypeImpl,
     includes_c: HashMap<str, &Include>,
     includes_cpp: HashMap<str, &Include>,
@@ -61,6 +62,7 @@ impl Root {
             type_usize: Type::Primitive(null),
             func_next: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, variadic: false, typed_variadic: false, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
             func_value: Function { name: null, context: null, declaration_start: 0, declaration_end: 0, token_start: 0, token_end: 0, parent: FunctionParent::None, type: FunctionType::Standard, variadic: false, typed_variadic: false, generics: Generics { parent: null, array: Array<Generic> { allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator, buckets: null, data: null, capacity: 0, length: 0 } }, parameters: Array<Parameter> { allocator, data: null, length: 0, capacity: 0 }, return_type: Type::Primitive(null), body: null },
+            type_impls: Array<TypeImpl>::new(allocator),
             hack_type_impl: null,
             mode_cpp: false,
         };
@@ -163,6 +165,162 @@ impl Root {
         if existing != null { return existing; }
 
         return self.primitives.insert(name, Primitive::new(self.allocator, name));
+    }
+
+    fn add_type_impl(&self, type: Type, impl_info: &Impl) -> usize {
+        let index = self.type_impls.length;
+        self.type_impls.append(TypeImpl::new(self.allocator, type, impl_info, index));
+        return index;
+    }
+
+    fn get_type_impl(&self, type: &Type, impl_index: usize) -> *TypeImpl {
+        let type_impl = self.type_impls.get(impl_index);
+        if type_impl == null { return null; }
+        if self.type_impl_target_eq(&type_impl.type, type) { return type_impl; }
+
+        return null;
+    }
+
+    fn find_type_impl_function(&self, type: &Type, name: str, generic_map: *GenericMap) -> *Function {
+        for (impl_index, *type_impl) in self.type_impls.iter().enumerate() {
+            if type_impl.impl_info.generics.array.length != 0 { continue; }
+            if !self.type_impl_target_eq(&type_impl.type, type) { continue; }
+
+            let function = type_impl.impl_info.find_function(name);
+            if function == null { continue; }
+
+            let stored_func_info = self.allocator.store(function);
+            if stored_func_info == null { return function; }
+            stored_func_info.parent = FunctionParent::Type(&type_impl.type, impl_index, type_impl.impl_info.trait_);
+            return stored_func_info;
+        }
+
+        return null;
+    }
+
+    fn type_impl_target_eq(&self, left: &Type, right: &Type) -> bool {
+        match left {
+            Type::Primitive(left_primitive) => {
+                if left_primitive == null { return false; }
+                match right {
+                    Type::Primitive(right_primitive) => {
+                        if right_primitive == null { return false; }
+                        return left_primitive.name.eq(right_primitive.name);
+                    },
+                    _ => {},
+                }
+            },
+            Type::Indirect(left_indirect) => {
+                match right {
+                    Type::Indirect(right_indirect) => {
+                        if left_indirect.type != right_indirect.type { return false; }
+                        return self.type_impl_target_eq(&left_indirect.to, &right_indirect.to);
+                    },
+                    _ => {},
+                }
+            },
+            Type::Sequence(left_sequence) => {
+                match right {
+                    Type::Sequence(right_sequence) => {
+                        match left_sequence.type {
+                            SequenceType::Slice => {
+                                match right_sequence.type {
+                                    SequenceType::Slice => {},
+                                    _ => { return false; },
+                                }
+                            },
+                            SequenceType::FixedArray(_) => {
+                                match right_sequence.type {
+                                    SequenceType::FixedArray(_) => {},
+                                    _ => { return false; },
+                                }
+                            },
+                        }
+                        return self.type_impl_target_eq(&left_sequence.element, &right_sequence.element);
+                    },
+                    _ => {},
+                }
+            },
+            Type::Struct(left_struct, left_generics) => {
+                match right {
+                    Type::Struct(right_struct, right_generics) => {
+                        if left_struct != right_struct { return false; }
+                        return self.type_impl_generics_eq(left_generics, right_generics);
+                    },
+                    _ => {},
+                }
+            },
+            Type::Enum(left_enum, left_generics) => {
+                match right {
+                    Type::Enum(right_enum, right_generics) => {
+                        if left_enum != right_enum { return false; }
+                        return self.type_impl_generics_eq(left_generics, right_generics);
+                    },
+                    _ => {},
+                }
+            },
+            Type::Trait(left_trait, left_generics) => {
+                match right {
+                    Type::Trait(right_trait, right_generics) => {
+                        if left_trait != right_trait { return false; }
+                        return self.type_impl_generics_eq(left_generics, right_generics);
+                    },
+                    _ => {},
+                }
+            },
+            Type::Tuple(left_tuple) => {
+                match right {
+                    Type::Tuple(right_tuple) => {
+                        if left_tuple.elements.length != right_tuple.elements.length { return false; }
+                        let i: usize = 0;
+                        while i < left_tuple.elements.length {
+                            if !self.type_impl_target_eq(&left_tuple.elements.data[i], &right_tuple.elements.data[i]) { return false; }
+                            i += 1;
+                        }
+                        return true;
+                    },
+                    _ => {},
+                }
+            },
+            Type::TypedefC(left_typedef) => {
+                match right {
+                    Type::TypedefC(right_typedef) => { return left_typedef.name.eq(right_typedef.name); },
+                    _ => { return self.type_impl_target_eq(left_typedef.type, right); },
+                }
+            },
+            Type::EnumC(left_enum) => {
+                match right {
+                    Type::EnumC(right_enum) => { return left_enum.name.eq(right_enum.name); },
+                    _ => {},
+                }
+            },
+            Type::StructC(left_struct) => {
+                match right {
+                    Type::StructC(right_struct) => { return left_struct.name.eq(right_struct.name); },
+                    _ => {},
+                }
+            },
+            Type::UnionC(left_union) => {
+                match right {
+                    Type::UnionC(right_union) => { return left_union.name.eq(right_union.name); },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+
+        return false;
+    }
+
+    fn type_impl_generics_eq(&self, left: *GenericMap, right: *GenericMap) -> bool {
+        if left == null || right == null { return left == right; }
+        if left.array.length != right.array.length { return false; }
+        let i: usize = 0;
+        while i < left.array.length {
+            if !self.type_impl_target_eq(&left.array.data[i], &right.array.data[i]) { return false; }
+            i += 1;
+        }
+        return true;
     }
 
     fn add_namespace(&self, name: str, path: str) -> bool {

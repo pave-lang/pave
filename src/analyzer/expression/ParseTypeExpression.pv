@@ -74,7 +74,7 @@ impl Expression {
                     let arguments = parsed.arguments;
 
                     if parsed.open_paren != null && parsed.close_paren != null {
-                        Expression::record_function_signature(context, function, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
+                        Expression::record_function_signature(context, member_type, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
                     }
 
                     if !Expression::validate_arguments(context, token, member_type, &arguments, generic_map, false) { return null; }
@@ -192,9 +192,9 @@ impl Expression {
                 let arguments = parsed.arguments;
 
                 match member_type {
-                    Type::Function(func_info, _) => {
+                    Type::Function(_, _) => {
                         if parsed.open_paren != null && parsed.close_paren != null {
-                            Expression::record_function_signature(context, func_info, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
+                            Expression::record_function_signature(context, member_type, parsed.open_paren, parsed.close_paren, parsed.comma_positions, false);
                         }
                     },
                     _ => {},

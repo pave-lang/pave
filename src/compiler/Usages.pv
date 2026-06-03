@@ -155,6 +155,7 @@ struct Usages {
     traits: HashMap<usize, TypeUsage<Trait>>,
     sequences: HashMap<usize, TypeUsage<Sequence>>,
     tuples: HashMap<usize, TypeUsage<Tuple>>,
+    type_impls: HashMap<usize, TypeUsage<TypeImpl>>,
     dynamic_impl_functions: HashSet<usize>,
 
     usage_mode: UsageMode,
@@ -186,6 +187,7 @@ impl Usages {
             traits: HashMap<usize, TypeUsage<Trait>>::new(allocator),
             sequences: HashMap<usize, TypeUsage<Sequence>>::new(allocator),
             tuples: HashMap<usize, TypeUsage<Tuple>>::new(allocator),
+            type_impls: HashMap<usize, TypeUsage<TypeImpl>>::new(allocator),
             dynamic_impl_functions: HashSet<usize>::new(allocator),
 
             std_namespace: generator.root.find_namespace("std"),
@@ -205,6 +207,16 @@ impl Usages {
 
         self.add_namespace(&self.root.children);
 
+        let type_impl_i: usize = 0;
+        while type_impl_i < self.root.type_impls.length {
+            let type_impl = &self.root.type_impls.data[type_impl_i];
+            if type_impl.impl_info.generics.array.length == 0 {
+                self.type_impls.insert(cast<usize>(type_impl), TypeUsage<TypeImpl>::new(self.allocator, type_impl));
+                self.usages.append(type_impl.type);
+            }
+            type_impl_i += 1;
+        }
+
         let usage_i: usize = 0;
         while usage_i < self.usages.length {
             let usage = self.usages.data[usage_i];
@@ -222,6 +234,10 @@ impl Usages {
             }
 
             usage_i += 1;
+        }
+
+        for (_, &usage) in self.type_impls {
+            self.process_type_impl(usage.type);
         }
 
         self.normalize();
@@ -365,6 +381,17 @@ impl Usages {
                     },
                     FunctionParent::Type(type_info, _, _) => {
                         self.add_type(type_info, type_generic_map);
+                        if func_info.generics.array.length == 0 {
+                            let function_generic_map: &GenericMap = generic_map;
+                            if type_generic_map != null { function_generic_map = type_generic_map; }
+                            let function_type = Type::Function(func_info, function_generic_map);
+                            let function_type_name = self.naming_ident.get_type_name(&function_type, function_generic_map.self_type, function_generic_map);
+                            match self.usage_mode {
+                                UsageMode::Layout => { usage_context.layout.insert(function_type_name.as_str(), function_type); },
+                                UsageMode::Signature => { usage_context.signature.insert(function_type_name.as_str(), function_type); },
+                                UsageMode::Body => { usage_context.body.insert(function_type_name.as_str(), function_type); },
+                            }
+                        }
                     },
                 }
             },
@@ -426,6 +453,14 @@ impl Usages {
         self.usages.append(*type_deref_all);
     }
 
+    fn add_type_impl_header(&self, self_type: &Type) {
+        let usage_context = self.usage_context;
+        if usage_context == null { return; }
+
+        let type_name = self.naming_ident.get_type_name(self_type, self_type, &GenericMap { self_type, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
+        usage_context.body.insert(type_name.as_str(), *self_type);
+    }
+
     fn process_impls(&self, impls: &Array<&Impl>, generic_map: &GenericMap) {
         self.usage_mode = UsageMode::Signature;
 
@@ -460,6 +495,29 @@ impl Usages {
         }
 
         self.active_impl_index = 0;
+    }
+
+    fn process_type_impl(&self, type_impl: &TypeImpl) {
+        let entry_usage_context = self.usage_context;
+        let generic_map_val = GenericMap::new(self.allocator, &type_impl.impl_info.generics, &Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 });
+        let generic_map = self.allocator.store(&generic_map_val);
+        if generic_map == null { return; }
+        generic_map.self_type = &type_impl.type;
+
+        let parent_ptr = cast<usize>(type_impl);
+        let parent_usage = self.type_impls.find(&parent_ptr);
+        if parent_usage == null { return; }
+
+        let usage_context = parent_usage.add_usage(generic_map);
+        let impls_base = [type_impl.impl_info];
+        let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: self.allocator, capacity: 0 };
+        usage_context.populate_impls(self.allocator, &impls);
+        usage_context.apply_pending_dynamic_functions(&self.dynamic_impl_functions);
+
+        self.usage_context = usage_context;
+        self.process_impls(&impls, generic_map);
+
+        self.usage_context = entry_usage_context;
     }
 
     fn process_primitive(&self, primitive_info: &Primitive) {
@@ -966,6 +1024,19 @@ impl Usages {
                         match func_info.parent {
                             FunctionParent::Trait(_) => {
                                 if arguments.length > 0 {
+                                    let func_name = func_info.name;
+                                    let exact_usage_context = self.usage_context;
+                                    if func_name != null && exact_usage_context != null {
+                                        let exact_arg_type_resolved = Context::resolve_type(self.allocator, &arguments.data[0].value.return_type, generic_map, null);
+                                        let exact_arg_type: &Type = &arguments.data[0].value.return_type;
+                                        if exact_arg_type_resolved != null { exact_arg_type = exact_arg_type_resolved; }
+                                        exact_arg_type = exact_arg_type.deref_reference();
+                                        let type_impl_function = self.root.find_type_impl_function(exact_arg_type, func_name.value, null);
+                                        if type_impl_function != null {
+                                            self.add_type_impl_header(exact_arg_type);
+                                        }
+                                    }
+
                                     let type = arguments.data[0].value.return_type.deref();
 
                                     match type {
@@ -1031,6 +1102,21 @@ impl Usages {
             ExpressionData::MemberInstanceExpression(inner, _) => {
                 self.add_type(inner.return_type.deref(), generic_map);
                 self.process_expression(inner, generic_map);
+
+                match expression.return_type {
+                    Type::Function(func_info, _) => {
+                        match func_info.parent {
+                            FunctionParent::Type(_, _, _) => {
+                                let resolved_self_type = Context::resolve_type(self.allocator, &inner.return_type, generic_map, null);
+                                if resolved_self_type != null {
+                                    self.add_type_impl_header(resolved_self_type);
+                                }
+                            },
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                }
             },
             ExpressionData::IndexExpression(inner, index) => {
                 self.process_expression(inner, generic_map);

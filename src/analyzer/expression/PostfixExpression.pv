@@ -108,10 +108,6 @@ impl Expression {
         if !context.expect_value(TokenType::Symbol, ".") { return null; }
         if dot_token != null { context.record_member_completion(dot_token, &inner.return_type, false); }
 
-        if !allow_pointer && inner.return_type.is_pointer() {
-            context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");
-        }
-
         let member_name = context.current();
         if member_name == null {
             context.error_token(dot_token, "no token found after .");
@@ -123,6 +119,13 @@ impl Expression {
         }
 
         context.next_token();
+
+        if !allow_pointer && inner.return_type.is_pointer() {
+            let pointer_impl_function = context.root.find_type_impl_function(&inner.return_type, member_name.value, null);
+            if pointer_impl_function == null {
+                context.error_token(dot_token, ". cannot be used on a *T pointer; use ?. or check for null with `if x == null { ... }` first");
+            }
+        }
 
         let member_type = Expression::get_member_type(context, &inner.return_type, member_name, true);
         if member_type == null { return null; }
@@ -189,10 +192,6 @@ impl Expression {
             }
             for arg in parsed.arguments { arguments.append(*arg); }
 
-            if parsed.open_paren != null && parsed.close_paren != null {
-                Expression::record_function_signature(context, func_info, parsed.open_paren, parsed.close_paren, parsed.comma_positions, true);
-            }
-
             if func_info.generics.array.length > 0 {
                 let func_generics = Expression::resolve_function_generics(context, func_info, &parsed_generics, &arguments);
                 let combined_generics_val = func_generics.clone(context.allocator);
@@ -217,6 +216,10 @@ impl Expression {
                         member_type = context.root.make_type_usage(member_type, &func_generics.array);
                     },
                 }
+            }
+
+            if parsed.open_paren != null && parsed.close_paren != null {
+                Expression::record_function_signature(context, member_type, parsed.open_paren, parsed.close_paren, parsed.comma_positions, true);
             }
 
             if (func_info.type == FunctionType::Builtin || func_info.type == FunctionType::MethodCpp) {

@@ -4,13 +4,15 @@ use analyzer
 struct TypeImpl {
     type: Type,
     impl_info: &Impl,
+    impl_index: usize,
 }
 
 impl TypeImpl {
-    fn new(allocator: &ArenaAllocator, type: Type, impl_info: &Impl) -> Self {
+    fn new(allocator: &ArenaAllocator, type: Type, impl_info: &Impl, impl_index: usize) -> Self {
         return Self {
             type,
             impl_info,
+            impl_index,
         };
     }
 }

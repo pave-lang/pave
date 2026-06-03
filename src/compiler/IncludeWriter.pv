@@ -35,6 +35,23 @@ impl IncludeWriter {
             if resolved == null { continue; }
             let resolved_nn: &Type = if deref { resolved.deref_all() } else { resolved };
 
+            let found_type_impl_header = false;
+            for *type_impl in generator.root.type_impls {
+                if type_impl.impl_info.generics.array.length != 0 { continue; }
+                if !generator.root.type_impl_target_eq(&type_impl.type, resolved) { continue; }
+
+                found_type_impl_header = true;
+                let include_type = &type_impl.type;
+                if include_type.is_fat_pointer() {
+                    include_type = include_type.deref_1();
+                    if include_type == null { include_type = &type_impl.type; }
+                }
+                let name = generator.naming_ident.get_type_name(include_type, generics.self_type, generics);
+                let path = generator.make_rel_path(type_impl.impl_info.context.module, name.as_str(), "");
+                if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
+            }
+            if found_type_impl_header { continue; }
+
             match resolved_nn {
                 Type::Indirect(_) => {
                     let type_deref = resolved_nn.deref_all();
@@ -118,9 +135,16 @@ impl IncludeWriter {
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                         },
                         FunctionParent::Trait(_) => {},
-                        FunctionParent::Type(type_info, _, _) => {
-                            let name = generator.naming_ident.get_type_name(type_info, generics.self_type, generics);
-                            let module = type_info.get_module();
+                        FunctionParent::Type(type_info, impl_index, _) => {
+                            let include_type = type_info;
+                            if type_info.is_fat_pointer() {
+                                include_type = type_info.deref_1();
+                                if include_type == null { include_type = type_info; }
+                            }
+                            let name = generator.naming_ident.get_type_name(include_type, generics.self_type, generics);
+                            let module = include_type?.get_module();
+                            let type_impl = generator.root.get_type_impl(type_info, impl_index);
+                            if type_impl != null { module = type_impl.impl_info.context.module; }
                             let path = generator.make_rel_path(module, name.as_str(), "");
                             if self.includes.insert(path.as_str()) { includes.insert(path.as_str()); }
                         },

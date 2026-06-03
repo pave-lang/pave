@@ -5,7 +5,7 @@ use std
 use analyzer
 
 fn main(argc: i32, argv: **const char) -> i32 {
-    let allocator: ArenaAllocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
     defer allocator.destroy();
 
     let args = Array<*const char>::new(&allocator);
@@ -101,43 +101,3 @@ fn main(argc: i32, argv: **const char) -> i32 {
 
     return 0;
 }
-
-
-
-// use test
-
-// fn test_func<T>(value: T) -> T {
-//     fprintf(stderr, "value: %d\n", value);
-//     return value - 10;
-// }
-
-// let test_cpp = TestCpp::new();
-// fprintf(stderr, "Hello %s! from cpp\n", test_cpp.get());
-// test_cpp.destroy();
-
-// let test1 = test_func<u32>(20);
-// let test2 = test_func<u8>(20);
-// fprintf(stderr, "value: %d %d\n", test1, test2);
-
-// let test_u64_hashmap = HashMap<u64, str>::new(&allocator);
-// let test_u64_hashmap_key: u64 = 1;
-// test_u64_hashmap.insert(test_u64_hashmap_key, "one");
-// fprintf(stderr, "test_u64_hashmap: %s\n", test_u64_hashmap.find(&test_u64_hashmap_key).ptr);
-
-// let test_void_hash: &void = 0;
-// fprintf(stderr, "test_void_hash: %zu\n", test_void_hash.hash().value);
-
-// let test_u64_hash: u64 = 0;
-// fprintf(stderr, "test_u64_hash: %zu\n", test_u64_hash.hash().value);
-
-// fprintf(stderr, "hash_fnv1a: %zu\n", hash_fnv1a(&test_void_hash, sizeof(test_void_hash)).value);
-
-// let abc: &Root = 0;
-// abc.add_use_namespaces();
-
-// let val: &u8 = allocator.store<u8>(1);
-// fprintf(stderr, "value: %d\n", *val);
-// *val = 100;
-// fprintf(stderr, "value: %d\n", *val);
-// allocator.store(Type::Void);
-// allocator.store<u8>(0);
