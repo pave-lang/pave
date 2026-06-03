@@ -256,6 +256,32 @@ impl FileGenerator {
             generator.indent -= 1;
             fprintf(code_file, "}\n");
 
+            fprintf(code_file, "void ");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__set_variant(void* __self, uintptr_t index) {\n");
+
+            generator.indent += 1;
+            generator.write_indent(code_file);
+            generator.write_type(code_file, &Type::Self, generics);
+
+            if module.mode_cpp {
+                fprintf(code_file, "* self = (");
+                generator.write_type(code_file, &Type::Self, generics);
+                fprintf(code_file, "*)__self;\n");
+            } else {
+                fprintf(code_file, "* self = __self;\n");
+            }
+
+            generator.write_indent(code_file);
+            if is_discriminated_union {
+                fprintf(code_file, "self->type = index;\n");
+            } else {
+                fprintf(code_file, "*self = index;\n");
+            }
+
+            generator.indent -= 1;
+            fprintf(code_file, "}\n");
+
             fprintf(code_file, "struct trait_EnumVTable ");
             generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__ENUM");
@@ -263,7 +289,9 @@ impl FileGenerator {
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Enum__get_variants, .fn_get_variant_index = &");
             generator.write_string(code_file, &name);
-            fprintf(code_file, "__Enum__get_variant_index };\n");
+            fprintf(code_file, "__Enum__get_variant_index, .fn_set_variant = &");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__set_variant };\n");
         }
 
         generator.overwrite_if_different(code.c_str(), code_file);

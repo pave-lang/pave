@@ -12,6 +12,8 @@ struct trait_EnumVTable {
     struct slice_EnumVariantInfo (*fn_get_variants)(void* __self);
     #line 8 "src/std/Enum.pv"
     uintptr_t (*fn_get_variant_index)(void* __self);
+    #line 9 "src/std/Enum.pv"
+    void (*fn_set_variant)(void* __self, uintptr_t index);
 };
 
 #line 6 "src/std/Enum.pv"
