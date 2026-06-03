@@ -1,0 +1,10 @@
+struct EnumVariantInfo {
+    index: usize,
+    name: str,
+}
+
+trait Enum {
+    fn get_variants(&self) -> &[EnumVariantInfo];
+    fn get_variant_index(&self) -> usize;
+    fn set_variant(&self, index: usize);
+}

@@ -502,6 +502,13 @@ impl DefinitionWriter {
             }
         }
 
+        if usage != null && usage.impl_dynamic_usage {
+            fprintf(file, "#include <std/trait_Enum.h>\n");
+            fprintf(file, "extern struct trait_EnumVTable ");
+            generator.write_str_title(file, name.as_str());
+            fprintf(file, "__VTABLE__ENUM;\n");
+        }
+
         return true;
     }
 
