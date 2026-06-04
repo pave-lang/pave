@@ -300,6 +300,19 @@ impl Naming {
                 if generic_type == null {
                     let len: u32 = name.length;
                     fprintf(stderr, "Naming.get_type_name: Attempt to retrieve generic %.*s but it does not exist in generics\n", len, name.ptr);
+                    result.append(name);
+                    return result;
+                }
+
+                match generic_type {
+                    Type::Generic(mapped_generic) => {
+                        let mapped_name = mapped_generic.name;
+                        if mapped_name != null && mapped_name.value.eq(name) {
+                            result.append(name);
+                            return result;
+                        }
+                    },
+                    _ => {},
                 }
 
                 return self.get_type_name(generic_type, type_self, generics_map);
@@ -495,6 +508,17 @@ impl Naming {
                 if type_self.is_self() {
                     result.append("Self");
                     return result;
+                }
+                match type_self {
+                    Type::Function(_, _) => {
+                        result.append("Self");
+                        return result;
+                    },
+                    Type::CoroutineInstance(_, _) => {
+                        result.append("Self");
+                        return result;
+                    },
+                    _ => {},
                 }
                 return self.get_type_name(type_self, type_self, generics_map);
             },

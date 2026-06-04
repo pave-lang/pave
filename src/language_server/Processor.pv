@@ -208,9 +208,8 @@ impl Processor {
         if args != null {
             for *arg in args {
                 let arg_string = arg.string();
-                let copy: *char = ls.allocator.alloc(arg_string.length + 1);
-                memcpy(copy, arg_string.ptr, arg_string.length);
-                ls.args.append(copy);
+                let copy = ls.copy_c_string(arg_string);
+                if copy != null { ls.args.append(copy); }
             }
         }
 
@@ -218,9 +217,8 @@ impl Processor {
         if clang_args != null {
             for *arg in clang_args {
                 let arg_string = arg.string();
-                let copy: *char = ls.allocator.alloc(arg_string.length + 1);
-                memcpy(copy, arg_string.ptr, arg_string.length);
-                ls.clang_args.append(copy);
+                let copy = ls.copy_c_string(arg_string);
+                if copy != null { ls.clang_args.append(copy); }
             }
         }
 

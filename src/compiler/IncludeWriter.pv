@@ -22,6 +22,74 @@ impl IncludeWriter {
         };
     }
 
+    fn has_unresolved_generic(type: &Type, generics_map: *GenericMap) -> bool {
+        match type {
+            Type::Indirect(indirect) => {
+                return IncludeWriter::has_unresolved_generic(&indirect.to, generics_map);
+            },
+            Type::Sequence(sequence) => {
+                return IncludeWriter::has_unresolved_generic(&sequence.element, generics_map);
+            },
+            Type::Tuple(tuple) => {
+                for element in tuple.elements {
+                    if IncludeWriter::has_unresolved_generic(element, generics_map) { return true; }
+                }
+            },
+            Type::Enum(_, type_generics) => {
+                if type_generics != null {
+                    for generic in type_generics.array {
+                        if IncludeWriter::has_unresolved_generic(generic, generics_map) { return true; }
+                    }
+                }
+            },
+            Type::Struct(_, type_generics) => {
+                if type_generics != null {
+                    for generic in type_generics.array {
+                        if IncludeWriter::has_unresolved_generic(generic, generics_map) { return true; }
+                    }
+                }
+            },
+            Type::Trait(_, type_generics) => {
+                if type_generics != null {
+                    for generic in type_generics.array {
+                        if IncludeWriter::has_unresolved_generic(generic, generics_map) { return true; }
+                    }
+                }
+            },
+            Type::Function(_, type_generics) => {
+                if type_generics != null {
+                    for generic in type_generics.array {
+                        if IncludeWriter::has_unresolved_generic(generic, generics_map) { return true; }
+                    }
+                }
+            },
+            Type::Generic(generic) => {
+                let generic_name = generic.name;
+                if generic_name == null { return false; }
+                if generics_map == null { return true; }
+                let concrete_type = generics_map.get(generic_name.value);
+                if concrete_type == null { return true; }
+                match concrete_type {
+                    Type::Generic(concrete_generic) => {
+                        let concrete_name = concrete_generic.name;
+                        if concrete_name != null && concrete_name.value.eq(generic_name.value) { return true; }
+                    },
+                    _ => {},
+                }
+                return IncludeWriter::has_unresolved_generic(concrete_type, generics_map);
+            },
+            Type::GenericTypedef(gt) => {
+                return IncludeWriter::has_unresolved_generic(&Type::Generic(gt.generic), generics_map);
+            },
+            Type::Self => {
+                return generics_map == null || generics_map.self_type == null;
+            },
+            _ => {},
+        }
+
+        return false;
+    }
+
     fn write(&self, file: &FILE, generator: &Generator, types: &HashMap<str, Type>, generics: &GenericMap, deref: bool) {
         let c_includes = HashSet<str>::new(self.allocator);
         defer c_includes.release();
@@ -136,12 +204,26 @@ impl IncludeWriter {
                         },
                         FunctionParent::Trait(_) => {},
                         FunctionParent::Type(type_info, impl_index, _) => {
+                            let include_generics: &GenericMap = generics;
+                            if func_generic_map != null {
+                                let resolved_generics = (*func_generic_map).resolve_types(self.allocator, generics);
+                                include_generics = &resolved_generics;
+                            }
+
                             let include_type = type_info;
                             if type_info.is_fat_pointer() {
                                 include_type = type_info.deref_1();
                                 if include_type == null { include_type = type_info; }
                             }
-                            let name = generator.naming_ident.get_type_name(include_type, generics.self_type, generics);
+
+                            let resolved_include_type = Context::resolve_type(self.allocator, include_type, include_generics, generics);
+                            if resolved_include_type != null { include_type = resolved_include_type; }
+
+                            if IncludeWriter::has_unresolved_generic(include_type, include_generics) {
+                                fprintf(stderr, "IncludeWriter.write: unresolved generic while writing type impl include\n");
+                            }
+
+                            let name = generator.naming_ident.get_type_name(include_type, include_generics.self_type, include_generics);
                             let module = include_type?.get_module();
                             let type_impl = generator.root.get_type_impl(type_info, impl_index);
                             if type_impl != null { module = type_impl.impl_info.context.module; }

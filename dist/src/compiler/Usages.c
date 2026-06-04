@@ -699,7 +699,7 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
                     #line 405 "src/compiler/Usages.pv"
                     is_type = Sequence__is_slice(sequence);
                     #line 406 "src/compiler/Usages.pv"
-                    type = Type__deref(type);
+                    type = type_deref;
                     #line 407 "src/compiler/Usages.pv"
                     resolved_type = type_deref;
                 } break;
@@ -784,24 +784,24 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
     }
 
     #line 435 "src/compiler/Usages.pv"
-    struct String type_name_generic = Naming__get_type_name(self->naming_ident, type, generic_map->self_type, generic_map);
+    struct String type_name_generic = Naming__get_type_name(self->naming_ident, resolved_type, generic_map->self_type, generic_map);
 
     #line 437 "src/compiler/Usages.pv"
     switch (self->usage_mode) {
         #line 438 "src/compiler/Usages.pv"
         case USAGE_MODE__LAYOUT: {
             #line 438 "src/compiler/Usages.pv"
-            HashMap_str_Type__insert(&usage_context->layout, String__as_str(&type_name_generic), *type);
+            HashMap_str_Type__insert(&usage_context->layout, String__as_str(&type_name_generic), *resolved_type);
         } break;
         #line 439 "src/compiler/Usages.pv"
         case USAGE_MODE__SIGNATURE: {
             #line 439 "src/compiler/Usages.pv"
-            HashMap_str_Type__insert(&usage_context->signature, String__as_str(&type_name_generic), *type);
+            HashMap_str_Type__insert(&usage_context->signature, String__as_str(&type_name_generic), *resolved_type);
         } break;
         #line 440 "src/compiler/Usages.pv"
         case USAGE_MODE__BODY: {
             #line 440 "src/compiler/Usages.pv"
-            HashMap_str_Type__insert(&usage_context->body, String__as_str(&type_name_generic), *type);
+            HashMap_str_Type__insert(&usage_context->body, String__as_str(&type_name_generic), *resolved_type);
         } break;
     }
 

@@ -86,6 +86,14 @@ impl LanguageServer {
         self.clang_args.append(arg);
     }
 
+    fn copy_c_string(&self, value: str) -> *char {
+        let copy: *char = self.allocator.alloc(value.length + 1);
+        if copy == null { return null; }
+        memcpy(copy, value.ptr, value.length);
+        copy[value.length] = 0;
+        return copy;
+    }
+
     fn analyze(&self) -> &Analysis {
         self.global_phases_ok = false;
         self.analysis_alloc.destroy();
