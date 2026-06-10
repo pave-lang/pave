@@ -52,16 +52,16 @@ struct Function Function__parse_optional_body(struct Context* context);
 #line 92 "src/analyzer/types/Function.pv"
 struct Function Function__parse_inner(struct Context* context, bool body_optional);
 
-#line 128 "src/analyzer/types/Function.pv"
+#line 129 "src/analyzer/types/Function.pv"
 bool Function__parse_parameters(struct Function* self, struct Generics* generics);
 
-#line 224 "src/analyzer/types/Function.pv"
+#line 225 "src/analyzer/types/Function.pv"
 bool Function__parse_return_type(struct Function* self, struct Generics* generics);
 
-#line 236 "src/analyzer/types/Function.pv"
+#line 237 "src/analyzer/types/Function.pv"
 bool Function__fill_types(struct Function* self, struct Generics* generics);
 
-#line 261 "src/analyzer/types/Function.pv"
+#line 262 "src/analyzer/types/Function.pv"
 bool Function__parse_function(struct Function* self, struct Generics* generics);
 
 #endif

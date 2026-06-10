@@ -715,7 +715,7 @@ bool Context__skip_brackets(struct Context* self, char const* open, char const* 
     }
 
     #line 421 "src/analyzer/Context.pv"
-    self->pos += 1;
+    Context__next_token(self);
 
     #line 423 "src/analyzer/Context.pv"
     if (brackets != 0) {

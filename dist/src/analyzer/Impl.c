@@ -174,7 +174,7 @@ bool Impl__fill_types(struct Impl* self, struct FunctionParent parent) {
     Context__skip_comments(context);
 
     #line 163 "src/analyzer/Impl.pv"
-    while (context->pos < self->token_end - 1) {
+    while (context->pos < self->token_end && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
         #line 164 "src/analyzer/Impl.pv"
         if (Context__check_value(context, TOKEN_TYPE__KEYWORD, "typedef")) {
             #line 165 "src/analyzer/Impl.pv"

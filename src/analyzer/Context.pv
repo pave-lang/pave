@@ -418,7 +418,7 @@ impl Context {
             }
         }
 
-        self.pos += 1;
+        self.next_token();
 
         if brackets != 0 {
             self.error_token(self.tokens + token_start, "Unclosed brackets");

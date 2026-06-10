@@ -108,8 +108,9 @@ impl Function {
             context.next_token();
         }
 
-        if body_optional && context.check_next(TokenType::Symbol, ";") {
-            node.declaration_end = context.pos - 1;
+        if body_optional && context.check_value(TokenType::Symbol, ";") {
+            node.declaration_end = context.pos;
+            context.next_token();
             node.token_start = context.pos;
             node.token_end = context.pos;
             node.name = name;

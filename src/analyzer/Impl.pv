@@ -160,7 +160,7 @@ impl Impl {
 
         context.skip_comments();
 
-        while context.pos < self.token_end - 1 {
+        while context.pos < self.token_end && !context.check_value(TokenType::Symbol, "}") {
             if context.check_value(TokenType::Keyword, "typedef") {
                 context.next_token();
                 let typedef_name = context.expect(TokenType::Identifier);
