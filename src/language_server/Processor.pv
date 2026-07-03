@@ -214,11 +214,13 @@ impl Processor {
         }
 
         ls.clang_args.clear();
+        ls.c_std_arg = null;
+        ls.cpp_std_arg = null;
         if clang_args != null {
             for *arg in clang_args {
                 let arg_string = arg.string();
                 let copy = ls.copy_c_string(arg_string);
-                if copy != null { ls.clang_args.append(copy); }
+                if copy != null { ls.add_clang_arg(copy); }
             }
         }
 

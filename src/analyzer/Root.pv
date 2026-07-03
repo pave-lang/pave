@@ -14,6 +14,8 @@ struct Root {
     traits: HashMap<str, Array<&Trait>>,
     functions: HashMap<str, Type>,
     clang_args: Array<*const char>,
+    c_std_arg: *const char,
+    cpp_std_arg: *const char,
     analysis: &Analysis,
     primitive_bool: *Primitive,
     primitive_usize: *Primitive,
@@ -35,7 +37,7 @@ struct Root {
 }
 
 impl Root {
-    fn new(allocator: &ArenaAllocator, args: &Array<*const char>, clang_args: &Array<*const char>, analysis: &Analysis) -> &Self {
+    fn new(allocator: &ArenaAllocator, args: &Array<*const char>, clang_args: &Array<*const char>, c_std_arg: *const char, cpp_std_arg: *const char, analysis: &Analysis) -> &Self {
         let self: &Self = allocator.alloc(sizeof(Self));
 
         *self = Self {
@@ -47,6 +49,8 @@ impl Root {
             traits: HashMap<str, Array<&Trait>>::new(allocator),
             functions: HashMap<str, Type>::new(allocator),
             clang_args: Array<*const char>::new(allocator),
+            c_std_arg,
+            cpp_std_arg,
             analysis,
             naming_decl: Naming::new_decl(allocator),
             includes_c: HashMap<str, &Include>::new(allocator),

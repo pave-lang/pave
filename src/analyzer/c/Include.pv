@@ -129,7 +129,15 @@ impl Include {
         if self.mode_cpp {
             filename = "__temp.cpp";
             clang_args = clang_args.clone(root.allocator);
-            clang_args.append("-std=c++17");
+            if root.cpp_std_arg != null {
+                clang_args.append(root.cpp_std_arg);
+            } else {
+                clang_args.append("-std=c++17");
+            }
+            release_clang_args = true;
+        } else if root.c_std_arg != null {
+            clang_args = clang_args.clone(root.allocator);
+            clang_args.append(root.c_std_arg);
             release_clang_args = true;
         }
 
