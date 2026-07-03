@@ -15,7 +15,7 @@ struct LanguageServer {
     cpp_std_arg: *const char,
     analysis_alloc: ArenaAllocator,
     analysis: Analysis,
-    file_map: HashMap<str, str>,
+    file_map: HashMap<Uri, str>,
     dirty_files: HashMap<str, bool>,
     file_overrides: HashMap<str, str>,
     decl_fingerprints: HashMap<str, u64>,
@@ -46,7 +46,7 @@ impl LanguageServer {
                 parsed_function_files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 file_overrides: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
             },
-            file_map: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
+            file_map: HashMap<Uri, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
             dirty_files: HashMap<str, bool>::new(allocator),
             file_overrides: HashMap<str, str>::new(allocator),
             decl_fingerprints: HashMap<str, u64>::new(allocator),
@@ -110,7 +110,7 @@ impl LanguageServer {
         self.analysis_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
         self.analysis = Analysis::new(&self.analysis_alloc);
         self.analysis.collect_symbols = true;
-        self.file_map = HashMap<str, str>::new(&self.analysis_alloc);
+        self.file_map = HashMap<Uri, str>::new(&self.analysis_alloc);
         let analysis = &self.analysis;
         for (path, content) in self.file_overrides {
             analysis.file_overrides.insert(path, content);

@@ -454,6 +454,7 @@ impl DefinitionWriter {
         include_writer.write(file, generator, &usage_context.signature, generics, false);
 
         for (impl_index, *impl_info) in enum_info.impls.iter().enumerate() {
+            let trait_info = impl_info.trait_;
             let impl_functions_for_impl: *HashMap<usize, TypeFunctionUsage> = null;
             if usage_context.impl_functions.length > impl_index { impl_functions_for_impl = usage_context.impl_functions.get(impl_index); }
 
@@ -464,7 +465,11 @@ impl DefinitionWriter {
 
                 if func_info.generics.array.length == 0 {
                     fprintf(file, "\n");
-                    if !self.write_function_definition(file, func_info, generics, null) { return false; }
+                    if trait_info == null {
+                        if !self.write_function_definition(file, func_info, generics, null) { return false; }
+                    } else {
+                        if !self.write_trait_function_decl(file, name.as_str(), trait_info, &impl_info.trait_type, func_info, generics) { return false; }
+                    }
                     fprintf(file, ";\n");
 
                     if function_usage != null && function_usage.impl_dynamic_function {
@@ -488,6 +493,10 @@ impl DefinitionWriter {
                         }
                     }
                 }
+            }
+
+            if trait_info != null {
+                if !self.write_trait_default_decls(file, name.as_str(), impl_info, trait_info, generics) { return false; }
             }
 
             for (_, impl_const) in impl_info.consts {

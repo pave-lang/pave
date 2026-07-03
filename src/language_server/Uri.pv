@@ -3,36 +3,69 @@
 
 use std
 
-struct Uri {}
+enum Uri {
+    File(str),
+}
 
 impl Uri {
-    fn file(allocator: &ArenaAllocator, path: str) -> str {
-        let result = String::new(allocator);
-        result.append("file:///");
+    const FILE_SCHEME: str = "file:///";
 
+    fn file(allocator: &ArenaAllocator, path: str) -> Uri {
         let resolved_path: *const char = resolve_path(path.ptr);
+        if resolved_path == null { return Uri::File(""); }
+        let file_path = Uri::copy_c_str(allocator, resolved_path);
+        return Uri::File(file_path);
+    }
 
-        Uri::write_encoded(&result, resolved_path);
+    fn parse(allocator: &ArenaAllocator, value: str) -> Uri {
+        if !value.starts_with(Uri::FILE_SCHEME) { return Uri::File(""); }
 
+        let encoded_path = value.slice(Uri::FILE_SCHEME.length, value.length);
+        let file_path = Uri::from_percent_encoded(allocator, encoded_path);
+
+        let resolved_path: *const char = resolve_path(file_path.ptr);
+        if resolved_path == null { return Uri::File(file_path); }
+
+        return Uri::File(Uri::copy_c_str(allocator, resolved_path));
+    }
+
+    fn to_string(&self, allocator: &ArenaAllocator) -> str {
+        match self {
+            Uri::File(path) => {
+                let result = String::new(allocator);
+                result.append(Uri::FILE_SCHEME);
+                result.append(Uri::to_percent_encoded(allocator, path.ptr));
+                return result.as_str();
+            },
+        }
+    }
+
+    fn path(&self) -> str {
+        match self {
+            Uri::File(path) => { return path; },
+        }
+    }
+
+    fn copy_c_str(allocator: &ArenaAllocator, value: *const char) -> str {
+        let result = String::new(allocator);
+        result.append(str::new(value));
         return result.as_str();
     }
 
-    fn write_encoded(target: &String, value: *const char) {
+    fn to_percent_encoded(allocator: &ArenaAllocator, value: *const char) -> str {
+        let result = String::new(allocator);
         let i: usize = 0;
         let pos: usize = 0;
         while value[i] != '\0' {
-            if value[i] == ':' { target.append_sized(value + pos, i - pos); target.append("%3A"); pos = i + 1; }
+            if value[i] == ':' { result.append_sized(value + pos, i - pos); result.append("%3A"); pos = i + 1; }
             i += 1;
         }
 
-        target.append_sized(value + pos, i - pos);
+        result.append_sized(value + pos, i - pos);
+        return result.as_str();
     }
 
-    fn path(allocator: &ArenaAllocator, uri: str) -> str {
-        let file_prefix: str = "file:///";
-        if !uri.starts_with(file_prefix.ptr) { return ""; }
-
-        let encoded = uri.slice(file_prefix.length, uri.length);
+    fn from_percent_encoded(allocator: &ArenaAllocator, encoded: str) -> str {
         let decoded = String::new(allocator);
 
         let i: usize = 0;
@@ -60,5 +93,13 @@ impl Uri {
         if c >= 'a' && c <= 'f' { return cast<i32>(c - 'a') + 10; }
         if c >= 'A' && c <= 'F' { return cast<i32>(c - 'A') + 10; }
         return -1;
+    }
+}
+
+impl Hash for Uri {
+    fn hash(&self) -> Hash {
+        match self {
+            Uri::File(path) => { return Uri::FILE_SCHEME.hash().continue_with(path.ptr, path.length); },
+        }
     }
 }

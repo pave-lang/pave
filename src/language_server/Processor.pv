@@ -246,10 +246,13 @@ impl Processor {
     }
 
     fn publish_diagnostics_file(&self, filename: str, analysis_diagnostics: &Array<Diagnostic>) {
+        let uri = Uri::file(self.allocator, filename);
+        self.publish_diagnostics_uri(uri.to_string(self.allocator), analysis_diagnostics);
+    }
+
+    fn publish_diagnostics_uri(&self, uri: str, analysis_diagnostics: &Array<Diagnostic>) {
         let source = JsonNode::String("pave");
         let params = HashMap<str, JsonNode>::new(self.allocator);
-
-        let uri = Uri::file(self.allocator, filename);
 
         params.insert("uri", JsonNode::String(uri));
         let diagnostics = Array<JsonNode>::new(self.allocator);
@@ -281,16 +284,26 @@ impl Processor {
         self.send_message("textDocument/publishDiagnostics", JsonNode::Object(params));
     }
 
+    fn filename_for_uri(&self, ls: &LanguageServer, uri: &Uri) -> str {
+        let filename = ls.file_map.find(uri);
+        if filename != null { return *filename; }
+
+        let path = uri.path();
+        if path.length == 0 { return ""; }
+        return path;
+    }
+
     fn did_change(&self, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
-        if uri.length == 0 { return; }
-        let filename = ls.file_map.find(&uri);
-        if filename == null { return; }
+        let uri_raw = params.key("textDocument").key("uri").string();
+        if uri_raw.length == 0 { return; }
+        let uri = Uri::parse(self.allocator, uri_raw);
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 { return; }
         let filename_copy = String::new(self.allocator);
-        filename_copy.append(*filename);
+        filename_copy.append(filename);
         let filename_str = filename_copy.as_str();
 
-        ls.set_dirty_uri(uri, true);
+        ls.set_dirty_uri(uri_raw, true);
 
         let content_changes = params.key("contentChanges").array();
         if content_changes != null && content_changes.length > 0 {
@@ -305,87 +318,77 @@ impl Processor {
         let diagnostics = analysis.diagnostics.find(&filename_str);
 
         let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
-        if diagnostics == null { self.publish_diagnostics_file(filename_str, &blank_diagnostics); }
-        else { self.publish_diagnostics_file(filename_str, diagnostics); }
+        if diagnostics == null { self.publish_diagnostics_uri(uri_raw, &blank_diagnostics); }
+        else { self.publish_diagnostics_uri(uri_raw, diagnostics); }
     }
 
     fn did_open(&self, ls: &LanguageServer, params: &JsonNode) {
         let text_document = params.key("textDocument");
-        let uri = text_document.key("uri").string();
-        if uri.length == 0 { return; }
+        let uri_raw = text_document.key("uri").string();
+        if uri_raw.length == 0 { return; }
+        let uri = Uri::parse(self.allocator, uri_raw);
 
         let text = text_document.key("text").string();
 
         // Ensure we have an initial analysis for the file_map
         if ls.root == null { ls.analyze(); }
-        let filename = ls.file_map.find(&uri);
-        if filename == null {
-            let fallback_path = Uri::path(self.allocator, uri);
-            if fallback_path.length == 0 { return; }
-            ls.set_override_file(fallback_path, text);
-            ls.set_dirty_uri(uri, true);
-            return;
-        }
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 { return; }
 
         let filename_copy = String::new(self.allocator);
-        filename_copy.append(*filename);
+        filename_copy.append(filename);
         let filename_str = filename_copy.as_str();
 
         ls.set_override_file(filename_str, text);
-        ls.set_dirty_uri(uri, true);
+        ls.set_dirty_uri(uri_raw, true);
 
         let analysis = ls.analyze_file(filename_str);
         let diagnostics = analysis.diagnostics.find(&filename_str);
 
         let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
-        if diagnostics == null { self.publish_diagnostics_file(filename_str, &blank_diagnostics); }
-        else { self.publish_diagnostics_file(filename_str, diagnostics); }
+        if diagnostics == null { self.publish_diagnostics_uri(uri_raw, &blank_diagnostics); }
+        else { self.publish_diagnostics_uri(uri_raw, diagnostics); }
     }
 
     fn did_close(&self, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
-        if uri.length == 0 { return; }
+        let uri_raw = params.key("textDocument").key("uri").string();
+        if uri_raw.length == 0 { return; }
+        let uri = Uri::parse(self.allocator, uri_raw);
 
-        let filename = ls.file_map.find(&uri);
-        if filename != null {
-            ls.clear_override_file(*filename);
-        } else {
-            let fallback_path = Uri::path(self.allocator, uri);
-            if fallback_path.length > 0 {
-                ls.clear_override_file(fallback_path);
-            }
-        }
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length > 0 { ls.clear_override_file(filename); }
 
-        ls.set_dirty_uri(uri, false);
+        ls.set_dirty_uri(uri_raw, false);
     }
 
     fn inlay_hint(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
-        if uri.length == 0 {
+        let uri_raw = params.key("textDocument").key("uri").string();
+        if uri_raw.length == 0 {
             self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
             return;
         }
+        let uri = Uri::parse(self.allocator, uri_raw);
         let range = params.key("range");
         let start_line = range.key("start").key("line").number();
         let start_character = range.key("start").key("character").number();
         let end_line = range.key("end").key("line").number();
         let end_character = range.key("end").key("character").number();
 
-        let filename = ls.file_map.find(&uri);
-        if filename == null {
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
             self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
             return;
         }
 
-        let file_diagnostics = ls.analysis.diagnostics.find(filename);
+        let file_diagnostics = ls.analysis.diagnostics.find(&filename);
         if file_diagnostics != null && file_diagnostics.length > 0 {
             // self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
             return;
         }
 
-        ls.parse_functions_file(*filename);
+        ls.parse_functions_file(filename);
 
-        let inlay_hints = ls.analysis.inlay_hints.find(filename);
+        let inlay_hints = ls.analysis.inlay_hints.find(&filename);
         if inlay_hints == null {
             self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
             return;
@@ -695,6 +698,7 @@ impl Processor {
 
     fn append_module_workspace_symbols(&self, result: &Array<JsonNode>, module: &Module, query: str) {
         let uri = Uri::file(self.allocator, module.path);
+        let uri_str = uri.to_string(self.allocator);
 
         for (_, &struct_arr) in module.structs {
             for *struct_info in struct_arr {
@@ -702,14 +706,14 @@ impl Processor {
                 if name == null { continue; }
                 let last = self.token_at_or_name(module, struct_info.token_end, name);
                 let range = self.make_token_span_range(name, last);
-                self.append_workspace_symbol_if_matches(result, name.value, 23, "", uri, &range, query);
+                self.append_workspace_symbol_if_matches(result, name.value, 23, "", uri_str, &range, query);
 
                 for (_, &field) in struct_info.fields {
                     let field_range = self.make_token_range(field.name);
-                    self.append_workspace_symbol_if_matches(result, field.name.value, 8, name.value, uri, &field_range, query);
+                    self.append_workspace_symbol_if_matches(result, field.name.value, 8, name.value, uri_str, &field_range, query);
                 }
 
-                self.append_impl_workspace_symbols(result, &struct_info.impls, name.value, uri, query);
+                self.append_impl_workspace_symbols(result, &struct_info.impls, name.value, uri_str, query);
             }
         }
 
@@ -719,14 +723,14 @@ impl Processor {
                 if name == null { continue; }
                 let last = self.token_at_or_name(module, enum_info.token_end, name);
                 let range = self.make_token_span_range(name, last);
-                self.append_workspace_symbol_if_matches(result, name.value, 10, "", uri, &range, query);
+                self.append_workspace_symbol_if_matches(result, name.value, 10, "", uri_str, &range, query);
 
                 for (_, &variant) in enum_info.variants {
                     let variant_range = self.make_token_range(variant.name);
-                    self.append_workspace_symbol_if_matches(result, variant.name.value, 22, name.value, uri, &variant_range, query);
+                    self.append_workspace_symbol_if_matches(result, variant.name.value, 22, name.value, uri_str, &variant_range, query);
                 }
 
-                self.append_impl_workspace_symbols(result, &enum_info.impls, name.value, uri, query);
+                self.append_impl_workspace_symbols(result, &enum_info.impls, name.value, uri_str, query);
             }
         }
 
@@ -736,13 +740,13 @@ impl Processor {
                 if name == null { continue; }
                 let last = self.token_at_or_name(module, trait_info.token_end, name);
                 let range = self.make_token_span_range(name, last);
-                self.append_workspace_symbol_if_matches(result, name.value, 11, "", uri, &range, query);
+                self.append_workspace_symbol_if_matches(result, name.value, 11, "", uri_str, &range, query);
 
                 for (_, &func_info) in trait_info.functions {
                     let func_name = func_info.name;
                     if func_name == null { continue; }
                     let func_range = self.function_range(func_info);
-                    self.append_workspace_symbol_if_matches(result, func_name.value, 6, name.value, uri, &func_range, query);
+                    self.append_workspace_symbol_if_matches(result, func_name.value, 6, name.value, uri_str, &func_range, query);
                 }
             }
         }
@@ -752,14 +756,14 @@ impl Processor {
             let name = func_info.name;
             if name == null { continue; }
             let range = self.function_range(func_info);
-            self.append_workspace_symbol_if_matches(result, name.value, self.function_kind(func_info, 12), "", uri, &range, query);
+            self.append_workspace_symbol_if_matches(result, name.value, self.function_kind(func_info, 12), "", uri_str, &range, query);
         }
 
         for (_, global) in module.globals {
             let kind: usize = 13;
             if global.is_const { kind = 14; }
             let range = self.make_token_range(global.name);
-            self.append_workspace_symbol_if_matches(result, global.name.value, kind, "", uri, &range, query);
+            self.append_workspace_symbol_if_matches(result, global.name.value, kind, "", uri_str, &range, query);
         }
 
         for test_info in module.tests {
@@ -768,7 +772,7 @@ impl Processor {
             if display_name.length >= 2 {
                 display_name = display_name.slice(1, display_name.length - 1);
             }
-            self.append_workspace_symbol_if_matches(result, display_name, 12, "", uri, &range, query);
+            self.append_workspace_symbol_if_matches(result, display_name, 12, "", uri_str, &range, query);
         }
     }
 
@@ -1154,27 +1158,28 @@ impl Processor {
     }
 
     fn completion(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
+        let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
         let result = Array<JsonNode>::new(self.allocator);
 
-        if uri.length == 0 {
+        if uri_raw.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+        let uri = Uri::parse(self.allocator, uri_raw);
+
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
             self.send_response(id, JsonNode::Array(result));
             return;
         }
 
-        let filename = ls.file_map.find(&uri);
-        if filename == null {
-            self.send_response(id, JsonNode::Array(result));
-            return;
-        }
-
-        ls.parse_functions_file(*filename);
+        ls.parse_functions_file(filename);
 
         let seen = HashMap<str, bool>::new(self.allocator);
         let module: *Module = null;
-        if ls.root != null { module = ls.root.find_module_by_path(*filename); }
+        if ls.root != null { module = ls.root.find_module_by_path(filename); }
 
         let separator_kind = self.completion_separator_kind(module, line, character);
         if separator_kind == 3 {
@@ -1182,7 +1187,7 @@ impl Processor {
             return;
         }
 
-        let member_infos = ls.analysis.member_completion_info.find(filename);
+        let member_infos = ls.analysis.member_completion_info.find(&filename);
         let member_info = self.find_member_completion_at(member_infos, line, character);
         if separator_kind == 1 || separator_kind == 2 {
             if member_info != null && module != null {
@@ -1192,7 +1197,7 @@ impl Processor {
             return;
         }
 
-        let completion_items = ls.analysis.completion_info.find(filename);
+        let completion_items = ls.analysis.completion_info.find(&filename);
         if completion_items != null {
             for item in completion_items {
                 if !self.position_in_range(&item.range, line, character) { continue; }
@@ -1209,23 +1214,20 @@ impl Processor {
     }
 
     fn document_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
+        let uri_raw = params.key("textDocument").key("uri").string();
         let result = Array<JsonNode>::new(self.allocator);
 
-        if uri.length == 0 {
+        if uri_raw.length == 0 {
             self.send_response(id, JsonNode::Array(result));
             return;
         }
+        let uri = Uri::parse(self.allocator, uri_raw);
 
-        let filename_ptr = ls.file_map.find(&uri);
-        if filename_ptr == null {
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
             self.send_response(id, JsonNode::Array(result));
             return;
         }
-
-        let filename_copy = String::new(self.allocator);
-        filename_copy.append(*filename_ptr);
-        let filename = filename_copy.as_str();
 
         if ls.root == null {
             ls.analyze();
@@ -1263,24 +1265,25 @@ impl Processor {
     }
 
     fn definition(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
+        let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
 
-        if uri.length == 0 {
+        if uri_raw.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+        let uri = Uri::parse(self.allocator, uri_raw);
+
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
             self.send_response(id, JsonNode::Null);
             return;
         }
 
-        let filename = ls.file_map.find(&uri);
-        if filename == null {
-            self.send_response(id, JsonNode::Null);
-            return;
-        }
+        ls.parse_functions_file(filename);
 
-        ls.parse_functions_file(*filename);
-
-        let symbols = ls.analysis.symbol_info.find(filename);
+        let symbols = ls.analysis.symbol_info.find(&filename);
         let symbol = self.find_symbol_at(symbols, line, character);
 
         if symbol == null || symbol.definition_path.length == 0 {
@@ -1289,37 +1292,39 @@ impl Processor {
         }
 
         let def_uri = Uri::file(self.allocator, symbol.definition_path);
+        let def_uri_str = def_uri.to_string(self.allocator);
         let def_range = Range {
             start: symbol.definition_position,
             end: Position { line: symbol.definition_position.line, character: symbol.definition_position.character + 1 },
         };
 
         let location = HashMap<str, JsonNode>::new(self.allocator);
-        location.insert("uri", JsonNode::String(def_uri));
+        location.insert("uri", JsonNode::String(def_uri_str));
         location.insert("range", self.make_range_json(&def_range));
 
         self.send_response(id, JsonNode::Object(location));
     }
 
     fn hover(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
+        let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
 
-        if uri.length == 0 {
+        if uri_raw.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+        let uri = Uri::parse(self.allocator, uri_raw);
+
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
             self.send_response(id, JsonNode::Null);
             return;
         }
 
-        let filename = ls.file_map.find(&uri);
-        if filename == null {
-            self.send_response(id, JsonNode::Null);
-            return;
-        }
+        ls.parse_functions_file(filename);
 
-        ls.parse_functions_file(*filename);
-
-        let symbols = ls.analysis.symbol_info.find(filename);
+        let symbols = ls.analysis.symbol_info.find(&filename);
         let symbol = self.find_symbol_at(symbols, line, character);
 
         if symbol == null || symbol.type_label.length == 0 {
@@ -1339,24 +1344,25 @@ impl Processor {
     }
 
     fn signature_help(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
-        let uri = params.key("textDocument").key("uri").string();
+        let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
 
-        if uri.length == 0 {
+        if uri_raw.length == 0 {
+            self.send_response(id, JsonNode::Null);
+            return;
+        }
+        let uri = Uri::parse(self.allocator, uri_raw);
+
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
             self.send_response(id, JsonNode::Null);
             return;
         }
 
-        let filename = ls.file_map.find(&uri);
-        if filename == null {
-            self.send_response(id, JsonNode::Null);
-            return;
-        }
+        ls.parse_functions_file(filename);
 
-        ls.parse_functions_file(*filename);
-
-        let sigs = ls.analysis.signature_info.find(filename);
+        let sigs = ls.analysis.signature_info.find(&filename);
         if sigs == null {
             self.send_response(id, JsonNode::Null);
             return;
@@ -1425,25 +1431,26 @@ impl Processor {
         } else if method.eq("workspace/didChangeConfiguration") {
             self.did_change_configuration(ls, msg_json.key("params"));
         } else if method.eq("textDocument/didSave") {
-            let uri = msg_json.key("params").key("textDocument").key("uri").string();
-            if uri.length == 0 { return true; }
-            let filename = ls.file_map.find(&uri);
-            if filename == null { return true; }
+            let uri_raw = msg_json.key("params").key("textDocument").key("uri").string();
+            if uri_raw.length == 0 { return true; }
+            let uri = Uri::parse(self.allocator, uri_raw);
+            let filename = self.filename_for_uri(ls, &uri);
+            if filename.length == 0 { return true; }
             let filename_copy = String::new(self.allocator);
-            filename_copy.append(*filename);
+            filename_copy.append(filename);
             let filename_str = filename_copy.as_str();
 
             ls.clear_override_file(filename_str);
-            ls.set_dirty_uri(uri, false);
+            ls.set_dirty_uri(uri_raw, false);
 
             let analysis = ls.analyze();
             ls.parse_functions_file(filename_str);
             let diagnostics = analysis.diagnostics.find(&filename_str);
             if diagnostics == null {
                 let blank_diagnostics = Array<Diagnostic> { allocator: self.allocator, data: null, length: 0, capacity: 0 };
-                self.publish_diagnostics_file(filename_str, &blank_diagnostics);
+                self.publish_diagnostics_uri(uri_raw, &blank_diagnostics);
             } else {
-                self.publish_diagnostics_file(filename_str, diagnostics);
+                self.publish_diagnostics_uri(uri_raw, diagnostics);
             }
             self.inlay_hint_refresh();
         } else if method.eq("textDocument/didOpen") {

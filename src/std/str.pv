@@ -37,11 +37,10 @@ impl str {
         return false;
     }
 
-    fn starts_with(self, prefix: *const char) -> bool {
-        let prefix_len = strlen(prefix);
-        if self.length < prefix_len { return false; }
+    fn starts_with(self, prefix: str) -> bool {
+        if self.length < prefix.length { return false; }
         
-        return strncmp(self.ptr, prefix, prefix_len) == 0;
+        return strncmp(self.ptr, prefix.ptr, prefix.length) == 0;
     }
 
     fn ends_with(self, suffix: *const char) -> bool {
