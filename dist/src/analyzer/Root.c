@@ -902,7 +902,10 @@ bool Root__parse_functions_if_path(struct Root* self, struct str path) {
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
         #line 426 "src/analyzer/Root.pv"
-        Namespace__parse_functions_if_path(child, path);
+        if (Namespace__parse_functions_if_path(child, path)) {
+            #line 426 "src/analyzer/Root.pv"
+            return true;
+        }
     } }
 
     #line 429 "src/analyzer/Root.pv"
@@ -923,107 +926,109 @@ bool Root__parse_functions_if_path(struct Root* self, struct str path) {
             if (str__Eq_str__eq(&impl_info->context->path, path)) {
                 #line 432 "src/analyzer/Root.pv"
                 Impl__parse_functions(impl_info);
+                #line 433 "src/analyzer/Root.pv"
+                return true;
             }
         } }
     } }
 
-    #line 437 "src/analyzer/Root.pv"
-    return true;
+    #line 438 "src/analyzer/Root.pv"
+    return false;
 }
 
-#line 440 "src/analyzer/Root.pv"
+#line 441 "src/analyzer/Root.pv"
 struct Module* Root__find_module_by_path(struct Root* self, struct str path) {
-    #line 441 "src/analyzer/Root.pv"
+    #line 442 "src/analyzer/Root.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 441 "src/analyzer/Root.pv"
+    #line 442 "src/analyzer/Root.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 441 "src/analyzer/Root.pv"
+        #line 442 "src/analyzer/Root.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 442 "src/analyzer/Root.pv"
-        struct Module* result = Namespace__find_module_by_path(child, path);
         #line 443 "src/analyzer/Root.pv"
+        struct Module* result = Namespace__find_module_by_path(child, path);
+        #line 444 "src/analyzer/Root.pv"
         if (result != 0) {
-            #line 443 "src/analyzer/Root.pv"
+            #line 444 "src/analyzer/Root.pv"
             return result;
         }
     } }
-    #line 445 "src/analyzer/Root.pv"
+    #line 446 "src/analyzer/Root.pv"
     return 0;
 }
 
-#line 448 "src/analyzer/Root.pv"
+#line 449 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name, uintptr_t arity) {
-    #line 449 "src/analyzer/Root.pv"
-    struct Array_Type* arr = HashMap_str_Array_Type__find(&self->types, &name);
     #line 450 "src/analyzer/Root.pv"
+    struct Array_Type* arr = HashMap_str_Array_Type__find(&self->types, &name);
+    #line 451 "src/analyzer/Root.pv"
     if (arr == 0) {
-        #line 450 "src/analyzer/Root.pv"
+        #line 451 "src/analyzer/Root.pv"
         return 0;
     }
-    #line 451 "src/analyzer/Root.pv"
-    uintptr_t i = 0;
     #line 452 "src/analyzer/Root.pv"
+    uintptr_t i = 0;
+    #line 453 "src/analyzer/Root.pv"
     while (i < arr->length) {
-        #line 453 "src/analyzer/Root.pv"
+        #line 454 "src/analyzer/Root.pv"
         if (Type__get_arity(&arr->data[i]) == arity) {
-            #line 453 "src/analyzer/Root.pv"
+            #line 454 "src/analyzer/Root.pv"
             return &arr->data[i];
         }
-        #line 454 "src/analyzer/Root.pv"
+        #line 455 "src/analyzer/Root.pv"
         i += 1;
     }
-    #line 456 "src/analyzer/Root.pv"
+    #line 457 "src/analyzer/Root.pv"
     return 0;
 }
 
-#line 459 "src/analyzer/Root.pv"
+#line 460 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name, uintptr_t arity) {
-    #line 460 "src/analyzer/Root.pv"
-    struct Array_ref_Trait* arr = HashMap_str_Array_ref_Trait__find(&self->traits, &name);
     #line 461 "src/analyzer/Root.pv"
+    struct Array_ref_Trait* arr = HashMap_str_Array_ref_Trait__find(&self->traits, &name);
+    #line 462 "src/analyzer/Root.pv"
     if (arr == 0) {
-        #line 461 "src/analyzer/Root.pv"
+        #line 462 "src/analyzer/Root.pv"
         return 0;
     }
-    #line 462 "src/analyzer/Root.pv"
-    uintptr_t i = 0;
     #line 463 "src/analyzer/Root.pv"
+    uintptr_t i = 0;
+    #line 464 "src/analyzer/Root.pv"
     while (i < arr->length) {
-        #line 464 "src/analyzer/Root.pv"
-        struct Trait* trait_info = arr->data[i];
         #line 465 "src/analyzer/Root.pv"
+        struct Trait* trait_info = arr->data[i];
+        #line 466 "src/analyzer/Root.pv"
         if (trait_info->generic_arity == arity) {
-            #line 465 "src/analyzer/Root.pv"
+            #line 466 "src/analyzer/Root.pv"
             return trait_info;
         }
-        #line 466 "src/analyzer/Root.pv"
+        #line 467 "src/analyzer/Root.pv"
         i += 1;
     }
-    #line 468 "src/analyzer/Root.pv"
+    #line 469 "src/analyzer/Root.pv"
     return 0;
 }
 
-#line 471 "src/analyzer/Root.pv"
+#line 472 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name) {
-    #line 472 "src/analyzer/Root.pv"
+    #line 473 "src/analyzer/Root.pv"
     return HashMap_str_Type__find(&self->functions, &name);
 }
 
-#line 475 "src/analyzer/Root.pv"
+#line 476 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, struct str name) {
-    #line 476 "src/analyzer/Root.pv"
+    #line 477 "src/analyzer/Root.pv"
     return HashMap_str_Primitive__find(&self->primitives, &name);
 }
 
-#line 479 "src/analyzer/Root.pv"
+#line 480 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message) {
-    #line 480 "src/analyzer/Root.pv"
-    struct HashMap_str_Array_Diagnostic* diagnostics = &self->analysis->diagnostics;
     #line 481 "src/analyzer/Root.pv"
+    struct HashMap_str_Array_Diagnostic* diagnostics = &self->analysis->diagnostics;
+    #line 482 "src/analyzer/Root.pv"
     struct Array_Diagnostic* file_diagnostics = HashMap_str_Array_Diagnostic__find(diagnostics, &path);
 
-    #line 483 "src/analyzer/Root.pv"
+    #line 484 "src/analyzer/Root.pv"
     struct Diagnostic diagnostic = (struct Diagnostic) {
         .message = (struct str){ .ptr = message, .length = strlen(message) },
         .code = (struct str) { .ptr = 0, .length = 0 },
@@ -1039,93 +1044,93 @@ void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintp
         },
     };
 
-    #line 498 "src/analyzer/Root.pv"
+    #line 499 "src/analyzer/Root.pv"
     if (file_diagnostics == 0) {
-        #line 499 "src/analyzer/Root.pv"
-        Array_Diagnostic__append(HashMap_str_Array_Diagnostic__insert(diagnostics, path, Array_Diagnostic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator })), diagnostic);
         #line 500 "src/analyzer/Root.pv"
+        Array_Diagnostic__append(HashMap_str_Array_Diagnostic__insert(diagnostics, path, Array_Diagnostic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator })), diagnostic);
+        #line 501 "src/analyzer/Root.pv"
         return;
     }
 
-    #line 503 "src/analyzer/Root.pv"
+    #line 504 "src/analyzer/Root.pv"
     Array_Diagnostic__append(file_diagnostics, diagnostic);
 }
 
-#line 506 "src/analyzer/Root.pv"
+#line 507 "src/analyzer/Root.pv"
 struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types) {
-    #line 507 "src/analyzer/Root.pv"
+    #line 508 "src/analyzer/Root.pv"
     if (type == 0) {
-        #line 507 "src/analyzer/Root.pv"
+        #line 508 "src/analyzer/Root.pv"
         return 0;
     }
-    #line 508 "src/analyzer/Root.pv"
+    #line 509 "src/analyzer/Root.pv"
     struct ArenaAllocator* allocator = self->allocator;
 
-    #line 510 "src/analyzer/Root.pv"
+    #line 511 "src/analyzer/Root.pv"
     switch (type->type) {
-        #line 511 "src/analyzer/Root.pv"
+        #line 512 "src/analyzer/Root.pv"
         case TYPE__ENUM: {
-            #line 511 "src/analyzer/Root.pv"
-            struct Enum* enum_info = type->enum_value._0;
             #line 512 "src/analyzer/Root.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &enum_info->generics, usage_types);
+            struct Enum* enum_info = type->enum_value._0;
             #line 513 "src/analyzer/Root.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            struct GenericMap generics = GenericMap__new(allocator, &enum_info->generics, usage_types);
             #line 514 "src/analyzer/Root.pv"
-            generics.self_type = self_type;
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
             #line 515 "src/analyzer/Root.pv"
-            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
+            generics.self_type = self_type;
             #line 516 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__ENUM, .enum_value = { ._0 = enum_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
+            #line 517 "src/analyzer/Root.pv"
             return self_type;
         } break;
-        #line 518 "src/analyzer/Root.pv"
+        #line 519 "src/analyzer/Root.pv"
         case TYPE__STRUCT: {
-            #line 518 "src/analyzer/Root.pv"
-            struct Struct* struct_info = type->struct_value._0;
             #line 519 "src/analyzer/Root.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &struct_info->generics, usage_types);
+            struct Struct* struct_info = type->struct_value._0;
             #line 520 "src/analyzer/Root.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            struct GenericMap generics = GenericMap__new(allocator, &struct_info->generics, usage_types);
             #line 521 "src/analyzer/Root.pv"
-            generics.self_type = self_type;
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
             #line 522 "src/analyzer/Root.pv"
-            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
+            generics.self_type = self_type;
             #line 523 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__STRUCT, .struct_value = { ._0 = struct_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
+            #line 524 "src/analyzer/Root.pv"
             return self_type;
         } break;
-        #line 525 "src/analyzer/Root.pv"
+        #line 526 "src/analyzer/Root.pv"
         case TYPE__TRAIT: {
-            #line 525 "src/analyzer/Root.pv"
-            struct Trait* trait_info = type->trait_value._0;
             #line 526 "src/analyzer/Root.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &trait_info->generics, usage_types);
+            struct Trait* trait_info = type->trait_value._0;
             #line 527 "src/analyzer/Root.pv"
-            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            struct GenericMap generics = GenericMap__new(allocator, &trait_info->generics, usage_types);
             #line 528 "src/analyzer/Root.pv"
-            generics.self_type = self_type;
-            #line 529 "src/analyzer/Root.pv"
-            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
-            #line 530 "src/analyzer/Root.pv"
-            return self_type;
-        } break;
-        #line 532 "src/analyzer/Root.pv"
-        case TYPE__FUNCTION: {
-            #line 532 "src/analyzer/Root.pv"
-            struct Function* function_info = type->function_value._0;
-            #line 533 "src/analyzer/Root.pv"
-            struct GenericMap generics = GenericMap__new(allocator, &function_info->generics, usage_types);
-            #line 534 "src/analyzer/Root.pv"
             struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
-            #line 535 "src/analyzer/Root.pv"
+            #line 529 "src/analyzer/Root.pv"
             generics.self_type = self_type;
-            #line 536 "src/analyzer/Root.pv"
-            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
-            #line 537 "src/analyzer/Root.pv"
+            #line 530 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
+            #line 531 "src/analyzer/Root.pv"
             return self_type;
         } break;
-        #line 539 "src/analyzer/Root.pv"
+        #line 533 "src/analyzer/Root.pv"
+        case TYPE__FUNCTION: {
+            #line 533 "src/analyzer/Root.pv"
+            struct Function* function_info = type->function_value._0;
+            #line 534 "src/analyzer/Root.pv"
+            struct GenericMap generics = GenericMap__new(allocator, &function_info->generics, usage_types);
+            #line 535 "src/analyzer/Root.pv"
+            struct Type* self_type = ArenaAllocator__Allocator__alloc(allocator, sizeof(struct Type));
+            #line 536 "src/analyzer/Root.pv"
+            generics.self_type = self_type;
+            #line 537 "src/analyzer/Root.pv"
+            *self_type = (struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function_info, ._1 = ArenaAllocator__store_GenericMap(allocator, &generics)} };
+            #line 538 "src/analyzer/Root.pv"
+            return self_type;
+        } break;
+        #line 540 "src/analyzer/Root.pv"
         default: {
-            #line 539 "src/analyzer/Root.pv"
+            #line 540 "src/analyzer/Root.pv"
             return type;
         } break;
     }

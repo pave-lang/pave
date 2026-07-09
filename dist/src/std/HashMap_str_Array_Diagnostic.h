@@ -62,5 +62,15 @@ void HashMap_str_Array_Diagnostic__clear(struct HashMap_str_Array_Diagnostic* se
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_Diagnostic* HashMap_str_Array_Diagnostic__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Array_Diagnostic* HashMap_str_Array_Diagnostic__Map_str_Array_Diagnostic__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Array_Diagnostic* HashMap_str_Array_Diagnostic__Map_str_Array_Diagnostic__insert(void* __self, struct str key, struct Array_Diagnostic value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Array_Diagnostic__Map_str_Array_Diagnostic__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_Array_DiagnosticVTable HASH_MAP_STR_ARRAY_DIAGNOSTIC__VTABLE__MAP;
 
 #endif

@@ -61,5 +61,15 @@ void HashMap_str_ref_Include__clear(struct HashMap_str_ref_Include* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Include* HashMap_str_ref_Include__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Include** HashMap_str_ref_Include__Map_str_ref_Include__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Include** HashMap_str_ref_Include__Map_str_ref_Include__insert(void* __self, struct str key, struct Include* value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_ref_Include__Map_str_ref_Include__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_ref_IncludeVTable HASH_MAP_STR_REF_INCLUDE__VTABLE__MAP;
 
 #endif

@@ -61,5 +61,15 @@ void HashMap_str_ref_Module__clear(struct HashMap_str_ref_Module* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Module* HashMap_str_ref_Module__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Module** HashMap_str_ref_Module__Map_str_ref_Module__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Module** HashMap_str_ref_Module__Map_str_ref_Module__insert(void* __self, struct str key, struct Module* value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_ref_Module__Map_str_ref_Module__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_ref_ModuleVTable HASH_MAP_STR_REF_MODULE__VTABLE__MAP;
 
 #endif

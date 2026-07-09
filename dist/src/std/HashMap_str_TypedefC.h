@@ -62,5 +62,15 @@ void HashMap_str_TypedefC__clear(struct HashMap_str_TypedefC* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_TypedefC* HashMap_str_TypedefC__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct TypedefC* HashMap_str_TypedefC__Map_str_TypedefC__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct TypedefC* HashMap_str_TypedefC__Map_str_TypedefC__insert(void* __self, struct str key, struct TypedefC value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_TypedefC__Map_str_TypedefC__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_TypedefCVTable HASH_MAP_STR_TYPEDEF_C__VTABLE__MAP;
 
 #endif

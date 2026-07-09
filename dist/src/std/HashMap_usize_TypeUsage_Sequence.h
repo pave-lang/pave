@@ -60,5 +60,15 @@ void HashMap_usize_TypeUsage_Sequence__clear(struct HashMap_usize_TypeUsage_Sequ
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__Map_usize_TypeUsage_Sequence__find(void* __self, uintptr_t* key);
+
+#line 214 "src/std/HashMap.pv"
+struct TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__Map_usize_TypeUsage_Sequence__insert(void* __self, uintptr_t key, struct TypeUsage_Sequence value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_usize_TypeUsage_Sequence__Map_usize_TypeUsage_Sequence__remove(void* __self, uintptr_t* key);
+
+extern struct trait_Map_usize_TypeUsage_SequenceVTable HASH_MAP_USIZE_TYPE_USAGE_SEQUENCE__VTABLE__MAP;
 
 #endif

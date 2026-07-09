@@ -236,6 +236,69 @@ impl Type {
         return null;
     }
 
+    fn contains_generic_name(&self, name: str) -> bool {
+        match self {
+            Type::Generic(generic) => {
+                let generic_name = generic.name;
+                return generic_name != null && generic_name.value.eq(name);
+            },
+            Type::Indirect(indirect) => {
+                return indirect.to.contains_generic_name(name);
+            },
+            Type::Sequence(sequence) => {
+                return sequence.element.contains_generic_name(name);
+            },
+            Type::Tuple(tuple) => {
+                for element in tuple.elements {
+                    if element.contains_generic_name(name) { return true; }
+                }
+            },
+            Type::Enum(_, generics) => {
+                if generics == null { return false; }
+                for generic_type in generics.array {
+                    if generic_type.contains_generic_name(name) { return true; }
+                }
+            },
+            Type::Struct(_, generics) => {
+                if generics == null { return false; }
+                for generic_type in generics.array {
+                    if generic_type.contains_generic_name(name) { return true; }
+                }
+            },
+            Type::Trait(_, generics) => {
+                if generics == null { return false; }
+                for generic_type in generics.array {
+                    if generic_type.contains_generic_name(name) { return true; }
+                }
+            },
+            Type::Function(_, generics) => {
+                if generics == null { return false; }
+                for generic_type in generics.array {
+                    if generic_type.contains_generic_name(name) { return true; }
+                }
+            },
+            Type::CoroutineInstance(_, generics) => {
+                if generics == null { return false; }
+                for generic_type in generics.array {
+                    if generic_type.contains_generic_name(name) { return true; }
+                }
+            },
+            Type::GenericTypedef(gt) => {
+                let generic_name = gt.generic.name;
+                return generic_name != null && generic_name.value.eq(name);
+            },
+            Type::TypedefC(info) => {
+                return info.type.contains_generic_name(name);
+            },
+            Type::Global(g) => {
+                return g.type.contains_generic_name(name);
+            },
+            _ => {},
+        }
+
+        return false;
+    }
+
     fn eq(&self, other: &Type) -> bool {
         if self.is_unknown() { return true; }
 

@@ -62,5 +62,15 @@ void HashMap_str_Array_MemberCompletionInfo__clear(struct HashMap_str_Array_Memb
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_MemberCompletionInfo* HashMap_str_Array_MemberCompletionInfo__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Array_MemberCompletionInfo* HashMap_str_Array_MemberCompletionInfo__Map_str_Array_MemberCompletionInfo__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Array_MemberCompletionInfo* HashMap_str_Array_MemberCompletionInfo__Map_str_Array_MemberCompletionInfo__insert(void* __self, struct str key, struct Array_MemberCompletionInfo value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Array_MemberCompletionInfo__Map_str_Array_MemberCompletionInfo__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_Array_MemberCompletionInfoVTable HASH_MAP_STR_ARRAY_MEMBER_COMPLETION_INFO__VTABLE__MAP;
 
 #endif

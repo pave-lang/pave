@@ -60,5 +60,15 @@ void HashMap_usize_TypeUsage_TypeImpl__clear(struct HashMap_usize_TypeUsage_Type
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_TypeImpl* HashMap_usize_TypeUsage_TypeImpl__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct TypeUsage_TypeImpl* HashMap_usize_TypeUsage_TypeImpl__Map_usize_TypeUsage_TypeImpl__find(void* __self, uintptr_t* key);
+
+#line 214 "src/std/HashMap.pv"
+struct TypeUsage_TypeImpl* HashMap_usize_TypeUsage_TypeImpl__Map_usize_TypeUsage_TypeImpl__insert(void* __self, uintptr_t key, struct TypeUsage_TypeImpl value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_usize_TypeUsage_TypeImpl__Map_usize_TypeUsage_TypeImpl__remove(void* __self, uintptr_t* key);
+
+extern struct trait_Map_usize_TypeUsage_TypeImplVTable HASH_MAP_USIZE_TYPE_USAGE_TYPE_IMPL__VTABLE__MAP;
 
 #endif

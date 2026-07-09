@@ -62,5 +62,15 @@ void HashMap_str_Array_ref_Enum__clear(struct HashMap_str_Array_ref_Enum* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_ref_Enum* HashMap_str_Array_ref_Enum__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Array_ref_Enum* HashMap_str_Array_ref_Enum__Map_str_Array_ref_Enum__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Array_ref_Enum* HashMap_str_Array_ref_Enum__Map_str_Array_ref_Enum__insert(void* __self, struct str key, struct Array_ref_Enum value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Array_ref_Enum__Map_str_Array_ref_Enum__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_Array_ref_EnumVTable HASH_MAP_STR_ARRAY_REF_ENUM__VTABLE__MAP;
 
 #endif

@@ -60,5 +60,15 @@ void HashMap_str_usize__clear(struct HashMap_str_usize* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_usize* HashMap_str_usize__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+uintptr_t* HashMap_str_usize__Map_str_usize__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+uintptr_t* HashMap_str_usize__Map_str_usize__insert(void* __self, struct str key, uintptr_t value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_usize__Map_str_usize__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_usizeVTable HASH_MAP_STR_USIZE__VTABLE__MAP;
 
 #endif

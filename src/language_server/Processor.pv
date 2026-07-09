@@ -382,7 +382,7 @@ impl Processor {
 
         let file_diagnostics = ls.analysis.diagnostics.find(&filename);
         if file_diagnostics != null && file_diagnostics.length > 0 {
-            // self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
+            self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
             return;
         }
 

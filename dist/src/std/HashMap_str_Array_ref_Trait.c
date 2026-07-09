@@ -12,6 +12,7 @@
 #include <std/Array_ref_Trait.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_Array_ref_Trait.h>
+#include <std/trait_Map_str_Array_ref_Trait.h>
 #include <std/HashMap_str_Array_ref_Trait.h>
 
 #include <std/HashMap_str_Array_ref_Trait.h>
@@ -274,3 +275,130 @@ struct HashMapBucket_str_Array_ref_Trait* HashMap_str_Array_ref_Trait__Index__in
     return self->data;
 }
 
+#line 197 "src/std/HashMap.pv"
+struct Array_ref_Trait* HashMap_str_Array_ref_Trait__Map_str_Array_ref_Trait__find(void* __self, struct str* key) {
+    struct HashMap_str_Array_ref_Trait* self = __self; (void)self;
+    #line 198 "src/std/HashMap.pv"
+    if (self->capacity == 0) {
+        #line 198 "src/std/HashMap.pv"
+        return 0;
+    }
+
+    #line 200 "src/std/HashMap.pv"
+    Hash hash = str__Hash__hash(&(*key));
+    #line 201 "src/std/HashMap.pv"
+    uintptr_t bucket_index = hash % self->capacity;
+    #line 202 "src/std/HashMap.pv"
+    struct HashMapBucket_str_Array_ref_Trait* current_bucket_node = self->buckets[bucket_index];
+
+    #line 204 "src/std/HashMap.pv"
+    while (current_bucket_node != 0) {
+        #line 205 "src/std/HashMap.pv"
+        if (str__Hash__hash(&current_bucket_node->key) == hash) {
+            #line 206 "src/std/HashMap.pv"
+            return &current_bucket_node->value;
+        }
+        #line 208 "src/std/HashMap.pv"
+        current_bucket_node = current_bucket_node->next;
+    }
+
+    #line 211 "src/std/HashMap.pv"
+    return 0;
+}
+
+#line 214 "src/std/HashMap.pv"
+struct Array_ref_Trait* HashMap_str_Array_ref_Trait__Map_str_Array_ref_Trait__insert(void* __self, struct str key, struct Array_ref_Trait value) {
+    struct HashMap_str_Array_ref_Trait* self = __self; (void)self;
+    #line 215 "src/std/HashMap.pv"
+    struct Array_ref_Trait* existing_value = HashMap_str_Array_ref_Trait__find(self, &key);
+    #line 216 "src/std/HashMap.pv"
+    if (existing_value != 0) {
+        #line 217 "src/std/HashMap.pv"
+        *existing_value = value;
+        #line 218 "src/std/HashMap.pv"
+        return existing_value;
+    }
+
+    #line 221 "src/std/HashMap.pv"
+    if (self->capacity == 0 || (self->length * 100 / self->capacity) > 75) {
+        #line 222 "src/std/HashMap.pv"
+        HashMap_str_Array_ref_Trait__resize(self, self->capacity * 2);
+    }
+
+    #line 225 "src/std/HashMap.pv"
+    Hash hash = str__Hash__hash(&key);
+    #line 226 "src/std/HashMap.pv"
+    uintptr_t bucket_index = hash % self->capacity;
+    #line 227 "src/std/HashMap.pv"
+    struct HashMapBucket_str_Array_ref_Trait** current_bucket_node = self->buckets + bucket_index;
+
+    #line 229 "src/std/HashMap.pv"
+    struct HashMapBucket_str_Array_ref_Trait* bucket_node = *current_bucket_node;
+    #line 230 "src/std/HashMap.pv"
+    while (bucket_node != 0) {
+        #line 231 "src/std/HashMap.pv"
+        current_bucket_node = &bucket_node->next;
+        #line 232 "src/std/HashMap.pv"
+        bucket_node = *current_bucket_node;
+    }
+
+    #line 235 "src/std/HashMap.pv"
+    self->data[self->length] = (struct HashMapBucket_str_Array_ref_Trait) { .key = key, .value = value, .next = 0 };
+    #line 236 "src/std/HashMap.pv"
+    struct HashMapBucket_str_Array_ref_Trait* data = self->data + self->length;
+    #line 237 "src/std/HashMap.pv"
+    self->length += 1;
+
+    #line 239 "src/std/HashMap.pv"
+    *current_bucket_node = data;
+
+    #line 241 "src/std/HashMap.pv"
+    return &(*data).value;
+}
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Array_ref_Trait__Map_str_Array_ref_Trait__remove(void* __self, struct str* key) {
+    struct HashMap_str_Array_ref_Trait* self = __self; (void)self;
+    #line 245 "src/std/HashMap.pv"
+    if (self->capacity == 0) {
+        #line 245 "src/std/HashMap.pv"
+        return false;
+    }
+
+    #line 247 "src/std/HashMap.pv"
+    Hash hash = str__Hash__hash(&(*key));
+    #line 248 "src/std/HashMap.pv"
+    uintptr_t bucket_index = hash % self->capacity;
+    #line 249 "src/std/HashMap.pv"
+    struct HashMapBucket_str_Array_ref_Trait* current_bucket_node = self->buckets[bucket_index];
+
+    #line 251 "src/std/HashMap.pv"
+    while (current_bucket_node != 0) {
+        #line 252 "src/std/HashMap.pv"
+        if (str__Hash__hash(&current_bucket_node->key) == hash) {
+            #line 253 "src/std/HashMap.pv"
+            struct HashMapBucket_str_Array_ref_Trait* last = self->data + self->length - 1;
+            #line 254 "src/std/HashMap.pv"
+            if (current_bucket_node != last) {
+                #line 254 "src/std/HashMap.pv"
+                *current_bucket_node = *last;
+            }
+
+            #line 256 "src/std/HashMap.pv"
+            self->length -= 1;
+            #line 257 "src/std/HashMap.pv"
+            HashMap_str_Array_ref_Trait__fill_buckets(self);
+
+            #line 259 "src/std/HashMap.pv"
+            return true;
+        }
+
+        #line 262 "src/std/HashMap.pv"
+        current_bucket_node = current_bucket_node->next;
+    }
+
+    #line 265 "src/std/HashMap.pv"
+    return false;
+}
+
+struct trait_Map_str_Array_ref_TraitVTable HASH_MAP_STR_ARRAY_REF_TRAIT__VTABLE__MAP = { .fn_find = &HashMap_str_Array_ref_Trait__Map_str_Array_ref_Trait__find, .fn_insert = &HashMap_str_Array_ref_Trait__Map_str_Array_ref_Trait__insert, .fn_remove = &HashMap_str_Array_ref_Trait__Map_str_Array_ref_Trait__remove };

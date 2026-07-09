@@ -61,5 +61,15 @@ void HashMap_str_ref_ImplConst__clear(struct HashMap_str_ref_ImplConst* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_ImplConst* HashMap_str_ref_ImplConst__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct ImplConst** HashMap_str_ref_ImplConst__Map_str_ref_ImplConst__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct ImplConst** HashMap_str_ref_ImplConst__Map_str_ref_ImplConst__insert(void* __self, struct str key, struct ImplConst* value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_ref_ImplConst__Map_str_ref_ImplConst__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_ref_ImplConstVTable HASH_MAP_STR_REF_IMPL_CONST__VTABLE__MAP;
 
 #endif

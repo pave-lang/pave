@@ -62,5 +62,15 @@ void HashMap_str_Primitive__clear(struct HashMap_str_Primitive* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Primitive* HashMap_str_Primitive__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Primitive* HashMap_str_Primitive__Map_str_Primitive__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Primitive* HashMap_str_Primitive__Map_str_Primitive__insert(void* __self, struct str key, struct Primitive value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Primitive__Map_str_Primitive__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_PrimitiveVTable HASH_MAP_STR_PRIMITIVE__VTABLE__MAP;
 
 #endif

@@ -60,5 +60,15 @@ void HashMap_str_bool__clear(struct HashMap_str_bool* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_bool* HashMap_str_bool__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+bool* HashMap_str_bool__Map_str_bool__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+bool* HashMap_str_bool__Map_str_bool__insert(void* __self, struct str key, bool value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_bool__Map_str_bool__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_boolVTable HASH_MAP_STR_BOOL__VTABLE__MAP;
 
 #endif

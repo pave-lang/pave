@@ -124,25 +124,25 @@ bool Root__parse_functions(struct Root* self);
 #line 424 "src/analyzer/Root.pv"
 bool Root__parse_functions_if_path(struct Root* self, struct str path);
 
-#line 440 "src/analyzer/Root.pv"
+#line 441 "src/analyzer/Root.pv"
 struct Module* Root__find_module_by_path(struct Root* self, struct str path);
 
-#line 448 "src/analyzer/Root.pv"
+#line 449 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name, uintptr_t arity);
 
-#line 459 "src/analyzer/Root.pv"
+#line 460 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name, uintptr_t arity);
 
-#line 471 "src/analyzer/Root.pv"
+#line 472 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name);
 
-#line 475 "src/analyzer/Root.pv"
+#line 476 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, struct str name);
 
-#line 479 "src/analyzer/Root.pv"
+#line 480 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
 
-#line 506 "src/analyzer/Root.pv"
+#line 507 "src/analyzer/Root.pv"
 struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types);
 
 #endif

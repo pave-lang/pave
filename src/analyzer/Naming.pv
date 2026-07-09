@@ -298,8 +298,6 @@ impl Naming {
 
                 let generic_type = generics_map.get(name);
                 if generic_type == null {
-                    let len: u32 = name.length;
-                    fprintf(stderr, "Naming.get_type_name: Attempt to retrieve generic %.*s but it does not exist in generics\n", len, name.ptr);
                     result.append(name);
                     return result;
                 }
@@ -313,6 +311,12 @@ impl Naming {
                         }
                     },
                     _ => {},
+                }
+
+                if generic_type.contains_generic_name(name) {
+                    let display_generics = generics_map.clone(self.allocator);
+                    display_generics.map.remove(&name);
+                    return self.get_type_name(generic_type, type_self, &display_generics);
                 }
 
                 return self.get_type_name(generic_type, type_self, generics_map);
@@ -585,7 +589,15 @@ impl Naming {
                 let function_type_self = type_self;
                 let function_generics = generics_map;
                 if func_generics != null {
-                    function_generics = func_generics;
+                    let display_generics = func_generics.clone(self.allocator);
+                    for generic in func_info.generics.array {
+                        let generic_name = generic.name;
+                        if generic_name == null { continue; }
+                        if !display_generics.has(generic_name.value) {
+                            display_generics.insert(generic_name.value, Type::Generic(generic));
+                        }
+                    }
+                    function_generics = &display_generics;
                     if func_generics.self_type != null {
                         function_type_self = func_generics.self_type;
                     }
@@ -601,7 +613,7 @@ impl Naming {
 
                 let return_name = self.get_type_decl(&func_info.return_type, function_type_self, function_generics);
                 if !return_name.as_str().eq("void") {
-                    result.append(") -> ");
+                    result.append(" -> ");
                     result.append_string(&return_name);
                 }
 

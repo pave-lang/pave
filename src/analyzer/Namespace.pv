@@ -208,14 +208,14 @@ impl Namespace {
 
     fn parse_functions_if_path(&self, path: str) -> bool {
         for (_, module) in self.modules {
-            module.parse_functions_if_path(path);
+            if module.parse_functions_if_path(path) { return true; }
         }
 
         for (_, child) in self.children {
-            child.parse_functions_if_path(path);
+            if child.parse_functions_if_path(path) { return true; }
         }
 
-        return true;
+        return false;
     }
 
     fn find_module_by_path(&self, path: str) -> *Module {

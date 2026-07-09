@@ -50,7 +50,7 @@ ls:
 	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/ls TARGET=dist/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 
 ls-release:
-	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/lsr TARGET=build/ls-release/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-O2 $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='$(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/lsr TARGET=build/lsr/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-O2 $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='$(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 
 define build_example
 	dist/pavec std=src/std $(1)=examples/$(1) -o examples --no-line-directives -- -I"C:/Program Files/LLVM/include" -Iexamples/$(1)

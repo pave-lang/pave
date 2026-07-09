@@ -1377,7 +1377,7 @@ bool Module__parse_functions_if_path(struct Module* self, struct str path) {
     #line 672 "src/analyzer/Module.pv"
     if (!str__Eq_str__eq(&self->path, path)) {
         #line 672 "src/analyzer/Module.pv"
-        return true;
+        return false;
     }
     #line 673 "src/analyzer/Module.pv"
     return Module__parse_functions(self);

@@ -713,7 +713,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
         #line 317 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__STRING: {
             #line 318 "src/analyzer/expression/Expression.pv"
-            struct Type return_type = str__starts_with(token->value, "'") ? context->type_char : (struct Type) { .type = TYPE__INDIRECT, .indirect_value = &context->pointer_const_char };
+            struct Type return_type = str__starts_with(token->value, (struct str){ .ptr = "'", .length = strlen("'") }) ? context->type_char : (struct Type) { .type = TYPE__INDIRECT, .indirect_value = &context->pointer_const_char };
 
             #line 320 "src/analyzer/expression/Expression.pv"
             result = Expression__make_next(context, (struct Expression) {

@@ -61,5 +61,15 @@ void HashMap_str_ref_Namespace__clear(struct HashMap_str_ref_Namespace* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Namespace* HashMap_str_ref_Namespace__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Namespace** HashMap_str_ref_Namespace__Map_str_ref_Namespace__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Namespace** HashMap_str_ref_Namespace__Map_str_ref_Namespace__insert(void* __self, struct str key, struct Namespace* value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_ref_Namespace__Map_str_ref_Namespace__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_ref_NamespaceVTable HASH_MAP_STR_REF_NAMESPACE__VTABLE__MAP;
 
 #endif

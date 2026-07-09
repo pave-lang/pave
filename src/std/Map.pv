@@ -1,0 +1,5 @@
+trait Map<K, V> {
+    fn find(&self, key: &K) -> *V;
+    fn insert(&self, key: K, value: V) -> &V;
+    fn remove(&self, key: &K) -> bool;
+}

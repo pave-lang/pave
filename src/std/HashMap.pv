@@ -192,3 +192,76 @@ impl<K: Hash, V> Index for HashMap<K, V> {
         return self.data;
     }
 }
+
+impl<K: Hash, V> Map<K, V> for HashMap<K, V> {
+    fn find(&self, key: &K) -> *V {
+        if self.capacity == 0 { return null; }
+
+        let hash = (*key).hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets[bucket_index];
+
+        while current_bucket_node != null {
+            if current_bucket_node.key.hash()._0 == hash._0 {
+                return &current_bucket_node.value;
+            }
+            current_bucket_node = current_bucket_node.next;
+        }
+
+        return null;
+    }
+
+    fn insert(&self, key: K, value: V) -> &V {
+        let existing_value = self.find(&key);
+        if existing_value != null {
+            *existing_value = value;
+            return existing_value;
+        }
+
+        if self.capacity == 0 || (self.length * 100 / self.capacity) > 75 {
+            self.resize(self.capacity * 2);
+        }
+
+        let hash = key.hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets + bucket_index;
+
+        let bucket_node = *current_bucket_node;
+        while bucket_node != null {
+            current_bucket_node = &bucket_node.next;
+            bucket_node = *current_bucket_node;
+        }
+
+        self.data[self.length] = HashMapBucket<K, V> { key, value, next: null };
+        let data = self.data + self.length;
+        self.length += 1;
+
+        *current_bucket_node = data;
+
+        return &(*data).value;
+    }
+
+    fn remove(&self, key: &K) -> bool {
+        if self.capacity == 0 { return false; }
+
+        let hash = (*key).hash();
+        let bucket_index: usize = hash._0 % self.capacity;
+        let current_bucket_node = self.buckets[bucket_index];
+
+        while current_bucket_node != null {
+            if current_bucket_node.key.hash()._0 == hash._0 {
+                let last = self.data + self.length - 1;
+                if current_bucket_node != last { *current_bucket_node = *last; }
+
+                self.length -= 1;
+                self.fill_buckets();
+
+                return true;
+            }
+
+            current_bucket_node = current_bucket_node.next;
+        }
+
+        return false;
+    }
+}

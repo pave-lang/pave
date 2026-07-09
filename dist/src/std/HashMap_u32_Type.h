@@ -60,5 +60,15 @@ void HashMap_u32_Type__clear(struct HashMap_u32_Type* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_u32_Type* HashMap_u32_Type__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Type* HashMap_u32_Type__Map_u32_Type__find(void* __self, uint32_t* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Type* HashMap_u32_Type__Map_u32_Type__insert(void* __self, uint32_t key, struct Type value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_u32_Type__Map_u32_Type__remove(void* __self, uint32_t* key);
+
+extern struct trait_Map_u32_TypeVTable HASH_MAP_U32_TYPE__VTABLE__MAP;
 
 #endif

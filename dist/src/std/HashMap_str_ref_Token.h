@@ -61,5 +61,15 @@ void HashMap_str_ref_Token__clear(struct HashMap_str_ref_Token* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Token* HashMap_str_ref_Token__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Token** HashMap_str_ref_Token__Map_str_ref_Token__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Token** HashMap_str_ref_Token__Map_str_ref_Token__insert(void* __self, struct str key, struct Token* value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_ref_Token__Map_str_ref_Token__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_ref_TokenVTable HASH_MAP_STR_REF_TOKEN__VTABLE__MAP;
 
 #endif

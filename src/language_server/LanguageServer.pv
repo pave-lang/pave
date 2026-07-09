@@ -213,8 +213,9 @@ impl LanguageServer {
         analysis.signature_info.remove(&path_str);
         analysis.completion_info.remove(&path_str);
         analysis.member_completion_info.remove(&path_str);
-        self.root.parse_functions_if_path(path_str);
-        analysis.parsed_function_files.insert(path_str, true);
+        if self.root.parse_functions_if_path(path_str) {
+            analysis.parsed_function_files.insert(path_str, true);
+        }
         return analysis;
     }
 

@@ -62,5 +62,15 @@ void HashMap_str_EnumVariant__clear(struct HashMap_str_EnumVariant* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_EnumVariant* HashMap_str_EnumVariant__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct EnumVariant* HashMap_str_EnumVariant__Map_str_EnumVariant__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct EnumVariant* HashMap_str_EnumVariant__Map_str_EnumVariant__insert(void* __self, struct str key, struct EnumVariant value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_EnumVariant__Map_str_EnumVariant__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_EnumVariantVTable HASH_MAP_STR_ENUM_VARIANT__VTABLE__MAP;
 
 #endif

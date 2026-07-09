@@ -62,5 +62,15 @@ void HashMap_str_Array_ref_Struct__clear(struct HashMap_str_Array_ref_Struct* se
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_ref_Struct* HashMap_str_Array_ref_Struct__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Array_ref_Struct* HashMap_str_Array_ref_Struct__Map_str_Array_ref_Struct__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Array_ref_Struct* HashMap_str_Array_ref_Struct__Map_str_Array_ref_Struct__insert(void* __self, struct str key, struct Array_ref_Struct value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Array_ref_Struct__Map_str_Array_ref_Struct__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_Array_ref_StructVTable HASH_MAP_STR_ARRAY_REF_STRUCT__VTABLE__MAP;
 
 #endif

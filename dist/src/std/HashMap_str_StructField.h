@@ -62,5 +62,15 @@ void HashMap_str_StructField__clear(struct HashMap_str_StructField* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_StructField* HashMap_str_StructField__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct StructField* HashMap_str_StructField__Map_str_StructField__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct StructField* HashMap_str_StructField__Map_str_StructField__insert(void* __self, struct str key, struct StructField value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_StructField__Map_str_StructField__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_StructFieldVTable HASH_MAP_STR_STRUCT_FIELD__VTABLE__MAP;
 
 #endif

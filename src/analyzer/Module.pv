@@ -669,7 +669,7 @@ impl Module {
     }
 
     fn parse_functions_if_path(&self, path: str) -> bool {
-        if !self.path.eq(path) { return true; }
+        if !self.path.eq(path) { return false; }
         return self.parse_functions();
     }
 

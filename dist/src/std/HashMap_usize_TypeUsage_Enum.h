@@ -60,5 +60,15 @@ void HashMap_usize_TypeUsage_Enum__clear(struct HashMap_usize_TypeUsage_Enum* se
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Enum* HashMap_usize_TypeUsage_Enum__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct TypeUsage_Enum* HashMap_usize_TypeUsage_Enum__Map_usize_TypeUsage_Enum__find(void* __self, uintptr_t* key);
+
+#line 214 "src/std/HashMap.pv"
+struct TypeUsage_Enum* HashMap_usize_TypeUsage_Enum__Map_usize_TypeUsage_Enum__insert(void* __self, uintptr_t key, struct TypeUsage_Enum value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_usize_TypeUsage_Enum__Map_usize_TypeUsage_Enum__remove(void* __self, uintptr_t* key);
+
+extern struct trait_Map_usize_TypeUsage_EnumVTable HASH_MAP_USIZE_TYPE_USAGE_ENUM__VTABLE__MAP;
 
 #endif

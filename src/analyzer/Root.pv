@@ -423,18 +423,19 @@ impl Root {
 
     fn parse_functions_if_path(&self, path: str) -> bool {
         for (_, child) in self.children {
-            child.parse_functions_if_path(path);
+            if child.parse_functions_if_path(path) { return true; }
         }
 
         for (_, &primitive_info) in self.primitives {
             for *impl_info in primitive_info.impls {
                 if impl_info.context.path.eq(path) {
                     impl_info.parse_functions();
+                    return true;
                 }
             }
         }
 
-        return true;
+        return false;
     }
 
     fn find_module_by_path(&self, path: str) -> *Module {

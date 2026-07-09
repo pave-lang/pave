@@ -70,143 +70,141 @@ bool str__contains(struct str self, char const* substring) {
 }
 
 #line 40 "src/std/str.pv"
-bool str__starts_with(struct str self, char const* prefix) {
+bool str__starts_with(struct str self, struct str prefix) {
     #line 41 "src/std/str.pv"
-    uint64_t prefix_len = strlen(prefix);
-    #line 42 "src/std/str.pv"
-    if (self.length < prefix_len) {
-        #line 42 "src/std/str.pv"
+    if (self.length < prefix.length) {
+        #line 41 "src/std/str.pv"
         return false;
     }
 
-    #line 44 "src/std/str.pv"
-    return strncmp(self.ptr, prefix, prefix_len) == 0;
+    #line 43 "src/std/str.pv"
+    return strncmp(self.ptr, prefix.ptr, prefix.length) == 0;
 }
 
-#line 47 "src/std/str.pv"
+#line 46 "src/std/str.pv"
 bool str__ends_with(struct str self, char const* suffix) {
-    #line 48 "src/std/str.pv"
+    #line 47 "src/std/str.pv"
     uint64_t suffix_len = strlen(suffix);
-    #line 49 "src/std/str.pv"
+    #line 48 "src/std/str.pv"
     if (self.length < suffix_len) {
-        #line 49 "src/std/str.pv"
+        #line 48 "src/std/str.pv"
         return false;
     }
 
-    #line 51 "src/std/str.pv"
+    #line 50 "src/std/str.pv"
     return strncmp(self.ptr + self.length - suffix_len, suffix, suffix_len) == 0;
 }
 
-#line 54 "src/std/str.pv"
+#line 53 "src/std/str.pv"
 struct Iter_ptrc_char str__iter(struct str self) {
-    #line 55 "src/std/str.pv"
+    #line 54 "src/std/str.pv"
     return Iter_ptrc_char__new(self.ptr, self.ptr + self.length);
 }
 
-#line 58 "src/std/str.pv"
+#line 57 "src/std/str.pv"
 intptr_t str__index_of(struct str self, char ch) {
-    #line 59 "src/std/str.pv"
+    #line 58 "src/std/str.pv"
     return str__index_of_start(self, ch, 0);
 }
 
-#line 62 "src/std/str.pv"
+#line 61 "src/std/str.pv"
 intptr_t str__index_of_start(struct str self, char ch, uintptr_t start) {
-    #line 63 "src/std/str.pv"
+    #line 62 "src/std/str.pv"
     char const* s = self.ptr + start;
-    #line 64 "src/std/str.pv"
+    #line 63 "src/std/str.pv"
     char const* e = self.ptr + self.length;
 
-    #line 66 "src/std/str.pv"
+    #line 65 "src/std/str.pv"
     for (char const* ptr = s; ptr < e; ptr++) {
-        #line 67 "src/std/str.pv"
+        #line 66 "src/std/str.pv"
         if (*ptr == ch) {
-            #line 68 "src/std/str.pv"
+            #line 67 "src/std/str.pv"
             return ptr - self.ptr;
         }
     }
 
-    #line 72 "src/std/str.pv"
+    #line 71 "src/std/str.pv"
     return -1;
 }
 
-#line 75 "src/std/str.pv"
+#line 74 "src/std/str.pv"
 intptr_t str__index_of_last(struct str self, char ch) {
-    #line 76 "src/std/str.pv"
+    #line 75 "src/std/str.pv"
     for (uintptr_t i = 0; i < self.length; i++) {
-        #line 77 "src/std/str.pv"
+        #line 76 "src/std/str.pv"
         char const* ptr = self.ptr + self.length - 1 - i;
-        #line 78 "src/std/str.pv"
+        #line 77 "src/std/str.pv"
         if (*ptr == ch) {
-            #line 79 "src/std/str.pv"
+            #line 78 "src/std/str.pv"
             return ptr - self.ptr;
         }
     }
 
-    #line 83 "src/std/str.pv"
+    #line 82 "src/std/str.pv"
     return -1;
 }
 
-#line 86 "src/std/str.pv"
+#line 85 "src/std/str.pv"
 bool str__is_whitespace(char ch) {
-    #line 87 "src/std/str.pv"
+    #line 86 "src/std/str.pv"
     return (ch == ' ') || (ch == '\r') || (ch == '\n') || (ch == '\t');
 }
 
-#line 90 "src/std/str.pv"
+#line 89 "src/std/str.pv"
 struct str str__trim(struct str self) {
-    #line 91 "src/std/str.pv"
+    #line 90 "src/std/str.pv"
     uintptr_t start = 0;
-    #line 92 "src/std/str.pv"
+    #line 91 "src/std/str.pv"
     uintptr_t end = self.length;
 
-    #line 94 "src/std/str.pv"
+    #line 93 "src/std/str.pv"
     while (start < end && str__is_whitespace(self.ptr[start])) {
-        #line 95 "src/std/str.pv"
+        #line 94 "src/std/str.pv"
         start = start + 1;
     }
 
-    #line 98 "src/std/str.pv"
+    #line 97 "src/std/str.pv"
     while (end > start && str__is_whitespace(self.ptr[end - 1])) {
-        #line 99 "src/std/str.pv"
+        #line 98 "src/std/str.pv"
         end = end - 1;
     }
 
-    #line 102 "src/std/str.pv"
+    #line 101 "src/std/str.pv"
     return str__slice(self, start, end);
 }
 
-#line 107 "src/std/str.pv"
+#line 106 "src/std/str.pv"
 Hash str__Hash__hash(void* __self) {
     struct str* self = __self; (void)self;
-    #line 107 "src/std/str.pv"
+    #line 106 "src/std/str.pv"
     return Fnv1a__hash(self->ptr, self->length);
 }
 
-#line 111 "src/std/str.pv"
+#line 110 "src/std/str.pv"
 bool str__Eq_str__eq(void* __self, struct str other) {
     struct str* self = __self; (void)self;
-    #line 112 "src/std/str.pv"
+    #line 111 "src/std/str.pv"
     if (self->length != other.length) {
-        #line 112 "src/std/str.pv"
+        #line 111 "src/std/str.pv"
         return false;
     }
 
-    #line 114 "src/std/str.pv"
+    #line 113 "src/std/str.pv"
     return strncmp(self->ptr, other.ptr, self->length) == 0;
 }
 
-#line 119 "src/std/str.pv"
+#line 118 "src/std/str.pv"
 bool str__Eq_ptrc_char__eq(void* __self, char const* other) {
     struct str* self = __self; (void)self;
-    #line 120 "src/std/str.pv"
+    #line 119 "src/std/str.pv"
     uint64_t other_len = strlen(other);
-    #line 121 "src/std/str.pv"
+    #line 120 "src/std/str.pv"
     if (self->length != other_len) {
-        #line 121 "src/std/str.pv"
+        #line 120 "src/std/str.pv"
         return false;
     }
 
-    #line 123 "src/std/str.pv"
+    #line 122 "src/std/str.pv"
     return strncmp(self->ptr, other, self->length) == 0;
 }
 

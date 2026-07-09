@@ -62,5 +62,15 @@ void HashMap_str_Array_SymbolInfo__clear(struct HashMap_str_Array_SymbolInfo* se
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_SymbolInfo* HashMap_str_Array_SymbolInfo__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Array_SymbolInfo* HashMap_str_Array_SymbolInfo__Map_str_Array_SymbolInfo__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Array_SymbolInfo* HashMap_str_Array_SymbolInfo__Map_str_Array_SymbolInfo__insert(void* __self, struct str key, struct Array_SymbolInfo value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_Array_SymbolInfo__Map_str_Array_SymbolInfo__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_Array_SymbolInfoVTable HASH_MAP_STR_ARRAY_SYMBOL_INFO__VTABLE__MAP;
 
 #endif

@@ -61,5 +61,15 @@ void HashMap_str_ref_Global__clear(struct HashMap_str_ref_Global* self);
 #line 191 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Global* HashMap_str_ref_Global__Index__index(void* __self);
 
+#line 197 "src/std/HashMap.pv"
+struct Global** HashMap_str_ref_Global__Map_str_ref_Global__find(void* __self, struct str* key);
+
+#line 214 "src/std/HashMap.pv"
+struct Global** HashMap_str_ref_Global__Map_str_ref_Global__insert(void* __self, struct str key, struct Global* value);
+
+#line 244 "src/std/HashMap.pv"
+bool HashMap_str_ref_Global__Map_str_ref_Global__remove(void* __self, struct str* key);
+
+extern struct trait_Map_str_ref_GlobalVTable HASH_MAP_STR_REF_GLOBAL__VTABLE__MAP;
 
 #endif

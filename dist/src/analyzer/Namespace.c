@@ -407,7 +407,10 @@ bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path)
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
         #line 211 "src/analyzer/Namespace.pv"
-        Module__parse_functions_if_path(module, path);
+        if (Module__parse_functions_if_path(module, path)) {
+            #line 211 "src/analyzer/Namespace.pv"
+            return true;
+        }
     } }
 
     #line 214 "src/analyzer/Namespace.pv"
@@ -418,11 +421,14 @@ bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path)
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
         #line 215 "src/analyzer/Namespace.pv"
-        Namespace__parse_functions_if_path(child, path);
+        if (Namespace__parse_functions_if_path(child, path)) {
+            #line 215 "src/analyzer/Namespace.pv"
+            return true;
+        }
     } }
 
     #line 218 "src/analyzer/Namespace.pv"
-    return true;
+    return false;
 }
 
 #line 221 "src/analyzer/Namespace.pv"
