@@ -1060,6 +1060,12 @@ impl ExpressionWriter {
             ExpressionData::MemberStaticExpression(parent, member) => {
                 let parent_type = &parent.return_type;
                 match parent_type {
+                    Type::Self => {
+                        if generics.self_type != null { parent_type = generics.self_type; }
+                    },
+                    _ => {},
+                }
+                match parent_type {
                     Type::Struct(struct_info, _) => {
                         for *impl_info in struct_info.impls {
                             let impl_const_ptr = impl_info.consts.find(&member);
