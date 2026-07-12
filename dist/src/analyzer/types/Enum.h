@@ -12,7 +12,7 @@
 struct Token;
 struct Context;
 
-#line 24 "src/analyzer/types/Enum.pv"
+#line 25 "src/analyzer/types/Enum.pv"
 struct Enum {
     struct Token* name;
     struct Context* context;
@@ -30,22 +30,22 @@ struct Enum {
 struct Context;
 struct Enum;
 
-#line 38 "src/analyzer/types/Enum.pv"
+#line 39 "src/analyzer/types/Enum.pv"
 struct Enum Enum__new(struct Context* context);
 
-#line 53 "src/analyzer/types/Enum.pv"
+#line 54 "src/analyzer/types/Enum.pv"
 struct Enum Enum__parse(struct Context* context);
 
-#line 92 "src/analyzer/types/Enum.pv"
+#line 93 "src/analyzer/types/Enum.pv"
 bool Enum__prefill_types(struct Enum* self);
 
-#line 102 "src/analyzer/types/Enum.pv"
+#line 103 "src/analyzer/types/Enum.pv"
 bool Enum__fill_variants(struct Enum* self);
 
-#line 121 "src/analyzer/types/Enum.pv"
+#line 122 "src/analyzer/types/Enum.pv"
 bool Enum__parse_variant(struct Enum* self);
 
-#line 185 "src/analyzer/types/Enum.pv"
+#line 200 "src/analyzer/types/Enum.pv"
 bool Enum__is_discriminated_union(struct Enum* self);
 
 #endif

@@ -1,8 +1,16 @@
 #include "stdio.h"
 
+use std
+
 enum Standard {
-    One,
+    One @label("one"),
     Two
+}
+
+fn print_dynamic(value: &dyn Enum) {
+    let variants = value.get_variants();
+    let index = value.get_variant_index();
+    printf("%.*s\n", variants.data[index].label.length, variants.data[index].label.ptr);
 }
 
 impl Standard {
@@ -65,6 +73,8 @@ fn main() -> i32 {
     let two = Standard::Two;
     one.print();
     two.print();
+    print_dynamic(&one);
+    print_dynamic(&two);
 
     let none = Discriminated::None;
     let single = Discriminated::Single(42);

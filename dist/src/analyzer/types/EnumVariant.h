@@ -10,6 +10,7 @@ struct Expression;
 #line 11 "src/analyzer/types/Enum.pv"
 struct EnumVariant {
     struct Token* name;
+    struct Token* label;
     struct Array_Type types;
     struct Array_str names;
     struct Enum* parent;

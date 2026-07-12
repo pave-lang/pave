@@ -218,9 +218,19 @@ impl FileGenerator {
             let variant_index: usize = 0;
             for (_, &variant) in enum_info.variants {
                 if variant_index > 0 { fprintf(code_file, ", "); }
-                fprintf(code_file, "(struct EnumVariantInfo){ .index = %zu, .name = (struct str){ .ptr = \"", variant_index);
+                fprintf(code_file, "(struct EnumVariantInfo){ .index = %zu, .key = (struct str){ .ptr = \"", variant_index);
                 generator.write_token(code_file, variant.name);
-                fprintf(code_file, "\", .length = %zu } }", variant.name.value.length);
+                fprintf(code_file, "\", .length = %zu }, .label = (struct str){ .ptr = ", variant.name.value.length);
+                if variant.label != null {
+                    generator.write_token(code_file, variant.label);
+                    fprintf(code_file, ", .length = sizeof(");
+                    generator.write_token(code_file, variant.label);
+                    fprintf(code_file, ") - 1 } }");
+                } else {
+                    fprintf(code_file, "\"");
+                    generator.write_token(code_file, variant.name);
+                    fprintf(code_file, "\", .length = %zu } }", variant.name.value.length);
+                }
                 variant_index += 1;
             }
 

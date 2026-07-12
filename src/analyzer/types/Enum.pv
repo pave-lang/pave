@@ -10,6 +10,7 @@ struct EnumVariantParameter {
 
 struct EnumVariant {
     name: &Token,
+    label: *Token,
     types: Array<Type>,
     names: Array<str>,
     parent: &Enum,
@@ -165,12 +166,26 @@ impl Enum {
             if value == null { return false; }
         }
 
+        let label: *Token = null;
+        if context.check_next(TokenType::Symbol, "@") {
+            if !context.expect_value(TokenType::Identifier, "label") { return false; }
+            if !context.expect_value(TokenType::Symbol, "(") { return false; }
+            label = context.expect(TokenType::String);
+            if label == null { return false; }
+            if label.value.length < 2 || label.value.ptr[0] != '"' {
+                context.error_token(label, "Enum variant label must use a double-quoted string");
+                return false;
+            }
+            if !context.expect_value(TokenType::Symbol, ")") { return false; }
+        }
+
         if types.length > 0 {
             self.type = EnumType::DiscriminatedUnion;
         }
 
         let variant: EnumVariant = EnumVariant {
             name,
+            label,
             types,
             names,
             parent: self,

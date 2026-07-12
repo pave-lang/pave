@@ -1,6 +1,7 @@
 struct EnumVariantInfo {
     index: usize,
-    name: str,
+    key: str,
+    label: str,
 }
 
 trait Enum {

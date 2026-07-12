@@ -22,7 +22,7 @@ void Standard__print(enum Standard* self) {
 #include <slice_EnumVariantInfo.h>
 struct slice_EnumVariantInfo Standard__Enum__get_variants(void* __self) {
     (void)__self;
-    static struct EnumVariantInfo variants[] = { (struct EnumVariantInfo){ .index = 0, .name = (struct str){ .ptr = "one", .length = sizeof("one") - 1 } }, (struct EnumVariantInfo){ .index = 1, .name = (struct str){ .ptr = "two", .length = sizeof("two") - 1 } } };
+    static struct EnumVariantInfo variants[] = { (struct EnumVariantInfo){ .index = 0, .name = (struct str){ .ptr = "one", .length = sizeof("one") - 1 } }, (struct EnumVariantInfo){ .index = 1, .name = (struct str){ .ptr = "Two", .length = 3 } } };
     return (struct slice_EnumVariantInfo){ .data = variants, .length = 2 };
 }
 uintptr_t Standard__Enum__get_variant_index(void* __self) {

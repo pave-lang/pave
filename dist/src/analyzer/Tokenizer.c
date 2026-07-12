@@ -72,7 +72,7 @@ bool Tokenizer__is_symbol(struct Tokenizer* self) {
     char c = self->data.ptr[self->pos];
 
     #line 51 "src/analyzer/Tokenizer.pv"
-    return c == '{' || c == '}' || c == '(' || c == ')' || c == '[' || c == ']' || c == '<' || c == '>' || c == '.' || c == ',' || c == ';' || c == ':' || c == '=' || c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '&' || c == '!' || c == '?' || c == '|' || c == '^' || c == '~';
+    return c == '{' || c == '}' || c == '(' || c == ')' || c == '[' || c == ']' || c == '<' || c == '>' || c == '.' || c == ',' || c == ';' || c == ':' || c == '=' || c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '&' || c == '!' || c == '?' || c == '|' || c == '^' || c == '~' || c == '@';
 }
 
 #line 54 "src/analyzer/Tokenizer.pv"

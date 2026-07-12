@@ -8,7 +8,8 @@
 #line 1 "src/std/Enum.pv"
 struct EnumVariantInfo {
     uintptr_t index;
-    struct str name;
+    struct str key;
+    struct str label;
 };
 
 #endif
