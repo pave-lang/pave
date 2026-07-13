@@ -10,12 +10,15 @@ struct PreprocessorIfStatement {
 
 impl PreprocessorIfStatement {
     fn parse(context: &Context, generics: &Generics) -> *Self {
+        let if_token = context.current();
         if !context.expect_value(TokenType::Keyword, "#if") { return null; }
+        if if_token == null { return null; }
 
         let condition = Array<&Token>::new(context.allocator);
-        while context.pos < context.length && !context.check_value(TokenType::Symbol, "{") {
+        while context.pos < context.length {
             let token = context.current();
             if token == null { return null; }
+            if token.start_line != if_token.start_line { break; }
             condition.append(token);
             context.next_token();
         }
@@ -24,14 +27,87 @@ impl PreprocessorIfStatement {
             return null;
         }
 
+        let parent_index = context.scopes.length - 1;
+        let parent_scope = &context.scopes.data[parent_index];
+        let original_values = parent_scope.values.clone(context.allocator);
+        let original_narrow_originals = parent_scope.narrow_originals.clone(context.allocator);
+        let original_definition_tokens = parent_scope.definition_tokens.clone(context.allocator);
+
         let block = Block::new_ptr(context);
-        if !block.parse(context, generics, true) { return null; }
+        let block_scope = block.parse_preprocessor_branch(context, generics);
+        if block_scope == null { return null; }
+
+        // Analysis inside a branch may broaden or otherwise update an outer binding.
+        // Restore the exact incoming state before analyzing the next possible branch.
+        parent_scope = &context.scopes.data[parent_index];
+        parent_scope.values = original_values.clone(context.allocator);
+        parent_scope.narrow_originals = original_narrow_originals.clone(context.allocator);
+        parent_scope.definition_tokens = original_definition_tokens.clone(context.allocator);
 
         let else_block: *Block = null;
+        let else_scope: *Scope = null;
         if context.check_next(TokenType::Keyword, "#else") {
             let parsed_else_block = Block::new_ptr(context);
-            if !parsed_else_block.parse(context, generics, true) { return null; }
+            else_scope = parsed_else_block.parse_preprocessor_branch(context, generics);
+            if else_scope == null { return null; }
             else_block = parsed_else_block;
+        }
+
+        if !context.expect_value(TokenType::Keyword, "#endif") { return null; }
+
+        parent_scope = &context.scopes.data[parent_index];
+        parent_scope.values = original_values.clone(context.allocator);
+        parent_scope.narrow_originals = original_narrow_originals.clone(context.allocator);
+        parent_scope.definition_tokens = original_definition_tokens.clone(context.allocator);
+
+        // The generated branches deliberately share the surrounding C scope.
+        // A branch-local declaration therefore cannot shadow an existing binding.
+        for (name, _) in block_scope.values {
+            if original_values.find(&name) != null {
+                let token = block_scope.definition_tokens.find(&name);
+                if token != null { context.error_token(*token, "Conditional declaration cannot shadow an existing variable"); }
+            }
+        }
+        if else_scope != null {
+            for (name, _) in else_scope.values {
+                if original_values.find(&name) != null {
+                    let token = else_scope.definition_tokens.find(&name);
+                    if token != null { context.error_token(*token, "Conditional declaration cannot shadow an existing variable"); }
+                }
+            }
+        }
+
+        // A missing #else is an implicit empty branch, so it cannot contribute
+        // declarations. With an else, promote only the intersection of equal types.
+        if else_scope != null {
+            for (name, block_type) in block_scope.values {
+                let other_type = else_scope.values.find(&name);
+                if other_type == null { continue; }
+
+                // Type.eq also answers assignment compatibility (for example some
+                // primitive/pointer coercions). Scope merging requires identity.
+                let block_type_name = context.root.naming_decl.get_type_decl(&block_type, context.type_self, null);
+                let else_type_name = context.root.naming_decl.get_type_decl(other_type, context.type_self, null);
+                if !block_type_name.as_str().eq(else_type_name.as_str()) {
+                    let message = String::new(context.allocator);
+                    message.append("Conditional declarations disagree for '");
+                    message.append(name);
+                    message.append("': ");
+                    message.append(block_type_name.as_str());
+                    message.append(" versus ");
+                    message.append(else_type_name.as_str());
+                    let token = else_scope.definition_tokens.find(&name);
+                    if token != null { context.error_token(*token, message.c_str()); }
+                    else { context.error(message.c_str()); }
+                    continue;
+                }
+
+                // Only names newly introduced on every path are structurally promoted.
+                if parent_scope.values.find(&name) == null {
+                    let token = block_scope.definition_tokens.find(&name);
+                    if token != null { context.set_value(*token, &block_type); }
+                }
+            }
         }
 
         let result = Self { condition, block, else_block };

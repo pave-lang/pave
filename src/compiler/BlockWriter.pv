@@ -395,14 +395,14 @@ impl BlockWriter {
                         return false;
                     }
                     function_context.push_scope(false, false);
-                    if !self.write_block(file, return_type, if_stmt.block, generics, false, false) { return false; }
+                    if !self.write_block(file, return_type, if_stmt.block, generics, false, true) { return false; }
                     function_context.pop_scope();
 
                     if if_stmt.else_block != null {
                         generator.write_indent(file);
                         fprintf(file, "#else\n");
                         function_context.push_scope(false, false);
-                        if !self.write_block(file, return_type, if_stmt.else_block, generics, false, false) { return false; }
+                        if !self.write_block(file, return_type, if_stmt.else_block, generics, false, true) { return false; }
                         function_context.pop_scope();
                     }
 

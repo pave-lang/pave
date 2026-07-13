@@ -54,6 +54,10 @@ struct AssignmentStatement;
 
 #line 169 "src/std/ArenaAllocator.pv"
 struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct ArenaAllocator* self, struct AssignmentStatement* value);
+struct Scope;
+
+#line 169 "src/std/ArenaAllocator.pv"
+struct Scope* ArenaAllocator__store_Scope(struct ArenaAllocator* self, struct Scope* value);
 struct Token;
 
 #line 169 "src/std/ArenaAllocator.pv"

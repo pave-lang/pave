@@ -118,6 +118,59 @@ impl Block {
         }
     }
 
+    fn parse_statement(&self, context: &Context, generics: &Generics) -> bool {
+        let first_token = context.current();
+        if first_token == null { return false; }
+
+        let data: StatementData;
+        let result = true;
+
+        if first_token.eq(TokenType::Symbol, "{") {
+            let block = Block::new_ptr(context);
+            result = block.parse(context, generics, true);
+            data = StatementData::BlockStatement(block);
+        } else if first_token.eq(TokenType::Keyword, "defer") {
+            let defer_stmt = DeferStatement::parse(self, context, generics);
+            if defer_stmt == null { return false; }
+            data = StatementData::DeferStatement(*defer_stmt);
+        } else if first_token.type == TokenType::Keyword {
+            result = Block::parse_keyword(self, context, generics, first_token, &data);
+        } else {
+            result = Block::parse_expression_statement(self, context, generics, &data);
+        }
+
+        if !result { return false; }
+        self.statements.append(Statement::new(first_token, context.prev(), data));
+        return true;
+    }
+
+    // Parse a preprocessor-delimited statement list, retaining its isolated scope
+    // so the enclosing #if can compare declarations from every branch.
+    fn parse_preprocessor_branch(&self, context: &Context, generics: &Generics) -> *Scope {
+        context.push_scope(self);
+
+        while !context.check_value(TokenType::Keyword, "#else") && !context.check_value(TokenType::Keyword, "#endif") {
+            if context.current() == null {
+                context.error("Expected #endif");
+                context.pop_scope();
+                return null;
+            }
+            if !self.parse_statement(context, generics) {
+                context.pop_scope();
+                return null;
+            }
+        }
+
+        let scope = context.scopes.back();
+        if scope == null {
+            context.pop_scope();
+            return null;
+        }
+        let result = context.allocator.store(scope);
+        context.pop_scope();
+        return result;
+    }
+
     fn parse(&self, context: &Context, generics: &Generics, new_scope: bool) -> bool {
         if !context.expect_value(TokenType::Symbol, "{") { return false; }
         if new_scope { context.push_scope(self); }
@@ -128,32 +181,10 @@ impl Block {
                 if new_scope { context.pop_scope(); }
                 return false;
             }
-            let data: StatementData;
-            let result = true;
-
-            if first_token.eq(TokenType::Symbol, "{") {
-                let block = Block::new_ptr(context);
-                result = block.parse(context, generics, true);
-                data = StatementData::BlockStatement(block);
-            } else if first_token.eq(TokenType::Keyword, "defer") {
-                let defer_stmt = DeferStatement::parse(self, context, generics);
-                if defer_stmt == null {
-                    if new_scope { context.pop_scope(); }
-                    return false;
-                }
-                data = StatementData::DeferStatement(*defer_stmt);
-            } else if first_token.type == TokenType::Keyword {
-                result = Block::parse_keyword(self, context, generics, first_token, &data);
-            } else {
-                result = Block::parse_expression_statement(self, context, generics, &data);
-            }
-
-            if !result {
+            if !self.parse_statement(context, generics) {
                 if new_scope { context.pop_scope(); }
                 return false;
             }
-
-            self.statements.append(Statement::new(first_token, context.prev(), data));
         }
 
         if new_scope {

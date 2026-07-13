@@ -838,7 +838,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                 #line 397 "src/compiler/BlockWriter.pv"
                 FunctionContext__push_scope(function_context, false, false);
                 #line 398 "src/compiler/BlockWriter.pv"
-                if (!BlockWriter__write_block(self, file, return_type, if_stmt->block, generics, false, false)) {
+                if (!BlockWriter__write_block(self, file, return_type, if_stmt->block, generics, false, true)) {
                     #line 398 "src/compiler/BlockWriter.pv"
                     return false;
                 }
@@ -854,7 +854,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                     #line 404 "src/compiler/BlockWriter.pv"
                     FunctionContext__push_scope(function_context, false, false);
                     #line 405 "src/compiler/BlockWriter.pv"
-                    if (!BlockWriter__write_block(self, file, return_type, if_stmt->else_block, generics, false, false)) {
+                    if (!BlockWriter__write_block(self, file, return_type, if_stmt->else_block, generics, false, true)) {
                         #line 405 "src/compiler/BlockWriter.pv"
                         return false;
                     }

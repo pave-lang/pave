@@ -180,6 +180,23 @@ struct AssignmentStatement* ArenaAllocator__store_AssignmentStatement(struct Are
     #line 174 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/Scope.h>
+
+#line 169 "src/std/ArenaAllocator.pv"
+struct Scope* ArenaAllocator__store_Scope(struct ArenaAllocator* self, struct Scope* value) {
+    #line 170 "src/std/ArenaAllocator.pv"
+    struct Scope* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct Scope));
+    #line 171 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 171 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 173 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct Scope));
+    #line 174 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/Token.h>
 
 #line 169 "src/std/ArenaAllocator.pv"
