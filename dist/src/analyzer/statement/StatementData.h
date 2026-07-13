@@ -7,6 +7,7 @@ struct LetStatement;
 struct ReturnStatement;
 struct YieldStatement;
 struct IfStatement;
+struct PreprocessorIfStatement;
 struct MatchStatement;
 struct WhileStatement;
 struct ForStatement;
@@ -20,6 +21,7 @@ struct StatementData {
         STATEMENT_DATA__RETURN_STATEMENT,
         STATEMENT_DATA__YIELD_STATEMENT,
         STATEMENT_DATA__IF_STATEMENT,
+        STATEMENT_DATA__PREPROCESSOR_IF_STATEMENT,
         STATEMENT_DATA__MATCH_STATEMENT,
         STATEMENT_DATA__WHILE_STATEMENT,
         STATEMENT_DATA__FOR_STATEMENT,
@@ -36,6 +38,7 @@ struct StatementData {
         struct ReturnStatement* returnstatement_value;
         struct YieldStatement* yieldstatement_value;
         struct IfStatement* ifstatement_value;
+        struct PreprocessorIfStatement* preprocessorifstatement_value;
         struct MatchStatement* matchstatement_value;
         struct WhileStatement* whilestatement_value;
         struct ForStatement* forstatement_value;

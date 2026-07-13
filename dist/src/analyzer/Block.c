@@ -19,6 +19,7 @@
 #include <analyzer/statement/ReturnStatement.h>
 #include <analyzer/statement/YieldStatement.h>
 #include <analyzer/statement/IfStatement.h>
+#include <analyzer/statement/PreprocessorIfStatement.h>
 #include <analyzer/statement/MatchStatement.h>
 #include <analyzer/statement/WhileStatement.h>
 #include <analyzer/statement/ForStatement.h>
@@ -150,150 +151,159 @@ bool Block__parse_keyword(struct Block* self, struct Context* context, struct Ge
             return if_stmt != 0;
         } break;
         #line 84 "src/analyzer/Block.pv"
-        case 14105242855728223222ULL: {
+        case 14795073645678820133ULL: {
             #line 85 "src/analyzer/Block.pv"
-            struct MatchStatement* match_stmt = MatchStatement__parse(context, generics);
+            struct PreprocessorIfStatement* if_stmt = PreprocessorIfStatement__parse(context, generics);
             #line 86 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__MATCH_STATEMENT, .matchstatement_value = match_stmt };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__PREPROCESSOR_IF_STATEMENT, .preprocessorifstatement_value = if_stmt };
             #line 87 "src/analyzer/Block.pv"
-            return match_stmt != 0;
+            return if_stmt != 0;
         } break;
         #line 89 "src/analyzer/Block.pv"
-        case 14882043299657492846ULL: {
+        case 14105242855728223222ULL: {
             #line 90 "src/analyzer/Block.pv"
-            struct WhileStatement* while_stmt = WhileStatement__parse(context, generics);
+            struct MatchStatement* match_stmt = MatchStatement__parse(context, generics);
             #line 91 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__WHILE_STATEMENT, .whilestatement_value = while_stmt };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__MATCH_STATEMENT, .matchstatement_value = match_stmt };
             #line 92 "src/analyzer/Block.pv"
-            return while_stmt != 0;
+            return match_stmt != 0;
         } break;
         #line 94 "src/analyzer/Block.pv"
-        case 15902905282948881040ULL: {
+        case 14882043299657492846ULL: {
             #line 95 "src/analyzer/Block.pv"
-            struct ForStatement* for_statement = ForStatement__parse(self, context, generics);
+            struct WhileStatement* while_stmt = WhileStatement__parse(context, generics);
             #line 96 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__FOR_STATEMENT, .forstatement_value = for_statement };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__WHILE_STATEMENT, .whilestatement_value = while_stmt };
             #line 97 "src/analyzer/Block.pv"
-            return for_statement != 0;
+            return while_stmt != 0;
         } break;
         #line 99 "src/analyzer/Block.pv"
-        case 15186091406668687012ULL: {
+        case 15902905282948881040ULL: {
             #line 100 "src/analyzer/Block.pv"
-            Context__next_token(context);
+            struct ForStatement* for_statement = ForStatement__parse(self, context, generics);
             #line 101 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__CONTINUE_STATEMENT };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__FOR_STATEMENT, .forstatement_value = for_statement };
             #line 102 "src/analyzer/Block.pv"
-            return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";");
+            return for_statement != 0;
         } break;
         #line 104 "src/analyzer/Block.pv"
-        case 10644074229358120504ULL: {
+        case 15186091406668687012ULL: {
             #line 105 "src/analyzer/Block.pv"
             Context__next_token(context);
             #line 106 "src/analyzer/Block.pv"
-            *data = (struct StatementData) { .type = STATEMENT_DATA__BREAK_STATEMENT };
+            *data = (struct StatementData) { .type = STATEMENT_DATA__CONTINUE_STATEMENT };
             #line 107 "src/analyzer/Block.pv"
             return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";");
         } break;
         #line 109 "src/analyzer/Block.pv"
-        default: {
+        case 10644074229358120504ULL: {
             #line 110 "src/analyzer/Block.pv"
-            Context__error_token(context, first_token, "Unexpected keyword");
+            Context__next_token(context);
             #line 111 "src/analyzer/Block.pv"
+            *data = (struct StatementData) { .type = STATEMENT_DATA__BREAK_STATEMENT };
+            #line 112 "src/analyzer/Block.pv"
+            return Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";");
+        } break;
+        #line 114 "src/analyzer/Block.pv"
+        default: {
+            #line 115 "src/analyzer/Block.pv"
+            Context__error_token(context, first_token, "Unexpected keyword");
+            #line 116 "src/analyzer/Block.pv"
             return false;
         } break;
     }
 }
 
-#line 116 "src/analyzer/Block.pv"
+#line 121 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope) {
-    #line 117 "src/analyzer/Block.pv"
+    #line 122 "src/analyzer/Block.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 117 "src/analyzer/Block.pv"
+        #line 122 "src/analyzer/Block.pv"
         return false;
     }
-    #line 118 "src/analyzer/Block.pv"
+    #line 123 "src/analyzer/Block.pv"
     if (new_scope) {
-        #line 118 "src/analyzer/Block.pv"
+        #line 123 "src/analyzer/Block.pv"
         Context__push_scope(context, self);
     }
 
-    #line 120 "src/analyzer/Block.pv"
+    #line 125 "src/analyzer/Block.pv"
     while (!Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 121 "src/analyzer/Block.pv"
+        #line 126 "src/analyzer/Block.pv"
         struct Token* first_token = Context__current(context);
-        #line 122 "src/analyzer/Block.pv"
+        #line 127 "src/analyzer/Block.pv"
         if (first_token == 0) {
-            #line 123 "src/analyzer/Block.pv"
+            #line 128 "src/analyzer/Block.pv"
             if (new_scope) {
-                #line 123 "src/analyzer/Block.pv"
+                #line 128 "src/analyzer/Block.pv"
                 Context__pop_scope(context);
             }
-            #line 124 "src/analyzer/Block.pv"
+            #line 129 "src/analyzer/Block.pv"
             return false;
         }
-        #line 126 "src/analyzer/Block.pv"
+        #line 131 "src/analyzer/Block.pv"
         struct StatementData data;
-        #line 127 "src/analyzer/Block.pv"
+        #line 132 "src/analyzer/Block.pv"
         bool result = true;
 
-        #line 129 "src/analyzer/Block.pv"
+        #line 134 "src/analyzer/Block.pv"
         if (Token__eq(first_token, TOKEN_TYPE__SYMBOL, "{")) {
-            #line 130 "src/analyzer/Block.pv"
+            #line 135 "src/analyzer/Block.pv"
             struct Block* block = Block__new_ptr(context);
-            #line 131 "src/analyzer/Block.pv"
+            #line 136 "src/analyzer/Block.pv"
             result = Block__parse(block, context, generics, true);
-            #line 132 "src/analyzer/Block.pv"
+            #line 137 "src/analyzer/Block.pv"
             data = (struct StatementData) { .type = STATEMENT_DATA__BLOCK_STATEMENT, .blockstatement_value = block };
         } else if (Token__eq(first_token, TOKEN_TYPE__KEYWORD, "defer")) {
-            #line 134 "src/analyzer/Block.pv"
+            #line 139 "src/analyzer/Block.pv"
             struct DeferStatement* defer_stmt = DeferStatement__parse(self, context, generics);
-            #line 135 "src/analyzer/Block.pv"
+            #line 140 "src/analyzer/Block.pv"
             if (defer_stmt == 0) {
-                #line 136 "src/analyzer/Block.pv"
+                #line 141 "src/analyzer/Block.pv"
                 if (new_scope) {
-                    #line 136 "src/analyzer/Block.pv"
+                    #line 141 "src/analyzer/Block.pv"
                     Context__pop_scope(context);
                 }
-                #line 137 "src/analyzer/Block.pv"
+                #line 142 "src/analyzer/Block.pv"
                 return false;
             }
-            #line 139 "src/analyzer/Block.pv"
+            #line 144 "src/analyzer/Block.pv"
             data = (struct StatementData) { .type = STATEMENT_DATA__DEFER_STATEMENT, .deferstatement_value = *defer_stmt };
         } else if (first_token->type == TOKEN_TYPE__KEYWORD) {
-            #line 141 "src/analyzer/Block.pv"
+            #line 146 "src/analyzer/Block.pv"
             result = Block__parse_keyword(self, context, generics, first_token, &data);
         } else {
-            #line 143 "src/analyzer/Block.pv"
+            #line 148 "src/analyzer/Block.pv"
             result = Block__parse_expression_statement(self, context, generics, &data);
         }
 
-        #line 146 "src/analyzer/Block.pv"
+        #line 151 "src/analyzer/Block.pv"
         if (!result) {
-            #line 147 "src/analyzer/Block.pv"
+            #line 152 "src/analyzer/Block.pv"
             if (new_scope) {
-                #line 147 "src/analyzer/Block.pv"
+                #line 152 "src/analyzer/Block.pv"
                 Context__pop_scope(context);
             }
-            #line 148 "src/analyzer/Block.pv"
+            #line 153 "src/analyzer/Block.pv"
             return false;
         }
 
-        #line 151 "src/analyzer/Block.pv"
+        #line 156 "src/analyzer/Block.pv"
         Array_Statement__append(&self->statements, Statement__new(first_token, Context__prev(context), data));
     }
 
-    #line 154 "src/analyzer/Block.pv"
+    #line 159 "src/analyzer/Block.pv"
     if (new_scope) {
-        #line 155 "src/analyzer/Block.pv"
+        #line 160 "src/analyzer/Block.pv"
         Context__pop_scope(context);
     }
 
-    #line 158 "src/analyzer/Block.pv"
+    #line 163 "src/analyzer/Block.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 158 "src/analyzer/Block.pv"
+        #line 163 "src/analyzer/Block.pv"
         return false;
     }
 
-    #line 160 "src/analyzer/Block.pv"
+    #line 165 "src/analyzer/Block.pv"
     return true;
 }

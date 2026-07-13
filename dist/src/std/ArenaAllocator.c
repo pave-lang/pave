@@ -418,6 +418,23 @@ struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocato
     #line 174 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/statement/PreprocessorIfStatement.h>
+
+#line 169 "src/std/ArenaAllocator.pv"
+struct PreprocessorIfStatement* ArenaAllocator__store_PreprocessorIfStatement(struct ArenaAllocator* self, struct PreprocessorIfStatement* value) {
+    #line 170 "src/std/ArenaAllocator.pv"
+    struct PreprocessorIfStatement* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct PreprocessorIfStatement));
+    #line 171 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 171 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 173 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct PreprocessorIfStatement));
+    #line 174 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/statement/ReturnStatement.h>
 
 #line 169 "src/std/ArenaAllocator.pv"

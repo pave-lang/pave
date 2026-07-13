@@ -381,6 +381,34 @@ impl BlockWriter {
 
                     fprintf(file, "\n");
                 },
+                StatementData::PreprocessorIfStatement(if_stmt) => {
+                    generator.write_indent(file);
+                    fprintf(file, "#if ");
+                    for *token in if_stmt.condition {
+                        fprintf(file, "%.*s ", cast<i32>(token.value.length), token.value.ptr);
+                    }
+                    fprintf(file, "\n");
+
+                    let function_context = generator.function_context;
+                    if function_context == null {
+                        fprintf(stderr, "Missing function context in preprocessor if statement\n");
+                        return false;
+                    }
+                    function_context.push_scope(false, false);
+                    if !self.write_block(file, return_type, if_stmt.block, generics, false, false) { return false; }
+                    function_context.pop_scope();
+
+                    if if_stmt.else_block != null {
+                        generator.write_indent(file);
+                        fprintf(file, "#else\n");
+                        function_context.push_scope(false, false);
+                        if !self.write_block(file, return_type, if_stmt.else_block, generics, false, false) { return false; }
+                        function_context.pop_scope();
+                    }
+
+                    generator.write_indent(file);
+                    fprintf(file, "#endif\n");
+                },
                 StatementData::MatchStatement(match_stmt) => {
                     let expression = match_stmt.expression;
                     let cases = &match_stmt.cases;

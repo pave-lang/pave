@@ -947,6 +947,10 @@ impl Usages {
                         self.process_block(else_statement.block, generic_map);
                     }
                 },
+                StatementData::PreprocessorIfStatement(statement) => {
+                    self.process_block(statement.block, generic_map);
+                    self.process_block(statement.else_block, generic_map);
+                },
                 StatementData::MatchStatement(statement) => {
                     self.process_expression(statement.expression, generic_map);
 

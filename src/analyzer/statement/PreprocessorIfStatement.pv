@@ -1,0 +1,40 @@
+use std
+use analyzer
+use types
+
+struct PreprocessorIfStatement {
+    condition: Array<&Token>,
+    block: &Block,
+    else_block: *Block,
+}
+
+impl PreprocessorIfStatement {
+    fn parse(context: &Context, generics: &Generics) -> *Self {
+        if !context.expect_value(TokenType::Keyword, "#if") { return null; }
+
+        let condition = Array<&Token>::new(context.allocator);
+        while context.pos < context.length && !context.check_value(TokenType::Symbol, "{") {
+            let token = context.current();
+            if token == null { return null; }
+            condition.append(token);
+            context.next_token();
+        }
+        if condition.length == 0 {
+            context.error("Expected preprocessor expression in #if condition");
+            return null;
+        }
+
+        let block = Block::new_ptr(context);
+        if !block.parse(context, generics, true) { return null; }
+
+        let else_block: *Block = null;
+        if context.check_next(TokenType::Keyword, "#else") {
+            let parsed_else_block = Block::new_ptr(context);
+            if !parsed_else_block.parse(context, generics, true) { return null; }
+            else_block = parsed_else_block;
+        }
+
+        let result = Self { condition, block, else_block };
+        return context.allocator.store(&result);
+    }
+}

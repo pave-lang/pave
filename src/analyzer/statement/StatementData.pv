@@ -8,6 +8,7 @@ enum StatementData {
     ReturnStatement(&ReturnStatement),
     YieldStatement(&YieldStatement),
     IfStatement(&IfStatement),
+    PreprocessorIfStatement(&PreprocessorIfStatement),
     MatchStatement(&MatchStatement),
     WhileStatement(&WhileStatement),
     ForStatement(&ForStatement),

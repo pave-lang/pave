@@ -81,6 +81,11 @@ impl Block {
                 *data = StatementData::IfStatement(if_stmt);
                 return if_stmt != null;
             },
+            hash("#if") => {
+                let if_stmt = PreprocessorIfStatement::parse(context, generics);
+                *data = StatementData::PreprocessorIfStatement(if_stmt);
+                return if_stmt != null;
+            },
             hash("match") => {
                 let match_stmt = MatchStatement::parse(context, generics);
                 *data = StatementData::MatchStatement(match_stmt);

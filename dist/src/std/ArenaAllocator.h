@@ -110,6 +110,10 @@ struct MatchStatement;
 
 #line 169 "src/std/ArenaAllocator.pv"
 struct MatchStatement* ArenaAllocator__store_MatchStatement(struct ArenaAllocator* self, struct MatchStatement* value);
+struct PreprocessorIfStatement;
+
+#line 169 "src/std/ArenaAllocator.pv"
+struct PreprocessorIfStatement* ArenaAllocator__store_PreprocessorIfStatement(struct ArenaAllocator* self, struct PreprocessorIfStatement* value);
 struct ReturnStatement;
 
 #line 169 "src/std/ArenaAllocator.pv"
