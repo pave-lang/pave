@@ -1,11 +1,28 @@
+enum EnumVariantKind {
+    Unit,
+    Tuple,
+    Struct,
+}
+
+struct EnumVariantParamInfo {
+    index: usize,
+    name: str,
+    type_id: TypeId,
+    type_name: *const char,
+}
+
 struct EnumVariantInfo {
     index: usize,
     key: str,
     label: str,
+    kind: EnumVariantKind,
+    params: &[EnumVariantParamInfo],
 }
 
 trait Enum {
     fn get_variants(&self) -> &[EnumVariantInfo];
     fn get_variant_index(&self) -> usize;
     fn set_variant(&self, index: usize);
+    fn get_param(&self, index: usize) -> &void;
+    fn set_param(&self, index: usize, value: *void) -> bool;
 }

@@ -86,6 +86,16 @@ impl Block {
                 *data = StatementData::PreprocessorIfStatement(if_stmt);
                 return if_stmt != null;
             },
+            hash("#ifdef") => {
+                let if_stmt = PreprocessorIfStatement::parse(context, generics);
+                *data = StatementData::PreprocessorIfStatement(if_stmt);
+                return if_stmt != null;
+            },
+            hash("#ifndef") => {
+                let if_stmt = PreprocessorIfStatement::parse(context, generics);
+                *data = StatementData::PreprocessorIfStatement(if_stmt);
+                return if_stmt != null;
+            },
             hash("match") => {
                 let match_stmt = MatchStatement::parse(context, generics);
                 *data = StatementData::MatchStatement(match_stmt);
@@ -149,7 +159,7 @@ impl Block {
     fn parse_preprocessor_branch(&self, context: &Context, generics: &Generics) -> *Scope {
         context.push_scope(self);
 
-        while !context.check_value(TokenType::Keyword, "#else") && !context.check_value(TokenType::Keyword, "#endif") {
+        while !context.check_value(TokenType::Keyword, "#elif") && !context.check_value(TokenType::Keyword, "#else") && !context.check_value(TokenType::Keyword, "#endif") {
             if context.current() == null {
                 context.error("Expected #endif");
                 context.pop_scope();

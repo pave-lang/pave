@@ -383,7 +383,7 @@ impl BlockWriter {
                 },
                 StatementData::PreprocessorIfStatement(if_stmt) => {
                     generator.write_indent(file);
-                    fprintf(file, "#if ");
+                    fprintf(file, "%.*s ", cast<i32>(if_stmt.directive.value.length), if_stmt.directive.value.ptr);
                     for *token in if_stmt.condition {
                         fprintf(file, "%.*s ", cast<i32>(token.value.length), token.value.ptr);
                     }
@@ -397,6 +397,18 @@ impl BlockWriter {
                     function_context.push_scope(false, false);
                     if !self.write_block(file, return_type, if_stmt.block, generics, false, true) { return false; }
                     function_context.pop_scope();
+
+                    for else_if in if_stmt.else_ifs {
+                        generator.write_indent(file);
+                        fprintf(file, "#elif ");
+                        for *token in else_if.condition {
+                            fprintf(file, "%.*s ", cast<i32>(token.value.length), token.value.ptr);
+                        }
+                        fprintf(file, "\n");
+                        function_context.push_scope(false, false);
+                        if !self.write_block(file, return_type, else_if.block, generics, false, true) { return false; }
+                        function_context.pop_scope();
+                    }
 
                     if if_stmt.else_block != null {
                         generator.write_indent(file);

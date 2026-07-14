@@ -34,13 +34,13 @@ bool Block__parse_expression_statement(struct Block* self, struct Context* conte
 #line 62 "src/analyzer/Block.pv"
 bool Block__parse_keyword(struct Block* self, struct Context* context, struct Generics* generics, struct Token* first_token, struct StatementData* data);
 
-#line 121 "src/analyzer/Block.pv"
+#line 131 "src/analyzer/Block.pv"
 bool Block__parse_statement(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 149 "src/analyzer/Block.pv"
+#line 159 "src/analyzer/Block.pv"
 struct Scope* Block__parse_preprocessor_branch(struct Block* self, struct Context* context, struct Generics* generics);
 
-#line 174 "src/analyzer/Block.pv"
+#line 184 "src/analyzer/Block.pv"
 bool Block__parse(struct Block* self, struct Context* context, struct Generics* generics, bool new_scope);
 
 #endif

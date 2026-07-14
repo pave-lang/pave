@@ -205,6 +205,9 @@ impl FileGenerator {
 
             fprintf(code_file, "#include <std/EnumVariantInfo.h>\n");
             fprintf(code_file, "#include <slice_EnumVariantInfo.h>\n");
+            fprintf(code_file, "#include <std/EnumVariantParamInfo.h>\n");
+            fprintf(code_file, "#include <slice_EnumVariantParamInfo.h>\n");
+            fprintf(code_file, "#include <std/EnumVariantKind.h>\n");
             fprintf(code_file, "struct slice_EnumVariantInfo ");
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Enum__get_variants(void* __self) {\n");
@@ -212,10 +215,45 @@ impl FileGenerator {
             generator.indent += 1;
             generator.write_indent(code_file);
             fprintf(code_file, "(void)__self;\n");
+
+            let variant_index: usize = 0;
+            for (_, &variant) in enum_info.variants {
+                if variant.types.length > 0 {
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "static struct EnumVariantParamInfo __params_%zu[] = { ", variant_index);
+
+                    let param_index: usize = 0;
+                    for type in variant.types {
+                        if param_index > 0 { fprintf(code_file, ", "); }
+                        fprintf(code_file, "(struct EnumVariantParamInfo){ .index = %zu, .name = ", param_index);
+
+                        if variant.names.length > 0 {
+                            let field_name = variant.names.data[param_index];
+                            fprintf(code_file, "(struct str){ .ptr = \"");
+                            generator.write_str(code_file, field_name);
+                            fprintf(code_file, "\", .length = %zu }", field_name.length);
+                        } else {
+                            fprintf(code_file, "(struct str){ .ptr = \"\", .length = 0 }");
+                        }
+
+                        fprintf(code_file, ", .type_id = ");
+                        generator.write_typeid(code_file, type, generics);
+                        fprintf(code_file, ", .type_name = ");
+                        generator.write_typename(code_file, type, generics);
+                        fprintf(code_file, " }");
+
+                        param_index += 1;
+                    }
+
+                    fprintf(code_file, " };\n");
+                }
+                variant_index += 1;
+            }
+
             generator.write_indent(code_file);
             fprintf(code_file, "static struct EnumVariantInfo variants[] = { ");
 
-            let variant_index: usize = 0;
+            variant_index = 0;
             for (_, &variant) in enum_info.variants {
                 if variant_index > 0 { fprintf(code_file, ", "); }
                 fprintf(code_file, "(struct EnumVariantInfo){ .index = %zu, .key = (struct str){ .ptr = \"", variant_index);
@@ -225,12 +263,29 @@ impl FileGenerator {
                     generator.write_token(code_file, variant.label);
                     fprintf(code_file, ", .length = sizeof(");
                     generator.write_token(code_file, variant.label);
-                    fprintf(code_file, ") - 1 } }");
+                    fprintf(code_file, ") - 1 }");
                 } else {
                     fprintf(code_file, "\"");
                     generator.write_token(code_file, variant.name);
-                    fprintf(code_file, "\", .length = %zu } }", variant.name.value.length);
+                    fprintf(code_file, "\", .length = %zu }", variant.name.value.length);
                 }
+
+                fprintf(code_file, ", .kind = ");
+                if variant.names.length > 0 {
+                    fprintf(code_file, "ENUM_VARIANT_KIND__STRUCT");
+                } else if variant.types.length > 0 {
+                    fprintf(code_file, "ENUM_VARIANT_KIND__TUPLE");
+                } else {
+                    fprintf(code_file, "ENUM_VARIANT_KIND__UNIT");
+                }
+
+                if variant.types.length > 0 {
+                    fprintf(code_file, ", .params = (struct slice_EnumVariantParamInfo){ .data = __params_%zu, .length = %zu }", variant_index, variant.types.length);
+                } else {
+                    fprintf(code_file, ", .params = (struct slice_EnumVariantParamInfo){ .data = 0, .length = 0 }");
+                }
+
+                fprintf(code_file, " }");
                 variant_index += 1;
             }
 
@@ -292,6 +347,173 @@ impl FileGenerator {
             generator.indent -= 1;
             fprintf(code_file, "}\n");
 
+            fprintf(code_file, "void* ");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__get_param(void* __self, uintptr_t index) {\n");
+
+            generator.indent += 1;
+
+            if !is_discriminated_union {
+                generator.write_indent(code_file);
+                fprintf(code_file, "(void)__self; (void)index;\n");
+                generator.write_indent(code_file);
+                fprintf(code_file, "return 0;\n");
+            } else {
+                generator.write_indent(code_file);
+                generator.write_type(code_file, &Type::Self, generics);
+
+                if module.mode_cpp {
+                    fprintf(code_file, "* self = (");
+                    generator.write_type(code_file, &Type::Self, generics);
+                    fprintf(code_file, "*)__self;\n");
+                } else {
+                    fprintf(code_file, "* self = __self;\n");
+                }
+
+                generator.write_indent(code_file);
+                fprintf(code_file, "switch (self->type) {\n");
+                generator.indent += 1;
+
+                for (_, &variant) in enum_info.variants {
+                    if variant.types.length == 0 { continue; }
+
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "case ");
+                    generator.write_enum_variant_name(code_file, generics.self_type, variant);
+                    fprintf(code_file, ": switch (index) {\n");
+                    generator.indent += 1;
+
+                    let i: usize = 0;
+                    for type in variant.types {
+                        generator.write_indent(code_file);
+                        fprintf(code_file, "case %zu: return ", i);
+
+                        if !Generator::is_reference(type) || type.is_fat_pointer() {
+                            fprintf(code_file, "&");
+                        }
+
+                        fprintf(code_file, "self->");
+                        generator.write_str_lowercase(code_file, variant.name.value);
+                        fprintf(code_file, "_value");
+
+                        if variant.names.length > 0 {
+                            fprintf(code_file, ".");
+                            generator.write_str(code_file, variant.names.data[i]);
+                        } else if variant.types.length > 1 {
+                            fprintf(code_file, "._%zu", i);
+                        }
+
+                        fprintf(code_file, ";\n");
+                        i += 1;
+                    }
+
+                    generator.indent -= 1;
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "}\n");
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "break;\n");
+                }
+
+                generator.indent -= 1;
+                generator.write_indent(code_file);
+                fprintf(code_file, "}\n");
+
+                generator.write_indent(code_file);
+                fprintf(code_file, "return 0;\n");
+            }
+
+            generator.indent -= 1;
+            fprintf(code_file, "}\n");
+
+            fprintf(code_file, "bool ");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__set_param(void* __self, uintptr_t index, void* value) {\n");
+
+            generator.indent += 1;
+
+            if !is_discriminated_union {
+                generator.write_indent(code_file);
+                fprintf(code_file, "(void)__self; (void)index; (void)value;\n");
+                generator.write_indent(code_file);
+                fprintf(code_file, "return false;\n");
+            } else {
+                generator.write_indent(code_file);
+                generator.write_type(code_file, &Type::Self, generics);
+
+                if module.mode_cpp {
+                    fprintf(code_file, "* self = (");
+                    generator.write_type(code_file, &Type::Self, generics);
+                    fprintf(code_file, "*)__self;\n");
+                } else {
+                    fprintf(code_file, "* self = __self;\n");
+                }
+
+                generator.write_indent(code_file);
+                fprintf(code_file, "switch (self->type) {\n");
+                generator.indent += 1;
+
+                for (_, &variant) in enum_info.variants {
+                    if variant.types.length == 0 { continue; }
+
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "case ");
+                    generator.write_enum_variant_name(code_file, generics.self_type, variant);
+                    fprintf(code_file, ": switch (index) {\n");
+                    generator.indent += 1;
+
+                    let i: usize = 0;
+                    for type in variant.types {
+                        if type.is_sequence() {
+                            i += 1;
+                            continue;
+                        }
+
+                        generator.write_indent(code_file);
+                        fprintf(code_file, "case %zu: self->", i);
+                        generator.write_str_lowercase(code_file, variant.name.value);
+                        fprintf(code_file, "_value");
+
+                        if variant.names.length > 0 {
+                            fprintf(code_file, ".");
+                            generator.write_str(code_file, variant.names.data[i]);
+                        } else if variant.types.length > 1 {
+                            fprintf(code_file, "._%zu", i);
+                        }
+
+                        fprintf(code_file, " = ");
+
+                        if !Generator::is_reference(type) || type.is_fat_pointer() {
+                            fprintf(code_file, "*(");
+                            generator.write_type(code_file, type, generics);
+                            fprintf(code_file, "*)");
+                        } else if module.mode_cpp {
+                            fprintf(code_file, "(");
+                            generator.write_type(code_file, type, generics);
+                            fprintf(code_file, ")");
+                        }
+
+                        fprintf(code_file, "value; return true;\n");
+                        i += 1;
+                    }
+
+                    generator.indent -= 1;
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "}\n");
+                    generator.write_indent(code_file);
+                    fprintf(code_file, "break;\n");
+                }
+
+                generator.indent -= 1;
+                generator.write_indent(code_file);
+                fprintf(code_file, "}\n");
+
+                generator.write_indent(code_file);
+                fprintf(code_file, "return false;\n");
+            }
+
+            generator.indent -= 1;
+            fprintf(code_file, "}\n");
+
             fprintf(code_file, "struct trait_EnumVTable ");
             generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__ENUM");
@@ -301,7 +523,11 @@ impl FileGenerator {
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Enum__get_variant_index, .fn_set_variant = &");
             generator.write_string(code_file, &name);
-            fprintf(code_file, "__Enum__set_variant };\n");
+            fprintf(code_file, "__Enum__set_variant, .fn_get_param = &");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__get_param, .fn_set_param = &");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Enum__set_param };\n");
         }
 
         generator.overwrite_if_different(code.c_str(), code_file);
