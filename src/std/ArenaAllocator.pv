@@ -1,6 +1,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "stddef.h"
 
 struct ArenaAllocator {
     allocator: &dyn Allocator,
@@ -18,6 +19,7 @@ struct ArenaBlock {
 
 struct ArenaOversize {
     size: usize,
+    data: *void,
     prev: *ArenaOversize,
 }
 
@@ -38,19 +40,22 @@ impl ArenaBlock {
 
     fn alloc(&self, size: usize) -> *void {
         let header_size: usize = sizeof(ArenaAllocation);
+        let alignment = ArenaAllocator::alignment();
+        let data_offset = ArenaAllocator::align_up(self.offset + header_size, alignment);
+        let next_offset = ArenaAllocator::align_up(data_offset + size, alignment);
 
-        let total_size: usize = header_size + size;
-
-        if self.offset + total_size > self.capacity {
+        if next_offset > self.capacity {
             return null;
         }
 
-        let header_ptr: &void = self.buffer + self.offset;
-        let data_ptr: &void = self.buffer + self.offset + header_size;
+        let header_ptr: &void = self.buffer + data_offset - header_size;
+        let data_ptr: &void = self.buffer + data_offset;
 
         let header: &ArenaAllocation = header_ptr;
         header.size = size;
-        self.offset += total_size;
+        header.start_offset = self.offset;
+        header.end_offset = next_offset;
+        self.offset = next_offset;
 
         return data_ptr;
     }
@@ -78,12 +83,10 @@ impl ArenaBlock {
         header -= 1;
         if header == null { return false; }
 
-        let data: &u8 = ptr;
-
-        if data + header.size == self.buffer + self.offset {
-            let total_size: usize = sizeof(ArenaAllocation) + header.size;
-            self.offset -= total_size;
-            memset(header, 0, total_size);
+        if header.end_offset == self.offset {
+            let old_offset = self.offset;
+            self.offset = header.start_offset;
+            memset(self.buffer + self.offset, 0, old_offset - self.offset);
             return true;
         }
 
@@ -103,18 +106,24 @@ impl ArenaBlock {
 
         if size <= header.size {
             memset(data + size, 0, header.size - size);
+            if header.end_offset == self.offset {
+                self.offset = ArenaAllocator::align_up(data - self.buffer + size, ArenaAllocator::alignment());
+                header.end_offset = self.offset;
+            }
             header.size = size;
             return data;
         }
 
-        if data + header.size == self.buffer + self.offset {
-            if self.offset - header.size + size > self.capacity {
+        if header.end_offset == self.offset {
+            let next_offset = ArenaAllocator::align_up(data - self.buffer + size, ArenaAllocator::alignment());
+            if next_offset > self.capacity {
                 // self.free(ptr);
                 return null;
             }
 
-            self.offset = self.offset - header.size + size;
+            self.offset = next_offset;
             header.size = size;
+            header.end_offset = next_offset;
             return data;
         }
 
@@ -133,9 +142,19 @@ impl ArenaBlock {
 
 struct ArenaAllocation {
     size: usize,
+    start_offset: usize,
+    end_offset: usize,
 }
 
 impl ArenaAllocator {
+    fn alignment() -> usize {
+        return __BIGGEST_ALIGNMENT__;
+    }
+
+    fn align_up(value: usize, alignment: usize) -> usize {
+        return ((value + alignment - 1) / alignment) * alignment;
+    }
+
     fn new(allocator: &dyn Allocator, block_size: usize) -> Self {
         let block = ArenaBlock::new(allocator, block_size, null);
         if block == null { return Self { allocator, block_size: 0, last_block: null, last_oversize: null }; }
@@ -197,13 +216,17 @@ impl ArenaAllocator {
 impl Allocator for ArenaAllocator {
     fn alloc(&self, size: usize) -> *void {
         if size > self.block_size / 4 {
-            let total_size = sizeof(ArenaOversize) + size;
+            let data_offset = ArenaAllocator::align_up(sizeof(ArenaOversize), ArenaAllocator::alignment());
+            let total_size = data_offset + size;
             let oversize: *ArenaOversize = self.allocator.alloc(total_size);
             if oversize == null { return null; }
+            let oversize_void: *void = oversize;
+            let oversize_bytes: &u8 = oversize_void;
             oversize.size = size;
+            oversize.data = oversize_bytes + data_offset;
             oversize.prev = self.last_oversize;
             self.last_oversize = oversize;
-            return oversize + 1;
+            return oversize.data;
         }
 
         let last_block = self.last_block;
@@ -226,7 +249,7 @@ impl Allocator for ArenaAllocator {
         while oversize != null {
             let prev = oversize.prev;
 
-            if ptr == oversize + 1 {
+            if ptr == oversize.data {
                 let old_size = oversize.size;
 
                 let new_ptr = self.alloc(new_size);
@@ -282,7 +305,7 @@ impl Allocator for ArenaAllocator {
         while oversize != null {
             let prev = oversize.prev;
 
-            if ptr == oversize + 1 {
+            if ptr == oversize.data {
                 if self.last_oversize == oversize { self.last_oversize = prev; }
                 if next != null { next.prev = prev; }
 
@@ -317,4 +340,42 @@ test "destroy clears oversize allocations" {
     allocator.destroy();
 
     if allocator.last_oversize != null { abort(); }
+}
+
+test "allocations preserve maximum alignment" {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    let block = allocator.last_block;
+    if block != null {
+        let first: *void = allocator.alloc(1);
+        if first == null { abort(); }
+        let first_bytes: &u8 = first;
+        let first_offset: usize = first_bytes - block.buffer;
+        if first_offset / ArenaAllocator::alignment() * ArenaAllocator::alignment() != first_offset { abort(); }
+        if block.offset / ArenaAllocator::alignment() * ArenaAllocator::alignment() != block.offset { abort(); }
+
+        let before_second = block.offset;
+        let second: *void = allocator.alloc(sizeof(usize));
+        if second == null { abort(); }
+        let second_bytes: &u8 = second;
+        let second_offset: usize = second_bytes - block.buffer;
+        if second_offset / ArenaAllocator::alignment() * ArenaAllocator::alignment() != second_offset { abort(); }
+        if block.offset / ArenaAllocator::alignment() * ArenaAllocator::alignment() != block.offset { abort(); }
+
+        if allocator.realloc(second, 1) == null { abort(); }
+        if !allocator.free(second) { abort(); }
+        if block.offset != before_second { abort(); }
+    } else { abort(); }
+
+    let large: *void = allocator.alloc(300);
+    if large == null { abort(); }
+    let oversize = allocator.last_oversize;
+    if oversize != null {
+        let large_bytes: &u8 = large;
+        let oversize_void: *void = oversize;
+        let oversize_bytes: &u8 = oversize_void;
+        let data_offset: usize = large_bytes - oversize_bytes;
+        if data_offset / ArenaAllocator::alignment() * ArenaAllocator::alignment() != data_offset { abort(); }
+    } else { abort(); }
+
+    allocator.destroy();
 }

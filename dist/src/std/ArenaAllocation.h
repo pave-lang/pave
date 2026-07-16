@@ -3,9 +3,11 @@
 
 #include <stdint.h>
 
-#line 134 "src/std/ArenaAllocator.pv"
+#line 143 "src/std/ArenaAllocator.pv"
 struct ArenaAllocation {
     uintptr_t size;
+    uintptr_t start_offset;
+    uintptr_t end_offset;
 };
 
 #endif
