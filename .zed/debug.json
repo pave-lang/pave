@@ -1,0 +1,103 @@
+[
+  {
+    "label": "Dist Debug",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/dist/pavec.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [
+      "std=src/std",
+      "analyzer=src/analyzer",
+      "compiler=src/compiler",
+      "-IC:/Program Files/LLVM/include/",
+      "-I./src/compiler",
+      "-o",
+      "./pave/build/2/src"
+    ],
+    "env": {
+      "PATH": "${env:PATH};C:\\Program Files\\LLVM\\lib\\clang\\20\\lib\\windows"
+    },
+    "terminal": "integrated",
+    "stopOnEntry": false
+  },
+  {
+    "label": "Build 1 Debug",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/build/1/pavec.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [
+      "compiler=src/compiler",
+      "std=src/std",
+      "analyzer=src/analyzer",
+      "-IC:/Program Files/LLVM/include/",
+      "-I./src/compiler",
+      "-o",
+      "build/2/src"
+    ],
+    "env": {
+      "PATH": "${env:PATH};C:\\Program Files\\LLVM\\lib\\clang\\20\\lib\\windows"
+    },
+    "terminal": "integrated",
+    "stopOnEntry": false
+  },
+  {
+    "label": "Build 1 Debug linux",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/build/1/pavec",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [
+      "std=src/std",
+      "analyzer=src/analyzer",
+      "compiler=src/compiler",
+      "-I/lib/llvm-20/include",
+      "-I./src/compiler",
+      "-o",
+      "build/2/src"
+    ],
+    "terminal": "integrated"
+  },
+  {
+    "label": "pavels",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/out/pavels.exe",
+    "cwd": "$ZED_WORKTREE_ROOT-vscode",
+    "args": [],
+    "build": "pavels build",
+    "terminal": "integrated",
+    "stopOnEntry": false
+  },
+  {
+    "label": "pavejson",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/build/json/pavejson.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [],
+    "terminal": "integrated",
+    "stopOnEntry": false
+  },
+  {
+    "label": "dist built pavels",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/dist/pavec.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [
+      "std=src/std",
+      "analyzer=src/analyzer",
+      "language_server=src/language_server",
+      "-IC:/Program Files/LLVM/include/",
+      "-I./src/language_server",
+      "-o",
+      "./build/ls/src"
+    ],
+    "env": {
+      "PATH": "${env:PATH};C:\\Program Files\\LLVM\\lib\\clang\\20\\lib\\windows"
+    },
+    "terminal": "integrated",
+    "stopOnEntry": false
+  }
+]
