@@ -149,6 +149,16 @@ impl ArenaAllocator {
     }
 
     fn destroy(&self) {
+        let oversize = self.last_oversize;
+
+        while oversize != null {
+            let prev = oversize.prev;
+            self.allocator.free(oversize);
+            oversize = prev;
+        }
+
+        self.last_oversize = null;
+
         let block = self.last_block;
 
         while block != null {
@@ -296,4 +306,15 @@ impl Allocator for ArenaAllocator {
 
         return false;
     }
+}
+
+test "destroy clears oversize allocations" {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+
+    if allocator.alloc(300) == null { abort(); }
+    if allocator.alloc(400) == null { abort(); }
+
+    allocator.destroy();
+
+    if allocator.last_oversize != null { abort(); }
 }

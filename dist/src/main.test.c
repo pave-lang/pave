@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <compiler/test_FunctionCoroutine__coroutine_fibonacci_test.test.h>
+#include <std/test_ArenaAllocator__destroy_clears_oversize_allocations.test.h>
 #include <std/test_HashMap__hash_collisions_compare_keys.test.h>
 #include <std/test_str__eq___equal_strings.test.h>
 #include <std/test_str__eq___different_content.test.h>
@@ -20,6 +21,10 @@ int main(void) {
 
     fputs("[TEST] compiler/FunctionCoroutine: coroutine fibonacci test\n", stdout);
     test_FunctionCoroutine__coroutine_fibonacci_test();
+    passed++;
+
+    fputs("[TEST] std/ArenaAllocator: destroy clears oversize allocations\n", stdout);
+    test_ArenaAllocator__destroy_clears_oversize_allocations();
     passed++;
 
     fputs("[TEST] std/HashMap: hash collisions compare keys\n", stdout);
