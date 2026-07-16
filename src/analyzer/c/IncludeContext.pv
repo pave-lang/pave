@@ -316,6 +316,7 @@ impl IncludeContext {
             //     return CXChildVisit_Continue;
             } else {
                 self.add_typedef(name, cursor);
+                return CXChildVisit_Continue;
             }
         } else if kind == CXCursor_VarDecl {
             let type = clang_getCursorType(cursor);

@@ -2,7 +2,7 @@
 
 #include <compiler/test_FunctionCoroutine__coroutine_fibonacci_test.test.h>
 #include <std/test_ArenaAllocator__allocations_preserve_maximum_alignment.test.h>
-#include <std/test_ArenaAllocator__copies_share_allocation_ownership.test.h>
+#include <std/test_ArenaAllocator__aliases_share_allocation_ownership.test.h>
 #include <std/test_ArenaAllocator__realloc_preserves_data_and_frees_the_old_allocation.test.h>
 #include <std/test_ArenaAllocator__guarded_allocations_reject_interior_pointers.test.h>
 #include <std/test_ArenaAllocator__failed_initialization_cleans_up_and_is_inert.test.h>
@@ -32,8 +32,8 @@ int main(void) {
     test_ArenaAllocator__allocations_preserve_maximum_alignment();
     passed++;
 
-    fputs("[TEST] std/ArenaAllocator: copies share allocation ownership\n", stdout);
-    test_ArenaAllocator__copies_share_allocation_ownership();
+    fputs("[TEST] std/ArenaAllocator: aliases share allocation ownership\n", stdout);
+    test_ArenaAllocator__aliases_share_allocation_ownership();
     passed++;
 
     fputs("[TEST] std/ArenaAllocator: realloc preserves data and frees the old allocation\n", stdout);

@@ -996,7 +996,6 @@ impl Module {
     }
 
     fn find_primitive(&self, name: str) -> *Primitive {
-        let primitives = &self.namespace.root.primitives;
-        return primitives.find(&name);
+        return self.namespace.root.find_primitive(name);
     }
 }

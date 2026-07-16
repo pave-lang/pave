@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#line 151 "src/std/ArenaAllocator.pv"
+#line 147 "src/std/ArenaAllocator.pv"
 struct ArenaAllocation {
     uintptr_t size;
     uintptr_t start_offset;

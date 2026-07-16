@@ -79,7 +79,6 @@
 #include <std/HashMapIter_str_ref_Module.h>
 #include <tuple_str_ref_Module.h>
 #include <std/HashMap_str_i64.h>
-#include <std/HashMap_str_Primitive.h>
 #include <analyzer/Module.h>
 
 #include <analyzer/Module.h>
@@ -2014,7 +2013,5 @@ struct Type* Module__find_make_type(struct Module* self, struct str name, struct
 #line 998 "src/analyzer/Module.pv"
 struct Primitive* Module__find_primitive(struct Module* self, struct str name) {
     #line 999 "src/analyzer/Module.pv"
-    struct HashMap_str_Primitive* primitives = &self->namespace->root->primitives;
-    #line 1000 "src/analyzer/Module.pv"
-    return HashMap_str_Primitive__find(primitives, &name);
+    return Root__find_primitive(self->namespace->root, name);
 }

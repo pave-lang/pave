@@ -11,9 +11,9 @@
 #include <std/trait_Allocator.h>
 #include <analyzer/Namespace.h>
 #include <std/str.h>
-#include <std/HashMap_str_Primitive.h>
-#include <std/HashMapIter_str_Primitive.h>
-#include <tuple_str_Primitive.h>
+#include <std/HashMap_str_ref_Primitive.h>
+#include <std/HashMapIter_str_ref_Primitive.h>
+#include <tuple_str_ref_Primitive.h>
 #include <std/Array_ref_Impl.h>
 #include <analyzer/types/Primitive.h>
 #include <compiler/TypeUsage_Primitive.h>
@@ -178,11 +178,11 @@ struct Usages Usages__new(struct Generator* generator) {
     };
 
     #line 200 "src/compiler/Usages.pv"
-    { struct HashMapIter_str_Primitive __iter = HashMap_str_Primitive__iter(&self.root->primitives);
+    { struct HashMapIter_str_ref_Primitive __iter = HashMap_str_ref_Primitive__iter(&self.root->primitives);
     #line 200 "src/compiler/Usages.pv"
-    while (HashMapIter_str_Primitive__next(&__iter)) {
+    while (HashMapIter_str_ref_Primitive__next(&__iter)) {
         #line 200 "src/compiler/Usages.pv"
-        struct Primitive* info = &HashMapIter_str_Primitive__value(&__iter)->_1;
+        struct Primitive* info = HashMapIter_str_ref_Primitive__value(&__iter)->_1;
 
         #line 201 "src/compiler/Usages.pv"
         if (info->impls.length > 0) {

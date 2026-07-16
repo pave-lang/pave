@@ -9,7 +9,7 @@ struct Root {
     allocator: &ArenaAllocator,
     children: HashMap<str, &Namespace>,
     types: HashMap<str, Array<Type>>,
-    primitives: HashMap<str, Primitive>,
+    primitives: HashMap<str, &Primitive>,
     ctypes: HashMap<str, TypedefC>,
     traits: HashMap<str, Array<&Trait>>,
     functions: HashMap<str, Type>,
@@ -44,7 +44,7 @@ impl Root {
             allocator,
             children: HashMap<str, &Namespace>::new(allocator),
             types: HashMap<str, Array<Type>>::new(allocator),
-            primitives: HashMap<str, Primitive>::new(allocator),
+            primitives: HashMap<str, &Primitive>::new(allocator),
             ctypes: HashMap<str, TypedefC>::new(allocator),
             traits: HashMap<str, Array<&Trait>>::new(allocator),
             functions: HashMap<str, Type>::new(allocator),
@@ -129,7 +129,7 @@ impl Root {
         };
         self.func_value.parameters.append(Parameter { name: allocator.store(&Token { type: TokenType::Identifier, value: "self", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), type: self.type_ref_self });
 
-        for (key, &value) in self.primitives {
+        for (key, value) in self.primitives {
             let arr = Array<Type>::new(allocator);
             arr.append(Type::Primitive(value));
             self.types.insert(key, arr);
@@ -161,14 +161,18 @@ impl Root {
     }
 
     fn add_primitive(&self, name: *const char) -> &Primitive {
-        return self.primitives.insert(name, Primitive::new(self.allocator, name));
+        let primitive = self.allocator.store(&Primitive::new(self.allocator, name));
+        self.primitives.insert(name, primitive);
+        return primitive;
     }
 
     fn add_ctype(&self, name: *const char) -> &Primitive {
         let existing = self.primitives.find(name);
-        if existing != null { return existing; }
+        if existing != null { return *existing; }
 
-        return self.primitives.insert(name, Primitive::new(self.allocator, name));
+        let primitive = self.allocator.store(&Primitive::new(self.allocator, name));
+        self.primitives.insert(name, primitive);
+        return primitive;
     }
 
     fn add_type_impl(&self, type: Type, impl_info: &Impl) -> usize {
@@ -381,7 +385,7 @@ impl Root {
     }
 
     fn parse_declarations(&self) -> bool {
-        for (_, &primitive_info) in self.primitives {
+        for (_, primitive_info) in self.primitives {
             for (impl_index, *impl_info) in primitive_info.impls.iter().enumerate() {
                 let parent = FunctionParent::Primitive(primitive_info, impl_index, impl_info.trait_);
                 impl_info.fill_types(parent);
@@ -412,7 +416,7 @@ impl Root {
             child.parse_functions();
         }
 
-        for (_, &primitive_info) in self.primitives {
+        for (_, primitive_info) in self.primitives {
             for *impl_info in primitive_info.impls {
                 impl_info.parse_functions();
             }
@@ -426,7 +430,7 @@ impl Root {
             if child.parse_functions_if_path(path) { return true; }
         }
 
-        for (_, &primitive_info) in self.primitives {
+        for (_, primitive_info) in self.primitives {
             for *impl_info in primitive_info.impls {
                 if impl_info.context.path.eq(path) {
                     impl_info.parse_functions();
@@ -474,7 +478,9 @@ impl Root {
     }
 
     fn find_primitive(&self, name: str) -> *Primitive {
-        return self.primitives.find(&name);
+        let primitive = self.primitives.find(&name);
+        if primitive == null { return null; }
+        return *primitive;
     }
 
     fn error(&self, path: str, start_line: usize, start_column: usize, end_line: usize, end_column: usize, message: *const char) {

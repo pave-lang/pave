@@ -14,33 +14,40 @@
 
 #line 1 "src/std/ArenaAllocator.pv"
 void test_ArenaAllocator__guarded_allocations_reject_interior_pointers() {
-    #line 448 "src/std/ArenaAllocator.pv"
+    #line 435 "src/std/ArenaAllocator.pv"
     if (ArenaAllocator__guarded_backend()) {
-        #line 449 "src/std/ArenaAllocator.pv"
-        struct ArenaAllocator allocator = ArenaAllocator__new((struct trait_Allocator) { .vtable = &GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR, .instance = GeneralPurposeAllocator__default() }, 1024);
-        #line 450 "src/std/ArenaAllocator.pv"
-        uint8_t* allocation = ArenaAllocator__Allocator__alloc(&allocator, 16);
-        #line 451 "src/std/ArenaAllocator.pv"
+        #line 436 "src/std/ArenaAllocator.pv"
+        struct ArenaAllocator* allocator_ptr = ArenaAllocator__new((struct trait_Allocator) { .vtable = &GENERAL_PURPOSE_ALLOCATOR__VTABLE__ALLOCATOR, .instance = GeneralPurposeAllocator__default() }, 1024);
+        #line 437 "src/std/ArenaAllocator.pv"
+        if (allocator_ptr == 0) {
+            #line 437 "src/std/ArenaAllocator.pv"
+            abort();
+        }
+        #line 438 "src/std/ArenaAllocator.pv"
+        struct ArenaAllocator* allocator = allocator_ptr;
+        #line 439 "src/std/ArenaAllocator.pv"
+        uint8_t* allocation = ArenaAllocator__Allocator__alloc(allocator, 16);
+        #line 440 "src/std/ArenaAllocator.pv"
         if (allocation == 0) {
-            #line 451 "src/std/ArenaAllocator.pv"
+            #line 440 "src/std/ArenaAllocator.pv"
             abort();
         }
-        #line 452 "src/std/ArenaAllocator.pv"
-        if (ArenaAllocator__Allocator__free(&allocator, allocation + 1)) {
-            #line 452 "src/std/ArenaAllocator.pv"
+        #line 441 "src/std/ArenaAllocator.pv"
+        if (ArenaAllocator__Allocator__free(allocator, allocation + 1)) {
+            #line 441 "src/std/ArenaAllocator.pv"
             abort();
         }
-        #line 453 "src/std/ArenaAllocator.pv"
-        if (ArenaAllocator__Allocator__free(&allocator, allocation - 1)) {
-            #line 453 "src/std/ArenaAllocator.pv"
+        #line 442 "src/std/ArenaAllocator.pv"
+        if (ArenaAllocator__Allocator__free(allocator, allocation - 1)) {
+            #line 442 "src/std/ArenaAllocator.pv"
             abort();
         }
-        #line 454 "src/std/ArenaAllocator.pv"
-        if (!ArenaAllocator__Allocator__free(&allocator, allocation)) {
-            #line 454 "src/std/ArenaAllocator.pv"
+        #line 443 "src/std/ArenaAllocator.pv"
+        if (!ArenaAllocator__Allocator__free(allocator, allocation)) {
+            #line 443 "src/std/ArenaAllocator.pv"
             abort();
         }
-        #line 455 "src/std/ArenaAllocator.pv"
-        ArenaAllocator__destroy(&allocator);
+        #line 444 "src/std/ArenaAllocator.pv"
+        ArenaAllocator__destroy(allocator);
     }
 }

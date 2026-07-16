@@ -87,9 +87,6 @@ impl Context {
         let typename_return_indirect = allocator.store(&Indirect { type: IndirectType::ConstPointer, to: type_char });
         self.insert_builtin_function("typename", &generics2, &params2, Type::Indirect(typename_return_indirect));
 
-        params.release();
-        generics.release();
-        
         analysis.files.insert(path, true);
 
         return self;

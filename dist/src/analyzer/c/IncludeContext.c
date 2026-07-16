@@ -28,8 +28,7 @@
 #include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/ClassCpp.h>
 #include <i32.h>
-#include <analyzer/types/Primitive.h>
-#include <std/HashMap_str_Primitive.h>
+#include <std/HashMap_str_ref_Primitive.h>
 #include <std/HashMap_str_i64.h>
 #include <analyzer/c/IncludeContext.h>
 
@@ -518,47 +517,49 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
         } else {
             #line 318 "src/analyzer/c/IncludeContext.pv"
             IncludeContext__add_typedef(self, name, cursor);
+            #line 319 "src/analyzer/c/IncludeContext.pv"
+            return CXChildVisit_Continue;
         }
     } else if (kind == CXCursor_VarDecl) {
-        #line 321 "src/analyzer/c/IncludeContext.pv"
-        CXType type = clang_getCursorType(cursor);
         #line 322 "src/analyzer/c/IncludeContext.pv"
-        struct Type* resolved_type = Include__parse_type(include, type);
+        CXType type = clang_getCursorType(cursor);
         #line 323 "src/analyzer/c/IncludeContext.pv"
+        struct Type* resolved_type = Include__parse_type(include, type);
+        #line 324 "src/analyzer/c/IncludeContext.pv"
         IncludeContext__insert_value(self, name, *resolved_type);
 
-        #line 325 "src/analyzer/c/IncludeContext.pv"
+        #line 326 "src/analyzer/c/IncludeContext.pv"
         return CXChildVisit_Continue;
     } else if (kind == CXCursor_MacroDefinition) {
-        #line 327 "src/analyzer/c/IncludeContext.pv"
-        if (HashMap_str_Primitive__find(&include->root->primitives, &(struct str){ .ptr = name, .length = strlen(name) }) != 0) {
-            #line 327 "src/analyzer/c/IncludeContext.pv"
+        #line 328 "src/analyzer/c/IncludeContext.pv"
+        if (HashMap_str_ref_Primitive__find(&include->root->primitives, &(struct str){ .ptr = name, .length = strlen(name) }) != 0) {
+            #line 328 "src/analyzer/c/IncludeContext.pv"
             return CXChildVisit_Continue;
         }
 
-        #line 329 "src/analyzer/c/IncludeContext.pv"
+        #line 330 "src/analyzer/c/IncludeContext.pv"
         if (Include__is_function_like_macro(include, cursor)) {
-            #line 330 "src/analyzer/c/IncludeContext.pv"
+            #line 331 "src/analyzer/c/IncludeContext.pv"
             IncludeContext__add_basic_function(self, name);
         } else {
-            #line 332 "src/analyzer/c/IncludeContext.pv"
-            int64_t macro_value = 0;
             #line 333 "src/analyzer/c/IncludeContext.pv"
+            int64_t macro_value = 0;
+            #line 334 "src/analyzer/c/IncludeContext.pv"
             if (Include__try_parse_int_macro(include, cursor, &macro_value)) {
-                #line 334 "src/analyzer/c/IncludeContext.pv"
+                #line 335 "src/analyzer/c/IncludeContext.pv"
                 HashMap_str_i64__insert(&include->macro_values, (struct str){ .ptr = name, .length = strlen(name) }, macro_value);
             }
-            #line 336 "src/analyzer/c/IncludeContext.pv"
+            #line 337 "src/analyzer/c/IncludeContext.pv"
             IncludeContext__insert_value(self, name, (struct Type) { .type = TYPE__UNKNOWN_C, .unknownc_value = UnknownC__new(include, name) });
         }
 
-        #line 339 "src/analyzer/c/IncludeContext.pv"
+        #line 340 "src/analyzer/c/IncludeContext.pv"
         return CXChildVisit_Continue;
     }
 
-    #line 342 "src/analyzer/c/IncludeContext.pv"
+    #line 343 "src/analyzer/c/IncludeContext.pv"
     ArenaAllocator__Allocator__free(include->root->allocator, name);
 
-    #line 344 "src/analyzer/c/IncludeContext.pv"
+    #line 345 "src/analyzer/c/IncludeContext.pv"
     return CXChildVisit_Continue;
 }

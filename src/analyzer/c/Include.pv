@@ -91,14 +91,11 @@ impl Include {
     }
 
     fn add_cxtype_primitive(&self, kind: CXTypeKind, name: *const char) {
-        let primitives = self.root.primitives;
-
-        self.cxtype_to_type.insert(cast<u32>(kind), Type::Primitive(primitives.find(name)));
+        self.cxtype_to_type.insert(cast<u32>(kind), Type::Primitive(self.root.find_primitive(name)));
     }
 
     fn add_typedef_primitive(&self, type: *const char, name: *const char) {
-        let primitives = &self.root.primitives;
-        self.typedef_to_type.insert(type, Type::Primitive(primitives.find(name)));
+        self.typedef_to_type.insert(type, Type::Primitive(self.root.find_primitive(name)));
     }
 
     fn add_opaque_typedef(&self, name: *const char) {

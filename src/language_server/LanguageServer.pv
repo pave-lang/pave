@@ -13,7 +13,7 @@ struct LanguageServer {
     clang_args: Array<*const char>,
     c_std_arg: *const char,
     cpp_std_arg: *const char,
-    analysis_alloc: ArenaAllocator,
+    analysis_alloc: *ArenaAllocator,
     analysis: Analysis,
     file_map: HashMap<Uri, str>,
     dirty_files: HashMap<str, bool>,
@@ -33,7 +33,7 @@ impl LanguageServer {
             c_std_arg: null,
             cpp_std_arg: null,
             root: null,
-            analysis_alloc: ArenaAllocator { state: null },
+            analysis_alloc: null,
             analysis: Analysis {
                 files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 diagnostics: HashMap<str, Array<Diagnostic>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
@@ -104,24 +104,37 @@ impl LanguageServer {
         return copy;
     }
 
+    fn analysis_allocator(&self) -> &ArenaAllocator {
+        let allocator = self.analysis_alloc;
+        if allocator == null { abort(); }
+        return allocator;
+    }
+
     fn analyze(&self) -> &Analysis {
         self.global_phases_ok = false;
-        self.analysis_alloc.destroy();
-        self.analysis_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
-        self.analysis = Analysis::new(&self.analysis_alloc);
+        let previous_analysis_alloc = self.analysis_alloc;
+        if previous_analysis_alloc != null {
+            let previous_analysis_alloc_ref: &ArenaAllocator = previous_analysis_alloc;
+            previous_analysis_alloc_ref.destroy();
+        }
+        let analysis_alloc_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+        if analysis_alloc_ptr == null { abort(); }
+        self.analysis_alloc = analysis_alloc_ptr;
+        let analysis_alloc: &ArenaAllocator = analysis_alloc_ptr;
+        self.analysis = Analysis::new(analysis_alloc);
         self.analysis.collect_symbols = true;
-        self.file_map = HashMap<Uri, str>::new(&self.analysis_alloc);
+        self.file_map = HashMap<Uri, str>::new(analysis_alloc);
         let analysis = &self.analysis;
         for (path, content) in self.file_overrides {
             analysis.file_overrides.insert(path, content);
         }
 
-        self.root = Root::new(&self.analysis_alloc, &self.args, &self.clang_args, self.c_std_arg, self.cpp_std_arg, analysis);
+        self.root = Root::new(analysis_alloc, &self.args, &self.clang_args, self.c_std_arg, self.cpp_std_arg, analysis);
         let root = self.root;
         if root == null { self.store_fingerprints(); return analysis; }
 
         for (filename, _) in analysis.files {
-            let uri = Uri::file(&self.analysis_alloc, filename);
+            let uri = Uri::file(analysis_alloc, filename);
             self.file_map.insert(uri, filename);
         }
 
@@ -161,8 +174,10 @@ impl LanguageServer {
                 let old_fp = self.decl_fingerprints.find(&path);
                 if old_fp != null {
                     // Quick-tokenize the new content on a temporary allocator to compute fingerprint
-                    let tmp_alloc = ArenaAllocator::new(GeneralPurposeAllocator::default(), 256 * 1024);
-                    let tmp_tokens = Tokenizer::tokenize_data(&tmp_alloc, *override_text);
+                    let tmp_alloc_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 256 * 1024);
+                    if tmp_alloc_ptr == null { abort(); }
+                    let tmp_alloc: &ArenaAllocator = tmp_alloc_ptr;
+                    let tmp_tokens = Tokenizer::tokenize_data(tmp_alloc, *override_text);
                     let new_fp = Module::compute_declaration_fingerprint(&tmp_tokens);
                     tmp_alloc.destroy();
 
@@ -172,9 +187,9 @@ impl LanguageServer {
 
                         // Copy fresh override text into analysis arena
                         analysis.file_overrides.remove(&path);
-                        let path_arena = String::new(&self.analysis_alloc);
+                        let path_arena = String::new(self.analysis_allocator());
                         path_arena.append(path);
-                        let text_arena = String::new(&self.analysis_alloc);
+                        let text_arena = String::new(self.analysis_allocator());
                         text_arena.append(*override_text);
                         analysis.file_overrides.insert(path_arena.as_str(), text_arena.as_str());
 
@@ -204,7 +219,7 @@ impl LanguageServer {
         if self.root == null { return analysis; }
         if analysis.parsed_function_files.find(&path) != null { return analysis; }
 
-        let path_copy = String::new(&self.analysis_alloc);
+        let path_copy = String::new(self.analysis_allocator());
         path_copy.append(path);
         let path_str = path_copy.as_str();
 
@@ -288,15 +303,23 @@ impl LanguageServer {
     }
 
     fn destroy(&self) {
-        self.allocator.destroy();
+        let allocator = self.allocator;
+        let analysis_alloc = self.analysis_alloc;
+        if analysis_alloc != null {
+            let analysis_alloc_ref: &ArenaAllocator = analysis_alloc;
+            analysis_alloc_ref.destroy();
+        }
+        allocator.destroy();
     }
 
     fn run(&self) -> i32 {
         let run = true;
         while run {
-            let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+            let allocator_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+            if allocator_ptr == null { return 1; }
+            let allocator: &ArenaAllocator = allocator_ptr;
 
-            let processor = Processor::new(&allocator, self.pipe_read, self.pipe_write);
+            let processor = Processor::new(allocator, self.pipe_read, self.pipe_write);
             run = processor.process(self);
 
             allocator.destroy();

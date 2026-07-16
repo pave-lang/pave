@@ -280,10 +280,12 @@ impl Eq<HashMapCollisionKey> for HashMapCollisionKey {
 }
 
 test "hash collisions compare keys" {
-    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    let allocator_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    if allocator_ptr == null { abort(); }
+    let allocator: &ArenaAllocator = allocator_ptr;
     defer allocator.destroy();
 
-    let map = HashMap<HashMapCollisionKey, i32>::new(&allocator);
+    let map = HashMap<HashMapCollisionKey, i32>::new(allocator);
     let first = HashMapCollisionKey(1);
     let second = HashMapCollisionKey(2);
 

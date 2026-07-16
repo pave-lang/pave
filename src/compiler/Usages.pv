@@ -197,7 +197,7 @@ impl Usages {
             active_impl_index: 0,
         };
 
-        for (_, &info) in self.root.primitives {
+        for (_, info) in self.root.primitives {
             if info.impls.length > 0 {
                 let primitive_ptr = cast<usize>(info);
                 self.primitives.insert(primitive_ptr, TypeUsage<Primitive>::new(self.allocator, info));

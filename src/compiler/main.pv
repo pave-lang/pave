@@ -5,11 +5,13 @@ use std
 use analyzer
 
 fn main(argc: i32, argv: **const char) -> i32 {
-    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+    let allocator_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 5 * 1024 * 1024);
+    if allocator_ptr == null { return -1; }
+    let allocator: &ArenaAllocator = allocator_ptr;
     defer allocator.destroy();
 
-    let args = Array<*const char>::new(&allocator);
-    let clang_args = Array<*const char>::new(&allocator);
+    let args = Array<*const char>::new(allocator);
+    let clang_args = Array<*const char>::new(allocator);
     let output_folder: *const char = null;
     let c_std_arg: *const char = null;
     let cpp_std_arg: *const char = null;
@@ -51,8 +53,8 @@ fn main(argc: i32, argv: **const char) -> i32 {
         return -1;
     }
 
-    let analysis = Analysis::new(&allocator);
-    let root = Root::new(&allocator, &args, &clang_args, c_std_arg, cpp_std_arg, &analysis);
+    let analysis = Analysis::new(allocator);
+    let root = Root::new(allocator, &args, &clang_args, c_std_arg, cpp_std_arg, &analysis);
 
     if analysis.diagnostics.length > 0 {
         analysis.print_diagnostics();
@@ -101,7 +103,7 @@ fn main(argc: i32, argv: **const char) -> i32 {
         return -1;
     }
 
-    if !Generator::generate(&allocator, output_folder, output_line_directives, output_seperator, root) {
+    if !Generator::generate(allocator, output_folder, output_line_directives, output_seperator, root) {
         // fprintf(stderr, "Generator::generate returned false\n");
         return -1;
     }
