@@ -6,7 +6,7 @@
 
 struct ArenaBlock;
 
-#line 13 "src/std/ArenaAllocator.pv"
+#line 17 "src/std/ArenaAllocator.pv"
 struct ArenaBlock {
     uint8_t* buffer;
     uintptr_t capacity;
@@ -17,25 +17,25 @@ struct ArenaBlock {
 #include <std/trait_Allocator.h>
 struct ArenaBlock;
 
-#line 27 "src/std/ArenaAllocator.pv"
+#line 31 "src/std/ArenaAllocator.pv"
 struct ArenaBlock* ArenaBlock__new(struct trait_Allocator allocator, uintptr_t capacity, struct ArenaBlock* prev);
 
-#line 41 "src/std/ArenaAllocator.pv"
+#line 49 "src/std/ArenaAllocator.pv"
 void* ArenaBlock__alloc(struct ArenaBlock* self, uintptr_t size);
 
-#line 63 "src/std/ArenaAllocator.pv"
+#line 71 "src/std/ArenaAllocator.pv"
 bool ArenaBlock__is_in_block(struct ArenaBlock* self, void* ptr);
 
-#line 69 "src/std/ArenaAllocator.pv"
+#line 77 "src/std/ArenaAllocator.pv"
 uintptr_t ArenaBlock__size(struct ArenaBlock* self, void* ptr);
 
-#line 79 "src/std/ArenaAllocator.pv"
+#line 87 "src/std/ArenaAllocator.pv"
 bool ArenaBlock__free(struct ArenaBlock* self, void* ptr);
 
-#line 96 "src/std/ArenaAllocator.pv"
+#line 104 "src/std/ArenaAllocator.pv"
 void ArenaBlock__destroy(struct ArenaBlock* self, struct trait_Allocator allocator);
 
-#line 100 "src/std/ArenaAllocator.pv"
+#line 108 "src/std/ArenaAllocator.pv"
 void* ArenaBlock__realloc(struct ArenaBlock* self, void* ptr, uintptr_t size);
 
 #endif

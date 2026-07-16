@@ -33,7 +33,7 @@ impl LanguageServer {
             c_std_arg: null,
             cpp_std_arg: null,
             root: null,
-            analysis_alloc: ArenaAllocator { allocator, block_size: 0, last_block: null, last_oversize: null },
+            analysis_alloc: ArenaAllocator { state: null },
             analysis: Analysis {
                 files: HashMap<str, bool> { allocator, buckets: null, data: null, capacity: 0, length: 0 },
                 diagnostics: HashMap<str, Array<Diagnostic>> { allocator, buckets: null, data: null, capacity: 0, length: 0 },

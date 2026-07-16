@@ -4,6 +4,10 @@
 #include "stddef.h"
 
 struct ArenaAllocator {
+    state: *ArenaState,
+}
+
+struct ArenaState {
     allocator: &dyn Allocator,
     block_size: usize,
     last_block: *ArenaBlock,
@@ -33,6 +37,10 @@ impl ArenaBlock {
 
         let self = Self { buffer, capacity, prev, offset: 0 };
         let self_ptr: *Self = self.alloc(sizeof(Self));
+        if self_ptr == null {
+            allocator.free(buffer);
+            return null;
+        }
         *self_ptr = self;
 
         return self_ptr;
@@ -147,6 +155,20 @@ struct ArenaAllocation {
 }
 
 impl ArenaAllocator {
+    fn guarded_backend() -> bool {
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+        return true;
+#else
+        return false;
+#endif
+#elif defined(__SANITIZE_ADDRESS__)
+        return true;
+#else
+        return false;
+#endif
+    }
+
     fn alignment() -> usize {
         return __BIGGEST_ALIGNMENT__;
     }
@@ -156,43 +178,49 @@ impl ArenaAllocator {
     }
 
     fn new(allocator: &dyn Allocator, block_size: usize) -> Self {
-        let block = ArenaBlock::new(allocator, block_size, null);
-        if block == null { return Self { allocator, block_size: 0, last_block: null, last_oversize: null }; }
+        let state: *ArenaState = allocator.alloc(sizeof(ArenaState));
+        if state == null { return Self { state: null }; }
 
-        return Self {
+        *state = ArenaState {
             allocator,
             block_size,
-            last_block: block,
+            last_block: null,
             last_oversize: null,
         };
+
+        if !Self::guarded_backend() {
+            let block = ArenaBlock::new(allocator, block_size, null);
+            if block == null {
+                allocator.free(state);
+                return Self { state: null };
+            }
+            state.last_block = block;
+        }
+
+        return Self { state };
     }
 
     fn destroy(&self) {
-        let oversize = self.last_oversize;
+        let state = self.state;
+        if state == null { return; }
+        let allocator = state.allocator;
 
+        let oversize = state.last_oversize;
         while oversize != null {
             let prev = oversize.prev;
-            self.allocator.free(oversize);
+            allocator.free(oversize.data);
+            allocator.free(oversize);
             oversize = prev;
         }
 
-        self.last_oversize = null;
-
-        let block = self.last_block;
-
+        let block = state.last_block;
         while block != null {
-            if block.is_in_block(self) {
-                block.destroy(self.allocator);
-                return;
-            }
-
             let prev = block.prev;
-            block.destroy(self.allocator);
+            block.destroy(allocator);
             block = prev;
         }
 
-        self.block_size = 0;
-        self.last_block = null;
+        allocator.free(state);
     }
 
     fn store<T>(&self, value: *T) -> *T {
@@ -215,37 +243,43 @@ impl ArenaAllocator {
 
 impl Allocator for ArenaAllocator {
     fn alloc(&self, size: usize) -> *void {
-        if size > self.block_size / 4 {
-            let data_offset = ArenaAllocator::align_up(sizeof(ArenaOversize), ArenaAllocator::alignment());
-            let total_size = data_offset + size;
-            let oversize: *ArenaOversize = self.allocator.alloc(total_size);
-            if oversize == null { return null; }
-            let oversize_void: *void = oversize;
-            let oversize_bytes: &u8 = oversize_void;
-            oversize.size = size;
-            oversize.data = oversize_bytes + data_offset;
-            oversize.prev = self.last_oversize;
-            self.last_oversize = oversize;
-            return oversize.data;
+        let state = self.state;
+        if state == null { return null; }
+
+        if Self::guarded_backend() || size > state.block_size / 4 {
+            let data = state.allocator.alloc(size);
+            if data == null { return null; }
+
+            let oversize: *ArenaOversize = state.allocator.alloc(sizeof(ArenaOversize));
+            if oversize == null {
+                state.allocator.free(data);
+                return null;
+            }
+
+            *oversize = ArenaOversize { data, size, prev: state.last_oversize };
+            state.last_oversize = oversize;
+            return data;
         }
 
-        let last_block = self.last_block;
+        let last_block = state.last_block;
         if last_block == null { return null; }
 
         let ptr = last_block.alloc(size);
         if ptr != null { return ptr; }
 
-        let block = ArenaBlock::new(self.allocator, self.block_size, self.last_block);
+        let block = ArenaBlock::new(state.allocator, state.block_size, state.last_block);
         if block == null { return null; }
 
-        self.last_block = block;
+        state.last_block = block;
         return block.alloc(size);
     }
 
     fn realloc(&self, ptr: *void, new_size: usize) -> *void {
         if ptr == null { return self.alloc(new_size); }
+        let state = self.state;
+        if state == null { return null; }
 
-        let oversize = self.last_oversize;
+        let oversize = state.last_oversize;
         while oversize != null {
             let prev = oversize.prev;
 
@@ -269,8 +303,13 @@ impl Allocator for ArenaAllocator {
             oversize = prev;
         }
 
+        if Self::guarded_backend() {
+            fprintf(stderr, "ArenaAllocator.realloc: No allocation found to reallocate\n");
+            return null;
+        }
+
         let current_block: *ArenaBlock = null;
-        let block = self.last_block;
+        let block = state.last_block;
         while current_block == null && block != null {
             if block.is_in_block(ptr) {
                 let realloc_ptr = block.realloc(ptr, new_size);
@@ -299,24 +338,30 @@ impl Allocator for ArenaAllocator {
 
     fn free(&self, ptr: *void) -> bool {
         if ptr == null { return false; }
+        let state = self.state;
+        if state == null { return false; }
 
-        let oversize = self.last_oversize;
+        let oversize = state.last_oversize;
         let next: *ArenaOversize = null;
         while oversize != null {
             let prev = oversize.prev;
 
             if ptr == oversize.data {
-                if self.last_oversize == oversize { self.last_oversize = prev; }
+                if state.last_oversize == oversize { state.last_oversize = prev; }
                 if next != null { next.prev = prev; }
 
-                return self.allocator.free(oversize);
+                let result = state.allocator.free(oversize.data);
+                state.allocator.free(oversize);
+                return result;
             }
 
             next = oversize;
             oversize = prev;
         }
 
-        let block = self.last_block;
+        if Self::guarded_backend() { return false; }
+
+        let block = state.last_block;
         while block != null {
             let prev = block.prev;
             
@@ -331,21 +376,17 @@ impl Allocator for ArenaAllocator {
     }
 }
 
-test "destroy clears oversize allocations" {
-    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
-
-    if allocator.alloc(300) == null { abort(); }
-    if allocator.alloc(400) == null { abort(); }
-
-    allocator.destroy();
-
-    if allocator.last_oversize != null { abort(); }
-}
-
 test "allocations preserve maximum alignment" {
     let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
-    let block = allocator.last_block;
-    if block != null {
+    let state_ptr = allocator.state;
+    if state_ptr == null { abort(); }
+    let state: &ArenaState = state_ptr;
+
+    if !ArenaAllocator::guarded_backend() {
+        let block_ptr = state.last_block;
+        if block_ptr == null { abort(); }
+        let block: &ArenaBlock = block_ptr;
+
         let first: *void = allocator.alloc(1);
         if first == null { abort(); }
         let first_bytes: &u8 = first;
@@ -364,18 +405,71 @@ test "allocations preserve maximum alignment" {
         if allocator.realloc(second, 1) == null { abort(); }
         if !allocator.free(second) { abort(); }
         if block.offset != before_second { abort(); }
-    } else { abort(); }
 
-    let large: *void = allocator.alloc(300);
-    if large == null { abort(); }
-    let oversize = allocator.last_oversize;
-    if oversize != null {
-        let large_bytes: &u8 = large;
+        let large: *void = allocator.alloc(300);
+        if large == null { abort(); }
+        let oversize_ptr = state.last_oversize;
+        if oversize_ptr == null { abort(); }
+        let oversize: &ArenaOversize = oversize_ptr;
         let oversize_void: *void = oversize;
-        let oversize_bytes: &u8 = oversize_void;
-        let data_offset: usize = large_bytes - oversize_bytes;
-        if data_offset / ArenaAllocator::alignment() * ArenaAllocator::alignment() != data_offset { abort(); }
-    } else { abort(); }
+        if oversize.data != large || oversize_void == large { abort(); }
+    }
 
     allocator.destroy();
+}
+
+test "copies share allocation ownership" {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    let copy = allocator;
+    if allocator.state == null || copy.state != allocator.state { abort(); }
+
+    let allocation = copy.alloc(300);
+    if allocation == null { abort(); }
+    if !allocator.free(allocation) { abort(); }
+
+    allocator.destroy();
+}
+
+test "realloc preserves data and frees the old allocation" {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    let allocation: *u8 = allocator.alloc(8);
+    if allocation == null { abort(); }
+    allocation[0] = 17;
+    allocation[7] = 29;
+
+    let grown: *u8 = allocator.realloc(allocation, 32);
+    if grown == null || grown[0] != 17 || grown[7] != 29 { abort(); }
+    if !allocator.free(grown) { abort(); }
+
+    allocator.destroy();
+}
+
+test "guarded allocations reject interior pointers" {
+    if ArenaAllocator::guarded_backend() {
+        let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+        let allocation: *u8 = allocator.alloc(16);
+        if allocation == null { abort(); }
+        if allocator.free(allocation + 1) { abort(); }
+        if allocator.free(allocation - 1) { abort(); }
+        if !allocator.free(allocation) { abort(); }
+        allocator.destroy();
+    }
+}
+
+test "failed initialization cleans up and is inert" {
+    if !ArenaAllocator::guarded_backend() {
+        let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1);
+        if allocator.state != null { abort(); }
+        if allocator.alloc(1) != null { abort(); }
+        allocator.destroy();
+    }
+}
+
+test "destroy works through an allocator stored in its own arena" {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    let stored = allocator.store(&allocator);
+    if stored == null { abort(); }
+    let stored_ref: &ArenaAllocator = stored;
+
+    stored_ref.destroy();
 }

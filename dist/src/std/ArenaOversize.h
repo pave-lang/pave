@@ -5,7 +5,7 @@
 
 struct ArenaOversize;
 
-#line 20 "src/std/ArenaAllocator.pv"
+#line 24 "src/std/ArenaAllocator.pv"
 struct ArenaOversize {
     uintptr_t size;
     void* data;
