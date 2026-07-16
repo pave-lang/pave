@@ -7,7 +7,7 @@
 #include <std/trait_Allocator.h>
 struct HashMapBucket_str_str;
 
-#line 26 "src/std/HashMap.pv"
+#line 27 "src/std/HashMap.pv"
 struct HashMap_str_str {
     struct trait_Allocator allocator;
     struct HashMapBucket_str_str** buckets;
@@ -24,49 +24,49 @@ struct HashMap_str_str;
 struct str;
 struct HashMapBucket_str_str;
 
-#line 35 "src/std/HashMap.pv"
+#line 36 "src/std/HashMap.pv"
 struct HashMap_str_str HashMap_str_str__new(struct trait_Allocator allocator);
 
-#line 39 "src/std/HashMap.pv"
+#line 40 "src/std/HashMap.pv"
 struct HashMap_str_str HashMap_str_str__with_capacity(struct trait_Allocator allocator, uintptr_t capacity);
 
-#line 53 "src/std/HashMap.pv"
+#line 54 "src/std/HashMap.pv"
 void HashMap_str_str__resize(struct HashMap_str_str* self, uintptr_t new_capacity);
 
-#line 60 "src/std/HashMap.pv"
+#line 61 "src/std/HashMap.pv"
 struct str* HashMap_str_str__find(struct HashMap_str_str* self, struct str* key);
 
-#line 77 "src/std/HashMap.pv"
+#line 78 "src/std/HashMap.pv"
 struct str* HashMap_str_str__insert(struct HashMap_str_str* self, struct str key, struct str value);
 
-#line 107 "src/std/HashMap.pv"
+#line 108 "src/std/HashMap.pv"
 bool HashMap_str_str__remove(struct HashMap_str_str* self, struct str* key);
 
-#line 131 "src/std/HashMap.pv"
+#line 132 "src/std/HashMap.pv"
 void HashMap_str_str__release(struct HashMap_str_str* self);
 
-#line 140 "src/std/HashMap.pv"
+#line 141 "src/std/HashMap.pv"
 void HashMap_str_str__fill_buckets(struct HashMap_str_str* self);
 
-#line 161 "src/std/HashMap.pv"
+#line 162 "src/std/HashMap.pv"
 struct HashMap_str_str HashMap_str_str__clone(struct HashMap_str_str* self, struct trait_Allocator allocator);
 
-#line 175 "src/std/HashMap.pv"
+#line 176 "src/std/HashMap.pv"
 struct HashMapIter_str_str HashMap_str_str__iter(struct HashMap_str_str* self);
 
-#line 182 "src/std/HashMap.pv"
+#line 183 "src/std/HashMap.pv"
 void HashMap_str_str__clear(struct HashMap_str_str* self);
 
-#line 191 "src/std/HashMap.pv"
+#line 192 "src/std/HashMap.pv"
 struct HashMapBucket_str_str* HashMap_str_str__Index__index(void* __self);
 
-#line 197 "src/std/HashMap.pv"
+#line 198 "src/std/HashMap.pv"
 struct str* HashMap_str_str__Map_str_str__find(void* __self, struct str* key);
 
-#line 214 "src/std/HashMap.pv"
+#line 215 "src/std/HashMap.pv"
 struct str* HashMap_str_str__Map_str_str__insert(void* __self, struct str key, struct str value);
 
-#line 244 "src/std/HashMap.pv"
+#line 245 "src/std/HashMap.pv"
 bool HashMap_str_str__Map_str_str__remove(void* __self, struct str* key);
 
 extern struct trait_Map_str_strVTable HASH_MAP_STR_STR__VTABLE__MAP;

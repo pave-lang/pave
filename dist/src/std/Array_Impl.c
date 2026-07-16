@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_Impl.h>
 #include <analyzer/Impl.h>
+#include <usize.h>
 #include <std/Iter_ref_Impl.h>
 #include <slice_Impl.h>
 #include <std/Array_Impl.h>
@@ -122,7 +123,7 @@ uintptr_t Array_Impl__prepend(struct Array_Impl* self, struct Impl value) {
 #line 143 "src/std/Array.pv"
 bool Array_Impl__remove_back(struct Array_Impl* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_Impl__remove_back(struct Array_Impl* self) {
 #line 154 "src/std/Array.pv"
 struct Impl* Array_Impl__back(struct Array_Impl* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
+#include <usize.h>
 #include <std/Iter_ref_TypeImpl.h>
 #include <slice_TypeImpl.h>
 #include <std/Array_TypeImpl.h>
@@ -122,7 +123,7 @@ uintptr_t Array_TypeImpl__prepend(struct Array_TypeImpl* self, struct TypeImpl v
 #line 143 "src/std/Array.pv"
 bool Array_TypeImpl__remove_back(struct Array_TypeImpl* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_TypeImpl__remove_back(struct Array_TypeImpl* self) {
 #line 154 "src/std/Array.pv"
 struct TypeImpl* Array_TypeImpl__back(struct Array_TypeImpl* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

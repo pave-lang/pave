@@ -5,14 +5,14 @@
 
 #include <string.h>
 #include <std/str.h>
+#include <i32.h>
 #include <std/Iter_ptrc_char.h>
 #include <std/Range_ptrc_char.h>
+#include <char.h>
 #include <std/Range_usize.h>
 #include <std/trait_Hash.h>
 #include <std/Hash.h>
 #include <std/Fnv1a.h>
-#include <std/trait_Eq_str.h>
-#include <std/trait_Eq_ptrc_char.h>
 #include <std/str.h>
 
 #include <std/str.h>
@@ -40,7 +40,7 @@ bool str__eq_len(struct str self, char const* s, uintptr_t len) {
         return false;
     }
     #line 23 "src/std/str.pv"
-    return strncmp(self.ptr, s, len) == 0;
+    return i32__Eq_i32__eq(strncmp(self.ptr, s, len), 0);
 }
 
 #line 26 "src/std/str.pv"
@@ -58,7 +58,7 @@ bool str__contains(struct str self, char const* substring) {
     #line 31 "src/std/str.pv"
     while (i <= self.length - sub_len) {
         #line 32 "src/std/str.pv"
-        if (strncmp(self.ptr + i, substring, sub_len) == 0) {
+        if (i32__Eq_i32__eq(strncmp(self.ptr + i, substring, sub_len), 0)) {
             #line 33 "src/std/str.pv"
             return true;
         }
@@ -78,7 +78,7 @@ bool str__starts_with(struct str self, struct str prefix) {
     }
 
     #line 43 "src/std/str.pv"
-    return strncmp(self.ptr, prefix.ptr, prefix.length) == 0;
+    return i32__Eq_i32__eq(strncmp(self.ptr, prefix.ptr, prefix.length), 0);
 }
 
 #line 46 "src/std/str.pv"
@@ -92,7 +92,7 @@ bool str__ends_with(struct str self, char const* suffix) {
     }
 
     #line 50 "src/std/str.pv"
-    return strncmp(self.ptr + self.length - suffix_len, suffix, suffix_len) == 0;
+    return i32__Eq_i32__eq(strncmp(self.ptr + self.length - suffix_len, suffix, suffix_len), 0);
 }
 
 #line 53 "src/std/str.pv"
@@ -117,7 +117,7 @@ intptr_t str__index_of_start(struct str self, char ch, uintptr_t start) {
     #line 65 "src/std/str.pv"
     for (char const* ptr = s; ptr < e; ptr++) {
         #line 66 "src/std/str.pv"
-        if (*ptr == ch) {
+        if (char__Eq_char__eq(*ptr, ch)) {
             #line 67 "src/std/str.pv"
             return ptr - self.ptr;
         }
@@ -134,7 +134,7 @@ intptr_t str__index_of_last(struct str self, char ch) {
         #line 76 "src/std/str.pv"
         char const* ptr = self.ptr + self.length - 1 - i;
         #line 77 "src/std/str.pv"
-        if (*ptr == ch) {
+        if (char__Eq_char__eq(*ptr, ch)) {
             #line 78 "src/std/str.pv"
             return ptr - self.ptr;
         }
@@ -147,7 +147,7 @@ intptr_t str__index_of_last(struct str self, char ch) {
 #line 85 "src/std/str.pv"
 bool str__is_whitespace(char ch) {
     #line 86 "src/std/str.pv"
-    return (ch == ' ') || (ch == '\r') || (ch == '\n') || (ch == '\t');
+    return (char__Eq_char__eq(ch, ' ')) || (char__Eq_char__eq(ch, '\r')) || (char__Eq_char__eq(ch, '\n')) || (char__Eq_char__eq(ch, '\t'));
 }
 
 #line 89 "src/std/str.pv"
@@ -181,32 +181,29 @@ Hash str__Hash__hash(void* __self) {
 }
 
 #line 110 "src/std/str.pv"
-bool str__Eq_str__eq(void* __self, struct str other) {
-    struct str* self = __self; (void)self;
+bool str__Eq_str__eq(struct str self, struct str other) {
     #line 111 "src/std/str.pv"
-    if (self->length != other.length) {
+    if (self.length != other.length) {
         #line 111 "src/std/str.pv"
         return false;
     }
 
     #line 113 "src/std/str.pv"
-    return strncmp(self->ptr, other.ptr, self->length) == 0;
+    return i32__Eq_i32__eq(strncmp(self.ptr, other.ptr, self.length), 0);
 }
 
 #line 118 "src/std/str.pv"
-bool str__Eq_ptrc_char__eq(void* __self, char const* other) {
-    struct str* self = __self; (void)self;
+bool str__Eq_ptrc_char__eq(struct str self, char const* other) {
     #line 119 "src/std/str.pv"
     uint64_t other_len = strlen(other);
     #line 120 "src/std/str.pv"
-    if (self->length != other_len) {
+    if (self.length != other_len) {
         #line 120 "src/std/str.pv"
         return false;
     }
 
     #line 122 "src/std/str.pv"
-    return strncmp(self->ptr, other, self->length) == 0;
+    return i32__Eq_i32__eq(strncmp(self.ptr, other, self.length), 0);
 }
 
 struct trait_HashVTable STR__VTABLE__HASH = { .fn_hash = &str__Hash__hash };
-struct trait_Eq_ptrc_charVTable STR__VTABLE__EQ = { .fn_eq = &str__Eq_ptrc_char__eq };

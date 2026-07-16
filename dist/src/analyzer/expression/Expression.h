@@ -86,7 +86,7 @@ struct Type* Expression__get_member_type(struct Context* context, struct Type* t
 #line 6 "src/analyzer/expression/GenericResolve.pv"
 struct GenericMap* Expression__resolve_function_generics(struct Context* context, struct Function* func_info, struct Array_Type* generics, struct Array_InvokeArgument* arguments);
 
-#line 58 "src/analyzer/expression/GenericResolve.pv"
+#line 64 "src/analyzer/expression/GenericResolve.pv"
 void Expression__resolve_generic_type(struct Context* context, struct Type* param_type, struct Type* arg_type, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ExpressionValidate.pv"

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_MemberCompletionInfo.h>
 #include <analyzer/MemberCompletionInfo.h>
+#include <usize.h>
 #include <std/Iter_ref_MemberCompletionInfo.h>
 #include <slice_MemberCompletionInfo.h>
 #include <std/Array_MemberCompletionInfo.h>
@@ -122,7 +123,7 @@ uintptr_t Array_MemberCompletionInfo__prepend(struct Array_MemberCompletionInfo*
 #line 143 "src/std/Array.pv"
 bool Array_MemberCompletionInfo__remove_back(struct Array_MemberCompletionInfo* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_MemberCompletionInfo__remove_back(struct Array_MemberCompletionInfo* 
 #line 154 "src/std/Array.pv"
 struct MemberCompletionInfo* Array_MemberCompletionInfo__back(struct Array_MemberCompletionInfo* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
+#include <usize.h>
 #include <std/Iter_ref_Diagnostic.h>
 #include <slice_Diagnostic.h>
 #include <std/Array_Diagnostic.h>
@@ -122,7 +123,7 @@ uintptr_t Array_Diagnostic__prepend(struct Array_Diagnostic* self, struct Diagno
 #line 143 "src/std/Array.pv"
 bool Array_Diagnostic__remove_back(struct Array_Diagnostic* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_Diagnostic__remove_back(struct Array_Diagnostic* self) {
 #line 154 "src/std/Array.pv"
 struct Diagnostic* Array_Diagnostic__back(struct Array_Diagnostic* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

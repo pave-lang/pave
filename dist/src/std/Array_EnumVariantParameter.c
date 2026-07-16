@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_EnumVariantParameter.h>
 #include <analyzer/types/EnumVariantParameter.h>
+#include <usize.h>
 #include <std/Iter_ref_EnumVariantParameter.h>
 #include <slice_EnumVariantParameter.h>
 #include <std/Array_EnumVariantParameter.h>
@@ -122,7 +123,7 @@ uintptr_t Array_EnumVariantParameter__prepend(struct Array_EnumVariantParameter*
 #line 143 "src/std/Array.pv"
 bool Array_EnumVariantParameter__remove_back(struct Array_EnumVariantParameter* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_EnumVariantParameter__remove_back(struct Array_EnumVariantParameter* 
 #line 154 "src/std/Array.pv"
 struct EnumVariantParameter* Array_EnumVariantParameter__back(struct Array_EnumVariantParameter* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

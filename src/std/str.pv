@@ -107,7 +107,7 @@ impl Hash for str {
 }
 
 impl Eq<str> for str {
-    fn eq(&self, other: str) -> bool {
+    fn eq(self, other: str) -> bool {
         if self.length != other.length { return false; }
 
         return strncmp(self.ptr, other.ptr, self.length) == 0;
@@ -115,7 +115,7 @@ impl Eq<str> for str {
 }
 
 impl Eq<*const char> for str {
-    fn eq(&self, other: *const char) -> bool {
+    fn eq(self, other: *const char) -> bool {
         let other_len = strlen(other);
         if self.length != other_len { return false; }
 

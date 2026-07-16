@@ -6,7 +6,7 @@
 #include <compiler/TypeFunctionUsage.h>
 struct HashMapBucket_usize_TypeFunctionUsage;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeFunctionUsage {
     uintptr_t key;
     struct TypeFunctionUsage value;

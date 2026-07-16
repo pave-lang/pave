@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 #include <std/str.h>
+#include <char.h>
 #include <std/trait_Writer.h>
 #include <slice_ref_trait_Format.h>
 #include <std/trait_Format.h>
@@ -22,9 +23,9 @@ void format(struct trait_Writer out, struct str fmt, struct slice_ref_trait_Form
         #line 12 "src/std/Format.pv"
         while (i < fmt.length) {
             #line 13 "src/std/Format.pv"
-            if (fmt.ptr[i] == '{') {
+            if (char__Eq_char__eq(fmt.ptr[i], '{')) {
                 #line 14 "src/std/Format.pv"
-                if (i + 1 < fmt.length && fmt.ptr[i + 1] == '{') {
+                if (i + 1 < fmt.length && char__Eq_char__eq(fmt.ptr[i + 1], '{')) {
                     #line 15 "src/std/Format.pv"
                     out.vtable->fn_write(out.instance, str__slice(fmt, start, i + 1));
                     #line 16 "src/std/Format.pv"
@@ -35,7 +36,7 @@ void format(struct trait_Writer out, struct str fmt, struct slice_ref_trait_Form
                     #line 19 "src/std/Format.pv"
                     break;
                 }
-            } else if (fmt.ptr[i] == '}' && i + 1 < fmt.length && fmt.ptr[i + 1] == '}') {
+            } else if (char__Eq_char__eq(fmt.ptr[i], '}') && i + 1 < fmt.length && char__Eq_char__eq(fmt.ptr[i + 1], '}')) {
                 #line 22 "src/std/Format.pv"
                 out.vtable->fn_write(out.instance, str__slice(fmt, start, i + 1));
                 #line 23 "src/std/Format.pv"

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_ElseStatement.h>
 #include <analyzer/statement/ElseStatement.h>
+#include <usize.h>
 #include <std/Iter_ref_ElseStatement.h>
 #include <slice_ElseStatement.h>
 #include <std/Array_ElseStatement.h>
@@ -122,7 +123,7 @@ uintptr_t Array_ElseStatement__prepend(struct Array_ElseStatement* self, struct 
 #line 143 "src/std/Array.pv"
 bool Array_ElseStatement__remove_back(struct Array_ElseStatement* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_ElseStatement__remove_back(struct Array_ElseStatement* self) {
 #line 154 "src/std/Array.pv"
 struct ElseStatement* Array_ElseStatement__back(struct Array_ElseStatement* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

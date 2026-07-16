@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
+#include <usize.h>
 #include <std/Iter_ref_MatchPattern.h>
 #include <slice_MatchPattern.h>
 #include <std/Array_MatchPattern.h>
@@ -122,7 +123,7 @@ uintptr_t Array_MatchPattern__prepend(struct Array_MatchPattern* self, struct Ma
 #line 143 "src/std/Array.pv"
 bool Array_MatchPattern__remove_back(struct Array_MatchPattern* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_MatchPattern__remove_back(struct Array_MatchPattern* self) {
 #line 154 "src/std/Array.pv"
 struct MatchPattern* Array_MatchPattern__back(struct Array_MatchPattern* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

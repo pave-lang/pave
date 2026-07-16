@@ -34,7 +34,13 @@ impl Expression {
             let concrete_type = generic_map.get(generic_name.value);
             if concrete_type == null { continue; }
 
-            for *trait_info in generic.traits {
+            for trait_type in generic.traits {
+                let trait_info: *Trait = null;
+                match trait_type {
+                    Type::Trait(info, _) => { trait_info = info; },
+                    _ => {},
+                }
+                if trait_info == null { continue; }
                 for (typedef_name, _) in trait_info.typedefs {
                     match concrete_type {
                         Type::Struct(struct_info, _) => {

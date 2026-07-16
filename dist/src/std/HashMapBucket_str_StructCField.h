@@ -5,7 +5,7 @@
 #include <analyzer/c/StructCField.h>
 struct HashMapBucket_str_StructCField;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_StructCField {
     struct str key;
     struct StructCField value;

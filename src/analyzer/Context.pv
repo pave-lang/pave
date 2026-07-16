@@ -582,8 +582,13 @@ impl Context {
                 if typedef_name == null { return false; }
 
                 let found = false;
-                for *trait_info in generic_ref.traits {
-                    if trait_info.typedefs.find(&typedef_name.value) != null { found = true; }
+                for trait_type in generic_ref.traits {
+                    match trait_type {
+                        Type::Trait(trait_info, _) => {
+                            if trait_info.typedefs.find(&typedef_name.value) != null { found = true; }
+                        },
+                        _ => {},
+                    }
                 }
                 if !found {
                     self.error_token(typedef_name, "Unknown typedef in trait bound");
@@ -1171,27 +1176,47 @@ impl Context {
     }
 
     fn validate_generic_constraints(&self, generics: &Generics, usage_types: &Array<Type>) -> bool {
+        let usage_map = GenericMap::new(self.allocator, generics, usage_types);
         let i: usize = 0;
         while i < generics.array.length && i < usage_types.length {
             let generic = &generics.array.data[i];
             let usage_type = &usage_types.data[i];
 
-            for *required_trait in generic.traits {
+            for required_trait in generic.traits {
+                let resolved_required_trait = Context::resolve_type(self.allocator, required_trait, &usage_map, null);
+                if resolved_required_trait == null { return false; }
                 let implements = false;
                 match usage_type {
                     Type::Struct(struct_info, _) => {
-                        let trait_key = required_trait.get_key(self.allocator);
-                        implements = struct_info.traits.find(&trait_key) != null;
+                        for *impl_info in struct_info.impls {
+                            if impl_info.trait_type.eq(resolved_required_trait) { implements = true; }
+                        }
+                    },
+                    Type::Enum(enum_info, _) => {
+                        for *impl_info in enum_info.impls {
+                            if impl_info.trait_type.eq(resolved_required_trait) { implements = true; }
+                        }
+                    },
+                    Type::Primitive(primitive_info) => {
+                        if primitive_info != null {
+                            for *impl_info in primitive_info.impls {
+                                if impl_info.trait_type.eq(resolved_required_trait) { implements = true; }
+                            }
+                        }
                     },
                     Type::Generic(generic_info) => {
-                        for *generic_trait in generic_info.traits {
-                            if generic_trait == required_trait { implements = true; }
+                        for generic_trait in generic_info.traits {
+                            if generic_trait.eq(resolved_required_trait) { implements = true; }
                         }
                     },
                     _ => { implements = true; },
                 }
                 if !implements {
-                    let name = required_trait.name;
+                    let name: *Token = null;
+                    match resolved_required_trait {
+                        Type::Trait(trait_info, _) => { name = trait_info.name; },
+                        _ => {},
+                    }
                     if name == null {
                         self.error("Type does not implement required trait");
                         return false;

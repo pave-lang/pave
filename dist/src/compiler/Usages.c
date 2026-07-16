@@ -21,6 +21,7 @@
 #include <std/HashMap_str_ref_Namespace.h>
 #include <std/Array_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
+#include <usize.h>
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/Impl.h>
@@ -204,7 +205,7 @@ struct Usages Usages__new(struct Generator* generator) {
         #line 212 "src/compiler/Usages.pv"
         struct TypeImpl* type_impl = &self.root->type_impls.data[type_impl_i];
         #line 213 "src/compiler/Usages.pv"
-        if (type_impl->impl_info->generics.array.length == 0) {
+        if (usize__Eq_usize__eq(type_impl->impl_info->generics.array.length, 0)) {
             #line 214 "src/compiler/Usages.pv"
             HashMap_usize_TypeUsage_TypeImpl__insert(&self.type_impls, (uintptr_t)(type_impl), TypeUsage_TypeImpl__new(self.allocator, type_impl));
             #line 215 "src/compiler/Usages.pv"
@@ -395,7 +396,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
             #line 278 "src/compiler/Usages.pv"
             struct Token* name = enum_info->name;
             #line 279 "src/compiler/Usages.pv"
-            if (name != 0 && enum_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, name->value)) {
+            if (name != 0 && usize__Eq_usize__eq(enum_info->generics.array.length, 0) && HashSet_str__insert(&self->usage_types, name->value)) {
                 #line 280 "src/compiler/Usages.pv"
                 struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = 0, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
                 #line 281 "src/compiler/Usages.pv"
@@ -431,7 +432,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
             #line 292 "src/compiler/Usages.pv"
             struct Token* name = struct_info->name;
             #line 293 "src/compiler/Usages.pv"
-            if (name != 0 && struct_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_types, name->value)) {
+            if (name != 0 && usize__Eq_usize__eq(struct_info->generics.array.length, 0) && HashSet_str__insert(&self->usage_types, name->value)) {
                 #line 294 "src/compiler/Usages.pv"
                 struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = 0, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
                 #line 295 "src/compiler/Usages.pv"
@@ -467,7 +468,7 @@ void Usages__add_module(struct Usages* self, struct Module* module) {
             #line 306 "src/compiler/Usages.pv"
             struct Token* name = trait_info->name;
             #line 307 "src/compiler/Usages.pv"
-            if (name != 0 && trait_info->generics.array.length == 0 && HashSet_str__insert(&self->usage_traits, name->value)) {
+            if (name != 0 && usize__Eq_usize__eq(trait_info->generics.array.length, 0) && HashSet_str__insert(&self->usage_traits, name->value)) {
                 #line 308 "src/compiler/Usages.pv"
                 struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(self->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = 0, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }});
                 #line 309 "src/compiler/Usages.pv"
@@ -644,7 +645,7 @@ void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap*
                     #line 383 "src/compiler/Usages.pv"
                     Usages__add_type(self, type_info, type_generic_map);
                     #line 384 "src/compiler/Usages.pv"
-                    if (func_info->generics.array.length == 0) {
+                    if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                         #line 385 "src/compiler/Usages.pv"
                         struct GenericMap* function_generic_map = generic_map;
                         #line 386 "src/compiler/Usages.pv"
@@ -2459,7 +2460,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                             #line 1161 "src/compiler/Usages.pv"
                             struct Token* target_trait_name = target_trait->name;
                             #line 1162 "src/compiler/Usages.pv"
-                            if (target_trait_name != 0 && str__Eq_str__eq(&target_trait_name->value, (struct str){ .ptr = "Any", .length = strlen("Any") })) {
+                            if (target_trait_name != 0 && str__Eq_str__eq(target_trait_name->value, (struct str){ .ptr = "Any", .length = strlen("Any") })) {
                                 #line 1163 "src/compiler/Usages.pv"
                                 struct Type* source = Context__resolve_type(self->allocator, &inner->return_type, generic_map, 0);
                                 #line 1164 "src/compiler/Usages.pv"
@@ -2490,7 +2491,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                     #line 1176 "src/compiler/Usages.pv"
                     struct UsageContext* usage_context = self->usage_context;
                     #line 1177 "src/compiler/Usages.pv"
-                    if (struct_name != 0 && str__Eq_str__eq(&struct_name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
+                    if (struct_name != 0 && str__Eq_str__eq(struct_name->value, (struct str){ .ptr = "str", .length = strlen("str") })) {
                         #line 1178 "src/compiler/Usages.pv"
                         if (usage_context != 0) {
                             #line 1179 "src/compiler/Usages.pv"
@@ -2535,7 +2536,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                             }
 
                             #line 1199 "src/compiler/Usages.pv"
-                            if (func_info->generics.array.length == 0) {
+                            if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                                 #line 1200 "src/compiler/Usages.pv"
                                 usage->impl_dynamic_function = true;
                             }
@@ -2586,7 +2587,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                         #line 1217 "src/compiler/Usages.pv"
                                         marked = true;
                                         #line 1218 "src/compiler/Usages.pv"
-                                        if (func_info->generics.array.length == 0) {
+                                        if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                                             #line 1219 "src/compiler/Usages.pv"
                                             impl_function->impl_dynamic_function = true;
                                         }
@@ -2645,7 +2646,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                         #line 1240 "src/compiler/Usages.pv"
                                         marked = true;
                                         #line 1241 "src/compiler/Usages.pv"
-                                        if (func_info->generics.array.length == 0) {
+                                        if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                                             #line 1242 "src/compiler/Usages.pv"
                                             impl_function->impl_dynamic_function = true;
                                         }
@@ -2704,7 +2705,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                         #line 1263 "src/compiler/Usages.pv"
                                         marked = true;
                                         #line 1264 "src/compiler/Usages.pv"
-                                        if (func_info->generics.array.length == 0) {
+                                        if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                                             #line 1265 "src/compiler/Usages.pv"
                                             impl_function->impl_dynamic_function = true;
                                         }
@@ -2757,7 +2758,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                     }
 
                                     #line 1286 "src/compiler/Usages.pv"
-                                    if (str__Eq_str__eq(&name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
+                                    if (str__Eq_str__eq(name->value, (struct str){ .ptr = "Struct", .length = strlen("Struct") })) {
                                         #line 1287 "src/compiler/Usages.pv"
                                         uintptr_t ptr = (uintptr_t)(struct_info);
                                         #line 1288 "src/compiler/Usages.pv"
@@ -2806,7 +2807,7 @@ void Usages__process_expression(struct Usages* self, struct Expression* expressi
                                     }
 
                                     #line 1307 "src/compiler/Usages.pv"
-                                    if (str__Eq_str__eq(&name->value, (struct str){ .ptr = "Enum", .length = strlen("Enum") })) {
+                                    if (str__Eq_str__eq(name->value, (struct str){ .ptr = "Enum", .length = strlen("Enum") })) {
                                         #line 1308 "src/compiler/Usages.pv"
                                         uintptr_t ptr = (uintptr_t)(enum_info);
                                         #line 1309 "src/compiler/Usages.pv"

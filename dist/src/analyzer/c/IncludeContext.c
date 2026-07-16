@@ -27,6 +27,7 @@
 #include <std/trait_Allocator.h>
 #include <analyzer/c/IncludeObjectContext.h>
 #include <analyzer/c/ClassCpp.h>
+#include <i32.h>
 #include <analyzer/types/Primitive.h>
 #include <std/HashMap_str_Primitive.h>
 #include <std/HashMap_str_i64.h>
@@ -420,7 +421,7 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
             return __result;
         } else {
             #line 248 "src/analyzer/c/IncludeContext.pv"
-            if (strncmp(type_name, "struct ", 7) == 0) {
+            if (i32__Eq_i32__eq(strncmp(type_name, "struct ", 7), 0)) {
                 #line 249 "src/analyzer/c/IncludeContext.pv"
                 struct StructC* struct_info = IncludeContext__add_struct(self, name);
 
@@ -437,7 +438,7 @@ enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent
             }
 
             #line 259 "src/analyzer/c/IncludeContext.pv"
-            if (strncmp(type_name, "union ", 7) == 0) {
+            if (i32__Eq_i32__eq(strncmp(type_name, "union ", 7), 0)) {
                 #line 260 "src/analyzer/c/IncludeContext.pv"
                 struct StructC* union_info = IncludeContext__add_union(self, name);
 

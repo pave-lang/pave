@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_SymbolInfo.h>
 #include <analyzer/SymbolInfo.h>
+#include <usize.h>
 #include <std/Iter_ref_SymbolInfo.h>
 #include <slice_SymbolInfo.h>
 #include <std/Array_SymbolInfo.h>
@@ -122,7 +123,7 @@ uintptr_t Array_SymbolInfo__prepend(struct Array_SymbolInfo* self, struct Symbol
 #line 143 "src/std/Array.pv"
 bool Array_SymbolInfo__remove_back(struct Array_SymbolInfo* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_SymbolInfo__remove_back(struct Array_SymbolInfo* self) {
 #line 154 "src/std/Array.pv"
 struct SymbolInfo* Array_SymbolInfo__back(struct Array_SymbolInfo* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

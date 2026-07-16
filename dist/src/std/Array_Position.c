@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_Position.h>
 #include <analyzer/Position.h>
+#include <usize.h>
 #include <std/Iter_ref_Position.h>
 #include <slice_Position.h>
 #include <std/Array_Position.h>
@@ -122,7 +123,7 @@ uintptr_t Array_Position__prepend(struct Array_Position* self, struct Position v
 #line 143 "src/std/Array.pv"
 bool Array_Position__remove_back(struct Array_Position* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_Position__remove_back(struct Array_Position* self) {
 #line 154 "src/std/Array.pv"
 struct Position* Array_Position__back(struct Array_Position* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_SignatureInfo.h>
 #include <analyzer/SignatureInfo.h>
+#include <usize.h>
 #include <std/Iter_ref_SignatureInfo.h>
 #include <slice_SignatureInfo.h>
 #include <std/Array_SignatureInfo.h>
@@ -122,7 +123,7 @@ uintptr_t Array_SignatureInfo__prepend(struct Array_SignatureInfo* self, struct 
 #line 143 "src/std/Array.pv"
 bool Array_SignatureInfo__remove_back(struct Array_SignatureInfo* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_SignatureInfo__remove_back(struct Array_SignatureInfo* self) {
 #line 154 "src/std/Array.pv"
 struct SignatureInfo* Array_SignatureInfo__back(struct Array_SignatureInfo* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

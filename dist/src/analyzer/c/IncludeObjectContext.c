@@ -28,6 +28,7 @@
 #include <analyzer/c/EnumC.h>
 #include <analyzer/c/ParentCpp.h>
 #include <analyzer/c/IncludeObjectEnumClass.h>
+#include <u64.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>
@@ -192,7 +193,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             clang_disposeString(spelling);
 
             #line 103 "src/analyzer/c/IncludeObjectContext.pv"
-            if (strlen(name) == 0) {
+            if (u64__Eq_u64__eq(strlen(name), 0)) {
                 #line 104 "src/analyzer/c/IncludeObjectContext.pv"
                 ArenaAllocator__Allocator__free(include->root->allocator, name);
                 #line 105 "src/analyzer/c/IncludeObjectContext.pv"
@@ -225,7 +226,7 @@ enum CXChildVisitResult IncludeObjectContext__visitor_class(CXCursor cursor, CXC
             clang_disposeString(spelling);
 
             #line 124 "src/analyzer/c/IncludeObjectContext.pv"
-            if (strlen(name) == 0) {
+            if (u64__Eq_u64__eq(strlen(name), 0)) {
                 #line 125 "src/analyzer/c/IncludeObjectContext.pv"
                 ArenaAllocator__Allocator__free(include->root->allocator, name);
                 #line 126 "src/analyzer/c/IncludeObjectContext.pv"

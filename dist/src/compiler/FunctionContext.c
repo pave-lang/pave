@@ -20,6 +20,7 @@
 #include <std/Iter_ref_DeferStatement.h>
 #include <std/HashMap_str_str.h>
 #include <std/String.h>
+#include <i32.h>
 #include <std/Array_char.h>
 #include <compiler/FunctionContext.h>
 
@@ -234,7 +235,7 @@ void FunctionContext__add_variable(struct FunctionContext* self, struct str name
     #line 119 "src/compiler/FunctionContext.pv"
     while (true) {
         #line 120 "src/compiler/FunctionContext.pv"
-        if (i == 10) {
+        if (i32__Eq_i32__eq(i, 10)) {
             #line 120 "src/compiler/FunctionContext.pv"
             String__append(&new_name, (struct str){ .ptr = "x", .length = strlen("x") });
         }

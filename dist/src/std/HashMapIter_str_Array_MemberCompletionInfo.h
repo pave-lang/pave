@@ -5,7 +5,7 @@
 
 struct HashMapBucket_str_Array_MemberCompletionInfo;
 
-#line 10 "src/std/HashMap.pv"
+#line 11 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_MemberCompletionInfo {
     struct HashMapBucket_str_Array_MemberCompletionInfo* iter;
     struct HashMapBucket_str_Array_MemberCompletionInfo* end;
@@ -13,10 +13,10 @@ struct HashMapIter_str_Array_MemberCompletionInfo {
 
 struct HashMapIter_str_Array_MemberCompletionInfo;
 
-#line 16 "src/std/HashMap.pv"
+#line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_MemberCompletionInfo__next(struct HashMapIter_str_Array_MemberCompletionInfo* self);
 
-#line 21 "src/std/HashMap.pv"
+#line 22 "src/std/HashMap.pv"
 struct tuple_str_Array_MemberCompletionInfo* HashMapIter_str_Array_MemberCompletionInfo__value(struct HashMapIter_str_Array_MemberCompletionInfo* self);
 
 #endif

@@ -5,7 +5,7 @@
 
 struct HashMapBucket_str_StructCField;
 
-#line 10 "src/std/HashMap.pv"
+#line 11 "src/std/HashMap.pv"
 struct HashMapIter_str_StructCField {
     struct HashMapBucket_str_StructCField* iter;
     struct HashMapBucket_str_StructCField* end;
@@ -13,10 +13,10 @@ struct HashMapIter_str_StructCField {
 
 struct HashMapIter_str_StructCField;
 
-#line 16 "src/std/HashMap.pv"
+#line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_StructCField__next(struct HashMapIter_str_StructCField* self);
 
-#line 21 "src/std/HashMap.pv"
+#line 22 "src/std/HashMap.pv"
 struct tuple_str_StructCField* HashMapIter_str_StructCField__value(struct HashMapIter_str_StructCField* self);
 
 #endif

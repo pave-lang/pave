@@ -103,3 +103,15 @@ impl Hash for Uri {
         }
     }
 }
+
+impl Eq<Uri> for Uri {
+    fn eq(self, other: Uri) -> bool {
+        match self {
+            Uri::File(path) => {
+                match other {
+                    Uri::File(other_path) => { return path.eq(other_path); },
+                }
+            },
+        }
+    }
+}

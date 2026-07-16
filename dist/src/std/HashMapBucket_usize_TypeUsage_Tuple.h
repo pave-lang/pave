@@ -6,7 +6,7 @@
 #include <compiler/TypeUsage_Tuple.h>
 struct HashMapBucket_usize_TypeUsage_Tuple;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Tuple {
     uintptr_t key;
     struct TypeUsage_Tuple value;

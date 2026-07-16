@@ -32,6 +32,7 @@
 #include <std/Array_String.h>
 #include <compiler/TypeUsage_Enum.h>
 #include <analyzer/types/Enum.h>
+#include <usize.h>
 #include <std/Array_ref_Impl.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
 #include <std/HashMap_str_EnumVariant.h>
@@ -400,7 +401,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
     remove(header_tmp);
 
     #line 175 "src/compiler/FileGenerator.pv"
-    if (enum_info->impls.length == 0 && !usage->any_usage && !usage->impl_dynamic_usage) {
+    if (usize__Eq_usize__eq(enum_info->impls.length, 0) && !usage->any_usage && !usage->impl_dynamic_usage) {
         #line 175 "src/compiler/FileGenerator.pv"
         return true;
     }
@@ -777,7 +778,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
                 struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
                 #line 378 "src/compiler/FileGenerator.pv"
-                if (variant->types.length == 0) {
+                if (usize__Eq_usize__eq(variant->types.length, 0)) {
                     #line 378 "src/compiler/FileGenerator.pv"
                     continue;
                 }
@@ -921,7 +922,7 @@ bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_E
                 struct EnumVariant* variant = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
                 #line 456 "src/compiler/FileGenerator.pv"
-                if (variant->types.length == 0) {
+                if (usize__Eq_usize__eq(variant->types.length, 0)) {
                     #line 456 "src/compiler/FileGenerator.pv"
                     continue;
                 }
@@ -1253,7 +1254,7 @@ bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage
     remove(header_tmp);
 
     #line 629 "src/compiler/FileGenerator.pv"
-    if (struct_info->impls.length == 0 && !usage->impl_dynamic_usage && !usage->any_usage) {
+    if (usize__Eq_usize__eq(struct_info->impls.length, 0) && !usage->impl_dynamic_usage && !usage->any_usage) {
         #line 630 "src/compiler/FileGenerator.pv"
         return true;
     }
@@ -1836,7 +1837,7 @@ bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUs
     remove(header_tmp);
 
     #line 935 "src/compiler/FileGenerator.pv"
-    if (primitive_info->impls.length == 0) {
+    if (usize__Eq_usize__eq(primitive_info->impls.length, 0)) {
         #line 936 "src/compiler/FileGenerator.pv"
         return true;
     }
@@ -2807,7 +2808,7 @@ void FileGenerator__generate_test_runner(struct FileGenerator* self, struct Hash
     FileGenerator__collect_tests(self, children, &func_names, &descriptions, &header_paths, &module_paths);
 
     #line 1413 "src/compiler/FileGenerator.pv"
-    if (func_names.length == 0) {
+    if (usize__Eq_usize__eq(func_names.length, 0)) {
         #line 1413 "src/compiler/FileGenerator.pv"
         return;
     }

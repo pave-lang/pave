@@ -81,7 +81,7 @@ bool ExpressionWriter__write_typed_variadic_slice(struct ExpressionWriter* self,
 #line 713 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 940 "src/compiler/ExpressionWriter.pv"
+#line 937 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics);
 
 #endif

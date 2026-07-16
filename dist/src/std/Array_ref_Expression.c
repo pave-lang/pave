@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_ref_Expression.h>
 #include <analyzer/expression/Expression.h>
+#include <usize.h>
 #include <std/Iter_ref_ref_Expression.h>
 #include <slice_ref_Expression.h>
 #include <std/Array_ref_Expression.h>
@@ -122,7 +123,7 @@ uintptr_t Array_ref_Expression__prepend(struct Array_ref_Expression* self, struc
 #line 143 "src/std/Array.pv"
 bool Array_ref_Expression__remove_back(struct Array_ref_Expression* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_ref_Expression__remove_back(struct Array_ref_Expression* self) {
 #line 154 "src/std/Array.pv"
 struct Expression** Array_ref_Expression__back(struct Array_ref_Expression* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

@@ -6,10 +6,14 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <char.h>
 #include <analyzer/Tokenizer.h>
+#include <u64.h>
+#include <i32.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <std/Array_Token.h>
+#include <usize.h>
 #include <analyzer/Token.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Tokenizer.h>
@@ -19,7 +23,7 @@
 #line 17 "src/analyzer/Tokenizer.pv"
 void Tokenizer__increase_pos(struct Tokenizer* self) {
     #line 18 "src/analyzer/Tokenizer.pv"
-    if (self->data.ptr[self->pos] == '\r' && self->data.ptr[self->pos + 1] == '\n') {
+    if (char__Eq_char__eq(self->data.ptr[self->pos], '\r') && char__Eq_char__eq(self->data.ptr[self->pos + 1], '\n')) {
         #line 19 "src/analyzer/Tokenizer.pv"
         self->pos += 2;
         #line 20 "src/analyzer/Tokenizer.pv"
@@ -31,7 +35,7 @@ void Tokenizer__increase_pos(struct Tokenizer* self) {
     }
 
     #line 25 "src/analyzer/Tokenizer.pv"
-    if (self->data.ptr[self->pos] == '\r' || self->data.ptr[self->pos] == '\n') {
+    if (char__Eq_char__eq(self->data.ptr[self->pos], '\r') || char__Eq_char__eq(self->data.ptr[self->pos], '\n')) {
         #line 26 "src/analyzer/Tokenizer.pv"
         self->pos += 1;
         #line 27 "src/analyzer/Tokenizer.pv"
@@ -54,7 +58,7 @@ bool Tokenizer__is_letter(struct Tokenizer* self) {
     char c = self->data.ptr[self->pos];
 
     #line 39 "src/analyzer/Tokenizer.pv"
-    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || char__Eq_char__eq(c, '_');
 }
 
 #line 42 "src/analyzer/Tokenizer.pv"
@@ -72,7 +76,7 @@ bool Tokenizer__is_symbol(struct Tokenizer* self) {
     char c = self->data.ptr[self->pos];
 
     #line 51 "src/analyzer/Tokenizer.pv"
-    return c == '{' || c == '}' || c == '(' || c == ')' || c == '[' || c == ']' || c == '<' || c == '>' || c == '.' || c == ',' || c == ';' || c == ':' || c == '=' || c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '&' || c == '!' || c == '?' || c == '|' || c == '^' || c == '~' || c == '@';
+    return char__Eq_char__eq(c, '{') || char__Eq_char__eq(c, '}') || char__Eq_char__eq(c, '(') || char__Eq_char__eq(c, ')') || char__Eq_char__eq(c, '[') || char__Eq_char__eq(c, ']') || char__Eq_char__eq(c, '<') || char__Eq_char__eq(c, '>') || char__Eq_char__eq(c, '.') || char__Eq_char__eq(c, ',') || char__Eq_char__eq(c, ';') || char__Eq_char__eq(c, ':') || char__Eq_char__eq(c, '=') || char__Eq_char__eq(c, '+') || char__Eq_char__eq(c, '-') || char__Eq_char__eq(c, '*') || char__Eq_char__eq(c, '/') || char__Eq_char__eq(c, '%') || char__Eq_char__eq(c, '&') || char__Eq_char__eq(c, '!') || char__Eq_char__eq(c, '?') || char__Eq_char__eq(c, '|') || char__Eq_char__eq(c, '^') || char__Eq_char__eq(c, '~') || char__Eq_char__eq(c, '@');
 }
 
 #line 54 "src/analyzer/Tokenizer.pv"
@@ -81,7 +85,7 @@ bool Tokenizer__is_quote(struct Tokenizer* self) {
     char c = self->data.ptr[self->pos];
 
     #line 57 "src/analyzer/Tokenizer.pv"
-    return c == '\"' || c == '\'';
+    return char__Eq_char__eq(c, '\"') || char__Eq_char__eq(c, '\'');
 }
 
 #line 60 "src/analyzer/Tokenizer.pv"
@@ -92,7 +96,7 @@ bool Tokenizer__is_comment_line(struct Tokenizer* self) {
     char c2 = self->data.ptr[self->pos + 1];
 
     #line 64 "src/analyzer/Tokenizer.pv"
-    return c1 == '/' && c2 == '/';
+    return char__Eq_char__eq(c1, '/') && char__Eq_char__eq(c2, '/');
 }
 
 #line 67 "src/analyzer/Tokenizer.pv"
@@ -117,13 +121,13 @@ void Tokenizer__skip_comment_block(struct Tokenizer* self) {
     Tokenizer__increase_pos(self);
 
     #line 80 "src/analyzer/Tokenizer.pv"
-    while (self->pos < self->data.length && !(self->data.ptr[self->pos] == '*' && self->data.ptr[self->pos + 1] == '/')) {
+    while (self->pos < self->data.length && !(char__Eq_char__eq(self->data.ptr[self->pos], '*') && char__Eq_char__eq(self->data.ptr[self->pos + 1], '/'))) {
         #line 81 "src/analyzer/Tokenizer.pv"
         Tokenizer__increase_pos(self);
     }
 
     #line 84 "src/analyzer/Tokenizer.pv"
-    if (self->data.ptr[self->pos] == '*' && self->data.ptr[self->pos + 1] == '/') {
+    if (char__Eq_char__eq(self->data.ptr[self->pos], '*') && char__Eq_char__eq(self->data.ptr[self->pos + 1], '/')) {
         #line 85 "src/analyzer/Tokenizer.pv"
         Tokenizer__increase_pos(self);
         #line 86 "src/analyzer/Tokenizer.pv"
@@ -139,13 +143,13 @@ bool Tokenizer__is_comment_block(struct Tokenizer* self) {
     char c2 = self->data.ptr[self->pos + 1];
 
     #line 94 "src/analyzer/Tokenizer.pv"
-    return c1 == '/' && c2 == '*';
+    return char__Eq_char__eq(c1, '/') && char__Eq_char__eq(c2, '*');
 }
 
 #line 97 "src/analyzer/Tokenizer.pv"
 void Tokenizer__skip_whitespace(struct Tokenizer* self) {
     #line 98 "src/analyzer/Tokenizer.pv"
-    while (self->pos < self->data.length && (self->data.ptr[self->pos] == ' ' || self->data.ptr[self->pos] == '\t' || self->data.ptr[self->pos] == '\r' || self->data.ptr[self->pos] == '\n')) {
+    while (self->pos < self->data.length && (char__Eq_char__eq(self->data.ptr[self->pos], ' ') || char__Eq_char__eq(self->data.ptr[self->pos], '\t') || char__Eq_char__eq(self->data.ptr[self->pos], '\r') || char__Eq_char__eq(self->data.ptr[self->pos], '\n'))) {
         #line 99 "src/analyzer/Tokenizer.pv"
         Tokenizer__increase_pos(self);
     }
@@ -163,7 +167,7 @@ void Tokenizer__skip_alphanumeric(struct Tokenizer* self) {
 #line 109 "src/analyzer/Tokenizer.pv"
 void Tokenizer__skip_digits(struct Tokenizer* self) {
     #line 110 "src/analyzer/Tokenizer.pv"
-    while (Tokenizer__is_digit(self, 0) || (self->data.ptr[self->pos] == '_' && Tokenizer__is_digit(self, 1))) {
+    while (Tokenizer__is_digit(self, 0) || (char__Eq_char__eq(self->data.ptr[self->pos], '_') && Tokenizer__is_digit(self, 1))) {
         #line 111 "src/analyzer/Tokenizer.pv"
         Tokenizer__increase_pos(self);
     }
@@ -179,7 +183,7 @@ void Tokenizer__skip_string(struct Tokenizer* self) {
     #line 119 "src/analyzer/Tokenizer.pv"
     while (self->pos < self->data.length && self->data.ptr[self->pos] != delimiter) {
         #line 120 "src/analyzer/Tokenizer.pv"
-        if (self->data.ptr[self->pos] == '\\') {
+        if (char__Eq_char__eq(self->data.ptr[self->pos], '\\')) {
             #line 121 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(self);
         }
@@ -189,7 +193,7 @@ void Tokenizer__skip_string(struct Tokenizer* self) {
     }
 
     #line 127 "src/analyzer/Tokenizer.pv"
-    if (self->data.ptr[self->pos] == delimiter) {
+    if (char__Eq_char__eq(self->data.ptr[self->pos], delimiter)) {
         #line 128 "src/analyzer/Tokenizer.pv"
         Tokenizer__increase_pos(self);
     }
@@ -203,7 +207,7 @@ bool Tokenizer__is_in_array(struct Array_ptrc_char* array, char const* s, uintpt
     #line 135 "src/analyzer/Tokenizer.pv"
     while (i < array->length) {
         #line 136 "src/analyzer/Tokenizer.pv"
-        if (strlen(array->data[i]) == len && strncmp(array->data[i], s, len) == 0) {
+        if (u64__Eq_u64__eq(strlen(array->data[i]), len) && i32__Eq_i32__eq(strncmp(array->data[i], s, len), 0)) {
             #line 137 "src/analyzer/Tokenizer.pv"
             return true;
         }
@@ -405,7 +409,7 @@ struct Array_Token Tokenizer__tokenize(struct ArenaAllocator* allocator, char co
 #line 253 "src/analyzer/Tokenizer.pv"
 struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, struct str data) {
     #line 254 "src/analyzer/Tokenizer.pv"
-    if (data.length == 0) {
+    if (usize__Eq_usize__eq(data.length, 0)) {
         #line 255 "src/analyzer/Tokenizer.pv"
         return (struct Array_Token) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }, .data = 0, .length = 0, .capacity = 0 };
     }
@@ -429,7 +433,7 @@ struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, st
     #line 271 "src/analyzer/Tokenizer.pv"
     while (tokenizer.pos < tokenizer.data.length) {
         #line 272 "src/analyzer/Tokenizer.pv"
-        bool is_raw_identifier = tokenizer.data.ptr[tokenizer.pos] == 'r' && tokenizer.data.ptr[tokenizer.pos + 1] == '#';
+        bool is_raw_identifier = char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'r') && char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos + 1], '#');
         #line 273 "src/analyzer/Tokenizer.pv"
         if (is_raw_identifier) {
             #line 274 "src/analyzer/Tokenizer.pv"
@@ -455,9 +459,9 @@ struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, st
         };
 
         #line 292 "src/analyzer/Tokenizer.pv"
-        if (is_raw_identifier || Tokenizer__is_letter(&tokenizer) || tokenizer.data.ptr[tokenizer.pos] == '#') {
+        if (is_raw_identifier || Tokenizer__is_letter(&tokenizer) || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '#')) {
             #line 293 "src/analyzer/Tokenizer.pv"
-            bool is_hash_keyword = !is_raw_identifier && tokenizer.data.ptr[tokenizer.pos] == '#';
+            bool is_hash_keyword = !is_raw_identifier && char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '#');
             #line 294 "src/analyzer/Tokenizer.pv"
             if (is_hash_keyword) {
                 #line 294 "src/analyzer/Tokenizer.pv"
@@ -480,19 +484,19 @@ struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, st
             Tokenizer__increase_pos(&tokenizer);
 
             #line 306 "src/analyzer/Tokenizer.pv"
-            if (tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'x' || tokenizer.data.ptr[tokenizer.pos] == 'X')) {
+            if (char__Eq_char__eq(tokenizer.data.ptr[start_pos], '0') && (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'x') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'X'))) {
                 #line 307 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
                 #line 308 "src/analyzer/Tokenizer.pv"
-                while (Tokenizer__is_digit(&tokenizer, 0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') || tokenizer.data.ptr[tokenizer.pos] == '_') {
+                while (Tokenizer__is_digit(&tokenizer, 0) || (tokenizer.data.ptr[tokenizer.pos] >= 'a' && tokenizer.data.ptr[tokenizer.pos] <= 'f') || (tokenizer.data.ptr[tokenizer.pos] >= 'A' && tokenizer.data.ptr[tokenizer.pos] <= 'F') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '_')) {
                     #line 309 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
-            } else if (tokenizer.data.ptr[start_pos] == '0' && (tokenizer.data.ptr[tokenizer.pos] == 'b' || tokenizer.data.ptr[tokenizer.pos] == 'B')) {
+            } else if (char__Eq_char__eq(tokenizer.data.ptr[start_pos], '0') && (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'b') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'B'))) {
                 #line 312 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
                 #line 313 "src/analyzer/Tokenizer.pv"
-                while (tokenizer.data.ptr[tokenizer.pos] == '0' || tokenizer.data.ptr[tokenizer.pos] == '1' || tokenizer.data.ptr[tokenizer.pos] == '_') {
+                while (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '0') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '1') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '_')) {
                     #line 314 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
@@ -501,7 +505,7 @@ struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, st
                 Tokenizer__skip_digits(&tokenizer);
 
                 #line 319 "src/analyzer/Tokenizer.pv"
-                if (tokenizer.data.ptr[tokenizer.pos] == '.' && Tokenizer__is_digit(&tokenizer, 1)) {
+                if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '.') && Tokenizer__is_digit(&tokenizer, 1)) {
                     #line 320 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                     #line 321 "src/analyzer/Tokenizer.pv"
@@ -511,10 +515,10 @@ struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, st
                 }
 
                 #line 325 "src/analyzer/Tokenizer.pv"
-                if (tokenizer.data.ptr[tokenizer.pos] == 'f' || tokenizer.data.ptr[tokenizer.pos] == 'F') {
+                if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'f') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'F')) {
                     #line 326 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
-                } else if (tokenizer.data.ptr[tokenizer.pos] == 'u' || tokenizer.data.ptr[tokenizer.pos] == 'U') {
+                } else if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'u') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'U')) {
                     #line 328 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }

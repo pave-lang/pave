@@ -566,7 +566,7 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
                     #line 307 "src/analyzer/Naming.pv"
                     struct Token* mapped_name = mapped_generic->name;
                     #line 308 "src/analyzer/Naming.pv"
-                    if (mapped_name != 0 && str__Eq_str__eq(&mapped_name->value, name)) {
+                    if (mapped_name != 0 && str__Eq_str__eq(mapped_name->value, name)) {
                         #line 309 "src/analyzer/Naming.pv"
                         String__append(&result, name);
                         #line 310 "src/analyzer/Naming.pv"
@@ -1237,7 +1237,7 @@ struct String Naming__get_type_decl(struct Naming* self, struct Type* type, stru
             #line 614 "src/analyzer/Naming.pv"
             struct String return_name = Naming__get_type_decl(self, &func_info->return_type, function_type_self, function_generics);
             #line 615 "src/analyzer/Naming.pv"
-            if (!str__Eq_str__eq((struct str[]){String__as_str(&return_name)}, (struct str){ .ptr = "void", .length = strlen("void") })) {
+            if (!str__Eq_str__eq(String__as_str(&return_name), (struct str){ .ptr = "void", .length = strlen("void") })) {
                 #line 616 "src/analyzer/Naming.pv"
                 String__append(&result, (struct str){ .ptr = " -> ", .length = strlen(" -> ") });
                 #line 617 "src/analyzer/Naming.pv"

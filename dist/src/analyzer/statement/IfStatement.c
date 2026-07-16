@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <usize.h>
 #include <std/Array_Statement.h>
 #include <analyzer/Block.h>
 #include <analyzer/statement/Statement.h>
@@ -27,7 +28,7 @@
 #line 14 "src/analyzer/statement/IfStatement.pv"
 bool IfStatement__block_always_diverges(struct Block* block) {
     #line 15 "src/analyzer/statement/IfStatement.pv"
-    if (block->statements.length == 0) {
+    if (usize__Eq_usize__eq(block->statements.length, 0)) {
         #line 15 "src/analyzer/statement/IfStatement.pv"
         return false;
     }
@@ -162,7 +163,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                     return 0;
                 }
                 #line 64 "src/analyzer/statement/IfStatement.pv"
-                if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                if (!str__Eq_str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
                     #line 65 "src/analyzer/statement/IfStatement.pv"
                     Context__error_expression(context, expression, "If condition must be a bool expression");
                     #line 66 "src/analyzer/statement/IfStatement.pv"
@@ -332,7 +333,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
                             return 0;
                         }
                         #line 132 "src/analyzer/statement/IfStatement.pv"
-                        if (!str__Eq_str__eq(&prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
+                        if (!str__Eq_str__eq(prim->name, (struct str){ .ptr = "bool", .length = strlen("bool") })) {
                             #line 133 "src/analyzer/statement/IfStatement.pv"
                             Context__error_expression(context, else_expression, "If condition must be a bool expression");
                             #line 134 "src/analyzer/statement/IfStatement.pv"
@@ -457,7 +458,7 @@ struct IfStatement* IfStatement__parse(struct Context* context, struct Generics*
     }
 
     #line 184 "src/analyzer/statement/IfStatement.pv"
-    if (pattern == 0 && expression != 0 && else_statements.length == 0) {
+    if (pattern == 0 && expression != 0 && usize__Eq_usize__eq(else_statements.length, 0)) {
         #line 185 "src/analyzer/statement/IfStatement.pv"
         if (IfStatement__block_always_diverges(block)) {
             #line 186 "src/analyzer/statement/IfStatement.pv"

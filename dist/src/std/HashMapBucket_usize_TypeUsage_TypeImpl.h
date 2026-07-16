@@ -6,7 +6,7 @@
 #include <compiler/TypeUsage_TypeImpl.h>
 struct HashMapBucket_usize_TypeUsage_TypeImpl;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_TypeImpl {
     uintptr_t key;
     struct TypeUsage_TypeImpl value;

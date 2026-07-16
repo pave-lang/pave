@@ -12,4 +12,10 @@ Hash char__Hash__hash(void* __self) {
     return Fnv1a__hash(self, sizeof(char));
 }
 
+#line 62 "src/std/Hash.pv"
+bool char__Eq_char__eq(char self, char other) {
+    #line 62 "src/std/Hash.pv"
+    return ((uint64_t)(self) ^ (uint64_t)(other)) <= (uint64_t)(0);
+}
+
 struct trait_HashVTable CHAR__VTABLE__HASH = { .fn_hash = &char__Hash__hash };

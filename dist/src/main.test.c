@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <compiler/test_FunctionCoroutine__coroutine_fibonacci_test.test.h>
+#include <std/test_HashMap__hash_collisions_compare_keys.test.h>
 #include <std/test_str__eq___equal_strings.test.h>
 #include <std/test_str__eq___different_content.test.h>
 #include <std/test_str__eq___different_lengths.test.h>
@@ -19,6 +20,10 @@ int main(void) {
 
     fputs("[TEST] compiler/FunctionCoroutine: coroutine fibonacci test\n", stdout);
     test_FunctionCoroutine__coroutine_fibonacci_test();
+    passed++;
+
+    fputs("[TEST] std/HashMap: hash collisions compare keys\n", stdout);
+    test_HashMap__hash_collisions_compare_keys();
     passed++;
 
     fputs("[TEST] std/str: eq - equal strings\n", stdout);

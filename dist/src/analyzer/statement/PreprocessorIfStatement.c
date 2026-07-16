@@ -5,6 +5,7 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/Context.h>
 #include <analyzer/Token.h>
+#include <usize.h>
 #include <std/str.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/statement/PreprocessorIfStatement.h>
@@ -57,14 +58,14 @@ struct Array_ref_Token PreprocessorIfStatement__parse_condition(struct Context* 
 #line 31 "src/analyzer/statement/PreprocessorIfStatement.pv"
 bool PreprocessorIfStatement__validate_condition(struct Context* context, struct Token* directive, struct Array_ref_Token* condition) {
     #line 32 "src/analyzer/statement/PreprocessorIfStatement.pv"
-    if (condition->length == 0) {
+    if (usize__Eq_usize__eq(condition->length, 0)) {
         #line 33 "src/analyzer/statement/PreprocessorIfStatement.pv"
         Context__error_token(context, directive, "Expected preprocessor condition");
         #line 34 "src/analyzer/statement/PreprocessorIfStatement.pv"
         return false;
     }
     #line 36 "src/analyzer/statement/PreprocessorIfStatement.pv"
-    if ((str__Eq_str__eq(&directive->value, (struct str){ .ptr = "#ifdef", .length = strlen("#ifdef") }) || str__Eq_str__eq(&directive->value, (struct str){ .ptr = "#ifndef", .length = strlen("#ifndef") })) && (condition->length != 1 || condition->data[0]->type != TOKEN_TYPE__IDENTIFIER)) {
+    if ((str__Eq_str__eq(directive->value, (struct str){ .ptr = "#ifdef", .length = strlen("#ifdef") }) || str__Eq_str__eq(directive->value, (struct str){ .ptr = "#ifndef", .length = strlen("#ifndef") })) && (condition->length != 1 || condition->data[0]->type != TOKEN_TYPE__IDENTIFIER)) {
         #line 37 "src/analyzer/statement/PreprocessorIfStatement.pv"
         Context__error_token(context, directive, "Expected one macro identifier");
         #line 38 "src/analyzer/statement/PreprocessorIfStatement.pv"
@@ -275,7 +276,7 @@ struct PreprocessorIfStatement* PreprocessorIfStatement__parse(struct Context* c
                 #line 138 "src/analyzer/statement/PreprocessorIfStatement.pv"
                 struct String other_type_name = Naming__get_type_decl(&context->root->naming_decl, other_type, context->type_self, 0);
                 #line 139 "src/analyzer/statement/PreprocessorIfStatement.pv"
-                if (!str__Eq_str__eq((struct str[]){String__as_str(&block_type_name)}, String__as_str(&other_type_name))) {
+                if (!str__Eq_str__eq(String__as_str(&block_type_name), String__as_str(&other_type_name))) {
                     #line 140 "src/analyzer/statement/PreprocessorIfStatement.pv"
                     struct String message = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
                     #line 141 "src/analyzer/statement/PreprocessorIfStatement.pv"

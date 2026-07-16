@@ -15,7 +15,7 @@ void test_str__eq___different_content() {
     #line 134 "src/std/str.pv"
     struct str b = (struct str){ .ptr = "world", .length = strlen("world") };
     #line 135 "src/std/str.pv"
-    if (str__Eq_str__eq(&a, b)) {
+    if (str__Eq_str__eq(a, b)) {
         #line 135 "src/std/str.pv"
         abort();
     }

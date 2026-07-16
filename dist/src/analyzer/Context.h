@@ -175,64 +175,64 @@ void Context__pop_scope(struct Context* self);
 #line 440 "src/analyzer/Context.pv"
 bool Context__parse_type(struct Context* self, struct Type* type, struct Generics* generics);
 
-#line 642 "src/analyzer/Context.pv"
+#line 647 "src/analyzer/Context.pv"
 bool Context__parse_type_namespace_cpp(struct Context* self, struct NamespaceCpp* parent, struct Type* type, struct Generics* generics);
 
-#line 672 "src/analyzer/Context.pv"
+#line 677 "src/analyzer/Context.pv"
 bool Context__parse_type_class_cpp(struct Context* self, struct ClassCpp* parent, struct Type* type, struct Generics* generics);
 
-#line 701 "src/analyzer/Context.pv"
+#line 706 "src/analyzer/Context.pv"
 bool Context__parse_type_trait(struct Context* self, struct Type* type, struct Generics* generics);
 
-#line 735 "src/analyzer/Context.pv"
+#line 740 "src/analyzer/Context.pv"
 struct Type* Context__parse_type2(struct Context* self, struct Generics* generics);
 
-#line 746 "src/analyzer/Context.pv"
+#line 751 "src/analyzer/Context.pv"
 struct Type* Context__resolve_type(struct ArenaAllocator* allocator, struct Type* type, struct GenericMap* generics_map, struct GenericMap* fallback_generics_map);
 
-#line 927 "src/analyzer/Context.pv"
+#line 932 "src/analyzer/Context.pv"
 struct Type* Context__get_path_narrowing(struct Context* self, struct str path);
 
-#line 938 "src/analyzer/Context.pv"
+#line 943 "src/analyzer/Context.pv"
 void Context__set_narrowed(struct Context* self, struct str name, struct Type* type);
 
-#line 949 "src/analyzer/Context.pv"
+#line 954 "src/analyzer/Context.pv"
 struct Type* Context__get_broadened_type(struct Context* self, struct str name);
 
-#line 958 "src/analyzer/Context.pv"
+#line 963 "src/analyzer/Context.pv"
 bool Context__broaden_if_narrowed(struct Context* self, struct str name);
 
-#line 975 "src/analyzer/Context.pv"
+#line 980 "src/analyzer/Context.pv"
 bool Context__update_value_type(struct Context* self, struct str name, struct Type* type);
 
-#line 991 "src/analyzer/Context.pv"
+#line 996 "src/analyzer/Context.pv"
 bool Context__set_value(struct Context* self, struct Token* name, struct Type* type);
 
-#line 1010 "src/analyzer/Context.pv"
+#line 1015 "src/analyzer/Context.pv"
 struct Type* Context__get_value(struct Context* self, struct str name);
 
-#line 1029 "src/analyzer/Context.pv"
+#line 1034 "src/analyzer/Context.pv"
 struct Token* Context__get_definition_token(struct Context* self, struct str name);
 
-#line 1044 "src/analyzer/Context.pv"
+#line 1049 "src/analyzer/Context.pv"
 bool Context__should_record_symbols(struct Context* self);
 
-#line 1048 "src/analyzer/Context.pv"
+#line 1053 "src/analyzer/Context.pv"
 void Context__record_symbol(struct Context* self, struct Token* token, struct str type_label, struct str def_path, struct Token* def_token);
 
-#line 1072 "src/analyzer/Context.pv"
+#line 1077 "src/analyzer/Context.pv"
 void Context__record_signature(struct Context* self, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, struct str label, struct Array_str parameters);
 
-#line 1089 "src/analyzer/Context.pv"
+#line 1094 "src/analyzer/Context.pv"
 void Context__record_completion(struct Context* self, struct Token* name, struct Type* type, uintptr_t kind);
 
-#line 1117 "src/analyzer/Context.pv"
+#line 1122 "src/analyzer/Context.pv"
 void Context__record_member_completion(struct Context* self, struct Token* dot, struct Type* receiver_type, bool is_static);
 
-#line 1152 "src/analyzer/Context.pv"
+#line 1157 "src/analyzer/Context.pv"
 struct Array_Type Context__parse_generics(struct Context* self, struct Generics* generics);
 
-#line 1173 "src/analyzer/Context.pv"
+#line 1178 "src/analyzer/Context.pv"
 bool Context__validate_generic_constraints(struct Context* self, struct Generics* generics, struct Array_Type* usage_types);
 
 #endif

@@ -5,7 +5,7 @@
 #include <analyzer/types/EnumVariant.h>
 struct HashMapBucket_str_EnumVariant;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_EnumVariant {
     struct str key;
     struct EnumVariant value;

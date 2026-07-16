@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
 
 struct HashMapBucket<K, V> {
@@ -23,7 +24,7 @@ impl<K, V> HashMapIter<K, V> {
     }
 }
 
-struct HashMap<K: Hash, V> {
+struct HashMap<K: Hash + Eq<K>, V> {
     allocator: &dyn Allocator,
     buckets: **HashMapBucket<K, V>,
     data: *HashMapBucket<K, V>,
@@ -31,7 +32,7 @@ struct HashMap<K: Hash, V> {
     length: usize,
 }
 
-impl<K: Hash, V> HashMap<K, V> {
+impl<K: Hash + Eq<K>, V> HashMap<K, V> {
     fn new(allocator: &dyn Allocator) -> Self {
         return Self::with_capacity(allocator, 16);
     }
@@ -65,7 +66,7 @@ impl<K: Hash, V> HashMap<K, V> {
         let current_bucket_node = self.buckets[bucket_index];
 
         while current_bucket_node != null {
-            if current_bucket_node.key.hash()._0 == hash._0 {
+            if current_bucket_node.key.hash()._0 == hash._0 && current_bucket_node.key.eq(*key) {
                 return &current_bucket_node.value;
             }
             current_bucket_node = current_bucket_node.next;
@@ -112,7 +113,7 @@ impl<K: Hash, V> HashMap<K, V> {
         let current_bucket_node = self.buckets[bucket_index];
 
         while current_bucket_node != null {
-            if current_bucket_node.key.hash()._0 == hash._0 {
+            if current_bucket_node.key.hash()._0 == hash._0 && current_bucket_node.key.eq(*key) {
                 let last = self.data + self.length - 1;
                 if current_bucket_node != last { *current_bucket_node = *last; }
                 
@@ -186,14 +187,14 @@ impl<K: Hash, V> HashMap<K, V> {
     }
 }
 
-impl<K: Hash, V> Index for HashMap<K, V> {
+impl<K: Hash + Eq<K>, V> Index for HashMap<K, V> {
     typedef Output = HashMapBucket<K, V>;
     fn index(&self) -> *HashMapBucket<K, V> {
         return self.data;
     }
 }
 
-impl<K: Hash, V> Map<K, V> for HashMap<K, V> {
+impl<K: Hash + Eq<K>, V> Map<K, V> for HashMap<K, V> {
     fn find(&self, key: &K) -> *V {
         if self.capacity == 0 { return null; }
 
@@ -202,7 +203,7 @@ impl<K: Hash, V> Map<K, V> for HashMap<K, V> {
         let current_bucket_node = self.buckets[bucket_index];
 
         while current_bucket_node != null {
-            if current_bucket_node.key.hash()._0 == hash._0 {
+            if current_bucket_node.key.hash()._0 == hash._0 && current_bucket_node.key.eq(*key) {
                 return &current_bucket_node.value;
             }
             current_bucket_node = current_bucket_node.next;
@@ -249,7 +250,7 @@ impl<K: Hash, V> Map<K, V> for HashMap<K, V> {
         let current_bucket_node = self.buckets[bucket_index];
 
         while current_bucket_node != null {
-            if current_bucket_node.key.hash()._0 == hash._0 {
+            if current_bucket_node.key.hash()._0 == hash._0 && current_bucket_node.key.eq(*key) {
                 let last = self.data + self.length - 1;
                 if current_bucket_node != last { *current_bucket_node = *last; }
 
@@ -264,4 +265,39 @@ impl<K: Hash, V> Map<K, V> for HashMap<K, V> {
 
         return false;
     }
+}
+
+struct HashMapCollisionKey(i32);
+
+impl Hash for HashMapCollisionKey {
+    fn hash(&self) -> Hash { return Hash(1); }
+}
+
+impl Eq<HashMapCollisionKey> for HashMapCollisionKey {
+    fn eq(self, other: HashMapCollisionKey) -> bool {
+        return (cast<u64>(self._0) ^ cast<u64>(other._0)) <= cast<u64>(0);
+    }
+}
+
+test "hash collisions compare keys" {
+    let allocator = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    defer allocator.destroy();
+
+    let map = HashMap<HashMapCollisionKey, i32>::new(&allocator);
+    let first = HashMapCollisionKey(1);
+    let second = HashMapCollisionKey(2);
+
+    map.insert(first, 10);
+    map.insert(second, 20);
+
+    let first_value = map.find(&first);
+    let second_value = map.find(&second);
+    if first_value == null || *first_value != 10 { abort(); }
+    if second_value == null || *second_value != 20 { abort(); }
+
+    if !map.remove(&first) { abort(); }
+    if map.find(&first) != null { abort(); }
+
+    second_value = map.find(&second);
+    if second_value == null || *second_value != 20 { abort(); }
 }

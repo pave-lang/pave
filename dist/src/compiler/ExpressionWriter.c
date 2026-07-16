@@ -33,6 +33,7 @@
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/SequenceType.h>
+#include <usize.h>
 #include <std/IterEnumerate_ref_InvokeArgument.h>
 #include <tuple_usize_ref_InvokeArgument.h>
 #include <analyzer/types/Enum.h>
@@ -900,7 +901,7 @@ void ExpressionWriter__write_sequence_cast(struct ExpressionWriter* self, FILE* 
             #line 407 "src/compiler/ExpressionWriter.pv"
             struct Expression* inner = inner_expr->data.unaryexpression_value._1;
             #line 408 "src/compiler/ExpressionWriter.pv"
-            if (str__Eq_str__eq(&expr, (struct str){ .ptr = "&", .length = strlen("&") })) {
+            if (str__Eq_str__eq(expr, (struct str){ .ptr = "&", .length = strlen("&") })) {
                 #line 409 "src/compiler/ExpressionWriter.pv"
                 unary_inner = inner;
             }
@@ -991,7 +992,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
         if (fields->length > 1) {
             #line 456 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "expected a single field as a value into this struct");
-        } else if (fields->length == 1) {
+        } else if (usize__Eq_usize__eq(fields->length, 1)) {
             #line 458 "src/compiler/ExpressionWriter.pv"
             struct InvokeArgument* field = fields->data;
             #line 459 "src/compiler/ExpressionWriter.pv"
@@ -1002,7 +1003,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
         }
     } else {
         #line 464 "src/compiler/ExpressionWriter.pv"
-        bool compact = (fields->length <= 1) || (fields->data[0].value->token->start_line == fields->data[fields->length - 1].value->token->start_line);
+        bool compact = (fields->length <= 1) || (usize__Eq_usize__eq(fields->data[0].value->token->start_line, fields->data[fields->length - 1].value->token->start_line));
 
         #line 466 "src/compiler/ExpressionWriter.pv"
         fprintf(file, "(");
@@ -1010,7 +1011,7 @@ bool ExpressionWriter__write_struct_construction(struct ExpressionWriter* self, 
         Generator__write_type(generator, file, type, generics);
 
         #line 469 "src/compiler/ExpressionWriter.pv"
-        if (fields->length == 0) {
+        if (usize__Eq_usize__eq(fields->length, 0)) {
             #line 470 "src/compiler/ExpressionWriter.pv"
             fprintf(file, ") {}");
         } else {
@@ -1162,7 +1163,7 @@ bool ExpressionWriter__write_enum_variant(struct ExpressionWriter* self, FILE* f
         } }
         #line 543 "src/compiler/ExpressionWriter.pv"
         fprintf(file, " }");
-    } else if (arguments->length == 1) {
+    } else if (usize__Eq_usize__eq(arguments->length, 1)) {
         #line 545 "src/compiler/ExpressionWriter.pv"
         ExpressionWriter__write_expression(self, file, arguments->data[0].value, generics);
     } else if (arguments->length > 1) {
@@ -1242,7 +1243,7 @@ bool ExpressionWriter__write_coroutine_invoke(struct ExpressionWriter* self, FIL
                         struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
                         #line 580 "src/compiler/ExpressionWriter.pv"
-                        if (i == 0) {
+                        if (usize__Eq_usize__eq(i, 0)) {
                             #line 580 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, " .");
                         } else {
@@ -1299,7 +1300,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
     struct str name = func_name.value;
 
     #line 613 "src/compiler/ExpressionWriter.pv"
-    if (str__Eq_str__eq(&name, (struct str){ .ptr = "typeid", .length = strlen("typeid") })) {
+    if (str__Eq_str__eq(name, (struct str){ .ptr = "typeid", .length = strlen("typeid") })) {
         #line 614 "src/compiler/ExpressionWriter.pv"
         struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 615 "src/compiler/ExpressionWriter.pv"
@@ -1314,7 +1315,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
     }
 
     #line 620 "src/compiler/ExpressionWriter.pv"
-    if (str__Eq_str__eq(&name, (struct str){ .ptr = "typename", .length = strlen("typename") })) {
+    if (str__Eq_str__eq(name, (struct str){ .ptr = "typename", .length = strlen("typename") })) {
         #line 621 "src/compiler/ExpressionWriter.pv"
         struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 622 "src/compiler/ExpressionWriter.pv"
@@ -1329,7 +1330,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
     }
 
     #line 627 "src/compiler/ExpressionWriter.pv"
-    if (str__Eq_str__eq(&name, (struct str){ .ptr = "cast", .length = strlen("cast") })) {
+    if (str__Eq_str__eq(name, (struct str){ .ptr = "cast", .length = strlen("cast") })) {
         #line 628 "src/compiler/ExpressionWriter.pv"
         struct GenericMap resolved_generics = GenericMap__resolve_types(func_generics, generator->allocator, generics);
         #line 629 "src/compiler/ExpressionWriter.pv"
@@ -1393,7 +1394,7 @@ bool ExpressionWriter__write_builtin_function_invoke(struct ExpressionWriter* se
 #line 652 "src/compiler/ExpressionWriter.pv"
 struct Sequence* ExpressionWriter__get_typed_variadic_sequence(struct ExpressionWriter* self, struct Function* func_info) {
     #line 653 "src/compiler/ExpressionWriter.pv"
-    if (!func_info->typed_variadic || func_info->parameters.length == 0) {
+    if (!func_info->typed_variadic || usize__Eq_usize__eq(func_info->parameters.length, 0)) {
         #line 653 "src/compiler/ExpressionWriter.pv"
         return 0;
     }
@@ -1456,7 +1457,7 @@ bool ExpressionWriter__write_typed_variadic_slice(struct ExpressionWriter* self,
     fprintf(file, ") { .data = ");
 
     #line 684 "src/compiler/ExpressionWriter.pv"
-    if (length == 0) {
+    if (usize__Eq_usize__eq(length, 0)) {
         #line 685 "src/compiler/ExpressionWriter.pv"
         fprintf(file, "0");
     } else {
@@ -1718,1046 +1719,1040 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
                             #line 801 "src/compiler/ExpressionWriter.pv"
                             struct Trait* trait_info = func_info->parent.trait_value;
                             #line 802 "src/compiler/ExpressionWriter.pv"
-                            struct Token trait_name = *trait_info->name;
-                            #line 803 "src/compiler/ExpressionWriter.pv"
                             if (!Iter_ref_InvokeArgument__next(&args)) {
-                                #line 804 "src/compiler/ExpressionWriter.pv"
+                                #line 803 "src/compiler/ExpressionWriter.pv"
                                 fprintf(stderr, "Trait function call missing instance argument\n");
-                                #line 805 "src/compiler/ExpressionWriter.pv"
+                                #line 804 "src/compiler/ExpressionWriter.pv"
                                 return false;
                             }
 
-                            #line 808 "src/compiler/ExpressionWriter.pv"
+                            #line 807 "src/compiler/ExpressionWriter.pv"
                             struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&args);
 
-                            #line 810 "src/compiler/ExpressionWriter.pv"
+                            #line 809 "src/compiler/ExpressionWriter.pv"
                             if (Type__is_trait(Type__deref(&arg->value->return_type))) {
+                                #line 810 "src/compiler/ExpressionWriter.pv"
+                                success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                                 #line 811 "src/compiler/ExpressionWriter.pv"
-                                success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
-                                #line 812 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, ".vtable->fn_");
-                                #line 813 "src/compiler/ExpressionWriter.pv"
+                                #line 812 "src/compiler/ExpressionWriter.pv"
                                 success = Generator__write_str(generator, file, name) && success;
-                                #line 814 "src/compiler/ExpressionWriter.pv"
+                                #line 813 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "(");
-                                #line 815 "src/compiler/ExpressionWriter.pv"
+                                #line 814 "src/compiler/ExpressionWriter.pv"
                                 success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
-                                #line 816 "src/compiler/ExpressionWriter.pv"
+                                #line 815 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, ".instance");
-                                #line 817 "src/compiler/ExpressionWriter.pv"
+                                #line 816 "src/compiler/ExpressionWriter.pv"
                                 first = false;
-                                #line 818 "src/compiler/ExpressionWriter.pv"
+                                #line 817 "src/compiler/ExpressionWriter.pv"
                                 arg_index = 1;
                             } else {
-                                #line 820 "src/compiler/ExpressionWriter.pv"
+                                #line 819 "src/compiler/ExpressionWriter.pv"
                                 struct Function* type_impl_function = Root__find_type_impl_function(generator->root, &arg->value->return_type, name, 0);
-                                #line 821 "src/compiler/ExpressionWriter.pv"
+                                #line 820 "src/compiler/ExpressionWriter.pv"
                                 if (type_impl_function != 0) {
-                                    #line 822 "src/compiler/ExpressionWriter.pv"
+                                    #line 821 "src/compiler/ExpressionWriter.pv"
                                     success = Generator__write_function_name(generator, file, type_impl_function, &resolved_generics) && success;
                                 } else {
-                                    #line 824 "src/compiler/ExpressionWriter.pv"
+                                    #line 823 "src/compiler/ExpressionWriter.pv"
                                     struct String parent_name = Naming__get_type_name(&generator->naming_ident, Type__deref(&arg->value->return_type), generics->self_type, generics);
+                                    #line 824 "src/compiler/ExpressionWriter.pv"
+                                    struct Type resolved_trait_type = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = trait_info, ._1 = ArenaAllocator__store_GenericMap(generator->allocator, &resolved_generics)} };
                                     #line 825 "src/compiler/ExpressionWriter.pv"
-                                    success = Generator__write_str(generator, file, String__as_str(&parent_name)) && success;
+                                    struct String function_name = Generator__get_trait_function_name(generator, String__as_str(&parent_name), trait_info, &resolved_trait_type, func_info, generics);
                                     #line 826 "src/compiler/ExpressionWriter.pv"
-                                    fprintf(file, "__");
-                                    #line 827 "src/compiler/ExpressionWriter.pv"
-                                    success = Generator__write_str(generator, file, trait_name.value) && success;
-                                    #line 828 "src/compiler/ExpressionWriter.pv"
-                                    fprintf(file, "__");
-                                    #line 829 "src/compiler/ExpressionWriter.pv"
-                                    success = Generator__write_str(generator, file, name) && success;
+                                    success = Generator__write_string(generator, file, &function_name) && success;
                                 }
-                                #line 831 "src/compiler/ExpressionWriter.pv"
+                                #line 828 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "(");
-                                #line 832 "src/compiler/ExpressionWriter.pv"
+                                #line 829 "src/compiler/ExpressionWriter.pv"
                                 success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
-                                #line 833 "src/compiler/ExpressionWriter.pv"
+                                #line 830 "src/compiler/ExpressionWriter.pv"
                                 first = false;
-                                #line 834 "src/compiler/ExpressionWriter.pv"
+                                #line 831 "src/compiler/ExpressionWriter.pv"
                                 arg_index = 1;
                             }
                         } break;
-                        #line 837 "src/compiler/ExpressionWriter.pv"
+                        #line 834 "src/compiler/ExpressionWriter.pv"
                         default: {
-                            #line 838 "src/compiler/ExpressionWriter.pv"
+                            #line 835 "src/compiler/ExpressionWriter.pv"
                             success = Generator__write_function_name(generator, file, func_info, &resolved_generics) && success;
-                            #line 839 "src/compiler/ExpressionWriter.pv"
+                            #line 836 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "(");
                         } break;
                     }
 
-                    #line 843 "src/compiler/ExpressionWriter.pv"
+                    #line 840 "src/compiler/ExpressionWriter.pv"
                     { struct Iter_ref_InvokeArgument __iter = args;
-                    #line 843 "src/compiler/ExpressionWriter.pv"
+                    #line 840 "src/compiler/ExpressionWriter.pv"
                     while (Iter_ref_InvokeArgument__next(&__iter)) {
-                        #line 843 "src/compiler/ExpressionWriter.pv"
+                        #line 840 "src/compiler/ExpressionWriter.pv"
                         struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                        #line 844 "src/compiler/ExpressionWriter.pv"
+                        #line 841 "src/compiler/ExpressionWriter.pv"
                         if (variadic_sequence != 0 && arg_index >= variadic_start) {
-                            #line 845 "src/compiler/ExpressionWriter.pv"
+                            #line 842 "src/compiler/ExpressionWriter.pv"
                             break;
                         }
-                        #line 847 "src/compiler/ExpressionWriter.pv"
+                        #line 844 "src/compiler/ExpressionWriter.pv"
                         if (first) {
-                            #line 847 "src/compiler/ExpressionWriter.pv"
+                            #line 844 "src/compiler/ExpressionWriter.pv"
                             first = false;
                         } else {
-                            #line 847 "src/compiler/ExpressionWriter.pv"
+                            #line 844 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, ", ");
                         }
-                        #line 848 "src/compiler/ExpressionWriter.pv"
+                        #line 845 "src/compiler/ExpressionWriter.pv"
                         success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
-                        #line 849 "src/compiler/ExpressionWriter.pv"
+                        #line 846 "src/compiler/ExpressionWriter.pv"
                         arg_index += 1;
                     } }
 
-                    #line 852 "src/compiler/ExpressionWriter.pv"
+                    #line 849 "src/compiler/ExpressionWriter.pv"
                     if (variadic_sequence != 0) {
-                        #line 853 "src/compiler/ExpressionWriter.pv"
+                        #line 850 "src/compiler/ExpressionWriter.pv"
                         if (first) {
-                            #line 853 "src/compiler/ExpressionWriter.pv"
+                            #line 850 "src/compiler/ExpressionWriter.pv"
                             first = false;
                         } else {
-                            #line 853 "src/compiler/ExpressionWriter.pv"
+                            #line 850 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, ", ");
                         }
-                        #line 854 "src/compiler/ExpressionWriter.pv"
+                        #line 851 "src/compiler/ExpressionWriter.pv"
                         success = ExpressionWriter__write_typed_variadic_slice(self, file, variadic_sequence, arguments, variadic_start, generics) && success;
                     }
 
-                    #line 857 "src/compiler/ExpressionWriter.pv"
+                    #line 854 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, ")");
-                    #line 858 "src/compiler/ExpressionWriter.pv"
+                    #line 855 "src/compiler/ExpressionWriter.pv"
                     return success;
                 } break;
-                #line 860 "src/compiler/ExpressionWriter.pv"
+                #line 857 "src/compiler/ExpressionWriter.pv"
                 case TYPE__FUNCTION_C: {
-                    #line 860 "src/compiler/ExpressionWriter.pv"
+                    #line 857 "src/compiler/ExpressionWriter.pv"
                     struct FunctionC* func_info = Type__resolve_typedef(invoke_type)->functionc_value;
-                    #line 861 "src/compiler/ExpressionWriter.pv"
+                    #line 858 "src/compiler/ExpressionWriter.pv"
                     struct str name = func_info->name;
-                    #line 862 "src/compiler/ExpressionWriter.pv"
+                    #line 859 "src/compiler/ExpressionWriter.pv"
                     bool success = Generator__write_str(generator, file, name);
-                    #line 863 "src/compiler/ExpressionWriter.pv"
+                    #line 860 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "(");
-                    #line 864 "src/compiler/ExpressionWriter.pv"
+                    #line 861 "src/compiler/ExpressionWriter.pv"
                     bool first = true;
-                    #line 865 "src/compiler/ExpressionWriter.pv"
+                    #line 862 "src/compiler/ExpressionWriter.pv"
                     { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-                    #line 865 "src/compiler/ExpressionWriter.pv"
+                    #line 862 "src/compiler/ExpressionWriter.pv"
                     while (Iter_ref_InvokeArgument__next(&__iter)) {
-                        #line 865 "src/compiler/ExpressionWriter.pv"
+                        #line 862 "src/compiler/ExpressionWriter.pv"
                         struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                        #line 866 "src/compiler/ExpressionWriter.pv"
+                        #line 863 "src/compiler/ExpressionWriter.pv"
                         if (first) {
-                            #line 866 "src/compiler/ExpressionWriter.pv"
+                            #line 863 "src/compiler/ExpressionWriter.pv"
                             first = false;
                         } else {
-                            #line 866 "src/compiler/ExpressionWriter.pv"
+                            #line 863 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, ", ");
                         }
-                        #line 867 "src/compiler/ExpressionWriter.pv"
+                        #line 864 "src/compiler/ExpressionWriter.pv"
                         success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                     } }
-                    #line 869 "src/compiler/ExpressionWriter.pv"
+                    #line 866 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, ")");
-                    #line 870 "src/compiler/ExpressionWriter.pv"
+                    #line 867 "src/compiler/ExpressionWriter.pv"
                     return success;
                 } break;
-                #line 872 "src/compiler/ExpressionWriter.pv"
+                #line 869 "src/compiler/ExpressionWriter.pv"
                 case TYPE__SEQUENCE: {
-                    #line 872 "src/compiler/ExpressionWriter.pv"
+                    #line 869 "src/compiler/ExpressionWriter.pv"
                     struct Sequence* sequence = Type__resolve_typedef(invoke_type)->sequence_value;
-                    #line 873 "src/compiler/ExpressionWriter.pv"
+                    #line 870 "src/compiler/ExpressionWriter.pv"
                     bool success = true;
-                    #line 874 "src/compiler/ExpressionWriter.pv"
+                    #line 871 "src/compiler/ExpressionWriter.pv"
                     switch (sequence->type.type) {
-                        #line 875 "src/compiler/ExpressionWriter.pv"
+                        #line 872 "src/compiler/ExpressionWriter.pv"
                         case SEQUENCE_TYPE__FIXED_ARRAY: {
-                            #line 876 "src/compiler/ExpressionWriter.pv"
+                            #line 873 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "{");
-                            #line 877 "src/compiler/ExpressionWriter.pv"
+                            #line 874 "src/compiler/ExpressionWriter.pv"
                             bool first = true;
-                            #line 878 "src/compiler/ExpressionWriter.pv"
+                            #line 875 "src/compiler/ExpressionWriter.pv"
                             { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-                            #line 878 "src/compiler/ExpressionWriter.pv"
+                            #line 875 "src/compiler/ExpressionWriter.pv"
                             while (Iter_ref_InvokeArgument__next(&__iter)) {
-                                #line 878 "src/compiler/ExpressionWriter.pv"
+                                #line 875 "src/compiler/ExpressionWriter.pv"
                                 struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                                #line 879 "src/compiler/ExpressionWriter.pv"
+                                #line 876 "src/compiler/ExpressionWriter.pv"
                                 if (first) {
-                                    #line 879 "src/compiler/ExpressionWriter.pv"
+                                    #line 876 "src/compiler/ExpressionWriter.pv"
                                     first = false;
                                 } else {
-                                    #line 879 "src/compiler/ExpressionWriter.pv"
+                                    #line 876 "src/compiler/ExpressionWriter.pv"
                                     fprintf(file, ", ");
                                 }
-                                #line 880 "src/compiler/ExpressionWriter.pv"
+                                #line 877 "src/compiler/ExpressionWriter.pv"
                                 success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                             } }
-                            #line 882 "src/compiler/ExpressionWriter.pv"
+                            #line 879 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "}");
                         } break;
-                        #line 884 "src/compiler/ExpressionWriter.pv"
+                        #line 881 "src/compiler/ExpressionWriter.pv"
                         case SEQUENCE_TYPE__SLICE: {
-                            #line 885 "src/compiler/ExpressionWriter.pv"
+                            #line 882 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "(");
-                            #line 886 "src/compiler/ExpressionWriter.pv"
+                            #line 883 "src/compiler/ExpressionWriter.pv"
                             Generator__write_type(generator, file, &expression->return_type, generics);
-                            #line 887 "src/compiler/ExpressionWriter.pv"
+                            #line 884 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, ") {");
-                            #line 888 "src/compiler/ExpressionWriter.pv"
+                            #line 885 "src/compiler/ExpressionWriter.pv"
                             bool first = true;
-                            #line 889 "src/compiler/ExpressionWriter.pv"
+                            #line 886 "src/compiler/ExpressionWriter.pv"
                             { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-                            #line 889 "src/compiler/ExpressionWriter.pv"
+                            #line 886 "src/compiler/ExpressionWriter.pv"
                             while (Iter_ref_InvokeArgument__next(&__iter)) {
-                                #line 889 "src/compiler/ExpressionWriter.pv"
+                                #line 886 "src/compiler/ExpressionWriter.pv"
                                 struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                                #line 890 "src/compiler/ExpressionWriter.pv"
+                                #line 887 "src/compiler/ExpressionWriter.pv"
                                 if (first) {
-                                    #line 890 "src/compiler/ExpressionWriter.pv"
+                                    #line 887 "src/compiler/ExpressionWriter.pv"
                                     first = false;
-                                    #line 890 "src/compiler/ExpressionWriter.pv"
+                                    #line 887 "src/compiler/ExpressionWriter.pv"
                                     fprintf(file, " .");
                                 } else {
-                                    #line 890 "src/compiler/ExpressionWriter.pv"
+                                    #line 887 "src/compiler/ExpressionWriter.pv"
                                     fprintf(file, ", .");
                                 }
-                                #line 891 "src/compiler/ExpressionWriter.pv"
+                                #line 888 "src/compiler/ExpressionWriter.pv"
                                 struct Token arg_name = *arg->name;
-                                #line 892 "src/compiler/ExpressionWriter.pv"
+                                #line 889 "src/compiler/ExpressionWriter.pv"
                                 success = Generator__write_str(generator, file, arg_name.value) && success;
-                                #line 893 "src/compiler/ExpressionWriter.pv"
+                                #line 890 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, " = ");
-                                #line 894 "src/compiler/ExpressionWriter.pv"
+                                #line 891 "src/compiler/ExpressionWriter.pv"
                                 success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                             } }
-                            #line 896 "src/compiler/ExpressionWriter.pv"
+                            #line 893 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, " }");
                         } break;
                     }
-                    #line 899 "src/compiler/ExpressionWriter.pv"
+                    #line 896 "src/compiler/ExpressionWriter.pv"
                     return success;
                 } break;
-                #line 901 "src/compiler/ExpressionWriter.pv"
+                #line 898 "src/compiler/ExpressionWriter.pv"
                 case TYPE__CLASS_CPP: {
-                    #line 902 "src/compiler/ExpressionWriter.pv"
+                    #line 899 "src/compiler/ExpressionWriter.pv"
                     bool success = Generator__write_type(generator, file, type, generics);
-                    #line 903 "src/compiler/ExpressionWriter.pv"
+                    #line 900 "src/compiler/ExpressionWriter.pv"
                     bool function_mode = (arguments->length > 0) && (arguments->data[0].name == 0);
 
-                    #line 905 "src/compiler/ExpressionWriter.pv"
+                    #line 902 "src/compiler/ExpressionWriter.pv"
                     if (function_mode) {
-                        #line 906 "src/compiler/ExpressionWriter.pv"
+                        #line 903 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "(");
-                        #line 907 "src/compiler/ExpressionWriter.pv"
+                        #line 904 "src/compiler/ExpressionWriter.pv"
                         bool first = true;
-                        #line 908 "src/compiler/ExpressionWriter.pv"
+                        #line 905 "src/compiler/ExpressionWriter.pv"
                         { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-                        #line 908 "src/compiler/ExpressionWriter.pv"
+                        #line 905 "src/compiler/ExpressionWriter.pv"
                         while (Iter_ref_InvokeArgument__next(&__iter)) {
-                            #line 908 "src/compiler/ExpressionWriter.pv"
+                            #line 905 "src/compiler/ExpressionWriter.pv"
                             struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                            #line 909 "src/compiler/ExpressionWriter.pv"
+                            #line 906 "src/compiler/ExpressionWriter.pv"
                             if (first) {
-                                #line 909 "src/compiler/ExpressionWriter.pv"
+                                #line 906 "src/compiler/ExpressionWriter.pv"
                                 first = false;
                             } else {
-                                #line 909 "src/compiler/ExpressionWriter.pv"
+                                #line 906 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, ", ");
                             }
-                            #line 910 "src/compiler/ExpressionWriter.pv"
+                            #line 907 "src/compiler/ExpressionWriter.pv"
                             success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                         } }
-                        #line 912 "src/compiler/ExpressionWriter.pv"
+                        #line 909 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, ")");
                     } else {
-                        #line 914 "src/compiler/ExpressionWriter.pv"
+                        #line 911 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, " {");
-                        #line 915 "src/compiler/ExpressionWriter.pv"
+                        #line 912 "src/compiler/ExpressionWriter.pv"
                         bool first = true;
-                        #line 916 "src/compiler/ExpressionWriter.pv"
+                        #line 913 "src/compiler/ExpressionWriter.pv"
                         { struct Iter_ref_InvokeArgument __iter = Array_InvokeArgument__iter(arguments);
-                        #line 916 "src/compiler/ExpressionWriter.pv"
+                        #line 913 "src/compiler/ExpressionWriter.pv"
                         while (Iter_ref_InvokeArgument__next(&__iter)) {
-                            #line 916 "src/compiler/ExpressionWriter.pv"
+                            #line 913 "src/compiler/ExpressionWriter.pv"
                             struct InvokeArgument* arg = Iter_ref_InvokeArgument__value(&__iter);
 
-                            #line 917 "src/compiler/ExpressionWriter.pv"
+                            #line 914 "src/compiler/ExpressionWriter.pv"
                             if (first) {
-                                #line 917 "src/compiler/ExpressionWriter.pv"
+                                #line 914 "src/compiler/ExpressionWriter.pv"
                                 first = false;
-                                #line 917 "src/compiler/ExpressionWriter.pv"
+                                #line 914 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, " .");
                             } else {
-                                #line 917 "src/compiler/ExpressionWriter.pv"
+                                #line 914 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, ", .");
                             }
-                            #line 918 "src/compiler/ExpressionWriter.pv"
+                            #line 915 "src/compiler/ExpressionWriter.pv"
                             struct Token arg_name = *arg->name;
-                            #line 919 "src/compiler/ExpressionWriter.pv"
+                            #line 916 "src/compiler/ExpressionWriter.pv"
                             success = Generator__write_str(generator, file, arg_name.value) && success;
-                            #line 920 "src/compiler/ExpressionWriter.pv"
+                            #line 917 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, " = ");
-                            #line 921 "src/compiler/ExpressionWriter.pv"
+                            #line 918 "src/compiler/ExpressionWriter.pv"
                             success = ExpressionWriter__write_expression(self, file, arg->value, generics) && success;
                         } }
-                        #line 923 "src/compiler/ExpressionWriter.pv"
+                        #line 920 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, " }");
                     }
-                    #line 925 "src/compiler/ExpressionWriter.pv"
+                    #line 922 "src/compiler/ExpressionWriter.pv"
                     return success;
                 } break;
-                #line 927 "src/compiler/ExpressionWriter.pv"
+                #line 924 "src/compiler/ExpressionWriter.pv"
                 default: {
-                    #line 928 "src/compiler/ExpressionWriter.pv"
+                    #line 925 "src/compiler/ExpressionWriter.pv"
                     fprintf(stderr, "Invoke unsupported expression type\n");
-                    #line 929 "src/compiler/ExpressionWriter.pv"
+                    #line 926 "src/compiler/ExpressionWriter.pv"
                     return false;
                 } break;
             }
         } break;
-        #line 933 "src/compiler/ExpressionWriter.pv"
+        #line 930 "src/compiler/ExpressionWriter.pv"
         default: {
         } break;
     }
 
-    #line 936 "src/compiler/ExpressionWriter.pv"
+    #line 933 "src/compiler/ExpressionWriter.pv"
     fprintf(stderr, "Invoke unsupported expression\n");
-    #line 937 "src/compiler/ExpressionWriter.pv"
+    #line 934 "src/compiler/ExpressionWriter.pv"
     return false;
 }
 
-#line 940 "src/compiler/ExpressionWriter.pv"
+#line 937 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics) {
-    #line 941 "src/compiler/ExpressionWriter.pv"
+    #line 938 "src/compiler/ExpressionWriter.pv"
     struct Generator* generator = self->generator;
-    #line 942 "src/compiler/ExpressionWriter.pv"
+    #line 939 "src/compiler/ExpressionWriter.pv"
     struct ExpressionData* data = &expression->data;
 
-    #line 944 "src/compiler/ExpressionWriter.pv"
+    #line 941 "src/compiler/ExpressionWriter.pv"
     switch (data->type) {
-        #line 945 "src/compiler/ExpressionWriter.pv"
+        #line 942 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__VARIABLE: {
-            #line 945 "src/compiler/ExpressionWriter.pv"
+            #line 942 "src/compiler/ExpressionWriter.pv"
             struct str name = data->variable_value;
-            #line 946 "src/compiler/ExpressionWriter.pv"
+            #line 943 "src/compiler/ExpressionWriter.pv"
             Generator__write_variable(generator, file, name);
-            #line 947 "src/compiler/ExpressionWriter.pv"
+            #line 944 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 949 "src/compiler/ExpressionWriter.pv"
+        #line 946 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__LITERAL: {
-            #line 949 "src/compiler/ExpressionWriter.pv"
+            #line 946 "src/compiler/ExpressionWriter.pv"
             struct str value = data->literal_value;
-            #line 950 "src/compiler/ExpressionWriter.pv"
+            #line 947 "src/compiler/ExpressionWriter.pv"
             Generator__write_literal(generator, file, &expression->return_type, value);
-            #line 951 "src/compiler/ExpressionWriter.pv"
+            #line 948 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 953 "src/compiler/ExpressionWriter.pv"
+        #line 950 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__NULL_LITERAL: {
-            #line 954 "src/compiler/ExpressionWriter.pv"
+            #line 951 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "0");
-            #line 955 "src/compiler/ExpressionWriter.pv"
+            #line 952 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 957 "src/compiler/ExpressionWriter.pv"
+        #line 954 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__INVOKE: {
-            #line 957 "src/compiler/ExpressionWriter.pv"
+            #line 954 "src/compiler/ExpressionWriter.pv"
             struct Expression* target = data->invoke_value._0;
-            #line 957 "src/compiler/ExpressionWriter.pv"
+            #line 954 "src/compiler/ExpressionWriter.pv"
             struct Array_InvokeArgument* arguments = &data->invoke_value._1;
-            #line 958 "src/compiler/ExpressionWriter.pv"
+            #line 955 "src/compiler/ExpressionWriter.pv"
             return ExpressionWriter__write_invoke(self, file, target, arguments, generics);
         } break;
-        #line 960 "src/compiler/ExpressionWriter.pv"
+        #line 957 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__ENUM_VARIANT: {
-            #line 960 "src/compiler/ExpressionWriter.pv"
+            #line 957 "src/compiler/ExpressionWriter.pv"
             struct EnumVariant* variant = data->enumvariant_value;
-            #line 961 "src/compiler/ExpressionWriter.pv"
+            #line 958 "src/compiler/ExpressionWriter.pv"
             return ExpressionWriter__write_enum_variant(self, file, variant, &expression->return_type, 0, generics);
         } break;
-        #line 963 "src/compiler/ExpressionWriter.pv"
+        #line 960 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__UNARY_EXPRESSION: {
-            #line 963 "src/compiler/ExpressionWriter.pv"
+            #line 960 "src/compiler/ExpressionWriter.pv"
             struct str operator = data->unaryexpression_value._0;
-            #line 963 "src/compiler/ExpressionWriter.pv"
+            #line 960 "src/compiler/ExpressionWriter.pv"
             struct Expression* inner = data->unaryexpression_value._1;
-            #line 964 "src/compiler/ExpressionWriter.pv"
-            bool skip_operator = str__Eq_str__eq(&operator, (struct str){ .ptr = "&", .length = strlen("&") }) && Type__is_fat_pointer(&expression->return_type);
-            #line 965 "src/compiler/ExpressionWriter.pv"
+            #line 961 "src/compiler/ExpressionWriter.pv"
+            bool skip_operator = str__Eq_str__eq(operator, (struct str){ .ptr = "&", .length = strlen("&") }) && Type__is_fat_pointer(&expression->return_type);
+            #line 962 "src/compiler/ExpressionWriter.pv"
             if (skip_operator) {
-                #line 966 "src/compiler/ExpressionWriter.pv"
+                #line 963 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, inner, generics);
-                #line 967 "src/compiler/ExpressionWriter.pv"
+                #line 964 "src/compiler/ExpressionWriter.pv"
                 return true;
             }
 
-            #line 970 "src/compiler/ExpressionWriter.pv"
-            if (str__Eq_str__eq(&operator, (struct str){ .ptr = "&", .length = strlen("&") })) {
-                #line 971 "src/compiler/ExpressionWriter.pv"
+            #line 967 "src/compiler/ExpressionWriter.pv"
+            if (str__Eq_str__eq(operator, (struct str){ .ptr = "&", .length = strlen("&") })) {
+                #line 968 "src/compiler/ExpressionWriter.pv"
                 bool is_rvalue = false;
-                #line 972 "src/compiler/ExpressionWriter.pv"
+                #line 969 "src/compiler/ExpressionWriter.pv"
                 switch (inner->data.type) {
-                    #line 973 "src/compiler/ExpressionWriter.pv"
+                    #line 970 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__INVOKE: {
-                        #line 973 "src/compiler/ExpressionWriter.pv"
+                        #line 970 "src/compiler/ExpressionWriter.pv"
                         is_rvalue = true;
                     } break;
-                    #line 974 "src/compiler/ExpressionWriter.pv"
+                    #line 971 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__LITERAL: {
-                        #line 974 "src/compiler/ExpressionWriter.pv"
+                        #line 971 "src/compiler/ExpressionWriter.pv"
                         is_rvalue = true;
                     } break;
-                    #line 975 "src/compiler/ExpressionWriter.pv"
+                    #line 972 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__BINARY_EXPRESSION: {
-                        #line 975 "src/compiler/ExpressionWriter.pv"
+                        #line 972 "src/compiler/ExpressionWriter.pv"
                         is_rvalue = true;
                     } break;
-                    #line 976 "src/compiler/ExpressionWriter.pv"
+                    #line 973 "src/compiler/ExpressionWriter.pv"
                     default: {
                     } break;
                 }
 
-                #line 979 "src/compiler/ExpressionWriter.pv"
+                #line 976 "src/compiler/ExpressionWriter.pv"
                 if (is_rvalue) {
-                    #line 982 "src/compiler/ExpressionWriter.pv"
+                    #line 979 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "(");
-                    #line 983 "src/compiler/ExpressionWriter.pv"
+                    #line 980 "src/compiler/ExpressionWriter.pv"
                     Generator__write_type(generator, file, &inner->return_type, generics);
-                    #line 984 "src/compiler/ExpressionWriter.pv"
+                    #line 981 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "[]){");
-                    #line 985 "src/compiler/ExpressionWriter.pv"
+                    #line 982 "src/compiler/ExpressionWriter.pv"
                     ExpressionWriter__write_expression(self, file, inner, generics);
-                    #line 986 "src/compiler/ExpressionWriter.pv"
+                    #line 983 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "}");
-                    #line 987 "src/compiler/ExpressionWriter.pv"
+                    #line 984 "src/compiler/ExpressionWriter.pv"
                     return true;
                 }
             }
 
-            #line 991 "src/compiler/ExpressionWriter.pv"
+            #line 988 "src/compiler/ExpressionWriter.pv"
             Generator__write_str(generator, file, operator);
-            #line 992 "src/compiler/ExpressionWriter.pv"
+            #line 989 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, inner, generics);
-            #line 993 "src/compiler/ExpressionWriter.pv"
+            #line 990 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 995 "src/compiler/ExpressionWriter.pv"
+        #line 992 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__BINARY_EXPRESSION: {
-            #line 995 "src/compiler/ExpressionWriter.pv"
+            #line 992 "src/compiler/ExpressionWriter.pv"
             struct Expression* left = data->binaryexpression_value._0;
-            #line 995 "src/compiler/ExpressionWriter.pv"
+            #line 992 "src/compiler/ExpressionWriter.pv"
             struct str operator = data->binaryexpression_value._1;
-            #line 995 "src/compiler/ExpressionWriter.pv"
+            #line 992 "src/compiler/ExpressionWriter.pv"
             struct Expression* right = data->binaryexpression_value._2;
-            #line 996 "src/compiler/ExpressionWriter.pv"
-            bool is_eq_or_ne = str__Eq_str__eq(&operator, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(&operator, (struct str){ .ptr = "!=", .length = strlen("!=") });
+            #line 993 "src/compiler/ExpressionWriter.pv"
+            bool is_eq_or_ne = str__Eq_str__eq(operator, (struct str){ .ptr = "==", .length = strlen("==") }) || str__Eq_str__eq(operator, (struct str){ .ptr = "!=", .length = strlen("!=") });
 
-            #line 998 "src/compiler/ExpressionWriter.pv"
+            #line 995 "src/compiler/ExpressionWriter.pv"
             bool left_is_null = false;
-            #line 999 "src/compiler/ExpressionWriter.pv"
+            #line 996 "src/compiler/ExpressionWriter.pv"
             bool right_is_null = false;
-            #line 1000 "src/compiler/ExpressionWriter.pv"
+            #line 997 "src/compiler/ExpressionWriter.pv"
             if (is_eq_or_ne) {
-                #line 1001 "src/compiler/ExpressionWriter.pv"
+                #line 998 "src/compiler/ExpressionWriter.pv"
                 switch (left->data.type) {
-                    #line 1002 "src/compiler/ExpressionWriter.pv"
+                    #line 999 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__NULL_LITERAL: {
-                        #line 1002 "src/compiler/ExpressionWriter.pv"
+                        #line 999 "src/compiler/ExpressionWriter.pv"
                         left_is_null = true;
                     } break;
-                    #line 1003 "src/compiler/ExpressionWriter.pv"
+                    #line 1000 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__LITERAL: {
-                        #line 1003 "src/compiler/ExpressionWriter.pv"
+                        #line 1000 "src/compiler/ExpressionWriter.pv"
                         struct str v = left->data.literal_value;
-                        #line 1003 "src/compiler/ExpressionWriter.pv"
-                        if (str__Eq_str__eq(&v, (struct str){ .ptr = "0", .length = strlen("0") })) {
-                            #line 1003 "src/compiler/ExpressionWriter.pv"
+                        #line 1000 "src/compiler/ExpressionWriter.pv"
+                        if (str__Eq_str__eq(v, (struct str){ .ptr = "0", .length = strlen("0") })) {
+                            #line 1000 "src/compiler/ExpressionWriter.pv"
                             left_is_null = true;
                         }
                     } break;
-                    #line 1004 "src/compiler/ExpressionWriter.pv"
+                    #line 1001 "src/compiler/ExpressionWriter.pv"
                     default: {
                     } break;
                 }
-                #line 1006 "src/compiler/ExpressionWriter.pv"
+                #line 1003 "src/compiler/ExpressionWriter.pv"
                 switch (right->data.type) {
-                    #line 1007 "src/compiler/ExpressionWriter.pv"
+                    #line 1004 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__NULL_LITERAL: {
-                        #line 1007 "src/compiler/ExpressionWriter.pv"
+                        #line 1004 "src/compiler/ExpressionWriter.pv"
                         right_is_null = true;
                     } break;
-                    #line 1008 "src/compiler/ExpressionWriter.pv"
+                    #line 1005 "src/compiler/ExpressionWriter.pv"
                     case EXPRESSION_DATA__LITERAL: {
-                        #line 1008 "src/compiler/ExpressionWriter.pv"
+                        #line 1005 "src/compiler/ExpressionWriter.pv"
                         struct str v = right->data.literal_value;
-                        #line 1008 "src/compiler/ExpressionWriter.pv"
-                        if (str__Eq_str__eq(&v, (struct str){ .ptr = "0", .length = strlen("0") })) {
-                            #line 1008 "src/compiler/ExpressionWriter.pv"
+                        #line 1005 "src/compiler/ExpressionWriter.pv"
+                        if (str__Eq_str__eq(v, (struct str){ .ptr = "0", .length = strlen("0") })) {
+                            #line 1005 "src/compiler/ExpressionWriter.pv"
                             right_is_null = true;
                         }
                     } break;
-                    #line 1009 "src/compiler/ExpressionWriter.pv"
+                    #line 1006 "src/compiler/ExpressionWriter.pv"
                     default: {
                     } break;
                 }
             }
 
-            #line 1013 "src/compiler/ExpressionWriter.pv"
+            #line 1010 "src/compiler/ExpressionWriter.pv"
             bool left_fat_null_cmp = is_eq_or_ne && right_is_null && Type__is_fat_pointer(&left->return_type);
-            #line 1014 "src/compiler/ExpressionWriter.pv"
+            #line 1011 "src/compiler/ExpressionWriter.pv"
             bool right_fat_null_cmp = is_eq_or_ne && left_is_null && Type__is_fat_pointer(&right->return_type);
 
-            #line 1016 "src/compiler/ExpressionWriter.pv"
+            #line 1013 "src/compiler/ExpressionWriter.pv"
             if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(generator, &left->return_type, generics)) {
-                #line 1017 "src/compiler/ExpressionWriter.pv"
+                #line 1014 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(");
-                #line 1018 "src/compiler/ExpressionWriter.pv"
+                #line 1015 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, left, generics);
-                #line 1019 "src/compiler/ExpressionWriter.pv"
+                #line 1016 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, ").type");
             } else if (left_fat_null_cmp) {
-                #line 1021 "src/compiler/ExpressionWriter.pv"
+                #line 1018 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(");
+                #line 1019 "src/compiler/ExpressionWriter.pv"
+                ExpressionWriter__write_expression(self, file, left, generics);
+                #line 1020 "src/compiler/ExpressionWriter.pv"
+                fprintf(file, ").instance");
+            } else {
                 #line 1022 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, left, generics);
-                #line 1023 "src/compiler/ExpressionWriter.pv"
-                fprintf(file, ").instance");
-            } else {
-                #line 1025 "src/compiler/ExpressionWriter.pv"
-                ExpressionWriter__write_expression(self, file, left, generics);
             }
 
-            #line 1028 "src/compiler/ExpressionWriter.pv"
+            #line 1025 "src/compiler/ExpressionWriter.pv"
             fprintf(file, " %.*s ", (int32_t)(operator.length), operator.ptr);
 
-            #line 1030 "src/compiler/ExpressionWriter.pv"
+            #line 1027 "src/compiler/ExpressionWriter.pv"
             if (is_eq_or_ne && Generator__type_is_discriminated_union_no_indirect(generator, &right->return_type, generics)) {
-                #line 1031 "src/compiler/ExpressionWriter.pv"
+                #line 1028 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(");
-                #line 1032 "src/compiler/ExpressionWriter.pv"
+                #line 1029 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, right, generics);
-                #line 1033 "src/compiler/ExpressionWriter.pv"
+                #line 1030 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, ").type");
             } else if (right_fat_null_cmp) {
-                #line 1035 "src/compiler/ExpressionWriter.pv"
+                #line 1032 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, "(");
-                #line 1036 "src/compiler/ExpressionWriter.pv"
+                #line 1033 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, right, generics);
-                #line 1037 "src/compiler/ExpressionWriter.pv"
+                #line 1034 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, ").instance");
             } else {
-                #line 1039 "src/compiler/ExpressionWriter.pv"
+                #line 1036 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, right, generics);
             }
 
-            #line 1042 "src/compiler/ExpressionWriter.pv"
+            #line 1039 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1044 "src/compiler/ExpressionWriter.pv"
+        #line 1041 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__IF_EXPRESSION: {
-            #line 1044 "src/compiler/ExpressionWriter.pv"
+            #line 1041 "src/compiler/ExpressionWriter.pv"
             struct Expression* cond = data->ifexpression_value._0;
-            #line 1044 "src/compiler/ExpressionWriter.pv"
+            #line 1041 "src/compiler/ExpressionWriter.pv"
             struct Expression* a = data->ifexpression_value._1;
-            #line 1044 "src/compiler/ExpressionWriter.pv"
+            #line 1041 "src/compiler/ExpressionWriter.pv"
             struct Expression* b = data->ifexpression_value._2;
-            #line 1045 "src/compiler/ExpressionWriter.pv"
+            #line 1042 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, cond, generics);
-            #line 1046 "src/compiler/ExpressionWriter.pv"
+            #line 1043 "src/compiler/ExpressionWriter.pv"
             fprintf(file, " ? ");
-            #line 1047 "src/compiler/ExpressionWriter.pv"
+            #line 1044 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, a, generics);
-            #line 1048 "src/compiler/ExpressionWriter.pv"
+            #line 1045 "src/compiler/ExpressionWriter.pv"
             fprintf(file, " : ");
-            #line 1049 "src/compiler/ExpressionWriter.pv"
+            #line 1046 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, b, generics);
-            #line 1050 "src/compiler/ExpressionWriter.pv"
+            #line 1047 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1052 "src/compiler/ExpressionWriter.pv"
+        #line 1049 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__OPTIONAL_EXPRESSION: {
-            #line 1052 "src/compiler/ExpressionWriter.pv"
+            #line 1049 "src/compiler/ExpressionWriter.pv"
             struct Expression* receiver = data->optionalexpression_value._0;
-            #line 1052 "src/compiler/ExpressionWriter.pv"
+            #line 1049 "src/compiler/ExpressionWriter.pv"
             struct Expression* value = data->optionalexpression_value._1;
-            #line 1053 "src/compiler/ExpressionWriter.pv"
+            #line 1050 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "(");
-            #line 1054 "src/compiler/ExpressionWriter.pv"
+            #line 1051 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, receiver, generics);
-            #line 1055 "src/compiler/ExpressionWriter.pv"
+            #line 1052 "src/compiler/ExpressionWriter.pv"
             fprintf(file, " == 0 ? 0 : ");
-            #line 1056 "src/compiler/ExpressionWriter.pv"
+            #line 1053 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, value, generics);
-            #line 1057 "src/compiler/ExpressionWriter.pv"
+            #line 1054 "src/compiler/ExpressionWriter.pv"
             fprintf(file, ")");
-            #line 1058 "src/compiler/ExpressionWriter.pv"
+            #line 1055 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1060 "src/compiler/ExpressionWriter.pv"
+        #line 1057 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__MEMBER_STATIC_EXPRESSION: {
-            #line 1060 "src/compiler/ExpressionWriter.pv"
+            #line 1057 "src/compiler/ExpressionWriter.pv"
             struct Expression* parent = data->memberstaticexpression_value._0;
-            #line 1060 "src/compiler/ExpressionWriter.pv"
+            #line 1057 "src/compiler/ExpressionWriter.pv"
             struct str member = data->memberstaticexpression_value._1;
-            #line 1061 "src/compiler/ExpressionWriter.pv"
+            #line 1058 "src/compiler/ExpressionWriter.pv"
             struct Type* parent_type = &parent->return_type;
-            #line 1062 "src/compiler/ExpressionWriter.pv"
+            #line 1059 "src/compiler/ExpressionWriter.pv"
             switch (parent_type->type) {
-                #line 1063 "src/compiler/ExpressionWriter.pv"
+                #line 1060 "src/compiler/ExpressionWriter.pv"
                 case TYPE__SELF: {
-                    #line 1064 "src/compiler/ExpressionWriter.pv"
+                    #line 1061 "src/compiler/ExpressionWriter.pv"
                     if (generics->self_type != 0) {
-                        #line 1064 "src/compiler/ExpressionWriter.pv"
+                        #line 1061 "src/compiler/ExpressionWriter.pv"
                         parent_type = generics->self_type;
                     }
                 } break;
-                #line 1066 "src/compiler/ExpressionWriter.pv"
+                #line 1063 "src/compiler/ExpressionWriter.pv"
                 default: {
                 } break;
             }
-            #line 1068 "src/compiler/ExpressionWriter.pv"
+            #line 1065 "src/compiler/ExpressionWriter.pv"
             switch (parent_type->type) {
-                #line 1069 "src/compiler/ExpressionWriter.pv"
+                #line 1066 "src/compiler/ExpressionWriter.pv"
                 case TYPE__STRUCT: {
-                    #line 1069 "src/compiler/ExpressionWriter.pv"
+                    #line 1066 "src/compiler/ExpressionWriter.pv"
                     struct Struct* struct_info = parent_type->struct_value._0;
-                    #line 1070 "src/compiler/ExpressionWriter.pv"
+                    #line 1067 "src/compiler/ExpressionWriter.pv"
                     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-                    #line 1070 "src/compiler/ExpressionWriter.pv"
+                    #line 1067 "src/compiler/ExpressionWriter.pv"
                     while (Iter_ref_ref_Impl__next(&__iter)) {
-                        #line 1070 "src/compiler/ExpressionWriter.pv"
+                        #line 1067 "src/compiler/ExpressionWriter.pv"
                         struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                        #line 1071 "src/compiler/ExpressionWriter.pv"
+                        #line 1068 "src/compiler/ExpressionWriter.pv"
                         struct ImplConst** impl_const_ptr = HashMap_str_ref_ImplConst__find(&impl_info->consts, &member);
-                        #line 1072 "src/compiler/ExpressionWriter.pv"
+                        #line 1069 "src/compiler/ExpressionWriter.pv"
                         if (impl_const_ptr != 0) {
+                            #line 1070 "src/compiler/ExpressionWriter.pv"
+                            struct String parent_name = Naming__get_type_name(&generator->naming_ident, parent_type, parent_type, generics);
+                            #line 1071 "src/compiler/ExpressionWriter.pv"
+                            Generator__write_str_title(generator, file, String__as_str(&parent_name));
+                            #line 1072 "src/compiler/ExpressionWriter.pv"
+                            fprintf(file, "_");
                             #line 1073 "src/compiler/ExpressionWriter.pv"
-                            struct String parent_name = Naming__get_type_name(&generator->naming_ident, parent_type, parent_type, generics);
-                            #line 1074 "src/compiler/ExpressionWriter.pv"
-                            Generator__write_str_title(generator, file, String__as_str(&parent_name));
-                            #line 1075 "src/compiler/ExpressionWriter.pv"
-                            fprintf(file, "_");
-                            #line 1076 "src/compiler/ExpressionWriter.pv"
                             Generator__write_str_title(generator, file, member);
-                            #line 1077 "src/compiler/ExpressionWriter.pv"
+                            #line 1074 "src/compiler/ExpressionWriter.pv"
                             return true;
                         }
                     } }
                 } break;
-                #line 1081 "src/compiler/ExpressionWriter.pv"
+                #line 1078 "src/compiler/ExpressionWriter.pv"
                 case TYPE__ENUM: {
-                    #line 1081 "src/compiler/ExpressionWriter.pv"
+                    #line 1078 "src/compiler/ExpressionWriter.pv"
                     struct Enum* enum_info = parent_type->enum_value._0;
-                    #line 1082 "src/compiler/ExpressionWriter.pv"
+                    #line 1079 "src/compiler/ExpressionWriter.pv"
                     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
-                    #line 1082 "src/compiler/ExpressionWriter.pv"
+                    #line 1079 "src/compiler/ExpressionWriter.pv"
                     while (Iter_ref_ref_Impl__next(&__iter)) {
-                        #line 1082 "src/compiler/ExpressionWriter.pv"
+                        #line 1079 "src/compiler/ExpressionWriter.pv"
                         struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                        #line 1083 "src/compiler/ExpressionWriter.pv"
+                        #line 1080 "src/compiler/ExpressionWriter.pv"
                         struct ImplConst** impl_const_ptr = HashMap_str_ref_ImplConst__find(&impl_info->consts, &member);
-                        #line 1084 "src/compiler/ExpressionWriter.pv"
+                        #line 1081 "src/compiler/ExpressionWriter.pv"
                         if (impl_const_ptr != 0) {
-                            #line 1085 "src/compiler/ExpressionWriter.pv"
+                            #line 1082 "src/compiler/ExpressionWriter.pv"
                             struct String parent_name = Naming__get_type_name(&generator->naming_ident, parent_type, parent_type, generics);
-                            #line 1086 "src/compiler/ExpressionWriter.pv"
+                            #line 1083 "src/compiler/ExpressionWriter.pv"
                             Generator__write_str_title(generator, file, String__as_str(&parent_name));
-                            #line 1087 "src/compiler/ExpressionWriter.pv"
+                            #line 1084 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "_");
-                            #line 1088 "src/compiler/ExpressionWriter.pv"
+                            #line 1085 "src/compiler/ExpressionWriter.pv"
                             Generator__write_str_title(generator, file, member);
-                            #line 1089 "src/compiler/ExpressionWriter.pv"
+                            #line 1086 "src/compiler/ExpressionWriter.pv"
                             return true;
                         }
                     } }
                 } break;
-                #line 1093 "src/compiler/ExpressionWriter.pv"
+                #line 1090 "src/compiler/ExpressionWriter.pv"
                 default: {
                 } break;
             }
-            #line 1095 "src/compiler/ExpressionWriter.pv"
+            #line 1092 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, parent, generics);
-            #line 1096 "src/compiler/ExpressionWriter.pv"
+            #line 1093 "src/compiler/ExpressionWriter.pv"
             Generator__write_static_member_accessor(generator, file, generics);
-            #line 1097 "src/compiler/ExpressionWriter.pv"
+            #line 1094 "src/compiler/ExpressionWriter.pv"
             Generator__write_str(generator, file, member);
-            #line 1098 "src/compiler/ExpressionWriter.pv"
+            #line 1095 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1100 "src/compiler/ExpressionWriter.pv"
+        #line 1097 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__MEMBER_INSTANCE_EXPRESSION: {
-            #line 1100 "src/compiler/ExpressionWriter.pv"
+            #line 1097 "src/compiler/ExpressionWriter.pv"
             struct Expression* parent = data->memberinstanceexpression_value._0;
-            #line 1100 "src/compiler/ExpressionWriter.pv"
+            #line 1097 "src/compiler/ExpressionWriter.pv"
             struct str member = data->memberinstanceexpression_value._1;
-            #line 1101 "src/compiler/ExpressionWriter.pv"
+            #line 1098 "src/compiler/ExpressionWriter.pv"
             switch (expression->return_type.type) {
-                #line 1102 "src/compiler/ExpressionWriter.pv"
+                #line 1099 "src/compiler/ExpressionWriter.pv"
                 case TYPE__FUNCTION: {
-                    #line 1102 "src/compiler/ExpressionWriter.pv"
+                    #line 1099 "src/compiler/ExpressionWriter.pv"
                     struct Function* func_info = expression->return_type.function_value._0;
-                    #line 1103 "src/compiler/ExpressionWriter.pv"
+                    #line 1100 "src/compiler/ExpressionWriter.pv"
                     switch (func_info->parent.type) {
-                        #line 1104 "src/compiler/ExpressionWriter.pv"
+                        #line 1101 "src/compiler/ExpressionWriter.pv"
                         case FUNCTION_PARENT__TYPE: {
-                            #line 1104 "src/compiler/ExpressionWriter.pv"
+                            #line 1101 "src/compiler/ExpressionWriter.pv"
                             struct Type* type = func_info->parent.type_value._0;
-                            #line 1104 "src/compiler/ExpressionWriter.pv"
+                            #line 1101 "src/compiler/ExpressionWriter.pv"
                             uintptr_t impl_index = func_info->parent.type_value._1;
-                            #line 1104 "src/compiler/ExpressionWriter.pv"
+                            #line 1101 "src/compiler/ExpressionWriter.pv"
                             struct Trait* trait_info = func_info->parent.type_value._2;
-                            #line 1105 "src/compiler/ExpressionWriter.pv"
+                            #line 1102 "src/compiler/ExpressionWriter.pv"
                             struct Type* named_type = type;
-                            #line 1106 "src/compiler/ExpressionWriter.pv"
+                            #line 1103 "src/compiler/ExpressionWriter.pv"
                             if (Type__is_fat_pointer(type)) {
-                                #line 1107 "src/compiler/ExpressionWriter.pv"
+                                #line 1104 "src/compiler/ExpressionWriter.pv"
                                 named_type = Type__deref_1(type);
-                                #line 1108 "src/compiler/ExpressionWriter.pv"
+                                #line 1105 "src/compiler/ExpressionWriter.pv"
                                 if (named_type == 0) {
-                                    #line 1108 "src/compiler/ExpressionWriter.pv"
+                                    #line 1105 "src/compiler/ExpressionWriter.pv"
                                     named_type = type;
                                 }
                             }
-                            #line 1110 "src/compiler/ExpressionWriter.pv"
+                            #line 1107 "src/compiler/ExpressionWriter.pv"
                             struct String parent_name = Naming__get_type_name(&generator->naming_ident, named_type, type, generics);
-                            #line 1111 "src/compiler/ExpressionWriter.pv"
+                            #line 1108 "src/compiler/ExpressionWriter.pv"
                             if (trait_info != 0) {
-                                #line 1112 "src/compiler/ExpressionWriter.pv"
+                                #line 1109 "src/compiler/ExpressionWriter.pv"
                                 struct TypeImpl* type_impl = Root__get_type_impl(generator->root, type, impl_index);
-                                #line 1113 "src/compiler/ExpressionWriter.pv"
+                                #line 1110 "src/compiler/ExpressionWriter.pv"
                                 struct Type* impl_trait_type = 0;
-                                #line 1114 "src/compiler/ExpressionWriter.pv"
+                                #line 1111 "src/compiler/ExpressionWriter.pv"
                                 if (type_impl != 0) {
-                                    #line 1114 "src/compiler/ExpressionWriter.pv"
+                                    #line 1111 "src/compiler/ExpressionWriter.pv"
                                     impl_trait_type = &type_impl->impl_info->trait_type;
                                 }
-                                #line 1115 "src/compiler/ExpressionWriter.pv"
+                                #line 1112 "src/compiler/ExpressionWriter.pv"
                                 struct String function_name = Generator__get_trait_function_name(generator, String__as_str(&parent_name), trait_info, impl_trait_type, func_info, generics);
-                                #line 1116 "src/compiler/ExpressionWriter.pv"
+                                #line 1113 "src/compiler/ExpressionWriter.pv"
                                 return Generator__write_string(generator, file, &function_name);
                             }
-                            #line 1118 "src/compiler/ExpressionWriter.pv"
+                            #line 1115 "src/compiler/ExpressionWriter.pv"
                             Generator__write_string(generator, file, &parent_name);
-                            #line 1119 "src/compiler/ExpressionWriter.pv"
+                            #line 1116 "src/compiler/ExpressionWriter.pv"
                             fprintf(file, "__");
-                            #line 1120 "src/compiler/ExpressionWriter.pv"
+                            #line 1117 "src/compiler/ExpressionWriter.pv"
                             Generator__write_str(generator, file, member);
-                            #line 1121 "src/compiler/ExpressionWriter.pv"
+                            #line 1118 "src/compiler/ExpressionWriter.pv"
                             return true;
                         } break;
-                        #line 1123 "src/compiler/ExpressionWriter.pv"
+                        #line 1120 "src/compiler/ExpressionWriter.pv"
                         default: {
                         } break;
                     }
                 } break;
-                #line 1126 "src/compiler/ExpressionWriter.pv"
+                #line 1123 "src/compiler/ExpressionWriter.pv"
                 default: {
                 } break;
             }
 
-            #line 1129 "src/compiler/ExpressionWriter.pv"
+            #line 1126 "src/compiler/ExpressionWriter.pv"
             struct Type* parent_type = &parent->return_type;
-            #line 1130 "src/compiler/ExpressionWriter.pv"
+            #line 1127 "src/compiler/ExpressionWriter.pv"
             struct Function* type_impl_function = Root__find_type_impl_function(generator->root, parent_type, member, 0);
-            #line 1131 "src/compiler/ExpressionWriter.pv"
+            #line 1128 "src/compiler/ExpressionWriter.pv"
             if (type_impl_function != 0) {
-                #line 1132 "src/compiler/ExpressionWriter.pv"
+                #line 1129 "src/compiler/ExpressionWriter.pv"
                 switch (type_impl_function->parent.type) {
-                    #line 1133 "src/compiler/ExpressionWriter.pv"
+                    #line 1130 "src/compiler/ExpressionWriter.pv"
                     case FUNCTION_PARENT__TYPE: {
-                        #line 1133 "src/compiler/ExpressionWriter.pv"
+                        #line 1130 "src/compiler/ExpressionWriter.pv"
                         struct Type* type = type_impl_function->parent.type_value._0;
-                        #line 1133 "src/compiler/ExpressionWriter.pv"
+                        #line 1130 "src/compiler/ExpressionWriter.pv"
                         uintptr_t impl_index = type_impl_function->parent.type_value._1;
-                        #line 1133 "src/compiler/ExpressionWriter.pv"
+                        #line 1130 "src/compiler/ExpressionWriter.pv"
                         struct Trait* trait_info = type_impl_function->parent.type_value._2;
-                        #line 1134 "src/compiler/ExpressionWriter.pv"
+                        #line 1131 "src/compiler/ExpressionWriter.pv"
                         struct Type* named_type = type;
-                        #line 1135 "src/compiler/ExpressionWriter.pv"
+                        #line 1132 "src/compiler/ExpressionWriter.pv"
                         if (Type__is_fat_pointer(type)) {
-                            #line 1136 "src/compiler/ExpressionWriter.pv"
+                            #line 1133 "src/compiler/ExpressionWriter.pv"
                             named_type = Type__deref_1(type);
-                            #line 1137 "src/compiler/ExpressionWriter.pv"
+                            #line 1134 "src/compiler/ExpressionWriter.pv"
                             if (named_type == 0) {
-                                #line 1137 "src/compiler/ExpressionWriter.pv"
+                                #line 1134 "src/compiler/ExpressionWriter.pv"
                                 named_type = type;
                             }
                         }
-                        #line 1139 "src/compiler/ExpressionWriter.pv"
+                        #line 1136 "src/compiler/ExpressionWriter.pv"
                         struct String parent_name = Naming__get_type_name(&generator->naming_ident, named_type, parent_type, generics);
-                        #line 1140 "src/compiler/ExpressionWriter.pv"
+                        #line 1137 "src/compiler/ExpressionWriter.pv"
                         if (trait_info != 0) {
-                            #line 1141 "src/compiler/ExpressionWriter.pv"
+                            #line 1138 "src/compiler/ExpressionWriter.pv"
                             struct TypeImpl* type_impl = Root__get_type_impl(generator->root, type, impl_index);
-                            #line 1142 "src/compiler/ExpressionWriter.pv"
+                            #line 1139 "src/compiler/ExpressionWriter.pv"
                             struct Type* impl_trait_type = 0;
-                            #line 1143 "src/compiler/ExpressionWriter.pv"
+                            #line 1140 "src/compiler/ExpressionWriter.pv"
                             if (type_impl != 0) {
-                                #line 1143 "src/compiler/ExpressionWriter.pv"
+                                #line 1140 "src/compiler/ExpressionWriter.pv"
                                 impl_trait_type = &type_impl->impl_info->trait_type;
                             }
-                            #line 1144 "src/compiler/ExpressionWriter.pv"
+                            #line 1141 "src/compiler/ExpressionWriter.pv"
                             struct String function_name = Generator__get_trait_function_name(generator, String__as_str(&parent_name), trait_info, impl_trait_type, type_impl_function, generics);
-                            #line 1145 "src/compiler/ExpressionWriter.pv"
+                            #line 1142 "src/compiler/ExpressionWriter.pv"
                             return Generator__write_string(generator, file, &function_name);
                         }
-                        #line 1147 "src/compiler/ExpressionWriter.pv"
+                        #line 1144 "src/compiler/ExpressionWriter.pv"
                         Generator__write_string(generator, file, &parent_name);
-                        #line 1148 "src/compiler/ExpressionWriter.pv"
+                        #line 1145 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "__");
-                        #line 1149 "src/compiler/ExpressionWriter.pv"
+                        #line 1146 "src/compiler/ExpressionWriter.pv"
                         Generator__write_str(generator, file, member);
-                        #line 1150 "src/compiler/ExpressionWriter.pv"
+                        #line 1147 "src/compiler/ExpressionWriter.pv"
                         return true;
                     } break;
-                    #line 1152 "src/compiler/ExpressionWriter.pv"
+                    #line 1149 "src/compiler/ExpressionWriter.pv"
                     default: {
                     } break;
                 }
 
-                #line 1155 "src/compiler/ExpressionWriter.pv"
+                #line 1152 "src/compiler/ExpressionWriter.pv"
                 struct GenericMap type_impl_generics = (struct GenericMap) { .self_type = parent_type, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = generator->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } };
-                #line 1156 "src/compiler/ExpressionWriter.pv"
+                #line 1153 "src/compiler/ExpressionWriter.pv"
                 return Generator__write_function_name(generator, file, type_impl_function, &type_impl_generics);
             }
 
-            #line 1159 "src/compiler/ExpressionWriter.pv"
+            #line 1156 "src/compiler/ExpressionWriter.pv"
             if (Generator__is_type_single_value_struct(generator, parent_type, generics)) {
-                #line 1160 "src/compiler/ExpressionWriter.pv"
+                #line 1157 "src/compiler/ExpressionWriter.pv"
                 bool is_ref = Generator__is_reference(parent_type);
-                #line 1161 "src/compiler/ExpressionWriter.pv"
+                #line 1158 "src/compiler/ExpressionWriter.pv"
                 if (is_ref) {
-                    #line 1161 "src/compiler/ExpressionWriter.pv"
+                    #line 1158 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "(*");
                 }
-                #line 1162 "src/compiler/ExpressionWriter.pv"
+                #line 1159 "src/compiler/ExpressionWriter.pv"
                 ExpressionWriter__write_expression(self, file, parent, generics);
-                #line 1163 "src/compiler/ExpressionWriter.pv"
+                #line 1160 "src/compiler/ExpressionWriter.pv"
                 if (is_ref) {
-                    #line 1163 "src/compiler/ExpressionWriter.pv"
+                    #line 1160 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, ")");
                 }
-                #line 1164 "src/compiler/ExpressionWriter.pv"
+                #line 1161 "src/compiler/ExpressionWriter.pv"
                 return true;
             }
 
-            #line 1167 "src/compiler/ExpressionWriter.pv"
+            #line 1164 "src/compiler/ExpressionWriter.pv"
             switch (parent_type->type) {
-                #line 1168 "src/compiler/ExpressionWriter.pv"
+                #line 1165 "src/compiler/ExpressionWriter.pv"
                 case TYPE__SEQUENCE: {
-                    #line 1168 "src/compiler/ExpressionWriter.pv"
+                    #line 1165 "src/compiler/ExpressionWriter.pv"
                     struct Sequence* sequence = parent_type->sequence_value;
-                    #line 1169 "src/compiler/ExpressionWriter.pv"
+                    #line 1166 "src/compiler/ExpressionWriter.pv"
                     switch (sequence->type.type) {
-                        #line 1170 "src/compiler/ExpressionWriter.pv"
+                        #line 1167 "src/compiler/ExpressionWriter.pv"
                         case SEQUENCE_TYPE__FIXED_ARRAY: {
-                            #line 1170 "src/compiler/ExpressionWriter.pv"
+                            #line 1167 "src/compiler/ExpressionWriter.pv"
                             struct Expression* length = sequence->type.fixedarray_value;
-                            #line 1171 "src/compiler/ExpressionWriter.pv"
-                            if (str__Eq_str__eq(&member, (struct str){ .ptr = "length", .length = strlen("length") })) {
-                                #line 1172 "src/compiler/ExpressionWriter.pv"
+                            #line 1168 "src/compiler/ExpressionWriter.pv"
+                            if (str__Eq_str__eq(member, (struct str){ .ptr = "length", .length = strlen("length") })) {
+                                #line 1169 "src/compiler/ExpressionWriter.pv"
                                 ExpressionWriter__write_expression(self, file, length, generics);
-                            } else if (str__Eq_str__eq(&member, (struct str){ .ptr = "data", .length = strlen("data") })) {
-                                #line 1174 "src/compiler/ExpressionWriter.pv"
+                            } else if (str__Eq_str__eq(member, (struct str){ .ptr = "data", .length = strlen("data") })) {
+                                #line 1171 "src/compiler/ExpressionWriter.pv"
                                 ExpressionWriter__write_expression(self, file, parent, generics);
                             } else {
-                                #line 1176 "src/compiler/ExpressionWriter.pv"
+                                #line 1173 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "!!ERROR NO MEMBER ");
-                                #line 1177 "src/compiler/ExpressionWriter.pv"
+                                #line 1174 "src/compiler/ExpressionWriter.pv"
                                 Generator__write_str(generator, file, member);
-                                #line 1178 "src/compiler/ExpressionWriter.pv"
+                                #line 1175 "src/compiler/ExpressionWriter.pv"
                                 fprintf(file, "!!");
                             }
                         } break;
-                        #line 1181 "src/compiler/ExpressionWriter.pv"
+                        #line 1178 "src/compiler/ExpressionWriter.pv"
                         case SEQUENCE_TYPE__SLICE: {
-                            #line 1182 "src/compiler/ExpressionWriter.pv"
+                            #line 1179 "src/compiler/ExpressionWriter.pv"
                             ExpressionWriter__write_expression(self, file, parent, generics);
-                            #line 1183 "src/compiler/ExpressionWriter.pv"
+                            #line 1180 "src/compiler/ExpressionWriter.pv"
                             Generator__write_instance_member_accessor(generator, file, &parent->return_type, generics);
-                            #line 1184 "src/compiler/ExpressionWriter.pv"
+                            #line 1181 "src/compiler/ExpressionWriter.pv"
                             Generator__write_str(generator, file, member);
                         } break;
                     }
                 } break;
-                #line 1188 "src/compiler/ExpressionWriter.pv"
+                #line 1185 "src/compiler/ExpressionWriter.pv"
                 default: {
-                    #line 1189 "src/compiler/ExpressionWriter.pv"
+                    #line 1186 "src/compiler/ExpressionWriter.pv"
                     ExpressionWriter__write_expression(self, file, parent, generics);
-                    #line 1190 "src/compiler/ExpressionWriter.pv"
+                    #line 1187 "src/compiler/ExpressionWriter.pv"
                     Generator__write_instance_member_accessor(generator, file, &parent->return_type, generics);
-                    #line 1191 "src/compiler/ExpressionWriter.pv"
+                    #line 1188 "src/compiler/ExpressionWriter.pv"
                     if (member.length > 0 && member.ptr[0] >= '0' && member.ptr[0] <= '9') {
-                        #line 1191 "src/compiler/ExpressionWriter.pv"
+                        #line 1188 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "_");
                     }
-                    #line 1192 "src/compiler/ExpressionWriter.pv"
+                    #line 1189 "src/compiler/ExpressionWriter.pv"
                     Generator__write_str(generator, file, member);
                 } break;
             }
 
-            #line 1196 "src/compiler/ExpressionWriter.pv"
+            #line 1193 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1198 "src/compiler/ExpressionWriter.pv"
+        #line 1195 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__TYPE: {
-            #line 1198 "src/compiler/ExpressionWriter.pv"
+            #line 1195 "src/compiler/ExpressionWriter.pv"
             struct Type* type = data->type_value;
-            #line 1199 "src/compiler/ExpressionWriter.pv"
+            #line 1196 "src/compiler/ExpressionWriter.pv"
             Generator__write_type(generator, file, type, generics);
-            #line 1200 "src/compiler/ExpressionWriter.pv"
+            #line 1197 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1202 "src/compiler/ExpressionWriter.pv"
+        #line 1199 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__INDEX_EXPRESSION: {
-            #line 1202 "src/compiler/ExpressionWriter.pv"
+            #line 1199 "src/compiler/ExpressionWriter.pv"
             struct Expression* array_expr = data->indexexpression_value._0;
-            #line 1202 "src/compiler/ExpressionWriter.pv"
+            #line 1199 "src/compiler/ExpressionWriter.pv"
             struct Expression* index_expr = data->indexexpression_value._1;
-            #line 1203 "src/compiler/ExpressionWriter.pv"
+            #line 1200 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, array_expr, generics);
-            #line 1204 "src/compiler/ExpressionWriter.pv"
+            #line 1201 "src/compiler/ExpressionWriter.pv"
             if (Type__is_reference_sequence_dynamic(&array_expr->return_type)) {
-                #line 1205 "src/compiler/ExpressionWriter.pv"
+                #line 1202 "src/compiler/ExpressionWriter.pv"
                 fprintf(file, ".data");
             }
-            #line 1207 "src/compiler/ExpressionWriter.pv"
+            #line 1204 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "[");
-            #line 1208 "src/compiler/ExpressionWriter.pv"
+            #line 1205 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, index_expr, generics);
-            #line 1209 "src/compiler/ExpressionWriter.pv"
+            #line 1206 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "]");
-            #line 1210 "src/compiler/ExpressionWriter.pv"
+            #line 1207 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1212 "src/compiler/ExpressionWriter.pv"
+        #line 1209 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__PARENTHESIZED_EXPRESSION: {
-            #line 1212 "src/compiler/ExpressionWriter.pv"
+            #line 1209 "src/compiler/ExpressionWriter.pv"
             struct Expression* expr = data->parenthesizedexpression_value;
-            #line 1213 "src/compiler/ExpressionWriter.pv"
+            #line 1210 "src/compiler/ExpressionWriter.pv"
             fprintf(file, "(");
-            #line 1214 "src/compiler/ExpressionWriter.pv"
+            #line 1211 "src/compiler/ExpressionWriter.pv"
             ExpressionWriter__write_expression(self, file, expr, generics);
-            #line 1215 "src/compiler/ExpressionWriter.pv"
+            #line 1212 "src/compiler/ExpressionWriter.pv"
             fprintf(file, ")");
-            #line 1216 "src/compiler/ExpressionWriter.pv"
+            #line 1213 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1218 "src/compiler/ExpressionWriter.pv"
+        #line 1215 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__CPP_EXPRESSION: {
-            #line 1218 "src/compiler/ExpressionWriter.pv"
+            #line 1215 "src/compiler/ExpressionWriter.pv"
             struct CppExpression cpp_expression = data->cppexpression_value;
-            #line 1219 "src/compiler/ExpressionWriter.pv"
+            #line 1216 "src/compiler/ExpressionWriter.pv"
             switch (cpp_expression.type) {
-                #line 1220 "src/compiler/ExpressionWriter.pv"
+                #line 1217 "src/compiler/ExpressionWriter.pv"
                 case CPP_EXPRESSION__NEW: {
-                    #line 1220 "src/compiler/ExpressionWriter.pv"
+                    #line 1217 "src/compiler/ExpressionWriter.pv"
                     struct Expression* placement = cpp_expression.new_value.placement;
-                    #line 1220 "src/compiler/ExpressionWriter.pv"
+                    #line 1217 "src/compiler/ExpressionWriter.pv"
                     struct Expression* new_expression = cpp_expression.new_value.expression;
-                    #line 1221 "src/compiler/ExpressionWriter.pv"
+                    #line 1218 "src/compiler/ExpressionWriter.pv"
                     if (placement != 0) {
-                        #line 1222 "src/compiler/ExpressionWriter.pv"
+                        #line 1219 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "new(");
-                        #line 1223 "src/compiler/ExpressionWriter.pv"
+                        #line 1220 "src/compiler/ExpressionWriter.pv"
                         ExpressionWriter__write_expression(self, file, placement, generics);
-                        #line 1224 "src/compiler/ExpressionWriter.pv"
+                        #line 1221 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, ") ");
                     } else {
-                        #line 1226 "src/compiler/ExpressionWriter.pv"
+                        #line 1223 "src/compiler/ExpressionWriter.pv"
                         fprintf(file, "new ");
                     }
-                    #line 1228 "src/compiler/ExpressionWriter.pv"
+                    #line 1225 "src/compiler/ExpressionWriter.pv"
                     ExpressionWriter__write_expression(self, file, new_expression, generics);
                 } break;
-                #line 1230 "src/compiler/ExpressionWriter.pv"
+                #line 1227 "src/compiler/ExpressionWriter.pv"
                 case CPP_EXPRESSION__DELETE: {
-                    #line 1230 "src/compiler/ExpressionWriter.pv"
+                    #line 1227 "src/compiler/ExpressionWriter.pv"
                     struct Expression* delete_expression = cpp_expression.delete_value;
-                    #line 1231 "src/compiler/ExpressionWriter.pv"
+                    #line 1228 "src/compiler/ExpressionWriter.pv"
                     fprintf(file, "delete ");
-                    #line 1232 "src/compiler/ExpressionWriter.pv"
+                    #line 1229 "src/compiler/ExpressionWriter.pv"
                     ExpressionWriter__write_expression(self, file, delete_expression, generics);
                 } break;
             }
-            #line 1235 "src/compiler/ExpressionWriter.pv"
+            #line 1232 "src/compiler/ExpressionWriter.pv"
             return true;
         } break;
-        #line 1237 "src/compiler/ExpressionWriter.pv"
+        #line 1234 "src/compiler/ExpressionWriter.pv"
         case EXPRESSION_DATA__IMPLICIT_CAST: {
-            #line 1237 "src/compiler/ExpressionWriter.pv"
+            #line 1234 "src/compiler/ExpressionWriter.pv"
             struct Expression* inner_expr = data->implicitcast_value;
-            #line 1238 "src/compiler/ExpressionWriter.pv"
+            #line 1235 "src/compiler/ExpressionWriter.pv"
             switch (expression->return_type.type) {
-                #line 1239 "src/compiler/ExpressionWriter.pv"
+                #line 1236 "src/compiler/ExpressionWriter.pv"
                 case TYPE__STRUCT: {
-                    #line 1239 "src/compiler/ExpressionWriter.pv"
+                    #line 1236 "src/compiler/ExpressionWriter.pv"
                     struct Struct* struct_info = expression->return_type.struct_value._0;
-                    #line 1240 "src/compiler/ExpressionWriter.pv"
+                    #line 1237 "src/compiler/ExpressionWriter.pv"
                     struct Token struct_name = *struct_info->name;
-                    #line 1241 "src/compiler/ExpressionWriter.pv"
-                    if (str__Eq_str__eq(&struct_name.value, (struct str){ .ptr = "str", .length = strlen("str") })) {
-                        #line 1242 "src/compiler/ExpressionWriter.pv"
+                    #line 1238 "src/compiler/ExpressionWriter.pv"
+                    if (str__Eq_str__eq(struct_name.value, (struct str){ .ptr = "str", .length = strlen("str") })) {
+                        #line 1239 "src/compiler/ExpressionWriter.pv"
                         ExpressionWriter__write_str_cast(self, file, inner_expr, generics, false);
                     }
                 } break;
-                #line 1245 "src/compiler/ExpressionWriter.pv"
+                #line 1242 "src/compiler/ExpressionWriter.pv"
                 case TYPE__INDIRECT: {
-                    #line 1245 "src/compiler/ExpressionWriter.pv"
+                    #line 1242 "src/compiler/ExpressionWriter.pv"
                     struct Indirect* indirect = expression->return_type.indirect_value;
-                    #line 1246 "src/compiler/ExpressionWriter.pv"
+                    #line 1243 "src/compiler/ExpressionWriter.pv"
                     switch (indirect->to.type) {
-                        #line 1247 "src/compiler/ExpressionWriter.pv"
+                        #line 1244 "src/compiler/ExpressionWriter.pv"
                         case TYPE__STRUCT: {
-                            #line 1247 "src/compiler/ExpressionWriter.pv"
+                            #line 1244 "src/compiler/ExpressionWriter.pv"
                             struct Struct* struct_info = indirect->to.struct_value._0;
-                            #line 1248 "src/compiler/ExpressionWriter.pv"
+                            #line 1245 "src/compiler/ExpressionWriter.pv"
                             struct Token struct_name = *struct_info->name;
-                            #line 1249 "src/compiler/ExpressionWriter.pv"
-                            if (str__Eq_str__eq(&struct_name.value, (struct str){ .ptr = "str", .length = strlen("str") })) {
-                                #line 1250 "src/compiler/ExpressionWriter.pv"
+                            #line 1246 "src/compiler/ExpressionWriter.pv"
+                            if (str__Eq_str__eq(struct_name.value, (struct str){ .ptr = "str", .length = strlen("str") })) {
+                                #line 1247 "src/compiler/ExpressionWriter.pv"
                                 ExpressionWriter__write_str_cast(self, file, inner_expr, generics, true);
                             } else {
-                                #line 1252 "src/compiler/ExpressionWriter.pv"
+                                #line 1249 "src/compiler/ExpressionWriter.pv"
                                 ExpressionWriter__write_trait_cast(self, file, inner_expr, &indirect->to, generics);
                             }
                         } break;
-                        #line 1255 "src/compiler/ExpressionWriter.pv"
+                        #line 1252 "src/compiler/ExpressionWriter.pv"
                         case TYPE__SEQUENCE: {
-                            #line 1255 "src/compiler/ExpressionWriter.pv"
+                            #line 1252 "src/compiler/ExpressionWriter.pv"
                             struct Sequence* sequence = indirect->to.sequence_value;
-                            #line 1255 "src/compiler/ExpressionWriter.pv"
+                            #line 1252 "src/compiler/ExpressionWriter.pv"
                             ExpressionWriter__write_sequence_cast(self, file, inner_expr, sequence, generics);
                         } break;
-                        #line 1256 "src/compiler/ExpressionWriter.pv"
+                        #line 1253 "src/compiler/ExpressionWriter.pv"
                         default: {
-                            #line 1256 "src/compiler/ExpressionWriter.pv"
+                            #line 1253 "src/compiler/ExpressionWriter.pv"
                             ExpressionWriter__write_trait_cast(self, file, inner_expr, &indirect->to, generics);
                         } break;
                     }
                 } break;
-                #line 1259 "src/compiler/ExpressionWriter.pv"
+                #line 1256 "src/compiler/ExpressionWriter.pv"
                 default: {
-                    #line 1259 "src/compiler/ExpressionWriter.pv"
+                    #line 1256 "src/compiler/ExpressionWriter.pv"
                     ExpressionWriter__write_expression(self, file, inner_expr, generics);
                 } break;
             }
         } break;
     }
 
-    #line 1264 "src/compiler/ExpressionWriter.pv"
+    #line 1261 "src/compiler/ExpressionWriter.pv"
     return false;
 }

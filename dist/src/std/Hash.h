@@ -17,9 +17,8 @@ Hash Hash__continue_with(Hash self, void const* value, uintptr_t size);
 Hash Hash__Hash__hash(void* __self);
 
 #line 56 "src/std/Hash.pv"
-bool Hash__Eq_Hash__eq(void* __self, Hash other);
+bool Hash__Eq_Hash__eq(Hash self, Hash other);
 
 extern struct trait_HashVTable HASH__VTABLE__HASH;
-extern struct trait_Eq_HashVTable HASH__VTABLE__EQ;
 
 #endif

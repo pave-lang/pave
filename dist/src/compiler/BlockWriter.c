@@ -165,7 +165,7 @@ bool BlockWriter__write_if_let_enum_variant(struct BlockWriter* self, FILE* file
             #line 56 "src/compiler/BlockWriter.pv"
             while (field_i < enum_variant->names.length) {
                 #line 57 "src/compiler/BlockWriter.pv"
-                if (str__Eq_str__eq(&enum_variant->names.data[field_i], param_iter->field_name)) {
+                if (str__Eq_str__eq(enum_variant->names.data[field_i], param_iter->field_name)) {
                     #line 57 "src/compiler/BlockWriter.pv"
                     break;
                 }
@@ -467,7 +467,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                         struct DestructureBinding* binding = Iter_ref_DestructureBinding__value(&__iter);
 
                         #line 214 "src/compiler/BlockWriter.pv"
-                        if (!str__Eq_str__eq(&binding->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+                        if (!str__Eq_str__eq(binding->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
                             #line 215 "src/compiler/BlockWriter.pv"
                             FunctionContext__add_variable(function_context, binding->name->value, binding->type);
                         }
@@ -565,7 +565,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                     struct DestructureBinding* binding = Iter_ref_DestructureBinding__value(&__iter);
 
                     #line 266 "src/compiler/BlockWriter.pv"
-                    if (str__Eq_str__eq(&binding->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+                    if (str__Eq_str__eq(binding->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
                         #line 267 "src/compiler/BlockWriter.pv"
                         binding_index += 1;
                         #line 268 "src/compiler/BlockWriter.pv"
@@ -1175,7 +1175,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                         #line 555 "src/compiler/BlockWriter.pv"
                                         while (field_i < enum_variant->names.length) {
                                             #line 556 "src/compiler/BlockWriter.pv"
-                                            if (str__Eq_str__eq(&enum_variant->names.data[field_i], param_iter->field_name)) {
+                                            if (str__Eq_str__eq(enum_variant->names.data[field_i], param_iter->field_name)) {
                                                 #line 556 "src/compiler/BlockWriter.pv"
                                                 break;
                                             }
@@ -1452,7 +1452,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                             struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
                             #line 692 "src/compiler/BlockWriter.pv"
-                            if (!str__Eq_str__eq(&variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+                            if (!str__Eq_str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
                                 #line 693 "src/compiler/BlockWriter.pv"
                                 Generator__write_line_directive(generator, file, block->context, variable->name);
                                 #line 694 "src/compiler/BlockWriter.pv"
@@ -1562,7 +1562,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                 struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
                                 #line 745 "src/compiler/BlockWriter.pv"
-                                if (!str__Eq_str__eq(&variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+                                if (!str__Eq_str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
                                     #line 746 "src/compiler/BlockWriter.pv"
                                     Generator__write_line_directive(generator, file, block->context, variable->name);
                                     #line 747 "src/compiler/BlockWriter.pv"
@@ -1647,7 +1647,7 @@ bool BlockWriter__write_block(struct BlockWriter* self, FILE* file, struct Type*
                                 struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
                                 #line 785 "src/compiler/BlockWriter.pv"
-                                if (!str__Eq_str__eq(&variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+                                if (!str__Eq_str__eq(variable->name->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
                                     #line 786 "src/compiler/BlockWriter.pv"
                                     Generator__write_line_directive(generator, file, block->context, variable->name);
                                     #line 787 "src/compiler/BlockWriter.pv"

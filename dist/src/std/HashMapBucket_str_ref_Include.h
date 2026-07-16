@@ -5,7 +5,7 @@
 struct Include;
 struct HashMapBucket_str_ref_Include;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Include {
     struct str key;
     struct Include* value;

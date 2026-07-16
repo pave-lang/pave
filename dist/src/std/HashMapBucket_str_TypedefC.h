@@ -5,7 +5,7 @@
 #include <analyzer/c/TypedefC.h>
 struct HashMapBucket_str_TypedefC;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_TypedefC {
     struct str key;
     struct TypedefC value;

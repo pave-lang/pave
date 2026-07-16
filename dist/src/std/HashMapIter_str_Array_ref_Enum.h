@@ -5,7 +5,7 @@
 
 struct HashMapBucket_str_Array_ref_Enum;
 
-#line 10 "src/std/HashMap.pv"
+#line 11 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_ref_Enum {
     struct HashMapBucket_str_Array_ref_Enum* iter;
     struct HashMapBucket_str_Array_ref_Enum* end;
@@ -13,10 +13,10 @@ struct HashMapIter_str_Array_ref_Enum {
 
 struct HashMapIter_str_Array_ref_Enum;
 
-#line 16 "src/std/HashMap.pv"
+#line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_ref_Enum__next(struct HashMapIter_str_Array_ref_Enum* self);
 
-#line 21 "src/std/HashMap.pv"
+#line 22 "src/std/HashMap.pv"
 struct tuple_str_Array_ref_Enum* HashMapIter_str_Array_ref_Enum__value(struct HashMapIter_str_Array_ref_Enum* self);
 
 #endif

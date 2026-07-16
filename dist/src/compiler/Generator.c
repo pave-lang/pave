@@ -33,6 +33,7 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/FunctionParent.h>
 #include <analyzer/types/EnumVariant.h>
+#include <char.h>
 #include <std/Hash.h>
 #include <std/Fnv1a.h>
 #include <std/Array_char.h>
@@ -800,7 +801,7 @@ bool Generator__write_instance_member_accessor(struct Generator* self, FILE* fil
 #line 401 "src/compiler/Generator.pv"
 bool Generator__write_literal(struct Generator* self, FILE* file, struct Type* type, struct str value) {
     #line 402 "src/compiler/Generator.pv"
-    if (value.length > 2 && value.ptr[0] == '0' && (value.ptr[1] == 'b' || value.ptr[1] == 'B')) {
+    if (value.length > 2 && char__Eq_char__eq(value.ptr[0], '0') && (char__Eq_char__eq(value.ptr[1], 'b') || char__Eq_char__eq(value.ptr[1], 'B'))) {
         #line 403 "src/compiler/Generator.pv"
         uint64_t acc = 0;
         #line 404 "src/compiler/Generator.pv"
@@ -842,7 +843,7 @@ bool Generator__write_literal(struct Generator* self, FILE* file, struct Type* t
             #line 425 "src/compiler/Generator.pv"
             struct Primitive* primitive_info = type->primitive_value;
             #line 426 "src/compiler/Generator.pv"
-            if (primitive_info != 0 && str__Eq_str__eq(&(*primitive_info).name, (struct str){ .ptr = "u64", .length = strlen("u64") })) {
+            if (primitive_info != 0 && str__Eq_str__eq((*primitive_info).name, (struct str){ .ptr = "u64", .length = strlen("u64") })) {
                 #line 427 "src/compiler/Generator.pv"
                 fprintf(file, "ULL");
             }
@@ -1036,7 +1037,7 @@ bool Generator__has_void_self_replacement(struct Parameter* parameter, struct Ge
             #line 518 "src/compiler/Generator.pv"
             struct Primitive* primitive_info = (*generics).self_type->primitive_value;
             #line 519 "src/compiler/Generator.pv"
-            if (primitive_info == 0 || !str__Eq_str__eq(&(*primitive_info).name, (struct str){ .ptr = "void", .length = strlen("void") })) {
+            if (primitive_info == 0 || !str__Eq_str__eq((*primitive_info).name, (struct str){ .ptr = "void", .length = strlen("void") })) {
                 #line 520 "src/compiler/Generator.pv"
                 return false;
             }

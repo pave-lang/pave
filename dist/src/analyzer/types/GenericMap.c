@@ -10,6 +10,7 @@
 #include <analyzer/types/Type.h>
 #include <std/str.h>
 #include <std/Iter_ref_Generic.h>
+#include <usize.h>
 #include <analyzer/Context.h>
 #include <std/Iter_ref_Type.h>
 #include <analyzer/types/GenericMap.h>
@@ -117,7 +118,7 @@ bool GenericMap__insert(struct GenericMap* self, struct str name, struct Type ty
 #line 68 "src/analyzer/types/GenericMap.pv"
 struct Type* GenericMap__get(struct GenericMap* self, struct str name) {
     #line 69 "src/analyzer/types/GenericMap.pv"
-    if (self->map.length == 0) {
+    if (usize__Eq_usize__eq(self->map.length, 0)) {
         #line 69 "src/analyzer/types/GenericMap.pv"
         return 0;
     }

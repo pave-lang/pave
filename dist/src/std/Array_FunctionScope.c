@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_FunctionScope.h>
 #include <compiler/FunctionScope.h>
+#include <usize.h>
 #include <std/Iter_ref_FunctionScope.h>
 #include <slice_FunctionScope.h>
 #include <std/Array_FunctionScope.h>
@@ -122,7 +123,7 @@ uintptr_t Array_FunctionScope__prepend(struct Array_FunctionScope* self, struct 
 #line 143 "src/std/Array.pv"
 bool Array_FunctionScope__remove_back(struct Array_FunctionScope* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_FunctionScope__remove_back(struct Array_FunctionScope* self) {
 #line 154 "src/std/Array.pv"
 struct FunctionScope* Array_FunctionScope__back(struct Array_FunctionScope* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

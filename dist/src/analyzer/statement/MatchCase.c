@@ -5,6 +5,7 @@
 #include <analyzer/Block.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
+#include <usize.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <analyzer/types/Generics.h>
@@ -27,7 +28,7 @@ bool MatchCase__parse(struct MatchCase* self, struct Context* context, struct Ge
     struct Array_MatchPattern patterns = Array_MatchPattern__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
 
     #line 22 "src/analyzer/statement/MatchCase.pv"
-    while (patterns.length == 0 || Context__check_next(context, TOKEN_TYPE__SYMBOL, "|")) {
+    while (usize__Eq_usize__eq(patterns.length, 0) || Context__check_next(context, TOKEN_TYPE__SYMBOL, "|")) {
         #line 23 "src/analyzer/statement/MatchCase.pv"
         struct MatchPattern pattern = (struct MatchPattern) { .type = MATCH_PATTERN__DEFAULT };
         #line 24 "src/analyzer/statement/MatchCase.pv"

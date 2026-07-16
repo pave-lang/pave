@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_InlayHint.h>
 #include <analyzer/InlayHint.h>
+#include <usize.h>
 #include <std/Iter_ref_InlayHint.h>
 #include <slice_InlayHint.h>
 #include <std/Array_InlayHint.h>
@@ -122,7 +123,7 @@ uintptr_t Array_InlayHint__prepend(struct Array_InlayHint* self, struct InlayHin
 #line 143 "src/std/Array.pv"
 bool Array_InlayHint__remove_back(struct Array_InlayHint* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_InlayHint__remove_back(struct Array_InlayHint* self) {
 #line 154 "src/std/Array.pv"
 struct InlayHint* Array_InlayHint__back(struct Array_InlayHint* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

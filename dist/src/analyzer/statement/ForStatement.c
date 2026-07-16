@@ -25,6 +25,7 @@
 #include <analyzer/types/Sequence.h>
 #include <analyzer/types/Indirect.h>
 #include <std/Iter_ref_ForVariable.h>
+#include <usize.h>
 #include <analyzer/Block.h>
 #include <analyzer/statement/ForStatement.h>
 
@@ -151,7 +152,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
                     #line 69 "src/analyzer/statement/ForStatement.pv"
                     struct Token* enum_name = enum_info->name;
                     #line 70 "src/analyzer/statement/ForStatement.pv"
-                    if (enum_name != 0 && str__Eq_str__eq(&enum_name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
+                    if (enum_name != 0 && str__Eq_str__eq(enum_name->value, (struct str){ .ptr = "Range", .length = strlen("Range") })) {
                         #line 71 "src/analyzer/statement/ForStatement.pv"
                         if (generic_map == 0) {
                             #line 71 "src/analyzer/statement/ForStatement.pv"
@@ -322,7 +323,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
             struct ForVariable* variable = Iter_ref_ForVariable__value(&__iter);
 
             #line 151 "src/analyzer/statement/ForStatement.pv"
-            if (for_statement.variables.length == 1) {
+            if (usize__Eq_usize__eq(for_statement.variables.length, 1)) {
                 #line 152 "src/analyzer/statement/ForStatement.pv"
                 variable->type = for_statement.value_type;
             } else {
@@ -386,7 +387,7 @@ struct ForStatement* ForStatement__parse(struct Block* parent_block, struct Cont
         struct ForVariable* variable2 = Iter_ref_ForVariable__value(&__iter);
 
         #line 184 "src/analyzer/statement/ForStatement.pv"
-        if (str__Eq_ptrc_char__eq(&variable2->name->value, "_")) {
+        if (str__Eq_ptrc_char__eq(variable2->name->value, "_")) {
             #line 184 "src/analyzer/statement/ForStatement.pv"
             continue;
         }

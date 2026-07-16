@@ -5,7 +5,7 @@
 
 struct HashMapBucket_str_TypedefC;
 
-#line 10 "src/std/HashMap.pv"
+#line 11 "src/std/HashMap.pv"
 struct HashMapIter_str_TypedefC {
     struct HashMapBucket_str_TypedefC* iter;
     struct HashMapBucket_str_TypedefC* end;
@@ -13,10 +13,10 @@ struct HashMapIter_str_TypedefC {
 
 struct HashMapIter_str_TypedefC;
 
-#line 16 "src/std/HashMap.pv"
+#line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_TypedefC__next(struct HashMapIter_str_TypedefC* self);
 
-#line 21 "src/std/HashMap.pv"
+#line 22 "src/std/HashMap.pv"
 struct tuple_str_TypedefC* HashMapIter_str_TypedefC__value(struct HashMapIter_str_TypedefC* self);
 
 #endif

@@ -11,6 +11,7 @@
 #include <std/GeneralPurposeAllocator.h>
 #include <std/Array_ptrc_char.h>
 #include <std/Range_i32.h>
+#include <i32.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Root.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
@@ -47,37 +48,37 @@ int32_t main(int32_t argc, char const** argv) {
         #line 21 "src/compiler/main.pv"
         if (in_clang_args) {
             #line 22 "src/compiler/main.pv"
-            if (strncmp(argv[i], "-std=c++", 8) == 0 || strncmp(argv[i], "-std=gnu++", 10) == 0) {
+            if (i32__Eq_i32__eq(strncmp(argv[i], "-std=c++", 8), 0) || i32__Eq_i32__eq(strncmp(argv[i], "-std=gnu++", 10), 0)) {
                 #line 23 "src/compiler/main.pv"
                 cpp_std_arg = argv[i];
-            } else if (strncmp(argv[i], "-std=", 5) == 0) {
+            } else if (i32__Eq_i32__eq(strncmp(argv[i], "-std=", 5), 0)) {
                 #line 25 "src/compiler/main.pv"
                 c_std_arg = argv[i];
             } else {
                 #line 27 "src/compiler/main.pv"
                 Array_ptrc_char__append(&clang_args, argv[i]);
             }
-        } else if (strncmp(argv[i], "-o", 3) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "-o", 3), 0)) {
             #line 30 "src/compiler/main.pv"
             i += 1;
             #line 31 "src/compiler/main.pv"
             output_folder = argv[i];
-        } else if (strncmp(argv[i], "--no-line-directives", 21) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "--no-line-directives", 21), 0)) {
             #line 33 "src/compiler/main.pv"
             output_line_directives = false;
-        } else if (strncmp(argv[i], "--output-separator=semicolon", 29) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "--output-separator=semicolon", 29), 0)) {
             #line 35 "src/compiler/main.pv"
             output_seperator = ";";
-        } else if (strncmp(argv[i], "--", 3) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "--", 3), 0)) {
             #line 37 "src/compiler/main.pv"
             in_clang_args = true;
-        } else if (strncmp(argv[i], "-std=c++", 8) == 0 || strncmp(argv[i], "-std=gnu++", 10) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "-std=c++", 8), 0) || i32__Eq_i32__eq(strncmp(argv[i], "-std=gnu++", 10), 0)) {
             #line 39 "src/compiler/main.pv"
             cpp_std_arg = argv[i];
-        } else if (strncmp(argv[i], "-std=", 5) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "-std=", 5), 0)) {
             #line 41 "src/compiler/main.pv"
             c_std_arg = argv[i];
-        } else if (strncmp(argv[i], "-I", 2) == 0) {
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "-I", 2), 0)) {
             #line 43 "src/compiler/main.pv"
             Array_ptrc_char__append(&clang_args, argv[i]);
         } else {

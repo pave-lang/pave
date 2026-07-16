@@ -10,9 +10,11 @@
 #include <std/trait_Allocator.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>
+#include <usize.h>
 #include <std/Array_ref_Trait.h>
 #include <analyzer/types/Trait.h>
 #include <std/String.h>
+#include <i32.h>
 #include <std/Array_char.h>
 #include <analyzer/Module.h>
 #include <std/HashMapIter_str_ref_Module.h>
@@ -67,7 +69,7 @@ bool Namespace__add_type(struct Namespace* self, struct str name, struct Type ty
         #line 47 "src/analyzer/Namespace.pv"
         while (i < arr->length) {
             #line 48 "src/analyzer/Namespace.pv"
-            if (Type__get_arity(&arr->data[i]) == arity) {
+            if (usize__Eq_usize__eq(Type__get_arity(&arr->data[i]), arity)) {
                 #line 48 "src/analyzer/Namespace.pv"
                 return false;
             }
@@ -99,7 +101,7 @@ bool Namespace__add_trait(struct Namespace* self, struct str name, struct Trait*
         #line 64 "src/analyzer/Namespace.pv"
         while (i < arr->length) {
             #line 65 "src/analyzer/Namespace.pv"
-            if (arr->data[i]->generic_arity == trait_info->generic_arity) {
+            if (usize__Eq_usize__eq(arr->data[i]->generic_arity, trait_info->generic_arity)) {
                 #line 65 "src/analyzer/Namespace.pv"
                 return false;
             }
@@ -183,7 +185,7 @@ bool Namespace__add_module(struct Namespace* self, struct str name) {
     String__append(&path, (struct str){ .ptr = ".pave", .length = strlen(".pave") });
 
     #line 113 "src/analyzer/Namespace.pv"
-    if (path_exists(String__c_str(&path)) == 0) {
+    if (i32__Eq_i32__eq(path_exists(String__c_str(&path)), 0)) {
         #line 114 "src/analyzer/Namespace.pv"
         path.array.length -= 5;
         #line 115 "src/analyzer/Namespace.pv"
@@ -441,7 +443,7 @@ struct Module* Namespace__find_module_by_path(struct Namespace* self, struct str
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
         #line 223 "src/analyzer/Namespace.pv"
-        if (str__Eq_str__eq(&module->path, path)) {
+        if (str__Eq_str__eq(module->path, path)) {
             #line 223 "src/analyzer/Namespace.pv"
             return module;
         }
@@ -479,7 +481,7 @@ struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintp
     #line 236 "src/analyzer/Namespace.pv"
     while (i < arr->length) {
         #line 237 "src/analyzer/Namespace.pv"
-        if (Type__get_arity(&arr->data[i]) == arity) {
+        if (usize__Eq_usize__eq(Type__get_arity(&arr->data[i]), arity)) {
             #line 237 "src/analyzer/Namespace.pv"
             return &arr->data[i];
         }
@@ -506,7 +508,7 @@ struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uin
         #line 248 "src/analyzer/Namespace.pv"
         struct Trait* trait_info = arr->data[i];
         #line 249 "src/analyzer/Namespace.pv"
-        if (trait_info->generic_arity == arity) {
+        if (usize__Eq_usize__eq(trait_info->generic_arity, arity)) {
             #line 249 "src/analyzer/Namespace.pv"
             return trait_info;
         }

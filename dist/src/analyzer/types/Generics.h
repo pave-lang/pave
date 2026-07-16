@@ -7,7 +7,7 @@
 #include <std/HashMap_str_usize.h>
 struct Generics;
 
-#line 42 "src/analyzer/types/Generics.pv"
+#line 50 "src/analyzer/types/Generics.pv"
 struct Generics {
     struct Generics* parent;
     struct Array_Generic array;
@@ -21,19 +21,19 @@ struct Generics;
 struct Generic;
 struct Context;
 
-#line 49 "src/analyzer/types/Generics.pv"
+#line 57 "src/analyzer/types/Generics.pv"
 struct Generics Generics__new(struct trait_Allocator allocator);
 
-#line 57 "src/analyzer/types/Generics.pv"
+#line 65 "src/analyzer/types/Generics.pv"
 bool Generics__has(struct Generics* self, struct str name);
 
-#line 64 "src/analyzer/types/Generics.pv"
+#line 72 "src/analyzer/types/Generics.pv"
 struct Generic* Generics__find(struct Generics* self, struct str name);
 
-#line 76 "src/analyzer/types/Generics.pv"
+#line 84 "src/analyzer/types/Generics.pv"
 bool Generics__parse(struct Generics* self, struct Context* context);
 
-#line 98 "src/analyzer/types/Generics.pv"
+#line 108 "src/analyzer/types/Generics.pv"
 bool Generics__is_empty(struct Generics* self);
 
 #endif

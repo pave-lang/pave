@@ -799,7 +799,6 @@ impl ExpressionWriter {
 
                         match func_info.parent {
                             FunctionParent::Trait(trait_info) => {
-                                let trait_name = *trait_info.name;
                                 if !args.next() {
                                     fprintf(stderr, "Trait function call missing instance argument\n");
                                     return false;
@@ -822,11 +821,9 @@ impl ExpressionWriter {
                                         success = generator.write_function_name(file, type_impl_function, &resolved_generics) && success;
                                     } else {
                                         let parent_name = generator.naming_ident.get_type_name(arg.value.return_type.deref(), generics.self_type, generics);
-                                        success = generator.write_str(file, parent_name.as_str()) && success;
-                                        fprintf(file, "__");
-                                        success = generator.write_str(file, trait_name.value) && success;
-                                        fprintf(file, "__");
-                                        success = generator.write_str(file, name) && success;
+                                        let resolved_trait_type = Type::Trait(trait_info, generator.allocator.store(&resolved_generics));
+                                        let function_name = generator.get_trait_function_name(parent_name.as_str(), trait_info, &resolved_trait_type, func_info, generics);
+                                        success = generator.write_string(file, &function_name) && success;
                                     }
                                     fprintf(file, "(");
                                     success = self.write_expression(file, arg.value, generics) && success;

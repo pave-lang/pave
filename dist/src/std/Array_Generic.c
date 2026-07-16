@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_Generic.h>
 #include <analyzer/types/Generic.h>
+#include <usize.h>
 #include <std/Iter_ref_Generic.h>
 #include <slice_Generic.h>
 #include <std/Array_Generic.h>
@@ -122,7 +123,7 @@ uintptr_t Array_Generic__prepend(struct Array_Generic* self, struct Generic valu
 #line 143 "src/std/Array.pv"
 bool Array_Generic__remove_back(struct Array_Generic* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_Generic__remove_back(struct Array_Generic* self) {
 #line 154 "src/std/Array.pv"
 struct Generic* Array_Generic__back(struct Array_Generic* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

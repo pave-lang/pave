@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
 #include <std/HashMap_usize_TypeFunctionUsage.h>
+#include <usize.h>
 #include <std/Iter_ref_HashMap_usize_TypeFunctionUsage.h>
 #include <slice_HashMap_usize_TypeFunctionUsage.h>
 #include <std/Array_HashMap_usize_TypeFunctionUsage.h>
@@ -122,7 +123,7 @@ uintptr_t Array_HashMap_usize_TypeFunctionUsage__prepend(struct Array_HashMap_us
 #line 143 "src/std/Array.pv"
 bool Array_HashMap_usize_TypeFunctionUsage__remove_back(struct Array_HashMap_usize_TypeFunctionUsage* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_HashMap_usize_TypeFunctionUsage__remove_back(struct Array_HashMap_usi
 #line 154 "src/std/Array.pv"
 struct HashMap_usize_TypeFunctionUsage* Array_HashMap_usize_TypeFunctionUsage__back(struct Array_HashMap_usize_TypeFunctionUsage* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

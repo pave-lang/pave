@@ -6,7 +6,10 @@
 #include <stdio.h>
 #include <std/String.h>
 #include <std/trait_Allocator.h>
+#include <u64.h>
+#include <usize.h>
 #include <std/str.h>
+#include <i32.h>
 #include <std/trait_Writer.h>
 #include <std/String.h>
 
@@ -121,7 +124,7 @@ void String__append_u64(struct String* self, uint64_t value) {
     struct Array_char* array = &self->array;
 
     #line 80 "src/std/String.pv"
-    if (value == 0) {
+    if (u64__Eq_u64__eq(value, 0)) {
         #line 81 "src/std/String.pv"
         String__ensure_can_hold(self, 1);
         #line 82 "src/std/String.pv"
@@ -145,7 +148,7 @@ void String__append_usize(struct String* self, uintptr_t value) {
     struct Array_char* array = &self->array;
 
     #line 95 "src/std/String.pv"
-    if (value == 0) {
+    if (usize__Eq_usize__eq(value, 0)) {
         #line 96 "src/std/String.pv"
         String__ensure_can_hold(self, 1);
         #line 97 "src/std/String.pv"
@@ -255,7 +258,7 @@ bool String__eq(struct String* self, char const* s) {
     }
 
     #line 163 "src/std/String.pv"
-    return strncmp(self->array.data, s, length) == 0;
+    return i32__Eq_i32__eq(strncmp(self->array.data, s, length), 0);
 }
 
 #line 166 "src/std/String.pv"

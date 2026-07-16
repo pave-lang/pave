@@ -25,10 +25,12 @@
 #include <analyzer/types/Struct.h>
 #include <std/Array_ref_Struct.h>
 #include <analyzer/Impl.h>
+#include <usize.h>
 #include <analyzer/types/Trait.h>
 #include <std/Array_ref_Trait.h>
 #include <analyzer/types/Function.h>
 #include <std/String.h>
+#include <char.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/TestInfo.h>
 #include <analyzer/types/Global.h>
@@ -392,7 +394,7 @@ bool Module__parse(struct Module* self) {
             struct Impl node = Impl__parse(context);
 
             #line 216 "src/analyzer/Module.pv"
-            if (node.token_start == node.token_end) {
+            if (usize__Eq_usize__eq(node.token_start, node.token_end)) {
                 #line 217 "src/analyzer/Module.pv"
                 result = false;
             } else {
@@ -486,7 +488,7 @@ bool Module__parse(struct Module* self) {
                 #line 271 "src/analyzer/Module.pv"
                 char pch = mod_path.ptr[pi];
                 #line 272 "src/analyzer/Module.pv"
-                if (pch == '/' || pch == '\\') {
+                if (char__Eq_char__eq(pch, '/') || char__Eq_char__eq(pch, '\\')) {
                     #line 272 "src/analyzer/Module.pv"
                     last_sep = (intptr_t)(pi);
                 }
@@ -503,7 +505,7 @@ bool Module__parse(struct Module* self) {
             #line 277 "src/analyzer/Module.pv"
             uintptr_t stem_end = mod_path.length;
             #line 278 "src/analyzer/Module.pv"
-            if (stem_end >= 3 && str__Eq_str__eq((struct str[]){str__slice(mod_path, stem_end - 3, stem_end)}, (struct str){ .ptr = ".pv", .length = strlen(".pv") })) {
+            if (stem_end >= 3 && str__Eq_str__eq(str__slice(mod_path, stem_end - 3, stem_end), (struct str){ .ptr = ".pv", .length = strlen(".pv") })) {
                 #line 279 "src/analyzer/Module.pv"
                 stem_end = stem_end - 3;
             }
@@ -884,7 +886,7 @@ bool Module__prefill_types(struct Module* self) {
         struct Namespace* namespace = *Iter_ref_ref_Namespace__value(&__iter);
 
         #line 465 "src/analyzer/Module.pv"
-        if (str__Eq_str__eq(&namespace->name, (struct str){ .ptr = "std", .length = strlen("std") })) {
+        if (str__Eq_str__eq(namespace->name, (struct str){ .ptr = "std", .length = strlen("std") })) {
             #line 466 "src/analyzer/Module.pv"
             struct Generic t = Generic__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->context.allocator });
             #line 467 "src/analyzer/Module.pv"
@@ -1375,7 +1377,7 @@ bool Module__parse_functions(struct Module* self) {
 #line 671 "src/analyzer/Module.pv"
 bool Module__parse_functions_if_path(struct Module* self, struct str path) {
     #line 672 "src/analyzer/Module.pv"
-    if (!str__Eq_str__eq(&self->path, path)) {
+    if (!str__Eq_str__eq(self->path, path)) {
         #line 672 "src/analyzer/Module.pv"
         return false;
     }

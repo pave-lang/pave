@@ -20,6 +20,7 @@
 #include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>
 #include <std/Array_ref_Token.h>
+#include <usize.h>
 #include <analyzer/types/Tuple.h>
 #include <std/Array_Type.h>
 #include <analyzer/statement/DestructureBinding.h>
@@ -218,7 +219,7 @@ struct LetStatement* LetStatement__parse_destructure(struct Context* context, st
     }
 
     #line 125 "src/analyzer/statement/LetStatement.pv"
-    if (names.length == 0) {
+    if (usize__Eq_usize__eq(names.length, 0)) {
         #line 126 "src/analyzer/statement/LetStatement.pv"
         Context__error_token(context, first_token, "Destructuring let requires at least one binding");
         #line 127 "src/analyzer/statement/LetStatement.pv"
@@ -290,7 +291,7 @@ struct LetStatement* LetStatement__parse_destructure(struct Context* context, st
         #line 158 "src/analyzer/statement/LetStatement.pv"
         struct Type* element_type = &tuple_ref->elements.data[bi];
         #line 159 "src/analyzer/statement/LetStatement.pv"
-        if (!str__Eq_str__eq(&name_token->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
+        if (!str__Eq_str__eq(name_token->value, (struct str){ .ptr = "_", .length = strlen("_") })) {
             #line 160 "src/analyzer/statement/LetStatement.pv"
             if (!Context__set_value(context, name_token, element_type)) {
                 #line 160 "src/analyzer/statement/LetStatement.pv"

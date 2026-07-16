@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include <compiler/FileWriter.h>
+#include <usize.h>
 #include <std/str.h>
 #include <analyzer/Token.h>
 #include <compiler/FileWriter.h>
@@ -24,7 +25,7 @@ void FileWriter__add_indent(struct FileWriter* self) {
 #line 20 "src/compiler/FileWriter.pv"
 bool FileWriter__remove_indent(struct FileWriter* self) {
     #line 21 "src/compiler/FileWriter.pv"
-    if (self->indent == 0) {
+    if (usize__Eq_usize__eq(self->indent, 0)) {
         #line 22 "src/compiler/FileWriter.pv"
         return false;
     }

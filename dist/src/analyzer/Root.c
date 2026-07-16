@@ -25,7 +25,6 @@
 #include <analyzer/TokenType.h>
 #include <analyzer/types/Parameter.h>
 #include <analyzer/types/Generic.h>
-#include <std/Array_ref_Trait.h>
 #include <std/HashMapIter_str_Primitive.h>
 #include <tuple_str_Primitive.h>
 #include <std/Iter_ref_ptrc_char.h>
@@ -57,6 +56,8 @@
 #include <tuple_str_Function.h>
 #include <analyzer/Context.h>
 #include <analyzer/Module.h>
+#include <usize.h>
+#include <std/Array_ref_Trait.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
 #include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
@@ -174,7 +175,7 @@ struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char*
         .typed_variadic = false,
         .name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__IDENTIFIER, .value = (struct str){ .ptr = "value", .length = strlen("value") }, .start_line = 0, .start_column = 0, .end_line = 0, .end_column = 0 }}),
         .parameters = Array_Parameter__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }),
-        .return_type = (struct Type) { .type = TYPE__GENERIC, .generic_value = ArenaAllocator__store_Generic(allocator, (struct Generic[]){(struct Generic) { .name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__IDENTIFIER, .value = (struct str){ .ptr = "T", .length = strlen("T") }, .start_line = 0, .start_column = 0, .end_line = 0, .end_column = 0 }}), .traits = (struct Array_ref_Trait) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }, .data = 0, .length = 0, .capacity = 0 } }}) },
+        .return_type = (struct Type) { .type = TYPE__GENERIC, .generic_value = ArenaAllocator__store_Generic(allocator, (struct Generic[]){(struct Generic) { .name = ArenaAllocator__store_Token(allocator, (struct Token[]){(struct Token) { .type = TOKEN_TYPE__IDENTIFIER, .value = (struct str){ .ptr = "T", .length = strlen("T") }, .start_line = 0, .start_column = 0, .end_line = 0, .end_column = 0 }}), .traits = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator }, .data = 0, .length = 0, .capacity = 0 } }}) },
         .context = 0,
         .declaration_start = 0,
         .declaration_end = 0,
@@ -378,7 +379,7 @@ bool Root__type_impl_target_eq(struct Root* self, struct Type* left, struct Type
                         return false;
                     }
                     #line 212 "src/analyzer/Root.pv"
-                    return str__Eq_str__eq(&left_primitive->name, right_primitive->name);
+                    return str__Eq_str__eq(left_primitive->name, right_primitive->name);
                 } break;
                 #line 214 "src/analyzer/Root.pv"
                 default: {
@@ -584,7 +585,7 @@ bool Root__type_impl_target_eq(struct Root* self, struct Type* left, struct Type
                     #line 291 "src/analyzer/Root.pv"
                     struct TypedefC* right_typedef = right->typedefc_value;
                     #line 291 "src/analyzer/Root.pv"
-                    return str__Eq_str__eq(&left_typedef->name, right_typedef->name);
+                    return str__Eq_str__eq(left_typedef->name, right_typedef->name);
                 } break;
                 #line 292 "src/analyzer/Root.pv"
                 default: {
@@ -604,7 +605,7 @@ bool Root__type_impl_target_eq(struct Root* self, struct Type* left, struct Type
                     #line 297 "src/analyzer/Root.pv"
                     struct EnumC* right_enum = right->enumc_value;
                     #line 297 "src/analyzer/Root.pv"
-                    return str__Eq_str__eq(&left_enum->name, right_enum->name);
+                    return str__Eq_str__eq(left_enum->name, right_enum->name);
                 } break;
                 #line 298 "src/analyzer/Root.pv"
                 default: {
@@ -622,7 +623,7 @@ bool Root__type_impl_target_eq(struct Root* self, struct Type* left, struct Type
                     #line 303 "src/analyzer/Root.pv"
                     struct StructC* right_struct = right->structc_value;
                     #line 303 "src/analyzer/Root.pv"
-                    return str__Eq_str__eq(&left_struct->name, right_struct->name);
+                    return str__Eq_str__eq(left_struct->name, right_struct->name);
                 } break;
                 #line 304 "src/analyzer/Root.pv"
                 default: {
@@ -640,7 +641,7 @@ bool Root__type_impl_target_eq(struct Root* self, struct Type* left, struct Type
                     #line 309 "src/analyzer/Root.pv"
                     struct StructC* right_union = right->unionc_value;
                     #line 309 "src/analyzer/Root.pv"
-                    return str__Eq_str__eq(&left_union->name, right_union->name);
+                    return str__Eq_str__eq(left_union->name, right_union->name);
                 } break;
                 #line 310 "src/analyzer/Root.pv"
                 default: {
@@ -923,7 +924,7 @@ bool Root__parse_functions_if_path(struct Root* self, struct str path) {
             struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
             #line 431 "src/analyzer/Root.pv"
-            if (str__Eq_str__eq(&impl_info->context->path, path)) {
+            if (str__Eq_str__eq(impl_info->context->path, path)) {
                 #line 432 "src/analyzer/Root.pv"
                 Impl__parse_functions(impl_info);
                 #line 433 "src/analyzer/Root.pv"
@@ -971,7 +972,7 @@ struct Type* Root__find_type(struct Root* self, struct str name, uintptr_t arity
     #line 453 "src/analyzer/Root.pv"
     while (i < arr->length) {
         #line 454 "src/analyzer/Root.pv"
-        if (Type__get_arity(&arr->data[i]) == arity) {
+        if (usize__Eq_usize__eq(Type__get_arity(&arr->data[i]), arity)) {
             #line 454 "src/analyzer/Root.pv"
             return &arr->data[i];
         }
@@ -998,7 +999,7 @@ struct Trait* Root__find_trait(struct Root* self, struct str name, uintptr_t ari
         #line 465 "src/analyzer/Root.pv"
         struct Trait* trait_info = arr->data[i];
         #line 466 "src/analyzer/Root.pv"
-        if (trait_info->generic_arity == arity) {
+        if (usize__Eq_usize__eq(trait_info->generic_arity, arity)) {
             #line 466 "src/analyzer/Root.pv"
             return trait_info;
         }

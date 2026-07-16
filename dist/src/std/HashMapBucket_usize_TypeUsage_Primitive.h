@@ -6,7 +6,7 @@
 #include <compiler/TypeUsage_Primitive.h>
 struct HashMapBucket_usize_TypeUsage_Primitive;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Primitive {
     uintptr_t key;
     struct TypeUsage_Primitive value;

@@ -13,7 +13,7 @@ void test_str__trim() {
     #line 169 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "  hello  ", .length = strlen("  hello  ") };
     #line 170 "src/std/str.pv"
-    if (!str__Eq_str__eq((struct str[]){str__trim(s)}, (struct str){ .ptr = "hello", .length = strlen("hello") })) {
+    if (!str__Eq_str__eq(str__trim(s), (struct str){ .ptr = "hello", .length = strlen("hello") })) {
         #line 170 "src/std/str.pv"
         abort();
     }

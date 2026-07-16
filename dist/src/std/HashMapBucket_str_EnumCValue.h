@@ -5,7 +5,7 @@
 #include <analyzer/c/EnumCValue.h>
 struct HashMapBucket_str_EnumCValue;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_EnumCValue {
     struct str key;
     struct EnumCValue value;

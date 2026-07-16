@@ -1054,9 +1054,14 @@ impl Processor {
             },
             Type::Generic(generic) => {
                 if is_static { return; }
-                for *trait_info in generic.traits {
-                    for (_, &func_info) in trait_info.functions {
-                        self.append_function_completion(result, seen, func_info, 2, context, !is_static);
+                for trait_type in generic.traits {
+                    match trait_type {
+                        Type::Trait(trait_info, _) => {
+                            for (_, &func_info) in trait_info.functions {
+                                self.append_function_completion(result, seen, func_info, 2, context, !is_static);
+                            }
+                        },
+                        _ => {},
                     }
                 }
             },

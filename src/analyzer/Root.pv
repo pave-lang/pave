@@ -117,7 +117,7 @@ impl Root {
             typed_variadic: false,
             name: allocator.store(&Token { type: TokenType::Identifier, value: "value", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }),
             parameters: Array<Parameter>::new(allocator),
-            return_type: Type::Generic(allocator.store(&Generic { name: allocator.store(&Token { type: TokenType::Identifier, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), traits: Array<&Trait> { allocator, data: null, length: 0, capacity: 0 } })),
+            return_type: Type::Generic(allocator.store(&Generic { name: allocator.store(&Token { type: TokenType::Identifier, value: "T", start_line: 0, start_column: 0, end_line: 0, end_column: 0 }), traits: Array<Type> { allocator, data: null, length: 0, capacity: 0 } })),
             context: null,
             declaration_start: 0,
             declaration_end: 0,

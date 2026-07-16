@@ -5,7 +5,7 @@
 struct Global;
 struct HashMapBucket_str_ref_Global;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Global {
     struct str key;
     struct Global* value;

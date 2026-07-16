@@ -6,7 +6,7 @@
 #include <std/str.h>
 struct HashMapBucket_str_i64;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_i64 {
     struct str key;
     int64_t value;

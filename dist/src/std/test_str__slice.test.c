@@ -14,12 +14,12 @@ void test_str__slice() {
     #line 145 "src/std/str.pv"
     struct str s = (struct str){ .ptr = "hello world", .length = strlen("hello world") };
     #line 146 "src/std/str.pv"
-    if (!str__Eq_str__eq((struct str[]){str__slice(s, 6, 11)}, (struct str){ .ptr = "world", .length = strlen("world") })) {
+    if (!str__Eq_str__eq(str__slice(s, 6, 11), (struct str){ .ptr = "world", .length = strlen("world") })) {
         #line 146 "src/std/str.pv"
         abort();
     }
     #line 147 "src/std/str.pv"
-    if (!str__Eq_str__eq((struct str[]){str__slice(s, 0, 5)}, (struct str){ .ptr = "hello", .length = strlen("hello") })) {
+    if (!str__Eq_str__eq(str__slice(s, 0, 5), (struct str){ .ptr = "hello", .length = strlen("hello") })) {
         #line 147 "src/std/str.pv"
         abort();
     }

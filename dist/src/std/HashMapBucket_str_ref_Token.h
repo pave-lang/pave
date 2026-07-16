@@ -5,7 +5,7 @@
 struct Token;
 struct HashMapBucket_str_ref_Token;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Token {
     struct str key;
     struct Token* value;

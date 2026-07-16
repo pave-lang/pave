@@ -15,7 +15,7 @@ void test_str__eq___equal_strings() {
     #line 128 "src/std/str.pv"
     struct str b = (struct str){ .ptr = "hello", .length = strlen("hello") };
     #line 129 "src/std/str.pv"
-    if (!str__Eq_str__eq(&a, b)) {
+    if (!str__Eq_str__eq(a, b)) {
         #line 129 "src/std/str.pv"
         abort();
     }

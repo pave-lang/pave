@@ -10,6 +10,7 @@
 #include <std/Hash.h>
 #include <std/trait_Hash.h>
 #include <usize.h>
+#include <u64.h>
 #include <std/HashSetIter_usize.h>
 #include <std/HashSet_usize.h>
 
@@ -62,7 +63,7 @@ bool HashSet_usize__has(struct HashSet_usize* self, uintptr_t* value) {
     #line 63 "src/std/HashSet.pv"
     while (current_bucket_node != 0) {
         #line 64 "src/std/HashSet.pv"
-        if (usize__Hash__hash(&current_bucket_node->value) == hash) {
+        if (u64__Eq_u64__eq(usize__Hash__hash(&current_bucket_node->value), hash)) {
             #line 65 "src/std/HashSet.pv"
             return true;
         }

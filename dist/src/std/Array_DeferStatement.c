@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
+#include <usize.h>
 #include <std/Iter_ref_DeferStatement.h>
 #include <slice_DeferStatement.h>
 #include <std/Array_DeferStatement.h>
@@ -122,7 +123,7 @@ uintptr_t Array_DeferStatement__prepend(struct Array_DeferStatement* self, struc
 #line 143 "src/std/Array.pv"
 bool Array_DeferStatement__remove_back(struct Array_DeferStatement* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_DeferStatement__remove_back(struct Array_DeferStatement* self) {
 #line 154 "src/std/Array.pv"
 struct DeferStatement* Array_DeferStatement__back(struct Array_DeferStatement* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

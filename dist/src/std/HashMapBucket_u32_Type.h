@@ -6,7 +6,7 @@
 #include <analyzer/types/Type.h>
 struct HashMapBucket_u32_Type;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_u32_Type {
     uint32_t key;
     struct Type value;

@@ -5,7 +5,7 @@
 #include <std/Array_InlayHint.h>
 struct HashMapBucket_str_Array_InlayHint;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_InlayHint {
     struct str key;
     struct Array_InlayHint value;

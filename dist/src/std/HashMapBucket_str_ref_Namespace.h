@@ -5,7 +5,7 @@
 struct Namespace;
 struct HashMapBucket_str_ref_Namespace;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Namespace {
     struct str key;
     struct Namespace* value;

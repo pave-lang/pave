@@ -16,6 +16,7 @@
 #include <std/String.h>
 #include <std/HashMapIter_str_Function.h>
 #include <tuple_str_Function.h>
+#include <usize.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <analyzer/Root.h>
@@ -194,7 +195,7 @@ bool Trait__has_dynamic_dispatch(struct Trait* self) {
         struct Function* func = &HashMapIter_str_Function__value(&__iter)->_1;
 
         #line 103 "src/analyzer/types/Trait.pv"
-        if (func->parameters.length == 0) {
+        if (usize__Eq_usize__eq(func->parameters.length, 0)) {
             #line 103 "src/analyzer/types/Trait.pv"
             continue;
         }

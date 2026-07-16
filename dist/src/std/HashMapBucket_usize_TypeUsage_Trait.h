@@ -6,7 +6,7 @@
 #include <compiler/TypeUsage_Trait.h>
 struct HashMapBucket_usize_TypeUsage_Trait;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Trait {
     uintptr_t key;
     struct TypeUsage_Trait value;

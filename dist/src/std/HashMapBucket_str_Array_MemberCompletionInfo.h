@@ -5,7 +5,7 @@
 #include <std/Array_MemberCompletionInfo.h>
 struct HashMapBucket_str_Array_MemberCompletionInfo;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_MemberCompletionInfo {
     struct str key;
     struct Array_MemberCompletionInfo value;

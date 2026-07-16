@@ -15,6 +15,7 @@
 #include <std/str.h>
 #include <analyzer/Token.h>
 #include <analyzer/InlayHintKind.h>
+#include <usize.h>
 #include <analyzer/types/Global.h>
 
 #include <analyzer/types/Global.h>
@@ -111,5 +112,5 @@ bool Global__parse_types(struct Global* self) {
     self->value = expression;
 
     #line 67 "src/analyzer/types/Global.pv"
-    return context->pos == self->token_end;
+    return usize__Eq_usize__eq(context->pos, self->token_end);
 }

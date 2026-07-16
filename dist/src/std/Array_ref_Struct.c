@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_ref_Struct.h>
 #include <analyzer/types/Struct.h>
+#include <usize.h>
 #include <std/Iter_ref_ref_Struct.h>
 #include <slice_ref_Struct.h>
 #include <std/Array_ref_Struct.h>
@@ -122,7 +123,7 @@ uintptr_t Array_ref_Struct__prepend(struct Array_ref_Struct* self, struct Struct
 #line 143 "src/std/Array.pv"
 bool Array_ref_Struct__remove_back(struct Array_ref_Struct* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_ref_Struct__remove_back(struct Array_ref_Struct* self) {
 #line 154 "src/std/Array.pv"
 struct Struct** Array_ref_Struct__back(struct Array_ref_Struct* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

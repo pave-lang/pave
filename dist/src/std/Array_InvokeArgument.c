@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_InvokeArgument.h>
 #include <analyzer/expression/InvokeArgument.h>
+#include <usize.h>
 #include <std/Iter_ref_InvokeArgument.h>
 #include <slice_InvokeArgument.h>
 #include <std/Array_InvokeArgument.h>
@@ -122,7 +123,7 @@ uintptr_t Array_InvokeArgument__prepend(struct Array_InvokeArgument* self, struc
 #line 143 "src/std/Array.pv"
 bool Array_InvokeArgument__remove_back(struct Array_InvokeArgument* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_InvokeArgument__remove_back(struct Array_InvokeArgument* self) {
 #line 154 "src/std/Array.pv"
 struct InvokeArgument* Array_InvokeArgument__back(struct Array_InvokeArgument* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

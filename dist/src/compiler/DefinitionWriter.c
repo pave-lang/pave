@@ -48,6 +48,7 @@
 #include <std/Array_Type.h>
 #include <std/Array_str.h>
 #include <std/Iter_ref_Type.h>
+#include <usize.h>
 #include <compiler/IncludeWriter.h>
 #include <std/HashMap_str_Type.h>
 #include <std/IterEnumerate_ref_ref_Impl.h>
@@ -849,7 +850,7 @@ bool DefinitionWriter__write_enum_definition(struct DefinitionWriter* self, FILE
                 Generator__write_str_lowercase(generator, file, variant->name->value);
                 #line 419 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "_value;\n");
-            } else if (variant->types.length == 1) {
+            } else if (usize__Eq_usize__eq(variant->types.length, 1)) {
                 #line 421 "src/compiler/DefinitionWriter.pv"
                 Generator__write_indent(generator, file);
                 #line 422 "src/compiler/DefinitionWriter.pv"
@@ -950,7 +951,7 @@ bool DefinitionWriter__write_enum_definition(struct DefinitionWriter* self, FILE
             }
 
             #line 466 "src/compiler/DefinitionWriter.pv"
-            if (func_info->generics.array.length == 0) {
+            if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                 #line 467 "src/compiler/DefinitionWriter.pv"
                 fprintf(file, "\n");
                 #line 468 "src/compiler/DefinitionWriter.pv"
@@ -1172,7 +1173,7 @@ bool DefinitionWriter__write_struct_definition(struct DefinitionWriter* self, FI
             }
 
             #line 570 "src/compiler/DefinitionWriter.pv"
-            if (func_info->generics.array.length == 0) {
+            if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                 #line 571 "src/compiler/DefinitionWriter.pv"
                 if (trait_info == 0) {
                     #line 572 "src/compiler/DefinitionWriter.pv"
@@ -1244,7 +1245,7 @@ bool DefinitionWriter__write_struct_definition(struct DefinitionWriter* self, FI
                     }
 
                     #line 607 "src/compiler/DefinitionWriter.pv"
-                    if (function_usage->impl_dynamic_function && func_info->generics.array.length == 0) {
+                    if (function_usage->impl_dynamic_function && usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                         #line 608 "src/compiler/DefinitionWriter.pv"
                         DefinitionWriter__write_dynamic_function_instance_header(self, file, func_info, struct_name.value, generics, func_info->type == FUNCTION_TYPE__COROUTINE);
                     }
@@ -1362,7 +1363,7 @@ bool DefinitionWriter__write_impl_definition(struct DefinitionWriter* self, FILE
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
         #line 662 "src/compiler/DefinitionWriter.pv"
-        if (func_info->generics.array.length == 0) {
+        if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
             #line 663 "src/compiler/DefinitionWriter.pv"
             if (trait_info == 0) {
                 #line 664 "src/compiler/DefinitionWriter.pv"
@@ -1501,7 +1502,7 @@ bool DefinitionWriter__write_trait_definition(struct DefinitionWriter* self, FIL
         struct Function* func_info = &HashMapIter_str_Function__value(&__iter)->_1;
 
         #line 726 "src/compiler/DefinitionWriter.pv"
-        if (func_info->generics.array.length == 0) {
+        if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
             #line 727 "src/compiler/DefinitionWriter.pv"
             struct Token* name = func_info->name;
             #line 728 "src/compiler/DefinitionWriter.pv"
@@ -2166,7 +2167,7 @@ bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, st
             }
 
             #line 1079 "src/compiler/DefinitionWriter.pv"
-            if (func_info->generics.array.length == 0) {
+            if (usize__Eq_usize__eq(func_info->generics.array.length, 0)) {
                 #line 1082 "src/compiler/DefinitionWriter.pv"
                 struct UsageContext* function_usage_context = 0;
                 #line 1083 "src/compiler/DefinitionWriter.pv"

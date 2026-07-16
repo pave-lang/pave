@@ -44,6 +44,9 @@ all:
 	rm -rf dist/src
 	cp -r $(DIST_COPY) build/2/src dist/
 	@echo ""
+	@echo "=== Building language server ==="
+	@$(MAKE) ls --no-print-directory
+	@echo ""
 	@echo "Bootstrap complete!"
 
 ls:

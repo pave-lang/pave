@@ -20,11 +20,15 @@
 #include <std/String.h>
 #include <analyzer/c/IncludeContext.h>
 #include <analyzer/c/ParentCpp.h>
+#include <usize.h>
 #include <analyzer/types/Indirect.h>
 #include <std/Array_CXCursor.h>
 #include <analyzer/c/NamespaceCpp.h>
 #include <analyzer/c/ClassCpp.h>
 #include <analyzer/c/EnumC.h>
+#include <u32.h>
+#include <i32.h>
+#include <char.h>
 #include <analyzer/c/Include.h>
 
 #include <analyzer/c/Include.h>
@@ -345,7 +349,7 @@ bool Include__report_diagnostics(struct Include* self, CXTranslationUnit unit) {
         #line 227 "src/analyzer/c/Include.pv"
         if ((uint32_t)(severity) >= 3) {
             #line 228 "src/analyzer/c/Include.pv"
-            if (self->error.length == 0) {
+            if (usize__Eq_usize__eq(self->error.length, 0)) {
                 #line 229 "src/analyzer/c/Include.pv"
                 CXString formatted = clang_formatDiagnostic(diag, display_options);
                 #line 230 "src/analyzer/c/Include.pv"
@@ -591,15 +595,15 @@ bool Include__try_parse_int_macro(struct Include* self, CXCursor cursor, int64_t
     uint32_t body_index = 1;
 
     #line 361 "src/analyzer/c/Include.pv"
-    if (num_tokens == 2 || num_tokens == 3) {
+    if (u32__Eq_u32__eq(num_tokens, 2) || u32__Eq_u32__eq(num_tokens, 3)) {
         #line 362 "src/analyzer/c/Include.pv"
-        if (num_tokens == 3) {
+        if (u32__Eq_u32__eq(num_tokens, 3)) {
             #line 363 "src/analyzer/c/Include.pv"
             CXString sign_spelling = clang_getTokenSpelling(tu, tokens[1]);
             #line 364 "src/analyzer/c/Include.pv"
             char const* sign_txt = clang_getCString(sign_spelling);
             #line 365 "src/analyzer/c/Include.pv"
-            if (strcmp(sign_txt, "-") == 0) {
+            if (i32__Eq_i32__eq(strcmp(sign_txt, "-"), 0)) {
                 #line 366 "src/analyzer/c/Include.pv"
                 negate = true;
                 #line 367 "src/analyzer/c/Include.pv"
@@ -633,7 +637,7 @@ bool Include__try_parse_int_macro(struct Include* self, CXCursor cursor, int64_t
             uintptr_t len = strlen(txt);
 
             #line 385 "src/analyzer/c/Include.pv"
-            if (len > 2 && txt[0] == '0' && (txt[1] == 'x' || txt[1] == 'X')) {
+            if (len > 2 && char__Eq_char__eq(txt[0], '0') && (char__Eq_char__eq(txt[1], 'x') || char__Eq_char__eq(txt[1], 'X'))) {
                 #line 386 "src/analyzer/c/Include.pv"
                 i = 2;
                 #line 387 "src/analyzer/c/Include.pv"
@@ -690,7 +694,7 @@ bool Include__try_parse_int_macro(struct Include* self, CXCursor cursor, int64_t
                     #line 413 "src/analyzer/c/Include.pv"
                     char c = txt[i];
                     #line 414 "src/analyzer/c/Include.pv"
-                    if (c == 'u' || c == 'U' || c == 'l' || c == 'L') {
+                    if (char__Eq_char__eq(c, 'u') || char__Eq_char__eq(c, 'U') || char__Eq_char__eq(c, 'l') || char__Eq_char__eq(c, 'L')) {
                         #line 415 "src/analyzer/c/Include.pv"
                         i += 1;
                     } else {
@@ -757,7 +761,7 @@ bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
     bool result = false;
 
     #line 455 "src/analyzer/c/Include.pv"
-    if (strcmp(txt, "(") == 0) {
+    if (i32__Eq_i32__eq(strcmp(txt, "("), 0)) {
         #line 456 "src/analyzer/c/Include.pv"
         CXSourceLocation loc_name_end = clang_getRangeEnd(clang_getTokenExtent(tu, tokens[0]));
         #line 457 "src/analyzer/c/Include.pv"
@@ -778,7 +782,7 @@ bool Include__is_function_like_macro(struct Include* self, CXCursor cursor) {
         clang_getSpellingLocation(loc_paren, 0, &line2, &col2, 0);
 
         #line 467 "src/analyzer/c/Include.pv"
-        if (line1 == line2 && col1 == col2) {
+        if (u32__Eq_u32__eq(line1, line2) && u32__Eq_u32__eq(col1, col2)) {
             #line 468 "src/analyzer/c/Include.pv"
             result = true;
         }

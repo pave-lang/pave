@@ -6,6 +6,7 @@
 #include <string.h>
 #include <std/Array_Statement.h>
 #include <analyzer/statement/Statement.h>
+#include <usize.h>
 #include <std/Iter_ref_Statement.h>
 #include <slice_Statement.h>
 #include <std/Array_Statement.h>
@@ -122,7 +123,7 @@ uintptr_t Array_Statement__prepend(struct Array_Statement* self, struct Statemen
 #line 143 "src/std/Array.pv"
 bool Array_Statement__remove_back(struct Array_Statement* self) {
     #line 144 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 145 "src/std/Array.pv"
         return false;
     }
@@ -139,7 +140,7 @@ bool Array_Statement__remove_back(struct Array_Statement* self) {
 #line 154 "src/std/Array.pv"
 struct Statement* Array_Statement__back(struct Array_Statement* self) {
     #line 155 "src/std/Array.pv"
-    if (self->length == 0) {
+    if (usize__Eq_usize__eq(self->length, 0)) {
         #line 155 "src/std/Array.pv"
         return 0;
     }

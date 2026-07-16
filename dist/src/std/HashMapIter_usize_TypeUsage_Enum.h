@@ -5,7 +5,7 @@
 
 struct HashMapBucket_usize_TypeUsage_Enum;
 
-#line 10 "src/std/HashMap.pv"
+#line 11 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Enum {
     struct HashMapBucket_usize_TypeUsage_Enum* iter;
     struct HashMapBucket_usize_TypeUsage_Enum* end;
@@ -13,10 +13,10 @@ struct HashMapIter_usize_TypeUsage_Enum {
 
 struct HashMapIter_usize_TypeUsage_Enum;
 
-#line 16 "src/std/HashMap.pv"
+#line 17 "src/std/HashMap.pv"
 bool HashMapIter_usize_TypeUsage_Enum__next(struct HashMapIter_usize_TypeUsage_Enum* self);
 
-#line 21 "src/std/HashMap.pv"
+#line 22 "src/std/HashMap.pv"
 struct tuple_usize_TypeUsage_Enum* HashMapIter_usize_TypeUsage_Enum__value(struct HashMapIter_usize_TypeUsage_Enum* self);
 
 #endif

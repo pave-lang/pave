@@ -5,7 +5,9 @@
 
 #include <assert.h>
 #include <compiler/test_FunctionCoroutine_fibonacci_1.h>
+#include <u64.h>
 #include <compiler/test_FunctionCoroutine_fibonacci_2.h>
+#include <usize.h>
 #include <compiler/test_FunctionCoroutine__coroutine_fibonacci_test.test.h>
 
 #line 1 "src/compiler/FunctionCoroutine.pv"
@@ -22,7 +24,7 @@ void test_FunctionCoroutine__coroutine_fibonacci_test() {
         uint64_t fib = test_FunctionCoroutine_fibonacci_1__value(&__iter);
 
         #line 50 "src/compiler/FunctionCoroutine.pv"
-        assert(fib == expected[i]);
+        assert(u64__Eq_u64__eq(fib, expected[i]));
         #line 51 "src/compiler/FunctionCoroutine.pv"
         i += 1;
     } }
@@ -37,11 +39,11 @@ void test_FunctionCoroutine__coroutine_fibonacci_test() {
         uint64_t fib = test_FunctionCoroutine_fibonacci_2__value(&__iter);
 
         #line 56 "src/compiler/FunctionCoroutine.pv"
-        assert(fib == expected[i]);
+        assert(u64__Eq_u64__eq(fib, expected[i]));
         #line 57 "src/compiler/FunctionCoroutine.pv"
         i += 1;
     } }
 
     #line 60 "src/compiler/FunctionCoroutine.pv"
-    assert(i == 8);
+    assert(usize__Eq_usize__eq(i, 8));
 }

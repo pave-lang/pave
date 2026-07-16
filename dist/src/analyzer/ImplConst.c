@@ -8,6 +8,7 @@
 #include <analyzer/TokenType.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/Token.h>
+#include <usize.h>
 #include <analyzer/ImplConst.h>
 
 #include <analyzer/ImplConst.h>
@@ -81,5 +82,5 @@ bool ImplConst__parse_types(struct ImplConst* self) {
     #line 50 "src/analyzer/Impl.pv"
     self->type = *type;
     #line 51 "src/analyzer/Impl.pv"
-    return context->pos == self->token_end;
+    return usize__Eq_usize__eq(context->pos, self->token_end);
 }

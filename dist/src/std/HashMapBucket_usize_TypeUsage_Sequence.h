@@ -6,7 +6,7 @@
 #include <compiler/TypeUsage_Sequence.h>
 struct HashMapBucket_usize_TypeUsage_Sequence;
 
-#line 4 "src/std/HashMap.pv"
+#line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Sequence {
     uintptr_t key;
     struct TypeUsage_Sequence value;

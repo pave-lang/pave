@@ -216,7 +216,7 @@ bool IncludeWriter__has_unresolved_generic(struct Type* type, struct GenericMap*
                     #line 74 "src/compiler/IncludeWriter.pv"
                     struct Token* concrete_name = concrete_generic->name;
                     #line 75 "src/compiler/IncludeWriter.pv"
-                    if (concrete_name != 0 && str__Eq_str__eq(&concrete_name->value, generic_name->value)) {
+                    if (concrete_name != 0 && str__Eq_str__eq(concrete_name->value, generic_name->value)) {
                         #line 75 "src/compiler/IncludeWriter.pv"
                         return true;
                     }

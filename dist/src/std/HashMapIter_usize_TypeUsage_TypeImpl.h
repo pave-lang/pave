@@ -5,7 +5,7 @@
 
 struct HashMapBucket_usize_TypeUsage_TypeImpl;
 
-#line 10 "src/std/HashMap.pv"
+#line 11 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_TypeImpl {
     struct HashMapBucket_usize_TypeUsage_TypeImpl* iter;
     struct HashMapBucket_usize_TypeUsage_TypeImpl* end;
@@ -13,10 +13,10 @@ struct HashMapIter_usize_TypeUsage_TypeImpl {
 
 struct HashMapIter_usize_TypeUsage_TypeImpl;
 
-#line 16 "src/std/HashMap.pv"
+#line 17 "src/std/HashMap.pv"
 bool HashMapIter_usize_TypeUsage_TypeImpl__next(struct HashMapIter_usize_TypeUsage_TypeImpl* self);
 
-#line 21 "src/std/HashMap.pv"
+#line 22 "src/std/HashMap.pv"
 struct tuple_usize_TypeUsage_TypeImpl* HashMapIter_usize_TypeUsage_TypeImpl__value(struct HashMapIter_usize_TypeUsage_TypeImpl* self);
 
 #endif

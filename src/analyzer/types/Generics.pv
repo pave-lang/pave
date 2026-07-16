@@ -3,35 +3,43 @@ use analyzer
 
 struct Generic {
     name: *Token,
-    traits: Array<&Trait>,
+    traits: Array<Type>,
 }
 
 impl Generic {
     fn new(allocator: &dyn Allocator) -> Self {
-        return Self { name: null, traits: Array<&Trait>::new(allocator) };
+        return Self { name: null, traits: Array<Type>::new(allocator) };
     }
 
-    fn parse(&self, context: &Context) -> bool {
+    fn parse_traits(&self, context: &Context, generics: &Generics) -> bool {
         let module: &Module = context.module;
 
-        self.name = context.expect(TokenType::Identifier);
-        if self.name == null { return false; }
-
         if context.check_next(TokenType::Symbol, ":") {
-            let name = context.expect(TokenType::Identifier);
-            if name == null { return false; }
-
-            let trait_info = module.find_trait(name.value, 0);
-            if trait_info == null { context.error_token(name, "Unable to find trait"); return false; }
-            self.traits.append(trait_info);
-
-            while context.check_next(TokenType::Symbol, "+") {
+            let has_more = true;
+            while has_more {
                 let name = context.expect(TokenType::Identifier);
                 if name == null { return false; }
 
-                let trait_info = module.find_trait(name.value, 0);
+                let usage_types = Array<Type>::new(context.allocator);
+                if context.check_next(TokenType::Symbol, "<") {
+                    while !context.check_next(TokenType::Symbol, ">") {
+                        let usage_type: Type;
+                        if !context.parse_type(&usage_type, generics) { return false; }
+                        usage_types.append(usage_type);
+
+                        if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, ">") {
+                            context.error("Expected , or >");
+                            return false;
+                        }
+                    }
+                }
+
+                let trait_info = module.find_trait(name.value, usage_types.length);
                 if trait_info == null { context.error_token(name, "Unable to find trait"); return false; }
-                self.traits.append(trait_info);
+                let generic_map = GenericMap::new(context.allocator, &trait_info.generics, &usage_types);
+                self.traits.append(Type::Trait(trait_info, context.allocator.store(&generic_map)));
+
+                has_more = context.check_next(TokenType::Symbol, "+");
             }
         }
 
@@ -78,12 +86,14 @@ impl Generics {
 
         while !context.check_next(TokenType::Symbol, ">") {
             let generic = Generic::new(self.array.allocator);
-            if !generic.parse(context) { return false; }
+            generic.name = context.expect(TokenType::Identifier);
             let generic_name = generic.name;
             if generic_name == null || self.has(generic_name.value) { return false; }
 
             let index = self.array.append(generic);
             self.map.insert(generic_name.value, index);
+            let stored_generic = self.array.get(index);
+            if stored_generic == null || !stored_generic.parse_traits(context, self) { return false; }
 
             if !context.check_next(TokenType::Symbol, ",") {
                 return context.expect_value(TokenType::Symbol, ">");

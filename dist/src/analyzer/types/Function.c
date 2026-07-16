@@ -9,6 +9,7 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
+#include <usize.h>
 #include <analyzer/types/Parameter.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/Root.h>
@@ -166,7 +167,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
         #line 135 "src/analyzer/types/Function.pv"
         if (Context__check_next(context, TOKEN_TYPE__SYMBOL, "...")) {
             #line 136 "src/analyzer/types/Function.pv"
-            if (self->parameters.length == 0) {
+            if (usize__Eq_usize__eq(self->parameters.length, 0)) {
                 #line 137 "src/analyzer/types/Function.pv"
                 Context__error_token(context, &context->tokens[context->pos - 1], "Variadic functions require at least one named parameter");
                 #line 138 "src/analyzer/types/Function.pv"
@@ -266,7 +267,7 @@ bool Function__parse_parameters(struct Function* self, struct Generics* generics
             }
 
             #line 199 "src/analyzer/types/Function.pv"
-            if (!has_type && str__Eq_str__eq(&parameter.name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
+            if (!has_type && str__Eq_str__eq(parameter.name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
                 #line 200 "src/analyzer/types/Function.pv"
                 parameter.type = (struct Type) { .type = TYPE__SELF };
                 #line 201 "src/analyzer/types/Function.pv"

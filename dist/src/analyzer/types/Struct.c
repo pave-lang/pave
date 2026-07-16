@@ -8,6 +8,7 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
+#include <usize.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/Root.h>
 #include <analyzer/types/StructField.h>
@@ -80,16 +81,16 @@ struct Struct Struct__parse(struct Module* module) {
                 #line 65 "src/analyzer/types/Struct.pv"
                 depth -= 1;
                 #line 66 "src/analyzer/types/Struct.pv"
-                if (depth == 0) {
+                if (usize__Eq_usize__eq(depth, 0)) {
                     #line 66 "src/analyzer/types/Struct.pv"
                     break;
                 }
-            } else if (depth == 1 && expect_generic && Context__check(context, TOKEN_TYPE__IDENTIFIER)) {
+            } else if (usize__Eq_usize__eq(depth, 1) && expect_generic && Context__check(context, TOKEN_TYPE__IDENTIFIER)) {
                 #line 68 "src/analyzer/types/Struct.pv"
                 node.generic_arity += 1;
                 #line 69 "src/analyzer/types/Struct.pv"
                 expect_generic = false;
-            } else if (depth == 1 && Context__check_value(context, TOKEN_TYPE__SYMBOL, ",")) {
+            } else if (usize__Eq_usize__eq(depth, 1) && Context__check_value(context, TOKEN_TYPE__SYMBOL, ",")) {
                 #line 71 "src/analyzer/types/Struct.pv"
                 expect_generic = true;
             }
@@ -258,13 +259,13 @@ bool Struct__fill_types_field(struct Struct* self) {
                     depth += 1;
                 } else if (is_close) {
                     #line 146 "src/analyzer/types/Struct.pv"
-                    if (depth == 0) {
+                    if (usize__Eq_usize__eq(depth, 0)) {
                         #line 146 "src/analyzer/types/Struct.pv"
                         break;
                     }
                     #line 147 "src/analyzer/types/Struct.pv"
                     depth -= 1;
-                } else if (is_comma && depth == 0) {
+                } else if (is_comma && usize__Eq_usize__eq(depth, 0)) {
                     #line 149 "src/analyzer/types/Struct.pv"
                     break;
                 }
@@ -409,5 +410,5 @@ bool Struct__fill_types_tuple(struct Struct* self) {
 #line 231 "src/analyzer/types/Struct.pv"
 bool Struct__is_newtype(struct Struct* self) {
     #line 232 "src/analyzer/types/Struct.pv"
-    return (self->type == STRUCT_TYPE__TUPLE) && (self->fields.length == 1);
+    return (self->type == STRUCT_TYPE__TUPLE) && (usize__Eq_usize__eq(self->fields.length, 1));
 }

@@ -6,6 +6,7 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/Token.h>
+#include <usize.h>
 #include <std/Array_Type.h>
 #include <std/Array_str.h>
 #include <analyzer/types/Type.h>
@@ -73,16 +74,16 @@ struct Enum Enum__parse(struct Context* context) {
                 #line 71 "src/analyzer/types/Enum.pv"
                 depth -= 1;
                 #line 72 "src/analyzer/types/Enum.pv"
-                if (depth == 0) {
+                if (usize__Eq_usize__eq(depth, 0)) {
                     #line 72 "src/analyzer/types/Enum.pv"
                     break;
                 }
-            } else if (depth == 1 && expect_generic && Context__check(context, TOKEN_TYPE__IDENTIFIER)) {
+            } else if (usize__Eq_usize__eq(depth, 1) && expect_generic && Context__check(context, TOKEN_TYPE__IDENTIFIER)) {
                 #line 74 "src/analyzer/types/Enum.pv"
                 node.generic_arity += 1;
                 #line 75 "src/analyzer/types/Enum.pv"
                 expect_generic = false;
-            } else if (depth == 1 && Context__check_value(context, TOKEN_TYPE__SYMBOL, ",")) {
+            } else if (usize__Eq_usize__eq(depth, 1) && Context__check_value(context, TOKEN_TYPE__SYMBOL, ",")) {
                 #line 77 "src/analyzer/types/Enum.pv"
                 expect_generic = true;
             }

@@ -200,10 +200,26 @@ impl Expression {
                 return null;
             },
             Type::Generic(generic) => {
-                for *trait_info in generic.traits {
+                for trait_type in generic.traits {
+                    let trait_info: *Trait = null;
+                    let bound_generics: *GenericMap = null;
+                    match trait_type {
+                        Type::Trait(info, generic_map) => {
+                            trait_info = info;
+                            bound_generics = generic_map;
+                        },
+                        _ => {},
+                    }
+                    if trait_info == null { continue; }
                     let function = trait_info.functions.find(&member.value);
                     if function != null {
-                        let generic_map_val: GenericMap = GenericMap { self_type: null, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
+                        let generic_map_val: GenericMap;
+                        if bound_generics == null {
+                            generic_map_val = GenericMap { self_type: null, array: Array<Type>::new(context.allocator), map: HashMap<str, usize>::new(context.allocator) };
+                        } else {
+                            generic_map_val = bound_generics.clone(context.allocator);
+                        }
+                        generic_map_val.self_type = context.allocator.store(&Type::Generic(generic));
                         let generic_map = context.allocator.store(&generic_map_val);
                         if generic_map == null { return null; }
                         for (typedef_name, _) in trait_info.typedefs {

@@ -417,7 +417,7 @@ bool MatchPattern__parse(struct Context* context, struct Generics* generics, str
                     #line 204 "src/analyzer/statement/MatchPattern.pv"
                     while (field_i < enum_variant->names.length) {
                         #line 205 "src/analyzer/statement/MatchPattern.pv"
-                        if (str__Eq_str__eq(&enum_variant->names.data[field_i], field_name)) {
+                        if (str__Eq_str__eq(enum_variant->names.data[field_i], field_name)) {
                             #line 206 "src/analyzer/statement/MatchPattern.pv"
                             found = true;
                             #line 207 "src/analyzer/statement/MatchPattern.pv"
