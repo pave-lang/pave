@@ -10,6 +10,10 @@ ifeq ($(OS),Windows_NT)
 	EXE := .exe
 	CC := clang
 	CXX := clang++
+else ifeq ($(shell uname -s),Darwin)
+	EXE :=
+	CC := clang
+	CXX := clang++
 else
 	EXE :=
 	CC := clang-20
@@ -19,8 +23,8 @@ endif
 ifneq ($(wildcard $(SRCS_LST)),)
     FILE_LIST := $(shell cat $(SRCS_LST))
 
-    OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(FILE_LIST)))) \
-            $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(FILE_LIST)))
+    OBJS := $(sort $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(FILE_LIST)))) \
+            $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(FILE_LIST))))
 
     TEST_SRCS := $(filter %.test.c,$(FILE_LIST))
     TEST_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(TEST_SRCS))
@@ -34,13 +38,13 @@ TEST_TARGET := $(BUILD_DIR)/tests$(EXE)
 all: generate
 	@echo "Compiling generated files..."
 	$(eval GEN_FILES := $(shell cat $(SRCS_LST)))
-	$(eval CURRENT_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(GEN_FILES)))) \
-                           $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(GEN_FILES))))
+	$(eval CURRENT_OBJS := $(sort $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(GEN_FILES)))) \
+                           $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(GEN_FILES)))))
 
 	@$(MAKE) -f Makefile.build build-objs
 
 	@echo "Linking..."
-	$(file >$(OBJS_LST),$(CURRENT_OBJS))
+	@printf '%s\n' $(CURRENT_OBJS) > $(OBJS_LST)
 	$(CC) @$(OBJS_LST) $(LDFLAGS) -o $(TARGET)
 	@echo "Build complete: $(TARGET)"
 
@@ -68,7 +72,7 @@ else
 	@echo "Compiling test files..."
 	@$(MAKE) -f Makefile.build build-test-objs
 	@echo "Linking test runner..."
-	$(file >$(BUILD_DIR)/test_objs.lst,$(TEST_LINK_OBJS))
+	@printf '%s\n' $(TEST_LINK_OBJS) > $(BUILD_DIR)/test_objs.lst
 	$(CC) @$(BUILD_DIR)/test_objs.lst $(LDFLAGS) -o $(TEST_TARGET)
 	@echo "Running tests..."
 	$(TEST_TARGET)

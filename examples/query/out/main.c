@@ -9,6 +9,7 @@
 #include <query/Query.h>
 #include <query/Query_Position.h>
 #include <tuple_u32_ptr_Position.h>
+#include <u32.h>
 #include <query/Query_Velocity.h>
 #include <tuple_u32_ptr_Velocity.h>
 #include <query/main.h>
@@ -25,7 +26,7 @@ int32_t main(int32_t argc, char const** argv) {
         printf("flags: %u\n", flags);
     } }
 
-    assert(positions.flags == 1);
+    assert(u32__Eq_u32__eq(positions.flags, 1));
 
     printf("query flags: %u\n", positions.flags);
 
@@ -39,7 +40,7 @@ int32_t main(int32_t argc, char const** argv) {
         printf("flags: %u\n", flags);
     } }
 
-    assert(velocities.flags == 1);
+    assert(u32__Eq_u32__eq(velocities.flags, 1));
 
     printf("query flags: %u\n", velocities.flags);
 

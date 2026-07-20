@@ -483,8 +483,9 @@ impl Module {
                     fprintf(stderr, "TypeId type not found in namespace std\n");
                 }
 
-                params.release();
-                generics.release();
+                // params/generics must stay alive: the inserted builtin's parameter
+                // types hold pointers into the generics array (same as the cast/sizeof
+                // builtins in Context, which never release theirs).
             }
         }
 

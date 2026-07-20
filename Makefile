@@ -2,20 +2,31 @@
 # clang-20 ./dist/src/*.c -o ./dist/pavec -I"/lib/llvm-20/include" -L"/lib/llvm-20/lib" -lclang
 
 ifeq ($(OS),Windows_NT)
-	GEN_FLAGS := std=src/std analyzer=src/analyzer -- -I"C:/Program Files/LLVM/include"
+	CLANG_ARGS := -I"C:/Program Files/LLVM/include"
+	GEN_FLAGS := std=src/std analyzer=src/analyzer -- $(CLANG_ARGS)
 	CFLAGS := -std=c99 -Wall -D_CRT_SECURE_NO_WARNINGS -I"C:/Program Files/LLVM/include"
 	LDFLAGS := -L"C:/Program Files/LLVM/lib" -llibclang
 	EXE := .exe
 	DIST_COPY := build/2/pavec$(EXE) build/2/pavec.pdb
+else ifeq ($(shell uname -s),Darwin)
+	LLVM_PREFIX := $(shell brew --prefix llvm 2>/dev/null || echo /opt/homebrew/opt/llvm)
+	SDK_PATH := $(shell xcrun --show-sdk-path)
+	CLANG_ARGS := -isysroot "$(SDK_PATH)" -I"$(LLVM_PREFIX)/include"
+	GEN_FLAGS := std=src/std analyzer=src/analyzer -- $(CLANG_ARGS)
+	CFLAGS := -std=c99 -Wall -I"$(LLVM_PREFIX)/include" -fsanitize=address -fno-omit-frame-pointer
+	LDFLAGS := -L"$(LLVM_PREFIX)/lib" -lclang -Wl,-rpath,"$(LLVM_PREFIX)/lib" -fsanitize=address -fno-omit-frame-pointer
+	EXE :=
+	DIST_COPY := build/2/pavec$(EXE)
 else
-	GEN_FLAGS := std=src/std analyzer=src/analyzer -- -I"/lib/llvm-20/include"
+	CLANG_ARGS := -I"/lib/llvm-20/include"
+	GEN_FLAGS := std=src/std analyzer=src/analyzer -- $(CLANG_ARGS)
 	CFLAGS := -std=c99 -Wall -I"/lib/llvm-20/include" -fsanitize=address -fno-omit-frame-pointer
 	LDFLAGS := -L"/lib/llvm-20/lib" -lclang -fsanitize=address -fno-omit-frame-pointer
 	EXE :=
 	DIST_COPY := build/2/pavec$(EXE)
 endif
 
-.PHONY: all ls ls-release examples clean
+.PHONY: all ls ls-release examples clean dist-compiler
 
 all:
 	@echo "=== Stage 1: Building with dist/pavec ==="
@@ -55,8 +66,17 @@ ls:
 ls-release:
 	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/lsr TARGET=build/lsr/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-O2 $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='$(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 
+# Rebuild the stage-0 compiler from the pre-generated C sources in dist/src.
+# Needed once on a fresh non-Windows checkout, where dist only ships pavec.exe.
+dist-compiler:
+	@mkdir -p build/dist-bootstrap
+	find dist/src -name '*.c' ! -name '*.test.c' > build/dist-bootstrap/files.lst
+	echo src/compiler/fs.c >> build/dist-bootstrap/files.lst
+	clang -O1 $(filter-out -fsanitize=address -fno-omit-frame-pointer,$(CFLAGS)) -Idist/src -Isrc/compiler @build/dist-bootstrap/files.lst $(filter-out -fsanitize=address -fno-omit-frame-pointer,$(LDFLAGS)) -o dist/pavec
+	@echo "Built dist/pavec"
+
 define build_example
-	dist/pavec std=src/std $(1)=examples/$(1) -o examples --no-line-directives -- -I"C:/Program Files/LLVM/include" -Iexamples/$(1)
+	dist/pavec std=src/std $(1)=examples/$(1) -o examples --no-line-directives -- $(CLANG_ARGS) -Iexamples/$(1)
 	rm -rf examples/$(1)/out
 	mkdir -p examples/$(1)/out
 	mv examples/$(1)/*.c examples/$(1)/*.h examples/$(1)/out/

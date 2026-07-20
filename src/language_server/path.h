@@ -12,9 +12,17 @@
 #else
     #include <stdlib.h>
     #include <limits.h>
+
+    #ifndef PATH_MAX_LEN
+        #ifdef PATH_MAX
+        #define PATH_MAX_LEN PATH_MAX
+        #else
+        #define PATH_MAX_LEN 4096
+        #endif
+    #endif
 #endif
 
-inline const char* resolve_path(const char* path) {
+static inline const char* resolve_path(const char* path) {
     static char resolved[PATH_MAX_LEN];
 
 #ifdef _WIN32

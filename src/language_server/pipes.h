@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-inline int read_pipe(pipe_t pipe, char *buf, int len) {
+static inline int read_pipe(pipe_t pipe, char *buf, int len) {
 #ifdef _WIN32
     DWORD total = 0;
     DWORD n;
@@ -37,7 +37,7 @@ inline int read_pipe(pipe_t pipe, char *buf, int len) {
 #endif
 }
 
-inline int write_pipe(pipe_t pipe, const char *data, int len) {
+static inline int write_pipe(pipe_t pipe, const char *data, int len) {
 #ifdef _WIN32
     DWORD written;
     if (!WriteFile(pipe, data, len, &written, NULL)) { return 0; }
@@ -53,7 +53,7 @@ inline int write_pipe(pipe_t pipe, const char *data, int len) {
 #endif
 }
 
-inline void flush_pipe(pipe_t pipe) {
+static inline void flush_pipe(pipe_t pipe) {
 #ifdef _WIN32
     FlushFileBuffers(pipe);
 #else
@@ -61,7 +61,7 @@ inline void flush_pipe(pipe_t pipe) {
 #endif
 }
 
-inline void close_pipe(pipe_t pipe) {
+static inline void close_pipe(pipe_t pipe) {
 #ifdef _WIN32
     CloseHandle(pipe);
 #else
@@ -69,7 +69,7 @@ inline void close_pipe(pipe_t pipe) {
 #endif
 }
 
-inline pipe_t open_pipe(const char *pipe_name) {
+static inline pipe_t open_pipe(const char *pipe_name) {
 #ifdef _WIN32
     pipe_t pipe = CreateFileA(
         pipe_name,
@@ -105,7 +105,7 @@ inline pipe_t open_pipe(const char *pipe_name) {
 #endif
 }
 
-inline pipe_t get_stdin_pipe() {
+static inline pipe_t get_stdin_pipe() {
 #ifdef _WIN32
     return GetStdHandle(STD_INPUT_HANDLE);
 #else
@@ -114,7 +114,7 @@ inline pipe_t get_stdin_pipe() {
 }
 
 
-inline pipe_t get_stdout_pipe() {
+static inline pipe_t get_stdout_pipe() {
 #ifdef _WIN32
     return GetStdHandle(STD_OUTPUT_HANDLE);
 #else

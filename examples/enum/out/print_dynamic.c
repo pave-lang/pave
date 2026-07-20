@@ -12,5 +12,5 @@
 void print_dynamic(struct trait_Enum value) {
     struct slice_EnumVariantInfo variants = value.vtable->fn_get_variants(value.instance);
     uintptr_t index = value.vtable->fn_get_variant_index(value.instance);
-    printf("%.*s\n", variants.data[index].name.length, variants.data[index].name.ptr);
+    printf("%.*s\n", variants.data[index].label.length, variants.data[index].label.ptr);
 }

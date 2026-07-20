@@ -47,13 +47,11 @@ impl Include {
         self.add_cxtype_primitive(CXType_SChar, "i8");
         self.add_cxtype_primitive(CXType_Short, "i16");
         self.add_cxtype_primitive(CXType_Int, "i32");
-        self.add_cxtype_primitive(CXType_Long, "i32");
         self.add_cxtype_primitive(CXType_LongLong, "i64");
 
         self.add_cxtype_primitive(CXType_UChar, "u8");
         self.add_cxtype_primitive(CXType_UShort, "u16");
         self.add_cxtype_primitive(CXType_UInt, "u32");
-        self.add_cxtype_primitive(CXType_ULong, "u32");
         self.add_cxtype_primitive(CXType_ULongLong, "u64");
 
         self.add_cxtype_primitive(CXType_Float, "f32");
@@ -245,6 +243,18 @@ impl Include {
             return lookup;
         }
 
+        if type.kind == CXType_Long || type.kind == CXType_ULong {
+            let size = clang_Type_getSizeOf(type);
+            let name: *const char;
+            if type.kind == CXType_Long {
+                if size == 8 { name = "i64"; } else { name = "i32"; }
+            } else {
+                if size == 8 { name = "u64"; } else { name = "u32"; }
+            }
+            self.add_cxtype_primitive(type.kind, name);
+            return self.cxtype_to_type.find(&type_u32);
+        }
+
         if type.kind == CXType_Pointer {
             let pointee_type = clang_getPointeeType(type);
             let is_pointee_const = clang_isConstQualifiedType(pointee_type) != 0;
@@ -260,7 +270,7 @@ impl Include {
             return self.root.allocator.store(&Type::Indirect(indirect));
         }
         
-        if type.kind == CXType_Elaborated {
+        if type.kind == CXType_Elaborated || type.kind == CXType_Typedef || type.kind == CXType_Record || type.kind == CXType_Enum {
             let decl = clang_getTypeDeclaration(type);
 
             let path = Array<CXCursor>::new(self.root.allocator);
@@ -311,8 +321,17 @@ impl Include {
             let lookup = self.types.find(name);
             clang_disposeString(name_spelling);
 
-            if lookup == null { return &self.root.type_unknown; }
+            if lookup == null { return self.parse_canonical_type(type); }
             return lookup;
+        }
+
+        return self.parse_canonical_type(type);
+    }
+
+    fn parse_canonical_type(&self, type: CXType) -> *Type {
+        let canonical = clang_getCanonicalType(type);
+        if cast<u32>(canonical.kind) != cast<u32>(type.kind) {
+            return self.parse_type(canonical);
         }
 
         return &self.root.type_unknown;
