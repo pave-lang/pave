@@ -12,10 +12,10 @@ make clean      # remove build artifacts (see "Test Functions and the Build" for
 make examples   # compile all examples using dist/pavec.exe
 ```
 
-On Windows from Codex/PowerShell, run `make all` through Git Bash so the Makefile uses Unix tools like `mkdir -p`, `rm`, `cp`, and `diff`:
+On Windows from the repository root in Codex/PowerShell, run `make all` through Git Bash so the Makefile uses Unix tools like `mkdir -p`, `rm`, `cp`, and `diff`:
 
 ```powershell
-& 'C:\Program Files\Git\bin\bash.exe' -lc 'cd /c/Users/logan-gyxos/Repos/pave && make all'
+& 'C:\Program Files\Git\bin\bash.exe' -lc 'make all'
 ```
 
 The bootstrap stages:
@@ -122,7 +122,7 @@ src/
     ├── HashSet.pv                # HashSet<T: Hash>
     ├── Iter.pv                   # Iter<T> (start/end/step iterator); IterEnumerate<T>
     ├── Iterator.pv               # Iterator trait
-    ├── Ops.pv                    # Add, Sub, Mul, Div trait definitions (each with typedef Output)
+    ├── Ops.pv                    # Operator traits: Add, Sub, Mul, Div, Eq, Neg, Ord, Index
     ├── Range.pv                  # Range<T> enum (All, Start, End, StartEnd); iter() method
     ├── Slice.pv                  # &[T] slice — iter() method
     ├── str.pv                    # str struct (ptr + length); eq, slice, trim, contains, etc.; Hash impl; tests
@@ -156,8 +156,8 @@ If a name or line of C only exists to satisfy the target language, build it in `
 Both must produce the same string. The `impl_trait_type: &Type` parameter (the impl's `trait_type` field) provides the generic bindings (e.g., `T=f32`) needed for disambiguation. Pass `null` when the impl is unavailable; the function silently skips the suffix.
 
 ### Operator Trait Dispatch
-`Expression.find_operator_trait_call` is called from `parse_binary` for `+`, `-`, `*`, `/`. It:
-1. Walks the LHS struct's impls looking for `Add`/`Sub`/`Mul`/`Div` trait
+`Expression.find_operator_trait_call` is called from `parse_binary` for `+`, `-`, `*`, `/`, `==`, `<`, `>`, `<=`, and `>=`. Arithmetic operators map to `Add`/`Sub`/`Mul`/`Div`, `==` maps to `Eq`, and ordered comparisons map to `Ord`; `!=` is not trait-dispatched. It:
+1. Walks the LHS type's impls looking for the corresponding operator trait
 2. Matches the RHS type against the impl's second parameter
 3. Builds an `Invoke(Type(Function(...)), [lhs, rhs])` expression (`validate_arguments` auto-wraps `lhs` in `&` only if the first parameter is `&self`; for value `self` no wrapping happens at analysis time)
 
@@ -210,7 +210,7 @@ If `make` fails with `main already defined in main.o`, the test file filter has 
 - In comparisons (`==`, `!=`), both sides are checked: `ptr == null` is valid, `ptr == 0` errors, `ref == null` errors.
 
 ### Struct Default Field Values
-`StructField` has a `default_token_start: usize` field. When parsing a struct, if a field has `= <expr>` after its type, the token position is stored. During struct construction (`Struct { field: val }`), if a field is omitted and `default_token_start != 0`, the default expression is re-parsed from that token position. This is handled in `ExpressionValidate.validate_arguments` for `Type::Struct`.
+`StructField` has a `default_token_start: usize` field. When parsing a struct, if a field has `= <expr>` after its type, the token position is stored. During struct construction (`Struct { field: val }`), if a field is omitted and `default_token_start != 0`, the default expression is re-parsed from that token position and appended before argument validation. This is handled in `ParseTypeExpression.pv`; `ExpressionValidate.validate_arguments` then validates the completed field set.
 
 ### Enum Struct Variants
 Enum variants support named fields in addition to tuple payloads:
