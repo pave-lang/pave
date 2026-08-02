@@ -76,7 +76,7 @@ dist-compiler:
 	@echo "Built dist/pavec"
 
 define build_example
-	dist/pavec std=src/std $(1)=examples/$(1) -o examples --no-line-directives -- $(CLANG_ARGS) -Iexamples/$(1)
+	dist/pavec$(EXE) std=src/std $(1)=examples/$(1) -o examples --no-line-directives -- $(CLANG_ARGS) -Iexamples/$(1)
 	rm -rf examples/$(1)/out
 	mkdir -p examples/$(1)/out
 	mv examples/$(1)/*.c examples/$(1)/*.h examples/$(1)/out/
@@ -89,6 +89,7 @@ examples:
 	$(call build_example,iterators)
 	$(call build_example,structs)
 	$(call build_example,query)
+	$(call build_example,query_refs)
 	$(call build_example,traits)
 	$(call build_example,dynamic_fn)
 	$(call build_example,cpp)
