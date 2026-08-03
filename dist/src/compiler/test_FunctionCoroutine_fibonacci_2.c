@@ -24,7 +24,7 @@ bool test_FunctionCoroutine_fibonacci_2__next(void* _ctx) {
     ctx->_value = 0; ctx->_state = 1; return true; yield_1:;
 
     #line 38 "src/compiler/FunctionCoroutine.pv"
-    for (ctx->i = 1; ctx->i < ctx->n; ctx->i++) {
+    for (ctx->i = 1; ctx->i != ctx->n; ctx->i < ctx->n ? ctx->i++ : ctx->i--) {
         #line 39 "src/compiler/FunctionCoroutine.pv"
         ctx->tmp = ctx->a + ctx->b;
         #line 40 "src/compiler/FunctionCoroutine.pv"

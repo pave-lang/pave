@@ -20,7 +20,7 @@ bool test_FunctionCoroutine_fibonacci_1__next(void* _ctx) {
     ctx->b = 1;
 
     #line 24 "src/compiler/FunctionCoroutine.pv"
-    for (ctx->i = 0; ctx->i < ctx->n; ctx->i++) {
+    for (ctx->i = 0; ctx->i != ctx->n; ctx->i < ctx->n ? ctx->i++ : ctx->i--) {
         #line 25 "src/compiler/FunctionCoroutine.pv"
         ctx->_value = ctx->a; ctx->_state = 1; return true; yield_1:;
         #line 26 "src/compiler/FunctionCoroutine.pv"

@@ -199,7 +199,7 @@ void HashMap_str_i64__fill_buckets(struct HashMap_str_i64* self) {
     memset(self->buckets, 0, self->capacity * sizeof(struct HashMapBucket_str_i64*));
 
     #line 144 "src/std/HashMap.pv"
-    for (uintptr_t i = 0; i < self->length; i++) {
+    for (uintptr_t i = 0; i != self->length; i < self->length ? i++ : i--) {
         #line 145 "src/std/HashMap.pv"
         struct HashMapBucket_str_i64* node = self->data + i;
         #line 146 "src/std/HashMap.pv"

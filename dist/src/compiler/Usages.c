@@ -1443,7 +1443,7 @@ struct UsageContext* Usages__find_parent_usage_context_struct(struct Usages* sel
         return 0;
     }
     #line 729 "src/compiler/Usages.pv"
-    for (uintptr_t i = 0; i < parent_usage->usage_contexts.length; i++) {
+    for (uintptr_t i = 0; i != parent_usage->usage_contexts.length; i < parent_usage->usage_contexts.length ? i++ : i--) {
         #line 730 "src/compiler/Usages.pv"
         struct UsageContext* uc = &parent_usage->usage_contexts.data[i];
         #line 731 "src/compiler/Usages.pv"
@@ -1468,7 +1468,7 @@ struct UsageContext* Usages__find_parent_usage_context_enum(struct Usages* self,
         return 0;
     }
     #line 740 "src/compiler/Usages.pv"
-    for (uintptr_t i = 0; i < parent_usage->usage_contexts.length; i++) {
+    for (uintptr_t i = 0; i != parent_usage->usage_contexts.length; i < parent_usage->usage_contexts.length ? i++ : i--) {
         #line 741 "src/compiler/Usages.pv"
         struct UsageContext* uc = &parent_usage->usage_contexts.data[i];
         #line 742 "src/compiler/Usages.pv"

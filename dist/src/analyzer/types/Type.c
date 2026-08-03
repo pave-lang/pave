@@ -849,7 +849,7 @@ bool Type__eq_tuple(struct Type* self, struct Tuple* other_tuple) {
             }
 
             #line 372 "src/analyzer/types/Type.pv"
-            for (uintptr_t i = 0; i < tuple->elements.length; i++) {
+            for (uintptr_t i = 0; i != tuple->elements.length; i < tuple->elements.length ? i++ : i--) {
                 #line 373 "src/analyzer/types/Type.pv"
                 if (!Type__eq(&tuple->elements.data[i], &other_tuple->elements.data[i])) {
                     #line 373 "src/analyzer/types/Type.pv"
@@ -931,7 +931,7 @@ bool Type__eq_enum(struct Type* self, struct Enum* other_enum, struct Array_Type
                 return false;
             }
             #line 403 "src/analyzer/types/Type.pv"
-            for (uintptr_t i = 0; i < self_generics->array.length; i++) {
+            for (uintptr_t i = 0; i != self_generics->array.length; i < self_generics->array.length ? i++ : i--) {
                 #line 404 "src/analyzer/types/Type.pv"
                 if (!Type__eq(&self_generics->array.data[i], &generics.data[i])) {
                     #line 404 "src/analyzer/types/Type.pv"
@@ -995,7 +995,7 @@ bool Type__eq_struct(struct Type* self, struct Struct* other_struct, struct Arra
                 return false;
             }
             #line 425 "src/analyzer/types/Type.pv"
-            for (uintptr_t i = 0; i < self_generics->array.length; i++) {
+            for (uintptr_t i = 0; i != self_generics->array.length; i < self_generics->array.length ? i++ : i--) {
                 #line 426 "src/analyzer/types/Type.pv"
                 if (!Type__eq(&self_generics->array.data[i], &generics.data[i])) {
                     #line 426 "src/analyzer/types/Type.pv"
@@ -1056,7 +1056,7 @@ bool Type__eq_trait(struct Type* self, struct Trait* other_trait, struct Array_T
                 return false;
             }
             #line 447 "src/analyzer/types/Type.pv"
-            for (uintptr_t i = 0; i < self_generics->array.length; i++) {
+            for (uintptr_t i = 0; i != self_generics->array.length; i < self_generics->array.length ? i++ : i--) {
                 #line 448 "src/analyzer/types/Type.pv"
                 if (!Type__eq(&self_generics->array.data[i], &generics.data[i])) {
                     #line 448 "src/analyzer/types/Type.pv"

@@ -199,7 +199,7 @@ void HashMap_usize_TypeUsage_Struct__fill_buckets(struct HashMap_usize_TypeUsage
     memset(self->buckets, 0, self->capacity * sizeof(struct HashMapBucket_usize_TypeUsage_Struct*));
 
     #line 144 "src/std/HashMap.pv"
-    for (uintptr_t i = 0; i < self->length; i++) {
+    for (uintptr_t i = 0; i != self->length; i < self->length ? i++ : i--) {
         #line 145 "src/std/HashMap.pv"
         struct HashMapBucket_usize_TypeUsage_Struct* node = self->data + i;
         #line 146 "src/std/HashMap.pv"

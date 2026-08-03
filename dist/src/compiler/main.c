@@ -51,7 +51,7 @@ int32_t main(int32_t argc, char const** argv) {
     #line 21 "src/compiler/main.pv"
     bool in_clang_args = false;
     #line 22 "src/compiler/main.pv"
-    for (int32_t i = 1; i < argc; i++) {
+    for (int32_t i = 1; i != argc; i < argc ? i++ : i--) {
         #line 23 "src/compiler/main.pv"
         if (in_clang_args) {
             #line 24 "src/compiler/main.pv"

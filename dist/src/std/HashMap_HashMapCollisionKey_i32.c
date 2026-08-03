@@ -199,7 +199,7 @@ void HashMap_HashMapCollisionKey_i32__fill_buckets(struct HashMap_HashMapCollisi
     memset(self->buckets, 0, self->capacity * sizeof(struct HashMapBucket_HashMapCollisionKey_i32*));
 
     #line 144 "src/std/HashMap.pv"
-    for (uintptr_t i = 0; i < self->length; i++) {
+    for (uintptr_t i = 0; i != self->length; i < self->length ? i++ : i--) {
         #line 145 "src/std/HashMap.pv"
         struct HashMapBucket_HashMapCollisionKey_i32* node = self->data + i;
         #line 146 "src/std/HashMap.pv"

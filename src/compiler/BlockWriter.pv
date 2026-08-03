@@ -656,11 +656,17 @@ impl BlockWriter {
                             expr.write_expression(file, start, generics);
                             fprintf(file, "; ");
                             generator.write_variable(file, variable_name);
-                            fprintf(file, " < ");
+                            fprintf(file, " != ");
                             expr.write_expression(file, end, generics);
                             fprintf(file, "; ");
                             generator.write_variable(file, variable_name);
-                            fprintf(file, "++) {");
+                            fprintf(file, " < ");
+                            expr.write_expression(file, end, generics);
+                            fprintf(file, " ? ");
+                            generator.write_variable(file, variable_name);
+                            fprintf(file, "++ : ");
+                            generator.write_variable(file, variable_name);
+                            fprintf(file, "--) {");
                             generator.indent += 1;
                         },
                         ForStatementType::Sequence(iter_expression) => {

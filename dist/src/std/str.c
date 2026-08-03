@@ -114,7 +114,7 @@ intptr_t str__index_of_start(struct str self, char ch, uintptr_t start) {
     char const* e = self.ptr + self.length;
 
     #line 65 "src/std/str.pv"
-    for (char const* ptr = s; ptr < e; ptr++) {
+    for (char const* ptr = s; ptr != e; ptr < e ? ptr++ : ptr--) {
         #line 66 "src/std/str.pv"
         if (char__Eq_char__eq(*ptr, ch)) {
             #line 67 "src/std/str.pv"
@@ -129,7 +129,7 @@ intptr_t str__index_of_start(struct str self, char ch, uintptr_t start) {
 #line 74 "src/std/str.pv"
 intptr_t str__index_of_last(struct str self, char ch) {
     #line 75 "src/std/str.pv"
-    for (uintptr_t i = 0; i < self.length; i++) {
+    for (uintptr_t i = 0; i != self.length; i < self.length ? i++ : i--) {
         #line 76 "src/std/str.pv"
         char const* ptr = self.ptr + self.length - 1 - i;
         #line 77 "src/std/str.pv"

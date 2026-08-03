@@ -541,7 +541,7 @@ bool DefinitionWriter__write_function_block(struct DefinitionWriter* self, FILE*
             yield_count = function_usage_context->function_context.coroutine.yield_count;
         }
         #line 252 "src/compiler/DefinitionWriter.pv"
-        for (uintptr_t i = 1; i < yield_count + 1; i++) {
+        for (uintptr_t i = 1; i != yield_count + 1; i < yield_count + 1 ? i++ : i--) {
             #line 253 "src/compiler/DefinitionWriter.pv"
             Generator__write_indent(generator, file);
             #line 254 "src/compiler/DefinitionWriter.pv"
@@ -2242,7 +2242,7 @@ bool DefinitionWriter__write_impls(struct DefinitionWriter* self, FILE* file, st
                     *func2 = *func_info;
 
                     #line 1124 "src/compiler/DefinitionWriter.pv"
-                    for (uintptr_t i = 0; i < function_usage->usage_contexts.length; i++) {
+                    for (uintptr_t i = 0; i != function_usage->usage_contexts.length; i < function_usage->usage_contexts.length ? i++ : i--) {
                         #line 1125 "src/compiler/DefinitionWriter.pv"
                         struct UsageContext* usage_context = &function_usage->usage_contexts.data[i];
                         #line 1126 "src/compiler/DefinitionWriter.pv"
