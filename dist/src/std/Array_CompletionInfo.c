@@ -44,7 +44,7 @@ struct Array_CompletionInfo Array_CompletionInfo__new_with_capacity(struct trait
 #line 94 "src/std/Array.pv"
 void Array_CompletionInfo__reserve(struct Array_CompletionInfo* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

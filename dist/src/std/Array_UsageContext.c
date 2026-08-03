@@ -44,7 +44,7 @@ struct Array_UsageContext Array_UsageContext__new_with_capacity(struct trait_All
 #line 94 "src/std/Array.pv"
 void Array_UsageContext__reserve(struct Array_UsageContext* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

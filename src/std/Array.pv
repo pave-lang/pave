@@ -92,7 +92,7 @@ impl<T> Array<T> {
     }
 
     fn reserve(&self, capacity: usize) {
-        if self.capacity > capacity {
+        if capacity <= self.capacity {
             return;
         }
 

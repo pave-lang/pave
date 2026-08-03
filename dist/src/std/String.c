@@ -10,7 +10,6 @@
 #include <usize.h>
 #include <std/str.h>
 #include <i32.h>
-#include <std/trait_Writer.h>
 #include <std/String.h>
 
 #include <std/String.h>

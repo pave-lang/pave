@@ -2,7 +2,6 @@
 
 #include <std/Hash.h>
 #include <std/Fnv1a.h>
-#include <std/trait_Hash.h>
 #include <std/Hash.h>
 
 #include <std/Hash.h>

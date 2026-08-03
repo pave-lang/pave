@@ -44,7 +44,7 @@ struct Array_PreprocessorElseIf Array_PreprocessorElseIf__new_with_capacity(stru
 #line 94 "src/std/Array.pv"
 void Array_PreprocessorElseIf__reserve(struct Array_PreprocessorElseIf* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

@@ -14,7 +14,6 @@
 #include <u64.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_str.h>
-#include <std/trait_Map_str_str.h>
 #include <std/HashMap_str_str.h>
 
 #include <std/HashMap_str_str.h>

@@ -20,6 +20,7 @@ struct HashMap_str_bool {
 #include <std/HashMap_str_bool.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_bool.h>
+#include <std/trait_Map_str_bool.h>
 struct HashMap_str_bool;
 struct str;
 struct HashMapBucket_str_bool;

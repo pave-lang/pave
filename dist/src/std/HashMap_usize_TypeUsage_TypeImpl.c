@@ -14,7 +14,6 @@
 #include <compiler/TypeUsage_TypeImpl.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_usize_TypeUsage_TypeImpl.h>
-#include <std/trait_Map_usize_TypeUsage_TypeImpl.h>
 #include <std/HashMap_usize_TypeUsage_TypeImpl.h>
 
 #include <std/HashMap_usize_TypeUsage_TypeImpl.h>

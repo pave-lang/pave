@@ -20,6 +20,7 @@ struct HashMap_usize_TypeUsage_Tuple {
 #include <std/HashMap_usize_TypeUsage_Tuple.h>
 #include <compiler/TypeUsage_Tuple.h>
 #include <std/HashMapIter_usize_TypeUsage_Tuple.h>
+#include <std/trait_Map_usize_TypeUsage_Tuple.h>
 struct HashMap_usize_TypeUsage_Tuple;
 struct TypeUsage_Tuple;
 struct HashMapBucket_usize_TypeUsage_Tuple;

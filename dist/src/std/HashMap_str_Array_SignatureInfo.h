@@ -21,6 +21,7 @@ struct HashMap_str_Array_SignatureInfo {
 #include <std/str.h>
 #include <std/Array_SignatureInfo.h>
 #include <std/HashMapIter_str_Array_SignatureInfo.h>
+#include <std/trait_Map_str_Array_SignatureInfo.h>
 struct HashMap_str_Array_SignatureInfo;
 struct str;
 struct Array_SignatureInfo;

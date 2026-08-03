@@ -20,6 +20,7 @@ struct HashMap_usize_TypeFunctionUsage {
 #include <std/HashMap_usize_TypeFunctionUsage.h>
 #include <compiler/TypeFunctionUsage.h>
 #include <std/HashMapIter_usize_TypeFunctionUsage.h>
+#include <std/trait_Map_usize_TypeFunctionUsage.h>
 struct HashMap_usize_TypeFunctionUsage;
 struct TypeFunctionUsage;
 struct HashMapBucket_usize_TypeFunctionUsage;

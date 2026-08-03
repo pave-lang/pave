@@ -15,7 +15,6 @@
 #include <analyzer/c/Include.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_ref_Include.h>
-#include <std/trait_Map_str_ref_Include.h>
 #include <std/HashMap_str_ref_Include.h>
 
 #include <std/HashMap_str_ref_Include.h>

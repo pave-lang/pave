@@ -21,6 +21,7 @@ struct HashMap_str_Array_MemberCompletionInfo {
 #include <std/str.h>
 #include <std/Array_MemberCompletionInfo.h>
 #include <std/HashMapIter_str_Array_MemberCompletionInfo.h>
+#include <std/trait_Map_str_Array_MemberCompletionInfo.h>
 struct HashMap_str_Array_MemberCompletionInfo;
 struct str;
 struct Array_MemberCompletionInfo;

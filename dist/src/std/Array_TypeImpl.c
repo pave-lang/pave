@@ -44,7 +44,7 @@ struct Array_TypeImpl Array_TypeImpl__new_with_capacity(struct trait_Allocator a
 #line 94 "src/std/Array.pv"
 void Array_TypeImpl__reserve(struct Array_TypeImpl* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

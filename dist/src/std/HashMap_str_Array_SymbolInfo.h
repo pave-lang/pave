@@ -21,6 +21,7 @@ struct HashMap_str_Array_SymbolInfo {
 #include <std/str.h>
 #include <std/Array_SymbolInfo.h>
 #include <std/HashMapIter_str_Array_SymbolInfo.h>
+#include <std/trait_Map_str_Array_SymbolInfo.h>
 struct HashMap_str_Array_SymbolInfo;
 struct str;
 struct Array_SymbolInfo;

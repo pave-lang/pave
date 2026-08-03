@@ -44,7 +44,7 @@ struct Array_EnumVariantParameter Array_EnumVariantParameter__new_with_capacity(
 #line 94 "src/std/Array.pv"
 void Array_EnumVariantParameter__reserve(struct Array_EnumVariantParameter* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

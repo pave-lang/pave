@@ -15,7 +15,6 @@
 #include <analyzer/ImplConst.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_ref_ImplConst.h>
-#include <std/trait_Map_str_ref_ImplConst.h>
 #include <std/HashMap_str_ref_ImplConst.h>
 
 #include <std/HashMap_str_ref_ImplConst.h>

@@ -44,7 +44,7 @@ struct Array_Scope Array_Scope__new_with_capacity(struct trait_Allocator allocat
 #line 94 "src/std/Array.pv"
 void Array_Scope__reserve(struct Array_Scope* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

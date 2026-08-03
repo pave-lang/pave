@@ -44,7 +44,7 @@ struct Array_HashMap_usize_TypeFunctionUsage Array_HashMap_usize_TypeFunctionUsa
 #line 94 "src/std/Array.pv"
 void Array_HashMap_usize_TypeFunctionUsage__reserve(struct Array_HashMap_usize_TypeFunctionUsage* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

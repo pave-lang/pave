@@ -20,6 +20,7 @@ struct HashMap_usize_TypeUsage_Primitive {
 #include <std/HashMap_usize_TypeUsage_Primitive.h>
 #include <compiler/TypeUsage_Primitive.h>
 #include <std/HashMapIter_usize_TypeUsage_Primitive.h>
+#include <std/trait_Map_usize_TypeUsage_Primitive.h>
 struct HashMap_usize_TypeUsage_Primitive;
 struct TypeUsage_Primitive;
 struct HashMapBucket_usize_TypeUsage_Primitive;

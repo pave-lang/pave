@@ -44,7 +44,7 @@ struct Array_Generic Array_Generic__new_with_capacity(struct trait_Allocator all
 #line 94 "src/std/Array.pv"
 void Array_Generic__reserve(struct Array_Generic* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

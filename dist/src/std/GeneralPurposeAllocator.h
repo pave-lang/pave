@@ -8,6 +8,7 @@
 struct GeneralPurposeAllocator {
 };
 
+#include <std/trait_Allocator.h>
 struct GeneralPurposeAllocator;
 
 #line 6 "src/std/GeneralPurposeAllocator.pv"

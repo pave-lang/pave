@@ -21,6 +21,7 @@ struct HashMap_str_EnumCValue {
 #include <std/str.h>
 #include <analyzer/c/EnumCValue.h>
 #include <std/HashMapIter_str_EnumCValue.h>
+#include <std/trait_Map_str_EnumCValue.h>
 struct HashMap_str_EnumCValue;
 struct str;
 struct EnumCValue;

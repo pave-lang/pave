@@ -20,6 +20,7 @@ struct HashMap_str_ref_Module {
 #include <std/HashMap_str_ref_Module.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Module.h>
+#include <std/trait_Map_str_ref_Module.h>
 struct HashMap_str_ref_Module;
 struct str;
 struct Module;

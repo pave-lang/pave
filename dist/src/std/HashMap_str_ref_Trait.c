@@ -15,7 +15,6 @@
 #include <analyzer/types/Trait.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_ref_Trait.h>
-#include <std/trait_Map_str_ref_Trait.h>
 #include <std/HashMap_str_ref_Trait.h>
 
 #include <std/HashMap_str_ref_Trait.h>

@@ -21,6 +21,7 @@ struct HashMap_str_Array_ref_Enum {
 #include <std/str.h>
 #include <std/Array_ref_Enum.h>
 #include <std/HashMapIter_str_Array_ref_Enum.h>
+#include <std/trait_Map_str_Array_ref_Enum.h>
 struct HashMap_str_Array_ref_Enum;
 struct str;
 struct Array_ref_Enum;

@@ -43,7 +43,7 @@ struct Array_ptrc_char Array_ptrc_char__new_with_capacity(struct trait_Allocator
 #line 94 "src/std/Array.pv"
 void Array_ptrc_char__reserve(struct Array_ptrc_char* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

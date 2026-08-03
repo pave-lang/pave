@@ -44,7 +44,7 @@ struct Array_String Array_String__new_with_capacity(struct trait_Allocator alloc
 #line 94 "src/std/Array.pv"
 void Array_String__reserve(struct Array_String* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

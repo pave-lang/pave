@@ -10,7 +10,6 @@
 #include <std/Range_ptrc_char.h>
 #include <char.h>
 #include <std/Range_usize.h>
-#include <std/trait_Hash.h>
 #include <std/Hash.h>
 #include <std/Fnv1a.h>
 #include <std/str.h>

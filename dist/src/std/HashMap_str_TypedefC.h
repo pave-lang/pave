@@ -21,6 +21,7 @@ struct HashMap_str_TypedefC {
 #include <std/str.h>
 #include <analyzer/c/TypedefC.h>
 #include <std/HashMapIter_str_TypedefC.h>
+#include <std/trait_Map_str_TypedefC.h>
 struct HashMap_str_TypedefC;
 struct str;
 struct TypedefC;

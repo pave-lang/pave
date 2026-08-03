@@ -15,7 +15,6 @@
 #include <analyzer/c/EnumCValue.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_EnumCValue.h>
-#include <std/trait_Map_str_EnumCValue.h>
 #include <std/HashMap_str_EnumCValue.h>
 
 #include <std/HashMap_str_EnumCValue.h>

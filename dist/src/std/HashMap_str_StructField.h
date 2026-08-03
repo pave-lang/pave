@@ -21,6 +21,7 @@ struct HashMap_str_StructField {
 #include <std/str.h>
 #include <analyzer/types/StructField.h>
 #include <std/HashMapIter_str_StructField.h>
+#include <std/trait_Map_str_StructField.h>
 struct HashMap_str_StructField;
 struct str;
 struct StructField;

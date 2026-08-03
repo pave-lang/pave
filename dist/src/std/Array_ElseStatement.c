@@ -44,7 +44,7 @@ struct Array_ElseStatement Array_ElseStatement__new_with_capacity(struct trait_A
 #line 94 "src/std/Array.pv"
 void Array_ElseStatement__reserve(struct Array_ElseStatement* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

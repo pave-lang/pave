@@ -20,6 +20,7 @@ struct HashMap_str_ref_ImplConst {
 #include <std/HashMap_str_ref_ImplConst.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_ImplConst.h>
+#include <std/trait_Map_str_ref_ImplConst.h>
 struct HashMap_str_ref_ImplConst;
 struct str;
 struct ImplConst;

@@ -20,6 +20,7 @@ struct HashMap_HashMapCollisionKey_i32 {
 #include <std/HashMap_HashMapCollisionKey_i32.h>
 #include <std/HashMapCollisionKey.h>
 #include <std/HashMapIter_HashMapCollisionKey_i32.h>
+#include <std/trait_Map_HashMapCollisionKey_i32.h>
 struct HashMap_HashMapCollisionKey_i32;
 typedef int32_t HashMapCollisionKey;
 struct HashMapBucket_HashMapCollisionKey_i32;

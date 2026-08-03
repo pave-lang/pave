@@ -15,7 +15,6 @@
 #include <analyzer/types/Type.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_u32_Type.h>
-#include <std/trait_Map_u32_Type.h>
 #include <std/HashMap_u32_Type.h>
 
 #include <std/HashMap_u32_Type.h>

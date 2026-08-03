@@ -44,7 +44,7 @@ struct Array_ref_Struct Array_ref_Struct__new_with_capacity(struct trait_Allocat
 #line 94 "src/std/Array.pv"
 void Array_ref_Struct__reserve(struct Array_ref_Struct* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

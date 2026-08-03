@@ -400,6 +400,7 @@ impl Usages {
                 match sequence.type {
                     SequenceType::FixedArray(expression) => {
                         self.process_expression(expression, generic_map);
+                        self.add_type(&sequence.element, generic_map);
                     },
                     SequenceType::Slice => {
                         is_type = sequence.is_slice();
@@ -483,6 +484,15 @@ impl Usages {
             for (_, &func_info) in impl_info.functions {
                 if func_info.generics.array.length > 0 { continue; }
                 self.process_function(func_info, generic_map);
+            }
+
+            self.usage_mode = UsageMode::Signature;
+
+            for (_, impl_const) in impl_info.consts {
+                self.add_type(&impl_const.type, generic_map);
+                if impl_const.value != null {
+                    self.process_expression(impl_const.value, generic_map);
+                }
             }
 
             let trait_info = impl_info.trait_;

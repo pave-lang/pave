@@ -20,6 +20,7 @@ struct HashMap_str_ref_Trait {
 #include <std/HashMap_str_ref_Trait.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Trait.h>
+#include <std/trait_Map_str_ref_Trait.h>
 struct HashMap_str_ref_Trait;
 struct str;
 struct Trait;

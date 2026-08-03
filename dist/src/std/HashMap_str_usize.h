@@ -20,6 +20,7 @@ struct HashMap_str_usize {
 #include <std/HashMap_str_usize.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_usize.h>
+#include <std/trait_Map_str_usize.h>
 struct HashMap_str_usize;
 struct str;
 struct HashMapBucket_str_usize;

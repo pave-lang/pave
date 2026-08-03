@@ -44,7 +44,7 @@ struct Array_ForVariable Array_ForVariable__new_with_capacity(struct trait_Alloc
 #line 94 "src/std/Array.pv"
 void Array_ForVariable__reserve(struct Array_ForVariable* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

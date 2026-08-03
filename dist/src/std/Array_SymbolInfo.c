@@ -44,7 +44,7 @@ struct Array_SymbolInfo Array_SymbolInfo__new_with_capacity(struct trait_Allocat
 #line 94 "src/std/Array.pv"
 void Array_SymbolInfo__reserve(struct Array_SymbolInfo* self, uintptr_t capacity) {
     #line 95 "src/std/Array.pv"
-    if (self->capacity > capacity) {
+    if (capacity <= self->capacity) {
         #line 96 "src/std/Array.pv"
         return;
     }

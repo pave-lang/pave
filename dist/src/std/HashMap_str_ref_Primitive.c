@@ -15,7 +15,6 @@
 #include <analyzer/types/Primitive.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_ref_Primitive.h>
-#include <std/trait_Map_str_ref_Primitive.h>
 #include <std/HashMap_str_ref_Primitive.h>
 
 #include <std/HashMap_str_ref_Primitive.h>

@@ -15,7 +15,6 @@
 #include <std/Array_SymbolInfo.h>
 #include <std/Range_usize.h>
 #include <std/HashMapIter_str_Array_SymbolInfo.h>
-#include <std/trait_Map_str_Array_SymbolInfo.h>
 #include <std/HashMap_str_Array_SymbolInfo.h>
 
 #include <std/HashMap_str_Array_SymbolInfo.h>
