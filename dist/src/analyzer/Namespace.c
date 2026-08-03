@@ -148,379 +148,434 @@ bool Namespace__add_namespace_subfolder(struct Namespace* self, struct str name)
 #line 91 "src/analyzer/Namespace.pv"
 struct Namespace* Namespace__find_namespace(struct Namespace* self, struct str name) {
     #line 92 "src/analyzer/Namespace.pv"
-    struct Namespace** child = HashMap_str_ref_Namespace__find(&self->children, &name);
+    struct Namespace* current = self;
     #line 93 "src/analyzer/Namespace.pv"
-    if (child != 0) {
-        #line 93 "src/analyzer/Namespace.pv"
-        return *child;
+    struct Namespace* slow = self;
+    #line 94 "src/analyzer/Namespace.pv"
+    struct Namespace* fast = self;
+    #line 95 "src/analyzer/Namespace.pv"
+    uintptr_t depth = 0;
+
+    #line 97 "src/analyzer/Namespace.pv"
+    while (current != 0) {
+        #line 98 "src/analyzer/Namespace.pv"
+        if (depth >= 1024) {
+            #line 99 "src/analyzer/Namespace.pv"
+            Root__error(self->root, self->path, 0, 0, 0, 0, "Namespace lookup exceeded maximum depth");
+            #line 100 "src/analyzer/Namespace.pv"
+            return 0;
+        }
+
+        #line 103 "src/analyzer/Namespace.pv"
+        struct Namespace** child = HashMap_str_ref_Namespace__find(&current->children, &name);
+        #line 104 "src/analyzer/Namespace.pv"
+        if (child != 0) {
+            #line 104 "src/analyzer/Namespace.pv"
+            return *child;
+        }
+
+        #line 106 "src/analyzer/Namespace.pv"
+        current = current->parent;
+        #line 107 "src/analyzer/Namespace.pv"
+        depth += 1;
+
+        #line 109 "src/analyzer/Namespace.pv"
+        struct Namespace* slow_next = 0;
+        #line 110 "src/analyzer/Namespace.pv"
+        if (slow != 0) {
+            #line 110 "src/analyzer/Namespace.pv"
+            slow_next = slow->parent;
+        }
+        #line 111 "src/analyzer/Namespace.pv"
+        slow = slow_next;
+
+        #line 113 "src/analyzer/Namespace.pv"
+        struct Namespace* fast_next = 0;
+        #line 114 "src/analyzer/Namespace.pv"
+        if (fast != 0) {
+            #line 114 "src/analyzer/Namespace.pv"
+            fast_next = fast->parent;
+        }
+        #line 115 "src/analyzer/Namespace.pv"
+        if (fast_next != 0) {
+            #line 115 "src/analyzer/Namespace.pv"
+            fast_next = fast_next->parent;
+        }
+        #line 116 "src/analyzer/Namespace.pv"
+        fast = fast_next;
+
+        #line 118 "src/analyzer/Namespace.pv"
+        if (slow != 0 && slow == fast) {
+            #line 119 "src/analyzer/Namespace.pv"
+            Root__error(self->root, self->path, 0, 0, 0, 0, "Namespace cycle detected during lookup");
+            #line 120 "src/analyzer/Namespace.pv"
+            return 0;
+        }
     }
 
-    #line 95 "src/analyzer/Namespace.pv"
-    if (self->parent != 0) {
-        #line 96 "src/analyzer/Namespace.pv"
-        return Namespace__find_namespace(self->parent, name);
-    } else {
-        #line 98 "src/analyzer/Namespace.pv"
-        return Root__find_namespace(self->root, name);
-    }
+    #line 124 "src/analyzer/Namespace.pv"
+    return Root__find_namespace(self->root, name);
 }
 
-#line 102 "src/analyzer/Namespace.pv"
+#line 127 "src/analyzer/Namespace.pv"
 bool Namespace__add_module(struct Namespace* self, struct str name) {
-    #line 103 "src/analyzer/Namespace.pv"
+    #line 128 "src/analyzer/Namespace.pv"
     if (HashMap_str_ref_Module__find(&self->modules, &name) != 0) {
-        #line 104 "src/analyzer/Namespace.pv"
+        #line 129 "src/analyzer/Namespace.pv"
         return true;
     }
 
-    #line 107 "src/analyzer/Namespace.pv"
+    #line 132 "src/analyzer/Namespace.pv"
     struct String path = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = self->root->allocator });
-    #line 108 "src/analyzer/Namespace.pv"
+    #line 133 "src/analyzer/Namespace.pv"
     String__append(&path, self->path);
-    #line 109 "src/analyzer/Namespace.pv"
+    #line 134 "src/analyzer/Namespace.pv"
     String__append(&path, (struct str){ .ptr = "/", .length = strlen("/") });
-    #line 110 "src/analyzer/Namespace.pv"
+    #line 135 "src/analyzer/Namespace.pv"
     String__append(&path, name);
-    #line 111 "src/analyzer/Namespace.pv"
+    #line 136 "src/analyzer/Namespace.pv"
     String__append(&path, (struct str){ .ptr = ".pave", .length = strlen(".pave") });
 
-    #line 113 "src/analyzer/Namespace.pv"
+    #line 138 "src/analyzer/Namespace.pv"
     if (i32__Eq_i32__eq(path_exists(String__c_str(&path)), 0)) {
-        #line 114 "src/analyzer/Namespace.pv"
+        #line 139 "src/analyzer/Namespace.pv"
         path.array.length -= 5;
-        #line 115 "src/analyzer/Namespace.pv"
+        #line 140 "src/analyzer/Namespace.pv"
         String__append(&path, (struct str){ .ptr = ".pv", .length = strlen(".pv") });
     }
 
-    #line 118 "src/analyzer/Namespace.pv"
+    #line 143 "src/analyzer/Namespace.pv"
     struct Module* module = Module__new(self, String__as_str(&path));
-    #line 119 "src/analyzer/Namespace.pv"
+    #line 144 "src/analyzer/Namespace.pv"
     HashMap_str_ref_Module__insert(&self->modules, name, module);
-    #line 120 "src/analyzer/Namespace.pv"
+    #line 145 "src/analyzer/Namespace.pv"
     return Module__parse(module);
 }
 
-#line 123 "src/analyzer/Namespace.pv"
+#line 148 "src/analyzer/Namespace.pv"
 bool Namespace__add_use_namespaces(struct Namespace* self) {
-    #line 124 "src/analyzer/Namespace.pv"
-    { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 124 "src/analyzer/Namespace.pv"
-    while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 124 "src/analyzer/Namespace.pv"
-        struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
-
-        #line 125 "src/analyzer/Namespace.pv"
-        Module__add_use_namespaces(module);
-    } }
-
-    #line 128 "src/analyzer/Namespace.pv"
-    { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 128 "src/analyzer/Namespace.pv"
-    while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 128 "src/analyzer/Namespace.pv"
-        struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
-
-        #line 129 "src/analyzer/Namespace.pv"
-        Namespace__add_use_namespaces(child);
-    } }
-
-    #line 132 "src/analyzer/Namespace.pv"
-    return true;
-}
-
-#line 135 "src/analyzer/Namespace.pv"
-bool Namespace__fill_namespace(struct Namespace* self) {
-    #line 136 "src/analyzer/Namespace.pv"
+    #line 149 "src/analyzer/Namespace.pv"
     bool success = true;
 
-    #line 138 "src/analyzer/Namespace.pv"
-    { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 138 "src/analyzer/Namespace.pv"
-    while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 138 "src/analyzer/Namespace.pv"
-        struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
-
-        #line 139 "src/analyzer/Namespace.pv"
-        success = Namespace__fill_namespace(child) && success;
-    } }
-
-    #line 142 "src/analyzer/Namespace.pv"
+    #line 151 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 142 "src/analyzer/Namespace.pv"
+    #line 151 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 142 "src/analyzer/Namespace.pv"
+        #line 151 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 143 "src/analyzer/Namespace.pv"
-        success = Module__fill_namespace(module) && success;
+        #line 152 "src/analyzer/Namespace.pv"
+        success = Module__add_use_namespaces(module) && success;
     } }
 
-    #line 146 "src/analyzer/Namespace.pv"
+    #line 155 "src/analyzer/Namespace.pv"
+    { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
+    #line 155 "src/analyzer/Namespace.pv"
+    while (HashMapIter_str_ref_Namespace__next(&__iter)) {
+        #line 155 "src/analyzer/Namespace.pv"
+        struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
+
+        #line 156 "src/analyzer/Namespace.pv"
+        success = Namespace__add_use_namespaces(child) && success;
+    } }
+
+    #line 159 "src/analyzer/Namespace.pv"
     return success;
 }
 
-#line 149 "src/analyzer/Namespace.pv"
-bool Namespace__prefill_types(struct Namespace* self) {
-    #line 150 "src/analyzer/Namespace.pv"
+#line 162 "src/analyzer/Namespace.pv"
+bool Namespace__fill_namespace(struct Namespace* self) {
+    #line 163 "src/analyzer/Namespace.pv"
+    bool success = true;
+
+    #line 165 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 150 "src/analyzer/Namespace.pv"
+    #line 165 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 150 "src/analyzer/Namespace.pv"
+        #line 165 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 151 "src/analyzer/Namespace.pv"
+        #line 166 "src/analyzer/Namespace.pv"
+        success = Namespace__fill_namespace(child) && success;
+    } }
+
+    #line 169 "src/analyzer/Namespace.pv"
+    { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
+    #line 169 "src/analyzer/Namespace.pv"
+    while (HashMapIter_str_ref_Module__next(&__iter)) {
+        #line 169 "src/analyzer/Namespace.pv"
+        struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
+
+        #line 170 "src/analyzer/Namespace.pv"
+        success = Module__fill_namespace(module) && success;
+    } }
+
+    #line 173 "src/analyzer/Namespace.pv"
+    return success;
+}
+
+#line 176 "src/analyzer/Namespace.pv"
+bool Namespace__prefill_types(struct Namespace* self) {
+    #line 177 "src/analyzer/Namespace.pv"
+    { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
+    #line 177 "src/analyzer/Namespace.pv"
+    while (HashMapIter_str_ref_Namespace__next(&__iter)) {
+        #line 177 "src/analyzer/Namespace.pv"
+        struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
+
+        #line 178 "src/analyzer/Namespace.pv"
         Namespace__prefill_types(child);
     } }
 
-    #line 154 "src/analyzer/Namespace.pv"
+    #line 181 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 154 "src/analyzer/Namespace.pv"
+    #line 181 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 154 "src/analyzer/Namespace.pv"
+        #line 181 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 155 "src/analyzer/Namespace.pv"
+        #line 182 "src/analyzer/Namespace.pv"
         Module__prefill_types(module);
     } }
 
-    #line 158 "src/analyzer/Namespace.pv"
+    #line 185 "src/analyzer/Namespace.pv"
     return true;
 }
 
-#line 161 "src/analyzer/Namespace.pv"
+#line 188 "src/analyzer/Namespace.pv"
 bool Namespace__prefill_types_impl(struct Namespace* self) {
-    #line 162 "src/analyzer/Namespace.pv"
+    #line 189 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 162 "src/analyzer/Namespace.pv"
+    #line 189 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 162 "src/analyzer/Namespace.pv"
+        #line 189 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 163 "src/analyzer/Namespace.pv"
+        #line 190 "src/analyzer/Namespace.pv"
         Namespace__prefill_types_impl(child);
     } }
 
-    #line 166 "src/analyzer/Namespace.pv"
+    #line 193 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 166 "src/analyzer/Namespace.pv"
+    #line 193 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 166 "src/analyzer/Namespace.pv"
+        #line 193 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 167 "src/analyzer/Namespace.pv"
+        #line 194 "src/analyzer/Namespace.pv"
         Module__prefill_types_impl(module);
     } }
 
-    #line 170 "src/analyzer/Namespace.pv"
+    #line 197 "src/analyzer/Namespace.pv"
     return true;
 }
 
-#line 173 "src/analyzer/Namespace.pv"
+#line 200 "src/analyzer/Namespace.pv"
 bool Namespace__parse_declarations(struct Namespace* self) {
-    #line 174 "src/analyzer/Namespace.pv"
+    #line 201 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 174 "src/analyzer/Namespace.pv"
+    #line 201 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 174 "src/analyzer/Namespace.pv"
+        #line 201 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 175 "src/analyzer/Namespace.pv"
+        #line 202 "src/analyzer/Namespace.pv"
         Module__parse_declarations(module);
     } }
 
-    #line 178 "src/analyzer/Namespace.pv"
+    #line 205 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 178 "src/analyzer/Namespace.pv"
+    #line 205 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 178 "src/analyzer/Namespace.pv"
+        #line 205 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 179 "src/analyzer/Namespace.pv"
+        #line 206 "src/analyzer/Namespace.pv"
         Namespace__parse_declarations(child);
     } }
 
-    #line 182 "src/analyzer/Namespace.pv"
+    #line 209 "src/analyzer/Namespace.pv"
     return true;
 }
 
-#line 185 "src/analyzer/Namespace.pv"
+#line 212 "src/analyzer/Namespace.pv"
 bool Namespace__parse_globals(struct Namespace* self) {
-    #line 186 "src/analyzer/Namespace.pv"
+    #line 213 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 186 "src/analyzer/Namespace.pv"
+    #line 213 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 186 "src/analyzer/Namespace.pv"
+        #line 213 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 187 "src/analyzer/Namespace.pv"
+        #line 214 "src/analyzer/Namespace.pv"
         Module__parse_globals(module);
     } }
 
-    #line 190 "src/analyzer/Namespace.pv"
+    #line 217 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 190 "src/analyzer/Namespace.pv"
+    #line 217 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 190 "src/analyzer/Namespace.pv"
+        #line 217 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 191 "src/analyzer/Namespace.pv"
+        #line 218 "src/analyzer/Namespace.pv"
         Namespace__parse_globals(child);
     } }
 
-    #line 194 "src/analyzer/Namespace.pv"
+    #line 221 "src/analyzer/Namespace.pv"
     return true;
 }
 
-#line 197 "src/analyzer/Namespace.pv"
+#line 224 "src/analyzer/Namespace.pv"
 bool Namespace__parse_functions(struct Namespace* self) {
-    #line 198 "src/analyzer/Namespace.pv"
+    #line 225 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 198 "src/analyzer/Namespace.pv"
+    #line 225 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 198 "src/analyzer/Namespace.pv"
+        #line 225 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 199 "src/analyzer/Namespace.pv"
+        #line 226 "src/analyzer/Namespace.pv"
         Module__parse_functions(module);
     } }
 
-    #line 202 "src/analyzer/Namespace.pv"
+    #line 229 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 202 "src/analyzer/Namespace.pv"
+    #line 229 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 202 "src/analyzer/Namespace.pv"
+        #line 229 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 203 "src/analyzer/Namespace.pv"
+        #line 230 "src/analyzer/Namespace.pv"
         Namespace__parse_functions(child);
     } }
 
-    #line 206 "src/analyzer/Namespace.pv"
+    #line 233 "src/analyzer/Namespace.pv"
     return true;
 }
 
-#line 209 "src/analyzer/Namespace.pv"
+#line 236 "src/analyzer/Namespace.pv"
 bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path) {
-    #line 210 "src/analyzer/Namespace.pv"
+    #line 237 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 210 "src/analyzer/Namespace.pv"
+    #line 237 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 210 "src/analyzer/Namespace.pv"
+        #line 237 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 211 "src/analyzer/Namespace.pv"
+        #line 238 "src/analyzer/Namespace.pv"
         if (Module__parse_functions_if_path(module, path)) {
-            #line 211 "src/analyzer/Namespace.pv"
+            #line 238 "src/analyzer/Namespace.pv"
             return true;
         }
     } }
 
-    #line 214 "src/analyzer/Namespace.pv"
+    #line 241 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 214 "src/analyzer/Namespace.pv"
+    #line 241 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 214 "src/analyzer/Namespace.pv"
+        #line 241 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 215 "src/analyzer/Namespace.pv"
+        #line 242 "src/analyzer/Namespace.pv"
         if (Namespace__parse_functions_if_path(child, path)) {
-            #line 215 "src/analyzer/Namespace.pv"
+            #line 242 "src/analyzer/Namespace.pv"
             return true;
         }
     } }
 
-    #line 218 "src/analyzer/Namespace.pv"
+    #line 245 "src/analyzer/Namespace.pv"
     return false;
 }
 
-#line 221 "src/analyzer/Namespace.pv"
+#line 248 "src/analyzer/Namespace.pv"
 struct Module* Namespace__find_module_by_path(struct Namespace* self, struct str path) {
-    #line 222 "src/analyzer/Namespace.pv"
+    #line 249 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Module __iter = HashMap_str_ref_Module__iter(&self->modules);
-    #line 222 "src/analyzer/Namespace.pv"
+    #line 249 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Module__next(&__iter)) {
-        #line 222 "src/analyzer/Namespace.pv"
+        #line 249 "src/analyzer/Namespace.pv"
         struct Module* module = HashMapIter_str_ref_Module__value(&__iter)->_1;
 
-        #line 223 "src/analyzer/Namespace.pv"
+        #line 250 "src/analyzer/Namespace.pv"
         if (str__Eq_str__eq(module->path, path)) {
-            #line 223 "src/analyzer/Namespace.pv"
+            #line 250 "src/analyzer/Namespace.pv"
             return module;
         }
     } }
-    #line 225 "src/analyzer/Namespace.pv"
+    #line 252 "src/analyzer/Namespace.pv"
     { struct HashMapIter_str_ref_Namespace __iter = HashMap_str_ref_Namespace__iter(&self->children);
-    #line 225 "src/analyzer/Namespace.pv"
+    #line 252 "src/analyzer/Namespace.pv"
     while (HashMapIter_str_ref_Namespace__next(&__iter)) {
-        #line 225 "src/analyzer/Namespace.pv"
+        #line 252 "src/analyzer/Namespace.pv"
         struct Namespace* child = HashMapIter_str_ref_Namespace__value(&__iter)->_1;
 
-        #line 226 "src/analyzer/Namespace.pv"
+        #line 253 "src/analyzer/Namespace.pv"
         struct Module* result = Namespace__find_module_by_path(child, path);
-        #line 227 "src/analyzer/Namespace.pv"
+        #line 254 "src/analyzer/Namespace.pv"
         if (result != 0) {
-            #line 227 "src/analyzer/Namespace.pv"
+            #line 254 "src/analyzer/Namespace.pv"
             return result;
         }
     } }
-    #line 229 "src/analyzer/Namespace.pv"
+    #line 256 "src/analyzer/Namespace.pv"
     return 0;
 }
 
-#line 232 "src/analyzer/Namespace.pv"
+#line 259 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity) {
-    #line 233 "src/analyzer/Namespace.pv"
+    #line 260 "src/analyzer/Namespace.pv"
     struct Array_Type* arr = HashMap_str_Array_Type__find(&self->types, &name);
-    #line 234 "src/analyzer/Namespace.pv"
+    #line 261 "src/analyzer/Namespace.pv"
     if (arr == 0) {
-        #line 234 "src/analyzer/Namespace.pv"
+        #line 261 "src/analyzer/Namespace.pv"
         return 0;
     }
-    #line 235 "src/analyzer/Namespace.pv"
+    #line 262 "src/analyzer/Namespace.pv"
     uintptr_t i = 0;
-    #line 236 "src/analyzer/Namespace.pv"
+    #line 263 "src/analyzer/Namespace.pv"
     while (i < arr->length) {
-        #line 237 "src/analyzer/Namespace.pv"
+        #line 264 "src/analyzer/Namespace.pv"
         if (usize__Eq_usize__eq(Type__get_arity(&arr->data[i]), arity)) {
-            #line 237 "src/analyzer/Namespace.pv"
+            #line 264 "src/analyzer/Namespace.pv"
             return &arr->data[i];
         }
-        #line 238 "src/analyzer/Namespace.pv"
+        #line 265 "src/analyzer/Namespace.pv"
         i += 1;
     }
-    #line 240 "src/analyzer/Namespace.pv"
+    #line 267 "src/analyzer/Namespace.pv"
     return 0;
 }
 
-#line 243 "src/analyzer/Namespace.pv"
+#line 270 "src/analyzer/Namespace.pv"
 struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uintptr_t arity) {
-    #line 244 "src/analyzer/Namespace.pv"
+    #line 271 "src/analyzer/Namespace.pv"
     struct Array_ref_Trait* arr = HashMap_str_Array_ref_Trait__find(&self->traits, &name);
-    #line 245 "src/analyzer/Namespace.pv"
+    #line 272 "src/analyzer/Namespace.pv"
     if (arr == 0) {
-        #line 245 "src/analyzer/Namespace.pv"
+        #line 272 "src/analyzer/Namespace.pv"
         return 0;
     }
-    #line 246 "src/analyzer/Namespace.pv"
+    #line 273 "src/analyzer/Namespace.pv"
     uintptr_t i = 0;
-    #line 247 "src/analyzer/Namespace.pv"
+    #line 274 "src/analyzer/Namespace.pv"
     while (i < arr->length) {
-        #line 248 "src/analyzer/Namespace.pv"
+        #line 275 "src/analyzer/Namespace.pv"
         struct Trait* trait_info = arr->data[i];
-        #line 249 "src/analyzer/Namespace.pv"
+        #line 276 "src/analyzer/Namespace.pv"
         if (usize__Eq_usize__eq(trait_info->generic_arity, arity)) {
-            #line 249 "src/analyzer/Namespace.pv"
+            #line 276 "src/analyzer/Namespace.pv"
             return trait_info;
         }
-        #line 250 "src/analyzer/Namespace.pv"
+        #line 277 "src/analyzer/Namespace.pv"
         i += 1;
     }
-    #line 252 "src/analyzer/Namespace.pv"
+    #line 279 "src/analyzer/Namespace.pv"
     return 0;
 }
 
-#line 255 "src/analyzer/Namespace.pv"
+#line 282 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_function(struct Namespace* self, struct str name) {
-    #line 256 "src/analyzer/Namespace.pv"
+    #line 283 "src/analyzer/Namespace.pv"
     return HashMap_str_Type__find(&self->functions, &name);
 }

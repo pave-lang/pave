@@ -55,43 +55,43 @@ bool Namespace__add_namespace_subfolder(struct Namespace* self, struct str name)
 #line 91 "src/analyzer/Namespace.pv"
 struct Namespace* Namespace__find_namespace(struct Namespace* self, struct str name);
 
-#line 102 "src/analyzer/Namespace.pv"
+#line 127 "src/analyzer/Namespace.pv"
 bool Namespace__add_module(struct Namespace* self, struct str name);
 
-#line 123 "src/analyzer/Namespace.pv"
+#line 148 "src/analyzer/Namespace.pv"
 bool Namespace__add_use_namespaces(struct Namespace* self);
 
-#line 135 "src/analyzer/Namespace.pv"
+#line 162 "src/analyzer/Namespace.pv"
 bool Namespace__fill_namespace(struct Namespace* self);
 
-#line 149 "src/analyzer/Namespace.pv"
+#line 176 "src/analyzer/Namespace.pv"
 bool Namespace__prefill_types(struct Namespace* self);
 
-#line 161 "src/analyzer/Namespace.pv"
+#line 188 "src/analyzer/Namespace.pv"
 bool Namespace__prefill_types_impl(struct Namespace* self);
 
-#line 173 "src/analyzer/Namespace.pv"
+#line 200 "src/analyzer/Namespace.pv"
 bool Namespace__parse_declarations(struct Namespace* self);
 
-#line 185 "src/analyzer/Namespace.pv"
+#line 212 "src/analyzer/Namespace.pv"
 bool Namespace__parse_globals(struct Namespace* self);
 
-#line 197 "src/analyzer/Namespace.pv"
+#line 224 "src/analyzer/Namespace.pv"
 bool Namespace__parse_functions(struct Namespace* self);
 
-#line 209 "src/analyzer/Namespace.pv"
+#line 236 "src/analyzer/Namespace.pv"
 bool Namespace__parse_functions_if_path(struct Namespace* self, struct str path);
 
-#line 221 "src/analyzer/Namespace.pv"
+#line 248 "src/analyzer/Namespace.pv"
 struct Module* Namespace__find_module_by_path(struct Namespace* self, struct str path);
 
-#line 232 "src/analyzer/Namespace.pv"
+#line 259 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_type(struct Namespace* self, struct str name, uintptr_t arity);
 
-#line 243 "src/analyzer/Namespace.pv"
+#line 270 "src/analyzer/Namespace.pv"
 struct Trait* Namespace__find_trait(struct Namespace* self, struct str name, uintptr_t arity);
 
-#line 255 "src/analyzer/Namespace.pv"
+#line 282 "src/analyzer/Namespace.pv"
 struct Type* Namespace__find_function(struct Namespace* self, struct str name);
 
 #endif

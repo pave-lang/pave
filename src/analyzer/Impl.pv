@@ -167,9 +167,7 @@ impl Impl {
                 if typedef_name == null { return false; }
                 if !context.expect_value(TokenType::Symbol, "=") { return false; }
                 let token_start = context.pos;
-                while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
-                    context.next_token();
-                }
+                if !context.skip_to_statement_end() { return false; }
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
                 self.typedef_starts.insert(typedef_name.value, token_start);
                 nodes.append(ImplNode::Typedef(typedef_name.value));
@@ -179,9 +177,7 @@ impl Impl {
                 if const_name == null { return false; }
 
                 let token_start = context.pos;
-                while context.pos < context.length && !context.check_value(TokenType::Symbol, ";") {
-                    context.next_token();
-                }
+                if !context.skip_to_statement_end() { return false; }
                 if !context.expect_value(TokenType::Symbol, ";") { return false; }
                 let token_end = context.pos;
 

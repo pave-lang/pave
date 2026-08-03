@@ -507,6 +507,7 @@ impl DefinitionWriter {
                 fprintf(file, "_");
                 let impl_const_name = *impl_const.name;
                 generator.write_str_title(file, impl_const_name.value);
+                generator.write_array_decl_suffix(file, &impl_const.type, generics);
                 fprintf(file, ";\n");
             }
         }
@@ -623,6 +624,7 @@ impl DefinitionWriter {
                 fprintf(file, "_");
                 let impl_const_name = *impl_const.name;
                 generator.write_str_title(file, impl_const_name.value);
+                generator.write_array_decl_suffix(file, &impl_const.type, generics);
                 fprintf(file, ";\n");
             }
         }
@@ -1168,6 +1170,7 @@ impl DefinitionWriter {
                 fprintf(file, "_");
                 let impl_const_name = *impl_const.name;
                 generator.write_str_title(file, impl_const_name.value);
+                generator.write_array_decl_suffix(file, &impl_const.type, generics);
                 fprintf(file, " = ");
                 ExpressionWriter { generator }.write_expression(file, impl_const.value, generics);
                 fprintf(file, ";\n");

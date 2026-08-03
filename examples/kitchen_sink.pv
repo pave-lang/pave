@@ -194,6 +194,7 @@ struct Limits {
 impl Limits {
     const MAX: i32 = 1000;
     const MIN: i32 = -1000;
+    const row_join_buttons: [f32; 3] = [ 0.4f, 0.2f, 0.4f ];
 }
 
 // --- 12. Numeric match patterns ---
@@ -518,6 +519,7 @@ test "enum struct variant" {
 test "impl const" {
     assert(Limits::MAX == 1000);
     assert(Limits::MIN == -1000);
+    assert(Limits::row_join_buttons[1] == 0.2f);
 }
 
 test "numeric match pattern" {

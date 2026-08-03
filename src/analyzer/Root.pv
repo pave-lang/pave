@@ -353,11 +353,13 @@ impl Root {
     }
 
     fn add_use_namespaces(&self) -> bool {
+        let success = true;
+
         for (_, child) in self.children {
-            child.add_use_namespaces();
+            success = child.add_use_namespaces() && success;
         }
 
-        return true;
+        return success;
     }
 
     fn fill_namespace(&self) -> bool {

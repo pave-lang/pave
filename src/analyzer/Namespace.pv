@@ -89,14 +89,39 @@ impl Namespace {
     }
 
     fn find_namespace(&self, name: str) -> *Namespace {
-        let child = self.children.find(&name);
-        if child != null { return *child; }
+        let current: *Namespace = self;
+        let slow: *Namespace = self;
+        let fast: *Namespace = self;
+        let depth: usize = 0;
 
-        if self.parent != null {
-            return self.parent.find_namespace(name);
-        } else {
-            return self.root.find_namespace(name);
+        while current != null {
+            if depth >= 1024 {
+                self.root.error(self.path, 0, 0, 0, 0, "Namespace lookup exceeded maximum depth");
+                return null;
+            }
+
+            let child = current.children.find(&name);
+            if child != null { return *child; }
+
+            current = current.parent;
+            depth += 1;
+
+            let slow_next: *Namespace = null;
+            if slow != null { slow_next = slow.parent; }
+            slow = slow_next;
+
+            let fast_next: *Namespace = null;
+            if fast != null { fast_next = fast.parent; }
+            if fast_next != null { fast_next = fast_next.parent; }
+            fast = fast_next;
+
+            if slow != null && slow == fast {
+                self.root.error(self.path, 0, 0, 0, 0, "Namespace cycle detected during lookup");
+                return null;
+            }
         }
+
+        return self.root.find_namespace(name);
     }
 
     fn add_module(&self, name: str) -> bool {
@@ -121,15 +146,17 @@ impl Namespace {
     }
 
     fn add_use_namespaces(&self) -> bool {
+        let success = true;
+
         for (_, module) in self.modules {
-            module.add_use_namespaces();
+            success = module.add_use_namespaces() && success;
         }
 
         for (_, child) in self.children {
-            child.add_use_namespaces();
+            success = child.add_use_namespaces() && success;
         }
 
-        return true;
+        return success;
     }
 
     fn fill_namespace(&self) -> bool {

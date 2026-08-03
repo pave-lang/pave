@@ -53,16 +53,16 @@ bool Impl__prefill_types(struct Impl* self);
 #line 153 "src/analyzer/Impl.pv"
 bool Impl__fill_types(struct Impl* self, struct FunctionParent parent);
 
-#line 220 "src/analyzer/Impl.pv"
+#line 216 "src/analyzer/Impl.pv"
 struct Function* Impl__find_function(struct Impl* self, struct str name);
 
-#line 231 "src/analyzer/Impl.pv"
+#line 227 "src/analyzer/Impl.pv"
 bool Impl__parse_consts(struct Impl* self);
 
-#line 238 "src/analyzer/Impl.pv"
+#line 234 "src/analyzer/Impl.pv"
 bool Impl__parse_typedefs(struct Impl* self);
 
-#line 281 "src/analyzer/Impl.pv"
+#line 277 "src/analyzer/Impl.pv"
 bool Impl__parse_functions(struct Impl* self);
 
 #endif
