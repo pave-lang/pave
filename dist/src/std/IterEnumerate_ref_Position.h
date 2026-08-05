@@ -13,7 +13,6 @@ struct IterEnumerate_ref_Position {
 };
 
 #include <tuple_usize_ref_Position.h>
-struct IterEnumerate_ref_Position;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_Position__next(struct IterEnumerate_ref_Position* self);

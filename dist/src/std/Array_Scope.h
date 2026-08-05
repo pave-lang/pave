@@ -16,11 +16,9 @@ struct Array_Scope {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_Scope.h>
 #include <analyzer/Scope.h>
 #include <std/Iter_ref_Scope.h>
 #include <slice_Scope.h>
-struct Array_Scope;
 struct Scope;
 
 #line 77 "src/std/Array.pv"

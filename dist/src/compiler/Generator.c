@@ -6,7 +6,6 @@
 #include <fs.h>
 
 #include <stdio.h>
-#include <compiler/Generator.h>
 #include <std/str.h>
 #include <std/String.h>
 #include <analyzer/Token.h>

@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_Array_SymbolInfo.h>
 #include <std/str.h>
 #include <std/Array_SymbolInfo.h>
 struct str;

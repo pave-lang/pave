@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/TypeUsage_Tuple.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Tuple.h>
 #include <std/trait_Allocator.h>

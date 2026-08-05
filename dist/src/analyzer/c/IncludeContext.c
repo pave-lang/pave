@@ -10,7 +10,6 @@
 #include <string.h>
 #include <analyzer/types/Type.h>
 #include <std/HashMap_str_Type.h>
-#include <analyzer/c/IncludeContext.h>
 #include <std/str.h>
 #include <analyzer/c/FunctionC.h>
 #include <analyzer/c/Include.h>

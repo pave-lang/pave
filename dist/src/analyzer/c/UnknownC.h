@@ -13,7 +13,6 @@ struct UnknownC {
 };
 
 struct Include;
-struct UnknownC;
 
 #line 11 "src/analyzer/c/UnknownC.pv"
 struct UnknownC* UnknownC__new(struct Include* include, char const* name);

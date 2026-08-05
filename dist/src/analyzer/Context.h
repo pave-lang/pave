@@ -38,7 +38,6 @@ struct Context {
 };
 
 #include <std/str.h>
-#include <analyzer/Context.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/TokenBounds.h>
 #include <analyzer/TokenType.h>
@@ -50,7 +49,6 @@ struct ArenaAllocator;
 struct Array_Token;
 struct Analysis;
 struct Module;
-struct Context;
 struct Array_Generic;
 struct Array_Parameter;
 struct Token;

@@ -16,11 +16,9 @@ struct Array_MemberCompletionInfo {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_MemberCompletionInfo.h>
 #include <analyzer/MemberCompletionInfo.h>
 #include <std/Iter_ref_MemberCompletionInfo.h>
 #include <slice_MemberCompletionInfo.h>
-struct Array_MemberCompletionInfo;
 struct MemberCompletionInfo;
 
 #line 77 "src/std/Array.pv"

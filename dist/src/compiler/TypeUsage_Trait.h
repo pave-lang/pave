@@ -16,10 +16,8 @@ struct TypeUsage_Trait {
     bool any_usage;
 };
 
-#include <compiler/TypeUsage_Trait.h>
 struct ArenaAllocator;
 struct Trait;
-struct TypeUsage_Trait;
 struct GenericMap;
 struct UsageContext;
 

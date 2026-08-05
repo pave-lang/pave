@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_Function.h>
 #include <std/str.h>
 #include <analyzer/types/Function.h>
 struct str;

@@ -13,7 +13,6 @@ struct IterEnumerate_ref_NullNarrowing {
 };
 
 #include <tuple_usize_ref_NullNarrowing.h>
-struct IterEnumerate_ref_NullNarrowing;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_NullNarrowing__next(struct IterEnumerate_ref_NullNarrowing* self);

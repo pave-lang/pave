@@ -14,10 +14,8 @@ struct Iter_ref_Position {
     struct Position* end;
 };
 
-#include <std/Iter_ref_Position.h>
 #include <std/IterEnumerate_ref_Position.h>
 struct Position;
-struct Iter_ref_Position;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Position Iter_ref_Position__new(struct Position* start, struct Position* end);

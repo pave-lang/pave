@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/TypeUsage_Primitive.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Primitive.h>
 #include <std/trait_Allocator.h>

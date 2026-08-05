@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_SignatureInfo.h>
 #include <analyzer/SignatureInfo.h>
 #include <usize.h>
 #include <std/Iter_ref_SignatureInfo.h>

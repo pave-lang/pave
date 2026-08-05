@@ -13,8 +13,6 @@ struct Generic {
 };
 
 #include <std/trait_Allocator.h>
-#include <analyzer/types/Generic.h>
-struct Generic;
 struct Context;
 struct Generics;
 

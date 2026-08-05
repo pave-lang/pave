@@ -16,10 +16,8 @@ struct TypeUsage_Sequence {
     bool any_usage;
 };
 
-#include <compiler/TypeUsage_Sequence.h>
 struct ArenaAllocator;
 struct Sequence;
-struct TypeUsage_Sequence;
 struct GenericMap;
 struct UsageContext;
 

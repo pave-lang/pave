@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <std/Array_Diagnostic.h>
-struct HashMapBucket_str_Array_Diagnostic;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_Diagnostic {

@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include <compiler/TypeUsage_Tuple.h>
-struct HashMapBucket_usize_TypeUsage_Tuple;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Tuple {

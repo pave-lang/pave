@@ -16,11 +16,9 @@ struct Array_CompletionInfo {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_CompletionInfo.h>
 #include <analyzer/CompletionInfo.h>
 #include <std/Iter_ref_CompletionInfo.h>
 #include <slice_CompletionInfo.h>
-struct Array_CompletionInfo;
 struct CompletionInfo;
 
 #line 77 "src/std/Array.pv"

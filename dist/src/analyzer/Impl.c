@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <analyzer/Impl.h>
 #include <analyzer/Context.h>
 #include <analyzer/Token.h>
 #include <std/trait_Allocator.h>

@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include <std/HashMapCollisionKey.h>
-struct HashMapBucket_HashMapCollisionKey_i32;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_HashMapCollisionKey_i32 {

@@ -17,11 +17,9 @@ struct HashMap_str_str {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_str.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_str.h>
 #include <std/trait_Map_str_str.h>
-struct HashMap_str_str;
 struct str;
 struct HashMapBucket_str_str;
 

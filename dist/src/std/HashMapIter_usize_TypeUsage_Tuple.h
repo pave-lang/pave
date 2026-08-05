@@ -11,7 +11,6 @@ struct HashMapIter_usize_TypeUsage_Tuple {
     struct HashMapBucket_usize_TypeUsage_Tuple* end;
 };
 
-struct HashMapIter_usize_TypeUsage_Tuple;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_usize_TypeUsage_Tuple__next(struct HashMapIter_usize_TypeUsage_Tuple* self);

@@ -13,7 +13,6 @@ struct IterEnumerate_ref_PreprocessorElseIf {
 };
 
 #include <tuple_usize_ref_PreprocessorElseIf.h>
-struct IterEnumerate_ref_PreprocessorElseIf;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_PreprocessorElseIf__next(struct IterEnumerate_ref_PreprocessorElseIf* self);

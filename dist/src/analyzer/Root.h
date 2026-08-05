@@ -58,7 +58,6 @@ struct Root {
 struct ArenaAllocator;
 struct Array_ptrc_char;
 struct Analysis;
-struct Root;
 struct Primitive;
 struct Impl;
 struct Type;

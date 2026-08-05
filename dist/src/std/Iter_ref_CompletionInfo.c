@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Iter_ref_CompletionInfo.h>
 #include <analyzer/CompletionInfo.h>
 #include <std/IterEnumerate_ref_CompletionInfo.h>
 #include <std/Iter_ref_CompletionInfo.h>

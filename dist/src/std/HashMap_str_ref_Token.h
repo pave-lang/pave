@@ -17,11 +17,9 @@ struct HashMap_str_ref_Token {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_Token.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Token.h>
 #include <std/trait_Map_str_ref_Token.h>
-struct HashMap_str_ref_Token;
 struct str;
 struct Token;
 struct HashMapBucket_str_ref_Token;

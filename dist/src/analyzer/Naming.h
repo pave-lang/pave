@@ -5,7 +5,6 @@
 #include <std/str.h>
 #include <std/HashMap_str_str.h>
 struct ArenaAllocator;
-struct Naming;
 
 #line 14 "src/analyzer/Naming.pv"
 struct Naming {
@@ -37,12 +36,10 @@ struct Naming {
     struct Naming* naming_ident;
 };
 
-#include <analyzer/Naming.h>
 #include <std/String.h>
 #include <std/str.h>
 #include <analyzer/c/ParentCpp.h>
 struct ArenaAllocator;
-struct Naming;
 struct Type;
 struct GenericMap;
 struct String;

@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_tuple_ref_Trait_ref_Type.h>
 #include <std/str.h>
 #include <tuple_ref_Trait_ref_Type.h>
 struct str;

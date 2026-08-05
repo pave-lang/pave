@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_StructCField.h>
 #include <std/str.h>
 #include <analyzer/c/StructCField.h>
 struct str;

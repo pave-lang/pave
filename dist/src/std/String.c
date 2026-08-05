@@ -4,7 +4,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <std/String.h>
 #include <std/trait_Allocator.h>
 #include <u64.h>
 #include <usize.h>

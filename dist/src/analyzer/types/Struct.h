@@ -26,9 +26,7 @@ struct Struct {
     struct Array_ref_Impl impls;
 };
 
-#include <analyzer/types/Struct.h>
 struct Module;
-struct Struct;
 
 #line 30 "src/analyzer/types/Struct.pv"
 struct Struct Struct__new(struct Module* module);

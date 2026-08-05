@@ -7,7 +7,6 @@
 #include <analyzer/types/Function.h>
 #include <analyzer/types/FunctionType.h>
 #include <analyzer/types/Type.h>
-#include <analyzer/statement/ReturnStatement.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/expression/Expression.h>
 #include <analyzer/types/Generics.h>

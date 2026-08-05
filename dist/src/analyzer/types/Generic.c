@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-#include <analyzer/types/Generic.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/Module.h>
 #include <analyzer/Context.h>

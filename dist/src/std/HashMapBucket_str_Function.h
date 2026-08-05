@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/types/Function.h>
-struct HashMapBucket_str_Function;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_Function {

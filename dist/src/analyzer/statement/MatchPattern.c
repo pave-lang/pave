@@ -3,7 +3,6 @@
 
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
-#include <analyzer/statement/MatchPattern.h>
 #include <analyzer/types/Generics.h>
 #include <analyzer/Token.h>
 #include <std/str.h>

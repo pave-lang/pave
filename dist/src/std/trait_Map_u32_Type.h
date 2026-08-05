@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_u32_Type.h>
 #include <analyzer/types/Type.h>
 struct Type;
 

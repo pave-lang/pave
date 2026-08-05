@@ -11,7 +11,6 @@ struct FunctionCoroutine {
     struct HashMap_str_ref_Type variables;
 };
 
-#include <compiler/FunctionCoroutine.h>
 struct ArenaAllocator;
 
 #line 12 "src/compiler/FunctionCoroutine.pv"

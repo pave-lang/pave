@@ -11,10 +11,8 @@ struct DefinitionWriter {
 };
 
 #include <stdio.h>
-#include <compiler/DefinitionWriter.h>
 #include <std/str.h>
 struct Generator;
-struct DefinitionWriter;
 struct Enum;
 struct GenericMap;
 struct Module;

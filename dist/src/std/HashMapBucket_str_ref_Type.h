@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 struct Type;
-struct HashMapBucket_str_ref_Type;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Type {

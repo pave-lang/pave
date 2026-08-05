@@ -14,9 +14,7 @@ struct Primitive {
     struct Array_ref_Impl impls;
 };
 
-#include <analyzer/types/Primitive.h>
 struct ArenaAllocator;
-struct Primitive;
 
 #line 11 "src/analyzer/types/Primitive.pv"
 struct Primitive Primitive__new(struct ArenaAllocator* allocator, char const* name);

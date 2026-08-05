@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <fs.h>
-#include <compiler/FileGenerator.h>
 #include <compiler/Generator.h>
 #include <std/Array_UsageContext.h>
 #include <compiler/TypeFunctionUsage.h>

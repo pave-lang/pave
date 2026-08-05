@@ -14,7 +14,6 @@ struct TypeImpl {
 };
 
 #include <analyzer/types/Type.h>
-#include <analyzer/types/TypeImpl.h>
 struct ArenaAllocator;
 struct Impl;
 

@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <usize.h>
 #include <std/Iter_ref_Diagnostic.h>

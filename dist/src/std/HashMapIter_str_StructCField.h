@@ -11,7 +11,6 @@ struct HashMapIter_str_StructCField {
     struct HashMapBucket_str_StructCField* end;
 };
 
-struct HashMapIter_str_StructCField;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_StructCField__next(struct HashMapIter_str_StructCField* self);

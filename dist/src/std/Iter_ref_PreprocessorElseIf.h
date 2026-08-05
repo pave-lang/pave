@@ -14,10 +14,8 @@ struct Iter_ref_PreprocessorElseIf {
     struct PreprocessorElseIf* end;
 };
 
-#include <std/Iter_ref_PreprocessorElseIf.h>
 #include <std/IterEnumerate_ref_PreprocessorElseIf.h>
 struct PreprocessorElseIf;
-struct Iter_ref_PreprocessorElseIf;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_PreprocessorElseIf Iter_ref_PreprocessorElseIf__new(struct PreprocessorElseIf* start, struct PreprocessorElseIf* end);

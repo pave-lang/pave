@@ -11,7 +11,6 @@ struct HashMapIter_str_Array_SignatureInfo {
     struct HashMapBucket_str_Array_SignatureInfo* end;
 };
 
-struct HashMapIter_str_Array_SignatureInfo;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_SignatureInfo__next(struct HashMapIter_str_Array_SignatureInfo* self);

@@ -11,7 +11,6 @@ struct HashMapIter_str_ref_Token {
     struct HashMapBucket_str_ref_Token* end;
 };
 
-struct HashMapIter_str_ref_Token;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_Token__next(struct HashMapIter_str_ref_Token* self);

@@ -13,7 +13,6 @@ struct IterEnumerate_ref_CXCursor {
 };
 
 #include <tuple_usize_ref_CXCursor.h>
-struct IterEnumerate_ref_CXCursor;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_CXCursor__next(struct IterEnumerate_ref_CXCursor* self);

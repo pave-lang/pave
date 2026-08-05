@@ -17,11 +17,9 @@ struct HashMap_usize_TypeUsage_Sequence {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_usize_TypeUsage_Sequence.h>
 #include <compiler/TypeUsage_Sequence.h>
 #include <std/HashMapIter_usize_TypeUsage_Sequence.h>
 #include <std/trait_Map_usize_TypeUsage_Sequence.h>
-struct HashMap_usize_TypeUsage_Sequence;
 struct TypeUsage_Sequence;
 struct HashMapBucket_usize_TypeUsage_Sequence;
 

@@ -10,11 +10,9 @@ struct str {
     uintptr_t length;
 };
 
-#include <std/str.h>
 #include <std/Iter_ptrc_char.h>
 #include <std/trait_Hash.h>
 #include <std/Hash.h>
-struct str;
 
 #line 10 "src/std/str.pv"
 struct str str__new(char const* ptr);

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Iter_ref_Diagnostic.h>
 #include <analyzer/Diagnostic.h>
 #include <std/IterEnumerate_ref_Diagnostic.h>
 #include <std/Iter_ref_Diagnostic.h>

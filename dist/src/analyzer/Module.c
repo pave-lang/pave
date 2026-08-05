@@ -8,7 +8,6 @@
 #include <analyzer/Root.h>
 #include <analyzer/Namespace.h>
 #include <analyzer/Analysis.h>
-#include <analyzer/Module.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>

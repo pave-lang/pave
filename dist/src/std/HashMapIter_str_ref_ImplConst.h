@@ -11,7 +11,6 @@ struct HashMapIter_str_ref_ImplConst {
     struct HashMapBucket_str_ref_ImplConst* end;
 };
 
-struct HashMapIter_str_ref_ImplConst;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_ImplConst__next(struct HashMapIter_str_ref_ImplConst* self);

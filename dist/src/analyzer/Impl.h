@@ -34,11 +34,9 @@ struct Impl {
     struct HashMap_str_Type typedefs;
 };
 
-#include <analyzer/Impl.h>
 #include <analyzer/types/FunctionParent.h>
 #include <std/str.h>
 struct Context;
-struct Impl;
 struct Function;
 
 #line 80 "src/analyzer/Impl.pv"

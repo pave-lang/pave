@@ -17,11 +17,9 @@ struct HashMap_str_ref_Namespace {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_Namespace.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Namespace.h>
 #include <std/trait_Map_str_ref_Namespace.h>
-struct HashMap_str_ref_Namespace;
 struct str;
 struct Namespace;
 struct HashMapBucket_str_ref_Namespace;

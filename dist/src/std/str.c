@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include <string.h>
-#include <std/str.h>
 #include <i32.h>
 #include <std/Iter_ptrc_char.h>
 #include <std/Range_ptrc_char.h>

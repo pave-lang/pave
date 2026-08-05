@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-struct HashSetBucket_usize;
 
 #line 4 "src/std/HashSet.pv"
 struct HashSetBucket_usize {

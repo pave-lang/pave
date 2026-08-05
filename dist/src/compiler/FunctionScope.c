@@ -1,4 +1,3 @@
-#include <compiler/FunctionScope.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <compiler/FunctionScope.h>

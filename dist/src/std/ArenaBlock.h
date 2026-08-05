@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct ArenaBlock;
 
 #line 13 "src/std/ArenaAllocator.pv"
 struct ArenaBlock {
@@ -15,7 +14,6 @@ struct ArenaBlock {
 };
 
 #include <std/trait_Allocator.h>
-struct ArenaBlock;
 
 #line 27 "src/std/ArenaAllocator.pv"
 struct ArenaBlock* ArenaBlock__new(struct trait_Allocator allocator, uintptr_t capacity, struct ArenaBlock* prev);

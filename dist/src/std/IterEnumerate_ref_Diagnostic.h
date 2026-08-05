@@ -13,7 +13,6 @@ struct IterEnumerate_ref_Diagnostic {
 };
 
 #include <tuple_usize_ref_Diagnostic.h>
-struct IterEnumerate_ref_Diagnostic;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_Diagnostic__next(struct IterEnumerate_ref_Diagnostic* self);

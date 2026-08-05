@@ -23,7 +23,6 @@ struct ClassCpp {
 
 #include <analyzer/c/ParentCpp.h>
 struct Include;
-struct ClassCpp;
 
 #line 16 "src/analyzer/c/ClassCpp.pv"
 struct ClassCpp* ClassCpp__new(struct Include* include, char const* name, struct ParentCpp parent, bool is_struct);

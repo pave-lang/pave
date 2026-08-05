@@ -16,10 +16,8 @@ struct TypeUsage_Tuple {
     bool any_usage;
 };
 
-#include <compiler/TypeUsage_Tuple.h>
 struct ArenaAllocator;
 struct Tuple;
-struct TypeUsage_Tuple;
 struct GenericMap;
 struct UsageContext;
 

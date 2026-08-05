@@ -11,7 +11,6 @@ struct HashMapIter_str_ref_Primitive {
     struct HashMapBucket_str_ref_Primitive* end;
 };
 
-struct HashMapIter_str_ref_Primitive;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_Primitive__next(struct HashMapIter_str_ref_Primitive* self);

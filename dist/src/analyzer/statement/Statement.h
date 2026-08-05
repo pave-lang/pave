@@ -12,10 +12,8 @@ struct Statement {
 };
 
 #include <analyzer/statement/StatementData.h>
-#include <analyzer/statement/Statement.h>
 #include <analyzer/TokenBounds.h>
 struct Token;
-struct Statement;
 
 #line 10 "src/analyzer/statement/Statement.pv"
 struct Statement Statement__new(struct Token* first_token, struct Token* last_token, struct StatementData data);

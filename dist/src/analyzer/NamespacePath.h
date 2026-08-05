@@ -12,8 +12,6 @@ struct NamespacePath {
 };
 
 #include <std/trait_Allocator.h>
-#include <analyzer/NamespacePath.h>
-struct NamespacePath;
 struct Context;
 
 #line 9 "src/analyzer/NamespacePath.pv"

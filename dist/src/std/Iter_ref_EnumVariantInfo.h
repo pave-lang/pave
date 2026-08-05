@@ -14,10 +14,8 @@ struct Iter_ref_EnumVariantInfo {
     struct EnumVariantInfo* end;
 };
 
-#include <std/Iter_ref_EnumVariantInfo.h>
 #include <std/IterEnumerate_ref_EnumVariantInfo.h>
 struct EnumVariantInfo;
-struct Iter_ref_EnumVariantInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_EnumVariantInfo Iter_ref_EnumVariantInfo__new(struct EnumVariantInfo* start, struct EnumVariantInfo* end);

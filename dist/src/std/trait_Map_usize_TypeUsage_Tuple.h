@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_usize_TypeUsage_Tuple.h>
 #include <compiler/TypeUsage_Tuple.h>
 struct TypeUsage_Tuple;
 

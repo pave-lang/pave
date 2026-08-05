@@ -16,11 +16,9 @@ struct Array_Generic {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_Generic.h>
 #include <analyzer/types/Generic.h>
 #include <std/Iter_ref_Generic.h>
 #include <slice_Generic.h>
-struct Array_Generic;
 struct Generic;
 
 #line 77 "src/std/Array.pv"

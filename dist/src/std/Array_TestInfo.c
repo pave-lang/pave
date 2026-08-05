@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_TestInfo.h>
 #include <analyzer/TestInfo.h>
 #include <usize.h>
 #include <std/Iter_ref_TestInfo.h>

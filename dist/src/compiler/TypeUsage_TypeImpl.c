@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/TypeUsage_TypeImpl.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/TypeImpl.h>
 #include <std/trait_Allocator.h>

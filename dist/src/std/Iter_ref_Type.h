@@ -14,10 +14,8 @@ struct Iter_ref_Type {
     struct Type* end;
 };
 
-#include <std/Iter_ref_Type.h>
 #include <std/IterEnumerate_ref_Type.h>
 struct Type;
-struct Iter_ref_Type;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Type Iter_ref_Type__new(struct Type* start, struct Type* end);

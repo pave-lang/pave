@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 struct Include;
-struct HashMapBucket_str_ref_Include;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Include {

@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/TypeFunctionUsage.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Function.h>
 #include <std/trait_Allocator.h>

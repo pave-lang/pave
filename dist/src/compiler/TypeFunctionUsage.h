@@ -15,10 +15,8 @@ struct TypeFunctionUsage {
     bool impl_dynamic_function;
 };
 
-#include <compiler/TypeFunctionUsage.h>
 struct ArenaAllocator;
 struct Function;
-struct TypeFunctionUsage;
 struct GenericMap;
 struct UsageContext;
 

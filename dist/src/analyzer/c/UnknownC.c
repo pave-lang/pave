@@ -3,7 +3,6 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <analyzer/c/Include.h>
-#include <analyzer/c/UnknownC.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/c/UnknownC.h>
 

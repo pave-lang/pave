@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 struct Primitive;
-struct HashMapBucket_str_ref_Primitive;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Primitive {

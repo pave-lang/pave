@@ -14,10 +14,8 @@ struct Iter_ref_Token {
     struct Token* end;
 };
 
-#include <std/Iter_ref_Token.h>
 #include <std/IterEnumerate_ref_Token.h>
 struct Token;
-struct Iter_ref_Token;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Token Iter_ref_Token__new(struct Token* start, struct Token* end);

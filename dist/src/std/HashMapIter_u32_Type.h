@@ -11,7 +11,6 @@ struct HashMapIter_u32_Type {
     struct HashMapBucket_u32_Type* end;
 };
 
-struct HashMapIter_u32_Type;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_u32_Type__next(struct HashMapIter_u32_Type* self);

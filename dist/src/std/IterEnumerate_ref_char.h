@@ -13,7 +13,6 @@ struct IterEnumerate_ref_char {
 };
 
 #include <tuple_usize_ref_char.h>
-struct IterEnumerate_ref_char;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_char__next(struct IterEnumerate_ref_char* self);

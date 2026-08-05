@@ -9,9 +9,7 @@ struct TokenBounds {
     struct Token* last;
 };
 
-#include <analyzer/TokenBounds.h>
 struct Token;
-struct TokenBounds;
 
 #line 44 "src/analyzer/Token.pv"
 struct TokenBounds TokenBounds__new(struct Token* first, struct Token* last);

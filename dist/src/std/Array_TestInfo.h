@@ -16,11 +16,9 @@ struct Array_TestInfo {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_TestInfo.h>
 #include <analyzer/TestInfo.h>
 #include <std/Iter_ref_TestInfo.h>
 #include <slice_TestInfo.h>
-struct Array_TestInfo;
 struct TestInfo;
 
 #line 77 "src/std/Array.pv"

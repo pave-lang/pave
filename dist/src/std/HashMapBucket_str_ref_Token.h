@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 struct Token;
-struct HashMapBucket_str_ref_Token;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Token {

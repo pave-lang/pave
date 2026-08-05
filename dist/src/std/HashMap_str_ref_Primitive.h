@@ -17,11 +17,9 @@ struct HashMap_str_ref_Primitive {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_Primitive.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Primitive.h>
 #include <std/trait_Map_str_ref_Primitive.h>
-struct HashMap_str_ref_Primitive;
 struct str;
 struct Primitive;
 struct HashMapBucket_str_ref_Primitive;

@@ -13,7 +13,6 @@ struct IterEnumerate_ref_DestructureBinding {
 };
 
 #include <tuple_usize_ref_DestructureBinding.h>
-struct IterEnumerate_ref_DestructureBinding;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_DestructureBinding__next(struct IterEnumerate_ref_DestructureBinding* self);

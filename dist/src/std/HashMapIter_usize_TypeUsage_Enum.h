@@ -11,7 +11,6 @@ struct HashMapIter_usize_TypeUsage_Enum {
     struct HashMapBucket_usize_TypeUsage_Enum* end;
 };
 
-struct HashMapIter_usize_TypeUsage_Enum;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_usize_TypeUsage_Enum__next(struct HashMapIter_usize_TypeUsage_Enum* self);

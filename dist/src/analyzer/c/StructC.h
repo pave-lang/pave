@@ -13,7 +13,6 @@ struct StructC {
 };
 
 struct Include;
-struct StructC;
 
 #line 10 "src/analyzer/c/StructC.pv"
 struct StructC* StructC__new(struct Include* include, char const* name);

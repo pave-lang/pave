@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 struct Trait;
-struct HashMapBucket_str_ref_Trait;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Trait {

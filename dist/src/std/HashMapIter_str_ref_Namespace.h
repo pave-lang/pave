@@ -11,7 +11,6 @@ struct HashMapIter_str_ref_Namespace {
     struct HashMapBucket_str_ref_Namespace* end;
 };
 
-struct HashMapIter_str_ref_Namespace;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_Namespace__next(struct HashMapIter_str_ref_Namespace* self);

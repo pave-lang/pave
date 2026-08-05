@@ -16,11 +16,9 @@ struct HashSet_str {
     uintptr_t length;
 };
 
-#include <std/HashSet_str.h>
 #include <std/str.h>
 #include <std/HashSetIter_str.h>
 struct ArenaAllocator;
-struct HashSet_str;
 struct str;
 
 #line 34 "src/std/HashSet.pv"

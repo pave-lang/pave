@@ -14,13 +14,11 @@ struct GenericMap {
     struct HashMap_str_usize map;
 };
 
-#include <analyzer/types/GenericMap.h>
 #include <std/str.h>
 #include <analyzer/types/Type.h>
 struct ArenaAllocator;
 struct Generics;
 struct Array_Type;
-struct GenericMap;
 struct Type;
 
 #line 11 "src/analyzer/types/GenericMap.pv"

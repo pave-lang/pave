@@ -17,7 +17,6 @@ struct NamespaceCpp {
 
 #include <analyzer/c/ParentCpp.h>
 struct Include;
-struct NamespaceCpp;
 
 #line 13 "src/analyzer/c/NamespaceCpp.pv"
 struct NamespaceCpp* NamespaceCpp__new(struct Include* include, char const* name, struct ParentCpp parent);

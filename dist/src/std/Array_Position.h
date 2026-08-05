@@ -16,11 +16,9 @@ struct Array_Position {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_Position.h>
 #include <analyzer/Position.h>
 #include <std/Iter_ref_Position.h>
 #include <slice_Position.h>
-struct Array_Position;
 struct Position;
 
 #line 77 "src/std/Array.pv"

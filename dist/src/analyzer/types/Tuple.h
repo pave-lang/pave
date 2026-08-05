@@ -9,8 +9,6 @@ struct Tuple {
 };
 
 #include <std/trait_Allocator.h>
-#include <analyzer/types/Tuple.h>
-struct Tuple;
 
 #line 90 "src/analyzer/types/Type.pv"
 struct Tuple Tuple__clone(struct Tuple* self, struct trait_Allocator allocator);

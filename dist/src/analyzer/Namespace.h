@@ -11,7 +11,6 @@
 #include <std/HashMap_str_Array_ref_Trait.h>
 #include <std/HashMap_str_Type.h>
 struct Root;
-struct Namespace;
 
 #line 6 "src/analyzer/Namespace.pv"
 struct Namespace {
@@ -29,7 +28,6 @@ struct Namespace {
 #include <std/str.h>
 #include <analyzer/types/Type.h>
 struct Root;
-struct Namespace;
 struct Trait;
 struct Module;
 struct Type;

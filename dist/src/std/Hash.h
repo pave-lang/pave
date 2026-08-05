@@ -7,9 +7,7 @@
 #line 1 "src/std/Hash.pv"
 typedef uint64_t Hash;
 
-#include <std/Hash.h>
 #include <std/trait_Hash.h>
-typedef uint64_t Hash;
 
 #line 42 "src/std/Hash.pv"
 Hash Hash__continue_with(Hash self, void const* value, uintptr_t size);

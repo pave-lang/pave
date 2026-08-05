@@ -6,7 +6,6 @@
 #include <fs.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
-#include <analyzer/Namespace.h>
 #include <std/trait_Allocator.h>
 #include <std/Array_Type.h>
 #include <analyzer/types/Type.h>

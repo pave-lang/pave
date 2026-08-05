@@ -15,9 +15,7 @@ struct Iter_ref_CXCursor {
 };
 
 #include <clang-c/Index.h>
-#include <std/Iter_ref_CXCursor.h>
 #include <std/IterEnumerate_ref_CXCursor.h>
-struct Iter_ref_CXCursor;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_CXCursor Iter_ref_CXCursor__new(CXCursor* start, CXCursor* end);

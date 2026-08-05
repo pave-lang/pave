@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-#include <analyzer/types/Enum.h>
 #include <analyzer/Context.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>

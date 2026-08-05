@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_TypedefC.h>
 #include <std/str.h>
 #include <analyzer/c/TypedefC.h>
 struct str;

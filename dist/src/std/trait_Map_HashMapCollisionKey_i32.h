@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_HashMapCollisionKey_i32.h>
 #include <std/HashMapCollisionKey.h>
 typedef int32_t HashMapCollisionKey;
 

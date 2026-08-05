@@ -12,7 +12,6 @@ struct HashSetIter_usize {
     struct HashSetBucket_usize* end;
 };
 
-struct HashSetIter_usize;
 
 #line 15 "src/std/HashSet.pv"
 bool HashSetIter_usize__next(struct HashSetIter_usize* self);

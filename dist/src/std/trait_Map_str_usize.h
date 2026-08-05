@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_str_usize.h>
 #include <std/str.h>
 struct str;
 

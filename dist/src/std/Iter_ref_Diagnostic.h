@@ -14,10 +14,8 @@ struct Iter_ref_Diagnostic {
     struct Diagnostic* end;
 };
 
-#include <std/Iter_ref_Diagnostic.h>
 #include <std/IterEnumerate_ref_Diagnostic.h>
 struct Diagnostic;
-struct Iter_ref_Diagnostic;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Diagnostic Iter_ref_Diagnostic__new(struct Diagnostic* start, struct Diagnostic* end);

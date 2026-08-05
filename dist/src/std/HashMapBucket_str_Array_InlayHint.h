@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <std/Array_InlayHint.h>
-struct HashMapBucket_str_Array_InlayHint;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_InlayHint {

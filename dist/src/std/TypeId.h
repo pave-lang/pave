@@ -8,7 +8,6 @@ typedef uint64_t TypeId;
 
 #include <std/trait_Hash.h>
 #include <std/Hash.h>
-typedef uint64_t TypeId;
 
 #line 3 "src/std/TypeId.pv"
 Hash TypeId__Hash__hash(void* __self);

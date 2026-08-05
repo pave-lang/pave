@@ -12,7 +12,6 @@ struct Indirect {
 
 #include <std/trait_Allocator.h>
 #include <analyzer/types/Type.h>
-struct Indirect;
 
 #line 22 "src/analyzer/types/Type.pv"
 struct Indirect* Indirect__new_reference(struct trait_Allocator allocator, struct Type to);

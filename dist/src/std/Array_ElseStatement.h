@@ -16,11 +16,9 @@ struct Array_ElseStatement {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_ElseStatement.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <std/Iter_ref_ElseStatement.h>
 #include <slice_ElseStatement.h>
-struct Array_ElseStatement;
 struct ElseStatement;
 
 #line 77 "src/std/Array.pv"

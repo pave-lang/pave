@@ -14,10 +14,8 @@ struct Iter_ref_Generic {
     struct Generic* end;
 };
 
-#include <std/Iter_ref_Generic.h>
 #include <std/IterEnumerate_ref_Generic.h>
 struct Generic;
-struct Iter_ref_Generic;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_Generic Iter_ref_Generic__new(struct Generic* start, struct Generic* end);

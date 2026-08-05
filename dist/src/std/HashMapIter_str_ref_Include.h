@@ -11,7 +11,6 @@ struct HashMapIter_str_ref_Include {
     struct HashMapBucket_str_ref_Include* end;
 };
 
-struct HashMapIter_str_ref_Include;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_Include__next(struct HashMapIter_str_ref_Include* self);

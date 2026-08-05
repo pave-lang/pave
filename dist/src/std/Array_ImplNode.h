@@ -16,11 +16,9 @@ struct Array_ImplNode {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_ImplNode.h>
 #include <analyzer/ImplNode.h>
 #include <std/Iter_ref_ImplNode.h>
 #include <slice_ImplNode.h>
-struct Array_ImplNode;
 struct ImplNode;
 
 #line 77 "src/std/Array.pv"

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Iter_ref_EnumVariantInfo.h>
 #include <std/EnumVariantInfo.h>
 #include <std/IterEnumerate_ref_EnumVariantInfo.h>
 #include <std/Iter_ref_EnumVariantInfo.h>

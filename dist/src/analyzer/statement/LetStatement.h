@@ -20,7 +20,6 @@ struct LetStatement {
 
 struct Context;
 struct Generics;
-struct LetStatement;
 struct Token;
 
 #line 21 "src/analyzer/statement/LetStatement.pv"

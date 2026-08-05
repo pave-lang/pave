@@ -6,7 +6,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <analyzer/Root.h>
 #include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/Analysis.h>

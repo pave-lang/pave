@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <analyzer/Token.h>
-#include <analyzer/Token.h>
 
 #include <analyzer/Token.h>
 

@@ -17,11 +17,9 @@ struct HashMap_str_ref_Include {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_Include.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Include.h>
 #include <std/trait_Map_str_ref_Include.h>
-struct HashMap_str_ref_Include;
 struct str;
 struct Include;
 struct HashMapBucket_str_ref_Include;

@@ -11,7 +11,6 @@ struct HashMapIter_str_TypedefC {
     struct HashMapBucket_str_TypedefC* end;
 };
 
-struct HashMapIter_str_TypedefC;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_TypedefC__next(struct HashMapIter_str_TypedefC* self);

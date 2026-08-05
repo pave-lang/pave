@@ -13,7 +13,6 @@ struct IterEnumerate_ref_StructFieldInfo {
 };
 
 #include <tuple_usize_ref_StructFieldInfo.h>
-struct IterEnumerate_ref_StructFieldInfo;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_StructFieldInfo__next(struct IterEnumerate_ref_StructFieldInfo* self);

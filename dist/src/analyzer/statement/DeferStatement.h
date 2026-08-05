@@ -18,7 +18,6 @@ struct DeferStatement {
 
 struct Context;
 struct Generics;
-struct DeferStatement;
 
 #line 11 "src/analyzer/statement/DeferStatement.pv"
 struct DeferStatement* DeferStatement__parse(struct Block* parent_block, struct Context* context, struct Generics* generics);

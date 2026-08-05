@@ -13,7 +13,6 @@ struct IterEnumerate_ref_MatchCase {
 };
 
 #include <tuple_usize_ref_MatchCase.h>
-struct IterEnumerate_ref_MatchCase;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_MatchCase__next(struct IterEnumerate_ref_MatchCase* self);

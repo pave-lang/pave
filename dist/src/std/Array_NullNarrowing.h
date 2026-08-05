@@ -16,11 +16,9 @@ struct Array_NullNarrowing {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_NullNarrowing.h>
 #include <analyzer/expression/NullNarrowing.h>
 #include <std/Iter_ref_NullNarrowing.h>
 #include <slice_NullNarrowing.h>
-struct Array_NullNarrowing;
 struct NullNarrowing;
 
 #line 77 "src/std/Array.pv"

@@ -14,7 +14,6 @@
 #include <std/str.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/statement/WhileStatement.h>
-#include <analyzer/statement/WhileStatement.h>
 
 #include <analyzer/statement/WhileStatement.h>
 

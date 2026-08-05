@@ -24,12 +24,10 @@ struct Trait {
     struct Type type_self;
 };
 
-#include <analyzer/types/Trait.h>
 #include <analyzer/types/FunctionParent.h>
 #include <std/trait_Allocator.h>
 #include <std/str.h>
 struct Module;
-struct Trait;
 
 #line 17 "src/analyzer/types/Trait.pv"
 struct Trait Trait__new(struct Module* module);

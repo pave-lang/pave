@@ -75,7 +75,6 @@ struct Type {
 
 #include <std/str.h>
 #include <std/Array_Type.h>
-struct Type;
 struct ArenaAllocator;
 struct Context;
 struct Module;

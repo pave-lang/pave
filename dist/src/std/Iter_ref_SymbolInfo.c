@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <std/Iter_ref_SymbolInfo.h>
 #include <analyzer/SymbolInfo.h>
 #include <std/IterEnumerate_ref_SymbolInfo.h>
 #include <std/Iter_ref_SymbolInfo.h>

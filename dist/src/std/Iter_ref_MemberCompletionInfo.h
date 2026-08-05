@@ -14,10 +14,8 @@ struct Iter_ref_MemberCompletionInfo {
     struct MemberCompletionInfo* end;
 };
 
-#include <std/Iter_ref_MemberCompletionInfo.h>
 #include <std/IterEnumerate_ref_MemberCompletionInfo.h>
 struct MemberCompletionInfo;
-struct Iter_ref_MemberCompletionInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_MemberCompletionInfo Iter_ref_MemberCompletionInfo__new(struct MemberCompletionInfo* start, struct MemberCompletionInfo* end);

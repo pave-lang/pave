@@ -18,7 +18,6 @@ struct ArenaAllocator {
 
 #include <std/trait_Allocator.h>
 #include <std/trait_Any.h>
-struct ArenaAllocator;
 
 #line 154 "src/std/ArenaAllocator.pv"
 bool ArenaAllocator__guarded_backend();

@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include <analyzer/types/Primitive.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Primitive.h>

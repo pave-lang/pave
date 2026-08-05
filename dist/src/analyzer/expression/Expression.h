@@ -17,7 +17,6 @@ struct Expression {
 
 #include <analyzer/expression/ExpressionData.h>
 #include <analyzer/TokenBounds.h>
-#include <analyzer/expression/Expression.h>
 #include <std/str.h>
 #include <std/Array_Position.h>
 #include <analyzer/expression/EnumVariantResult.h>
@@ -25,7 +24,6 @@ struct Expression {
 struct ArenaAllocator;
 struct Token;
 struct Type;
-struct Expression;
 struct Context;
 struct Generics;
 struct String;

@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_CompletionInfo.h>
 #include <analyzer/CompletionInfo.h>
 #include <usize.h>
 #include <std/Iter_ref_CompletionInfo.h>

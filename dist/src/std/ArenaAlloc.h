@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-struct ArenaAlloc;
 
 #line 20 "src/std/ArenaAllocator.pv"
 struct ArenaAlloc {

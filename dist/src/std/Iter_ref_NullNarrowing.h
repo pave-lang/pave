@@ -14,10 +14,8 @@ struct Iter_ref_NullNarrowing {
     struct NullNarrowing* end;
 };
 
-#include <std/Iter_ref_NullNarrowing.h>
 #include <std/IterEnumerate_ref_NullNarrowing.h>
 struct NullNarrowing;
-struct Iter_ref_NullNarrowing;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_NullNarrowing Iter_ref_NullNarrowing__new(struct NullNarrowing* start, struct NullNarrowing* end);

@@ -1,4 +1,6 @@
 build*
+dist/pave*
+dist/pave*.*
 
 examples/*.c
 examples/*.h

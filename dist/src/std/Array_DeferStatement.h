@@ -16,11 +16,9 @@ struct Array_DeferStatement {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_DeferStatement.h>
 #include <analyzer/statement/DeferStatement.h>
 #include <std/Iter_ref_DeferStatement.h>
 #include <slice_DeferStatement.h>
-struct Array_DeferStatement;
 struct DeferStatement;
 
 #line 77 "src/std/Array.pv"

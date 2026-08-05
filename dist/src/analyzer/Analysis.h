@@ -26,9 +26,7 @@ struct Analysis {
     struct HashMap_str_str file_overrides;
 };
 
-#include <analyzer/Analysis.h>
 struct ArenaAllocator;
-struct Analysis;
 
 #line 79 "src/analyzer/Analysis.pv"
 struct Analysis Analysis__new(struct ArenaAllocator* allocator);

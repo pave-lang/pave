@@ -11,7 +11,6 @@ struct HashMapIter_str_ref_Global {
     struct HashMapBucket_str_ref_Global* end;
 };
 
-struct HashMapIter_str_ref_Global;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_ref_Global__next(struct HashMapIter_str_ref_Global* self);

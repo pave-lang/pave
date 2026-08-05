@@ -3,7 +3,6 @@
 
 #include <analyzer/Context.h>
 #include <analyzer/Module.h>
-#include <analyzer/types/Trait.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/TokenType.h>

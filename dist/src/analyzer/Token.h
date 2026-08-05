@@ -18,7 +18,6 @@ struct Token {
 };
 
 #include <analyzer/TokenType.h>
-struct Token;
 
 #line 60 "src/analyzer/Token.pv"
 bool Token__eq(struct Token* self, enum TokenType type, char const* value);

@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 struct Global;
-struct HashMapBucket_str_ref_Global;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_ref_Global {

@@ -17,12 +17,10 @@ struct HashMap_str_Function {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_Function.h>
 #include <std/str.h>
 #include <analyzer/types/Function.h>
 #include <std/HashMapIter_str_Function.h>
 #include <std/trait_Map_str_Function.h>
-struct HashMap_str_Function;
 struct str;
 struct Function;
 struct HashMapBucket_str_Function;

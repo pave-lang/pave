@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <usize.h>
 #include <std/Iter_ref_MatchPattern.h>

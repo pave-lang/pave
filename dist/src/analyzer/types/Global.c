@@ -3,7 +3,6 @@
 
 #include <analyzer/Context.h>
 #include <analyzer/Module.h>
-#include <analyzer/types/Global.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>

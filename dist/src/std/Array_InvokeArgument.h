@@ -16,11 +16,9 @@ struct Array_InvokeArgument {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_InvokeArgument.h>
 #include <analyzer/expression/InvokeArgument.h>
 #include <std/Iter_ref_InvokeArgument.h>
 #include <slice_InvokeArgument.h>
-struct Array_InvokeArgument;
 struct InvokeArgument;
 
 #line 77 "src/std/Array.pv"

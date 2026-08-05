@@ -14,10 +14,8 @@ struct Iter_ref_DestructureBinding {
     struct DestructureBinding* end;
 };
 
-#include <std/Iter_ref_DestructureBinding.h>
 #include <std/IterEnumerate_ref_DestructureBinding.h>
 struct DestructureBinding;
-struct Iter_ref_DestructureBinding;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_DestructureBinding Iter_ref_DestructureBinding__new(struct DestructureBinding* start, struct DestructureBinding* end);

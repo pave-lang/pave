@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include <analyzer/types/Type.h>
-struct HashMapBucket_u32_Type;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_u32_Type {

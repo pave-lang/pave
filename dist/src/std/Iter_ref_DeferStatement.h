@@ -14,10 +14,8 @@ struct Iter_ref_DeferStatement {
     struct DeferStatement* end;
 };
 
-#include <std/Iter_ref_DeferStatement.h>
 #include <std/IterEnumerate_ref_DeferStatement.h>
 struct DeferStatement;
-struct Iter_ref_DeferStatement;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_DeferStatement Iter_ref_DeferStatement__new(struct DeferStatement* start, struct DeferStatement* end);

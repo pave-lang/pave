@@ -13,7 +13,6 @@ struct IterEnumerate_ptrc_char {
 };
 
 #include <tuple_usize_ptrc_char.h>
-struct IterEnumerate_ptrc_char;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ptrc_char__next(struct IterEnumerate_ptrc_char* self);

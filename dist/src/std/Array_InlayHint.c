@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_InlayHint.h>
 #include <analyzer/InlayHint.h>
 #include <usize.h>
 #include <std/Iter_ref_InlayHint.h>

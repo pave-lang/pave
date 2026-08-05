@@ -13,9 +13,7 @@ struct FileWriter {
 };
 
 #include <stdio.h>
-#include <compiler/FileWriter.h>
 #include <std/str.h>
-struct FileWriter;
 struct Token;
 
 #line 12 "src/compiler/FileWriter.pv"

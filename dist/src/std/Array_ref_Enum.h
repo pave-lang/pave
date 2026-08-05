@@ -15,10 +15,8 @@ struct Array_ref_Enum {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_ref_Enum.h>
 #include <std/Iter_ref_ref_Enum.h>
 #include <slice_ref_Enum.h>
-struct Array_ref_Enum;
 struct Enum;
 
 #line 77 "src/std/Array.pv"

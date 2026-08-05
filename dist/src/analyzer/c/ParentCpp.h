@@ -19,7 +19,6 @@ struct ParentCpp {
     };
 };
 
-struct ParentCpp;
 
 #line 8 "src/analyzer/c/ParentCpp.pv"
 bool ParentCpp__is_none(struct ParentCpp* self);

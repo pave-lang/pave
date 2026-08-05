@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_Statement.h>
 #include <analyzer/statement/Statement.h>
 #include <usize.h>
 #include <std/Iter_ref_Statement.h>

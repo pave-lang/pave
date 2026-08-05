@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/c/EnumCValue.h>
-struct HashMapBucket_str_EnumCValue;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_EnumCValue {

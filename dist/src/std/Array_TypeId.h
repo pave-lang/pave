@@ -16,11 +16,9 @@ struct Array_TypeId {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_TypeId.h>
 #include <std/TypeId.h>
 #include <std/Iter_ref_TypeId.h>
 #include <slice_TypeId.h>
-struct Array_TypeId;
 typedef uint64_t TypeId;
 
 #line 77 "src/std/Array.pv"

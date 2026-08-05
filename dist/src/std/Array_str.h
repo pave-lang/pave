@@ -16,11 +16,9 @@ struct Array_str {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_str.h>
 #include <std/str.h>
 #include <std/Iter_ref_str.h>
 #include <slice_str.h>
-struct Array_str;
 struct str;
 
 #line 77 "src/std/Array.pv"

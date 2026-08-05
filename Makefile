@@ -28,7 +28,12 @@ endif
 
 .PHONY: all ls ls-release examples clean dist-compiler
 
-all:
+# Build dist/pavec from the pre-generated C sources in dist/src, but only if
+# the executable doesn't already exist (e.g. a fresh non-Windows checkout).
+dist/pavec$(EXE):
+	@$(MAKE) dist-compiler --no-print-directory
+
+all: dist/pavec$(EXE)
 	@echo "=== Stage 1: Building with dist/pavec ==="
 	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/1 TARGET=build/1/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 	@echo ""

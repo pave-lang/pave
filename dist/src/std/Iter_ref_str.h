@@ -14,10 +14,8 @@ struct Iter_ref_str {
     struct str* end;
 };
 
-#include <std/Iter_ref_str.h>
 #include <std/IterEnumerate_ref_str.h>
 struct str;
-struct Iter_ref_str;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_str Iter_ref_str__new(struct str* start, struct str* end);

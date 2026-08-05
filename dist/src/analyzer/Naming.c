@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 
-#include <analyzer/Naming.h>
 #include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>
 #include <std/String.h>

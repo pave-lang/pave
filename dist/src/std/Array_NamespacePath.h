@@ -16,11 +16,9 @@ struct Array_NamespacePath {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_NamespacePath.h>
 #include <analyzer/NamespacePath.h>
 #include <std/Iter_ref_NamespacePath.h>
 #include <slice_NamespacePath.h>
-struct Array_NamespacePath;
 struct NamespacePath;
 
 #line 77 "src/std/Array.pv"

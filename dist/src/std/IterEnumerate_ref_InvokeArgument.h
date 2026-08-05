@@ -13,7 +13,6 @@ struct IterEnumerate_ref_InvokeArgument {
 };
 
 #include <tuple_usize_ref_InvokeArgument.h>
-struct IterEnumerate_ref_InvokeArgument;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_InvokeArgument__next(struct IterEnumerate_ref_InvokeArgument* self);

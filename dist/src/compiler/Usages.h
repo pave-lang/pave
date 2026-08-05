@@ -49,9 +49,7 @@ struct Usages {
     struct Namespace* std_namespace;
 };
 
-#include <compiler/Usages.h>
 struct Generator;
-struct Usages;
 struct HashMap_str_ref_Namespace;
 struct Module;
 struct Type;

@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-#include <analyzer/types/Type.h>
 #include <analyzer/types/Indirect.h>
 #include <analyzer/types/Struct.h>
 #include <analyzer/types/Enum.h>

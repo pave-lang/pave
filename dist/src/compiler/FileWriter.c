@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/FileWriter.h>
 #include <usize.h>
 #include <std/str.h>
 #include <analyzer/Token.h>

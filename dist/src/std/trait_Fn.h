@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Fn.h>
 struct Array_TypeId;
 
 #line 1 "src/std/Fn.pv"

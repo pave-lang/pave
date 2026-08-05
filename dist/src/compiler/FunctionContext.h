@@ -17,13 +17,11 @@ struct FunctionContext {
     struct FunctionCoroutine coroutine;
 };
 
-#include <compiler/FunctionContext.h>
 #include <analyzer/statement/DeferStatement.h>
 #include <std/Array_DeferStatement.h>
 #include <std/str.h>
 struct ArenaAllocator;
 struct Function;
-struct FunctionContext;
 struct Type;
 
 #line 14 "src/compiler/FunctionContext.pv"

@@ -15,9 +15,7 @@ struct Iter_ref_ref_trait_Format {
 };
 
 #include <std/trait_Format.h>
-#include <std/Iter_ref_ref_trait_Format.h>
 #include <std/IterEnumerate_ref_ref_trait_Format.h>
-struct Iter_ref_ref_trait_Format;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_trait_Format Iter_ref_ref_trait_Format__new(struct trait_Format* start, struct trait_Format* end);

@@ -1,4 +1,3 @@
-#include <analyzer/statement/Statement.h>
 #include <analyzer/Token.h>
 #include <analyzer/TokenBounds.h>
 #include <analyzer/statement/Statement.h>

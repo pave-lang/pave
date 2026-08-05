@@ -11,7 +11,6 @@ struct HashMapIter_HashMapCollisionKey_i32 {
     struct HashMapBucket_HashMapCollisionKey_i32* end;
 };
 
-struct HashMapIter_HashMapCollisionKey_i32;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_HashMapCollisionKey_i32__next(struct HashMapIter_HashMapCollisionKey_i32* self);

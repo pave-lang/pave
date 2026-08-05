@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_usize_TypeUsage_Trait.h>
 #include <compiler/TypeUsage_Trait.h>
 struct TypeUsage_Trait;
 

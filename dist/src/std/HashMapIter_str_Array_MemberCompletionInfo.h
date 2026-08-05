@@ -11,7 +11,6 @@ struct HashMapIter_str_Array_MemberCompletionInfo {
     struct HashMapBucket_str_Array_MemberCompletionInfo* end;
 };
 
-struct HashMapIter_str_Array_MemberCompletionInfo;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_MemberCompletionInfo__next(struct HashMapIter_str_Array_MemberCompletionInfo* self);

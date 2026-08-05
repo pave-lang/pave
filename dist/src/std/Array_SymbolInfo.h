@@ -16,11 +16,9 @@ struct Array_SymbolInfo {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_SymbolInfo.h>
 #include <analyzer/SymbolInfo.h>
 #include <std/Iter_ref_SymbolInfo.h>
 #include <slice_SymbolInfo.h>
-struct Array_SymbolInfo;
 struct SymbolInfo;
 
 #line 77 "src/std/Array.pv"

@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <std/trait_Allocator.h>
-#include <std/ArenaBlock.h>
 #include <std/ArenaAllocation.h>
 #include <std/ArenaAllocator.h>
 #include <usize.h>

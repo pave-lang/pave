@@ -13,7 +13,6 @@ struct IterEnumerate_ref_UsageContext {
 };
 
 #include <tuple_usize_ref_UsageContext.h>
-struct IterEnumerate_ref_UsageContext;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_UsageContext__next(struct IterEnumerate_ref_UsageContext* self);

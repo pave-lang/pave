@@ -19,7 +19,6 @@ struct IfStatement {
 struct Block;
 struct Context;
 struct Generics;
-struct IfStatement;
 
 #line 14 "src/analyzer/statement/IfStatement.pv"
 bool IfStatement__block_always_diverges(struct Block* block);

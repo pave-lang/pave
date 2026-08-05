@@ -13,7 +13,6 @@ struct IterEnumerate_ref_SignatureInfo {
 };
 
 #include <tuple_usize_ref_SignatureInfo.h>
-struct IterEnumerate_ref_SignatureInfo;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_SignatureInfo__next(struct IterEnumerate_ref_SignatureInfo* self);

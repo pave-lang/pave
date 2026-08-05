@@ -11,7 +11,6 @@ struct HashMapIter_str_i64 {
     struct HashMapBucket_str_i64* end;
 };
 
-struct HashMapIter_str_i64;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_i64__next(struct HashMapIter_str_i64* self);

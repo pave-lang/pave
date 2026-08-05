@@ -16,11 +16,9 @@ struct Array_Token {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_Token.h>
 #include <analyzer/Token.h>
 #include <std/Iter_ref_Token.h>
 #include <slice_Token.h>
-struct Array_Token;
 struct Token;
 
 #line 77 "src/std/Array.pv"

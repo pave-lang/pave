@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/TypeUsage_Sequence.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Sequence.h>
 #include <std/trait_Allocator.h>

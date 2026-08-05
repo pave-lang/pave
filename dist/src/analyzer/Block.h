@@ -14,9 +14,7 @@ struct Block {
     bool is_loop;
 };
 
-#include <analyzer/Block.h>
 struct Context;
-struct Block;
 struct Generics;
 struct StatementData;
 struct Token;

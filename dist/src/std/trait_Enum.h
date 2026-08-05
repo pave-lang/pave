@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Enum.h>
 #include <slice_EnumVariantInfo.h>
 
 #line 22 "src/std/Enum.pv"

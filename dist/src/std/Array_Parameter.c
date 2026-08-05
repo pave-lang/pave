@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <usize.h>
 #include <std/Iter_ref_Parameter.h>

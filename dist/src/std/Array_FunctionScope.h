@@ -16,11 +16,9 @@ struct Array_FunctionScope {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_FunctionScope.h>
 #include <compiler/FunctionScope.h>
 #include <std/Iter_ref_FunctionScope.h>
 #include <slice_FunctionScope.h>
-struct Array_FunctionScope;
 struct FunctionScope;
 
 #line 77 "src/std/Array.pv"

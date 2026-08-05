@@ -14,10 +14,8 @@ struct Iter_ref_InlayHint {
     struct InlayHint* end;
 };
 
-#include <std/Iter_ref_InlayHint.h>
 #include <std/IterEnumerate_ref_InlayHint.h>
 struct InlayHint;
-struct Iter_ref_InlayHint;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_InlayHint Iter_ref_InlayHint__new(struct InlayHint* start, struct InlayHint* end);

@@ -16,11 +16,9 @@ struct Array_MatchPattern {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_MatchPattern.h>
 #include <analyzer/statement/MatchPattern.h>
 #include <std/Iter_ref_MatchPattern.h>
 #include <slice_MatchPattern.h>
-struct Array_MatchPattern;
 struct MatchPattern;
 
 #line 77 "src/std/Array.pv"

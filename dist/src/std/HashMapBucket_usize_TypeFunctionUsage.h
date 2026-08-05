@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include <compiler/TypeFunctionUsage.h>
-struct HashMapBucket_usize_TypeFunctionUsage;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeFunctionUsage {

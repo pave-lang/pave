@@ -16,10 +16,8 @@ struct TypeUsage_Enum {
     bool any_usage;
 };
 
-#include <compiler/TypeUsage_Enum.h>
 struct ArenaAllocator;
 struct Enum;
-struct TypeUsage_Enum;
 struct GenericMap;
 struct UsageContext;
 

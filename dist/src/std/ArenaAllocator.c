@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <std/ArenaAllocator.h>
 #include <std/ArenaBlock.h>
 #include <std/ArenaAlloc.h>
 #include <std/trait_Any.h>
@@ -120,6 +119,7 @@ void ArenaAllocator__destroy(struct ArenaAllocator* self) {
     allocator.vtable->fn_free(allocator.instance, self);
 }
 #include <analyzer/types/Function.h>
+#include <std/ArenaAllocator.h>
 
 #line 220 "src/std/ArenaAllocator.pv"
 struct Function* ArenaAllocator__store_Function(struct ArenaAllocator* self, struct Function* value) {

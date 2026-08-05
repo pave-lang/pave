@@ -22,7 +22,6 @@ struct Context;
 struct Token;
 struct Array_ref_Token;
 struct Generics;
-struct PreprocessorIfStatement;
 
 #line 19 "src/analyzer/statement/PreprocessorIfStatement.pv"
 struct Array_ref_Token PreprocessorIfStatement__parse_condition(struct Context* context, struct Token* directive);

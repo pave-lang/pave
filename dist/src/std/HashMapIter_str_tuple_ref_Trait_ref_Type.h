@@ -11,7 +11,6 @@ struct HashMapIter_str_tuple_ref_Trait_ref_Type {
     struct HashMapBucket_str_tuple_ref_Trait_ref_Type* end;
 };
 
-struct HashMapIter_str_tuple_ref_Trait_ref_Type;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_tuple_ref_Trait_ref_Type__next(struct HashMapIter_str_tuple_ref_Trait_ref_Type* self);

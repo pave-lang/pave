@@ -17,12 +17,10 @@ struct HashMap_str_Array_Diagnostic {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_Array_Diagnostic.h>
 #include <std/str.h>
 #include <std/Array_Diagnostic.h>
 #include <std/HashMapIter_str_Array_Diagnostic.h>
 #include <std/trait_Map_str_Array_Diagnostic.h>
-struct HashMap_str_Array_Diagnostic;
 struct str;
 struct Array_Diagnostic;
 struct HashMapBucket_str_Array_Diagnostic;

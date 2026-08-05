@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/c/TypedefC.h>
-struct HashMapBucket_str_TypedefC;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_TypedefC {

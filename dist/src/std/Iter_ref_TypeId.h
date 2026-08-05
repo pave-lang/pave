@@ -14,10 +14,8 @@ struct Iter_ref_TypeId {
     TypeId* end;
 };
 
-#include <std/Iter_ref_TypeId.h>
 #include <std/IterEnumerate_ref_TypeId.h>
 typedef uint64_t TypeId;
-struct Iter_ref_TypeId;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_TypeId Iter_ref_TypeId__new(TypeId* start, TypeId* end);

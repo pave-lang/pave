@@ -6,7 +6,6 @@
 
 #include <analyzer/c/ParentCpp.h>
 struct Include;
-struct IncludeContext;
 struct HashMap_str_Type;
 
 #line 8 "src/analyzer/c/IncludeContext.pv"
@@ -20,7 +19,6 @@ struct IncludeContext {
 
 #include <clang-c/Index.h>
 #include <analyzer/types/Type.h>
-struct IncludeContext;
 struct Type;
 struct StructC;
 struct EnumC;

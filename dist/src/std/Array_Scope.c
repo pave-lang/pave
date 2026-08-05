@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_Scope.h>
 #include <analyzer/Scope.h>
 #include <usize.h>
 #include <std/Iter_ref_Scope.h>

@@ -11,7 +11,6 @@ struct HashMapIter_str_Array_ref_Enum {
     struct HashMapBucket_str_Array_ref_Enum* end;
 };
 
-struct HashMapIter_str_Array_ref_Enum;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_ref_Enum__next(struct HashMapIter_str_Array_ref_Enum* self);

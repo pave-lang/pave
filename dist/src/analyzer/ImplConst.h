@@ -19,7 +19,6 @@ struct ImplConst {
     uintptr_t token_end;
 };
 
-struct ImplConst;
 
 #line 15 "src/analyzer/Impl.pv"
 bool ImplConst__parse_types(struct ImplConst* self);

@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #include <stdio.h>
-#include <compiler/DefinitionWriter.h>
 #include <compiler/Generator.h>
 #include <std/HashMap_str_EnumVariant.h>
 #include <analyzer/types/Enum.h>

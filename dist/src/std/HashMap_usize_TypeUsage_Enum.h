@@ -17,11 +17,9 @@ struct HashMap_usize_TypeUsage_Enum {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_usize_TypeUsage_Enum.h>
 #include <compiler/TypeUsage_Enum.h>
 #include <std/HashMapIter_usize_TypeUsage_Enum.h>
 #include <std/trait_Map_usize_TypeUsage_Enum.h>
-struct HashMap_usize_TypeUsage_Enum;
 struct TypeUsage_Enum;
 struct HashMapBucket_usize_TypeUsage_Enum;
 

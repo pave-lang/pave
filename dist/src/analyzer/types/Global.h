@@ -20,7 +20,6 @@ struct Global {
     bool is_const;
 };
 
-struct Global;
 
 #line 16 "src/analyzer/types/Global.pv"
 bool Global__parse_types(struct Global* self);

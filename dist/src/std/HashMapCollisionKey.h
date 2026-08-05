@@ -9,8 +9,6 @@ typedef int32_t HashMapCollisionKey;
 
 #include <std/trait_Hash.h>
 #include <std/Hash.h>
-#include <std/HashMapCollisionKey.h>
-typedef int32_t HashMapCollisionKey;
 
 #line 273 "src/std/HashMap.pv"
 Hash HashMapCollisionKey__Hash__hash(void* __self);

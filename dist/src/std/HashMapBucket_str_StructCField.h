@@ -3,7 +3,6 @@
 
 #include <std/str.h>
 #include <analyzer/c/StructCField.h>
-struct HashMapBucket_str_StructCField;
 
 #line 5 "src/std/HashMap.pv"
 struct HashMapBucket_str_StructCField {

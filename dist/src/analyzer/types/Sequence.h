@@ -13,7 +13,6 @@ struct Sequence {
     struct Type element_pointer;
 };
 
-struct Sequence;
 
 #line 65 "src/analyzer/types/Type.pv"
 bool Sequence__is_slice(struct Sequence* self);

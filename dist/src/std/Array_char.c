@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_char.h>
 #include <usize.h>
 #include <std/Iter_ref_char.h>
 #include <slice_char.h>

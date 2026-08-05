@@ -9,7 +9,6 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/statement/MatchCase.h>
 #include <analyzer/statement/MatchStatement.h>
-#include <analyzer/statement/MatchStatement.h>
 
 #include <analyzer/statement/MatchStatement.h>
 

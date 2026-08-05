@@ -31,10 +31,8 @@ struct Function {
     struct Block* body;
 };
 
-#include <analyzer/types/Function.h>
 #include <std/trait_Allocator.h>
 struct Context;
-struct Function;
 struct Generics;
 
 #line 46 "src/analyzer/types/Function.pv"

@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/UsageContext.h>
 #include <analyzer/types/GenericMap.h>
 #include <std/ArenaAllocator.h>
 #include <std/trait_Allocator.h>

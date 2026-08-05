@@ -9,7 +9,6 @@
 #include <string.h>
 #include <analyzer/types/Primitive.h>
 #include <analyzer/Module.h>
-#include <analyzer/Context.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Analysis.h>
 #include <std/trait_Allocator.h>

@@ -17,11 +17,9 @@ struct HashMap_str_ref_Global {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_Global.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_Global.h>
 #include <std/trait_Map_str_ref_Global.h>
-struct HashMap_str_ref_Global;
 struct str;
 struct Global;
 struct HashMapBucket_str_ref_Global;

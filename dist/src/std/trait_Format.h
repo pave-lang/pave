@@ -1,7 +1,6 @@
 #ifndef PAVE_TRAIT_FORMAT
 #define PAVE_TRAIT_FORMAT
 
-#include <std/trait_Format.h>
 #include <std/trait_Writer.h>
 #include <std/str.h>
 

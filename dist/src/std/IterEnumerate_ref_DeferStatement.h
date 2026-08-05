@@ -13,7 +13,6 @@ struct IterEnumerate_ref_DeferStatement {
 };
 
 #include <tuple_usize_ref_DeferStatement.h>
-struct IterEnumerate_ref_DeferStatement;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_DeferStatement__next(struct IterEnumerate_ref_DeferStatement* self);

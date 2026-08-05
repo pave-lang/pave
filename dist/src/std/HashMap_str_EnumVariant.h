@@ -17,12 +17,10 @@ struct HashMap_str_EnumVariant {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_EnumVariant.h>
 #include <std/str.h>
 #include <analyzer/types/EnumVariant.h>
 #include <std/HashMapIter_str_EnumVariant.h>
 #include <std/trait_Map_str_EnumVariant.h>
-struct HashMap_str_EnumVariant;
 struct str;
 struct EnumVariant;
 struct HashMapBucket_str_EnumVariant;

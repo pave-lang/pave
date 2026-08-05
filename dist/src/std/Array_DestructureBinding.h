@@ -16,11 +16,9 @@ struct Array_DestructureBinding {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_DestructureBinding.h>
 #include <analyzer/statement/DestructureBinding.h>
 #include <std/Iter_ref_DestructureBinding.h>
 #include <slice_DestructureBinding.h>
-struct Array_DestructureBinding;
 struct DestructureBinding;
 
 #line 77 "src/std/Array.pv"

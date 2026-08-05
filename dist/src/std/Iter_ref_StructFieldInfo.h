@@ -14,10 +14,8 @@ struct Iter_ref_StructFieldInfo {
     struct StructFieldInfo* end;
 };
 
-#include <std/Iter_ref_StructFieldInfo.h>
 #include <std/IterEnumerate_ref_StructFieldInfo.h>
 struct StructFieldInfo;
-struct Iter_ref_StructFieldInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_StructFieldInfo Iter_ref_StructFieldInfo__new(struct StructFieldInfo* start, struct StructFieldInfo* end);

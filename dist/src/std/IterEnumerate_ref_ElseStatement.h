@@ -13,7 +13,6 @@ struct IterEnumerate_ref_ElseStatement {
 };
 
 #include <tuple_usize_ref_ElseStatement.h>
-struct IterEnumerate_ref_ElseStatement;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ElseStatement__next(struct IterEnumerate_ref_ElseStatement* self);

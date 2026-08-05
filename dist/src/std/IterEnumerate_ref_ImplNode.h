@@ -13,7 +13,6 @@ struct IterEnumerate_ref_ImplNode {
 };
 
 #include <tuple_usize_ref_ImplNode.h>
-struct IterEnumerate_ref_ImplNode;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ImplNode__next(struct IterEnumerate_ref_ImplNode* self);

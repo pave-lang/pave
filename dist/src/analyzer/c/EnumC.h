@@ -16,7 +16,6 @@ struct EnumC {
 
 #include <analyzer/c/ParentCpp.h>
 struct Include;
-struct EnumC;
 
 #line 11 "src/analyzer/c/EnumC.pv"
 struct EnumC* EnumC__new(struct Include* include, char const* name, struct ParentCpp parent);

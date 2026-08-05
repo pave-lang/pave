@@ -11,7 +11,6 @@ struct HashSetIter_str {
     struct HashSetBucket_str* end;
 };
 
-struct HashSetIter_str;
 struct str;
 
 #line 15 "src/std/HashSet.pv"

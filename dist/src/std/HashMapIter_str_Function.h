@@ -11,7 +11,6 @@ struct HashMapIter_str_Function {
     struct HashMapBucket_str_Function* end;
 };
 
-struct HashMapIter_str_Function;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Function__next(struct HashMapIter_str_Function* self);

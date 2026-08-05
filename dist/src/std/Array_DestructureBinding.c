@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_DestructureBinding.h>
 #include <analyzer/statement/DestructureBinding.h>
 #include <usize.h>
 #include <std/Iter_ref_DestructureBinding.h>

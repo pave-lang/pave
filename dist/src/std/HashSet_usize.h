@@ -16,10 +16,8 @@ struct HashSet_usize {
     uintptr_t length;
 };
 
-#include <std/HashSet_usize.h>
 #include <std/HashSetIter_usize.h>
 struct ArenaAllocator;
-struct HashSet_usize;
 
 #line 34 "src/std/HashSet.pv"
 struct HashSet_usize HashSet_usize__new(struct ArenaAllocator* allocator);

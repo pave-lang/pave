@@ -16,11 +16,9 @@ struct Array_SignatureInfo {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_SignatureInfo.h>
 #include <analyzer/SignatureInfo.h>
 #include <std/Iter_ref_SignatureInfo.h>
 #include <slice_SignatureInfo.h>
-struct Array_SignatureInfo;
 struct SignatureInfo;
 
 #line 77 "src/std/Array.pv"

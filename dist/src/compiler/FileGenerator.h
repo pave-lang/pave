@@ -11,10 +11,8 @@ struct FileGenerator {
 };
 
 #include <stdio.h>
-#include <compiler/FileGenerator.h>
 #include <std/str.h>
 struct Generator;
-struct FileGenerator;
 struct TypeFunctionUsage;
 struct UsageContext;
 struct TypeUsage_Enum;

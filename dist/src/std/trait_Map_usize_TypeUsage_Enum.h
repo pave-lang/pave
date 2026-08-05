@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_usize_TypeUsage_Enum.h>
 #include <compiler/TypeUsage_Enum.h>
 struct TypeUsage_Enum;
 

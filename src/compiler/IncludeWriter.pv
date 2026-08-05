@@ -103,6 +103,8 @@ impl IncludeWriter {
             if resolved == null { continue; }
             let resolved_nn: &Type = if deref { resolved.deref_all() } else { resolved };
 
+            if generics.self_type != null && generator.root.type_impl_target_eq(resolved.deref_all(), generics.self_type) { continue; }
+
             let found_type_impl_header = false;
             for *type_impl in generator.root.type_impls {
                 if type_impl.impl_info.generics.array.length != 0 { continue; }

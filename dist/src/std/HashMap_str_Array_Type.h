@@ -17,12 +17,10 @@ struct HashMap_str_Array_Type {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_Array_Type.h>
 #include <std/str.h>
 #include <std/Array_Type.h>
 #include <std/HashMapIter_str_Array_Type.h>
 #include <std/trait_Map_str_Array_Type.h>
-struct HashMap_str_Array_Type;
 struct str;
 struct Array_Type;
 struct HashMapBucket_str_Array_Type;

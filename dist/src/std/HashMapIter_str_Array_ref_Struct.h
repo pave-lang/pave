@@ -11,7 +11,6 @@ struct HashMapIter_str_Array_ref_Struct {
     struct HashMapBucket_str_Array_ref_Struct* end;
 };
 
-struct HashMapIter_str_Array_ref_Struct;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_ref_Struct__next(struct HashMapIter_str_Array_ref_Struct* self);

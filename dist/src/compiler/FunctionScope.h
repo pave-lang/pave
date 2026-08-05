@@ -14,7 +14,6 @@ struct FunctionScope {
     struct HashMap_str_str variable_replacements;
 };
 
-#include <compiler/FunctionScope.h>
 struct ArenaAllocator;
 
 #line 13 "src/compiler/FunctionScope.pv"

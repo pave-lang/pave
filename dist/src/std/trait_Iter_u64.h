@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <std/trait_Iter_u64.h>
 
 #line 1 "src/std/Iter.pv"
 struct trait_Iter_u64VTable {

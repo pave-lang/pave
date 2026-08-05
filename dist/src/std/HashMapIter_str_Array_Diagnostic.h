@@ -11,7 +11,6 @@ struct HashMapIter_str_Array_Diagnostic {
     struct HashMapBucket_str_Array_Diagnostic* end;
 };
 
-struct HashMapIter_str_Array_Diagnostic;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_Diagnostic__next(struct HashMapIter_str_Array_Diagnostic* self);

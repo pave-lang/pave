@@ -5,7 +5,6 @@
 
 #include <std/ArenaAllocator.h>
 #include <compiler/Generator.h>
-#include <compiler/Usages.h>
 #include <analyzer/Root.h>
 #include <analyzer/Naming.h>
 #include <std/trait_Allocator.h>

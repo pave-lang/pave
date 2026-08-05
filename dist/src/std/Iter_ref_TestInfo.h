@@ -14,10 +14,8 @@ struct Iter_ref_TestInfo {
     struct TestInfo* end;
 };
 
-#include <std/Iter_ref_TestInfo.h>
 #include <std/IterEnumerate_ref_TestInfo.h>
 struct TestInfo;
-struct Iter_ref_TestInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_TestInfo Iter_ref_TestInfo__new(struct TestInfo* start, struct TestInfo* end);

@@ -21,7 +21,6 @@
 #include <analyzer/expression/NullNarrowing.h>
 #include <analyzer/statement/ElseStatement.h>
 #include <analyzer/statement/IfStatement.h>
-#include <analyzer/statement/IfStatement.h>
 
 #include <analyzer/statement/IfStatement.h>
 

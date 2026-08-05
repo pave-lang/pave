@@ -14,7 +14,6 @@ struct MatchCase {
     struct Block* body;
 };
 
-struct MatchCase;
 struct Context;
 struct Generics;
 

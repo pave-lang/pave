@@ -16,11 +16,9 @@ struct Array_UsageContext {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_UsageContext.h>
 #include <compiler/UsageContext.h>
 #include <std/Iter_ref_UsageContext.h>
 #include <slice_UsageContext.h>
-struct Array_UsageContext;
 struct UsageContext;
 
 #line 77 "src/std/Array.pv"

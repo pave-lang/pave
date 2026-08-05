@@ -14,10 +14,8 @@ struct Iter_ref_CompletionInfo {
     struct CompletionInfo* end;
 };
 
-#include <std/Iter_ref_CompletionInfo.h>
 #include <std/IterEnumerate_ref_CompletionInfo.h>
 struct CompletionInfo;
-struct Iter_ref_CompletionInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_CompletionInfo Iter_ref_CompletionInfo__new(struct CompletionInfo* start, struct CompletionInfo* end);

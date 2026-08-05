@@ -11,7 +11,6 @@ struct HashMapIter_str_Array_SymbolInfo {
     struct HashMapBucket_str_Array_SymbolInfo* end;
 };
 
-struct HashMapIter_str_Array_SymbolInfo;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Array_SymbolInfo__next(struct HashMapIter_str_Array_SymbolInfo* self);

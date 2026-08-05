@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Map_usize_TypeUsage_Struct.h>
 #include <compiler/TypeUsage_Struct.h>
 struct TypeUsage_Struct;
 

@@ -1,7 +1,6 @@
 #ifndef PAVE_TRAIT_WRITER
 #define PAVE_TRAIT_WRITER
 
-#include <std/trait_Writer.h>
 #include <std/str.h>
 
 #line 1 "src/std/Writer.pv"

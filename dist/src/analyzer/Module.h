@@ -47,7 +47,6 @@ struct Module {
 
 #include <std/str.h>
 struct Namespace;
-struct Module;
 struct NamespacePath;
 struct Array_Token;
 struct Type;

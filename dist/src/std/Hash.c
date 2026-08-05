@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-#include <std/Hash.h>
 #include <std/Fnv1a.h>
 #include <std/Hash.h>
 

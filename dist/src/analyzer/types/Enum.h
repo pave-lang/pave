@@ -26,9 +26,7 @@ struct Enum {
     struct Array_ref_Impl impls;
 };
 
-#include <analyzer/types/Enum.h>
 struct Context;
-struct Enum;
 
 #line 39 "src/analyzer/types/Enum.pv"
 struct Enum Enum__new(struct Context* context);

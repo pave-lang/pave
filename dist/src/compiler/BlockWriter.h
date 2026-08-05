@@ -11,9 +11,7 @@ struct BlockWriter {
 };
 
 #include <stdio.h>
-#include <compiler/BlockWriter.h>
 struct Generator;
-struct BlockWriter;
 struct Type;
 struct EnumVariant;
 struct Array_EnumVariantParameter;

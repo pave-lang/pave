@@ -13,7 +13,6 @@ struct IterEnumerate_ref_ref_trait_Format {
 };
 
 #include <tuple_usize_ref_ref_trait_Format.h>
-struct IterEnumerate_ref_ref_trait_Format;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_trait_Format__next(struct IterEnumerate_ref_ref_trait_Format* self);

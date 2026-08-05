@@ -17,12 +17,10 @@ struct HashMap_str_tuple_ref_Trait_ref_Type {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
 #include <std/str.h>
 #include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMapIter_str_tuple_ref_Trait_ref_Type.h>
 #include <std/trait_Map_str_tuple_ref_Trait_ref_Type.h>
-struct HashMap_str_tuple_ref_Trait_ref_Type;
 struct str;
 struct HashMapBucket_str_tuple_ref_Trait_ref_Type;
 

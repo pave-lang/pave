@@ -16,11 +16,9 @@ struct Array_Parameter {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <std/Iter_ref_Parameter.h>
 #include <slice_Parameter.h>
-struct Array_Parameter;
 struct Parameter;
 
 #line 77 "src/std/Array.pv"

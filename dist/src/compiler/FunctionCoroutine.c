@@ -2,7 +2,6 @@
 
 #include <assert.h>
 
-#include <compiler/FunctionCoroutine.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <compiler/FunctionCoroutine.h>

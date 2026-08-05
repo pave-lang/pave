@@ -13,7 +13,6 @@ struct IterEnumerate_ref_MemberCompletionInfo {
 };
 
 #include <tuple_usize_ref_MemberCompletionInfo.h>
-struct IterEnumerate_ref_MemberCompletionInfo;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_MemberCompletionInfo__next(struct IterEnumerate_ref_MemberCompletionInfo* self);

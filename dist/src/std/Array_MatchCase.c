@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_MatchCase.h>
 #include <analyzer/statement/MatchCase.h>
 #include <usize.h>
 #include <std/Iter_ref_MatchCase.h>

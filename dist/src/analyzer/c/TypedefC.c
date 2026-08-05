@@ -1,7 +1,6 @@
 #include <std/ArenaAllocator.h>
 #include <analyzer/Root.h>
 #include <analyzer/c/Include.h>
-#include <analyzer/c/TypedefC.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/c/TypedefC.h>
 

@@ -17,11 +17,9 @@ struct HashMap_u32_Type {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_u32_Type.h>
 #include <analyzer/types/Type.h>
 #include <std/HashMapIter_u32_Type.h>
 #include <std/trait_Map_u32_Type.h>
-struct HashMap_u32_Type;
 struct Type;
 struct HashMapBucket_u32_Type;
 

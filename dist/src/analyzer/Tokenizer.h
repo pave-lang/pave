@@ -20,7 +20,6 @@ struct Tokenizer {
 #include <std/Array_ptrc_char.h>
 #include <std/str.h>
 #include <std/Array_Token.h>
-struct Tokenizer;
 struct Array_ptrc_char;
 struct ArenaAllocator;
 

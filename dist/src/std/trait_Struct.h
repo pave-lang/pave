@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <std/trait_Struct.h>
 #include <slice_StructFieldInfo.h>
 
 #line 8 "src/std/Struct.pv"

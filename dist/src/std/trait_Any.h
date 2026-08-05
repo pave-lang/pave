@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#include <std/trait_Any.h>
 
 #line 1 "src/std/Any.pv"
 struct trait_AnyVTable {

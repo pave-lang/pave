@@ -13,7 +13,6 @@ struct IterEnumerate_ref_ref_Struct {
 };
 
 #include <tuple_usize_ref_ref_Struct.h>
-struct IterEnumerate_ref_ref_Struct;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_ref_Struct__next(struct IterEnumerate_ref_ref_Struct* self);

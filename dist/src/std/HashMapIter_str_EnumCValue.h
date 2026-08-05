@@ -11,7 +11,6 @@ struct HashMapIter_str_EnumCValue {
     struct HashMapBucket_str_EnumCValue* end;
 };
 
-struct HashMapIter_str_EnumCValue;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_EnumCValue__next(struct HashMapIter_str_EnumCValue* self);

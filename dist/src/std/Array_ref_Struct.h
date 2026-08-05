@@ -15,10 +15,8 @@ struct Array_ref_Struct {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_ref_Struct.h>
 #include <std/Iter_ref_ref_Struct.h>
 #include <slice_ref_Struct.h>
-struct Array_ref_Struct;
 struct Struct;
 
 #line 77 "src/std/Array.pv"

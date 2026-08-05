@@ -12,10 +12,8 @@ struct ExpressionWriter {
 };
 
 #include <stdio.h>
-#include <compiler/ExpressionWriter.h>
 #include <std/str.h>
 struct Generator;
-struct ExpressionWriter;
 struct Expression;
 struct Type;
 struct GenericMap;

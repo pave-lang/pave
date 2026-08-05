@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-#include <analyzer/NamespacePath.h>
 #include <std/trait_Allocator.h>
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>

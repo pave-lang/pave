@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_TypeImpl.h>
 #include <analyzer/types/TypeImpl.h>
 #include <usize.h>
 #include <std/Iter_ref_TypeImpl.h>

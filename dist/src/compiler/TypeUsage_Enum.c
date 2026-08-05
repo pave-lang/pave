@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <compiler/TypeUsage_Enum.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Enum.h>
 #include <std/trait_Allocator.h>

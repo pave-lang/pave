@@ -12,9 +12,7 @@ struct Iter_ref_ref_Struct {
     struct Struct** end;
 };
 
-#include <std/Iter_ref_ref_Struct.h>
 #include <std/IterEnumerate_ref_ref_Struct.h>
-struct Iter_ref_ref_Struct;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_ref_Struct Iter_ref_ref_Struct__new(struct Struct** start, struct Struct** end);

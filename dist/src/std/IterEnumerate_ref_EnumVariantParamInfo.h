@@ -13,7 +13,6 @@ struct IterEnumerate_ref_EnumVariantParamInfo {
 };
 
 #include <tuple_usize_ref_EnumVariantParamInfo.h>
-struct IterEnumerate_ref_EnumVariantParamInfo;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_EnumVariantParamInfo__next(struct IterEnumerate_ref_EnumVariantParamInfo* self);

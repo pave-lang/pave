@@ -14,10 +14,8 @@ struct Iter_ref_SignatureInfo {
     struct SignatureInfo* end;
 };
 
-#include <std/Iter_ref_SignatureInfo.h>
 #include <std/IterEnumerate_ref_SignatureInfo.h>
 struct SignatureInfo;
-struct Iter_ref_SignatureInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_SignatureInfo Iter_ref_SignatureInfo__new(struct SignatureInfo* start, struct SignatureInfo* end);

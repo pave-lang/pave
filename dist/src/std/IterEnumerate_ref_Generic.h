@@ -13,7 +13,6 @@ struct IterEnumerate_ref_Generic {
 };
 
 #include <tuple_usize_ref_Generic.h>
-struct IterEnumerate_ref_Generic;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_Generic__next(struct IterEnumerate_ref_Generic* self);

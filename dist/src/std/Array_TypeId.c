@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_TypeId.h>
 #include <std/TypeId.h>
 #include <usize.h>
 #include <std/Iter_ref_TypeId.h>

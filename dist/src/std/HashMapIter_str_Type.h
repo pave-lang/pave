@@ -11,7 +11,6 @@ struct HashMapIter_str_Type {
     struct HashMapBucket_str_Type* end;
 };
 
-struct HashMapIter_str_Type;
 
 #line 17 "src/std/HashMap.pv"
 bool HashMapIter_str_Type__next(struct HashMapIter_str_Type* self);

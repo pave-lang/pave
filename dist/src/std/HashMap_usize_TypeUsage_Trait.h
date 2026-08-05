@@ -17,11 +17,9 @@ struct HashMap_usize_TypeUsage_Trait {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_usize_TypeUsage_Trait.h>
 #include <compiler/TypeUsage_Trait.h>
 #include <std/HashMapIter_usize_TypeUsage_Trait.h>
 #include <std/trait_Map_usize_TypeUsage_Trait.h>
-struct HashMap_usize_TypeUsage_Trait;
 struct TypeUsage_Trait;
 struct HashMapBucket_usize_TypeUsage_Trait;
 

@@ -15,10 +15,8 @@ struct Array_char {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/Array_char.h>
 #include <std/Iter_ref_char.h>
 #include <slice_char.h>
-struct Array_char;
 
 #line 77 "src/std/Array.pv"
 struct Array_char Array_char__new(struct trait_Allocator allocator);

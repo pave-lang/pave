@@ -23,10 +23,8 @@ struct UsageContext {
     struct Array_HashMap_usize_TypeFunctionUsage impl_functions;
 };
 
-#include <compiler/UsageContext.h>
 struct ArenaAllocator;
 struct GenericMap;
-struct UsageContext;
 struct Array_ref_Impl;
 struct Trait;
 struct HashSet_usize;

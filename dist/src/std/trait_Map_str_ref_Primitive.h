@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_ref_Primitive.h>
 #include <std/str.h>
 struct str;
 struct Primitive;

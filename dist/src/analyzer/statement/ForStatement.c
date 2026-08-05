@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <analyzer/statement/ForStatement.h>
 #include <std/trait_Allocator.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/Context.h>

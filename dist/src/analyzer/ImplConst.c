@@ -1,7 +1,6 @@
 #include <stdint.h>
 
 #include <analyzer/Context.h>
-#include <analyzer/ImplConst.h>
 #include <std/ArenaAllocator.h>
 #include <analyzer/types/Generics.h>
 #include <std/trait_Allocator.h>

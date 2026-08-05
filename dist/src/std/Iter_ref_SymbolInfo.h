@@ -14,10 +14,8 @@ struct Iter_ref_SymbolInfo {
     struct SymbolInfo* end;
 };
 
-#include <std/Iter_ref_SymbolInfo.h>
 #include <std/IterEnumerate_ref_SymbolInfo.h>
 struct SymbolInfo;
-struct Iter_ref_SymbolInfo;
 
 #line 12 "src/std/Array.pv"
 struct Iter_ref_SymbolInfo Iter_ref_SymbolInfo__new(struct SymbolInfo* start, struct SymbolInfo* end);

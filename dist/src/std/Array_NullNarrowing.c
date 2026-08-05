@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <string.h>
-#include <std/Array_NullNarrowing.h>
 #include <analyzer/expression/NullNarrowing.h>
 #include <usize.h>
 #include <std/Iter_ref_NullNarrowing.h>

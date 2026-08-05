@@ -13,7 +13,6 @@ struct IterEnumerate_ref_SymbolInfo {
 };
 
 #include <tuple_usize_ref_SymbolInfo.h>
-struct IterEnumerate_ref_SymbolInfo;
 
 #line 58 "src/std/Array.pv"
 bool IterEnumerate_ref_SymbolInfo__next(struct IterEnumerate_ref_SymbolInfo* self);

@@ -17,11 +17,9 @@ struct HashMap_str_ref_ImplConst {
 };
 
 #include <std/trait_Allocator.h>
-#include <std/HashMap_str_ref_ImplConst.h>
 #include <std/str.h>
 #include <std/HashMapIter_str_ref_ImplConst.h>
 #include <std/trait_Map_str_ref_ImplConst.h>
-struct HashMap_str_ref_ImplConst;
 struct str;
 struct ImplConst;
 struct HashMapBucket_str_ref_ImplConst;

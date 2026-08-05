@@ -33,7 +33,6 @@ struct Generator {
 #include <stdio.h>
 #include <std/str.h>
 #include <std/String.h>
-struct Generator;
 struct String;
 struct Token;
 struct Type;

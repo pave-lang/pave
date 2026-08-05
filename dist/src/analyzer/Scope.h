@@ -13,7 +13,6 @@ struct Scope {
     struct Block* block;
 };
 
-#include <analyzer/Scope.h>
 struct ArenaAllocator;
 struct Block;
 

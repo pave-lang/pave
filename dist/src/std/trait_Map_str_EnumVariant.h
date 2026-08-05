@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include <std/trait_Map_str_EnumVariant.h>
 #include <std/str.h>
 #include <analyzer/types/EnumVariant.h>
 struct str;
