@@ -1,8 +1,5 @@
-#include <stdint.h>
-
 #include <assert.h>
 
-#include <std/Range_usize.h>
 #include <compiler/test_FunctionCoroutine_fibonacci_1.h>
 
 #line 20 "src/compiler/FunctionCoroutine.pv"

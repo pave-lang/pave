@@ -74,7 +74,7 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
 #line 856 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
-#line 906 "src/analyzer/expression/Expression.pv"
+#line 926 "src/analyzer/expression/Expression.pv"
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

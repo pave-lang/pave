@@ -898,7 +898,9 @@ impl Usages {
 
         self.add_type(&func_info.return_type, generic_map);
 
-        self.usage_mode = UsageMode::Body;
+        if func_info.type != FunctionType::Coroutine {
+            self.usage_mode = UsageMode::Body;
+        }
 
         self.process_block(func_info.body, generic_map);
 

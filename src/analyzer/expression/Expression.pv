@@ -880,7 +880,17 @@ impl Expression {
 
         if !context.expect_value(TokenType::Symbol, "{") { return null; }
 
+        let narrowings_true = Array<NullNarrowing>::new(context.allocator);
+        Expression::collect_null_narrowings(context, condition, true, &narrowings_true);
+        let pushed_true_scope = false;
+        if narrowings_true.length > 0 {
+            context.push_scope(null);
+            for narrow in narrowings_true { context.set_narrowed(narrow.path, narrow.type); }
+            pushed_true_scope = true;
+        }
+
         let a = Expression::parse(context, generics);
+        if pushed_true_scope { context.pop_scope(); }
         if a == null { return null; }
 
         if !context.expect_value(TokenType::Symbol, "}") { return null; }
@@ -893,7 +903,17 @@ impl Expression {
             return null;
         }
 
+        let narrowings_false = Array<NullNarrowing>::new(context.allocator);
+        Expression::collect_null_narrowings(context, condition, false, &narrowings_false);
+        let pushed_false_scope = false;
+        if narrowings_false.length > 0 {
+            context.push_scope(null);
+            for narrow in narrowings_false { context.set_narrowed(narrow.path, narrow.type); }
+            pushed_false_scope = true;
+        }
+
         let b = Expression::parse(context, generics);
+        if pushed_false_scope { context.pop_scope(); }
         if b == null { return null; }
 
         if !is_else_if && !context.expect_value(TokenType::Symbol, "}") { return null; }

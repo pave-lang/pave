@@ -44,6 +44,9 @@
 #include <analyzer/expression/EnumVariantResult.h>
 #include <analyzer/types/EnumVariant.h>
 #include <analyzer/types/IndirectType.h>
+#include <std/Array_NullNarrowing.h>
+#include <std/Iter_ref_NullNarrowing.h>
+#include <analyzer/expression/NullNarrowing.h>
 #include <std/Array_str.h>
 #include <std/Array_Parameter.h>
 #include <std/Iter_ref_Parameter.h>
@@ -84,9 +87,6 @@
 #include <std/HashMapBucket_str_StructField.h>
 #include <analyzer/InlayHintKind.h>
 #include <analyzer/c/UnknownC.h>
-#include <std/Array_NullNarrowing.h>
-#include <analyzer/expression/NullNarrowing.h>
-#include <std/Iter_ref_NullNarrowing.h>
 #include <analyzer/Position.h>
 #include <analyzer/expression/Expression.h>
 
@@ -1858,182 +1858,240 @@ struct Expression* Expression__parse_if_expression(struct Context* context, stru
     }
 
     #line 883 "src/analyzer/expression/Expression.pv"
-    struct Expression* a = Expression__parse(context, generics);
+    struct Array_NullNarrowing narrowings_true = Array_NullNarrowing__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
     #line 884 "src/analyzer/expression/Expression.pv"
-    if (a == 0) {
-        #line 884 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
-
+    Expression__collect_null_narrowings(context, condition, true, &narrowings_true);
+    #line 885 "src/analyzer/expression/Expression.pv"
+    bool pushed_true_scope = false;
     #line 886 "src/analyzer/expression/Expression.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 886 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
-    #line 887 "src/analyzer/expression/Expression.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "else")) {
+    if (narrowings_true.length > 0) {
         #line 887 "src/analyzer/expression/Expression.pv"
-        return 0;
+        Context__push_scope(context, 0);
+        #line 888 "src/analyzer/expression/Expression.pv"
+        { struct Iter_ref_NullNarrowing __iter = Array_NullNarrowing__iter(&narrowings_true);
+        #line 888 "src/analyzer/expression/Expression.pv"
+        while (Iter_ref_NullNarrowing__next(&__iter)) {
+            #line 888 "src/analyzer/expression/Expression.pv"
+            struct NullNarrowing* narrow = Iter_ref_NullNarrowing__value(&__iter);
+
+            #line 888 "src/analyzer/expression/Expression.pv"
+            Context__set_narrowed(context, narrow->path, narrow->type);
+        } }
+        #line 889 "src/analyzer/expression/Expression.pv"
+        pushed_true_scope = true;
     }
 
-    #line 889 "src/analyzer/expression/Expression.pv"
-    bool is_else_if = Context__check_value(context, TOKEN_TYPE__KEYWORD, "if");
-
-    #line 891 "src/analyzer/expression/Expression.pv"
-    if (!is_else_if && !Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
-        #line 892 "src/analyzer/expression/Expression.pv"
-        Context__error(context, "Expected { or else if");
+    #line 892 "src/analyzer/expression/Expression.pv"
+    struct Expression* a = Expression__parse(context, generics);
+    #line 893 "src/analyzer/expression/Expression.pv"
+    if (pushed_true_scope) {
         #line 893 "src/analyzer/expression/Expression.pv"
+        Context__pop_scope(context);
+    }
+    #line 894 "src/analyzer/expression/Expression.pv"
+    if (a == 0) {
+        #line 894 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
     #line 896 "src/analyzer/expression/Expression.pv"
-    struct Expression* b = Expression__parse(context, generics);
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+        #line 896 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
     #line 897 "src/analyzer/expression/Expression.pv"
-    if (b == 0) {
+    if (!Context__expect_value(context, TOKEN_TYPE__KEYWORD, "else")) {
         #line 897 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
     #line 899 "src/analyzer/expression/Expression.pv"
-    if (!is_else_if && !Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
-        #line 899 "src/analyzer/expression/Expression.pv"
-        return 0;
-    }
+    bool is_else_if = Context__check_value(context, TOKEN_TYPE__KEYWORD, "if");
 
     #line 901 "src/analyzer/expression/Expression.pv"
-    if (!Expression__validate_type(a, context, &b->return_type, false)) {
-        #line 901 "src/analyzer/expression/Expression.pv"
+    if (!is_else_if && !Context__check_next(context, TOKEN_TYPE__SYMBOL, "{")) {
+        #line 902 "src/analyzer/expression/Expression.pv"
+        Context__error(context, "Expected { or else if");
+        #line 903 "src/analyzer/expression/Expression.pv"
         return 0;
     }
 
-    #line 903 "src/analyzer/expression/Expression.pv"
+    #line 906 "src/analyzer/expression/Expression.pv"
+    struct Array_NullNarrowing narrowings_false = Array_NullNarrowing__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+    #line 907 "src/analyzer/expression/Expression.pv"
+    Expression__collect_null_narrowings(context, condition, false, &narrowings_false);
+    #line 908 "src/analyzer/expression/Expression.pv"
+    bool pushed_false_scope = false;
+    #line 909 "src/analyzer/expression/Expression.pv"
+    if (narrowings_false.length > 0) {
+        #line 910 "src/analyzer/expression/Expression.pv"
+        Context__push_scope(context, 0);
+        #line 911 "src/analyzer/expression/Expression.pv"
+        { struct Iter_ref_NullNarrowing __iter = Array_NullNarrowing__iter(&narrowings_false);
+        #line 911 "src/analyzer/expression/Expression.pv"
+        while (Iter_ref_NullNarrowing__next(&__iter)) {
+            #line 911 "src/analyzer/expression/Expression.pv"
+            struct NullNarrowing* narrow = Iter_ref_NullNarrowing__value(&__iter);
+
+            #line 911 "src/analyzer/expression/Expression.pv"
+            Context__set_narrowed(context, narrow->path, narrow->type);
+        } }
+        #line 912 "src/analyzer/expression/Expression.pv"
+        pushed_false_scope = true;
+    }
+
+    #line 915 "src/analyzer/expression/Expression.pv"
+    struct Expression* b = Expression__parse(context, generics);
+    #line 916 "src/analyzer/expression/Expression.pv"
+    if (pushed_false_scope) {
+        #line 916 "src/analyzer/expression/Expression.pv"
+        Context__pop_scope(context);
+    }
+    #line 917 "src/analyzer/expression/Expression.pv"
+    if (b == 0) {
+        #line 917 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 919 "src/analyzer/expression/Expression.pv"
+    if (!is_else_if && !Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+        #line 919 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 921 "src/analyzer/expression/Expression.pv"
+    if (!Expression__validate_type(a, context, &b->return_type, false)) {
+        #line 921 "src/analyzer/expression/Expression.pv"
+        return 0;
+    }
+
+    #line 923 "src/analyzer/expression/Expression.pv"
     return Expression__make(context->allocator, token, (struct ExpressionData) { .type = EXPRESSION_DATA__IF_EXPRESSION, .ifexpression_value = { ._0 = condition, ._1 = a, ._2 = b} }, &a->return_type);
 }
 
-#line 906 "src/analyzer/expression/Expression.pv"
+#line 926 "src/analyzer/expression/Expression.pv"
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self) {
-    #line 907 "src/analyzer/expression/Expression.pv"
+    #line 927 "src/analyzer/expression/Expression.pv"
     if (!Context__should_record_symbols(context)) {
-        #line 907 "src/analyzer/expression/Expression.pv"
+        #line 927 "src/analyzer/expression/Expression.pv"
         return;
     }
 
-    #line 909 "src/analyzer/expression/Expression.pv"
+    #line 929 "src/analyzer/expression/Expression.pv"
     struct Function* func_info = 0;
-    #line 910 "src/analyzer/expression/Expression.pv"
+    #line 930 "src/analyzer/expression/Expression.pv"
     struct Type* function_type_self = context->type_self;
-    #line 911 "src/analyzer/expression/Expression.pv"
+    #line 931 "src/analyzer/expression/Expression.pv"
     struct GenericMap* function_generics = 0;
 
-    #line 913 "src/analyzer/expression/Expression.pv"
+    #line 933 "src/analyzer/expression/Expression.pv"
     switch (function_type->type) {
-        #line 914 "src/analyzer/expression/Expression.pv"
+        #line 934 "src/analyzer/expression/Expression.pv"
         case TYPE__FUNCTION: {
-            #line 914 "src/analyzer/expression/Expression.pv"
+            #line 934 "src/analyzer/expression/Expression.pv"
             struct Function* info = function_type->function_value._0;
-            #line 914 "src/analyzer/expression/Expression.pv"
+            #line 934 "src/analyzer/expression/Expression.pv"
             struct GenericMap* generics = function_type->function_value._1;
-            #line 915 "src/analyzer/expression/Expression.pv"
+            #line 935 "src/analyzer/expression/Expression.pv"
             func_info = info;
-            #line 916 "src/analyzer/expression/Expression.pv"
+            #line 936 "src/analyzer/expression/Expression.pv"
             function_generics = generics;
-            #line 917 "src/analyzer/expression/Expression.pv"
+            #line 937 "src/analyzer/expression/Expression.pv"
             if (generics != 0 && generics->self_type != 0) {
-                #line 918 "src/analyzer/expression/Expression.pv"
+                #line 938 "src/analyzer/expression/Expression.pv"
                 function_type_self = generics->self_type;
             }
         } break;
-        #line 921 "src/analyzer/expression/Expression.pv"
+        #line 941 "src/analyzer/expression/Expression.pv"
         default: {
-            #line 921 "src/analyzer/expression/Expression.pv"
+            #line 941 "src/analyzer/expression/Expression.pv"
             return;
         } break;
     }
-    #line 923 "src/analyzer/expression/Expression.pv"
+    #line 943 "src/analyzer/expression/Expression.pv"
     if (func_info == 0) {
-        #line 923 "src/analyzer/expression/Expression.pv"
+        #line 943 "src/analyzer/expression/Expression.pv"
         return;
     }
 
-    #line 925 "src/analyzer/expression/Expression.pv"
+    #line 945 "src/analyzer/expression/Expression.pv"
     struct String label = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-    #line 926 "src/analyzer/expression/Expression.pv"
+    #line 946 "src/analyzer/expression/Expression.pv"
     String__append(&label, (struct str){ .ptr = "fn ", .length = strlen("fn ") });
-    #line 927 "src/analyzer/expression/Expression.pv"
+    #line 947 "src/analyzer/expression/Expression.pv"
     struct Token* name = func_info->name;
-    #line 928 "src/analyzer/expression/Expression.pv"
+    #line 948 "src/analyzer/expression/Expression.pv"
     if (name != 0) {
-        #line 928 "src/analyzer/expression/Expression.pv"
+        #line 948 "src/analyzer/expression/Expression.pv"
         String__append(&label, name->value);
     }
-    #line 929 "src/analyzer/expression/Expression.pv"
+    #line 949 "src/analyzer/expression/Expression.pv"
     String__append(&label, (struct str){ .ptr = "(", .length = strlen("(") });
 
-    #line 931 "src/analyzer/expression/Expression.pv"
+    #line 951 "src/analyzer/expression/Expression.pv"
     struct Array_str params = Array_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-    #line 932 "src/analyzer/expression/Expression.pv"
+    #line 952 "src/analyzer/expression/Expression.pv"
     bool first = true;
-    #line 933 "src/analyzer/expression/Expression.pv"
+    #line 953 "src/analyzer/expression/Expression.pv"
     uintptr_t i = 0;
-    #line 934 "src/analyzer/expression/Expression.pv"
+    #line 954 "src/analyzer/expression/Expression.pv"
     { struct Iter_ref_Parameter __iter = Array_Parameter__iter(&func_info->parameters);
-    #line 934 "src/analyzer/expression/Expression.pv"
+    #line 954 "src/analyzer/expression/Expression.pv"
     while (Iter_ref_Parameter__next(&__iter)) {
-        #line 934 "src/analyzer/expression/Expression.pv"
+        #line 954 "src/analyzer/expression/Expression.pv"
         struct Parameter* param = Iter_ref_Parameter__value(&__iter);
 
-        #line 935 "src/analyzer/expression/Expression.pv"
+        #line 955 "src/analyzer/expression/Expression.pv"
         if (skip_self && usize__Eq_usize__eq(i, 0)) {
-            #line 936 "src/analyzer/expression/Expression.pv"
+            #line 956 "src/analyzer/expression/Expression.pv"
             i += 1;
-            #line 937 "src/analyzer/expression/Expression.pv"
+            #line 957 "src/analyzer/expression/Expression.pv"
             continue;
         }
-        #line 939 "src/analyzer/expression/Expression.pv"
+        #line 959 "src/analyzer/expression/Expression.pv"
         if (!first) {
-            #line 939 "src/analyzer/expression/Expression.pv"
+            #line 959 "src/analyzer/expression/Expression.pv"
             String__append(&label, (struct str){ .ptr = ", ", .length = strlen(", ") });
         }
-        #line 940 "src/analyzer/expression/Expression.pv"
+        #line 960 "src/analyzer/expression/Expression.pv"
         first = false;
 
-        #line 942 "src/analyzer/expression/Expression.pv"
+        #line 962 "src/analyzer/expression/Expression.pv"
         struct String param_str = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 943 "src/analyzer/expression/Expression.pv"
+        #line 963 "src/analyzer/expression/Expression.pv"
         struct Token* pname = param->name;
-        #line 944 "src/analyzer/expression/Expression.pv"
+        #line 964 "src/analyzer/expression/Expression.pv"
         if (pname != 0) {
-            #line 945 "src/analyzer/expression/Expression.pv"
+            #line 965 "src/analyzer/expression/Expression.pv"
             String__append(&param_str, pname->value);
-            #line 946 "src/analyzer/expression/Expression.pv"
+            #line 966 "src/analyzer/expression/Expression.pv"
             String__append(&param_str, (struct str){ .ptr = ": ", .length = strlen(": ") });
         }
-        #line 948 "src/analyzer/expression/Expression.pv"
+        #line 968 "src/analyzer/expression/Expression.pv"
         struct String type_decl = Naming__get_type_decl(&context->root->naming_decl, &param->type, function_type_self, function_generics);
-        #line 949 "src/analyzer/expression/Expression.pv"
+        #line 969 "src/analyzer/expression/Expression.pv"
         String__append(&param_str, String__as_str(&type_decl));
-        #line 950 "src/analyzer/expression/Expression.pv"
+        #line 970 "src/analyzer/expression/Expression.pv"
         String__append(&label, String__as_str(&param_str));
-        #line 951 "src/analyzer/expression/Expression.pv"
+        #line 971 "src/analyzer/expression/Expression.pv"
         Array_str__append(&params, String__as_str(&param_str));
-        #line 952 "src/analyzer/expression/Expression.pv"
+        #line 972 "src/analyzer/expression/Expression.pv"
         i += 1;
     } }
 
-    #line 955 "src/analyzer/expression/Expression.pv"
+    #line 975 "src/analyzer/expression/Expression.pv"
     String__append(&label, (struct str){ .ptr = ")", .length = strlen(")") });
-    #line 956 "src/analyzer/expression/Expression.pv"
+    #line 976 "src/analyzer/expression/Expression.pv"
     struct String ret_type_decl = Naming__get_type_decl(&context->root->naming_decl, &func_info->return_type, function_type_self, function_generics);
-    #line 957 "src/analyzer/expression/Expression.pv"
+    #line 977 "src/analyzer/expression/Expression.pv"
     if (!Type__is_void(&func_info->return_type)) {
-        #line 958 "src/analyzer/expression/Expression.pv"
+        #line 978 "src/analyzer/expression/Expression.pv"
         String__append(&label, (struct str){ .ptr = " -> ", .length = strlen(" -> ") });
-        #line 959 "src/analyzer/expression/Expression.pv"
+        #line 979 "src/analyzer/expression/Expression.pv"
         String__append(&label, String__as_str(&ret_type_decl));
     }
 
-    #line 962 "src/analyzer/expression/Expression.pv"
+    #line 982 "src/analyzer/expression/Expression.pv"
     Context__record_signature(context, open_paren, close_paren, comma_positions, String__as_str(&label), params);
 }
 

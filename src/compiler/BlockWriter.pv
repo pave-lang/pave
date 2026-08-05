@@ -301,7 +301,11 @@ impl BlockWriter {
                     if value == null {
                         self.write_defer_statements(file, return_type, &defer_statements, generics);
                         generator.write_indent(file);
-                        fprintf(file, "return;\n");
+                        if function_context.func_info != null && function_context.func_info.type == FunctionType::Coroutine {
+                            fprintf(file, "return false;\n");
+                        } else {
+                            fprintf(file, "return;\n");
+                        }
                     } else if defer_statements.length > 0 {
                         generator.write_indent(file);
                         fprintf(file, "__result = ");

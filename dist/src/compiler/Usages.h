@@ -127,13 +127,13 @@ struct UsageContext* Usages__find_parent_usage_context_primitive(struct Usages* 
 #line 780 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 909 "src/compiler/Usages.pv"
+#line 911 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 1028 "src/compiler/Usages.pv"
+#line 1030 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 1336 "src/compiler/Usages.pv"
+#line 1338 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

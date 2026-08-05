@@ -5,6 +5,7 @@
 #include <analyzer/Context.h>
 #include <analyzer/TokenType.h>
 #include <analyzer/types/Function.h>
+#include <analyzer/types/FunctionType.h>
 #include <analyzer/types/Type.h>
 #include <analyzer/statement/ReturnStatement.h>
 #include <std/ArenaAllocator.h>
@@ -35,7 +36,7 @@ struct ReturnStatement* ReturnStatement__parse(struct Context* context, struct G
     #line 18 "src/analyzer/statement/ReturnStatement.pv"
     if (Context__check_next(context, TOKEN_TYPE__SYMBOL, ";")) {
         #line 19 "src/analyzer/statement/ReturnStatement.pv"
-        if (!Type__is_void(&function->return_type)) {
+        if (function->type != FUNCTION_TYPE__COROUTINE && !Type__is_void(&function->return_type)) {
             #line 20 "src/analyzer/statement/ReturnStatement.pv"
             Context__error_token(context, first_token, "Return statement is blank but function has a return type");
         }
