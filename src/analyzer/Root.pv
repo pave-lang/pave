@@ -11,7 +11,6 @@ struct Root {
     types: HashMap<str, Array<Type>>,
     primitives: HashMap<str, &Primitive>,
     ctypes: HashMap<str, TypedefC>,
-    traits: HashMap<str, Array<&Trait>>,
     functions: HashMap<str, Type>,
     clang_args: Array<*const char>,
     c_std_arg: *const char,
@@ -46,7 +45,6 @@ impl Root {
             types: HashMap<str, Array<Type>>::new(allocator),
             primitives: HashMap<str, &Primitive>::new(allocator),
             ctypes: HashMap<str, TypedefC>::new(allocator),
-            traits: HashMap<str, Array<&Trait>>::new(allocator),
             functions: HashMap<str, Type>::new(allocator),
             clang_args: Array<*const char>::new(allocator),
             c_std_arg: null,
@@ -478,18 +476,6 @@ impl Root {
         let i: usize = 0;
         while i < arr.length {
             if arr.data[i].get_arity() == arity { return &arr.data[i]; }
-            i += 1;
-        }
-        return null;
-    }
-
-    fn find_trait(&self, name: str, arity: usize) -> *Trait {
-        let arr = self.traits.find(&name);
-        if arr == null { return null; }
-        let i: usize = 0;
-        while i < arr.length {
-            let trait_info = arr.data[i];
-            if trait_info.generic_arity == arity { return trait_info; }
             i += 1;
         }
         return null;

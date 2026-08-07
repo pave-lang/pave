@@ -703,10 +703,14 @@ impl FileGenerator {
             fprintf(code_file, "#include <std/StructTraitInfo.h>\n");
             fprintf(code_file, "#include <slice_StructTraitInfo.h>\n");
 
-            // The reflection trait is synthesized for every struct. Include it
-            // in the metadata alongside the user-declared dynamic traits.
-            let struct_trait = generator.root.find_trait("Struct", 0);
-            if struct_trait == null { return false; }
+            let struct_trait: *Trait = null;
+            let std_namespace = generator.root.find_namespace("std");
+            if std_namespace != null { struct_trait = std_namespace.find_trait("Struct", 0); }
+            if struct_trait == null {
+                fprintf(stderr, "Missing std Struct trait for dynamic struct %s\n", name.c_str());
+                fclose(code_file);
+                return false;
+            }
 
             fprintf(code_file, "extern struct trait_StructVTable ");
             generator.write_str_title(code_file, name.as_str());

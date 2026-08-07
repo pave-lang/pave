@@ -934,10 +934,7 @@ impl Module {
     }
 
     fn find_trait(&self, name: str, arity: usize) -> *Trait {
-        let type = self.namespace.root.find_trait(name, arity);
-        if type != null { return type; }
-
-        type = self.namespace.find_trait(name, arity);
+        let type = self.namespace.find_trait(name, arity);
         if type != null { return type; }
 
         for *namespace in self.used_namespaces {
