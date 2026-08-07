@@ -1,10 +1,6 @@
-#include <stdint.h>
-
 #include <assert.h>
 #include <stdio.h>
 
-#include <tuple_u32_ptr_Position.h>
-#include <query/Query_Position.h>
 #include <query/Query_Position.h>
 
 #include <query/Query_Position.h>

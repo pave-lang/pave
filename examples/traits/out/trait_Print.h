@@ -1,7 +1,6 @@
 #ifndef PAVE_TRAIT_PRINT
 #define PAVE_TRAIT_PRINT
 
-#include <traits/trait_Print.h>
 
 struct trait_PrintVTable {
     void (*fn_print)(void* __self);

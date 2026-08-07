@@ -19,7 +19,7 @@
 #include <iterators/main.h>
 
 int32_t main(int32_t argc, char const** argv) {
-    for (int32_t i = 0; i < 10; i++) {
+    for (int32_t i = 0; i != 10; i < 10 ? i++ : i--) {
         printf("index: %d\n", i);
     }
 

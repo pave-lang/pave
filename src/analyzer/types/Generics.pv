@@ -4,11 +4,47 @@ use analyzer
 struct Generic {
     name: *Token,
     traits: Array<Type>,
+    const_type: *Type,
 }
 
 impl Generic {
     fn new(allocator: &dyn Allocator) -> Self {
-        return Self { name: null, traits: Array<Type>::new(allocator) };
+        return Self { name: null, traits: Array<Type>::new(allocator), const_type: null };
+    }
+
+    fn is_const(&self) -> bool {
+        return self.const_type != null;
+    }
+
+    fn parse_const_type(&self, context: &Context, generics: &Generics) -> bool {
+        if !context.expect_value(TokenType::Symbol, ":") { return false; }
+
+        let type_token = context.current();
+        if type_token == null { return false; }
+
+        let const_type: Type;
+        if !context.parse_type(&const_type, generics) { return false; }
+
+        let is_integer = false;
+        match const_type {
+            Type::Primitive(primitive_info) => {
+                if primitive_info != null {
+                    is_integer = primitive_info.is_number()
+                        && !primitive_info.name.eq("f32")
+                        && !primitive_info.name.eq("f64");
+                }
+            },
+            _ => {},
+        }
+
+        if !is_integer {
+            context.error_token(type_token, "Const generic type must be an integer primitive");
+            return false;
+        }
+
+        self.const_type = context.allocator.store(&const_type);
+
+        return self.const_type != null;
     }
 
     fn parse_traits(&self, context: &Context, generics: &Generics) -> bool {
@@ -86,6 +122,7 @@ impl Generics {
 
         while !context.check_next(TokenType::Symbol, ">") {
             let generic = Generic::new(self.array.allocator);
+            let is_const = context.check_next(TokenType::Keyword, "const");
             generic.name = context.expect(TokenType::Identifier);
             let generic_name = generic.name;
             if generic_name == null || self.has(generic_name.value) { return false; }
@@ -93,7 +130,13 @@ impl Generics {
             let index = self.array.append(generic);
             self.map.insert(generic_name.value, index);
             let stored_generic = self.array.get(index);
-            if stored_generic == null || !stored_generic.parse_traits(context, self) { return false; }
+            if stored_generic == null { return false; }
+
+            if is_const {
+                if !stored_generic.parse_const_type(context, self) { return false; }
+            } else {
+                if !stored_generic.parse_traits(context, self) { return false; }
+            }
 
             if !context.check_next(TokenType::Symbol, ",") {
                 return context.expect_value(TokenType::Symbol, ">");

@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <enum/Shape.h>
-#include <enum/Shape.h>
 
 #include <enum/Shape.h>
 

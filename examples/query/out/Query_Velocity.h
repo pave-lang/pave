@@ -9,7 +9,6 @@ struct Query_Velocity {
 
 #include <std/trait_Iter_tuple_u32_ptr_Velocity.h>
 #include <tuple_u32_ptr_Velocity.h>
-struct Query_Velocity;
 struct Query_Velocity__run {
     int32_t _state;
     struct tuple_u32_ptr_Velocity _value;

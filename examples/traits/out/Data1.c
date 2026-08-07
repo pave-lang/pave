@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <traits/Data1.h>
-#include <traits/Data1.h>
 
 #include <traits/Data1.h>
 

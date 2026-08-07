@@ -592,6 +592,12 @@ impl Expression {
                 return lhs.is_const_expression(context) && rhs.is_const_expression(context);
             },
             ExpressionData::EnumVariant(_) => { return true; },
+            ExpressionData::Type(type) => {
+                match type {
+                    Type::Generic(generic) => { return generic.is_const(); },
+                    _ => { return false; },
+                }
+            },
             ExpressionData::Invoke(target, arguments) => {
                 if arguments.length != 0 { return false; }
                 return target.is_const_expression(context);
@@ -613,6 +619,49 @@ impl Expression {
             },
             _ => { return false; },
         }
+    }
+
+    fn eq_const_value(&self, other: &Expression) -> bool {
+        match self.data {
+            ExpressionData::Literal(value) => {
+                match other.data {
+                    ExpressionData::Literal(other_value) => { return value.eq(other_value); },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                return inner.eq_const_value(other);
+            },
+            ExpressionData::UnaryExpression(op, inner) => {
+                match other.data {
+                    ExpressionData::UnaryExpression(other_op, other_inner) => {
+                        return op.eq(other_op) && inner.eq_const_value(other_inner);
+                    },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                match other.data {
+                    ExpressionData::BinaryExpression(other_lhs, other_op, other_rhs) => {
+                        return op.eq(other_op) && lhs.eq_const_value(other_lhs) && rhs.eq_const_value(other_rhs);
+                    },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::Variable(name) => {
+                match other.data {
+                    ExpressionData::Variable(other_name) => { return name.eq(other_name); },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            _ => { return false; },
+        }
+
+        return false;
     }
 
     fn append_ident_name(&self, result: &String) {

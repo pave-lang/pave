@@ -16,7 +16,6 @@ struct Discriminated {
     };
 };
 
-struct Discriminated;
 
 void Discriminated__print(struct Discriminated* self);
 

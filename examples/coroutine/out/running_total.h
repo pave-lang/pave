@@ -1,8 +1,7 @@
 #ifndef PAVE_RUNNING_TOTAL
 #define PAVE_RUNNING_TOTAL
 
-#include <stdint.h>
-
+#include <std/Range_usize.h>
 struct running_total {
     int32_t _state;
     float _value;

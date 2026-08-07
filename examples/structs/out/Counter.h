@@ -8,8 +8,6 @@ struct Counter {
     int32_t step;
 };
 
-#include <structs/Counter.h>
-struct Counter;
 
 struct Counter Counter__new();
 

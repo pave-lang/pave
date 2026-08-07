@@ -2,10 +2,10 @@
 #include <stdio.h>
 
 #include <query/Query.h>
-#include <query/Query.h>
 
 #include <query/Query.h>
 #include <query/Query_Position.h>
+#include <query/Query.h>
 
 struct Query_Position Query__add_flag_Position(struct Query self) {
     return (struct Query_Position) { .flags = self.flags | 1 };

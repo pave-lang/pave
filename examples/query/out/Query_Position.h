@@ -9,7 +9,6 @@ struct Query_Position {
 
 #include <std/trait_Iter_tuple_u32_ptr_Position.h>
 #include <tuple_u32_ptr_Position.h>
-struct Query_Position;
 struct Query_Position__run {
     int32_t _state;
     struct tuple_u32_ptr_Position _value;

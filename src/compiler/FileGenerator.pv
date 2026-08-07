@@ -700,6 +700,61 @@ impl FileGenerator {
 
             fprintf(code_file, "#include <std/StructFieldInfo.h>\n");
             fprintf(code_file, "#include <slice_StructFieldInfo.h>\n");
+            fprintf(code_file, "#include <std/StructTraitInfo.h>\n");
+            fprintf(code_file, "#include <slice_StructTraitInfo.h>\n");
+
+            // The reflection trait is synthesized for every struct. Include it
+            // in the metadata alongside the user-declared dynamic traits.
+            let struct_trait = generator.root.find_trait("Struct", 0);
+            if struct_trait == null { return false; }
+
+            fprintf(code_file, "extern struct trait_StructVTable ");
+            generator.write_str_title(code_file, name.as_str());
+            fprintf(code_file, "__VTABLE__STRUCT;\n");
+
+            fprintf(code_file, "struct slice_StructTraitInfo ");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Struct__get_traits(void* __self) {\n");
+            generator.indent += 1;
+            generator.write_indent(code_file);
+            fprintf(code_file, "(void)__self;\n");
+            generator.write_indent(code_file);
+            fprintf(code_file, "static struct StructTraitInfo traits[] = { ");
+
+            let first_trait = true;
+            let trait_count: usize = 1;
+            let struct_trait_type = Type::Trait(struct_trait, null);
+            fprintf(code_file, "(struct StructTraitInfo){ .type_id = ");
+            generator.write_typeid(code_file, &struct_trait_type, generics);
+            fprintf(code_file, ", .vtable = (void*)&");
+            generator.write_str_title(code_file, name.as_str());
+            fprintf(code_file, "__VTABLE__STRUCT }");
+            first_trait = false;
+
+            for (_, trait_entry) in struct_info.traits {
+                let trait_info = trait_entry.0;
+                let trait_name = trait_info.name;
+                if trait_name == null || !trait_info.has_dynamic_dispatch() { continue; }
+                if trait_name.value.eq("Struct") { continue; }
+
+                if !first_trait { fprintf(code_file, ", "); }
+                first_trait = false;
+                trait_count += 1;
+                fprintf(code_file, "(struct StructTraitInfo){ .type_id = ");
+                generator.write_typeid(code_file, trait_entry.1, generics);
+                fprintf(code_file, ", .vtable = (void*)&");
+                generator.write_str_title(code_file, name.as_str());
+                fprintf(code_file, "__VTABLE__");
+                generator.write_str_title(code_file, trait_name.value);
+                fprintf(code_file, " }");
+            }
+
+            fprintf(code_file, " };\n");
+            generator.write_indent(code_file);
+            fprintf(code_file, "return (struct slice_StructTraitInfo){ .data = traits, .length = %zu };\n", trait_count);
+            generator.indent -= 1;
+            fprintf(code_file, "}\n\n");
+
             fprintf(code_file, "struct slice_StructFieldInfo ");
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_fields(void* __self) {\n");
@@ -844,7 +899,9 @@ impl FileGenerator {
             fprintf(code_file, "__VTABLE__STRUCT");
             fprintf(code_file, " = { .fn_get_fields = &");
             generator.write_string(code_file, &name);
-            fprintf(code_file, "__Struct__get_fields, .fn_get_field = &");
+            fprintf(code_file, "__Struct__get_fields, .fn_get_traits = &");
+            generator.write_string(code_file, &name);
+            fprintf(code_file, "__Struct__get_traits, .fn_get_field = &");
             generator.write_string(code_file, &name);
             fprintf(code_file, "__Struct__get_field, .fn_set_field = &");
             generator.write_string(code_file, &name);

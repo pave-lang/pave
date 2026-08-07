@@ -9,7 +9,6 @@ struct Data1 {
 };
 
 #include <traits/trait_Print.h>
-struct Data1;
 
 void Data1__Print__print(void* __self);
 

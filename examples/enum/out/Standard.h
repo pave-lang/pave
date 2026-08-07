@@ -6,7 +6,6 @@ enum Standard {
     STANDARD__TWO,
 };
 
-#include <enum/Standard.h>
 
 void Standard__print(enum Standard* self);
 #include <std/trait_Enum.h>

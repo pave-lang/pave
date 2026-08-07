@@ -556,6 +556,13 @@ impl Naming {
                 result.release();
                 return self.get_type_name(&g.type, type_self, generics_map);
             },
+            Type::Const(expression) => {
+                if self.type == NamingType::Ident {
+                    expression.append_ident_name(&result);
+                } else {
+                    expression.append_display_name(&result);
+                }
+            },
         }
 
         if generics.length > 0 {

@@ -60,19 +60,22 @@ bool Expression__is_zero(struct Expression* self);
 #line 580 "src/analyzer/expression/Expression.pv"
 bool Expression__is_const_expression(struct Expression* self, struct Context* context);
 
-#line 618 "src/analyzer/expression/Expression.pv"
+#line 624 "src/analyzer/expression/Expression.pv"
+bool Expression__eq_const_value(struct Expression* self, struct Expression* other);
+
+#line 667 "src/analyzer/expression/Expression.pv"
 void Expression__append_ident_name(struct Expression* self, struct String* result);
 
-#line 675 "src/analyzer/expression/Expression.pv"
+#line 724 "src/analyzer/expression/Expression.pv"
 void Expression__append_display_name(struct Expression* self, struct String* result);
 
-#line 722 "src/analyzer/expression/Expression.pv"
+#line 771 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast);
 
-#line 856 "src/analyzer/expression/Expression.pv"
+#line 905 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
-#line 926 "src/analyzer/expression/Expression.pv"
+#line 975 "src/analyzer/expression/Expression.pv"
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

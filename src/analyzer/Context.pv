@@ -350,6 +350,38 @@ impl Context {
         return check;
     }
 
+    fn check_const_generic_argument(&self) -> bool {
+        if self.pos >= self.length { return false; }
+
+        let token = &self.tokens[self.pos];
+        if token.type == TokenType::Number { return true; }
+
+        return token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+");
+    }
+
+    fn parse_const_generic_argument(&self, type: &Type, generics: *Generics) -> bool {
+        let value_token = self.current();
+        if value_token == null { return false; }
+
+        // Precedence 9 stops before comparisons (7) and shifts (8) so the closing
+        // `>` of the generic list is not consumed as a greater-than operator.
+        // It admits exactly `+ - * / %`, which is what is_const_expression allows.
+        let expression = Expression::parse_primary(self, generics);
+        if expression == null { return false; }
+
+        expression = Expression::parse_binary(self, expression, 9, generics);
+        if expression == null { return false; }
+
+        if !expression.is_const_expression(self) {
+            self.error_token(value_token, "Const generic argument must be a compile-time constant integer expression");
+            return false;
+        }
+
+        *type = Type::Const(expression);
+
+        return true;
+    }
+
     fn expect(&self, type: TokenType) -> *Token {
         if self.pos >= self.length {
             return null;
@@ -580,12 +612,14 @@ impl Context {
         }
 
         let generics_ = Array<Type>::new(self.allocator);
-        
+
         if self.check_next(TokenType::Symbol, "<") {
             while !self.check_next(TokenType::Symbol, ">") {
                 let child_type: Type;
 
-                if !self.parse_type(&child_type, generics) {
+                if self.check_const_generic_argument() {
+                    if !self.parse_const_generic_argument(&child_type, generics) { return false; }
+                } else if !self.parse_type(&child_type, generics) {
                     return false;
                 }
 
@@ -738,7 +772,9 @@ impl Context {
             while !self.check_next(TokenType::Symbol, ">") {
                 let child_type: Type;
 
-                if !self.parse_type(&child_type, generics) {
+                if self.check_const_generic_argument() {
+                    if !self.parse_const_generic_argument(&child_type, generics) { return false; }
+                } else if !self.parse_type(&child_type, generics) {
                     return false;
                 }
 
@@ -773,6 +809,56 @@ impl Context {
         return result;
     }
     
+    // Substitutes const generics inside a compile-time constant expression, such as
+    // the length of `[V; N]`. Returns the original expression when nothing changed.
+    fn resolve_const_expression(allocator: &ArenaAllocator, expression: &Expression, generics_map: *GenericMap, fallback_generics_map: *GenericMap) -> &Expression {
+        match expression.data {
+            ExpressionData::Type(type) => {
+                match type {
+                    Type::Generic(generic) => {
+                        if !generic.is_const() { return expression; }
+
+                        let generic_name = generic.name;
+                        if generic_name == null { return expression; }
+
+                        let concrete_type: *Type = null;
+                        if generics_map != null { concrete_type = generics_map.get(generic_name.value); }
+                        if concrete_type == null && fallback_generics_map != null { concrete_type = fallback_generics_map.get(generic_name.value); }
+                        if concrete_type == null { return expression; }
+
+                        match concrete_type {
+                            Type::Const(value) => { return value; },
+                            _ => { return expression; },
+                        }
+                    },
+                    _ => { return expression; },
+                }
+            },
+            ExpressionData::ParenthesizedExpression(inner) => {
+                let resolved_inner = Context::resolve_const_expression(allocator, inner, generics_map, fallback_generics_map);
+                if resolved_inner == inner { return expression; }
+
+                return Expression::make(allocator, expression.token, ExpressionData::ParenthesizedExpression(resolved_inner), &expression.return_type);
+            },
+            ExpressionData::UnaryExpression(op, inner) => {
+                let resolved_inner = Context::resolve_const_expression(allocator, inner, generics_map, fallback_generics_map);
+                if resolved_inner == inner { return expression; }
+
+                return Expression::make(allocator, expression.token, ExpressionData::UnaryExpression(op, resolved_inner), &expression.return_type);
+            },
+            ExpressionData::BinaryExpression(lhs, op, rhs) => {
+                let resolved_lhs = Context::resolve_const_expression(allocator, lhs, generics_map, fallback_generics_map);
+                let resolved_rhs = Context::resolve_const_expression(allocator, rhs, generics_map, fallback_generics_map);
+                if resolved_lhs == lhs && resolved_rhs == rhs { return expression; }
+
+                return Expression::make(allocator, expression.token, ExpressionData::BinaryExpression(resolved_lhs, op, resolved_rhs), &expression.return_type);
+            },
+            _ => {},
+        }
+
+        return expression;
+    }
+
     fn resolve_type(allocator: &ArenaAllocator, type: &Type, generics_map: *GenericMap, fallback_generics_map: *GenericMap) -> *Type {
         match type {
             Type::Indirect(indirect) => {
@@ -791,8 +877,17 @@ impl Context {
                 let resolved_element = Context::resolve_type(allocator, &sequence.element, generics_map, fallback_generics_map);
                 if resolved_element == null { return type; }
 
+                let resolved_sequence_type = sequence.type;
+                match sequence.type {
+                    SequenceType::FixedArray(length) => {
+                        let resolved_length = Context::resolve_const_expression(allocator, length, generics_map, fallback_generics_map);
+                        resolved_sequence_type = SequenceType::FixedArray(resolved_length);
+                    },
+                    _ => {},
+                }
+
                 let resolved = allocator.store(&Sequence {
-                    type: sequence.type,
+                    type: resolved_sequence_type,
                     element: *resolved_element,
                     element_pointer: Type::Primitive(null),
                 });
@@ -1187,7 +1282,11 @@ impl Context {
         while !self.check_next(TokenType::Symbol, ">") {
             let child_type: Type;
 
-            if !self.parse_type(&child_type, generics) { return Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }; }
+            if self.check_const_generic_argument() {
+                if !self.parse_const_generic_argument(&child_type, generics) { return Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }; }
+            } else {
+                if !self.parse_type(&child_type, generics) { return Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }; }
+            }
 
             generic_inputs.append(child_type);
 
@@ -1206,6 +1305,23 @@ impl Context {
         while i < generics.array.length && i < usage_types.length {
             let generic = &generics.array.data[i];
             let usage_type = &usage_types.data[i];
+
+            let is_const_argument = false;
+            match usage_type {
+                Type::Const(_) => { is_const_argument = true; },
+                Type::Generic(argument_generic) => { is_const_argument = argument_generic.is_const(); },
+                _ => {},
+            }
+
+            if generic.is_const() && !is_const_argument {
+                self.error("Expected a constant value for this const generic parameter");
+                return false;
+            }
+
+            if !generic.is_const() && is_const_argument {
+                self.error("Expected a type for this generic parameter, not a constant value");
+                return false;
+            }
 
             for required_trait in generic.traits {
                 let resolved_required_trait = Context::resolve_type(self.allocator, required_trait, &usage_map, null);

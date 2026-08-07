@@ -14,7 +14,6 @@ struct Shape {
     };
 };
 
-struct Shape;
 
 float Shape__area(struct Shape* self);
 

@@ -8,7 +8,6 @@ struct Query {
 };
 
 #include <std/trait_Iter_u32.h>
-struct Query;
 #include <query/Query.h>
 #include <query/Query_Position.h>
 

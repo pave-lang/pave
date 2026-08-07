@@ -75,7 +75,7 @@ impl<K: Hash + Eq<K>, V> HashMap<K, V> {
         return null;
     }
 
-    fn insert(&self, key: K, value: V) -> &V {
+    fn insert(&self, key: K, value: V) -> *V {
         let existing_value = self.find(&key);
         if existing_value != null {
             *existing_value = value;
@@ -212,7 +212,7 @@ impl<K: Hash + Eq<K>, V> Map<K, V> for HashMap<K, V> {
         return null;
     }
 
-    fn insert(&self, key: K, value: V) -> &V {
+    fn insert(&self, key: K, value: V) -> *V {
         let existing_value = self.find(&key);
         if existing_value != null {
             *existing_value = value;

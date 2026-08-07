@@ -6,7 +6,6 @@ struct Physics {
 };
 
 #include <dynamic_fn/Time.h>
-struct Physics;
 struct Position;
 
 void Physics__apply_physics(struct Physics* self, struct Position* data, struct Time time);

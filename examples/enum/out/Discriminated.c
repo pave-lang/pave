@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <enum/Discriminated.h>
-#include <enum/Discriminated.h>
 
 #include <enum/Discriminated.h>
 

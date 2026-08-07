@@ -1,8 +1,5 @@
-#include <stdint.h>
-
 #include <stdio.h>
 
-#include <std/Range_usize.h>
 #include <coroutine/running_total.h>
 
 bool running_total__next(void* _ctx) {
@@ -16,7 +13,7 @@ bool running_total__next(void* _ctx) {
 
     ctx->total = 0.0f;
 
-    for (ctx->i = 0; ctx->i < ctx->steps; ctx->i++) {
+    for (ctx->i = 0; ctx->i != ctx->steps; ctx->i < ctx->steps ? ctx->i++ : ctx->i--) {
         ctx->_value = ctx->total; ctx->_state = 1; return true; yield_1:;
 
         ctx->total += ctx->increment;
