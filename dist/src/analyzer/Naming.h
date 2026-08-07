@@ -59,13 +59,13 @@ struct String Naming__get_type_name(struct Naming* self, struct Type* type, stru
 #line 583 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 633 "src/analyzer/Naming.pv"
+#line 634 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 663 "src/analyzer/Naming.pv"
+#line 664 "src/analyzer/Naming.pv"
 void Naming__append_decl_suffix(struct Naming* self, struct String* result, struct Type* type);
 
-#line 685 "src/analyzer/Naming.pv"
+#line 686 "src/analyzer/Naming.pv"
 void Naming__append_cpp_path(struct Naming* self, struct String* result, struct ParentCpp parent);
 
 #endif

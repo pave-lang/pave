@@ -26,14 +26,26 @@ else
 	DIST_COPY := build/2/pavec$(EXE)
 endif
 
-.PHONY: all ls ls-release examples clean dist-compiler
+.PHONY: all bootstrap ls ls-release examples clean dist-compiler
+.DEFAULT_GOAL := all
 
 # Build dist/pavec from the pre-generated C sources in dist/src, but only if
 # the executable doesn't already exist (e.g. a fresh non-Windows checkout).
 dist/pavec$(EXE):
 	@$(MAKE) dist-compiler --no-print-directory
 
+# Normal day-to-day build: regenerate and recompile dist/pavec using the
+# existing dist/pavec (single stage, no self-hosting verification or tests),
+# then build the language server. Use `bootstrap` for the full self-hosted
+# rebuild with verification and tests.
 all: dist/pavec$(EXE)
+	@echo "=== Building dist/pavec ==="
+	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/dist TARGET=dist/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@echo ""
+	@echo "=== Building language server ==="
+	@$(MAKE) ls --no-print-directory
+
+bootstrap: dist/pavec$(EXE)
 	@echo "=== Stage 1: Building with dist/pavec ==="
 	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/1 TARGET=build/1/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 	@echo ""

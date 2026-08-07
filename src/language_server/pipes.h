@@ -8,6 +8,8 @@
 #else
     #include <unistd.h>
     #include <fcntl.h>
+    #include <sys/socket.h>
+    #include <sys/un.h>
     typedef int pipe_t;
     #define INVALID_PIPE -1
 #endif
@@ -95,12 +97,24 @@ static inline pipe_t open_pipe(const char *pipe_name) {
     
     return pipe;
 #else
-    pipe_t fd = open(pipe_name, O_RDWR);
+    pipe_t fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0) {
-        fprintf(stderr, "Failed to open pipe: %s\n", pipe_name);
-        perror("open");
+        perror("socket");
         return INVALID_PIPE;
     }
+
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, pipe_name, sizeof(addr.sun_path) - 1);
+
+    if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        fprintf(stderr, "Failed to connect to pipe: %s\n", pipe_name);
+        perror("connect");
+        close(fd);
+        return INVALID_PIPE;
+    }
+
     return fd;
 #endif
 }

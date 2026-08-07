@@ -70,78 +70,81 @@ struct Trait;
 struct Array_Type;
 
 #line 40 "src/analyzer/Root.pv"
-struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char* args, struct Array_ptrc_char* clang_args, char const* c_std_arg, char const* cpp_std_arg, struct Analysis* analysis);
+struct Root* Root__new(struct ArenaAllocator* allocator, struct Array_ptrc_char* args, struct Analysis* analysis);
 
-#line 163 "src/analyzer/Root.pv"
+#line 173 "src/analyzer/Root.pv"
+void Root__add_clang_arg(struct Root* self, char const* arg);
+
+#line 183 "src/analyzer/Root.pv"
 struct Primitive* Root__add_primitive(struct Root* self, char const* name);
 
-#line 169 "src/analyzer/Root.pv"
+#line 189 "src/analyzer/Root.pv"
 struct Primitive* Root__add_ctype(struct Root* self, char const* name);
 
-#line 178 "src/analyzer/Root.pv"
+#line 198 "src/analyzer/Root.pv"
 uintptr_t Root__add_type_impl(struct Root* self, struct Type type, struct Impl* impl_info);
 
-#line 184 "src/analyzer/Root.pv"
+#line 204 "src/analyzer/Root.pv"
 struct TypeImpl* Root__get_type_impl(struct Root* self, struct Type* type, uintptr_t impl_index);
 
-#line 192 "src/analyzer/Root.pv"
+#line 212 "src/analyzer/Root.pv"
 struct Function* Root__find_type_impl_function(struct Root* self, struct Type* type, struct str name, struct GenericMap* generic_map);
 
-#line 209 "src/analyzer/Root.pv"
+#line 229 "src/analyzer/Root.pv"
 bool Root__type_impl_target_eq(struct Root* self, struct Type* left, struct Type* right);
 
-#line 323 "src/analyzer/Root.pv"
+#line 343 "src/analyzer/Root.pv"
 bool Root__type_impl_generics_eq(struct Root* self, struct GenericMap* left, struct GenericMap* right);
 
-#line 334 "src/analyzer/Root.pv"
+#line 354 "src/analyzer/Root.pv"
 bool Root__add_namespace(struct Root* self, struct str name, struct str path);
 
-#line 348 "src/analyzer/Root.pv"
+#line 368 "src/analyzer/Root.pv"
 struct Namespace* Root__find_namespace(struct Root* self, struct str name);
 
-#line 355 "src/analyzer/Root.pv"
+#line 375 "src/analyzer/Root.pv"
 bool Root__add_use_namespaces(struct Root* self);
 
-#line 365 "src/analyzer/Root.pv"
+#line 385 "src/analyzer/Root.pv"
 bool Root__fill_namespace(struct Root* self);
 
-#line 373 "src/analyzer/Root.pv"
+#line 393 "src/analyzer/Root.pv"
 bool Root__prefill_types(struct Root* self);
 
-#line 381 "src/analyzer/Root.pv"
+#line 401 "src/analyzer/Root.pv"
 bool Root__prefill_types_impl(struct Root* self);
 
-#line 389 "src/analyzer/Root.pv"
+#line 409 "src/analyzer/Root.pv"
 bool Root__parse_declarations(struct Root* self);
 
-#line 408 "src/analyzer/Root.pv"
+#line 428 "src/analyzer/Root.pv"
 bool Root__parse_globals(struct Root* self);
 
-#line 416 "src/analyzer/Root.pv"
+#line 436 "src/analyzer/Root.pv"
 bool Root__parse_functions(struct Root* self);
 
-#line 430 "src/analyzer/Root.pv"
+#line 450 "src/analyzer/Root.pv"
 bool Root__parse_functions_if_path(struct Root* self, struct str path);
 
-#line 447 "src/analyzer/Root.pv"
+#line 467 "src/analyzer/Root.pv"
 struct Module* Root__find_module_by_path(struct Root* self, struct str path);
 
-#line 455 "src/analyzer/Root.pv"
+#line 475 "src/analyzer/Root.pv"
 struct Type* Root__find_type(struct Root* self, struct str name, uintptr_t arity);
 
-#line 466 "src/analyzer/Root.pv"
+#line 486 "src/analyzer/Root.pv"
 struct Trait* Root__find_trait(struct Root* self, struct str name, uintptr_t arity);
 
-#line 478 "src/analyzer/Root.pv"
+#line 498 "src/analyzer/Root.pv"
 struct Type* Root__find_function(struct Root* self, struct str name);
 
-#line 482 "src/analyzer/Root.pv"
+#line 502 "src/analyzer/Root.pv"
 struct Primitive* Root__find_primitive(struct Root* self, struct str name);
 
-#line 488 "src/analyzer/Root.pv"
+#line 508 "src/analyzer/Root.pv"
 void Root__error(struct Root* self, struct str path, uintptr_t start_line, uintptr_t start_column, uintptr_t end_line, uintptr_t end_column, char const* message);
 
-#line 515 "src/analyzer/Root.pv"
+#line 535 "src/analyzer/Root.pv"
 struct Type* Root__make_type_usage(struct Root* self, struct Type* type, struct Array_Type* usage_types);
 
 #endif

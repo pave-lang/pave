@@ -8,7 +8,7 @@ enum Uri {
 }
 
 impl Uri {
-    const FILE_SCHEME: str = "file:///";
+    const FILE_SCHEME: str = "file://";
 
     fn file(allocator: &ArenaAllocator, path: str) -> Uri {
         let resolved_path: *const char = resolve_path(path.ptr);
@@ -23,10 +23,19 @@ impl Uri {
         let encoded_path = value.slice(Uri::FILE_SCHEME.length, value.length);
         let file_path = Uri::from_percent_encoded(allocator, encoded_path);
 
-        let resolved_path: *const char = resolve_path(file_path.ptr);
+        let resolve_input = file_path;
+        if file_path.length >= 3 && file_path.ptr[0] == '/' && Uri::is_drive_letter(file_path.ptr[1]) && file_path.ptr[2] == ':' {
+            resolve_input = file_path.slice(1, file_path.length);
+        }
+
+        let resolved_path: *const char = resolve_path(resolve_input.ptr);
         if resolved_path == null { return Uri::File(file_path); }
 
         return Uri::File(Uri::copy_c_str(allocator, resolved_path));
+    }
+
+    fn is_drive_letter(c: char) -> bool {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
     fn to_string(&self, allocator: &ArenaAllocator) -> str {
@@ -34,6 +43,7 @@ impl Uri {
             Uri::File(path) => {
                 let result = String::new(allocator);
                 result.append(Uri::FILE_SCHEME);
+                if !path.starts_with("/") { result.append("/"); }
                 result.append(Uri::to_percent_encoded(allocator, path.ptr));
                 return result.as_str();
             },

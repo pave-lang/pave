@@ -37,7 +37,7 @@ struct Root {
 }
 
 impl Root {
-    fn new(allocator: &ArenaAllocator, args: &Array<*const char>, clang_args: &Array<*const char>, c_std_arg: *const char, cpp_std_arg: *const char, analysis: &Analysis) -> &Self {
+    fn new(allocator: &ArenaAllocator, args: &Array<*const char>, analysis: &Analysis) -> &Self {
         let self: &Self = allocator.alloc(sizeof(Self));
 
         *self = Self {
@@ -49,8 +49,8 @@ impl Root {
             traits: HashMap<str, Array<&Trait>>::new(allocator),
             functions: HashMap<str, Type>::new(allocator),
             clang_args: Array<*const char>::new(allocator),
-            c_std_arg,
-            cpp_std_arg,
+            c_std_arg: null,
+            cpp_std_arg: null,
             analysis,
             naming_decl: Naming::new_decl(allocator),
             includes_c: HashMap<str, &Include>::new(allocator),
@@ -135,13 +135,27 @@ impl Root {
             self.types.insert(key, arr);
         }
 
+        let in_clang_args = false;
         for *arg in args {
+            let arg_str: str = arg;
+
+            if arg_str.eq("--") {
+                in_clang_args = true;
+                continue;
+            }
+
+            if in_clang_args || arg_str.starts_with("-std=") || arg_str.starts_with("-I") {
+                self.add_clang_arg(arg);
+                continue;
+            }
+
+            if arg_str.starts_with("-") { continue; }
+
             let pos: *const char = strchr(arg, '=');
 
             if pos == null {
                 fprintf(stderr, "Unknown arg \"%s\"\n", arg);
             } else {
-                let arg_str: str = arg;
                 let name = arg_str.slice(0, pos - arg);
                 let path: *const char = pos + 1;
 
@@ -149,15 +163,21 @@ impl Root {
             }
         }
 
-        for *arg in clang_args {
-            self.clang_args.append(arg);
-        }
-
         for (_, child) in self.children {
             child.parse();
         }
 
         return self;
+    }
+
+    fn add_clang_arg(&self, arg: *const char) {
+        if strncmp(arg, "-std=c++", 8) == 0 || strncmp(arg, "-std=gnu++", 10) == 0 {
+            self.cpp_std_arg = arg;
+        } else if strncmp(arg, "-std=", 5) == 0 {
+            self.c_std_arg = arg;
+        } else {
+            self.clang_args.append(arg);
+        }
     }
 
     fn add_primitive(&self, name: *const char) -> &Primitive {

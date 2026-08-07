@@ -202,7 +202,6 @@ impl Processor {
     fn did_change_configuration(&self, ls: &LanguageServer, params: &JsonNode) -> bool {
         let settings = params.key("settings").key("pave");
         let args = settings.key("args").array();
-        let clang_args = settings.key("clang_args").array();
 
         ls.args.clear();
         if args != null {
@@ -210,17 +209,6 @@ impl Processor {
                 let arg_string = arg.string();
                 let copy = ls.copy_c_string(arg_string);
                 if copy != null { ls.args.append(copy); }
-            }
-        }
-
-        ls.clang_args.clear();
-        ls.c_std_arg = null;
-        ls.cpp_std_arg = null;
-        if clang_args != null {
-            for *arg in clang_args {
-                let arg_string = arg.string();
-                let copy = ls.copy_c_string(arg_string);
-                if copy != null { ls.add_clang_arg(copy); }
             }
         }
 

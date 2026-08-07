@@ -588,8 +588,9 @@ impl Naming {
 
                 let function_type_self = type_self;
                 let function_generics = generics_map;
+                let display_generics: GenericMap;
                 if func_generics != null {
-                    let display_generics = func_generics.clone(self.allocator);
+                    display_generics = func_generics.clone(self.allocator);
                     for generic in func_info.generics.array {
                         let generic_name = generic.name;
                         if generic_name == null { continue; }

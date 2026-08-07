@@ -10,9 +10,6 @@ struct LanguageServer {
     allocator: &ArenaAllocator,
     root: *Root,
     args: Array<*const char>,
-    clang_args: Array<*const char>,
-    c_std_arg: *const char,
-    cpp_std_arg: *const char,
     analysis_alloc: *ArenaAllocator,
     analysis: Analysis,
     file_map: HashMap<Uri, str>,
@@ -29,9 +26,6 @@ impl LanguageServer {
         let self = allocator.store(&LanguageServer {
             allocator,
             args: Array<*const char>::new(allocator),
-            clang_args: Array<*const char>::new(allocator),
-            c_std_arg: null,
-            cpp_std_arg: null,
             root: null,
             analysis_alloc: null,
             analysis: Analysis {
@@ -86,16 +80,6 @@ impl LanguageServer {
         self.args.append(arg);
     }
 
-    fn add_clang_arg(&self, arg: *const char) {
-        if strncmp(arg, "-std=c++", 8) == 0 || strncmp(arg, "-std=gnu++", 10) == 0 {
-            self.cpp_std_arg = arg;
-        } else if strncmp(arg, "-std=", 5) == 0 {
-            self.c_std_arg = arg;
-        } else {
-            self.clang_args.append(arg);
-        }
-    }
-
     fn copy_c_string(&self, value: str) -> *char {
         let copy: *char = self.allocator.alloc(value.length + 1);
         if copy == null { return null; }
@@ -129,7 +113,7 @@ impl LanguageServer {
             analysis.file_overrides.insert(path, content);
         }
 
-        self.root = Root::new(analysis_alloc, &self.args, &self.clang_args, self.c_std_arg, self.cpp_std_arg, analysis);
+        self.root = Root::new(analysis_alloc, &self.args, analysis);
         let root = self.root;
         if root == null { self.store_fingerprints(); return analysis; }
 
