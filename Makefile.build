@@ -32,10 +32,20 @@ ifneq ($(wildcard $(SRCS_LST)),)
 endif
 
 TEST_TARGET := $(BUILD_DIR)/tests$(EXE)
+FLAGS_STAMP := $(BUILD_DIR)/build-flags.txt
 
-.PHONY: all build-objs generate tests build-test-objs
+.PHONY: all build-objs generate tests build-test-objs check-flags
+.DEFAULT_GOAL := all
 
-all: generate
+check-flags:
+	@mkdir -p $(BUILD_DIR)
+	@if [ ! -f "$(FLAGS_STAMP)" ] || [ "`cat "$(FLAGS_STAMP)"`" != "$(CFLAGS) | $(LDFLAGS)" ]; then \
+		if [ -d "$(OBJ_DIR)" ]; then echo "Build flags changed, rebuilding objects..."; fi; \
+		rm -rf "$(OBJ_DIR)"; \
+		printf '%s' "$(CFLAGS) | $(LDFLAGS)" > "$(FLAGS_STAMP)"; \
+	fi
+
+all: check-flags generate
 	@echo "Compiling generated files..."
 	$(eval GEN_FILES := $(shell cat $(SRCS_LST)))
 	$(eval CURRENT_OBJS := $(sort $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(GEN_FILES)))) \
@@ -65,7 +75,7 @@ build-objs: $(OBJS)
 
 build-test-objs: $(TEST_OBJS)
 
-tests:
+tests: check-flags
 ifeq ($(TEST_SRCS),)
 	@echo "No tests found, skipping."
 else

@@ -1,5 +1,12 @@
-# clang ./dist/src/*.c -o ./dist/pavec.exe -I"C:/Program Files/LLVM/include" -D_CRT_SECURE_NO_WARNINGS -L"C:/Program Files/LLVM/lib" -llibclang
-# clang-20 ./dist/src/*.c -o ./dist/pavec -I"/lib/llvm-20/include" -L"/lib/llvm-20/lib" -lclang
+ASAN ?= 0
+
+ifeq ($(ASAN),1)
+	OPT := -g -O0
+	SAN := -fsanitize=address -fno-omit-frame-pointer
+else
+	OPT := -g -O2
+	SAN :=
+endif
 
 ifeq ($(OS),Windows_NT)
 	CLANG_ARGS := -I"C:/Program Files/LLVM/include"
@@ -13,15 +20,15 @@ else ifeq ($(shell uname -s),Darwin)
 	SDK_PATH := $(shell xcrun --show-sdk-path)
 	CLANG_ARGS := -isysroot "$(SDK_PATH)" -I"$(LLVM_PREFIX)/include"
 	GEN_FLAGS := std=src/std analyzer=src/analyzer -- $(CLANG_ARGS)
-	CFLAGS := -std=c99 -Wall -I"$(LLVM_PREFIX)/include" -fsanitize=address -fno-omit-frame-pointer
-	LDFLAGS := -L"$(LLVM_PREFIX)/lib" -lclang -Wl,-rpath,"$(LLVM_PREFIX)/lib" -fsanitize=address -fno-omit-frame-pointer
+	CFLAGS := -std=c99 -Wall -I"$(LLVM_PREFIX)/include" $(SAN)
+	LDFLAGS := -L"$(LLVM_PREFIX)/lib" -lclang -Wl,-rpath,"$(LLVM_PREFIX)/lib" $(SAN)
 	EXE :=
 	DIST_COPY := build/2/pavec$(EXE)
 else
 	CLANG_ARGS := -I"/lib/llvm-20/include"
 	GEN_FLAGS := std=src/std analyzer=src/analyzer -- $(CLANG_ARGS)
-	CFLAGS := -std=c99 -Wall -I"/lib/llvm-20/include" -fsanitize=address -fno-omit-frame-pointer
-	LDFLAGS := -L"/lib/llvm-20/lib" -lclang -fsanitize=address -fno-omit-frame-pointer
+	CFLAGS := -std=c99 -Wall -I"/lib/llvm-20/include" $(SAN)
+	LDFLAGS := -L"/lib/llvm-20/lib" -lclang $(SAN)
 	EXE :=
 	DIST_COPY := build/2/pavec$(EXE)
 endif
@@ -40,17 +47,17 @@ dist/pavec$(EXE):
 # rebuild with verification and tests.
 all: dist/pavec$(EXE)
 	@echo "=== Building dist/pavec ==="
-	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/dist TARGET=dist/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/dist TARGET=dist/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='$(OPT) $(CFLAGS) -I./src/compiler' LDFLAGS='$(OPT) $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 	@echo ""
 	@echo "=== Building language server ==="
 	@$(MAKE) ls --no-print-directory
 
 bootstrap: dist/pavec$(EXE)
 	@echo "=== Stage 1: Building with dist/pavec ==="
-	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/1 TARGET=build/1/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/1 TARGET=build/1/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='$(OPT) $(CFLAGS) -I./src/compiler' LDFLAGS='$(OPT) $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 	@echo ""
 	@echo "=== Stage 2: Building with build/1/pavec ==="
-	@$(MAKE) -f Makefile.build GENERATOR=build/1/pavec$(EXE) BUILD_DIR=build/2 TARGET=build/2/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@$(MAKE) -f Makefile.build GENERATOR=build/1/pavec$(EXE) BUILD_DIR=build/2 TARGET=build/2/pavec$(EXE) GEN_FLAGS='compiler=src/compiler $(GEN_FLAGS) -I./src/compiler' CFLAGS='$(OPT) $(CFLAGS) -I./src/compiler' LDFLAGS='$(OPT) $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 	@echo ""
 	@echo "=== Stage 3: Generating sources with build/2/pavec (verification) ==="
 	@rm -rf build/3/src
@@ -66,7 +73,7 @@ bootstrap: dist/pavec$(EXE)
 	fi
 	@echo ""
 	@echo "=== Building and running tests ==="
-	@$(MAKE) -f Makefile.build BUILD_DIR=build/2 CFLAGS='-g -O0 $(CFLAGS) -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' tests --no-print-directory
+	@$(MAKE) -f Makefile.build BUILD_DIR=build/2 CFLAGS='$(OPT) $(CFLAGS) -I./src/compiler' LDFLAGS='$(OPT) $(LDFLAGS) ./src/compiler/fs.c' tests --no-print-directory
 	@echo ""
 	@echo "=== Building language server ==="
 	@$(MAKE) ls --no-print-directory
@@ -78,10 +85,11 @@ bootstrap: dist/pavec$(EXE)
 	@echo "Bootstrap complete!"
 
 ls:
-	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/ls TARGET=dist/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-g -O0 $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='-g $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/ls TARGET=dist/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='$(OPT) $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='$(OPT) $(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
 
+# Always unsanitized, regardless of ASAN.
 ls-release:
-	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/lsr TARGET=build/lsr/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-O2 $(CFLAGS) -I./src/language_server -I./src/compiler' LDFLAGS='$(LDFLAGS) ./src/compiler/fs.c' --no-print-directory
+	@$(MAKE) -f Makefile.build GENERATOR=dist/pavec$(EXE) BUILD_DIR=build/lsr TARGET=build/lsr/pavels$(EXE) GEN_FLAGS='language_server=src/language_server $(GEN_FLAGS) -I./src/language_server -I./src/compiler' CFLAGS='-O2 $(filter-out $(SAN),$(CFLAGS)) -I./src/language_server -I./src/compiler' LDFLAGS='$(filter-out $(SAN),$(LDFLAGS)) ./src/compiler/fs.c' --no-print-directory
 
 # Rebuild the stage-0 compiler from the pre-generated C sources in dist/src.
 # Needed once on a fresh non-Windows checkout, where dist only ships pavec.exe.
