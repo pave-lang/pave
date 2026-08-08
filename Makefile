@@ -89,7 +89,7 @@ dist-compiler:
 	@mkdir -p build/dist-bootstrap
 	find dist/src -name '*.c' ! -name '*.test.c' > build/dist-bootstrap/files.lst
 	echo src/compiler/fs.c >> build/dist-bootstrap/files.lst
-	clang -O1 $(filter-out -fsanitize=address -fno-omit-frame-pointer,$(CFLAGS)) -Idist/src -Isrc/compiler @build/dist-bootstrap/files.lst $(filter-out -fsanitize=address -fno-omit-frame-pointer,$(LDFLAGS)) -o dist/pavec
+	clang -O1 $(filter-out -fsanitize=address -fno-omit-frame-pointer,$(CFLAGS)) -Idist/src -Isrc/compiler @build/dist-bootstrap/files.lst $(filter-out -fsanitize=address -fno-omit-frame-pointer,$(LDFLAGS)) -o dist/pavec$(EXE)
 	@echo "Built dist/pavec"
 
 define build_example
