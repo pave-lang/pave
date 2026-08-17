@@ -51,31 +51,31 @@ struct str Expression__number_primitive(struct str value);
 #line 112 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 526 "src/analyzer/expression/Expression.pv"
+#line 531 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 573 "src/analyzer/expression/Expression.pv"
+#line 578 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 580 "src/analyzer/expression/Expression.pv"
+#line 585 "src/analyzer/expression/Expression.pv"
 bool Expression__is_const_expression(struct Expression* self, struct Context* context);
 
-#line 624 "src/analyzer/expression/Expression.pv"
+#line 629 "src/analyzer/expression/Expression.pv"
 bool Expression__eq_const_value(struct Expression* self, struct Expression* other);
 
-#line 667 "src/analyzer/expression/Expression.pv"
+#line 672 "src/analyzer/expression/Expression.pv"
 void Expression__append_ident_name(struct Expression* self, struct String* result);
 
-#line 724 "src/analyzer/expression/Expression.pv"
+#line 729 "src/analyzer/expression/Expression.pv"
 void Expression__append_display_name(struct Expression* self, struct String* result);
 
-#line 771 "src/analyzer/expression/Expression.pv"
+#line 776 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast);
 
-#line 905 "src/analyzer/expression/Expression.pv"
+#line 910 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
-#line 975 "src/analyzer/expression/Expression.pv"
+#line 980 "src/analyzer/expression/Expression.pv"
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"

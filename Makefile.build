@@ -44,7 +44,8 @@ all: generate
 	@$(MAKE) -f Makefile.build build-objs
 
 	@echo "Linking..."
-	@printf '%s\n' $(CURRENT_OBJS) > $(OBJS_LST)
+	$(file >$(OBJS_LST))
+	$(foreach obj,$(CURRENT_OBJS),$(file >>$(OBJS_LST),$(obj)))
 	$(CC) @$(OBJS_LST) $(LDFLAGS) -o $(TARGET)
 	@echo "Build complete: $(TARGET)"
 
@@ -72,7 +73,8 @@ else
 	@echo "Compiling test files..."
 	@$(MAKE) -f Makefile.build build-test-objs
 	@echo "Linking test runner..."
-	@printf '%s\n' $(TEST_LINK_OBJS) > $(BUILD_DIR)/test_objs.lst
+	$(file >$(BUILD_DIR)/test_objs.lst)
+	$(foreach obj,$(TEST_LINK_OBJS),$(file >>$(BUILD_DIR)/test_objs.lst,$(obj)))
 	$(CC) @$(BUILD_DIR)/test_objs.lst $(LDFLAGS) -o $(TEST_TARGET)
 	@echo "Running tests..."
 	$(TEST_TARGET)
