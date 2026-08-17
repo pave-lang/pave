@@ -1,5 +1,8 @@
 #ifdef _WIN32
     #include <windows.h>
+    #include <fcntl.h>
+    #include <io.h>
+    #include <stdint.h>
 #else
     #include <sys/stat.h>
     #include <sys/types.h>
@@ -114,6 +117,53 @@ static int mem_file_write(const char *path, const char *data, size_t length) {
     return 1;
 }
 
+#ifdef _WIN32
+
+static FILE *win_temp_file(void) {
+    char dir[MAX_PATH + 1];
+    DWORD dir_length = GetTempPathA(sizeof(dir), dir);
+    if (dir_length == 0 || dir_length > MAX_PATH) {
+        return NULL;
+    }
+
+    char path[MAX_PATH + 1];
+    if (GetTempFileNameA(dir, "pav", 0, path) == 0) {
+        return NULL;
+    }
+
+    HANDLE handle = CreateFileA(
+        path,
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
+        NULL);
+
+    if (handle == INVALID_HANDLE_VALUE) {
+        DeleteFileA(path);
+        return NULL;
+    }
+
+    int fd = _open_osfhandle((intptr_t)handle, _O_RDWR | _O_BINARY);
+    if (fd < 0) {
+        CloseHandle(handle);
+        return NULL;
+    }
+
+    FILE *file = _fdopen(fd, "w+b");
+    if (file == NULL) {
+        _close(fd);
+        return NULL;
+    }
+
+    setvbuf(file, NULL, _IOFBF, 64 * 1024);
+
+    return file;
+}
+
+#endif
+
 FILE *mem_file_open(void) {
 #ifdef PAVE_MEMSTREAM
     MemFile *entry = malloc(sizeof(MemFile));
@@ -132,6 +182,13 @@ FILE *mem_file_open(void) {
     entry->next = mem_files;
     mem_files = entry;
     return entry->file;
+#elif defined(_WIN32)
+    FILE *file = win_temp_file();
+    if (file != NULL) {
+        return file;
+    }
+
+    return tmpfile();
 #else
     return tmpfile();
 #endif
