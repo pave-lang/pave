@@ -170,6 +170,10 @@ impl Module {
                 }
 
                 if include != null {
+                    if include_ptr == null {
+                        includes.insert(path.value, include);
+                    }
+
                     if self.includes.find(&path.value) == null {
                         self.includes.insert(path.value, include);
                     }

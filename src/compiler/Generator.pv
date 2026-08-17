@@ -26,41 +26,6 @@ struct Generator {
 }
 
 impl Generator {
-    fn overwrite_if_different(&self, file_name: *const char, source: &FILE) -> bool {
-        let orig: *FILE = fopen(file_name, "r");
-        let different = true;
-
-        if orig != null {
-            rewind(source);
-            let c1: i32 = 0;
-            let c2: i32 = 0;
-            different = false;
-            while !different && (c1 != cast<i32>(EOF)) && (c2 != cast<i32>(EOF)) {
-                c1 = fgetc(source);
-                c2 = fgetc(orig);
-                different = c1 != c2;
-            }
-
-            fclose(orig);
-        }
-
-        if !different { return false; }
-
-        rewind(source);
-
-        let out: *FILE = fopen(file_name, "w");
-        if out == null { perror("fopen"); return false; }
-
-        let c: i32 = fgetc(source);
-        while c != cast<i32>(EOF) {
-            fputc(c, out);
-            c = fgetc(source);
-        }
-
-        fclose(out);
-        return true;
-    }
-
     fn write_indent(&self, file: &FILE) {
         let i: i16 = 0;
         while i < self.indent {
