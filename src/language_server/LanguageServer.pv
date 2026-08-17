@@ -62,7 +62,6 @@ impl LanguageServer {
                 }
                 self.pipe_write = self.pipe_read;
 
-                fprintf(stderr, "LSP Server started (using pipe %s)...\n", pipe_name);
                 use_stdio = false;
             }
         }
@@ -70,7 +69,6 @@ impl LanguageServer {
         if use_stdio {
             self.pipe_read = get_stdin_pipe();
             self.pipe_write = get_stdout_pipe();
-            fprintf(stderr, "LSP Server started (using stdio)...\n");
         }
 
         return self;

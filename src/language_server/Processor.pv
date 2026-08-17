@@ -62,8 +62,6 @@ impl Processor {
         content.array.length = content_length;
         if read_pipe(self.pipe_read, content.array.data, content_length) == 0 { return String::new(self.allocator); }
 
-        fprintf(stderr, "Receved: %s\n\n", content.c_str());
-
         return content;
     }
 
@@ -116,7 +114,6 @@ impl Processor {
         write_pipe(self.pipe_write, header, header_len);
         write_pipe(self.pipe_write, string.ptr, string.length);
 
-        fprintf(stderr, "Sent: %s\n\n", string.ptr);
     }
 
     fn initialize(&self, params: &JsonNode) -> JsonNode {
