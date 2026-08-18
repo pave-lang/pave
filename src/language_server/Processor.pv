@@ -8,14 +8,16 @@ struct Processor {
     allocator: &ArenaAllocator,
     pipe_read: pipe_t,
     pipe_write: pipe_t,
+    log_messages: bool,
 }
 
 impl Processor {
-    fn new(allocator: &ArenaAllocator, pipe_read: pipe_t, pipe_write: pipe_t) -> Self {
+    fn new(allocator: &ArenaAllocator, pipe_read: pipe_t, pipe_write: pipe_t, log_messages: bool) -> Self {
         return Self {
             allocator,
             pipe_read,
             pipe_write,
+            log_messages,
         };
     }
 
@@ -61,6 +63,10 @@ impl Processor {
 
         content.array.length = content_length;
         if read_pipe(self.pipe_read, content.array.data, content_length) == 0 { return String::new(self.allocator); }
+
+        if self.log_messages {
+            fprintf(stderr, "Received: %.*s\n\n", content.len_i32(), content.c_str());
+        }
 
         return content;
     }
@@ -113,6 +119,10 @@ impl Processor {
 
         write_pipe(self.pipe_write, header, header_len);
         write_pipe(self.pipe_write, string.ptr, string.length);
+
+        if self.log_messages {
+            fprintf(stderr, "Sent: %.*s\n\n", cast<i32>(string.length), string.ptr);
+        }
 
     }
 
@@ -199,6 +209,11 @@ impl Processor {
     fn did_change_configuration(&self, ls: &LanguageServer, params: &JsonNode) -> bool {
         let settings = params.key("settings").key("pave");
         let args = settings.key("args").array();
+
+        match settings.key("logMessages") {
+            JsonNode::Boolean(value) => { self.log_messages = value; },
+            _ => {},
+        }
 
         ls.args.clear();
         if args != null {

@@ -17,6 +17,7 @@ struct LanguageServer {
     file_overrides: HashMap<str, str>,
     decl_fingerprints: HashMap<str, u64>,
     global_phases_ok: bool,
+    log_messages: bool,
     pipe_read: pipe_t,
     pipe_write: pipe_t,
 }
@@ -45,6 +46,7 @@ impl LanguageServer {
             file_overrides: HashMap<str, str>::new(allocator),
             decl_fingerprints: HashMap<str, u64>::new(allocator),
             global_phases_ok: false,
+            log_messages: false,
             pipe_read: cast<pipe_t>(null),
             pipe_write: cast<pipe_t>(null),
         });
@@ -63,12 +65,22 @@ impl LanguageServer {
                 self.pipe_write = self.pipe_read;
 
                 use_stdio = false;
+            } else if strcmp(arg, "--log-messages") == 0 {
+                self.log_messages = true;
             }
         }
 
         if use_stdio {
             self.pipe_read = get_stdin_pipe();
             self.pipe_write = get_stdout_pipe();
+        }
+
+        if self.log_messages {
+            if use_stdio {
+                fprintf(stderr, "LSP Server started (using stdio)...\n");
+            } else {
+                fprintf(stderr, "LSP Server started (using pipe)...\n");
+            }
         }
 
         return self;
@@ -301,7 +313,7 @@ impl LanguageServer {
             if allocator_ptr == null { return 1; }
             let allocator: &ArenaAllocator = allocator_ptr;
 
-            let processor = Processor::new(allocator, self.pipe_read, self.pipe_write);
+            let processor = Processor::new(allocator, self.pipe_read, self.pipe_write, self.log_messages);
             run = processor.process(self);
 
             allocator.destroy();
