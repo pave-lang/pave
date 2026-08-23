@@ -1193,8 +1193,30 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::Type(type) => {
-                generator.write_type(file, type, generics);
-                return true;
+                let resolved_type = type;
+                match type {
+                    Type::Generic(generic) => {
+                        if generic.is_const() {
+                            let generic_name = generic.name;
+                            if generic_name != null {
+                                let concrete_type = generics.get(generic_name.value);
+                                if concrete_type != null {
+                                    resolved_type = concrete_type;
+                                }
+                            }
+                        }
+                    },
+                    _ => {},
+                }
+                match resolved_type {
+                    Type::Const(const_expr) => {
+                        return self.write_expression(file, const_expr, generics);
+                    },
+                    _ => {
+                        generator.write_type(file, type, generics);
+                        return true;
+                    },
+                }
             },
             ExpressionData::IndexExpression(array_expr, index_expr) => {
                 self.write_expression(file, array_expr, generics);

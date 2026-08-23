@@ -610,6 +610,14 @@ impl Expression {
             ExpressionData::MemberStaticExpression(_, _) => {
                 match self.return_type {
                     Type::EnumC(_) => { return true; },
+                    Type::Primitive(primitive_info) => {
+                        if primitive_info != null {
+                            return primitive_info.is_number()
+                                && !primitive_info.name.eq("f32")
+                                && !primitive_info.name.eq("f64");
+                        }
+                        return false;
+                    },
                     _ => { return false; },
                 }
             },
@@ -659,6 +667,43 @@ impl Expression {
             ExpressionData::Variable(name) => {
                 match other.data {
                     ExpressionData::Variable(other_name) => { return name.eq(other_name); },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::MemberStaticExpression(target, name) => {
+                match other.data {
+                    ExpressionData::MemberStaticExpression(other_target, other_name) => {
+                        return name.eq(other_name) && target.eq_const_value(other_target);
+                    },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::EnumVariant(variant) => {
+                match other.data {
+                    ExpressionData::EnumVariant(other_variant) => {
+                        if variant.parent.name == null || other_variant.parent.name == null { return false; }
+                        return variant.name.value.eq(other_variant.name.value)
+                            && variant.parent.name.value.eq(other_variant.parent.name.value);
+                    },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::Invoke(target, arguments) => {
+                match other.data {
+                    ExpressionData::Invoke(other_target, other_arguments) => {
+                        if arguments.length != other_arguments.length { return false; }
+                        return target.eq_const_value(other_target);
+                    },
+                    ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
+                    _ => { return false; },
+                }
+            },
+            ExpressionData::Type(type) => {
+                match other.data {
+                    ExpressionData::Type(other_type) => { return type.eq(other_type); },
                     ExpressionData::ParenthesizedExpression(other_inner) => { return self.eq_const_value(other_inner); },
                     _ => { return false; },
                 }

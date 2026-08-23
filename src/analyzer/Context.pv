@@ -356,6 +356,12 @@ impl Context {
         let token = &self.tokens[self.pos];
         if token.type == TokenType::Number { return true; }
 
+        if token.type == TokenType::Identifier && self.pos + 1 < self.length {
+            if self.tokens[self.pos + 1].eq(TokenType::Symbol, "::") {
+                return true;
+            }
+        }
+
         return token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+");
     }
 
