@@ -92,46 +92,46 @@ void Usages__process_type_impl(struct Usages* self, struct TypeImpl* type_impl);
 #line 533 "src/compiler/Usages.pv"
 void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_info);
 
-#line 554 "src/compiler/Usages.pv"
+#line 558 "src/compiler/Usages.pv"
 void Usages__process_sequence(struct Usages* self, struct Sequence* sequence);
 
-#line 607 "src/compiler/Usages.pv"
+#line 611 "src/compiler/Usages.pv"
 void Usages__process_tuple(struct Usages* self, struct Tuple* tuple);
 
-#line 631 "src/compiler/Usages.pv"
+#line 635 "src/compiler/Usages.pv"
 void Usages__process_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 670 "src/compiler/Usages.pv"
+#line 674 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 694 "src/compiler/Usages.pv"
+#line 698 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map);
 
-#line 711 "src/compiler/Usages.pv"
+#line 715 "src/compiler/Usages.pv"
 bool Usages__usage_context_matches(struct UsageContext* uc, struct Generics* generics, struct GenericMap* generic_map);
 
-#line 725 "src/compiler/Usages.pv"
+#line 729 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 736 "src/compiler/Usages.pv"
+#line 740 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 747 "src/compiler/Usages.pv"
+#line 751 "src/compiler/Usages.pv"
 void Usages__mark_any_usage(struct Usages* self, struct Type* type);
 
-#line 769 "src/compiler/Usages.pv"
+#line 773 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_primitive(struct Usages* self, struct Primitive* primitive_info, struct GenericMap* generic_map);
 
-#line 780 "src/compiler/Usages.pv"
+#line 784 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 911 "src/compiler/Usages.pv"
+#line 915 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 1030 "src/compiler/Usages.pv"
+#line 1034 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 1338 "src/compiler/Usages.pv"
+#line 1342 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

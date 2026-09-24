@@ -609,6 +609,9 @@ impl Module {
         for impl_info in self.impls {
             match impl_info.type {
                 Type::Primitive(_) => { continue; },
+                Type::StructC(_) => { continue; },
+                Type::EnumC(_) => { continue; },
+                Type::TypedefC(_) => { continue; },
                 _ => {},
             }
             for (_, &func_info) in impl_info.functions {
@@ -655,6 +658,9 @@ impl Module {
         for impl_info in self.impls {
             match impl_info.type {
                 Type::Primitive(_) => { continue; },
+                Type::StructC(_) => { continue; },
+                Type::EnumC(_) => { continue; },
+                Type::TypedefC(_) => { continue; },
                 _ => {},
             }
             impl_info.parse_functions();

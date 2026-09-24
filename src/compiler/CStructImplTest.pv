@@ -1,0 +1,51 @@
+#include "c_struct_impl_test.h"
+#include "assert.h"
+
+impl PaveCImplPoint {
+    fn new(x: i32) -> Self {
+        let result: Self;
+        result.x = x;
+        return result;
+    }
+
+    fn get(&self) -> i32 { return self.x; }
+    fn set(&self, x: i32) { self.x = x; }
+}
+
+impl PaveCImplAlias {
+    fn from_alias(x: i32) -> Self {
+        let result: Self;
+        result.x = x;
+        return result;
+    }
+
+    fn get(&self) -> i32 { return self.x; }
+}
+
+impl PaveCImplAnonymous {
+    fn new(value: i32) -> Self {
+        let result: Self;
+        result.value = value;
+        return result;
+    }
+
+    fn get(&self) -> i32 { return self.value; }
+}
+
+test "C struct impl constructors and methods" {
+    let point = PaveCImplPoint::new(7);
+    assert(point.x == 7);
+    assert(point.get() == 7);
+    point.set(9);
+    assert(point.get() == 9);
+    let reference = &point;
+    assert(reference.get() == 9);
+
+    let alias = PaveCImplAlias::from_alias(11);
+    assert(alias.x == 11);
+    assert(alias.get() == 11);
+
+    let anonymous = PaveCImplAnonymous::new(17);
+    assert(anonymous.value == 17);
+    assert(anonymous.get() == 17);
+}

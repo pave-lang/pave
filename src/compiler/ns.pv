@@ -10,3 +10,4 @@ mod BlockWriter
 mod DefinitionWriter
 mod FileGenerator
 mod Usages
+mod CStructImplTest

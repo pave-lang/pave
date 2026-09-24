@@ -6,6 +6,28 @@ use types
 use c
 
 impl Expression {
+    fn get_c_impl_member_type(context: &Context, type: &Type, name: str, member: &Token) -> *Type {
+        // C impls are registered under their declared name in the primitive table.
+        let primitive_ptr = context.root.primitives.find(&name);
+        if primitive_ptr == null { return null; }
+        let primitive = *primitive_ptr;
+        for *impl_info in primitive.impls {
+            let function = impl_info.find_function(member.value);
+            if function == null { continue; }
+            let generic_map = context.allocator.store(&GenericMap {
+                self_type: type,
+                array: Array<Type>::new(context.allocator),
+                map: HashMap<str, usize>::new(context.allocator),
+            });
+            if generic_map == null { return null; }
+            for (typedef_name, &typedef_type) in impl_info.typedefs {
+                generic_map.insert(typedef_name, *typedef_type);
+            }
+            return context.allocator.store(&Type::Function(function, generic_map));
+        }
+        return null;
+    }
+
     fn get_enum_variant(context: &Context, type: &Type, token: &Token) -> EnumVariantResult {
         match type {
             Type::Indirect(indirect) => {
@@ -168,13 +190,18 @@ impl Expression {
                 return context.allocator.store(&Type::Function(function, generic_map));
             },
             Type::TypedefC(typedef_info) => {
+                let function = Expression::get_c_impl_member_type(context, type, typedef_info.name, member);
+                if function != null { return function; }
                 return Expression::get_member_type(context, typedef_info.type, member, output_error);
             },
             Type::StructC(struct_info) => {
                 let field = struct_info.fields.find(&member.value);
                 if field != null { return &field.type; }
 
-                if output_error { context.error_token(member, "Field not found in C struct"); }
+                let function = Expression::get_c_impl_member_type(context, type, struct_info.name, member);
+                if function != null { return function; }
+
+                if output_error { context.error_token(member, "Field or function not found in C struct"); }
                 return null;
             },
             Type::UnionC(union_info) => {

@@ -533,6 +533,10 @@ impl Usages {
     fn process_primitive(&self, primitive_info: &Primitive) {
         let entry_usage_context = self.usage_context;
         let self_type = self.allocator.store(&Type::Primitive(primitive_info));
+        // The primitive registry also owns C impls; retain their C declaration type.
+        if primitive_info.impls.length > 0 {
+            self_type = &primitive_info.impls.data[0].type;
+        }
         let generic_map = self.allocator.store(&GenericMap { self_type, array: Array<Type> { allocator: self.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: self.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
         if generic_map == null { return; }
 

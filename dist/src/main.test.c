@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <compiler/test_FunctionCoroutine__coroutine_fibonacci_test.test.h>
+#include <compiler/test_CStructImplTest__C_struct_impl_constructors_and_methods.test.h>
 #include <std/test_ArenaAllocator__allocations_preserve_maximum_alignment.test.h>
 #include <std/test_ArenaAllocator__aliases_share_allocation_ownership.test.h>
 #include <std/test_ArenaAllocator__realloc_preserves_data_and_frees_the_old_allocation.test.h>
@@ -26,6 +27,10 @@ int main(void) {
 
     fputs("[TEST] compiler/FunctionCoroutine: coroutine fibonacci test\n", stdout);
     test_FunctionCoroutine__coroutine_fibonacci_test();
+    passed++;
+
+    fputs("[TEST] compiler/CStructImplTest: C struct impl constructors and methods\n", stdout);
+    test_CStructImplTest__C_struct_impl_constructors_and_methods();
     passed++;
 
     fputs("[TEST] std/ArenaAllocator: allocations preserve maximum alignment\n", stdout);

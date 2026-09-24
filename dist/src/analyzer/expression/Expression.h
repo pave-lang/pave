@@ -79,9 +79,12 @@ struct Expression* Expression__parse_if_expression(struct Context* context, stru
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
 #line 9 "src/analyzer/expression/MemberLookup.pv"
+struct Type* Expression__get_c_impl_member_type(struct Context* context, struct Type* type, struct str name, struct Token* member);
+
+#line 31 "src/analyzer/expression/MemberLookup.pv"
 struct EnumVariantResult Expression__get_enum_variant(struct Context* context, struct Type* type, struct Token* token);
 
-#line 55 "src/analyzer/expression/MemberLookup.pv"
+#line 77 "src/analyzer/expression/MemberLookup.pv"
 struct Type* Expression__get_member_type(struct Context* context, struct Type* type, struct Token* member, bool output_error);
 
 #line 6 "src/analyzer/expression/GenericResolve.pv"
