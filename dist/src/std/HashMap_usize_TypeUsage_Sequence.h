@@ -38,34 +38,34 @@ struct TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__find(struct HashMap
 #line 78 "src/std/HashMap.pv"
 struct TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__insert(struct HashMap_usize_TypeUsage_Sequence* self, uintptr_t key, struct TypeUsage_Sequence value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Sequence__remove(struct HashMap_usize_TypeUsage_Sequence* self, uintptr_t* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Sequence__release(struct HashMap_usize_TypeUsage_Sequence* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Sequence__fill_buckets(struct HashMap_usize_TypeUsage_Sequence* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Sequence HashMap_usize_TypeUsage_Sequence__clone(struct HashMap_usize_TypeUsage_Sequence* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Sequence HashMap_usize_TypeUsage_Sequence__iter(struct HashMap_usize_TypeUsage_Sequence* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Sequence__clear(struct HashMap_usize_TypeUsage_Sequence* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__Map_usize_TypeUsage_Sequence__find(void* __self, uintptr_t* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct TypeUsage_Sequence* HashMap_usize_TypeUsage_Sequence__Map_usize_TypeUsage_Sequence__insert(void* __self, uintptr_t key, struct TypeUsage_Sequence value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Sequence__Map_usize_TypeUsage_Sequence__remove(void* __self, uintptr_t* key);
 
 extern struct trait_Map_usize_TypeUsage_SequenceVTable HASH_MAP_USIZE_TYPE_USAGE_SEQUENCE__VTABLE__MAP;

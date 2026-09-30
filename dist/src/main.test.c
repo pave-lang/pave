@@ -2,6 +2,8 @@
 
 #include <compiler/test_FunctionCoroutine__coroutine_fibonacci_test.test.h>
 #include <compiler/test_CStructImplTest__C_struct_impl_constructors_and_methods.test.h>
+#include <compiler/test_TraitImplTest__a_generic_trait_s_default_method_binds_the_impl_s_generics.test.h>
+#include <compiler/test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work.test.h>
 #include <std/test_ArenaAllocator__allocations_preserve_maximum_alignment.test.h>
 #include <std/test_ArenaAllocator__aliases_share_allocation_ownership.test.h>
 #include <std/test_ArenaAllocator__realloc_preserves_data_and_frees_the_old_allocation.test.h>
@@ -9,6 +11,8 @@
 #include <std/test_ArenaAllocator__failed_initialization_cleans_up_and_is_inert.test.h>
 #include <std/test_ArenaAllocator__destroy_works_through_an_allocator_stored_in_its_own_arena.test.h>
 #include <std/test_HashMap__hash_collisions_compare_keys.test.h>
+#include <std/test_HashMap__an_empty_map_literal_and_its_clone_take_inserts.test.h>
+#include <std/test_HashSet__an_empty_set_literal_takes_inserts.test.h>
 #include <std/test_str__eq___equal_strings.test.h>
 #include <std/test_str__eq___different_content.test.h>
 #include <std/test_str__eq___different_lengths.test.h>
@@ -31,6 +35,14 @@ int main(void) {
 
     fputs("[TEST] compiler/CStructImplTest: C struct impl constructors and methods\n", stdout);
     test_CStructImplTest__C_struct_impl_constructors_and_methods();
+    passed++;
+
+    fputs("[TEST] compiler/TraitImplTest: a generic trait's default method binds the impl's generics\n", stdout);
+    test_TraitImplTest__a_generic_trait_s_default_method_binds_the_impl_s_generics();
+    passed++;
+
+    fputs("[TEST] compiler/TraitImplTest: a pointer type's impls in one module both work\n", stdout);
+    test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work();
     passed++;
 
     fputs("[TEST] std/ArenaAllocator: allocations preserve maximum alignment\n", stdout);
@@ -59,6 +71,14 @@ int main(void) {
 
     fputs("[TEST] std/HashMap: hash collisions compare keys\n", stdout);
     test_HashMap__hash_collisions_compare_keys();
+    passed++;
+
+    fputs("[TEST] std/HashMap: an empty map literal and its clone take inserts\n", stdout);
+    test_HashMap__an_empty_map_literal_and_its_clone_take_inserts();
+    passed++;
+
+    fputs("[TEST] std/HashSet: an empty set literal takes inserts\n", stdout);
+    test_HashSet__an_empty_set_literal_takes_inserts();
     passed++;
 
     fputs("[TEST] std/str: eq - equal strings\n", stdout);

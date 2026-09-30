@@ -40,34 +40,34 @@ struct Array_SignatureInfo* HashMap_str_Array_SignatureInfo__find(struct HashMap
 #line 78 "src/std/HashMap.pv"
 struct Array_SignatureInfo* HashMap_str_Array_SignatureInfo__insert(struct HashMap_str_Array_SignatureInfo* self, struct str key, struct Array_SignatureInfo value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_str_Array_SignatureInfo__remove(struct HashMap_str_Array_SignatureInfo* self, struct str* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_str_Array_SignatureInfo__release(struct HashMap_str_Array_SignatureInfo* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_str_Array_SignatureInfo__fill_buckets(struct HashMap_str_Array_SignatureInfo* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_str_Array_SignatureInfo HashMap_str_Array_SignatureInfo__clone(struct HashMap_str_Array_SignatureInfo* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_SignatureInfo HashMap_str_Array_SignatureInfo__iter(struct HashMap_str_Array_SignatureInfo* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_str_Array_SignatureInfo__clear(struct HashMap_str_Array_SignatureInfo* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_SignatureInfo* HashMap_str_Array_SignatureInfo__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct Array_SignatureInfo* HashMap_str_Array_SignatureInfo__Map_str_Array_SignatureInfo__find(void* __self, struct str* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct Array_SignatureInfo* HashMap_str_Array_SignatureInfo__Map_str_Array_SignatureInfo__insert(void* __self, struct str key, struct Array_SignatureInfo value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_str_Array_SignatureInfo__Map_str_Array_SignatureInfo__remove(void* __self, struct str* key);
 
 extern struct trait_Map_str_Array_SignatureInfoVTable HASH_MAP_STR_ARRAY_SIGNATURE_INFO__VTABLE__MAP;

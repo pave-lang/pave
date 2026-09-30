@@ -40,34 +40,34 @@ struct Array_Diagnostic* HashMap_str_Array_Diagnostic__find(struct HashMap_str_A
 #line 78 "src/std/HashMap.pv"
 struct Array_Diagnostic* HashMap_str_Array_Diagnostic__insert(struct HashMap_str_Array_Diagnostic* self, struct str key, struct Array_Diagnostic value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_str_Array_Diagnostic__remove(struct HashMap_str_Array_Diagnostic* self, struct str* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__release(struct HashMap_str_Array_Diagnostic* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__fill_buckets(struct HashMap_str_Array_Diagnostic* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_str_Array_Diagnostic HashMap_str_Array_Diagnostic__clone(struct HashMap_str_Array_Diagnostic* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_Diagnostic HashMap_str_Array_Diagnostic__iter(struct HashMap_str_Array_Diagnostic* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_str_Array_Diagnostic__clear(struct HashMap_str_Array_Diagnostic* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_Diagnostic* HashMap_str_Array_Diagnostic__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct Array_Diagnostic* HashMap_str_Array_Diagnostic__Map_str_Array_Diagnostic__find(void* __self, struct str* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct Array_Diagnostic* HashMap_str_Array_Diagnostic__Map_str_Array_Diagnostic__insert(void* __self, struct str key, struct Array_Diagnostic value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_str_Array_Diagnostic__Map_str_Array_Diagnostic__remove(void* __self, struct str* key);
 
 extern struct trait_Map_str_Array_DiagnosticVTable HASH_MAP_STR_ARRAY_DIAGNOSTIC__VTABLE__MAP;

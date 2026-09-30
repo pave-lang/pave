@@ -82,22 +82,22 @@ bool FileGenerator__generate_type_impl_loop(struct FileGenerator* self, struct T
 #line 1218 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_type_impl(struct FileGenerator* self, struct TypeUsage_TypeImpl* usage, struct UsageContext* usage_context);
 
-#line 1282 "src/compiler/FileGenerator.pv"
+#line 1311 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
-#line 1329 "src/compiler/FileGenerator.pv"
+#line 1358 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* global);
 
-#line 1405 "src/compiler/FileGenerator.pv"
+#line 1434 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1417 "src/compiler/FileGenerator.pv"
+#line 1446 "src/compiler/FileGenerator.pv"
 void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths, struct Array_str* module_paths);
 
-#line 1439 "src/compiler/FileGenerator.pv"
+#line 1468 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1504 "src/compiler/FileGenerator.pv"
+#line 1533 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif

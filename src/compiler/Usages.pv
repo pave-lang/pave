@@ -497,9 +497,10 @@ impl Usages {
 
             let trait_info = impl_info.trait_;
             if trait_info != null {
+                let default_generics = self.generator.trait_default_generics(impl_info, generic_map);
                 for (func_base_name, &func_info) in trait_info.functions {
                     if impl_info.functions.find(&func_base_name) != null { continue; }
-                    self.process_function(func_info, generic_map);
+                    self.process_function(func_info, default_generics);
                 }
             }
         }

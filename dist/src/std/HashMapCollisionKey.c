@@ -9,16 +9,16 @@
 
 #include <std/HashMapCollisionKey.h>
 
-#line 273 "src/std/HashMap.pv"
+#line 281 "src/std/HashMap.pv"
 Hash HashMapCollisionKey__Hash__hash(void* __self) {
     HashMapCollisionKey* self = __self; (void)self;
-    #line 273 "src/std/HashMap.pv"
+    #line 281 "src/std/HashMap.pv"
     return 1;
 }
 
-#line 277 "src/std/HashMap.pv"
+#line 285 "src/std/HashMap.pv"
 bool HashMapCollisionKey__Eq_HashMapCollisionKey__eq(HashMapCollisionKey self, HashMapCollisionKey other) {
-    #line 278 "src/std/HashMap.pv"
+    #line 286 "src/std/HashMap.pv"
     return ((uint64_t)(self) ^ (uint64_t)(other)) <= (uint64_t)(0);
 }
 

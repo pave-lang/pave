@@ -38,34 +38,34 @@ struct Type* HashMap_u32_Type__find(struct HashMap_u32_Type* self, uint32_t* key
 #line 78 "src/std/HashMap.pv"
 struct Type* HashMap_u32_Type__insert(struct HashMap_u32_Type* self, uint32_t key, struct Type value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_u32_Type__remove(struct HashMap_u32_Type* self, uint32_t* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_u32_Type__release(struct HashMap_u32_Type* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_u32_Type__fill_buckets(struct HashMap_u32_Type* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_u32_Type HashMap_u32_Type__clone(struct HashMap_u32_Type* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_u32_Type HashMap_u32_Type__iter(struct HashMap_u32_Type* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_u32_Type__clear(struct HashMap_u32_Type* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_u32_Type* HashMap_u32_Type__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct Type* HashMap_u32_Type__Map_u32_Type__find(void* __self, uint32_t* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct Type* HashMap_u32_Type__Map_u32_Type__insert(void* __self, uint32_t key, struct Type value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_u32_Type__Map_u32_Type__remove(void* __self, uint32_t* key);
 
 extern struct trait_Map_u32_TypeVTable HASH_MAP_U32_TYPE__VTABLE__MAP;

@@ -40,34 +40,34 @@ struct Array_CompletionInfo* HashMap_str_Array_CompletionInfo__find(struct HashM
 #line 78 "src/std/HashMap.pv"
 struct Array_CompletionInfo* HashMap_str_Array_CompletionInfo__insert(struct HashMap_str_Array_CompletionInfo* self, struct str key, struct Array_CompletionInfo value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_str_Array_CompletionInfo__remove(struct HashMap_str_Array_CompletionInfo* self, struct str* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_str_Array_CompletionInfo__release(struct HashMap_str_Array_CompletionInfo* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_str_Array_CompletionInfo__fill_buckets(struct HashMap_str_Array_CompletionInfo* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_str_Array_CompletionInfo HashMap_str_Array_CompletionInfo__clone(struct HashMap_str_Array_CompletionInfo* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_str_Array_CompletionInfo HashMap_str_Array_CompletionInfo__iter(struct HashMap_str_Array_CompletionInfo* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_str_Array_CompletionInfo__clear(struct HashMap_str_Array_CompletionInfo* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_str_Array_CompletionInfo* HashMap_str_Array_CompletionInfo__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct Array_CompletionInfo* HashMap_str_Array_CompletionInfo__Map_str_Array_CompletionInfo__find(void* __self, struct str* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct Array_CompletionInfo* HashMap_str_Array_CompletionInfo__Map_str_Array_CompletionInfo__insert(void* __self, struct str key, struct Array_CompletionInfo value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_str_Array_CompletionInfo__Map_str_Array_CompletionInfo__remove(void* __self, struct str* key);
 
 extern struct trait_Map_str_Array_CompletionInfoVTable HASH_MAP_STR_ARRAY_COMPLETION_INFO__VTABLE__MAP;

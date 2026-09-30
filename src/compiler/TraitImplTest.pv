@@ -1,0 +1,36 @@
+#include "stdlib.h"
+
+// Compiler regressions: a generic trait's default method called on a type
+// that takes it (its generics bound by the impl), and a pointer type with
+// two impls in one module (their methods share one pair of files).
+
+trait PaveTestHandler<S> {
+    fn handle(&self, value: &S) -> i32;
+    fn doubled(&self, value: &S) -> i32 { return self.handle(value) * 2; }
+}
+
+struct PaveTestCounter { count: i32 }
+
+impl PaveTestHandler<i32> for PaveTestCounter {
+    fn handle(&self, value: &i32) -> i32 { self.count += *value; return self.count; }
+}
+
+trait PaveTestNamed { fn name(&self) -> i32 { return 1; } }
+trait PaveTestSized { fn size(&self) -> i32; }
+
+struct PaveTestThing { value: i32 }
+
+impl PaveTestNamed for *PaveTestThing {}
+impl PaveTestSized for *PaveTestThing { fn size(&self) -> i32 { return 2; } }
+
+test "a generic trait's default method binds the impl's generics" {
+    let counter = PaveTestCounter { count: 0 };
+    let three = 3;
+    if counter.doubled(&three) != 6 { abort(); }
+}
+
+test "a pointer type's impls in one module both work" {
+    let thing = PaveTestThing { value: 5 };
+    let pointer: *PaveTestThing = &thing;
+    if pointer.name() + pointer.size() != 3 { abort(); }
+}

@@ -555,185 +555,187 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
                         struct Type* type_info = func_info->parent.type_value._0;
                         #line 208 "src/compiler/IncludeWriter.pv"
                         uintptr_t impl_index = func_info->parent.type_value._1;
-                        #line 209 "src/compiler/IncludeWriter.pv"
-                        struct GenericMap* include_generics = generics;
                         #line 210 "src/compiler/IncludeWriter.pv"
+                        struct GenericMap* include_generics = generics;
+                        #line 211 "src/compiler/IncludeWriter.pv"
+                        struct GenericMap resolved_generics = *generics;
+                        #line 212 "src/compiler/IncludeWriter.pv"
                         if (func_generic_map != 0) {
-                            #line 211 "src/compiler/IncludeWriter.pv"
-                            struct GenericMap resolved_generics = GenericMap__resolve_types(&(*func_generic_map), self->allocator, generics);
-                            #line 212 "src/compiler/IncludeWriter.pv"
+                            #line 213 "src/compiler/IncludeWriter.pv"
+                            resolved_generics = GenericMap__resolve_types(&(*func_generic_map), self->allocator, generics);
+                            #line 214 "src/compiler/IncludeWriter.pv"
                             include_generics = &resolved_generics;
                         }
 
-                        #line 215 "src/compiler/IncludeWriter.pv"
+                        #line 217 "src/compiler/IncludeWriter.pv"
                         struct Type* include_type = type_info;
-                        #line 216 "src/compiler/IncludeWriter.pv"
+                        #line 218 "src/compiler/IncludeWriter.pv"
                         if (Type__is_fat_pointer(type_info)) {
-                            #line 217 "src/compiler/IncludeWriter.pv"
+                            #line 219 "src/compiler/IncludeWriter.pv"
                             include_type = Type__deref_1(type_info);
-                            #line 218 "src/compiler/IncludeWriter.pv"
+                            #line 220 "src/compiler/IncludeWriter.pv"
                             if (include_type == 0) {
-                                #line 218 "src/compiler/IncludeWriter.pv"
+                                #line 220 "src/compiler/IncludeWriter.pv"
                                 include_type = type_info;
                             }
                         }
 
-                        #line 221 "src/compiler/IncludeWriter.pv"
+                        #line 223 "src/compiler/IncludeWriter.pv"
                         struct Type* resolved_include_type = Context__resolve_type(self->allocator, include_type, include_generics, generics);
-                        #line 222 "src/compiler/IncludeWriter.pv"
+                        #line 224 "src/compiler/IncludeWriter.pv"
                         if (resolved_include_type != 0) {
-                            #line 222 "src/compiler/IncludeWriter.pv"
+                            #line 224 "src/compiler/IncludeWriter.pv"
                             include_type = resolved_include_type;
                         }
 
-                        #line 224 "src/compiler/IncludeWriter.pv"
+                        #line 226 "src/compiler/IncludeWriter.pv"
                         if (IncludeWriter__has_unresolved_generic(include_type, include_generics)) {
-                            #line 225 "src/compiler/IncludeWriter.pv"
+                            #line 227 "src/compiler/IncludeWriter.pv"
                             fprintf(stderr, "IncludeWriter.write: unresolved generic while writing type impl include\n");
                         }
 
-                        #line 228 "src/compiler/IncludeWriter.pv"
-                        struct String name = Naming__get_type_name(&generator->naming_ident, include_type, include_generics->self_type, include_generics);
-                        #line 229 "src/compiler/IncludeWriter.pv"
-                        struct Module* module = (include_type == 0 ? 0 : Type__get_module(include_type));
                         #line 230 "src/compiler/IncludeWriter.pv"
-                        struct TypeImpl* type_impl = Root__get_type_impl(generator->root, type_info, impl_index);
+                        struct String name = Naming__get_type_name(&generator->naming_ident, include_type, include_generics->self_type, include_generics);
                         #line 231 "src/compiler/IncludeWriter.pv"
+                        struct Module* module = (include_type == 0 ? 0 : Type__get_module(include_type));
+                        #line 232 "src/compiler/IncludeWriter.pv"
+                        struct TypeImpl* type_impl = Root__get_type_impl(generator->root, type_info, impl_index);
+                        #line 233 "src/compiler/IncludeWriter.pv"
                         if (type_impl != 0) {
-                            #line 231 "src/compiler/IncludeWriter.pv"
+                            #line 233 "src/compiler/IncludeWriter.pv"
                             module = type_impl->impl_info->context->module;
                         }
-                        #line 232 "src/compiler/IncludeWriter.pv"
+                        #line 234 "src/compiler/IncludeWriter.pv"
                         struct String path = Generator__make_rel_path(generator, module, String__as_str(&name), (struct str){ .ptr = "", .length = strlen("") });
-                        #line 233 "src/compiler/IncludeWriter.pv"
+                        #line 235 "src/compiler/IncludeWriter.pv"
                         if (HashSet_str__insert(&self->includes, String__as_str(&path))) {
-                            #line 233 "src/compiler/IncludeWriter.pv"
+                            #line 235 "src/compiler/IncludeWriter.pv"
                             HashSet_str__insert(&includes, String__as_str(&path));
                         }
                     } break;
-                    #line 235 "src/compiler/IncludeWriter.pv"
+                    #line 237 "src/compiler/IncludeWriter.pv"
                     default: {
                     } break;
                 }
             } break;
-            #line 239 "src/compiler/IncludeWriter.pv"
+            #line 241 "src/compiler/IncludeWriter.pv"
             case TYPE__ENUM_C: {
-                #line 239 "src/compiler/IncludeWriter.pv"
+                #line 241 "src/compiler/IncludeWriter.pv"
                 struct EnumC* info = resolved_nn->enumc_value;
-                #line 240 "src/compiler/IncludeWriter.pv"
-                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 240 "src/compiler/IncludeWriter.pv"
-                    HashSet_str__insert(&c_includes, info->include->path);
-                }
-            } break;
-            #line 242 "src/compiler/IncludeWriter.pv"
-            case TYPE__STRUCT_C: {
                 #line 242 "src/compiler/IncludeWriter.pv"
+                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
+                    #line 242 "src/compiler/IncludeWriter.pv"
+                    HashSet_str__insert(&c_includes, info->include->path);
+                }
+            } break;
+            #line 244 "src/compiler/IncludeWriter.pv"
+            case TYPE__STRUCT_C: {
+                #line 244 "src/compiler/IncludeWriter.pv"
                 struct StructC* info = resolved_nn->structc_value;
-                #line 243 "src/compiler/IncludeWriter.pv"
-                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 243 "src/compiler/IncludeWriter.pv"
-                    HashSet_str__insert(&c_includes, info->include->path);
-                }
-            } break;
-            #line 245 "src/compiler/IncludeWriter.pv"
-            case TYPE__UNION_C: {
                 #line 245 "src/compiler/IncludeWriter.pv"
+                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
+                    #line 245 "src/compiler/IncludeWriter.pv"
+                    HashSet_str__insert(&c_includes, info->include->path);
+                }
+            } break;
+            #line 247 "src/compiler/IncludeWriter.pv"
+            case TYPE__UNION_C: {
+                #line 247 "src/compiler/IncludeWriter.pv"
                 struct StructC* info = resolved_nn->unionc_value;
-                #line 246 "src/compiler/IncludeWriter.pv"
-                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 246 "src/compiler/IncludeWriter.pv"
-                    HashSet_str__insert(&c_includes, info->include->path);
-                }
-            } break;
-            #line 248 "src/compiler/IncludeWriter.pv"
-            case TYPE__TYPEDEF_C: {
                 #line 248 "src/compiler/IncludeWriter.pv"
+                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
+                    #line 248 "src/compiler/IncludeWriter.pv"
+                    HashSet_str__insert(&c_includes, info->include->path);
+                }
+            } break;
+            #line 250 "src/compiler/IncludeWriter.pv"
+            case TYPE__TYPEDEF_C: {
+                #line 250 "src/compiler/IncludeWriter.pv"
                 struct TypedefC* info = resolved_nn->typedefc_value;
-                #line 249 "src/compiler/IncludeWriter.pv"
-                if (info->include != 0 && HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 249 "src/compiler/IncludeWriter.pv"
-                    HashSet_str__insert(&c_includes, info->include->path);
-                }
-            } break;
-            #line 251 "src/compiler/IncludeWriter.pv"
-            case TYPE__FUNCTION_C: {
                 #line 251 "src/compiler/IncludeWriter.pv"
-                struct FunctionC* info = resolved_nn->functionc_value;
-                #line 252 "src/compiler/IncludeWriter.pv"
-                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 252 "src/compiler/IncludeWriter.pv"
-                    HashSet_str__insert(&c_includes, info->include->path);
-                }
-            } break;
-            #line 254 "src/compiler/IncludeWriter.pv"
-            case TYPE__CLASS_CPP: {
-                #line 254 "src/compiler/IncludeWriter.pv"
-                struct ClassCpp* info = resolved_nn->classcpp_value;
-                #line 255 "src/compiler/IncludeWriter.pv"
-                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 255 "src/compiler/IncludeWriter.pv"
-                    HashSet_str__insert(&c_includes, info->include->path);
-                }
-            } break;
-            #line 257 "src/compiler/IncludeWriter.pv"
-            case TYPE__UNKNOWN_C: {
-                #line 257 "src/compiler/IncludeWriter.pv"
-                struct UnknownC* info = resolved_nn->unknownc_value;
-                #line 258 "src/compiler/IncludeWriter.pv"
                 if (info->include != 0 && HashSet_str__insert(&self->c_includes, info->include->path)) {
-                    #line 258 "src/compiler/IncludeWriter.pv"
+                    #line 251 "src/compiler/IncludeWriter.pv"
                     HashSet_str__insert(&c_includes, info->include->path);
                 }
             } break;
-            #line 260 "src/compiler/IncludeWriter.pv"
+            #line 253 "src/compiler/IncludeWriter.pv"
+            case TYPE__FUNCTION_C: {
+                #line 253 "src/compiler/IncludeWriter.pv"
+                struct FunctionC* info = resolved_nn->functionc_value;
+                #line 254 "src/compiler/IncludeWriter.pv"
+                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
+                    #line 254 "src/compiler/IncludeWriter.pv"
+                    HashSet_str__insert(&c_includes, info->include->path);
+                }
+            } break;
+            #line 256 "src/compiler/IncludeWriter.pv"
+            case TYPE__CLASS_CPP: {
+                #line 256 "src/compiler/IncludeWriter.pv"
+                struct ClassCpp* info = resolved_nn->classcpp_value;
+                #line 257 "src/compiler/IncludeWriter.pv"
+                if (HashSet_str__insert(&self->c_includes, info->include->path)) {
+                    #line 257 "src/compiler/IncludeWriter.pv"
+                    HashSet_str__insert(&c_includes, info->include->path);
+                }
+            } break;
+            #line 259 "src/compiler/IncludeWriter.pv"
+            case TYPE__UNKNOWN_C: {
+                #line 259 "src/compiler/IncludeWriter.pv"
+                struct UnknownC* info = resolved_nn->unknownc_value;
+                #line 260 "src/compiler/IncludeWriter.pv"
+                if (info->include != 0 && HashSet_str__insert(&self->c_includes, info->include->path)) {
+                    #line 260 "src/compiler/IncludeWriter.pv"
+                    HashSet_str__insert(&c_includes, info->include->path);
+                }
+            } break;
+            #line 262 "src/compiler/IncludeWriter.pv"
             default: {
-                #line 261 "src/compiler/IncludeWriter.pv"
+                #line 263 "src/compiler/IncludeWriter.pv"
                 struct String name = Naming__get_type_name(&generator->naming_ident, resolved_nn, generics->self_type, generics);
-                #line 262 "src/compiler/IncludeWriter.pv"
+                #line 264 "src/compiler/IncludeWriter.pv"
                 struct Module* module = Type__get_module(resolved_nn);
 
-                #line 264 "src/compiler/IncludeWriter.pv"
+                #line 266 "src/compiler/IncludeWriter.pv"
                 struct String path = Generator__make_rel_path(generator, module, String__as_str(&name), (struct str){ .ptr = "", .length = strlen("") });
-                #line 265 "src/compiler/IncludeWriter.pv"
+                #line 267 "src/compiler/IncludeWriter.pv"
                 if (HashSet_str__insert(&self->includes, String__as_str(&path))) {
-                    #line 265 "src/compiler/IncludeWriter.pv"
+                    #line 267 "src/compiler/IncludeWriter.pv"
                     HashSet_str__insert(&includes, String__as_str(&path));
                 }
             } break;
         }
     } }
 
-    #line 270 "src/compiler/IncludeWriter.pv"
+    #line 272 "src/compiler/IncludeWriter.pv"
     { struct HashSetIter_str __iter = HashSet_str__iter(&c_includes);
-    #line 270 "src/compiler/IncludeWriter.pv"
+    #line 272 "src/compiler/IncludeWriter.pv"
     while (HashSetIter_str__next(&__iter)) {
-        #line 270 "src/compiler/IncludeWriter.pv"
+        #line 272 "src/compiler/IncludeWriter.pv"
         struct str include = *HashSetIter_str__value(&__iter);
 
-        #line 271 "src/compiler/IncludeWriter.pv"
+        #line 273 "src/compiler/IncludeWriter.pv"
         fprintf(file, "#include <%.*s>\n", (int32_t)(include.length - 2), include.ptr + 1);
     } }
 
-    #line 274 "src/compiler/IncludeWriter.pv"
+    #line 276 "src/compiler/IncludeWriter.pv"
     { struct HashSetIter_str __iter = HashSet_str__iter(&includes);
-    #line 274 "src/compiler/IncludeWriter.pv"
+    #line 276 "src/compiler/IncludeWriter.pv"
     while (HashSetIter_str__next(&__iter)) {
-        #line 274 "src/compiler/IncludeWriter.pv"
+        #line 276 "src/compiler/IncludeWriter.pv"
         struct str include = *HashSetIter_str__value(&__iter);
 
-        #line 275 "src/compiler/IncludeWriter.pv"
+        #line 277 "src/compiler/IncludeWriter.pv"
         fprintf(file, "#include <%.*s.h>\n", (int32_t)(include.length), include.ptr);
     } }
 
-    #line 278 "src/compiler/IncludeWriter.pv"
+    #line 280 "src/compiler/IncludeWriter.pv"
     { struct HashSetIter_str __iter = HashSet_str__iter(&type_declarations);
-    #line 278 "src/compiler/IncludeWriter.pv"
+    #line 280 "src/compiler/IncludeWriter.pv"
     while (HashSetIter_str__next(&__iter)) {
-        #line 278 "src/compiler/IncludeWriter.pv"
+        #line 280 "src/compiler/IncludeWriter.pv"
         struct str type_declaration = *HashSetIter_str__value(&__iter);
 
-        #line 279 "src/compiler/IncludeWriter.pv"
+        #line 281 "src/compiler/IncludeWriter.pv"
         fprintf(file, "%.*s;\n", (int32_t)(type_declaration.length), type_declaration.ptr);
     } }
     HashSet_str__release(&c_includes);
@@ -741,8 +743,8 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
     HashSet_str__release(&type_declarations);
 }
 
-#line 283 "src/compiler/IncludeWriter.pv"
+#line 285 "src/compiler/IncludeWriter.pv"
 void IncludeWriter__release(struct IncludeWriter* self) {
-    #line 284 "src/compiler/IncludeWriter.pv"
+    #line 286 "src/compiler/IncludeWriter.pv"
     HashSet_str__release(&self->includes);
 }

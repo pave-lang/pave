@@ -38,34 +38,34 @@ struct TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__find(struct HashMap_usize
 #line 78 "src/std/HashMap.pv"
 struct TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__insert(struct HashMap_usize_TypeUsage_Tuple* self, uintptr_t key, struct TypeUsage_Tuple value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Tuple__remove(struct HashMap_usize_TypeUsage_Tuple* self, uintptr_t* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Tuple__release(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Tuple__fill_buckets(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_usize_TypeUsage_Tuple HashMap_usize_TypeUsage_Tuple__clone(struct HashMap_usize_TypeUsage_Tuple* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_usize_TypeUsage_Tuple HashMap_usize_TypeUsage_Tuple__iter(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_usize_TypeUsage_Tuple__clear(struct HashMap_usize_TypeUsage_Tuple* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_usize_TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__Map_usize_TypeUsage_Tuple__find(void* __self, uintptr_t* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct TypeUsage_Tuple* HashMap_usize_TypeUsage_Tuple__Map_usize_TypeUsage_Tuple__insert(void* __self, uintptr_t key, struct TypeUsage_Tuple value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_usize_TypeUsage_Tuple__Map_usize_TypeUsage_Tuple__remove(void* __self, uintptr_t* key);
 
 extern struct trait_Map_usize_TypeUsage_TupleVTable HASH_MAP_USIZE_TYPE_USAGE_TUPLE__VTABLE__MAP;

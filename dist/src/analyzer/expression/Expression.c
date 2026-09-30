@@ -51,14 +51,16 @@
 #include <std/Iter_ref_Parameter.h>
 #include <analyzer/types/Parameter.h>
 #include <usize.h>
+#include <std/HashMap_str_Function.h>
+#include <analyzer/Impl.h>
+#include <std/HashMap_str_Type.h>
+#include <std/HashMap_str_usize.h>
+#include <std/HashMapIter_str_Type.h>
+#include <tuple_str_Type.h>
+#include <std/Iter_ref_Generic.h>
 #include <std/HashMap_str_ref_Primitive.h>
 #include <std/Array_ref_Impl.h>
 #include <std/Iter_ref_ref_Impl.h>
-#include <analyzer/Impl.h>
-#include <std/HashMap_str_usize.h>
-#include <std/HashMap_str_Type.h>
-#include <std/HashMapIter_str_Type.h>
-#include <tuple_str_Type.h>
 #include <std/HashMap_str_EnumVariant.h>
 #include <std/HashMap_str_ref_ImplConst.h>
 #include <analyzer/ImplConst.h>
@@ -68,7 +70,6 @@
 #include <analyzer/types/StructField.h>
 #include <std/HashMap_str_StructField.h>
 #include <analyzer/types/FunctionParent.h>
-#include <std/HashMap_str_Function.h>
 #include <analyzer/c/TypedefC.h>
 #include <analyzer/c/StructCField.h>
 #include <std/HashMap_str_StructCField.h>
@@ -80,7 +81,6 @@
 #include <analyzer/types/GenericTypedef.h>
 #include <analyzer/types/TypeImpl.h>
 #include <analyzer/c/NamespaceCpp.h>
-#include <std/Iter_ref_Generic.h>
 #include <std/HashMap_str_ref_Trait.h>
 #include <tuple_ref_Trait_ref_Type.h>
 #include <std/HashMap_str_tuple_ref_Trait_ref_Type.h>
@@ -2403,748 +2403,810 @@ void Expression__record_function_signature(struct Context* context, struct Type*
     Context__record_signature(context, open_paren, close_paren, comma_positions, String__as_str(&label), params);
 }
 
-#line 9 "src/analyzer/expression/MemberLookup.pv"
-struct Type* Expression__get_c_impl_member_type(struct Context* context, struct Type* type, struct str name, struct Token* member) {
-    #line 11 "src/analyzer/expression/MemberLookup.pv"
-    struct Primitive** primitive_ptr = HashMap_str_ref_Primitive__find(&context->root->primitives, &name);
-    #line 12 "src/analyzer/expression/MemberLookup.pv"
-    if (primitive_ptr == 0) {
-        #line 12 "src/analyzer/expression/MemberLookup.pv"
+#line 14 "src/analyzer/expression/MemberLookup.pv"
+struct GenericMap* Expression__impl_function_generics(struct Context* context, struct Impl* impl_info, struct str name, struct Type* type, struct GenericMap* generic_map) {
+    #line 15 "src/analyzer/expression/MemberLookup.pv"
+    bool from_trait = HashMap_str_Function__find(&impl_info->functions, &name) == 0;
+    #line 16 "src/analyzer/expression/MemberLookup.pv"
+    if (usize__Eq_usize__eq(impl_info->typedefs.length, 0) && !from_trait) {
+        #line 16 "src/analyzer/expression/MemberLookup.pv"
+        return generic_map;
+    }
+
+    #line 18 "src/analyzer/expression/MemberLookup.pv"
+    struct GenericMap* aug_map = 0;
+    #line 19 "src/analyzer/expression/MemberLookup.pv"
+    if (generic_map != 0) {
+        #line 20 "src/analyzer/expression/MemberLookup.pv"
+        struct GenericMap aug_map_val = GenericMap__clone(generic_map, context->allocator);
+        #line 21 "src/analyzer/expression/MemberLookup.pv"
+        aug_map = ArenaAllocator__store_GenericMap(context->allocator, &aug_map_val);
+    } else {
+        #line 23 "src/analyzer/expression/MemberLookup.pv"
+        aug_map = ArenaAllocator__store_GenericMap(context->allocator, (struct GenericMap[]){(struct GenericMap) {
+            .self_type = type,
+            .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+            .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
+        }});
+    }
+    #line 29 "src/analyzer/expression/MemberLookup.pv"
+    if (aug_map == 0) {
+        #line 29 "src/analyzer/expression/MemberLookup.pv"
         return 0;
     }
-    #line 13 "src/analyzer/expression/MemberLookup.pv"
+
+    #line 31 "src/analyzer/expression/MemberLookup.pv"
+    { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&impl_info->typedefs);
+    #line 31 "src/analyzer/expression/MemberLookup.pv"
+    while (HashMapIter_str_Type__next(&__iter)) {
+        #line 31 "src/analyzer/expression/MemberLookup.pv"
+        struct str typedef_name = HashMapIter_str_Type__value(&__iter)->_0;
+        #line 31 "src/analyzer/expression/MemberLookup.pv"
+        struct Type* typedef_type = &HashMapIter_str_Type__value(&__iter)->_1;
+
+        #line 32 "src/analyzer/expression/MemberLookup.pv"
+        GenericMap__insert(aug_map, typedef_name, *typedef_type);
+    } }
+    #line 34 "src/analyzer/expression/MemberLookup.pv"
+    if (from_trait) {
+        #line 35 "src/analyzer/expression/MemberLookup.pv"
+        switch (impl_info->trait_type.type) {
+            #line 36 "src/analyzer/expression/MemberLookup.pv"
+            case TYPE__TRAIT: {
+                #line 36 "src/analyzer/expression/MemberLookup.pv"
+                struct Trait* trait_info = impl_info->trait_type.trait_value._0;
+                #line 36 "src/analyzer/expression/MemberLookup.pv"
+                struct GenericMap* trait_map = impl_info->trait_type.trait_value._1;
+                #line 37 "src/analyzer/expression/MemberLookup.pv"
+                if (trait_map != 0) {
+                    #line 38 "src/analyzer/expression/MemberLookup.pv"
+                    { struct Iter_ref_Generic __iter = Array_Generic__iter(&trait_info->generics.array);
+                    #line 38 "src/analyzer/expression/MemberLookup.pv"
+                    while (Iter_ref_Generic__next(&__iter)) {
+                        #line 38 "src/analyzer/expression/MemberLookup.pv"
+                        struct Generic* generic = Iter_ref_Generic__value(&__iter);
+
+                        #line 39 "src/analyzer/expression/MemberLookup.pv"
+                        struct Token* generic_name = generic->name;
+                        #line 40 "src/analyzer/expression/MemberLookup.pv"
+                        if (generic_name == 0) {
+                            #line 40 "src/analyzer/expression/MemberLookup.pv"
+                            continue;
+                        }
+                        #line 41 "src/analyzer/expression/MemberLookup.pv"
+                        struct Type* bound = GenericMap__get(trait_map, generic_name->value);
+                        #line 42 "src/analyzer/expression/MemberLookup.pv"
+                        if (bound != 0) {
+                            #line 42 "src/analyzer/expression/MemberLookup.pv"
+                            GenericMap__insert(aug_map, generic_name->value, *bound);
+                        }
+                    } }
+                }
+            } break;
+            #line 46 "src/analyzer/expression/MemberLookup.pv"
+            default: {
+            } break;
+        }
+    }
+    #line 49 "src/analyzer/expression/MemberLookup.pv"
+    return aug_map;
+}
+
+#line 52 "src/analyzer/expression/MemberLookup.pv"
+struct Type* Expression__get_c_impl_member_type(struct Context* context, struct Type* type, struct str name, struct Token* member) {
+    #line 54 "src/analyzer/expression/MemberLookup.pv"
+    struct Primitive** primitive_ptr = HashMap_str_ref_Primitive__find(&context->root->primitives, &name);
+    #line 55 "src/analyzer/expression/MemberLookup.pv"
+    if (primitive_ptr == 0) {
+        #line 55 "src/analyzer/expression/MemberLookup.pv"
+        return 0;
+    }
+    #line 56 "src/analyzer/expression/MemberLookup.pv"
     struct Primitive* primitive = *primitive_ptr;
-    #line 14 "src/analyzer/expression/MemberLookup.pv"
+    #line 57 "src/analyzer/expression/MemberLookup.pv"
     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive->impls);
-    #line 14 "src/analyzer/expression/MemberLookup.pv"
+    #line 57 "src/analyzer/expression/MemberLookup.pv"
     while (Iter_ref_ref_Impl__next(&__iter)) {
-        #line 14 "src/analyzer/expression/MemberLookup.pv"
+        #line 57 "src/analyzer/expression/MemberLookup.pv"
         struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-        #line 15 "src/analyzer/expression/MemberLookup.pv"
+        #line 58 "src/analyzer/expression/MemberLookup.pv"
         struct Function* function = Impl__find_function(impl_info, member->value);
-        #line 16 "src/analyzer/expression/MemberLookup.pv"
+        #line 59 "src/analyzer/expression/MemberLookup.pv"
         if (function == 0) {
-            #line 16 "src/analyzer/expression/MemberLookup.pv"
+            #line 59 "src/analyzer/expression/MemberLookup.pv"
             continue;
         }
-        #line 17 "src/analyzer/expression/MemberLookup.pv"
+        #line 60 "src/analyzer/expression/MemberLookup.pv"
         struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(context->allocator, (struct GenericMap[]){(struct GenericMap) {
             .self_type = type,
             .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
             .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }),
         }});
-        #line 22 "src/analyzer/expression/MemberLookup.pv"
+        #line 65 "src/analyzer/expression/MemberLookup.pv"
         if (generic_map == 0) {
-            #line 22 "src/analyzer/expression/MemberLookup.pv"
+            #line 65 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         }
-        #line 23 "src/analyzer/expression/MemberLookup.pv"
+        #line 66 "src/analyzer/expression/MemberLookup.pv"
         { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&impl_info->typedefs);
-        #line 23 "src/analyzer/expression/MemberLookup.pv"
+        #line 66 "src/analyzer/expression/MemberLookup.pv"
         while (HashMapIter_str_Type__next(&__iter)) {
-            #line 23 "src/analyzer/expression/MemberLookup.pv"
+            #line 66 "src/analyzer/expression/MemberLookup.pv"
             struct str typedef_name = HashMapIter_str_Type__value(&__iter)->_0;
-            #line 23 "src/analyzer/expression/MemberLookup.pv"
+            #line 66 "src/analyzer/expression/MemberLookup.pv"
             struct Type* typedef_type = &HashMapIter_str_Type__value(&__iter)->_1;
 
-            #line 24 "src/analyzer/expression/MemberLookup.pv"
+            #line 67 "src/analyzer/expression/MemberLookup.pv"
             GenericMap__insert(generic_map, typedef_name, *typedef_type);
         } }
-        #line 26 "src/analyzer/expression/MemberLookup.pv"
+        #line 69 "src/analyzer/expression/MemberLookup.pv"
         return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
     } }
-    #line 28 "src/analyzer/expression/MemberLookup.pv"
+    #line 71 "src/analyzer/expression/MemberLookup.pv"
     return 0;
 }
 
-#line 31 "src/analyzer/expression/MemberLookup.pv"
+#line 74 "src/analyzer/expression/MemberLookup.pv"
 struct EnumVariantResult Expression__get_enum_variant(struct Context* context, struct Type* type, struct Token* token) {
-    #line 32 "src/analyzer/expression/MemberLookup.pv"
+    #line 75 "src/analyzer/expression/MemberLookup.pv"
     switch (type->type) {
-        #line 33 "src/analyzer/expression/MemberLookup.pv"
+        #line 76 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__INDIRECT: {
-            #line 33 "src/analyzer/expression/MemberLookup.pv"
+            #line 76 "src/analyzer/expression/MemberLookup.pv"
             struct Indirect* indirect = type->indirect_value;
-            #line 34 "src/analyzer/expression/MemberLookup.pv"
+            #line 77 "src/analyzer/expression/MemberLookup.pv"
             return Expression__get_enum_variant(context, &indirect->to, token);
         } break;
-        #line 36 "src/analyzer/expression/MemberLookup.pv"
+        #line 79 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__SELF: {
-            #line 37 "src/analyzer/expression/MemberLookup.pv"
+            #line 80 "src/analyzer/expression/MemberLookup.pv"
             if (context->type_self == 0) {
-                #line 37 "src/analyzer/expression/MemberLookup.pv"
+                #line 80 "src/analyzer/expression/MemberLookup.pv"
                 return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__NONE };
             }
-            #line 38 "src/analyzer/expression/MemberLookup.pv"
+            #line 81 "src/analyzer/expression/MemberLookup.pv"
             return Expression__get_enum_variant(context, context->type_self, token);
         } break;
-        #line 40 "src/analyzer/expression/MemberLookup.pv"
+        #line 83 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__ENUM: {
-            #line 40 "src/analyzer/expression/MemberLookup.pv"
+            #line 83 "src/analyzer/expression/MemberLookup.pv"
             struct Enum* enum_info = type->enum_value._0;
-            #line 40 "src/analyzer/expression/MemberLookup.pv"
+            #line 83 "src/analyzer/expression/MemberLookup.pv"
             struct GenericMap* generic_map = type->enum_value._1;
-            #line 41 "src/analyzer/expression/MemberLookup.pv"
+            #line 84 "src/analyzer/expression/MemberLookup.pv"
             struct EnumVariant* variant = HashMap_str_EnumVariant__find(&enum_info->variants, &token->value);
-            #line 42 "src/analyzer/expression/MemberLookup.pv"
+            #line 85 "src/analyzer/expression/MemberLookup.pv"
             if (variant != 0) {
-                #line 43 "src/analyzer/expression/MemberLookup.pv"
+                #line 86 "src/analyzer/expression/MemberLookup.pv"
                 return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__ENUM_VARIANT, .enumvariant_value = variant };
             }
 
-            #line 46 "src/analyzer/expression/MemberLookup.pv"
+            #line 89 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
-            #line 46 "src/analyzer/expression/MemberLookup.pv"
+            #line 89 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 46 "src/analyzer/expression/MemberLookup.pv"
+                #line 89 "src/analyzer/expression/MemberLookup.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 47 "src/analyzer/expression/MemberLookup.pv"
+                #line 90 "src/analyzer/expression/MemberLookup.pv"
                 struct Function* function = Impl__find_function(impl_info, token->value);
-                #line 48 "src/analyzer/expression/MemberLookup.pv"
+                #line 91 "src/analyzer/expression/MemberLookup.pv"
                 if (function != 0) {
-                    #line 49 "src/analyzer/expression/MemberLookup.pv"
+                    #line 92 "src/analyzer/expression/MemberLookup.pv"
                     return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} };
                 }
             } }
 
-            #line 53 "src/analyzer/expression/MemberLookup.pv"
+            #line 96 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
-            #line 53 "src/analyzer/expression/MemberLookup.pv"
+            #line 96 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 53 "src/analyzer/expression/MemberLookup.pv"
+                #line 96 "src/analyzer/expression/MemberLookup.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 54 "src/analyzer/expression/MemberLookup.pv"
+                #line 97 "src/analyzer/expression/MemberLookup.pv"
                 struct ImplConst** impl_const_ptr = HashMap_str_ref_ImplConst__find(&impl_info->consts, &token->value);
-                #line 55 "src/analyzer/expression/MemberLookup.pv"
+                #line 98 "src/analyzer/expression/MemberLookup.pv"
                 if (impl_const_ptr != 0) {
-                    #line 56 "src/analyzer/expression/MemberLookup.pv"
+                    #line 99 "src/analyzer/expression/MemberLookup.pv"
                     return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__CONST, .const_value = *impl_const_ptr };
                 }
             } }
 
-            #line 60 "src/analyzer/expression/MemberLookup.pv"
+            #line 103 "src/analyzer/expression/MemberLookup.pv"
             return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__NONE };
         } break;
-        #line 62 "src/analyzer/expression/MemberLookup.pv"
+        #line 105 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__ENUM_C: {
-            #line 62 "src/analyzer/expression/MemberLookup.pv"
+            #line 105 "src/analyzer/expression/MemberLookup.pv"
             struct EnumC* enum_info = type->enumc_value;
-            #line 63 "src/analyzer/expression/MemberLookup.pv"
+            #line 106 "src/analyzer/expression/MemberLookup.pv"
             struct EnumCValue* variant = HashMap_str_EnumCValue__find(&enum_info->values, &token->value);
-            #line 64 "src/analyzer/expression/MemberLookup.pv"
+            #line 107 "src/analyzer/expression/MemberLookup.pv"
             if (variant == 0) {
-                #line 65 "src/analyzer/expression/MemberLookup.pv"
+                #line 108 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, token, "Variant not found in enum");
-                #line 66 "src/analyzer/expression/MemberLookup.pv"
+                #line 109 "src/analyzer/expression/MemberLookup.pv"
                 return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__NONE };
             }
 
-            #line 69 "src/analyzer/expression/MemberLookup.pv"
+            #line 112 "src/analyzer/expression/MemberLookup.pv"
             return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__ENUM_CVALUE, .enumcvalue_value = variant };
         } break;
-        #line 71 "src/analyzer/expression/MemberLookup.pv"
+        #line 114 "src/analyzer/expression/MemberLookup.pv"
         default: {
-            #line 71 "src/analyzer/expression/MemberLookup.pv"
+            #line 114 "src/analyzer/expression/MemberLookup.pv"
             return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__NONE };
         } break;
     }
 
-    #line 74 "src/analyzer/expression/MemberLookup.pv"
+    #line 117 "src/analyzer/expression/MemberLookup.pv"
     return (struct EnumVariantResult) { .type = ENUM_VARIANT_RESULT__NONE };
 }
 
-#line 77 "src/analyzer/expression/MemberLookup.pv"
+#line 120 "src/analyzer/expression/MemberLookup.pv"
 struct Type* Expression__get_member_type(struct Context* context, struct Type* type, struct Token* member, bool output_error) {
-    #line 78 "src/analyzer/expression/MemberLookup.pv"
+    #line 121 "src/analyzer/expression/MemberLookup.pv"
     switch (type->type) {
-        #line 79 "src/analyzer/expression/MemberLookup.pv"
+        #line 122 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__INDIRECT: {
-            #line 79 "src/analyzer/expression/MemberLookup.pv"
+            #line 122 "src/analyzer/expression/MemberLookup.pv"
             struct Indirect* indirect = type->indirect_value;
-            #line 80 "src/analyzer/expression/MemberLookup.pv"
+            #line 123 "src/analyzer/expression/MemberLookup.pv"
             switch (indirect->to.type) {
-                #line 81 "src/analyzer/expression/MemberLookup.pv"
+                #line 124 "src/analyzer/expression/MemberLookup.pv"
                 case TYPE__SELF: {
                 } break;
-                #line 82 "src/analyzer/expression/MemberLookup.pv"
+                #line 125 "src/analyzer/expression/MemberLookup.pv"
                 case TYPE__GENERIC: {
                 } break;
-                #line 83 "src/analyzer/expression/MemberLookup.pv"
+                #line 126 "src/analyzer/expression/MemberLookup.pv"
                 case TYPE__GENERIC_TYPEDEF: {
                 } break;
-                #line 84 "src/analyzer/expression/MemberLookup.pv"
+                #line 127 "src/analyzer/expression/MemberLookup.pv"
                 default: {
-                    #line 85 "src/analyzer/expression/MemberLookup.pv"
+                    #line 128 "src/analyzer/expression/MemberLookup.pv"
                     struct Function* function = Root__find_type_impl_function(context->root, type, member->value, 0);
-                    #line 86 "src/analyzer/expression/MemberLookup.pv"
+                    #line 129 "src/analyzer/expression/MemberLookup.pv"
                     if (function != 0) {
-                        #line 87 "src/analyzer/expression/MemberLookup.pv"
+                        #line 130 "src/analyzer/expression/MemberLookup.pv"
                         struct GenericMap generic_map_val = (struct GenericMap) { .self_type = type, .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }), .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }) };
-                        #line 88 "src/analyzer/expression/MemberLookup.pv"
+                        #line 131 "src/analyzer/expression/MemberLookup.pv"
                         struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(context->allocator, &generic_map_val);
-                        #line 89 "src/analyzer/expression/MemberLookup.pv"
+                        #line 132 "src/analyzer/expression/MemberLookup.pv"
                         if (generic_map == 0) {
-                            #line 89 "src/analyzer/expression/MemberLookup.pv"
+                            #line 132 "src/analyzer/expression/MemberLookup.pv"
                             return 0;
                         }
-                        #line 90 "src/analyzer/expression/MemberLookup.pv"
+                        #line 133 "src/analyzer/expression/MemberLookup.pv"
                         return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
                     }
                 } break;
             }
 
-            #line 95 "src/analyzer/expression/MemberLookup.pv"
+            #line 138 "src/analyzer/expression/MemberLookup.pv"
             return Expression__get_member_type(context, &indirect->to, member, output_error);
         } break;
-        #line 97 "src/analyzer/expression/MemberLookup.pv"
+        #line 140 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__SELF: {
-            #line 98 "src/analyzer/expression/MemberLookup.pv"
+            #line 141 "src/analyzer/expression/MemberLookup.pv"
             if (context->type_self == 0) {
-                #line 98 "src/analyzer/expression/MemberLookup.pv"
+                #line 141 "src/analyzer/expression/MemberLookup.pv"
                 return 0;
             }
-            #line 99 "src/analyzer/expression/MemberLookup.pv"
+            #line 142 "src/analyzer/expression/MemberLookup.pv"
             return Expression__get_member_type(context, context->type_self, member, output_error);
         } break;
-        #line 101 "src/analyzer/expression/MemberLookup.pv"
+        #line 144 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__PRIMITIVE: {
-            #line 101 "src/analyzer/expression/MemberLookup.pv"
+            #line 144 "src/analyzer/expression/MemberLookup.pv"
             struct Primitive* primitive_info = type->primitive_value;
-            #line 102 "src/analyzer/expression/MemberLookup.pv"
+            #line 145 "src/analyzer/expression/MemberLookup.pv"
             if (primitive_info == 0) {
-                #line 102 "src/analyzer/expression/MemberLookup.pv"
+                #line 145 "src/analyzer/expression/MemberLookup.pv"
                 return 0;
             }
-            #line 103 "src/analyzer/expression/MemberLookup.pv"
+            #line 146 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&primitive_info->impls);
-            #line 103 "src/analyzer/expression/MemberLookup.pv"
+            #line 146 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 103 "src/analyzer/expression/MemberLookup.pv"
+                #line 146 "src/analyzer/expression/MemberLookup.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 104 "src/analyzer/expression/MemberLookup.pv"
+                #line 147 "src/analyzer/expression/MemberLookup.pv"
                 struct Function* function = Impl__find_function(impl_info, member->value);
-                #line 105 "src/analyzer/expression/MemberLookup.pv"
+                #line 148 "src/analyzer/expression/MemberLookup.pv"
                 if (function != 0) {
-                    #line 106 "src/analyzer/expression/MemberLookup.pv"
+                    #line 149 "src/analyzer/expression/MemberLookup.pv"
                     return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, (struct GenericMap[]){(struct GenericMap) { .self_type = type, .array = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }})} }});
                 }
             } }
 
-            #line 110 "src/analyzer/expression/MemberLookup.pv"
+            #line 153 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
-                #line 110 "src/analyzer/expression/MemberLookup.pv"
+                #line 153 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, member, "Function not implemented on primitive");
             }
-            #line 111 "src/analyzer/expression/MemberLookup.pv"
+            #line 154 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
-        #line 113 "src/analyzer/expression/MemberLookup.pv"
+        #line 156 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__STRUCT: {
-            #line 113 "src/analyzer/expression/MemberLookup.pv"
+            #line 156 "src/analyzer/expression/MemberLookup.pv"
             struct Struct* struct_info = type->struct_value._0;
-            #line 113 "src/analyzer/expression/MemberLookup.pv"
+            #line 156 "src/analyzer/expression/MemberLookup.pv"
             struct GenericMap* generic_map = type->struct_value._1;
-            #line 114 "src/analyzer/expression/MemberLookup.pv"
+            #line 157 "src/analyzer/expression/MemberLookup.pv"
             struct StructField* field = HashMap_str_StructField__find(&struct_info->fields, &member->value);
-            #line 115 "src/analyzer/expression/MemberLookup.pv"
+            #line 158 "src/analyzer/expression/MemberLookup.pv"
             if (field != 0) {
-                #line 116 "src/analyzer/expression/MemberLookup.pv"
+                #line 159 "src/analyzer/expression/MemberLookup.pv"
                 return &field->type;
             }
 
-            #line 119 "src/analyzer/expression/MemberLookup.pv"
+            #line 162 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-            #line 119 "src/analyzer/expression/MemberLookup.pv"
+            #line 162 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 119 "src/analyzer/expression/MemberLookup.pv"
+                #line 162 "src/analyzer/expression/MemberLookup.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 120 "src/analyzer/expression/MemberLookup.pv"
+                #line 163 "src/analyzer/expression/MemberLookup.pv"
                 struct Function* function = Impl__find_function(impl_info, member->value);
-                #line 121 "src/analyzer/expression/MemberLookup.pv"
+                #line 164 "src/analyzer/expression/MemberLookup.pv"
                 if (function != 0) {
-                    #line 122 "src/analyzer/expression/MemberLookup.pv"
-                    if (usize__Eq_usize__eq(impl_info->typedefs.length, 0)) {
-                        #line 123 "src/analyzer/expression/MemberLookup.pv"
-                        return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
-                    }
-                    #line 125 "src/analyzer/expression/MemberLookup.pv"
-                    if (generic_map == 0) {
-                        #line 125 "src/analyzer/expression/MemberLookup.pv"
-                        return 0;
-                    }
-                    #line 126 "src/analyzer/expression/MemberLookup.pv"
-                    struct GenericMap aug_map_val = GenericMap__clone(generic_map, context->allocator);
-                    #line 127 "src/analyzer/expression/MemberLookup.pv"
-                    struct GenericMap* aug_map = ArenaAllocator__store_GenericMap(context->allocator, &aug_map_val);
-                    #line 128 "src/analyzer/expression/MemberLookup.pv"
-                    if (aug_map == 0) {
-                        #line 128 "src/analyzer/expression/MemberLookup.pv"
-                        return 0;
-                    }
-                    #line 129 "src/analyzer/expression/MemberLookup.pv"
-                    { struct HashMapIter_str_Type __iter = HashMap_str_Type__iter(&impl_info->typedefs);
-                    #line 129 "src/analyzer/expression/MemberLookup.pv"
-                    while (HashMapIter_str_Type__next(&__iter)) {
-                        #line 129 "src/analyzer/expression/MemberLookup.pv"
-                        struct str name = HashMapIter_str_Type__value(&__iter)->_0;
-                        #line 129 "src/analyzer/expression/MemberLookup.pv"
-                        struct Type* typedef_type = &HashMapIter_str_Type__value(&__iter)->_1;
-
-                        #line 130 "src/analyzer/expression/MemberLookup.pv"
-                        GenericMap__insert(aug_map, name, *typedef_type);
-                    } }
-                    #line 132 "src/analyzer/expression/MemberLookup.pv"
-                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = aug_map} }});
+                    #line 165 "src/analyzer/expression/MemberLookup.pv"
+                    struct GenericMap* function_generics = Expression__impl_function_generics(context, impl_info, member->value, type, generic_map);
+                    #line 166 "src/analyzer/expression/MemberLookup.pv"
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = function_generics} }});
                 }
             } }
 
-            #line 136 "src/analyzer/expression/MemberLookup.pv"
+            #line 170 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
-            #line 136 "src/analyzer/expression/MemberLookup.pv"
+            #line 170 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 136 "src/analyzer/expression/MemberLookup.pv"
+                #line 170 "src/analyzer/expression/MemberLookup.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 137 "src/analyzer/expression/MemberLookup.pv"
+                #line 171 "src/analyzer/expression/MemberLookup.pv"
                 struct ImplConst** impl_const_ptr = HashMap_str_ref_ImplConst__find(&impl_info->consts, &member->value);
-                #line 138 "src/analyzer/expression/MemberLookup.pv"
+                #line 172 "src/analyzer/expression/MemberLookup.pv"
                 if (impl_const_ptr != 0) {
-                    #line 139 "src/analyzer/expression/MemberLookup.pv"
+                    #line 173 "src/analyzer/expression/MemberLookup.pv"
                     struct ImplConst* impl_const = *impl_const_ptr;
-                    #line 140 "src/analyzer/expression/MemberLookup.pv"
+                    #line 174 "src/analyzer/expression/MemberLookup.pv"
                     return ArenaAllocator__store_Type(context->allocator, &impl_const->type);
                 }
             } }
 
-            #line 144 "src/analyzer/expression/MemberLookup.pv"
+            #line 178 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
-                #line 145 "src/analyzer/expression/MemberLookup.pv"
+                #line 179 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token_value(context, member, "Field or function not found in struct", member->value);
             }
-            #line 147 "src/analyzer/expression/MemberLookup.pv"
+            #line 181 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
-        #line 149 "src/analyzer/expression/MemberLookup.pv"
+        #line 183 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__COROUTINE_INSTANCE: {
-            #line 149 "src/analyzer/expression/MemberLookup.pv"
+            #line 183 "src/analyzer/expression/MemberLookup.pv"
             struct Function* func_info = type->coroutineinstance_value._0;
-            #line 149 "src/analyzer/expression/MemberLookup.pv"
+            #line 183 "src/analyzer/expression/MemberLookup.pv"
             struct GenericMap* generic_map = type->coroutineinstance_value._1;
-            #line 150 "src/analyzer/expression/MemberLookup.pv"
+            #line 184 "src/analyzer/expression/MemberLookup.pv"
             if (str__Eq_str__eq(member->value, (struct str){ .ptr = "next", .length = strlen("next") })) {
-                #line 151 "src/analyzer/expression/MemberLookup.pv"
+                #line 185 "src/analyzer/expression/MemberLookup.pv"
                 struct Function* func_next = ArenaAllocator__store_Function(context->allocator, &context->root->func_next);
-                #line 152 "src/analyzer/expression/MemberLookup.pv"
+                #line 186 "src/analyzer/expression/MemberLookup.pv"
                 if (func_next == 0) {
-                    #line 152 "src/analyzer/expression/MemberLookup.pv"
+                    #line 186 "src/analyzer/expression/MemberLookup.pv"
                     return 0;
                 }
-                #line 153 "src/analyzer/expression/MemberLookup.pv"
+                #line 187 "src/analyzer/expression/MemberLookup.pv"
                 func_next->parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = type, ._1 = 0, ._2 = 0} };
-                #line 154 "src/analyzer/expression/MemberLookup.pv"
+                #line 188 "src/analyzer/expression/MemberLookup.pv"
                 return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_next, ._1 = generic_map} }});
             }
 
-            #line 157 "src/analyzer/expression/MemberLookup.pv"
+            #line 191 "src/analyzer/expression/MemberLookup.pv"
             if (str__Eq_str__eq(member->value, (struct str){ .ptr = "value", .length = strlen("value") })) {
-                #line 158 "src/analyzer/expression/MemberLookup.pv"
+                #line 192 "src/analyzer/expression/MemberLookup.pv"
                 struct Function* func_value = ArenaAllocator__store_Function(context->allocator, &context->root->func_value);
-                #line 159 "src/analyzer/expression/MemberLookup.pv"
+                #line 193 "src/analyzer/expression/MemberLookup.pv"
                 if (func_value == 0) {
-                    #line 159 "src/analyzer/expression/MemberLookup.pv"
+                    #line 193 "src/analyzer/expression/MemberLookup.pv"
                     return 0;
                 }
-                #line 160 "src/analyzer/expression/MemberLookup.pv"
+                #line 194 "src/analyzer/expression/MemberLookup.pv"
                 func_value->parent = (struct FunctionParent) { .type = FUNCTION_PARENT__TYPE, .type_value = { ._0 = type, ._1 = 0, ._2 = 0} };
-                #line 161 "src/analyzer/expression/MemberLookup.pv"
+                #line 195 "src/analyzer/expression/MemberLookup.pv"
                 func_value->return_type = func_info->return_type;
-                #line 162 "src/analyzer/expression/MemberLookup.pv"
+                #line 196 "src/analyzer/expression/MemberLookup.pv"
                 return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = func_value, ._1 = generic_map} }});
             }
 
-            #line 165 "src/analyzer/expression/MemberLookup.pv"
+            #line 199 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
-                #line 165 "src/analyzer/expression/MemberLookup.pv"
+                #line 199 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, member, "Only next() and value() functions exist on coroutine instances");
             }
-            #line 166 "src/analyzer/expression/MemberLookup.pv"
+            #line 200 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
-        #line 168 "src/analyzer/expression/MemberLookup.pv"
+        #line 202 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__ENUM: {
-            #line 168 "src/analyzer/expression/MemberLookup.pv"
+            #line 202 "src/analyzer/expression/MemberLookup.pv"
             struct Enum* enum_info = type->enum_value._0;
-            #line 168 "src/analyzer/expression/MemberLookup.pv"
+            #line 202 "src/analyzer/expression/MemberLookup.pv"
             struct GenericMap* generic_map = type->enum_value._1;
-            #line 169 "src/analyzer/expression/MemberLookup.pv"
+            #line 203 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
-            #line 169 "src/analyzer/expression/MemberLookup.pv"
+            #line 203 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_ref_Impl__next(&__iter)) {
-                #line 169 "src/analyzer/expression/MemberLookup.pv"
+                #line 203 "src/analyzer/expression/MemberLookup.pv"
                 struct Impl* impl_info = *Iter_ref_ref_Impl__value(&__iter);
 
-                #line 170 "src/analyzer/expression/MemberLookup.pv"
+                #line 204 "src/analyzer/expression/MemberLookup.pv"
                 struct Function* function = Impl__find_function(impl_info, member->value);
-                #line 171 "src/analyzer/expression/MemberLookup.pv"
+                #line 205 "src/analyzer/expression/MemberLookup.pv"
                 if (function != 0) {
-                    #line 172 "src/analyzer/expression/MemberLookup.pv"
-                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
+                    #line 206 "src/analyzer/expression/MemberLookup.pv"
+                    struct GenericMap* function_generics = Expression__impl_function_generics(context, impl_info, member->value, type, generic_map);
+                    #line 207 "src/analyzer/expression/MemberLookup.pv"
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = function_generics} }});
                 }
             } }
-
-            #line 176 "src/analyzer/expression/MemberLookup.pv"
-            if (output_error) {
-                #line 176 "src/analyzer/expression/MemberLookup.pv"
-                Context__error_token(context, member, "Function not found in enum");
-            }
-            #line 177 "src/analyzer/expression/MemberLookup.pv"
-            return 0;
-        } break;
-        #line 179 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__TRAIT: {
-            #line 179 "src/analyzer/expression/MemberLookup.pv"
-            struct Trait* trait_info = type->trait_value._0;
-            #line 179 "src/analyzer/expression/MemberLookup.pv"
-            struct GenericMap* generic_map = type->trait_value._1;
-            #line 180 "src/analyzer/expression/MemberLookup.pv"
-            if (str__Eq_str__eq(member->value, (struct str){ .ptr = "instance", .length = strlen("instance") })) {
-                #line 181 "src/analyzer/expression/MemberLookup.pv"
-                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_void) }});
-            }
-
-            #line 184 "src/analyzer/expression/MemberLookup.pv"
-            struct Function* function = HashMap_str_Function__find(&trait_info->functions, &member->value);
-            #line 185 "src/analyzer/expression/MemberLookup.pv"
-            if (function == 0) {
-                #line 186 "src/analyzer/expression/MemberLookup.pv"
-                if (output_error) {
-                    #line 186 "src/analyzer/expression/MemberLookup.pv"
-                    Context__error_token(context, member, "Function not found in trait");
-                }
-                #line 187 "src/analyzer/expression/MemberLookup.pv"
-                return 0;
-            }
-
-            #line 190 "src/analyzer/expression/MemberLookup.pv"
-            return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
-        } break;
-        #line 192 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__TYPEDEF_C: {
-            #line 192 "src/analyzer/expression/MemberLookup.pv"
-            struct TypedefC* typedef_info = type->typedefc_value;
-            #line 193 "src/analyzer/expression/MemberLookup.pv"
-            struct Type* function = Expression__get_c_impl_member_type(context, type, typedef_info->name, member);
-            #line 194 "src/analyzer/expression/MemberLookup.pv"
-            if (function != 0) {
-                #line 194 "src/analyzer/expression/MemberLookup.pv"
-                return function;
-            }
-            #line 195 "src/analyzer/expression/MemberLookup.pv"
-            return Expression__get_member_type(context, typedef_info->type, member, output_error);
-        } break;
-        #line 197 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__STRUCT_C: {
-            #line 197 "src/analyzer/expression/MemberLookup.pv"
-            struct StructC* struct_info = type->structc_value;
-            #line 198 "src/analyzer/expression/MemberLookup.pv"
-            struct StructCField* field = HashMap_str_StructCField__find(&struct_info->fields, &member->value);
-            #line 199 "src/analyzer/expression/MemberLookup.pv"
-            if (field != 0) {
-                #line 199 "src/analyzer/expression/MemberLookup.pv"
-                return &field->type;
-            }
-
-            #line 201 "src/analyzer/expression/MemberLookup.pv"
-            struct Type* function = Expression__get_c_impl_member_type(context, type, struct_info->name, member);
-            #line 202 "src/analyzer/expression/MemberLookup.pv"
-            if (function != 0) {
-                #line 202 "src/analyzer/expression/MemberLookup.pv"
-                return function;
-            }
-
-            #line 204 "src/analyzer/expression/MemberLookup.pv"
-            if (output_error) {
-                #line 204 "src/analyzer/expression/MemberLookup.pv"
-                Context__error_token(context, member, "Field or function not found in C struct");
-            }
-            #line 205 "src/analyzer/expression/MemberLookup.pv"
-            return 0;
-        } break;
-        #line 207 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__UNION_C: {
-            #line 207 "src/analyzer/expression/MemberLookup.pv"
-            struct StructC* union_info = type->unionc_value;
-            #line 208 "src/analyzer/expression/MemberLookup.pv"
-            struct StructCField* field = HashMap_str_StructCField__find(&union_info->fields, &member->value);
-            #line 209 "src/analyzer/expression/MemberLookup.pv"
-            if (field != 0) {
-                #line 209 "src/analyzer/expression/MemberLookup.pv"
-                return &field->type;
-            }
 
             #line 211 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
                 #line 211 "src/analyzer/expression/MemberLookup.pv"
-                Context__error_token(context, member, "Field not found in C union");
+                Context__error_token(context, member, "Function not found in enum");
             }
             #line 212 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
         #line 214 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__CLASS_CPP: {
+        case TYPE__TRAIT: {
             #line 214 "src/analyzer/expression/MemberLookup.pv"
-            struct ClassCpp* class_info = type->classcpp_value;
+            struct Trait* trait_info = type->trait_value._0;
+            #line 214 "src/analyzer/expression/MemberLookup.pv"
+            struct GenericMap* generic_map = type->trait_value._1;
             #line 215 "src/analyzer/expression/MemberLookup.pv"
-            struct Type* field_type = HashMap_str_Type__find(&class_info->fields, &member->value);
-            #line 216 "src/analyzer/expression/MemberLookup.pv"
-            if (field_type != 0) {
+            if (str__Eq_str__eq(member->value, (struct str){ .ptr = "instance", .length = strlen("instance") })) {
                 #line 216 "src/analyzer/expression/MemberLookup.pv"
+                return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_pointer((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, context->root->type_void) }});
+            }
+
+            #line 219 "src/analyzer/expression/MemberLookup.pv"
+            struct Function* function = HashMap_str_Function__find(&trait_info->functions, &member->value);
+            #line 220 "src/analyzer/expression/MemberLookup.pv"
+            if (function == 0) {
+                #line 221 "src/analyzer/expression/MemberLookup.pv"
+                if (output_error) {
+                    #line 221 "src/analyzer/expression/MemberLookup.pv"
+                    Context__error_token(context, member, "Function not found in trait");
+                }
+                #line 222 "src/analyzer/expression/MemberLookup.pv"
+                return 0;
+            }
+
+            #line 225 "src/analyzer/expression/MemberLookup.pv"
+            return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
+        } break;
+        #line 227 "src/analyzer/expression/MemberLookup.pv"
+        case TYPE__TYPEDEF_C: {
+            #line 227 "src/analyzer/expression/MemberLookup.pv"
+            struct TypedefC* typedef_info = type->typedefc_value;
+            #line 228 "src/analyzer/expression/MemberLookup.pv"
+            struct Type* function = Expression__get_c_impl_member_type(context, type, typedef_info->name, member);
+            #line 229 "src/analyzer/expression/MemberLookup.pv"
+            if (function != 0) {
+                #line 229 "src/analyzer/expression/MemberLookup.pv"
+                return function;
+            }
+            #line 230 "src/analyzer/expression/MemberLookup.pv"
+            return Expression__get_member_type(context, typedef_info->type, member, output_error);
+        } break;
+        #line 232 "src/analyzer/expression/MemberLookup.pv"
+        case TYPE__STRUCT_C: {
+            #line 232 "src/analyzer/expression/MemberLookup.pv"
+            struct StructC* struct_info = type->structc_value;
+            #line 233 "src/analyzer/expression/MemberLookup.pv"
+            struct StructCField* field = HashMap_str_StructCField__find(&struct_info->fields, &member->value);
+            #line 234 "src/analyzer/expression/MemberLookup.pv"
+            if (field != 0) {
+                #line 234 "src/analyzer/expression/MemberLookup.pv"
+                return &field->type;
+            }
+
+            #line 236 "src/analyzer/expression/MemberLookup.pv"
+            struct Type* function = Expression__get_c_impl_member_type(context, type, struct_info->name, member);
+            #line 237 "src/analyzer/expression/MemberLookup.pv"
+            if (function != 0) {
+                #line 237 "src/analyzer/expression/MemberLookup.pv"
+                return function;
+            }
+
+            #line 239 "src/analyzer/expression/MemberLookup.pv"
+            if (output_error) {
+                #line 239 "src/analyzer/expression/MemberLookup.pv"
+                Context__error_token(context, member, "Field or function not found in C struct");
+            }
+            #line 240 "src/analyzer/expression/MemberLookup.pv"
+            return 0;
+        } break;
+        #line 242 "src/analyzer/expression/MemberLookup.pv"
+        case TYPE__UNION_C: {
+            #line 242 "src/analyzer/expression/MemberLookup.pv"
+            struct StructC* union_info = type->unionc_value;
+            #line 243 "src/analyzer/expression/MemberLookup.pv"
+            struct StructCField* field = HashMap_str_StructCField__find(&union_info->fields, &member->value);
+            #line 244 "src/analyzer/expression/MemberLookup.pv"
+            if (field != 0) {
+                #line 244 "src/analyzer/expression/MemberLookup.pv"
+                return &field->type;
+            }
+
+            #line 246 "src/analyzer/expression/MemberLookup.pv"
+            if (output_error) {
+                #line 246 "src/analyzer/expression/MemberLookup.pv"
+                Context__error_token(context, member, "Field not found in C union");
+            }
+            #line 247 "src/analyzer/expression/MemberLookup.pv"
+            return 0;
+        } break;
+        #line 249 "src/analyzer/expression/MemberLookup.pv"
+        case TYPE__CLASS_CPP: {
+            #line 249 "src/analyzer/expression/MemberLookup.pv"
+            struct ClassCpp* class_info = type->classcpp_value;
+            #line 250 "src/analyzer/expression/MemberLookup.pv"
+            struct Type* field_type = HashMap_str_Type__find(&class_info->fields, &member->value);
+            #line 251 "src/analyzer/expression/MemberLookup.pv"
+            if (field_type != 0) {
+                #line 251 "src/analyzer/expression/MemberLookup.pv"
                 return field_type;
             }
 
-            #line 218 "src/analyzer/expression/MemberLookup.pv"
+            #line 253 "src/analyzer/expression/MemberLookup.pv"
             struct Type* value_type = HashMap_str_Type__find(&class_info->values, &member->value);
-            #line 219 "src/analyzer/expression/MemberLookup.pv"
+            #line 254 "src/analyzer/expression/MemberLookup.pv"
             if (value_type != 0) {
-                #line 219 "src/analyzer/expression/MemberLookup.pv"
+                #line 254 "src/analyzer/expression/MemberLookup.pv"
                 return value_type;
             }
 
-            #line 221 "src/analyzer/expression/MemberLookup.pv"
+            #line 256 "src/analyzer/expression/MemberLookup.pv"
             { struct Iter_ref_Type __iter = Array_Type__iter(&class_info->bases);
-            #line 221 "src/analyzer/expression/MemberLookup.pv"
+            #line 256 "src/analyzer/expression/MemberLookup.pv"
             while (Iter_ref_Type__next(&__iter)) {
-                #line 221 "src/analyzer/expression/MemberLookup.pv"
+                #line 256 "src/analyzer/expression/MemberLookup.pv"
                 struct Type* base = Iter_ref_Type__value(&__iter);
 
-                #line 222 "src/analyzer/expression/MemberLookup.pv"
+                #line 257 "src/analyzer/expression/MemberLookup.pv"
                 struct Type* base_type = Expression__get_member_type(context, base, member, output_error);
-                #line 223 "src/analyzer/expression/MemberLookup.pv"
+                #line 258 "src/analyzer/expression/MemberLookup.pv"
                 if (base_type != 0) {
-                    #line 223 "src/analyzer/expression/MemberLookup.pv"
+                    #line 258 "src/analyzer/expression/MemberLookup.pv"
                     return base_type;
-                }
-            } }
-
-            #line 226 "src/analyzer/expression/MemberLookup.pv"
-            if (output_error) {
-                #line 226 "src/analyzer/expression/MemberLookup.pv"
-                Context__error_token(context, member, "Field not found in Cpp class/struct");
-            }
-            #line 227 "src/analyzer/expression/MemberLookup.pv"
-            return 0;
-        } break;
-        #line 229 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__GENERIC: {
-            #line 229 "src/analyzer/expression/MemberLookup.pv"
-            struct Generic* generic = type->generic_value;
-            #line 230 "src/analyzer/expression/MemberLookup.pv"
-            { struct Iter_ref_Type __iter = Array_Type__iter(&generic->traits);
-            #line 230 "src/analyzer/expression/MemberLookup.pv"
-            while (Iter_ref_Type__next(&__iter)) {
-                #line 230 "src/analyzer/expression/MemberLookup.pv"
-                struct Type* trait_type = Iter_ref_Type__value(&__iter);
-
-                #line 231 "src/analyzer/expression/MemberLookup.pv"
-                struct Trait* trait_info = 0;
-                #line 232 "src/analyzer/expression/MemberLookup.pv"
-                struct GenericMap* bound_generics = 0;
-                #line 233 "src/analyzer/expression/MemberLookup.pv"
-                switch (trait_type->type) {
-                    #line 234 "src/analyzer/expression/MemberLookup.pv"
-                    case TYPE__TRAIT: {
-                        #line 234 "src/analyzer/expression/MemberLookup.pv"
-                        struct Trait* info = trait_type->trait_value._0;
-                        #line 234 "src/analyzer/expression/MemberLookup.pv"
-                        struct GenericMap* generic_map = trait_type->trait_value._1;
-                        #line 235 "src/analyzer/expression/MemberLookup.pv"
-                        trait_info = info;
-                        #line 236 "src/analyzer/expression/MemberLookup.pv"
-                        bound_generics = generic_map;
-                    } break;
-                    #line 238 "src/analyzer/expression/MemberLookup.pv"
-                    default: {
-                    } break;
-                }
-                #line 240 "src/analyzer/expression/MemberLookup.pv"
-                if (trait_info == 0) {
-                    #line 240 "src/analyzer/expression/MemberLookup.pv"
-                    continue;
-                }
-                #line 241 "src/analyzer/expression/MemberLookup.pv"
-                struct Function* function = HashMap_str_Function__find(&trait_info->functions, &member->value);
-                #line 242 "src/analyzer/expression/MemberLookup.pv"
-                if (function != 0) {
-                    #line 243 "src/analyzer/expression/MemberLookup.pv"
-                    struct GenericMap generic_map_val;
-                    #line 244 "src/analyzer/expression/MemberLookup.pv"
-                    if (bound_generics == 0) {
-                        #line 245 "src/analyzer/expression/MemberLookup.pv"
-                        generic_map_val = (struct GenericMap) { .self_type = 0, .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }), .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }) };
-                    } else {
-                        #line 247 "src/analyzer/expression/MemberLookup.pv"
-                        generic_map_val = GenericMap__clone(bound_generics, context->allocator);
-                    }
-                    #line 249 "src/analyzer/expression/MemberLookup.pv"
-                    generic_map_val.self_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__GENERIC, .generic_value = generic }});
-                    #line 250 "src/analyzer/expression/MemberLookup.pv"
-                    struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(context->allocator, &generic_map_val);
-                    #line 251 "src/analyzer/expression/MemberLookup.pv"
-                    if (generic_map == 0) {
-                        #line 251 "src/analyzer/expression/MemberLookup.pv"
-                        return 0;
-                    }
-                    #line 252 "src/analyzer/expression/MemberLookup.pv"
-                    { struct HashMapIter_str_usize __iter = HashMap_str_usize__iter(&trait_info->typedefs);
-                    #line 252 "src/analyzer/expression/MemberLookup.pv"
-                    while (HashMapIter_str_usize__next(&__iter)) {
-                        #line 252 "src/analyzer/expression/MemberLookup.pv"
-                        struct str typedef_name = HashMapIter_str_usize__value(&__iter)->_0;
-
-                        #line 253 "src/analyzer/expression/MemberLookup.pv"
-                        struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(context->allocator, (struct GenericTypedef[]){(struct GenericTypedef) { .generic = generic, .typedef_name = typedef_name }});
-                        #line 254 "src/analyzer/expression/MemberLookup.pv"
-                        if (gt == 0) {
-                            #line 254 "src/analyzer/expression/MemberLookup.pv"
-                            return 0;
-                        }
-                        #line 255 "src/analyzer/expression/MemberLookup.pv"
-                        GenericMap__insert(generic_map, typedef_name, (struct Type) { .type = TYPE__GENERIC_TYPEDEF, .generictypedef_value = gt });
-                    } }
-                    #line 257 "src/analyzer/expression/MemberLookup.pv"
-                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
                 }
             } }
 
             #line 261 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
                 #line 261 "src/analyzer/expression/MemberLookup.pv"
-                Context__error_token(context, member, "Function not found in Generic traits");
+                Context__error_token(context, member, "Field not found in Cpp class/struct");
             }
             #line 262 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
         #line 264 "src/analyzer/expression/MemberLookup.pv"
-        case TYPE__SEQUENCE: {
+        case TYPE__GENERIC: {
             #line 264 "src/analyzer/expression/MemberLookup.pv"
-            struct Sequence* sequence = type->sequence_value;
+            struct Generic* generic = type->generic_value;
             #line 265 "src/analyzer/expression/MemberLookup.pv"
-            if (str__Eq_str__eq(member->value, (struct str){ .ptr = "data", .length = strlen("data") })) {
+            { struct Iter_ref_Type __iter = Array_Type__iter(&generic->traits);
+            #line 265 "src/analyzer/expression/MemberLookup.pv"
+            while (Iter_ref_Type__next(&__iter)) {
+                #line 265 "src/analyzer/expression/MemberLookup.pv"
+                struct Type* trait_type = Iter_ref_Type__value(&__iter);
+
                 #line 266 "src/analyzer/expression/MemberLookup.pv"
+                struct Trait* trait_info = 0;
+                #line 267 "src/analyzer/expression/MemberLookup.pv"
+                struct GenericMap* bound_generics = 0;
+                #line 268 "src/analyzer/expression/MemberLookup.pv"
+                switch (trait_type->type) {
+                    #line 269 "src/analyzer/expression/MemberLookup.pv"
+                    case TYPE__TRAIT: {
+                        #line 269 "src/analyzer/expression/MemberLookup.pv"
+                        struct Trait* info = trait_type->trait_value._0;
+                        #line 269 "src/analyzer/expression/MemberLookup.pv"
+                        struct GenericMap* generic_map = trait_type->trait_value._1;
+                        #line 270 "src/analyzer/expression/MemberLookup.pv"
+                        trait_info = info;
+                        #line 271 "src/analyzer/expression/MemberLookup.pv"
+                        bound_generics = generic_map;
+                    } break;
+                    #line 273 "src/analyzer/expression/MemberLookup.pv"
+                    default: {
+                    } break;
+                }
+                #line 275 "src/analyzer/expression/MemberLookup.pv"
+                if (trait_info == 0) {
+                    #line 275 "src/analyzer/expression/MemberLookup.pv"
+                    continue;
+                }
+                #line 276 "src/analyzer/expression/MemberLookup.pv"
+                struct Function* function = HashMap_str_Function__find(&trait_info->functions, &member->value);
+                #line 277 "src/analyzer/expression/MemberLookup.pv"
+                if (function != 0) {
+                    #line 278 "src/analyzer/expression/MemberLookup.pv"
+                    struct GenericMap generic_map_val;
+                    #line 279 "src/analyzer/expression/MemberLookup.pv"
+                    if (bound_generics == 0) {
+                        #line 280 "src/analyzer/expression/MemberLookup.pv"
+                        generic_map_val = (struct GenericMap) { .self_type = 0, .array = Array_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }), .map = HashMap_str_usize__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }) };
+                    } else {
+                        #line 282 "src/analyzer/expression/MemberLookup.pv"
+                        generic_map_val = GenericMap__clone(bound_generics, context->allocator);
+                    }
+                    #line 284 "src/analyzer/expression/MemberLookup.pv"
+                    generic_map_val.self_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__GENERIC, .generic_value = generic }});
+                    #line 285 "src/analyzer/expression/MemberLookup.pv"
+                    struct GenericMap* generic_map = ArenaAllocator__store_GenericMap(context->allocator, &generic_map_val);
+                    #line 286 "src/analyzer/expression/MemberLookup.pv"
+                    if (generic_map == 0) {
+                        #line 286 "src/analyzer/expression/MemberLookup.pv"
+                        return 0;
+                    }
+                    #line 287 "src/analyzer/expression/MemberLookup.pv"
+                    { struct HashMapIter_str_usize __iter = HashMap_str_usize__iter(&trait_info->typedefs);
+                    #line 287 "src/analyzer/expression/MemberLookup.pv"
+                    while (HashMapIter_str_usize__next(&__iter)) {
+                        #line 287 "src/analyzer/expression/MemberLookup.pv"
+                        struct str typedef_name = HashMapIter_str_usize__value(&__iter)->_0;
+
+                        #line 288 "src/analyzer/expression/MemberLookup.pv"
+                        struct GenericTypedef* gt = ArenaAllocator__store_GenericTypedef(context->allocator, (struct GenericTypedef[]){(struct GenericTypedef) { .generic = generic, .typedef_name = typedef_name }});
+                        #line 289 "src/analyzer/expression/MemberLookup.pv"
+                        if (gt == 0) {
+                            #line 289 "src/analyzer/expression/MemberLookup.pv"
+                            return 0;
+                        }
+                        #line 290 "src/analyzer/expression/MemberLookup.pv"
+                        GenericMap__insert(generic_map, typedef_name, (struct Type) { .type = TYPE__GENERIC_TYPEDEF, .generictypedef_value = gt });
+                    } }
+                    #line 292 "src/analyzer/expression/MemberLookup.pv"
+                    return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = generic_map} }});
+                }
+            } }
+
+            #line 296 "src/analyzer/expression/MemberLookup.pv"
+            if (output_error) {
+                #line 296 "src/analyzer/expression/MemberLookup.pv"
+                Context__error_token(context, member, "Function not found in Generic traits");
+            }
+            #line 297 "src/analyzer/expression/MemberLookup.pv"
+            return 0;
+        } break;
+        #line 299 "src/analyzer/expression/MemberLookup.pv"
+        case TYPE__SEQUENCE: {
+            #line 299 "src/analyzer/expression/MemberLookup.pv"
+            struct Sequence* sequence = type->sequence_value;
+            #line 300 "src/analyzer/expression/MemberLookup.pv"
+            if (str__Eq_str__eq(member->value, (struct str){ .ptr = "data", .length = strlen("data") })) {
+                #line 301 "src/analyzer/expression/MemberLookup.pv"
                 return &sequence->element_pointer;
             }
 
-            #line 269 "src/analyzer/expression/MemberLookup.pv"
+            #line 304 "src/analyzer/expression/MemberLookup.pv"
             if (str__Eq_str__eq(member->value, (struct str){ .ptr = "length", .length = strlen("length") })) {
-                #line 270 "src/analyzer/expression/MemberLookup.pv"
+                #line 305 "src/analyzer/expression/MemberLookup.pv"
                 return &context->root->type_usize;
             }
 
-            #line 273 "src/analyzer/expression/MemberLookup.pv"
+            #line 308 "src/analyzer/expression/MemberLookup.pv"
             struct TypeImpl* hack_type_impl = context->root->hack_type_impl;
-            #line 274 "src/analyzer/expression/MemberLookup.pv"
+            #line 309 "src/analyzer/expression/MemberLookup.pv"
             if (hack_type_impl == 0) {
-                #line 274 "src/analyzer/expression/MemberLookup.pv"
+                #line 309 "src/analyzer/expression/MemberLookup.pv"
                 return 0;
             }
-            #line 275 "src/analyzer/expression/MemberLookup.pv"
+            #line 310 "src/analyzer/expression/MemberLookup.pv"
             struct Impl* impl_info = hack_type_impl->impl_info;
 
-            #line 277 "src/analyzer/expression/MemberLookup.pv"
+            #line 312 "src/analyzer/expression/MemberLookup.pv"
             struct Function* function = Impl__find_function(impl_info, member->value);
-            #line 278 "src/analyzer/expression/MemberLookup.pv"
+            #line 313 "src/analyzer/expression/MemberLookup.pv"
             if (function != 0) {
-                #line 279 "src/analyzer/expression/MemberLookup.pv"
+                #line 314 "src/analyzer/expression/MemberLookup.pv"
                 struct GenericMap generic_map = GenericMap__new(context->allocator, (struct Generics[]){(struct Generics) { .parent = 0, .array = (struct Array_Generic) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 }, .map = (struct HashMap_str_usize) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .buckets = 0, .data = 0, .capacity = 0, .length = 0 } }}, (struct Array_Type[]){(struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 }});
-                #line 280 "src/analyzer/expression/MemberLookup.pv"
+                #line 315 "src/analyzer/expression/MemberLookup.pv"
                 GenericMap__insert(&generic_map, (struct str){ .ptr = "T", .length = strlen("T") }, sequence->element);
-                #line 281 "src/analyzer/expression/MemberLookup.pv"
+                #line 316 "src/analyzer/expression/MemberLookup.pv"
                 generic_map.self_type = ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__INDIRECT, .indirect_value = Indirect__new_reference((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, (struct Type) { .type = TYPE__SEQUENCE, .sequence_value = sequence }) }});
 
-                #line 283 "src/analyzer/expression/MemberLookup.pv"
+                #line 318 "src/analyzer/expression/MemberLookup.pv"
                 return ArenaAllocator__store_Type(context->allocator, (struct Type[]){(struct Type) { .type = TYPE__FUNCTION, .function_value = { ._0 = function, ._1 = ArenaAllocator__store_GenericMap(context->allocator, &generic_map)} }});
             }
 
-            #line 286 "src/analyzer/expression/MemberLookup.pv"
+            #line 321 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
-                #line 286 "src/analyzer/expression/MemberLookup.pv"
+                #line 321 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, member, "Sequences do not have this member");
             }
-            #line 287 "src/analyzer/expression/MemberLookup.pv"
+            #line 322 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
-        #line 289 "src/analyzer/expression/MemberLookup.pv"
+        #line 324 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__TUPLE: {
-            #line 289 "src/analyzer/expression/MemberLookup.pv"
+            #line 324 "src/analyzer/expression/MemberLookup.pv"
             struct Tuple* tuple = type->tuple_value;
-            #line 290 "src/analyzer/expression/MemberLookup.pv"
+            #line 325 "src/analyzer/expression/MemberLookup.pv"
             if (member->type != TOKEN_TYPE__NUMBER) {
-                #line 291 "src/analyzer/expression/MemberLookup.pv"
+                #line 326 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, member, "Tuples do not have this member");
-                #line 292 "src/analyzer/expression/MemberLookup.pv"
+                #line 327 "src/analyzer/expression/MemberLookup.pv"
                 return 0;
             }
 
-            #line 295 "src/analyzer/expression/MemberLookup.pv"
+            #line 330 "src/analyzer/expression/MemberLookup.pv"
             uintptr_t index = strtoul(member->value.ptr, 0, 10);
-            #line 296 "src/analyzer/expression/MemberLookup.pv"
+            #line 331 "src/analyzer/expression/MemberLookup.pv"
             if (index >= tuple->elements.length) {
-                #line 297 "src/analyzer/expression/MemberLookup.pv"
+                #line 332 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, member, "Tuple does not have this member");
-                #line 298 "src/analyzer/expression/MemberLookup.pv"
+                #line 333 "src/analyzer/expression/MemberLookup.pv"
                 return 0;
             }
 
-            #line 301 "src/analyzer/expression/MemberLookup.pv"
+            #line 336 "src/analyzer/expression/MemberLookup.pv"
             return &tuple->elements.data[index];
         } break;
-        #line 303 "src/analyzer/expression/MemberLookup.pv"
+        #line 338 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__NAMESPACE_CPP: {
-            #line 303 "src/analyzer/expression/MemberLookup.pv"
+            #line 338 "src/analyzer/expression/MemberLookup.pv"
             struct NamespaceCpp* ns_info = type->namespacecpp_value;
-            #line 304 "src/analyzer/expression/MemberLookup.pv"
+            #line 339 "src/analyzer/expression/MemberLookup.pv"
             struct Type* type = HashMap_str_Type__find(&ns_info->types, &member->value);
-            #line 305 "src/analyzer/expression/MemberLookup.pv"
+            #line 340 "src/analyzer/expression/MemberLookup.pv"
             if (type != 0) {
-                #line 305 "src/analyzer/expression/MemberLookup.pv"
+                #line 340 "src/analyzer/expression/MemberLookup.pv"
                 return type;
             }
 
-            #line 307 "src/analyzer/expression/MemberLookup.pv"
+            #line 342 "src/analyzer/expression/MemberLookup.pv"
             struct Type* value = HashMap_str_Type__find(&ns_info->values, &member->value);
-            #line 308 "src/analyzer/expression/MemberLookup.pv"
+            #line 343 "src/analyzer/expression/MemberLookup.pv"
             if (value != 0) {
-                #line 308 "src/analyzer/expression/MemberLookup.pv"
+                #line 343 "src/analyzer/expression/MemberLookup.pv"
                 return value;
             }
 
-            #line 310 "src/analyzer/expression/MemberLookup.pv"
+            #line 345 "src/analyzer/expression/MemberLookup.pv"
             if (output_error) {
-                #line 310 "src/analyzer/expression/MemberLookup.pv"
+                #line 345 "src/analyzer/expression/MemberLookup.pv"
                 Context__error_token(context, member, "Namespace does not have this member");
             }
 
-            #line 312 "src/analyzer/expression/MemberLookup.pv"
+            #line 347 "src/analyzer/expression/MemberLookup.pv"
             return 0;
         } break;
-        #line 314 "src/analyzer/expression/MemberLookup.pv"
+        #line 349 "src/analyzer/expression/MemberLookup.pv"
         case TYPE__UNKNOWN_C: {
-            #line 314 "src/analyzer/expression/MemberLookup.pv"
+            #line 349 "src/analyzer/expression/MemberLookup.pv"
             return type;
         } break;
-        #line 315 "src/analyzer/expression/MemberLookup.pv"
+        #line 350 "src/analyzer/expression/MemberLookup.pv"
         default: {
-            #line 315 "src/analyzer/expression/MemberLookup.pv"
+            #line 350 "src/analyzer/expression/MemberLookup.pv"
             Context__error_token(context, member, "Type does not have members");
         } break;
     }
 
-    #line 318 "src/analyzer/expression/MemberLookup.pv"
+    #line 353 "src/analyzer/expression/MemberLookup.pv"
     return 0;
 }
 

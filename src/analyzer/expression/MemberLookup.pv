@@ -6,6 +6,49 @@ use types
 use c
 
 impl Expression {
+    // The generic map a method found through `impl_info` is called with: the
+    // type's own, plus the impl's typedefs, plus, for a default method the
+    // impl takes from its trait, the trait's generics as the impl binds them
+    // (`impl Handler<i32> for Counter` calling Handler's default `fn
+    // ignored(&self, value: &S)` needs S = i32).
+    fn impl_function_generics(context: &Context, impl_info: &Impl, name: str, type: &Type, generic_map: *GenericMap) -> *GenericMap {
+        let from_trait = impl_info.functions.find(&name) == null;
+        if impl_info.typedefs.length == 0 && !from_trait { return generic_map; }
+
+        let aug_map: *GenericMap = null;
+        if generic_map != null {
+            let aug_map_val = generic_map.clone(context.allocator);
+            aug_map = context.allocator.store(&aug_map_val);
+        } else {
+            aug_map = context.allocator.store(&GenericMap {
+                self_type: type,
+                array: Array<Type>::new(context.allocator),
+                map: HashMap<str, usize>::new(context.allocator),
+            });
+        }
+        if aug_map == null { return null; }
+
+        for (typedef_name, &typedef_type) in impl_info.typedefs {
+            aug_map.insert(typedef_name, *typedef_type);
+        }
+        if from_trait {
+            match impl_info.trait_type {
+                Type::Trait(trait_info, trait_map) => {
+                    if trait_map != null {
+                        for generic in trait_info.generics.array {
+                            let generic_name = generic.name;
+                            if generic_name == null { continue; }
+                            let bound = trait_map.get(generic_name.value);
+                            if bound != null { aug_map.insert(generic_name.value, *bound); }
+                        }
+                    }
+                },
+                _ => {},
+            }
+        }
+        return aug_map;
+    }
+
     fn get_c_impl_member_type(context: &Context, type: &Type, name: str, member: &Token) -> *Type {
         // C impls are registered under their declared name in the primitive table.
         let primitive_ptr = context.root.primitives.find(&name);
@@ -119,17 +162,8 @@ impl Expression {
                 for *impl_info in struct_info.impls {
                     let function = impl_info.find_function(member.value);
                     if function != null {
-                        if impl_info.typedefs.length == 0 {
-                            return context.allocator.store(&Type::Function(function, generic_map));
-                        }
-                        if generic_map == null { return null; }
-                        let aug_map_val = generic_map.clone(context.allocator);
-                        let aug_map = context.allocator.store(&aug_map_val);
-                        if aug_map == null { return null; }
-                        for (name, &typedef_type) in impl_info.typedefs {
-                            aug_map.insert(name, *typedef_type);
-                        }
-                        return context.allocator.store(&Type::Function(function, aug_map));
+                        let function_generics = Expression::impl_function_generics(context, impl_info, member.value, type, generic_map);
+                        return context.allocator.store(&Type::Function(function, function_generics));
                     }
                 }
 
@@ -169,7 +203,8 @@ impl Expression {
                 for *impl_info in enum_info.impls {
                     let function = impl_info.find_function(member.value);
                     if function != null {
-                        return context.allocator.store(&Type::Function(function, generic_map));
+                        let function_generics = Expression::impl_function_generics(context, impl_info, member.value, type, generic_map);
+                        return context.allocator.store(&Type::Function(function, function_generics));
                     }
                 }
 

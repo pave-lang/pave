@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 
-#line 4 "src/std/HashSet.pv"
+#line 5 "src/std/HashSet.pv"
 struct HashSetBucket_usize {
     uintptr_t value;
     struct HashSetBucket_usize* next;

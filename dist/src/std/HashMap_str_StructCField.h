@@ -40,34 +40,34 @@ struct StructCField* HashMap_str_StructCField__find(struct HashMap_str_StructCFi
 #line 78 "src/std/HashMap.pv"
 struct StructCField* HashMap_str_StructCField__insert(struct HashMap_str_StructCField* self, struct str key, struct StructCField value);
 
-#line 108 "src/std/HashMap.pv"
+#line 112 "src/std/HashMap.pv"
 bool HashMap_str_StructCField__remove(struct HashMap_str_StructCField* self, struct str* key);
 
-#line 132 "src/std/HashMap.pv"
+#line 136 "src/std/HashMap.pv"
 void HashMap_str_StructCField__release(struct HashMap_str_StructCField* self);
 
-#line 141 "src/std/HashMap.pv"
+#line 145 "src/std/HashMap.pv"
 void HashMap_str_StructCField__fill_buckets(struct HashMap_str_StructCField* self);
 
-#line 162 "src/std/HashMap.pv"
+#line 166 "src/std/HashMap.pv"
 struct HashMap_str_StructCField HashMap_str_StructCField__clone(struct HashMap_str_StructCField* self, struct trait_Allocator allocator);
 
-#line 176 "src/std/HashMap.pv"
+#line 180 "src/std/HashMap.pv"
 struct HashMapIter_str_StructCField HashMap_str_StructCField__iter(struct HashMap_str_StructCField* self);
 
-#line 183 "src/std/HashMap.pv"
+#line 187 "src/std/HashMap.pv"
 void HashMap_str_StructCField__clear(struct HashMap_str_StructCField* self);
 
-#line 192 "src/std/HashMap.pv"
+#line 196 "src/std/HashMap.pv"
 struct HashMapBucket_str_StructCField* HashMap_str_StructCField__Index__index(void* __self);
 
-#line 198 "src/std/HashMap.pv"
+#line 202 "src/std/HashMap.pv"
 struct StructCField* HashMap_str_StructCField__Map_str_StructCField__find(void* __self, struct str* key);
 
-#line 215 "src/std/HashMap.pv"
+#line 219 "src/std/HashMap.pv"
 struct StructCField* HashMap_str_StructCField__Map_str_StructCField__insert(void* __self, struct str key, struct StructCField value);
 
-#line 245 "src/std/HashMap.pv"
+#line 253 "src/std/HashMap.pv"
 bool HashMap_str_StructCField__Map_str_StructCField__remove(void* __self, struct str* key);
 
 extern struct trait_Map_str_StructCFieldVTable HASH_MAP_STR_STRUCT_CFIELD__VTABLE__MAP;

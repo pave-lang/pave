@@ -1236,6 +1236,30 @@ impl FileGenerator {
         let name = generator.naming_ident.get_type_name(named_self_type, self_type, generics);
 
         let header = generator.make_path(module, name.as_str(), ".h");
+        // Every impl of the type in this module (std's `impl Hash for *void`
+        // and `impl Eq<*void> for *void`) goes in these files: the first
+        // usage writes them all, the rest find them written.
+        if !generator.type_impl_paths.insert(header.as_str()) { return true; }
+
+        let impls = Array<&Impl>::new(generator.allocator);
+        let impl_functions = Array<HashMap<usize, TypeFunctionUsage>>::new(generator.allocator);
+        let contexts = Array<&UsageContext>::new(generator.allocator);
+        impls.append(impl_info);
+        impl_functions.append(if usage_context.impl_functions.length > 0 { usage_context.impl_functions.data[0] } else { HashMap<usize, TypeFunctionUsage>::new(generator.allocator) });
+        contexts.append(usage_context);
+        if generator.type_impl_usages != null {
+            for (_, &other) in *generator.type_impl_usages {
+                if cast<usize>(other.type) == cast<usize>(type_impl) || other.usage_contexts.length == 0 { continue; }
+                let other_impl = other.type.impl_info;
+                if cast<usize>(other_impl.context.module) != cast<usize>(module) { continue; }
+                if !generator.root.type_impl_target_eq(&other.type.type, &type_impl.type) { continue; }
+                let other_context = &other.usage_contexts.data[0];
+                impls.append(other_impl);
+                impl_functions.append(if other_context.impl_functions.length > 0 { other_context.impl_functions.data[0] } else { HashMap<usize, TypeFunctionUsage>::new(generator.allocator) });
+                contexts.append(other_context);
+            }
+        }
+
         let header_file: *FILE = mem_file_open();
         if header_file == null { perror(header.c_str()); return false; }
 
@@ -1245,9 +1269,13 @@ impl FileGenerator {
         generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
-        defs.write_impl_definition(header_file, name.as_str(), impl_info, generics);
+        for *impl_context in contexts {
+            generator.write_context_primitives(header_file, &impl_context.primitive_header, null);
+            include_writer.write(header_file, generator, &impl_context.signature, generics, false);
+        }
+        for *each_impl in impls {
+            defs.write_impl_definition(header_file, name.as_str(), each_impl, generics);
+        }
 
         fprintf(header_file, "\n#endif\n");
 
@@ -1258,14 +1286,15 @@ impl FileGenerator {
         let code_file: *FILE = mem_file_open();
         if code_file == null { perror(code.c_str()); return false; }
 
-        generator.write_context_primitives(code_file, &usage_context.primitive_code, &usage_context.primitive_header);
+        for *impl_context in contexts {
+            generator.write_context_primitives(code_file, &impl_context.primitive_code, &impl_context.primitive_header);
+        }
         generator.write_includes_raw(code_file, &module.includes);
-        include_writer.write(code_file, generator, &usage_context.body, generics, true);
+        for *impl_context in contexts {
+            include_writer.write(code_file, generator, &impl_context.body, generics, true);
+        }
 
-        let impls_base = [impl_info];
-        let impls = Array<&Impl> { data: impls_base, length: impls_base.length, allocator: generator.allocator, capacity: 0 };
-
-        if !defs.write_impls(code_file, module, &impls, &usage_context.impl_functions, generics, &include_writer) {
+        if !defs.write_impls(code_file, module, &impls, &impl_functions, generics, &include_writer) {
             fprintf(stderr, "Failed to write impls for type %s\n", name.c_str());
             mem_file_close(code_file);
             return false;

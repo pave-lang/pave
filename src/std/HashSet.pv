@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
 
 struct HashSetBucket<T> {
@@ -56,6 +57,7 @@ impl<T: Hash> HashSet<T> {
     }
 
     fn has(&self, value: &T) -> bool {
+        if self.capacity == 0 { return false; }
         let hash = (*value).hash();
         let bucket_index: usize = hash._0 % self.capacity;
         let current_bucket_node = self.buckets[bucket_index];
@@ -73,7 +75,10 @@ impl<T: Hash> HashSet<T> {
     fn insert(&self, value: T) -> bool {
         if self.has(&value) { return false; }
 
-        if self.length * 100 / self.capacity > 75 {
+        // An empty set (a literal, or a clone of one) starts at 16.
+        if self.capacity == 0 {
+            self.resize(16);
+        } else if self.length * 100 / self.capacity > 75 {
             self.resize(self.capacity * 2);
         }
 
@@ -149,4 +154,15 @@ impl<T: Hash> HashSet<T> {
             end: self.data + self.length,
         };
     }
+}
+
+test "an empty set literal takes inserts" {
+    let allocator_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    if allocator_ptr == null { abort(); }
+    let allocator: &ArenaAllocator = allocator_ptr;
+    defer allocator.destroy();
+
+    let empty = HashSet<u32> { allocator, buckets: null, data: null, capacity: 0, length: 0 };
+    if empty.has(&cast<u32>(3)) { abort(); }
+    if !empty.insert(3) || !empty.has(&cast<u32>(3)) { abort(); }
 }

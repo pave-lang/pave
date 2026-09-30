@@ -27,10 +27,11 @@ struct Type;
 struct Context;
 struct Generics;
 struct String;
+struct Impl;
+struct GenericMap;
 struct Function;
 struct Array_Type;
 struct Array_InvokeArgument;
-struct GenericMap;
 struct Trait;
 struct EnumVariant;
 struct Array_NullNarrowing;
@@ -78,13 +79,16 @@ struct Expression* Expression__parse_if_expression(struct Context* context, stru
 #line 1025 "src/analyzer/expression/Expression.pv"
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
-#line 9 "src/analyzer/expression/MemberLookup.pv"
+#line 14 "src/analyzer/expression/MemberLookup.pv"
+struct GenericMap* Expression__impl_function_generics(struct Context* context, struct Impl* impl_info, struct str name, struct Type* type, struct GenericMap* generic_map);
+
+#line 52 "src/analyzer/expression/MemberLookup.pv"
 struct Type* Expression__get_c_impl_member_type(struct Context* context, struct Type* type, struct str name, struct Token* member);
 
-#line 31 "src/analyzer/expression/MemberLookup.pv"
+#line 74 "src/analyzer/expression/MemberLookup.pv"
 struct EnumVariantResult Expression__get_enum_variant(struct Context* context, struct Type* type, struct Token* token);
 
-#line 77 "src/analyzer/expression/MemberLookup.pv"
+#line 120 "src/analyzer/expression/MemberLookup.pv"
 struct Type* Expression__get_member_type(struct Context* context, struct Type* type, struct Token* member, bool output_error);
 
 #line 6 "src/analyzer/expression/GenericResolve.pv"

@@ -89,6 +89,10 @@ struct Tuple;
 
 #line 220 "src/std/ArenaAllocator.pv"
 struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tuple* value);
+struct TypeImpl;
+
+#line 220 "src/std/ArenaAllocator.pv"
+struct TypeImpl* ArenaAllocator__store_TypeImpl(struct ArenaAllocator* self, struct TypeImpl* value);
 struct Generic;
 
 #line 220 "src/std/ArenaAllocator.pv"

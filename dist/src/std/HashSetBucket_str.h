@@ -3,7 +3,7 @@
 
 #include <std/str.h>
 
-#line 4 "src/std/HashSet.pv"
+#line 5 "src/std/HashSet.pv"
 struct HashSetBucket_str {
     struct str value;
     struct HashSetBucket_str* next;

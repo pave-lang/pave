@@ -111,6 +111,10 @@ impl Trait {
 
     fn parse_functions(&self) -> bool {
         let context = &self.module.context;
+        // Inside a default method, Self is the trait (over its own generics),
+        // so `self.other(...)` finds the trait's other methods.
+        let self_generics = context.allocator.store(&GenericMap::from_generics(context.allocator, &self.generics));
+        self.type_self = Type::Trait(self, self_generics);
         context.type_self = &self.type_self;
 
         for (_, &function) in self.functions {

@@ -30,6 +30,10 @@ struct Generator {
     current_host: bool,
     host_files: Array<String>,
     game_files: Array<String>,
+    // The type impls being generated, and the headers already written for
+    // them: every impl of a type in a module shares one pair of files.
+    type_impl_usages: *HashMap<usize, TypeUsage<TypeImpl>>,
+    type_impl_paths: HashSet<str>,
 }
 
 impl Generator {
@@ -626,6 +630,33 @@ impl Generator {
         return true;
     }
 
+    // The generic map a trait's default method is written with for
+    // `impl_info`: the type's, plus the trait's generics as the impl binds
+    // them (`impl Handler<i32> for Counter` writes Handler's default `fn
+    // ignored(&self, value: &S)` with S = i32).
+    fn trait_default_generics(&self, impl_info: &Impl, generics: &GenericMap) -> &GenericMap {
+        let trait_info = impl_info.trait_;
+        if trait_info == null || trait_info.generics.array.length == 0 { return generics; }
+        let trait_map: *GenericMap = null;
+        match impl_info.trait_type {
+            Type::Trait(_, bound_map) => { trait_map = bound_map; },
+            _ => {},
+        }
+        if trait_map == null { return generics; }
+        let result_val = generics.clone(self.allocator);
+        let result = self.allocator.store(&result_val);
+        if result == null { return generics; }
+        for generic in trait_info.generics.array {
+            let generic_name = generic.name;
+            if generic_name == null { continue; }
+            let bound = trait_map.get(generic_name.value);
+            if bound == null { continue; }
+            let resolved = Context::resolve_type(self.allocator, bound, generics, null);
+            result.insert(generic_name.value, if resolved != null { *resolved } else { *bound });
+        }
+        return result;
+    }
+
     fn make_path(&self, module: *Module, name: str, ext: str) -> String {
         let result = self.make_rel_path(module, name, ext);
         result.prepend("/");
@@ -723,6 +754,8 @@ impl Generator {
             current_host: false,
             host_files: Array<String>::new(allocator),
             game_files: Array<String>::new(allocator),
+            type_impl_usages: null,
+            type_impl_paths: HashSet<str>::new(allocator),
         };
 
         self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);
@@ -765,6 +798,7 @@ impl Generator {
         let success = true;
 
         let usages = Usages::new(&self);
+        self.type_impl_usages = &usages.type_impls;
         for (_, &usage) in usages.primitives { success = file_gen.generate_primitive_loop(usage) && success; }
         for (_, &usage) in usages.structs { success = file_gen.generate_struct_loop(usage) && success; }
         for (_, &usage) in usages.enums { success = file_gen.generate_enum_loop(usage) && success; }

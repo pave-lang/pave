@@ -206,9 +206,11 @@ impl IncludeWriter {
                         },
                         FunctionParent::Trait(_) => {},
                         FunctionParent::Type(type_info, impl_index, _) => {
+                            // Declared outside the `if`: include_generics points at it after.
                             let include_generics: &GenericMap = generics;
+                            let resolved_generics: GenericMap = *generics;
                             if func_generic_map != null {
-                                let resolved_generics = (*func_generic_map).resolve_types(self.allocator, generics);
+                                resolved_generics = (*func_generic_map).resolve_types(self.allocator, generics);
                                 include_generics = &resolved_generics;
                             }
 

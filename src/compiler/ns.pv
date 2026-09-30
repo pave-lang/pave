@@ -11,3 +11,4 @@ mod DefinitionWriter
 mod FileGenerator
 mod Usages
 mod CStructImplTest
+mod TraitImplTest

@@ -18,6 +18,7 @@
 #include <usize.h>
 #include <std/Array_Parameter.h>
 #include <analyzer/types/Parameter.h>
+#include <analyzer/types/GenericMap.h>
 #include <analyzer/Root.h>
 #include <analyzer/types/Trait.h>
 
@@ -220,31 +221,35 @@ bool Trait__has_dynamic_dispatch(struct Trait* self) {
 bool Trait__parse_functions(struct Trait* self) {
     #line 113 "src/analyzer/types/Trait.pv"
     struct Context* context = &self->module->context;
-    #line 114 "src/analyzer/types/Trait.pv"
+    #line 116 "src/analyzer/types/Trait.pv"
+    struct GenericMap* self_generics = ArenaAllocator__store_GenericMap(context->allocator, (struct GenericMap[]){GenericMap__from_generics(context->allocator, &self->generics)});
+    #line 117 "src/analyzer/types/Trait.pv"
+    self->type_self = (struct Type) { .type = TYPE__TRAIT, .trait_value = { ._0 = self, ._1 = self_generics} };
+    #line 118 "src/analyzer/types/Trait.pv"
     context->type_self = &self->type_self;
 
-    #line 116 "src/analyzer/types/Trait.pv"
+    #line 120 "src/analyzer/types/Trait.pv"
     { struct HashMapIter_str_Function __iter = HashMap_str_Function__iter(&self->functions);
-    #line 116 "src/analyzer/types/Trait.pv"
+    #line 120 "src/analyzer/types/Trait.pv"
     while (HashMapIter_str_Function__next(&__iter)) {
-        #line 116 "src/analyzer/types/Trait.pv"
+        #line 120 "src/analyzer/types/Trait.pv"
         struct Function* function = &HashMapIter_str_Function__value(&__iter)->_1;
 
-        #line 117 "src/analyzer/types/Trait.pv"
+        #line 121 "src/analyzer/types/Trait.pv"
         bool has_impl = function->token_start < function->token_end;
-        #line 118 "src/analyzer/types/Trait.pv"
+        #line 122 "src/analyzer/types/Trait.pv"
         if (!has_impl) {
-            #line 118 "src/analyzer/types/Trait.pv"
+            #line 122 "src/analyzer/types/Trait.pv"
             continue;
         }
 
-        #line 120 "src/analyzer/types/Trait.pv"
+        #line 124 "src/analyzer/types/Trait.pv"
         Function__parse_function(function, &self->generics);
     } }
 
-    #line 123 "src/analyzer/types/Trait.pv"
+    #line 127 "src/analyzer/types/Trait.pv"
     context->type_self = &context->root->type_self;
 
-    #line 125 "src/analyzer/types/Trait.pv"
+    #line 129 "src/analyzer/types/Trait.pv"
     return true;
 }

@@ -561,10 +561,17 @@ impl Module {
                     if trait_info != null { ctype.traits.insert(trait_info.get_key(self.context.allocator), trait_info); }
                     ctype.impls.append(impl_info);
                 },
-                Type::Indirect(_) => {
+                Type::Indirect(indirect) => {
                     let impl_index = self.root.add_type_impl(impl_info.type, impl_info);
-                    self.type_impls.append(TypeImpl::new(allocator, impl_info.type, impl_info, impl_index));
-                    self.root.hack_type_impl = self.type_impls.back();
+                    let type_impl = TypeImpl::new(allocator, impl_info.type, impl_info, impl_index);
+                    self.type_impls.append(type_impl);
+                    // The slice impl (`impl<T> &[T]`), which slices' methods
+                    // come from: only it, and a copy of its own, since the
+                    // array grows with the module's other impls.
+                    match indirect.to {
+                        Type::Sequence(_) => { self.root.hack_type_impl = allocator.store(&type_impl); },
+                        _ => {},
+                    }
                 },
                 _ => {
                     let impl_index = self.root.add_type_impl(impl_info.type, impl_info);

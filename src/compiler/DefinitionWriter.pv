@@ -61,11 +61,12 @@ impl DefinitionWriter {
     }
 
     fn write_trait_default_decls(&self, file: &FILE, name: str, impl_info: &Impl, trait_info: &Trait, generics: &GenericMap) -> bool {
+        let default_generics = self.generator.trait_default_generics(impl_info, generics);
         for (func_base_name, &func_info) in trait_info.functions {
             if impl_info.functions.find(&func_base_name) != null { continue; }
 
             fprintf(file, "\n");
-            if !self.write_trait_function_decl(file, name, trait_info, &impl_info.trait_type, func_info, generics) { return false; }
+            if !self.write_trait_function_decl(file, name, trait_info, &impl_info.trait_type, func_info, default_generics) { return false; }
             fprintf(file, ";\n");
         }
         return true;
@@ -1174,11 +1175,12 @@ impl DefinitionWriter {
             }
 
             if trait_info != null {
+                let default_generics = generator.trait_default_generics(impl_info, generics);
                 for (func_base_name, &func_info) in trait_info.functions {
                     if impl_info.functions.find(&func_base_name) != null { continue; }
 
                     fprintf(file, "\n");
-                    if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, &impl_info.trait_type, generics, module, null) { return false; }
+                    if !self.write_trait_function_with_body(file, name.as_str(), func_info, trait_info, &impl_info.trait_type, default_generics, module, null) { return false; }
                 }
             }
 

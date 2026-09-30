@@ -82,7 +82,11 @@ impl<K: Hash + Eq<K>, V> HashMap<K, V> {
             return existing_value;
         }
 
-        if self.capacity == 0 || (self.length * 100 / self.capacity) > 75 {
+        // An empty map (a literal, or a clone of one) starts at 16, since twice
+        // nothing is nothing.
+        if self.capacity == 0 {
+            self.resize(16);
+        } else if (self.length * 100 / self.capacity) > 75 {
             self.resize(self.capacity * 2);
         }
 
@@ -219,7 +223,11 @@ impl<K: Hash + Eq<K>, V> Map<K, V> for HashMap<K, V> {
             return existing_value;
         }
 
-        if self.capacity == 0 || (self.length * 100 / self.capacity) > 75 {
+        // An empty map (a literal, or a clone of one) starts at 16, since twice
+        // nothing is nothing.
+        if self.capacity == 0 {
+            self.resize(16);
+        } else if (self.length * 100 / self.capacity) > 75 {
             self.resize(self.capacity * 2);
         }
 
@@ -302,4 +310,21 @@ test "hash collisions compare keys" {
 
     second_value = map.find(&second);
     if second_value == null || *second_value != 20 { abort(); }
+}
+
+test "an empty map literal and its clone take inserts" {
+    let allocator_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    if allocator_ptr == null { abort(); }
+    let allocator: &ArenaAllocator = allocator_ptr;
+    defer allocator.destroy();
+
+    let empty = HashMap<u32, i32> { allocator, buckets: null, data: null, capacity: 0, length: 0 };
+    if empty.find(&cast<u32>(1)) != null { abort(); }
+    let copy = empty.clone(allocator);
+    copy.insert(1, 10);
+    empty.insert(2, 20);
+    let one = copy.find(&cast<u32>(1));
+    let two = empty.find(&cast<u32>(2));
+    if one == null || *one != 10 { abort(); }
+    if two == null || *two != 20 { abort(); }
 }

@@ -86,52 +86,52 @@ void Usages__add_type_impl_header(struct Usages* self, struct Type* self_type);
 #line 465 "src/compiler/Usages.pv"
 void Usages__process_impls(struct Usages* self, struct Array_ref_Impl* impls, struct GenericMap* generic_map);
 
-#line 510 "src/compiler/Usages.pv"
+#line 511 "src/compiler/Usages.pv"
 void Usages__process_type_impl(struct Usages* self, struct TypeImpl* type_impl);
 
-#line 533 "src/compiler/Usages.pv"
+#line 534 "src/compiler/Usages.pv"
 void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_info);
 
-#line 558 "src/compiler/Usages.pv"
+#line 559 "src/compiler/Usages.pv"
 void Usages__process_sequence(struct Usages* self, struct Sequence* sequence);
 
-#line 611 "src/compiler/Usages.pv"
+#line 612 "src/compiler/Usages.pv"
 void Usages__process_tuple(struct Usages* self, struct Tuple* tuple);
 
-#line 635 "src/compiler/Usages.pv"
+#line 636 "src/compiler/Usages.pv"
 void Usages__process_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 674 "src/compiler/Usages.pv"
+#line 675 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 698 "src/compiler/Usages.pv"
+#line 699 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map);
 
-#line 715 "src/compiler/Usages.pv"
+#line 716 "src/compiler/Usages.pv"
 bool Usages__usage_context_matches(struct UsageContext* uc, struct Generics* generics, struct GenericMap* generic_map);
 
-#line 729 "src/compiler/Usages.pv"
+#line 730 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 740 "src/compiler/Usages.pv"
+#line 741 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 751 "src/compiler/Usages.pv"
+#line 752 "src/compiler/Usages.pv"
 void Usages__mark_any_usage(struct Usages* self, struct Type* type);
 
-#line 773 "src/compiler/Usages.pv"
+#line 774 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_primitive(struct Usages* self, struct Primitive* primitive_info, struct GenericMap* generic_map);
 
-#line 784 "src/compiler/Usages.pv"
+#line 785 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 915 "src/compiler/Usages.pv"
+#line 916 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 1034 "src/compiler/Usages.pv"
+#line 1035 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 1342 "src/compiler/Usages.pv"
+#line 1343 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

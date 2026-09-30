@@ -217,7 +217,10 @@ impl Root {
 
             let stored_func_info = self.allocator.store(function);
             if stored_func_info == null { return function; }
-            stored_func_info.parent = FunctionParent::Type(&type_impl.type, impl_index, type_impl.impl_info.trait_);
+            // The parent outlives this loop, whose `type_impl` is a copy: point
+            // at the array's own entry.
+            let stored_type_impl = &self.type_impls.data[impl_index];
+            stored_func_info.parent = FunctionParent::Type(&stored_type_impl.type, impl_index, type_impl.impl_info.trait_);
             return stored_func_info;
         }
 

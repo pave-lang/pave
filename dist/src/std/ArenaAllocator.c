@@ -356,6 +356,23 @@ struct Tuple* ArenaAllocator__store_Tuple(struct ArenaAllocator* self, struct Tu
     #line 225 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <analyzer/types/TypeImpl.h>
+
+#line 220 "src/std/ArenaAllocator.pv"
+struct TypeImpl* ArenaAllocator__store_TypeImpl(struct ArenaAllocator* self, struct TypeImpl* value) {
+    #line 221 "src/std/ArenaAllocator.pv"
+    struct TypeImpl* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct TypeImpl));
+    #line 222 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 222 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 224 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct TypeImpl));
+    #line 225 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/types/Generic.h>
 
 #line 220 "src/std/ArenaAllocator.pv"
