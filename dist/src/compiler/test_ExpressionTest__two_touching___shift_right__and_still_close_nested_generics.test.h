@@ -1,0 +1,10 @@
+#ifndef PAVE_TEST_EXPRESSION_TEST__TWO_TOUCHING___SHIFT_RIGHT__AND_STILL_CLOSE_NESTED_GENERICS
+#define PAVE_TEST_EXPRESSION_TEST__TWO_TOUCHING___SHIFT_RIGHT__AND_STILL_CLOSE_NESTED_GENERICS
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#line 1 "src/compiler/ExpressionTest.pv"
+void test_ExpressionTest__two_touching___shift_right__and_still_close_nested_generics();
+
+#endif

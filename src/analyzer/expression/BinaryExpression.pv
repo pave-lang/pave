@@ -112,11 +112,27 @@ impl Expression {
 
         while true {
             let token = context.current();
-            let prec = Expression::get_precedence(token);
+            let shift = Expression::is_right_shift(context);
+            let prec = if shift { cast<usize>(8) } else { Expression::get_precedence(token) };
             if prec < min_prec { break; }
 
-            let operator = context.expect(TokenType::Symbol);
-            if operator == null { return null; }
+            let first = context.expect(TokenType::Symbol);
+            if first == null { return null; }
+            let operator: &Token = first;
+            if shift {
+                let second = context.expect(TokenType::Symbol);
+                if second == null { return null; }
+                let joined = context.allocator.store(&Token {
+                    type: TokenType::Symbol,
+                    value: ">>",
+                    start_line: first.start_line,
+                    start_column: first.start_column,
+                    end_line: second.end_line,
+                    end_column: second.end_column,
+                });
+                if joined == null { return null; }
+                operator = joined;
+            }
 
             // Short-circuit narrowing: when parsing the RHS of `||` we know the LHS was false,
             // and for `&&` we know the LHS was true. If the LHS contains a null-check on a
@@ -388,6 +404,16 @@ impl Expression {
         }
 
         return null;
+    }
+
+    // `>>` in an expression: the tokenizer never joins two `>` (they close
+    // nested generics, `Array<Array<T>>`), so a shift is two touching `>`.
+    fn is_right_shift(context: &Context) -> bool {
+        if context.pos + 1 >= context.length { return false; }
+        let first = &context.tokens[context.pos];
+        let second = &context.tokens[context.pos + 1];
+        return first.type == TokenType::Symbol && first.value.eq(">") && second.type == TokenType::Symbol && second.value.eq(">")
+            && first.end_line == second.start_line && second.start_column <= first.end_column + 1;
     }
 
     fn get_precedence(token: &Token) -> usize {

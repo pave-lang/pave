@@ -12,3 +12,4 @@ mod FileGenerator
 mod Usages
 mod CStructImplTest
 mod TraitImplTest
+mod ExpressionTest

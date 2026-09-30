@@ -4,6 +4,7 @@
 #include <compiler/test_CStructImplTest__C_struct_impl_constructors_and_methods.test.h>
 #include <compiler/test_TraitImplTest__a_generic_trait_s_default_method_binds_the_impl_s_generics.test.h>
 #include <compiler/test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work.test.h>
+#include <compiler/test_ExpressionTest__two_touching___shift_right__and_still_close_nested_generics.test.h>
 #include <std/test_ArenaAllocator__allocations_preserve_maximum_alignment.test.h>
 #include <std/test_ArenaAllocator__aliases_share_allocation_ownership.test.h>
 #include <std/test_ArenaAllocator__realloc_preserves_data_and_frees_the_old_allocation.test.h>
@@ -43,6 +44,10 @@ int main(void) {
 
     fputs("[TEST] compiler/TraitImplTest: a pointer type's impls in one module both work\n", stdout);
     test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work();
+    passed++;
+
+    fputs("[TEST] compiler/ExpressionTest: two touching > shift right, and still close nested generics\n", stdout);
+    test_ExpressionTest__two_touching___shift_right__and_still_close_nested_generics();
     passed++;
 
     fputs("[TEST] std/ArenaAllocator: allocations preserve maximum alignment\n", stdout);

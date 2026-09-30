@@ -175,16 +175,19 @@ void Expression__collect_null_narrowings(struct Context* context, struct Express
 #line 110 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__parse_binary(struct Context* context, struct Expression* lhs, uintptr_t min_prec, struct Generics* generics);
 
-#line 198 "src/analyzer/expression/BinaryExpression.pv"
+#line 214 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_operator_trait_call(struct Context* context, struct Token* token, struct Expression* lhs, struct Type* lhs_type, struct str operator, struct Expression* rhs);
 
-#line 297 "src/analyzer/expression/BinaryExpression.pv"
+#line 313 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_unary_trait_call(struct Context* context, struct Token* token, struct Expression* operand);
 
-#line 346 "src/analyzer/expression/BinaryExpression.pv"
+#line 362 "src/analyzer/expression/BinaryExpression.pv"
 struct Expression* Expression__find_index_trait_call(struct Context* context, struct Token* token, struct Expression* inner, struct Expression* index_expr);
 
-#line 393 "src/analyzer/expression/BinaryExpression.pv"
+#line 411 "src/analyzer/expression/BinaryExpression.pv"
+bool Expression__is_right_shift(struct Context* context);
+
+#line 419 "src/analyzer/expression/BinaryExpression.pv"
 uintptr_t Expression__get_precedence(struct Token* token);
 
 #line 13 "src/analyzer/expression/ParseCallArguments.pv"
