@@ -9,5 +9,6 @@ int create_directory(const char *path);
 FILE *mem_file_open(void);
 int mem_file_save(FILE *file, const char *path);
 void mem_file_close(FILE *file);
+int mem_file_flush(void);
 
 #endif

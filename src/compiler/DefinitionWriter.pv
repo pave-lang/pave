@@ -92,7 +92,8 @@ impl DefinitionWriter {
             }
             generator.indent -= 1;
             fprintf(file, "};\n");
-            fprintf(file, "extern struct trait_Co_");
+            generator.write_extern(file);
+            fprintf(file, "struct trait_Co_");
             generator.write_string(file, &co_ret_name);
             fprintf(file, "VTable ");
             generator.write_dynamic_vtable_name(file, func_info, generics);
@@ -111,7 +112,8 @@ impl DefinitionWriter {
             }
             generator.indent -= 1;
             fprintf(file, "};\n");
-            fprintf(file, "extern struct trait_FnVTable ");
+            generator.write_extern(file);
+            fprintf(file, "struct trait_FnVTable ");
             generator.write_dynamic_vtable_name(file, func_info, generics);
             fprintf(file, "__VTABLE__DYN_FN;\n");
         }
@@ -122,6 +124,13 @@ impl DefinitionWriter {
         generator.write_line_directive(file, func_info.context, func_info.name);
 
         generator.write_indent(file);
+        // Not on a vtable's function pointer fields ("(*fn_name)").
+        let is_pointer_field = false;
+        if custom_name != null {
+            let custom: String = *custom_name;
+            is_pointer_field = custom.as_str().starts_with("(*");
+        }
+        if generator.current_host && !is_pointer_field { fprintf(file, "PAVE_HOST_API "); }
 
         if func_info.type == FunctionType::Coroutine {
             fprintf(file, "bool");
@@ -209,12 +218,14 @@ impl DefinitionWriter {
 
         fprintf(file, ".h>\n");
 
+        if generator.current_host { fprintf(file, "PAVE_HOST_API "); }
         generator.write_type(file, &func_info.return_type, generics);
         fprintf(file, " ");
         generator.write_function_name(file, func_info, generics);
         fprintf(file, "__value(void* ctx);\n");
 
-        fprintf(file, "extern struct trait_Iter_");
+        generator.write_extern(file);
+            fprintf(file, "struct trait_Iter_");
         generator.write_string(file, &name);
         name.release();
 
@@ -280,6 +291,7 @@ impl DefinitionWriter {
             generator.indent -= 1;
             fprintf(file, "}\n");
 
+            if generator.current_host { fprintf(file, "PAVE_HOST_API "); }
             generator.write_type(file, &func_info.return_type, generics);
             fprintf(file, " ");
             generator.write_function_name(file, func_info, generics);
@@ -500,7 +512,9 @@ impl DefinitionWriter {
             }
 
             for (_, impl_const) in impl_info.consts {
-                fprintf(file, "\nextern const ");
+                fprintf(file, "\n");
+                generator.write_extern(file);
+                fprintf(file, "const ");
                 generator.write_type(file, &impl_const.type, generics);
                 fprintf(file, " ");
                 generator.write_str_title(file, name.as_str());
@@ -514,7 +528,8 @@ impl DefinitionWriter {
 
         if usage != null && usage.impl_dynamic_usage {
             fprintf(file, "#include <std/trait_Enum.h>\n");
-            fprintf(file, "extern struct trait_EnumVTable ");
+            generator.write_extern(file);
+            fprintf(file, "struct trait_EnumVTable ");
             generator.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__ENUM;\n");
         }
@@ -617,7 +632,9 @@ impl DefinitionWriter {
             }
 
             for (_, impl_const) in impl_info.consts {
-                fprintf(file, "\nextern const ");
+                fprintf(file, "\n");
+                generator.write_extern(file);
+                fprintf(file, "const ");
                 generator.write_type(file, &impl_const.type, generics);
                 fprintf(file, " ");
                 generator.write_str_title(file, name.as_str());
@@ -636,7 +653,8 @@ impl DefinitionWriter {
             let trait_name = trait_info.name;
             if trait_name == null { continue; }
             if !trait_info.has_dynamic_dispatch() { continue; }
-            fprintf(file, "extern struct ");
+            generator.write_extern(file);
+            fprintf(file, "struct ");
             generator.write_type_name(file, trait_entry.1, generics);
             fprintf(file, "VTable ");
             generator.write_str_title(file, name.as_str());
@@ -647,7 +665,8 @@ impl DefinitionWriter {
 
         if usage != null && usage.impl_dynamic_usage {
             fprintf(file, "#include <std/trait_Struct.h>\n");
-            fprintf(file, "extern struct trait_StructVTable ");
+            generator.write_extern(file);
+            fprintf(file, "struct trait_StructVTable ");
             generator.write_str_title(file, name.as_str());
             fprintf(file, "__VTABLE__STRUCT;\n");
         }
@@ -698,7 +717,8 @@ impl DefinitionWriter {
 
             if !trait_info.has_dynamic_dispatch() { continue; }
 
-            fprintf(file, "extern struct ");
+            generator.write_extern(file);
+            fprintf(file, "struct ");
             generator.write_type_name(file, &impl_info.trait_type, generics);
             fprintf(file, "VTable ");
             generator.write_str_title(file, name.as_str());

@@ -14,6 +14,7 @@ fn main(argc: i32, argv: **const char) -> i32 {
     let output_folder: *const char = null;
     let output_line_directives = true;
     let output_seperator = " ";
+    let game_namespaces = Array<str>::new(allocator);
 
     for i in 1..argc {
         if strncmp(argv[i], "-o", 3) == 0 {
@@ -23,13 +24,15 @@ fn main(argc: i32, argv: **const char) -> i32 {
             output_line_directives = false;
         } else if strncmp(argv[i], "--output-separator=semicolon", 29) == 0 {
             output_seperator = ";";
+        } else if strncmp(argv[i], "--game-namespace=", 17) == 0 {
+            game_namespaces.append(str::new(argv[i] + 17));
         } else {
             args.append(argv[i]);
         }
     }
 
     if !output_folder || argc < 4 {
-        fprintf(stderr, "Usage: %s ns_name=ns_path -o <output_folder> [-std=<version>] [--no-line-directives] [--output-new-lines] -- [clang_args]\n", argv[0]);
+        fprintf(stderr, "Usage: %s ns_name=ns_path -o <output_folder> [-std=<version>] [--no-line-directives] [--output-new-lines] [--game-namespace=<ns::path>]... -- [clang_args]\n", argv[0]);
         return -1;
     }
 
@@ -83,7 +86,7 @@ fn main(argc: i32, argv: **const char) -> i32 {
         return -1;
     }
 
-    if !Generator::generate(allocator, output_folder, output_line_directives, output_seperator, root) {
+    if !Generator::generate(allocator, output_folder, output_line_directives, output_seperator, game_namespaces, root) {
         // fprintf(stderr, "Generator::generate returned false\n");
         return -1;
     }

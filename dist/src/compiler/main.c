@@ -10,8 +10,10 @@
 #include <std/trait_Allocator.h>
 #include <std/GeneralPurposeAllocator.h>
 #include <std/Array_ptrc_char.h>
+#include <std/Array_str.h>
 #include <std/Range_i32.h>
 #include <i32.h>
+#include <std/str.h>
 #include <analyzer/Analysis.h>
 #include <analyzer/Root.h>
 #include <std/HashMap_str_Array_Diagnostic.h>
@@ -41,155 +43,160 @@ int32_t main(int32_t argc, char const** argv) {
     bool output_line_directives = true;
     #line 16 "src/compiler/main.pv"
     char const* output_seperator = " ";
+    #line 17 "src/compiler/main.pv"
+    struct Array_str game_namespaces = Array_str__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = allocator });
 
-    #line 18 "src/compiler/main.pv"
+    #line 19 "src/compiler/main.pv"
     for (int32_t i = 1; i != argc; i < argc ? i++ : i--) {
-        #line 19 "src/compiler/main.pv"
+        #line 20 "src/compiler/main.pv"
         if (i32__Eq_i32__eq(strncmp(argv[i], "-o", 3), 0)) {
-            #line 20 "src/compiler/main.pv"
-            i += 1;
             #line 21 "src/compiler/main.pv"
+            i += 1;
+            #line 22 "src/compiler/main.pv"
             output_folder = argv[i];
         } else if (i32__Eq_i32__eq(strncmp(argv[i], "--no-line-directives", 21), 0)) {
-            #line 23 "src/compiler/main.pv"
+            #line 24 "src/compiler/main.pv"
             output_line_directives = false;
         } else if (i32__Eq_i32__eq(strncmp(argv[i], "--output-separator=semicolon", 29), 0)) {
-            #line 25 "src/compiler/main.pv"
+            #line 26 "src/compiler/main.pv"
             output_seperator = ";";
+        } else if (i32__Eq_i32__eq(strncmp(argv[i], "--game-namespace=", 17), 0)) {
+            #line 28 "src/compiler/main.pv"
+            Array_str__append(&game_namespaces, str__new(argv[i] + 17));
         } else {
-            #line 27 "src/compiler/main.pv"
+            #line 30 "src/compiler/main.pv"
             Array_ptrc_char__append(&args, argv[i]);
         }
     }
 
-    #line 31 "src/compiler/main.pv"
+    #line 34 "src/compiler/main.pv"
     if (!output_folder || argc < 4) {
-        #line 32 "src/compiler/main.pv"
-        fprintf(stderr, "Usage: %s ns_name=ns_path -o <output_folder> [-std=<version>] [--no-line-directives] [--output-new-lines] -- [clang_args]\n", argv[0]);
-        #line 33 "src/compiler/main.pv"
+        #line 35 "src/compiler/main.pv"
+        fprintf(stderr, "Usage: %s ns_name=ns_path -o <output_folder> [-std=<version>] [--no-line-directives] [--output-new-lines] [--game-namespace=<ns::path>]... -- [clang_args]\n", argv[0]);
+        #line 36 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
-
-    #line 36 "src/compiler/main.pv"
-    struct Analysis analysis = Analysis__new(allocator);
-    #line 37 "src/compiler/main.pv"
-    struct Root* root = Root__new(allocator, &args, &analysis);
 
     #line 39 "src/compiler/main.pv"
+    struct Analysis analysis = Analysis__new(allocator);
+    #line 40 "src/compiler/main.pv"
+    struct Root* root = Root__new(allocator, &args, &analysis);
+
+    #line 42 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 40 "src/compiler/main.pv"
+        #line 43 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 41 "src/compiler/main.pv"
+        #line 44 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 44 "src/compiler/main.pv"
+    #line 47 "src/compiler/main.pv"
     Root__add_use_namespaces(root);
-    #line 45 "src/compiler/main.pv"
+    #line 48 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 46 "src/compiler/main.pv"
+        #line 49 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 47 "src/compiler/main.pv"
+        #line 50 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 50 "src/compiler/main.pv"
+    #line 53 "src/compiler/main.pv"
     Root__fill_namespace(root);
-    #line 51 "src/compiler/main.pv"
+    #line 54 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 52 "src/compiler/main.pv"
+        #line 55 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 53 "src/compiler/main.pv"
+        #line 56 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 56 "src/compiler/main.pv"
+    #line 59 "src/compiler/main.pv"
     Root__prefill_types(root);
-    #line 57 "src/compiler/main.pv"
+    #line 60 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 58 "src/compiler/main.pv"
+        #line 61 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 59 "src/compiler/main.pv"
+        #line 62 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 62 "src/compiler/main.pv"
+    #line 65 "src/compiler/main.pv"
     Root__prefill_types_impl(root);
-    #line 63 "src/compiler/main.pv"
+    #line 66 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 64 "src/compiler/main.pv"
+        #line 67 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 65 "src/compiler/main.pv"
+        #line 68 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 68 "src/compiler/main.pv"
+    #line 71 "src/compiler/main.pv"
     Root__parse_declarations(root);
-    #line 69 "src/compiler/main.pv"
+    #line 72 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 70 "src/compiler/main.pv"
+        #line 73 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 71 "src/compiler/main.pv"
+        #line 74 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 74 "src/compiler/main.pv"
+    #line 77 "src/compiler/main.pv"
     Root__parse_globals(root);
-    #line 75 "src/compiler/main.pv"
+    #line 78 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 76 "src/compiler/main.pv"
+        #line 79 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 77 "src/compiler/main.pv"
+        #line 80 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 80 "src/compiler/main.pv"
+    #line 83 "src/compiler/main.pv"
     Root__parse_functions(root);
-    #line 81 "src/compiler/main.pv"
+    #line 84 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 82 "src/compiler/main.pv"
+        #line 85 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 83 "src/compiler/main.pv"
+        #line 86 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 86 "src/compiler/main.pv"
-    if (!Generator__generate(allocator, output_folder, output_line_directives, output_seperator, root)) {
-        #line 88 "src/compiler/main.pv"
+    #line 89 "src/compiler/main.pv"
+    if (!Generator__generate(allocator, output_folder, output_line_directives, output_seperator, game_namespaces, root)) {
+        #line 91 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 91 "src/compiler/main.pv"
+    #line 94 "src/compiler/main.pv"
     if (analysis.diagnostics.length > 0) {
-        #line 92 "src/compiler/main.pv"
+        #line 95 "src/compiler/main.pv"
         Analysis__print_diagnostics(&analysis);
-        #line 93 "src/compiler/main.pv"
+        #line 96 "src/compiler/main.pv"
         __result = -1;
         ArenaAllocator__destroy(allocator);
         return __result;
     }
 
-    #line 96 "src/compiler/main.pv"
+    #line 99 "src/compiler/main.pv"
     __result = 0;
     ArenaAllocator__destroy(allocator);
     return __result;

@@ -23,6 +23,13 @@ struct Generator {
     naming_ident: Naming,
     naming_c99: Naming,
     function_context: *FunctionContext,
+    // Split builds (--game-namespace): the namespaces whose code goes in a
+    // game library loaded by the host executable, whether the file being
+    // written belongs to the host, and each side's code files.
+    game_namespaces: Array<str>,
+    current_host: bool,
+    host_files: Array<String>,
+    game_files: Array<String>,
 }
 
 impl Generator {
@@ -518,6 +525,107 @@ impl Generator {
         self.write_str(file, name);
     }
 
+    fn namespace_is_game(&self, module: *Module) -> bool {
+        if module == null || self.game_namespaces.length == 0 { return false; }
+        let path = String::new(self.allocator);
+        let namespace: *Namespace = (*module).namespace;
+        while namespace != null {
+            let namespace_info: Namespace = *namespace;
+            if path.array.length > 0 { path.prepend("::"); }
+            path.prepend(namespace_info.name);
+            namespace = namespace_info.parent;
+        }
+        let module_path = path.as_str();
+        for i in 0..self.game_namespaces.length {
+            let game = self.game_namespaces.data[i];
+            if module_path.eq(game) { return true; }
+            if module_path.length > game.length + 1 && module_path.starts_with(game) && module_path.ptr[game.length] == ':' { return true; }
+        }
+        return false;
+    }
+
+    fn generics_are_game(&self, generics: *GenericMap, depth: u32) -> bool {
+        if generics == null { return false; }
+        let map: GenericMap = *generics;
+        for i in 0..map.array.length {
+            if self.type_is_game(&map.array.data[i], depth + 1) { return true; }
+        }
+        return false;
+    }
+
+    // Whether `type` is defined in a game namespace or instantiated with a
+    // game type anywhere in its generics.
+    fn type_is_game(&self, type: &Type, depth: u32) -> bool {
+        if depth > 16 { return false; }
+        match type {
+            Type::Indirect(indirect) => { return self.type_is_game(&indirect.to, depth + 1); },
+            Type::Sequence(sequence) => { return self.type_is_game(&sequence.element, depth + 1); },
+            Type::Tuple(tuple) => {
+                for i in 0..tuple.elements.length {
+                    if self.type_is_game(&tuple.elements.data[i], depth + 1) { return true; }
+                }
+                return false;
+            },
+            Type::Struct(struct_info, generics) => { return self.namespace_is_game(struct_info.module) || self.generics_are_game(generics, depth); },
+            Type::Enum(enum_info, generics) => { return self.namespace_is_game(enum_info.context.module) || self.generics_are_game(generics, depth); },
+            Type::Trait(trait_info, generics) => { return self.namespace_is_game(trait_info.module) || self.generics_are_game(generics, depth); },
+            Type::Function(func_info, generics) => {
+                if func_info.context != null {
+                    let context: Context = *func_info.context;
+                    if self.namespace_is_game(context.module) { return true; }
+                }
+                return self.generics_are_game(generics, depth);
+            },
+            Type::CoroutineInstance(func_info, generics) => {
+                if func_info.context != null {
+                    let context: Context = *func_info.context;
+                    if self.namespace_is_game(context.module) { return true; }
+                }
+                return self.generics_are_game(generics, depth);
+            },
+            Type::Global(global) => { return self.namespace_is_game(global.module); },
+            _ => { return false; },
+        }
+    }
+
+    // Starts a generated file: in a split build it belongs to the game when
+    // its module is a game namespace or it involves a game type, and to the
+    // host otherwise.
+    fn begin_file(&self, type: *Type, generics: *GenericMap, module: *Module) {
+        if self.game_namespaces.length == 0 { self.current_host = false; return; }
+        let game = self.namespace_is_game(module) || self.generics_are_game(generics, 0);
+        if !game && type != null { game = self.type_is_game(type, 0); }
+        self.current_host = !game;
+    }
+
+    fn add_code_file(&self, code: String) {
+        self.code_files.append(code);
+        if self.game_namespaces.length == 0 { return; }
+        if self.current_host { self.host_files.append(code); } else { self.game_files.append(code); }
+    }
+
+    // `extern `, and in a split build the host's export and import macro
+    // (PAVE_HOST_API: dllexport building the host, dllimport the game).
+    fn write_extern(&self, file: &FILE) {
+        fprintf(file, "extern ");
+        if self.current_host { fprintf(file, "PAVE_HOST_API "); }
+    }
+
+    fn write_file_list(&self, name: *const char, files: &Array<String>) -> bool {
+        let path = String::new(self.allocator);
+        path.append(str::new(self.path));
+        path.append("/");
+        path.append(str::new(name));
+        let file = fopen(path.c_str(), "wb");
+        if file == null { perror(path.c_str()); return false; }
+        for code_file in files {
+            let length: u32 = code_file.array.length;
+            fprintf(file, "%.*s\n", length, code_file.array.data);
+        }
+        fclose(file);
+        return true;
+    }
+
     fn make_path(&self, module: *Module, name: str, ext: str) -> String {
         let result = self.make_rel_path(module, name, ext);
         result.prepend("/");
@@ -594,7 +702,7 @@ impl Generator {
         return trait_name;
     }
 
-    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, root: &Root) -> bool {
+    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, game_namespaces: Array<str>, root: &Root) -> bool {
         let result = true;
 
         let self: Generator = Generator {
@@ -611,6 +719,10 @@ impl Generator {
             indent: 0,
             naming_c99: Naming { allocator, type: NamingType::Ident, generic_start: "", generic_seperator: "", generic_end: "", pointer_prefix: "", pointer_suffix: "", pointer_const_prefix: "", pointer_const_suffix: "", reference_prefix: "", reference_suffix: "", sequence_slice_prefix: "", sequence_open: "", sequence_fixed_delimiter: "", sequence_close: "", tuple_prefix: "", tuple_open: "", tuple_close: "", enum_generic_type_suffix: "", enum_prefix: "", struct_prefix: "", trait_prefix: "", union_prefix: "", coroutine_instance_prefix: "", primitives: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 }, naming_ident: null },
             function_context: null,
+            game_namespaces,
+            current_host: false,
+            host_files: Array<String>::new(allocator),
+            game_files: Array<String>::new(allocator),
         };
 
         self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);
@@ -663,10 +775,15 @@ impl Generator {
         for (_, &usage) in usages.type_impls { success = file_gen.generate_type_impl_loop(usage) && success; }
         file_gen.generate_globals_namespace(&root.children);
         file_gen.generate_test_runner(&root.children);
+        if mem_file_flush() != 0 { success = false; }
 
         if !success {
             fprintf(stderr, "Generation failed\n");
             return false;
+        }
+
+        if game_namespaces.length > 0 {
+            if !self.write_file_list("pave_host_sources.txt", &self.host_files) || !self.write_file_list("pave_game_sources.txt", &self.game_files) { return false; }
         }
 
         if self.code_files.length > 0 {

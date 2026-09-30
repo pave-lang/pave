@@ -51,6 +51,7 @@ impl FileGenerator {
             fprintf(stderr, "Missing function context in generate_function\n");
             return false;
         }
+        generator.begin_file(generics.self_type, generics, context.module);
 
         let code = generator.make_path(context.module, name_str, code_ext);
         let code_file: *FILE = mem_file_open();
@@ -77,7 +78,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         include_writer = IncludeWriter::new(generator.allocator); // TODO fix function definition setup so that we can write headers first, then we only need the initial IncludeWriter
 
@@ -131,6 +132,7 @@ impl FileGenerator {
         let generics = usage_context.generic_map;
         let enum_info = usage.type;
         let module = enum_info.context.module;
+        generator.begin_file(generics.self_type, generics, module);
         let is_discriminated_union = enum_info.is_discriminated_union();
         let include_writer = IncludeWriter::new(generator.allocator);
 
@@ -521,7 +523,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         return true;
     }
@@ -541,6 +543,7 @@ impl FileGenerator {
         let struct_info = usage.type;
         let name = generator.naming_ident.get_type_name(generics.self_type, generics.self_type, generics);
         let module = struct_info.module;
+        generator.begin_file(generics.self_type, generics, module);
         let include_writer = IncludeWriter::new(generator.allocator);
 
         let header = generator.make_path(struct_info.module, name.as_str(), ".h");
@@ -696,7 +699,8 @@ impl FileGenerator {
                 return false;
             }
 
-            fprintf(code_file, "extern struct trait_StructVTable ");
+            generator.write_extern(code_file);
+            fprintf(code_file, "struct trait_StructVTable ");
             generator.write_str_title(code_file, name.as_str());
             fprintf(code_file, "__VTABLE__STRUCT;\n");
 
@@ -899,7 +903,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         return true;
     }
@@ -907,7 +911,8 @@ impl FileGenerator {
     fn write_any_extern(&self, file: &FILE, name: str) {
         let generator = self.generator;
         fprintf(file, "#include <std/trait_Any.h>\n");
-        fprintf(file, "extern struct trait_AnyVTable ");
+        generator.write_extern(file);
+            fprintf(file, "struct trait_AnyVTable ");
         generator.write_str_title(file, name);
         fprintf(file, "__VTABLE__");
         generator.write_str_title(file, "Any");
@@ -944,6 +949,7 @@ impl FileGenerator {
         let defs = DefinitionWriter { generator: generator };
         let primitive_info = usage.type;
         let generics = usage_context.generic_map;
+        generator.begin_file(null, null, null);
         let name = primitive_info.name;
         let include_writer = IncludeWriter::new(generator.allocator);
 
@@ -1038,7 +1044,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         return true;
     }
@@ -1061,6 +1067,7 @@ impl FileGenerator {
         let defs = DefinitionWriter { generator: generator };
         let generics = usage_context.generic_map;
         let element_type = &usage.type.element;
+        generator.begin_file(element_type, generics, null);
 
         let element_indirect = Indirect { type: IndirectType::Reference, to: *element_type };
         let element_reference_type = Type::Indirect(&element_indirect);
@@ -1128,7 +1135,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         return true;
     }
@@ -1147,6 +1154,7 @@ impl FileGenerator {
         let tuple = usage.type;
         let element_types = &tuple.elements;
         let tuple_type = Type::Tuple(tuple);
+        generator.begin_file(&tuple_type, generics, null);
 
         let name = generator.naming_ident.get_type_name(&tuple_type, &tuple_type, generics);
         let include_writer = IncludeWriter::new(generator.allocator);
@@ -1216,6 +1224,7 @@ impl FileGenerator {
         let context = impl_info.context;
         let module = context.module;
         let generics = usage_context.generic_map;
+        generator.begin_file(generics.self_type, generics, module);
         let self_type = generics.self_type;
         if self_type == null { return false; }
 
@@ -1265,7 +1274,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         return true;
     }
@@ -1275,6 +1284,7 @@ impl FileGenerator {
         let defs = DefinitionWriter { generator: generator };
         let generics = usage_context.generic_map;
         let trait_info = usage.type;
+        generator.begin_file(generics.self_type, generics, trait_info.module);
 
         if !trait_info.has_dynamic_dispatch() { return true; }
 
@@ -1321,6 +1331,7 @@ impl FileGenerator {
         if global.type.is_unknown() { return true; }
 
         let name = global.name.value;
+        generator.begin_file(null, null, global.module);
 
         let blank_generics = generator.allocator.store(&GenericMap { self_type: null, array: Array<Type> { allocator: generator.allocator, data: null, length: 0, capacity: 0 }, map: HashMap<str, usize> { allocator: generator.allocator, buckets: null, data: null, capacity: 0, length: 0 } });
         if blank_generics == null {
@@ -1350,7 +1361,9 @@ impl FileGenerator {
             fprintf(header_file, "#include <%.*s.h>\n", cast<i32>(inc.length), inc.ptr);
         }
 
-        fprintf(header_file, "\nextern ");
+        fprintf(header_file, "\n");
+                generator.write_extern(header_file);
+                fprintf(header_file, "");
         if global.is_const { fprintf(header_file, "const "); }
         generator.write_variable_decl(header_file, name, &global.type, blank_generics);
         fprintf(header_file, ";\n");
@@ -1382,7 +1395,7 @@ impl FileGenerator {
         mem_file_save(code_file, code.c_str());
         mem_file_close(code_file);
 
-        generator.code_files.append(code);
+        generator.add_code_file(code);
 
         generator.function_context = null;
 
@@ -1484,7 +1497,8 @@ impl FileGenerator {
         mem_file_save(runner_file, runner_path.c_str());
         mem_file_close(runner_file);
 
-        generator.code_files.append(runner_path);
+        generator.current_host = true;
+        generator.add_code_file(runner_path);
     }
 
     fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {

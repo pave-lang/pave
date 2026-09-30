@@ -96,7 +96,7 @@ static int mem_file_matches(const char *path, const char *data, size_t length) {
     return matches && offset == length;
 }
 
-static int mem_file_write(const char *path, const char *data, size_t length) {
+static int mem_file_write_now(const char *path, const char *data, size_t length) {
     if (mem_file_matches(path, data, length)) {
         return 0;
     }
@@ -115,6 +115,69 @@ static int mem_file_write(const char *path, const char *data, size_t length) {
 
     fclose(out);
     return 1;
+}
+
+// Saved files wait here until mem_file_flush, the last save of a path
+// winning, so a file generated more than once in a run is written once, and
+// not at all if it ends up as it was: its time stays the same, and builds
+// that depend on it are not redone.
+typedef struct PendingFile {
+    char *path;
+    char *data;
+    size_t length;
+    struct PendingFile *next;
+} PendingFile;
+
+static PendingFile *pending_files = NULL;
+
+static int mem_file_write(const char *path, const char *data, size_t length) {
+    PendingFile *entry = pending_files;
+    while (entry != NULL && strcmp(entry->path, path) != 0) {
+        entry = entry->next;
+    }
+
+    char *copy = malloc(length + 1);
+    if (copy == NULL) {
+        return -1;
+    }
+    memcpy(copy, data, length);
+
+    if (entry == NULL) {
+        entry = calloc(1, sizeof(PendingFile));
+        size_t path_length = strlen(path);
+        char *path_copy = malloc(path_length + 1);
+        if (entry == NULL || path_copy == NULL) {
+            free(entry);
+            free(path_copy);
+            free(copy);
+            return -1;
+        }
+        memcpy(path_copy, path, path_length + 1);
+        entry->path = path_copy;
+        entry->next = pending_files;
+        pending_files = entry;
+    } else {
+        free(entry->data);
+    }
+
+    entry->data = copy;
+    entry->length = length;
+    return 0;
+}
+
+int mem_file_flush(void) {
+    int result = 0;
+    while (pending_files != NULL) {
+        PendingFile *entry = pending_files;
+        pending_files = entry->next;
+        if (mem_file_write_now(entry->path, entry->data, entry->length) < 0) {
+            result = -1;
+        }
+        free(entry->path);
+        free(entry->data);
+        free(entry);
+    }
+    return result;
 }
 
 #ifdef _WIN32
