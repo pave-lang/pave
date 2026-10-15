@@ -1,0 +1,10 @@
+#ifndef PAVE_TEST_EXPRESSION_TEST__HEX_AND_BINARY_LITERALS_TAKE_A_U_SUFFIX__AND_A_HEX_F_IS_A_DIGIT
+#define PAVE_TEST_EXPRESSION_TEST__HEX_AND_BINARY_LITERALS_TAKE_A_U_SUFFIX__AND_A_HEX_F_IS_A_DIGIT
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#line 1 "src/compiler/ExpressionTest.pv"
+void test_ExpressionTest__hex_and_binary_literals_take_a_u_suffix__and_a_hex_f_is_a_digit();
+
+#endif

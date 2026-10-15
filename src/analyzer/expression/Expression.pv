@@ -99,7 +99,9 @@ impl Expression {
     }
 
     fn number_primitive(value: str) -> str {
-        if value.ends_with("f") || value.ends_with("F") {
+        // A hex literal's last digit may be an f (`0xff`): not a float.
+        let hex = value.length > 1 && value.ptr[0] == '0' && (value.ptr[1] == 'x' || value.ptr[1] == 'X');
+        if !hex && (value.ends_with("f") || value.ends_with("F")) {
             return "f32";
         } else if value.ends_with("u") || value.ends_with("U") {
             return "u32";

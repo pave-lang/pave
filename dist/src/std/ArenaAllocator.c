@@ -662,6 +662,23 @@ struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struc
     #line 225 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
+#include <std/HashMap_str_Type.h>
+
+#line 220 "src/std/ArenaAllocator.pv"
+struct HashMap_str_Type* ArenaAllocator__store_HashMap_str_Type(struct ArenaAllocator* self, struct HashMap_str_Type* value) {
+    #line 221 "src/std/ArenaAllocator.pv"
+    struct HashMap_str_Type* new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct HashMap_str_Type));
+    #line 222 "src/std/ArenaAllocator.pv"
+    if (new_memory == 0) {
+        #line 222 "src/std/ArenaAllocator.pv"
+        return 0;
+    }
+
+    #line 224 "src/std/ArenaAllocator.pv"
+    memcpy(new_memory, value, sizeof(struct HashMap_str_Type));
+    #line 225 "src/std/ArenaAllocator.pv"
+    return new_memory;
+}
 #include <analyzer/c/IncludeContext.h>
 
 #line 220 "src/std/ArenaAllocator.pv"

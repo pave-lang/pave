@@ -19,10 +19,12 @@ struct IncludeContext {
 
 #include <clang-c/Index.h>
 #include <analyzer/types/Type.h>
+#include <analyzer/c/ParentCpp.h>
 struct Type;
 struct StructC;
 struct EnumC;
 struct FunctionC;
+struct HashMap_str_Type;
 
 #line 17 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__insert_type(struct IncludeContext* self, char const* name, struct Type type);
@@ -72,7 +74,13 @@ struct FunctionC* IncludeContext__add_typedef_function_pointer(struct IncludeCon
 #line 178 "src/analyzer/c/IncludeContext.pv"
 void IncludeContext__add_typedef_pointer(struct IncludeContext* self, char const* name);
 
-#line 191 "src/analyzer/c/IncludeContext.pv"
+#line 195 "src/analyzer/c/IncludeContext.pv"
+void IncludeContext__add_type_alias(struct IncludeContext* self, char const* name, CXCursor cursor);
+
+#line 201 "src/analyzer/c/IncludeContext.pv"
+void IncludeContext__add_type_alias_into(struct IncludeContext* self, struct HashMap_str_Type* types, struct ParentCpp parent, char const* name, CXCursor cursor);
+
+#line 226 "src/analyzer/c/IncludeContext.pv"
 enum CXChildVisitResult IncludeContext__visitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 #endif

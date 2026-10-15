@@ -1877,7 +1877,7 @@ struct Type* Module__find_type(struct Module* self, struct str name, uintptr_t a
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
         #line 946 "src/analyzer/Module.pv"
-        type = HashMap_str_Type__find(&include->types, &name);
+        type = HashMap_str_Type__find(include->types, &name);
         #line 947 "src/analyzer/Module.pv"
         if (type != 0) {
             #line 947 "src/analyzer/Module.pv"
@@ -1999,7 +1999,7 @@ struct Type* Module__find_value(struct Module* self, struct str name) {
         struct Include* include = HashMapIter_str_ref_Include__value(&__iter)->_1;
 
         #line 992 "src/analyzer/Module.pv"
-        type = HashMap_str_Type__find(&include->values, &name);
+        type = HashMap_str_Type__find(include->values, &name);
         #line 993 "src/analyzer/Module.pv"
         if (type != 0) {
             #line 993 "src/analyzer/Module.pv"

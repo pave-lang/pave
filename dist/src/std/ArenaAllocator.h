@@ -161,6 +161,10 @@ struct Include;
 
 #line 220 "src/std/ArenaAllocator.pv"
 struct Include* ArenaAllocator__store_Include(struct ArenaAllocator* self, struct Include* value);
+struct HashMap_str_Type;
+
+#line 220 "src/std/ArenaAllocator.pv"
+struct HashMap_str_Type* ArenaAllocator__store_HashMap_str_Type(struct ArenaAllocator* self, struct HashMap_str_Type* value);
 struct IncludeContext;
 
 #line 220 "src/std/ArenaAllocator.pv"

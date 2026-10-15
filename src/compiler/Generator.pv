@@ -376,15 +376,21 @@ impl Generator {
 
     fn write_literal(&self, file: &FILE, type: &Type, value: str) -> bool {
         if value.length > 2 && value.ptr[0] == '0' && (value.ptr[1] == 'b' || value.ptr[1] == 'B') {
+            // C99 has no binary literals: as hex, keeping a `u` suffix.
             let acc: u64 = 0;
+            let unsigned_suffix = false;
             let i: usize = 2;
             while i < value.length {
-                if value.ptr[i] != '_' {
-                    acc = (acc << 1) | cast<u64>(value.ptr[i] - '0');
+                let c = value.ptr[i];
+                if c == '0' || c == '1' {
+                    acc = (acc << 1) | cast<u64>(c - '0');
+                } else if c == 'u' || c == 'U' {
+                    unsigned_suffix = true;
                 }
                 i += 1;
             }
             fprintf(file, "0x%llx", acc);
+            if unsigned_suffix { fprintf(file, "u"); }
         } else if value.length > 0 && value.ptr[0] >= '0' && value.ptr[0] <= '9' {
             let i: usize = 0;
             while i < value.length {

@@ -5,6 +5,7 @@
 #include <compiler/test_TraitImplTest__a_generic_trait_s_default_method_binds_the_impl_s_generics.test.h>
 #include <compiler/test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work.test.h>
 #include <compiler/test_ExpressionTest__two_touching___shift_right__and_still_close_nested_generics.test.h>
+#include <compiler/test_ExpressionTest__hex_and_binary_literals_take_a_u_suffix__and_a_hex_f_is_a_digit.test.h>
 #include <std/test_ArenaAllocator__allocations_preserve_maximum_alignment.test.h>
 #include <std/test_ArenaAllocator__aliases_share_allocation_ownership.test.h>
 #include <std/test_ArenaAllocator__realloc_preserves_data_and_frees_the_old_allocation.test.h>
@@ -48,6 +49,10 @@ int main(void) {
 
     fputs("[TEST] compiler/ExpressionTest: two touching > shift right, and still close nested generics\n", stdout);
     test_ExpressionTest__two_touching___shift_right__and_still_close_nested_generics();
+    passed++;
+
+    fputs("[TEST] compiler/ExpressionTest: hex and binary literals take a u suffix, and a hex f is a digit\n", stdout);
+    test_ExpressionTest__hex_and_binary_literals_take_a_u_suffix__and_a_hex_f_is_a_digit();
     passed++;
 
     fputs("[TEST] std/ArenaAllocator: allocations preserve maximum alignment\n", stdout);

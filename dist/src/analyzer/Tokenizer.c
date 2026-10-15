@@ -491,96 +491,106 @@ struct Array_Token Tokenizer__tokenize_data(struct ArenaAllocator* allocator, st
                     #line 309 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
-            } else if (char__Eq_char__eq(tokenizer.data.ptr[start_pos], '0') && (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'b') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'B'))) {
                 #line 312 "src/analyzer/Tokenizer.pv"
+                if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'u') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'U')) {
+                    #line 313 "src/analyzer/Tokenizer.pv"
+                    Tokenizer__increase_pos(&tokenizer);
+                }
+            } else if (char__Eq_char__eq(tokenizer.data.ptr[start_pos], '0') && (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'b') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'B'))) {
+                #line 316 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
-                #line 313 "src/analyzer/Tokenizer.pv"
+                #line 317 "src/analyzer/Tokenizer.pv"
                 while (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '0') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '1') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '_')) {
-                    #line 314 "src/analyzer/Tokenizer.pv"
+                    #line 318 "src/analyzer/Tokenizer.pv"
+                    Tokenizer__increase_pos(&tokenizer);
+                }
+                #line 320 "src/analyzer/Tokenizer.pv"
+                if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'u') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'U')) {
+                    #line 321 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
             } else {
-                #line 317 "src/analyzer/Tokenizer.pv"
+                #line 324 "src/analyzer/Tokenizer.pv"
                 Tokenizer__skip_digits(&tokenizer);
 
-                #line 319 "src/analyzer/Tokenizer.pv"
+                #line 326 "src/analyzer/Tokenizer.pv"
                 if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], '.') && Tokenizer__is_digit(&tokenizer, 1)) {
-                    #line 320 "src/analyzer/Tokenizer.pv"
+                    #line 327 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
-                    #line 321 "src/analyzer/Tokenizer.pv"
+                    #line 328 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
-                    #line 322 "src/analyzer/Tokenizer.pv"
+                    #line 329 "src/analyzer/Tokenizer.pv"
                     Tokenizer__skip_digits(&tokenizer);
                 }
 
-                #line 325 "src/analyzer/Tokenizer.pv"
+                #line 332 "src/analyzer/Tokenizer.pv"
                 if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'f') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'F')) {
-                    #line 326 "src/analyzer/Tokenizer.pv"
+                    #line 333 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 } else if (char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'u') || char__Eq_char__eq(tokenizer.data.ptr[tokenizer.pos], 'U')) {
-                    #line 328 "src/analyzer/Tokenizer.pv"
+                    #line 335 "src/analyzer/Tokenizer.pv"
                     Tokenizer__increase_pos(&tokenizer);
                 }
             }
 
-            #line 332 "src/analyzer/Tokenizer.pv"
+            #line 339 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__NUMBER;
         } else if (Tokenizer__is_quote(&tokenizer)) {
-            #line 334 "src/analyzer/Tokenizer.pv"
+            #line 341 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_string(&tokenizer);
 
-            #line 336 "src/analyzer/Tokenizer.pv"
+            #line 343 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__STRING;
         } else if (Tokenizer__is_comment_line(&tokenizer)) {
-            #line 338 "src/analyzer/Tokenizer.pv"
+            #line 345 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_comment_line(&tokenizer);
 
-            #line 340 "src/analyzer/Tokenizer.pv"
+            #line 347 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__COMMENT;
         } else if (Tokenizer__is_comment_block(&tokenizer)) {
-            #line 342 "src/analyzer/Tokenizer.pv"
+            #line 349 "src/analyzer/Tokenizer.pv"
             Tokenizer__skip_comment_block(&tokenizer);
 
-            #line 344 "src/analyzer/Tokenizer.pv"
+            #line 351 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__COMMENT;
         } else if (Tokenizer__is_symbol(&tokenizer)) {
-            #line 346 "src/analyzer/Tokenizer.pv"
+            #line 353 "src/analyzer/Tokenizer.pv"
             if (Tokenizer__is_in_array(&tokenizer.symbols, token.value.ptr, 3)) {
-                #line 347 "src/analyzer/Tokenizer.pv"
+                #line 354 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
-                #line 348 "src/analyzer/Tokenizer.pv"
+                #line 355 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
             } else if (Tokenizer__is_in_array(&tokenizer.symbols, token.value.ptr, 2)) {
-                #line 350 "src/analyzer/Tokenizer.pv"
+                #line 357 "src/analyzer/Tokenizer.pv"
                 Tokenizer__increase_pos(&tokenizer);
             }
 
-            #line 353 "src/analyzer/Tokenizer.pv"
+            #line 360 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
 
-            #line 355 "src/analyzer/Tokenizer.pv"
+            #line 362 "src/analyzer/Tokenizer.pv"
             token.type = TOKEN_TYPE__SYMBOL;
         } else {
-            #line 357 "src/analyzer/Tokenizer.pv"
+            #line 364 "src/analyzer/Tokenizer.pv"
             fprintf(stderr, "Tokenizer: Unknown token type: %.*s\n", 10, tokenizer.data.ptr + tokenizer.pos);
-            #line 358 "src/analyzer/Tokenizer.pv"
+            #line 365 "src/analyzer/Tokenizer.pv"
             Tokenizer__increase_pos(&tokenizer);
         }
 
-        #line 361 "src/analyzer/Tokenizer.pv"
+        #line 368 "src/analyzer/Tokenizer.pv"
         token.value.length = tokenizer.pos - start_pos;
-        #line 362 "src/analyzer/Tokenizer.pv"
+        #line 369 "src/analyzer/Tokenizer.pv"
         token.end_line = tokenizer.line;
-        #line 363 "src/analyzer/Tokenizer.pv"
+        #line 370 "src/analyzer/Tokenizer.pv"
         token.end_column = tokenizer.column;
 
-        #line 365 "src/analyzer/Tokenizer.pv"
+        #line 372 "src/analyzer/Tokenizer.pv"
         Array_Token__append(&tokens, token);
 
-        #line 367 "src/analyzer/Tokenizer.pv"
+        #line 374 "src/analyzer/Tokenizer.pv"
         Tokenizer__skip_whitespace(&tokenizer);
     }
 
-    #line 370 "src/analyzer/Tokenizer.pv"
+    #line 377 "src/analyzer/Tokenizer.pv"
     return tokens;
 }

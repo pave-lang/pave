@@ -76,10 +76,16 @@ struct Sequence* ExpressionWriter__get_typed_variadic_sequence(struct Expression
 #line 673 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_typed_variadic_slice(struct ExpressionWriter* self, FILE* file, struct Sequence* sequence, struct Array_InvokeArgument* arguments, uintptr_t start, struct GenericMap* generics);
 
-#line 713 "src/compiler/ExpressionWriter.pv"
+#line 716 "src/compiler/ExpressionWriter.pv"
+bool ExpressionWriter__returns_cpp_reference(struct Type* function);
+
+#line 733 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 937 "src/compiler/ExpressionWriter.pv"
+#line 744 "src/compiler/ExpressionWriter.pv"
+bool ExpressionWriter__write_invoke_call(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
+
+#line 968 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics);
 
 #endif

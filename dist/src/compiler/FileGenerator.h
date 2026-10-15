@@ -31,73 +31,79 @@ struct Array_str;
 #line 16 "src/compiler/FileGenerator.pv"
 struct FileGenerator FileGenerator__new(struct Generator* generator);
 
-#line 20 "src/compiler/FileGenerator.pv"
+#line 24 "src/compiler/FileGenerator.pv"
+void FileGenerator__open_c_linkage(struct FileGenerator* self, FILE* file);
+
+#line 29 "src/compiler/FileGenerator.pv"
+void FileGenerator__close_c_linkage(struct FileGenerator* self, FILE* file);
+
+#line 34 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_function_loop(struct FileGenerator* self, struct TypeFunctionUsage* usage);
 
-#line 28 "src/compiler/FileGenerator.pv"
+#line 42 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_function(struct FileGenerator* self, struct TypeFunctionUsage* usage, struct UsageContext* usage_context);
 
-#line 121 "src/compiler/FileGenerator.pv"
+#line 137 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_enum_loop(struct FileGenerator* self, struct TypeUsage_Enum* usage);
 
-#line 129 "src/compiler/FileGenerator.pv"
+#line 145 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_enum(struct FileGenerator* self, struct TypeUsage_Enum* usage, struct UsageContext* usage_context);
 
-#line 531 "src/compiler/FileGenerator.pv"
+#line 549 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_struct_loop(struct FileGenerator* self, struct TypeUsage_Struct* usage);
 
-#line 539 "src/compiler/FileGenerator.pv"
+#line 557 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_struct(struct FileGenerator* self, struct TypeUsage_Struct* usage, struct UsageContext* usage_context);
 
-#line 911 "src/compiler/FileGenerator.pv"
+#line 936 "src/compiler/FileGenerator.pv"
 void FileGenerator__write_any_extern(struct FileGenerator* self, FILE* file, struct str name);
 
-#line 922 "src/compiler/FileGenerator.pv"
+#line 947 "src/compiler/FileGenerator.pv"
 void FileGenerator__write_any_definition(struct FileGenerator* self, FILE* file, struct str name, struct Type* self_type, struct GenericMap* generics);
 
-#line 939 "src/compiler/FileGenerator.pv"
+#line 964 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive_loop(struct FileGenerator* self, struct TypeUsage_Primitive* usage);
 
-#line 947 "src/compiler/FileGenerator.pv"
+#line 972 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_primitive(struct FileGenerator* self, struct TypeUsage_Primitive* usage, struct UsageContext* usage_context);
 
-#line 1052 "src/compiler/FileGenerator.pv"
+#line 1079 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_sequence(struct FileGenerator* self, struct TypeUsage_Sequence* usage);
 
-#line 1065 "src/compiler/FileGenerator.pv"
+#line 1092 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_slice(struct FileGenerator* self, struct TypeUsage_Sequence* usage, struct UsageContext* usage_context);
 
-#line 1143 "src/compiler/FileGenerator.pv"
+#line 1172 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple_loop(struct FileGenerator* self, struct TypeUsage_Tuple* usage);
 
-#line 1151 "src/compiler/FileGenerator.pv"
+#line 1180 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_tuple(struct FileGenerator* self, struct TypeUsage_Tuple* usage, struct UsageContext* usage_context);
 
-#line 1202 "src/compiler/FileGenerator.pv"
+#line 1233 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait_loop(struct FileGenerator* self, struct TypeUsage_Trait* usage);
 
-#line 1210 "src/compiler/FileGenerator.pv"
+#line 1241 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_type_impl_loop(struct FileGenerator* self, struct TypeUsage_TypeImpl* usage);
 
-#line 1218 "src/compiler/FileGenerator.pv"
+#line 1249 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_type_impl(struct FileGenerator* self, struct TypeUsage_TypeImpl* usage, struct UsageContext* usage_context);
 
-#line 1311 "src/compiler/FileGenerator.pv"
+#line 1344 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_trait(struct FileGenerator* self, struct TypeUsage_Trait* usage, struct UsageContext* usage_context);
 
-#line 1358 "src/compiler/FileGenerator.pv"
+#line 1392 "src/compiler/FileGenerator.pv"
 bool FileGenerator__generate_global(struct FileGenerator* self, struct Global* global);
 
-#line 1434 "src/compiler/FileGenerator.pv"
+#line 1470 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1446 "src/compiler/FileGenerator.pv"
+#line 1482 "src/compiler/FileGenerator.pv"
 void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths, struct Array_str* module_paths);
 
-#line 1468 "src/compiler/FileGenerator.pv"
+#line 1504 "src/compiler/FileGenerator.pv"
 void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1533 "src/compiler/FileGenerator.pv"
+#line 1569 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif

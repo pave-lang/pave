@@ -56,16 +56,16 @@ struct Naming Naming__new_c99(struct ArenaAllocator* allocator, struct Naming* n
 #line 154 "src/analyzer/Naming.pv"
 struct String Naming__get_type_name(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 590 "src/analyzer/Naming.pv"
+#line 592 "src/analyzer/Naming.pv"
 struct String Naming__get_type_decl(struct Naming* self, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 641 "src/analyzer/Naming.pv"
+#line 643 "src/analyzer/Naming.pv"
 struct String Naming__get_variable_decl(struct Naming* self, struct str variable_name, struct Type* type, struct Type* type_self, struct GenericMap* generics_map);
 
-#line 671 "src/analyzer/Naming.pv"
+#line 673 "src/analyzer/Naming.pv"
 void Naming__append_decl_suffix(struct Naming* self, struct String* result, struct Type* type);
 
-#line 693 "src/analyzer/Naming.pv"
+#line 695 "src/analyzer/Naming.pv"
 void Naming__append_cpp_path(struct Naming* self, struct String* result, struct ParentCpp parent);
 
 #endif

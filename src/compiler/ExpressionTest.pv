@@ -11,3 +11,12 @@ test "two touching > shift right, and still close nested generics" {
     if ((word >> 8) & 255u) != 2 || (word >> 16) != 3 || nested.length != 0 { abort(); }
     if !(word > 3) { abort(); }
 }
+
+test "hex and binary literals take a u suffix, and a hex f is a digit" {
+    let byte: u32 = 0xffu;
+    let mask: u32 = 0xff00u;
+    let bits: u32 = 0b101u;
+    // A trailing f here is a hex digit, so this is an i32, not an f32.
+    let low: i32 = 0xff;
+    if byte != 255u || mask != 65280u || bits != 5u || low != 255 { abort(); }
+}
