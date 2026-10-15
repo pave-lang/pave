@@ -32,6 +32,11 @@ struct Root {
     hack_type_impl: *TypeImpl,
     includes_c: HashMap<str, &Include>,
     includes_cpp: HashMap<str, &Include>,
+    // Every C++ include's declarations, merged: a class one header only
+    // forward-declares is completed by the header that defines it, and a
+    // namespace reopened in another header gains its members.
+    cpp_types: HashMap<str, Type>,
+    cpp_values: HashMap<str, Type>,
     mode_cpp: bool,
 }
 
@@ -53,6 +58,8 @@ impl Root {
             naming_decl: Naming::new_decl(allocator),
             includes_c: HashMap<str, &Include>::new(allocator),
             includes_cpp: HashMap<str, &Include>::new(allocator),
+            cpp_types: HashMap<str, Type>::new(allocator),
+            cpp_values: HashMap<str, Type>::new(allocator),
             primitive_bool: null,
             primitive_usize: null,
             primitive_void: null,

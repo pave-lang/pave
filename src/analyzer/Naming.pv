@@ -530,7 +530,9 @@ impl Naming {
                 result.append(info.name);
             },
             Type::EnumC(enum_info) => {
-                if self.type == NamingType::C99 { result.append("enum "); }
+                // C needs `enum E`; C++ names it plainly, which also works where
+                // `enum` can't go (a value, `ns::E::A`).
+                if self.type == NamingType::C99 && !enum_info.include.mode_cpp { result.append("enum "); }
                 self.append_cpp_path(&result, enum_info.parent);
                 result.append(enum_info.name);
             },

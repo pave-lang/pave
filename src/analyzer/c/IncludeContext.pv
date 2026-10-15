@@ -188,6 +188,41 @@ impl IncludeContext {
         self.insert_type(name, Type::TypedefC(typedef_));
     }
 
+    // A C++ `using name = ...`. Of a class template (`using float3 =
+    // TVec3<float>`): a class of its own, named by the alias where it's
+    // declared, with the specialization's fields. Otherwise the type it
+    // names, under this name too.
+    fn add_type_alias(&self, name: *const char, cursor: CXCursor) {
+        self.add_type_alias_into(self.types, self.parent, name, cursor);
+    }
+
+    // add_type_alias for an alias in `parent` (a namespace's or a class's,
+    // `using Format = backend::PixelDataFormat` in a class), into its `types`.
+    fn add_type_alias_into(&self, types: &HashMap<str, Type>, parent: ParentCpp, name: *const char, cursor: CXCursor) {
+        let include = self.include;
+        if types.find(name) != null { return; }
+
+        let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
+        let canonical_type = clang_getCanonicalType(underlying_type);
+        if canonical_type.kind == CXType_Record && clang_Type_getNumTemplateArguments(canonical_type) > 0 {
+            let class_info = ClassCpp::new(include, name, parent, true);
+            types.insert(name, Type::ClassCpp(class_info));
+            clang_Type_visitFields(canonical_type, IncludeObjectContext::visitor_alias_field, &IncludeObjectContext {
+                context: self,
+                object: class_info,
+            });
+            return;
+        }
+
+        let resolved = include.parse_type(underlying_type);
+        if resolved == null { return; }
+        match resolved {
+            Type::UnknownC(_) => { return; },
+            _ => {},
+        }
+        types.insert(name, *resolved);
+    }
+
     fn visitor(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {
         let self: &IncludeContext = client_data;
         let include = self.include;
@@ -208,6 +243,9 @@ impl IncludeContext {
             return CXChildVisit_Continue;
         } else if kind == CXCursor_FunctionDecl {
             self.add_function(name, cursor);
+            return CXChildVisit_Continue;
+        } else if kind == CXCursor_TypeAliasDecl {
+            self.add_type_alias(name, cursor);
             return CXChildVisit_Continue;
         } else if kind == CXCursor_EnumDecl {
             let enum_info = self.add_enum(name);
@@ -237,6 +275,9 @@ impl IncludeContext {
                     class_info = ClassCpp::new(include, name, self.parent, kind == CXCursor_StructDecl);
                     self.insert_type(name, Type::ClassCpp(class_info));
                 }
+                // Generated code includes the header that defines the class,
+                // not one that only forward-declares it.
+                if class_info != null && clang_isCursorDefinition(cursor) != 0 { class_info.include = include; }
 
                 clang_visitChildren(cursor, IncludeObjectContext::visitor_class, &IncludeObjectContext {
                     context: self,
@@ -272,6 +313,13 @@ impl IncludeContext {
             let canonical_type = clang_getCanonicalType(typedef_type);
             let canonical_decl = clang_getTypeDeclaration(canonical_type);
             let canonical_kind = clang_getCursorKind(canonical_decl);
+
+            // A C++ typedef of a class template (`typedef TMat44<float>
+            // mat4f`) is the same as a `using` alias of it.
+            if canonical_type.kind == CXType_Record && clang_Type_getNumTemplateArguments(canonical_type) > 0 {
+                self.add_type_alias(name, cursor);
+                return CXChildVisit_Continue;
+            }
 
             if canonical_kind == CXCursor_StructDecl || canonical_kind == CXCursor_ClassDecl {
                 let struct_info = self.add_typedef_struct(name);

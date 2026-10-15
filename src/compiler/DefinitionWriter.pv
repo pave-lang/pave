@@ -538,6 +538,38 @@ impl DefinitionWriter {
         return true;
     }
 
+    // Whether only C++ can name `type`: a C++ class, or an enum or alias in a
+    // namespace or class, or a pointer to one.
+    fn is_cpp_type(type: &Type) -> bool {
+        match type {
+            Type::ClassCpp(_) => { return true; },
+            Type::NamespaceCpp(_) => { return true; },
+            Type::EnumC(enum_info) => { return !enum_info.parent.is_none(); },
+            Type::TypedefC(typedef_info) => { return DefinitionWriter::is_cpp_type(typedef_info.type); },
+            Type::Indirect(indirect) => { return DefinitionWriter::is_cpp_type(&indirect.to); },
+            _ => {},
+        }
+        return false;
+    }
+
+    // Whether `type` is a pointer (or reference) to a C++-only type.
+    fn is_cpp_pointer(type: &Type) -> bool {
+        match type {
+            Type::Indirect(_) => { return true; },
+            Type::TypedefC(typedef_info) => { return DefinitionWriter::is_cpp_pointer(typedef_info.type); },
+            _ => {},
+        }
+        return false;
+    }
+
+    fn has_cpp_signature(func_info: &Function) -> bool {
+        if DefinitionWriter::is_cpp_type(&func_info.return_type) { return true; }
+        for parameter in func_info.parameters {
+            if DefinitionWriter::is_cpp_type(&parameter.type) { return true; }
+        }
+        return false;
+    }
+
     fn write_struct_definition(&self, file: &FILE, struct_info: &Struct, usage: *TypeUsage<Struct>, usage_context: &UsageContext) -> bool {
         let generator = self.generator;
         let generics = usage_context.generic_map;
@@ -561,8 +593,26 @@ impl DefinitionWriter {
             generator.indent += 1;
 
             for (_, &field) in struct_info.fields {
-                generator.write_indent(file);
                 let field_name = *field.name;
+                // C sees a C++ type's pointer as void*, the same size, so a
+                // header both include gives both the same layout.
+                if DefinitionWriter::is_cpp_type(&field.type) {
+                    if !DefinitionWriter::is_cpp_pointer(&field.type) {
+                        fprintf(stderr, "%.*s.%.*s: a struct C can see holds a C++ type only by pointer\n",
+                            name_length, name.array.data, cast<i32>(field_name.value.length), field_name.value.ptr);
+                        return false;
+                    }
+                    fprintf(file, "#ifdef __cplusplus\n");
+                    generator.write_indent(file);
+                    generator.write_variable_decl(file, field_name.value, &field.type, generics);
+                    fprintf(file, ";\n#else\n");
+                    generator.write_indent(file);
+                    fprintf(file, "void* ");
+                    generator.write_str(file, field_name.value);
+                    fprintf(file, ";\n#endif\n");
+                    continue;
+                }
+                generator.write_indent(file);
                 generator.write_variable_decl(file, field_name.value, &field.type, generics);
                 fprintf(file, ";\n");
             }
@@ -572,7 +622,13 @@ impl DefinitionWriter {
         }
 
         if usage_context.signature.length > 0 { fprintf(file, "\n"); }
+        // Outside the header's extern "C" (FileGenerator), which a C++
+        // compile has open here: what they include may be C++ (Box3D's math
+        // operators under __cplusplus).
+        let reopen_c_linkage = usage_context.signature.length > 0 && (struct_info.module.mode_cpp || generator.root.mode_cpp);
+        if reopen_c_linkage { fprintf(file, "#ifdef __cplusplus\n}\n#endif\n"); }
         include_writer.write(file, generator, &usage_context.signature, generics, false);
+        if reopen_c_linkage { fprintf(file, "#ifdef __cplusplus\nextern \"C\" {\n#endif\n"); }
 
         for (impl_index, *impl_info) in struct_info.impls.iter().enumerate() {
             let trait_info = impl_info.trait_;
@@ -593,13 +649,17 @@ impl DefinitionWriter {
                         }
 
                         fprintf(file, "\n");
+                        // Only C++ can call a method whose signature has C++ types.
+                        let cpp_only = DefinitionWriter::has_cpp_signature(func_info);
+                        if cpp_only { fprintf(file, "#ifdef __cplusplus\n"); }
                         if !self.write_function_definition(file, func_info, generics, null) { return false; }
+                        fprintf(file, ";\n");
+                        if cpp_only { fprintf(file, "#endif\n"); }
                     } else {
                         fprintf(file, "\n");
                         if !self.write_trait_function_decl(file, name.as_str(), trait_info, &impl_info.trait_type, func_info, generics) { return false; }
+                        fprintf(file, ";\n");
                     }
-
-                    fprintf(file, ";\n");
                 }
 
                 if impl_functions_for_impl != null {

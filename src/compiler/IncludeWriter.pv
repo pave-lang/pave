@@ -270,7 +270,13 @@ impl IncludeWriter {
         }
 
         for *include in c_includes {
+            // A header only a #cpp module includes is C++'s alone: a C file
+            // including this one sees its types as void* instead
+            // (DefinitionWriter.write_struct_definition).
+            let cpp_only = generator.root.includes_cpp.find(&include) != null && generator.root.includes_c.find(&include) == null;
+            if cpp_only { fprintf(file, "#ifdef __cplusplus\n"); }
             fprintf(file, "#include <%.*s>\n", cast<i32>(include.length - 2), include.ptr + 1);
+            if cpp_only { fprintf(file, "#endif\n"); }
         }
 
         for *include in includes {

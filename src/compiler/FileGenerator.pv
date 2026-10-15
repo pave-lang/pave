@@ -17,6 +17,20 @@ impl FileGenerator {
         return Self { generator };
     }
 
+    // A header's declarations get C linkage when C++ compiles part of the
+    // program (a #cpp module), so C++ calls Pave's functions by their C names.
+    // Opened after its includes, which may hold C++ (Box3D's math operators
+    // under __cplusplus).
+    fn open_c_linkage(&self, file: &FILE) {
+        if !self.generator.root.mode_cpp { return; }
+        fprintf(file, "#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n");
+    }
+
+    fn close_c_linkage(&self, file: &FILE) {
+        if !self.generator.root.mode_cpp { return; }
+        fprintf(file, "\n#ifdef __cplusplus\n}\n#endif\n");
+    }
+
     fn generate_function_loop(&self, usage: &TypeFunctionUsage) -> bool {
         let success = true;
         for usage_context in usage.usage_contexts {
@@ -95,6 +109,7 @@ impl FileGenerator {
 
         generator.write_context_primitives(header_file, &usage_context.primitive_code, null);
         include_writer.write(header_file, generator, &usage_context.signature, generics, false);
+        self.open_c_linkage(header_file);
 
         if generator.is_coroutine() {
             defs.write_function_coroutine(header_file, func_info, generics);
@@ -108,6 +123,7 @@ impl FileGenerator {
 
         fprintf(header_file, ";\n");
 
+        self.close_c_linkage(header_file);
         fprintf(header_file, "\n#endif\n");
 
         mem_file_save(header_file, header.c_str());
@@ -149,6 +165,7 @@ impl FileGenerator {
 
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.layout, generics, false);
+        self.open_c_linkage(header_file);
 
         if !defs.write_enum_definition(header_file, enum_info, usage, usage_context, &include_writer) {
             fprintf(stderr, "Failed to write enum definition for %s\n", name.c_str());
@@ -158,6 +175,7 @@ impl FileGenerator {
 
         if usage.any_usage { self.write_any_extern(header_file, name.as_str()); }
 
+        self.close_c_linkage(header_file);
         fprintf(header_file, "\n#endif\n");
 
         mem_file_save(header_file, header.c_str());
@@ -556,7 +574,14 @@ impl FileGenerator {
         generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
-        if struct_info.module.mode_cpp || usage_context.cpp_usages.length > 0 {
+        if struct_info.module.mode_cpp {
+            // C++ sees the real types, from the module's own headers (C++
+            // names are qualified, so a bare forward declaration won't do);
+            // C sees them as void* (DefinitionWriter.write_struct_definition).
+            fprintf(header_file, "#ifdef __cplusplus\n");
+            generator.write_includes_raw(header_file, &struct_info.module.includes);
+            fprintf(header_file, "#endif\n\n");
+        } else if usage_context.cpp_usages.length > 0 {
             fprintf(header_file, "#ifdef __cplusplus\n");
 
             for (name, type) in usage_context.cpp_usages {
@@ -572,11 +597,6 @@ impl FileGenerator {
                 }
             }
 
-            if struct_info.module.mode_cpp {
-                if usage_context.cpp_usages.length > 0 { fprintf(header_file, "\n"); }
-                fprintf(header_file, "extern \"C\" {\n");
-            }
-
             fprintf(header_file, "#else\n");
 
             for (name, _) in usage_context.cpp_usages {
@@ -584,15 +604,20 @@ impl FileGenerator {
             }
 
             fprintf(header_file, "#endif\n\n");
-        } else if generator.root.mode_cpp {
-            fprintf(header_file, "#ifdef __cplusplus\n");
-            fprintf(header_file, "extern \"C\" {\n");
-            fprintf(header_file, "#endif\n\n");
         }
 
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.layout, generics, false);
         if usage_context.layout.length > 0 { fprintf(header_file, "\n"); }
+
+        // C linkage for what's declared here, not for the headers included
+        // above: a C header with C++ overloads under __cplusplus (Box3D's
+        // math) can't have them inside extern "C".
+        if struct_info.module.mode_cpp || generator.root.mode_cpp {
+            fprintf(header_file, "#ifdef __cplusplus\n");
+            fprintf(header_file, "extern \"C\" {\n");
+            fprintf(header_file, "#endif\n\n");
+        }
 
         if !defs.write_struct_definition(header_file, struct_info, usage, usage_context) {
             fprintf(stderr, "Failed to write struct definition for %s\n", name.c_str());
@@ -966,6 +991,7 @@ impl FileGenerator {
         generator.write_impl_includes_raw(header_file, &primitive_info.impls);
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.signature, generics, false);
+        self.open_c_linkage(header_file);
 
         if !defs.write_primitive_definition(header_file, primitive_info, generics) {
             fprintf(stderr, "Failed to write primitive definition for %.*s\n", cast<i32>(name.length), name.ptr);
@@ -975,6 +1001,7 @@ impl FileGenerator {
 
         if usage.any_usage { self.write_any_extern(header_file, name); }
 
+        self.close_c_linkage(header_file);
         fprintf(header_file, "\n#endif\n");
 
         mem_file_save(header_file, header.c_str());
@@ -1088,6 +1115,7 @@ impl FileGenerator {
 
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.layout, generics, false);
+        self.open_c_linkage(header_file);
 
         fprintf(header_file, "struct ");
         generator.write_string(header_file, &name);
@@ -1107,6 +1135,7 @@ impl FileGenerator {
 
         defs.write_impl_definition(header_file, name.as_str(), hack_type_impl.impl_info, generics);
 
+        self.close_c_linkage(header_file);
         fprintf(header_file, "\n#endif\n");
 
         mem_file_save(header_file, header.c_str());
@@ -1171,6 +1200,7 @@ impl FileGenerator {
 
         generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
         include_writer.write(header_file, generator, &usage_context.layout, generics, false);
+        self.open_c_linkage(header_file);
 
         fprintf(header_file, "struct ");
         generator.write_string(header_file, &name);
@@ -1191,6 +1221,7 @@ impl FileGenerator {
         generator.indent -= 1;
         fprintf(header_file, "};\n");
 
+        self.close_c_linkage(header_file);
         fprintf(header_file, "\n#endif\n");
 
         mem_file_save(header_file, header.c_str());
@@ -1273,9 +1304,11 @@ impl FileGenerator {
             generator.write_context_primitives(header_file, &impl_context.primitive_header, null);
             include_writer.write(header_file, generator, &impl_context.signature, generics, false);
         }
+        self.open_c_linkage(header_file);
         for *each_impl in impls {
             defs.write_impl_definition(header_file, name.as_str(), each_impl, generics);
         }
+        self.close_c_linkage(header_file);
 
         fprintf(header_file, "\n#endif\n");
 
@@ -1330,14 +1363,15 @@ impl FileGenerator {
         generator.write_str_title(header_file, name.as_str());
         fprintf(header_file, "\n\n");
 
+        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
+        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
+
+        // After the includes, as for struct headers.
         if trait_info.module.mode_cpp {
             fprintf(header_file, "#ifdef __cplusplus\n");
             fprintf(header_file, "extern \"C\" {\n");
             fprintf(header_file, "#endif\n\n");
         }
-
-        generator.write_context_primitives(header_file, &usage_context.primitive_header, null);
-        include_writer.write(header_file, generator, &usage_context.signature, generics, false);
 
         if !defs.write_trait_definition(header_file, trait_info, generics) { mem_file_close(header_file); return false; }
 
@@ -1391,11 +1425,13 @@ impl FileGenerator {
         }
 
         fprintf(header_file, "\n");
+        self.open_c_linkage(header_file);
                 generator.write_extern(header_file);
                 fprintf(header_file, "");
         if global.is_const { fprintf(header_file, "const "); }
         generator.write_variable_decl(header_file, name, &global.type, blank_generics);
         fprintf(header_file, ";\n");
+        self.close_c_linkage(header_file);
 
         fprintf(header_file, "\n#endif\n");
 

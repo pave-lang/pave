@@ -71,7 +71,22 @@ impl IncludeObjectContext {
                 let method_name: *const char = include.make_string(method_spelling);
                 clang_disposeString(method_spelling);
 
+                // One entry per name, typed by the overload a call most likely
+                // means: one that returns something over one that returns
+                // void (a builder's `T* build()` over its `void
+                // build(callback)`), and then of a const and a non-const
+                // overload (`T& get()`, `T const& get() const`), the non-const
+                // one, as called through a non-const object.
                 let return_type = clang_getCursorResultType(cursor);
+                let existing = class_info.fields.find(method_name);
+                if existing != null {
+                    let keep_existing = return_type.kind == CXType_Void ||
+                        (clang_CXXMethod_isConst(cursor) != 0 && !IncludeObjectContext::returns_void(include, existing));
+                    if keep_existing {
+                        include.root.allocator.free(method_name);
+                        return CXChildVisit_Continue;
+                    }
+                }
                 let return_type_resolved = include.parse_type(return_type);
 
                 let func_info = Function::new_allocator(include.root.allocator);
@@ -137,29 +152,57 @@ impl IncludeObjectContext {
                     });
                 }
             },
-            CXCursor_TypedefDecl => {
+            // A class's `typedef` or `using` names a type C++ reaches through
+            // the class (`Texture::Format`): what it names, or a class of its
+            // own for a template (IncludeContext.add_type_alias_into).
+            CXCursor_TypedefDecl | CXCursor_TypeAliasDecl => {
                 let spelling = clang_getCursorSpelling(cursor);
                 let name = include.make_string(spelling);
                 clang_disposeString(spelling);
 
-                if class_info.types.find(name) == null {
-                    let underlying_type = clang_getTypedefDeclUnderlyingType(cursor);
-                    let resolved = include.parse_type(underlying_type);
-
-                    if resolved != null {
-                        let typedef_ = TypedefC::new(include, name, resolved);
-                        class_info.types.insert(name, Type::TypedefC(typedef_));
-                    } else {
-                        include.root.allocator.free(name);
-                    }
-                } else {
-                    include.root.allocator.free(name);
-                }
+                self.context.add_type_alias_into(&class_info.types, ParentCpp::Class(class_info), name, cursor);
             },
             _ => {},
         }
 
         return CXChildVisit_Continue;
+    }
+
+    // Whether `method` (a class's imported method) returns void.
+    fn returns_void(include: &Include, method: &Type) -> bool {
+        match method {
+            Type::Function(func_info, _) => {
+                match func_info.return_type {
+                    Type::Primitive(primitive) => { return primitive == include.root.primitive_void; },
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+        return false;
+    }
+
+    // A field of a class template specialization (IncludeContext.add_type_alias),
+    // with the anonymous unions and structs it's made of flattened in, so
+    // `float3`'s `x`, `y` and `z` are its fields.
+    fn visitor_alias_field(cursor: CXCursor, client_data: CXClientData) -> CXVisitorResult {
+        let self: &IncludeObjectContext = client_data;
+        let include = self.context.include;
+        let class_info: &ClassCpp = self.object;
+
+        let field_spelling: CXString = clang_getCursorSpelling(cursor);
+        let field_name: *const char = include.make_string(field_spelling);
+        clang_disposeString(field_spelling);
+
+        let field_cx_type = clang_getCursorType(cursor);
+        if clang_Cursor_isAnonymousRecordDecl(clang_getTypeDeclaration(field_cx_type)) != 0 {
+            include.root.allocator.free(field_name);
+            clang_Type_visitFields(field_cx_type, IncludeObjectContext::visitor_alias_field, client_data);
+            return CXVisit_Continue;
+        }
+
+        class_info.fields.insert(field_name, *include.parse_type(field_cx_type));
+        return CXVisit_Continue;
     }
 
     fn visitor_enum(cursor: CXCursor, parent: CXCursor, client_data: CXClientData) -> CXChildVisitResult {

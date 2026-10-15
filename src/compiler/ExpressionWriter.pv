@@ -710,7 +710,38 @@ impl ExpressionWriter {
         return success;
     }
 
+    // Whether calling `function` gives a C++ `T&`, which Pave holds as `&T`
+    // (Include.parse_type). Only C++ methods and header functions: a Pave
+    // function returning `&T` already returns a pointer.
+    fn returns_cpp_reference(function: &Type) -> bool {
+        let return_type: *Type = null;
+        match function {
+            Type::Function(func_info, _) => {
+                if func_info.type == FunctionType::MethodCpp { return_type = &func_info.return_type; }
+            },
+            Type::FunctionC(func_info) => { return_type = &func_info.return_type; },
+            _ => {},
+        }
+        if return_type == null { return false; }
+        match return_type {
+            Type::Indirect(indirect) => { return indirect.type == IndirectType::Reference; },
+            _ => {},
+        }
+        return false;
+    }
+
     fn write_invoke(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
+        if ExpressionWriter::returns_cpp_reference(&expression.return_type) {
+            // Its address, so it's used like any other `&T`: `a->b()`.
+            fprintf(file, "(&(");
+            let success = self.write_invoke_call(file, expression, arguments, generics);
+            fprintf(file, "))");
+            return success;
+        }
+        return self.write_invoke_call(file, expression, arguments, generics);
+    }
+
+    fn write_invoke_call(&self, file: &FILE, expression: &Expression, arguments: &Array<InvokeArgument>, generics: &GenericMap) -> bool {
         let generator = self.generator;
         let data: &ExpressionData = &expression.data;
         match data {

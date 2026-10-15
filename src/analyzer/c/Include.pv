@@ -12,8 +12,10 @@ struct Include {
     path: str,
     cxtype_to_type: HashMap<u32, Type>,
     typedef_to_type: HashMap<str, Type>,
-    types: HashMap<str, Type>,
-    values: HashMap<str, Type>,
+    // Its own for a C include; for C++, every include shares the root's
+    // (Root.cpp_types), so declarations from different headers merge.
+    types: &HashMap<str, Type>,
+    values: &HashMap<str, Type>,
     macro_values: HashMap<str, i64>,
     error: str,
 }
@@ -26,8 +28,8 @@ impl Include {
             path,
             cxtype_to_type: HashMap<u32, Type>::new(root.allocator),
             typedef_to_type: HashMap<str, Type>::new(root.allocator),
-            types: HashMap<str, Type>::new(root.allocator),
-            values: HashMap<str, Type>::new(root.allocator),
+            types: if mode_cpp { &root.cpp_types } else { root.allocator.store(&HashMap<str, Type>::new(root.allocator)) },
+            values: if mode_cpp { &root.cpp_values } else { root.allocator.store(&HashMap<str, Type>::new(root.allocator)) },
             macro_values: HashMap<str, i64>::new(root.allocator),
             error: str { ptr: null, length: 0 },
         });
@@ -198,7 +200,7 @@ impl Include {
 
         if success {
             let cursor = clang_getTranslationUnitCursor(unit);
-            clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: null, types: &self.types, values: &self.values, parent: ParentCpp::None });
+            clang_visitChildren(cursor, IncludeContext::visitor, &IncludeContext { include: self, parent_context: null, types: self.types, values: self.values, parent: ParentCpp::None });
         }
 
         if unit != cast<CXTranslationUnit>(0) {
@@ -255,6 +257,18 @@ impl Include {
             return self.cxtype_to_type.find(&type_u32);
         }
 
+        // A C++ `T&` is a Pave `&T` (codegen takes the address of whatever
+        // returns one, ExpressionWriter.write_invoke); `const T&` and `T&&`
+        // are taken as the value, copied.
+        if type.kind == CXType_LValueReference || type.kind == CXType_RValueReference {
+            let referenced_type = clang_getPointeeType(type);
+            let resolved_referenced_type = self.parse_type(referenced_type);
+            if type.kind == CXType_RValueReference || clang_isConstQualifiedType(referenced_type) != 0 {
+                return resolved_referenced_type;
+            }
+            return self.root.allocator.store(&Type::Indirect(Indirect::new_reference(self.root.allocator, *resolved_referenced_type)));
+        }
+
         if type.kind == CXType_Pointer {
             let pointee_type = clang_getPointeeType(type);
             let is_pointee_const = clang_isConstQualifiedType(pointee_type) != 0;
@@ -281,7 +295,7 @@ impl Include {
             }
 
             if path.length > 0 {
-                let current_types = &self.types;
+                let current_types = self.types;
                 let i = path.length;
                 while i > 0 {
                     i -= 1;
@@ -291,12 +305,12 @@ impl Include {
                     let ns_type = current_types.find(ns_name);
                     clang_disposeString(ns_spelling);
 
-                    if ns_type == null { return &self.root.type_unknown; }
+                    if ns_type == null { return self.parse_canonical_type(type); }
 
                     match ns_type {
                         Type::NamespaceCpp(ns_info) => { current_types = &ns_info.types; },
                         Type::ClassCpp(class_info) => { current_types = &class_info.types; },
-                        _ => { return &self.root.type_unknown; }
+                        _ => { return self.parse_canonical_type(type); }
                     }
                 }
 
@@ -306,7 +320,8 @@ impl Include {
                 clang_disposeString(name_spelling);
 
                 if lookup != null { return lookup; }
-                return &self.root.type_unknown;
+                // Not a name it imported, a `using` alias say: what it names.
+                return self.parse_canonical_type(type);
             }
 
             let name_spelling = clang_getCursorSpelling(decl);
