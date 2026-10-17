@@ -9,10 +9,10 @@
 #include <compiler/trait_PaveTestSized.h>
 
 
-#line 18 "src/compiler/TraitImplTest.pv"
+#line 19 "src/compiler/TraitImplTest.pv"
 int32_t ptr_PaveTestThing__PaveTestNamed__name(void* __self);
 
-#line 24 "src/compiler/TraitImplTest.pv"
+#line 25 "src/compiler/TraitImplTest.pv"
 int32_t ptr_PaveTestThing__PaveTestSized__size(void* __self);
 
 #endif
