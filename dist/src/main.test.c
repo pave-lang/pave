@@ -4,6 +4,7 @@
 #include <compiler/test_CStructImplTest__C_struct_impl_constructors_and_methods.test.h>
 #include <compiler/test_TraitImplTest__a_generic_trait_s_default_method_binds_the_impl_s_generics.test.h>
 #include <compiler/test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work.test.h>
+#include <compiler/test_TraitImplTest__a_trait_s_functions_without_self_compile_on_a_struct_with_fields.test.h>
 #include <compiler/test_ExpressionTest__two_touching___shift_right__and_still_close_nested_generics.test.h>
 #include <compiler/test_ExpressionTest__hex_and_binary_literals_take_a_u_suffix__and_a_hex_f_is_a_digit.test.h>
 #include <std/test_ArenaAllocator__allocations_preserve_maximum_alignment.test.h>
@@ -45,6 +46,10 @@ int main(void) {
 
     fputs("[TEST] compiler/TraitImplTest: a pointer type's impls in one module both work\n", stdout);
     test_TraitImplTest__a_pointer_type_s_impls_in_one_module_both_work();
+    passed++;
+
+    fputs("[TEST] compiler/TraitImplTest: a trait's functions without self compile on a struct with fields\n", stdout);
+    test_TraitImplTest__a_trait_s_functions_without_self_compile_on_a_struct_with_fields();
     passed++;
 
     fputs("[TEST] compiler/ExpressionTest: two touching > shift right, and still close nested generics\n", stdout);

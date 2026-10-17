@@ -5,19 +5,19 @@
 
 #include <compiler/PaveTestCounter.h>
 
-#line 15 "src/compiler/TraitImplTest.pv"
+#line 16 "src/compiler/TraitImplTest.pv"
 int32_t PaveTestCounter__PaveTestHandler_i32__handle(void* __self, int32_t* value) {
     struct PaveTestCounter* self = __self; (void)self;
-    #line 15 "src/compiler/TraitImplTest.pv"
+    #line 16 "src/compiler/TraitImplTest.pv"
     self->count += *value;
-    #line 15 "src/compiler/TraitImplTest.pv"
+    #line 16 "src/compiler/TraitImplTest.pv"
     return self->count;
 }
 
-#line 9 "src/compiler/TraitImplTest.pv"
+#line 10 "src/compiler/TraitImplTest.pv"
 int32_t PaveTestCounter__PaveTestHandler_i32__doubled(void* __self, int32_t* value) {
     struct PaveTestCounter* self = __self; (void)self;
-    #line 9 "src/compiler/TraitImplTest.pv"
+    #line 10 "src/compiler/TraitImplTest.pv"
     return PaveTestCounter__PaveTestHandler_i32__handle(self, value) * 2;
 }
 

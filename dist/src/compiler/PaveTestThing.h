@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#line 21 "src/compiler/TraitImplTest.pv"
+#line 22 "src/compiler/TraitImplTest.pv"
 struct PaveTestThing {
     int32_t value;
 };

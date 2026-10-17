@@ -1,8 +1,9 @@
 #include "stdlib.h"
 
 // Compiler regressions: a generic trait's default method called on a type
-// that takes it (its generics bound by the impl), and a pointer type with
-// two impls in one module (their methods share one pair of files).
+// that takes it (its generics bound by the impl), a pointer type with two
+// impls in one module (their methods share one pair of files), and a trait's
+// functions without self, defaulted or not, on a struct with fields.
 
 trait PaveTestHandler<S> {
     fn handle(&self, value: &S) -> i32;
@@ -23,6 +24,17 @@ struct PaveTestThing { value: i32 }
 impl PaveTestNamed for *PaveTestThing {}
 impl PaveTestSized for *PaveTestThing { fn size(&self) -> i32 { return 2; } }
 
+trait PaveTestStatic {
+    fn bytes() -> usize { return sizeof(Self); }
+    fn kind() -> i32;
+}
+
+struct PaveTestWide { a: i64, b: i64 }
+
+impl PaveTestStatic for PaveTestWide {
+    fn kind() -> i32 { return 4; }
+}
+
 test "a generic trait's default method binds the impl's generics" {
     let counter = PaveTestCounter { count: 0 };
     let three = 3;
@@ -33,4 +45,10 @@ test "a pointer type's impls in one module both work" {
     let thing = PaveTestThing { value: 5 };
     let pointer: *PaveTestThing = &thing;
     if pointer.name() + pointer.size() != 3 { abort(); }
+}
+
+test "a trait's functions without self compile on a struct with fields" {
+    // bytes() is compiled but not called: a call to a defaulted static trait
+    // function through its type emits nothing yet.
+    if PaveTestWide::kind() != 4 { abort(); }
 }

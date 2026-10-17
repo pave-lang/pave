@@ -855,8 +855,11 @@ impl DefinitionWriter {
         fprintf(file, " {\n");
         generator.indent += 1;
 
-        let is_value_self = func_info.parameters.length > 0 && func_info.parameters.data[0].type.is_self();
-        if !is_value_self {
+        // Only a `&self` function has the void* __self parameter to cast; a
+        // value `self` is passed as is, and a static one has none.
+        let generics_void = *generics;
+        generics_void.self_type = &generator.root.type_void;
+        if func_info.parameters.length > 0 && Generator::has_void_self_replacement(&func_info.parameters.data[0], &generics_void) {
             self.write_self_cast(file, module, generics);
         }
 

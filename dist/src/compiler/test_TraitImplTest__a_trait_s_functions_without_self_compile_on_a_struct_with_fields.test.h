@@ -1,0 +1,10 @@
+#ifndef PAVE_TEST_TRAIT_IMPL_TEST__A_TRAIT_S_FUNCTIONS_WITHOUT_SELF_COMPILE_ON_A_STRUCT_WITH_FIELDS
+#define PAVE_TEST_TRAIT_IMPL_TEST__A_TRAIT_S_FUNCTIONS_WITHOUT_SELF_COMPILE_ON_A_STRUCT_WITH_FIELDS
+
+#include <stdbool.h>
+#include <stdint.h>
+
+#line 1 "src/compiler/TraitImplTest.pv"
+void test_TraitImplTest__a_trait_s_functions_without_self_compile_on_a_struct_with_fields();
+
+#endif

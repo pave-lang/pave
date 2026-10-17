@@ -10,13 +10,13 @@
 
 #line 1 "src/compiler/TraitImplTest.pv"
 void test_TraitImplTest__a_generic_trait_s_default_method_binds_the_impl_s_generics() {
-    #line 27 "src/compiler/TraitImplTest.pv"
+    #line 39 "src/compiler/TraitImplTest.pv"
     struct PaveTestCounter counter = (struct PaveTestCounter) { .count = 0 };
-    #line 28 "src/compiler/TraitImplTest.pv"
+    #line 40 "src/compiler/TraitImplTest.pv"
     int32_t three = 3;
-    #line 29 "src/compiler/TraitImplTest.pv"
+    #line 41 "src/compiler/TraitImplTest.pv"
     if (PaveTestCounter__PaveTestHandler_i32__doubled(&counter, &three) != 6) {
-        #line 29 "src/compiler/TraitImplTest.pv"
+        #line 41 "src/compiler/TraitImplTest.pv"
         abort();
     }
 }
