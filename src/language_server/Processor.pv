@@ -150,6 +150,10 @@ impl Processor {
         capabilities.insert("documentSymbolProvider", JsonNode::Boolean(true));
         capabilities.insert("workspaceSymbolProvider", JsonNode::Boolean(true));
 
+        let code_lens_provider = HashMap<str, JsonNode>::new(self.allocator);
+        code_lens_provider.insert("resolveProvider", JsonNode::Boolean(false));
+        capabilities.insert("codeLensProvider", JsonNode::Object(code_lens_provider));
+
         let completion_provider = HashMap<str, JsonNode>::new(self.allocator);
         completion_provider.insert("resolveProvider", JsonNode::Boolean(false));
         let completion_triggers = Array<JsonNode>::new(self.allocator);
@@ -1253,6 +1257,108 @@ impl Processor {
         self.send_response(id, JsonNode::Array(result));
     }
 
+    // The name a test runner gives a module: its namespaces and file stem,
+    // e.g. "std/str", matching Generator.make_rel_path in the compiler.
+    fn test_module_path(&self, module: &Module) -> String {
+        let result = String::new(self.allocator);
+        let namespace: *Namespace = module.namespace;
+        while namespace != null {
+            let namespace_info: Namespace = *namespace;
+            result.prepend("/");
+            result.prepend(namespace_info.name);
+            namespace = namespace_info.parent;
+        }
+
+        let path = module.path;
+        let stem_start: usize = 0;
+        let i: usize = 0;
+        while i < path.length {
+            if path.ptr[i] == '/' || path.ptr[i] == '\\' { stem_start = i + 1; }
+            i += 1;
+        }
+        let stem_end = path.length;
+        if stem_end >= stem_start + 3 && path.slice(stem_end - 3, stem_end).eq(".pv") { stem_end -= 3; }
+        result.append(path.slice(stem_start, stem_end));
+        return result;
+    }
+
+    // A lens running the test runner with runner_args: the client's pave.runTests
+    // command builds the test program and runs it with those arguments.
+    fn make_test_code_lens_json(&self, range: &Range, title: str, runner_args: Array<JsonNode>, label: str) -> JsonNode {
+        let arguments = Array<JsonNode>::new(self.allocator);
+        arguments.append(JsonNode::Array(runner_args));
+        arguments.append(JsonNode::String(label));
+
+        let command = HashMap<str, JsonNode>::new(self.allocator);
+        command.insert("title", JsonNode::String(title));
+        command.insert("command", JsonNode::String("pave.runTests"));
+        command.insert("arguments", JsonNode::Array(arguments));
+
+        let lens = HashMap<str, JsonNode>::new(self.allocator);
+        lens.insert("range", self.make_range_json(range));
+        lens.insert("command", JsonNode::Object(command));
+        return JsonNode::Object(lens);
+    }
+
+    fn code_lens(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+        let uri_raw = params.key("textDocument").key("uri").string();
+        let result = Array<JsonNode>::new(self.allocator);
+
+        if uri_raw.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+        let uri = Uri::parse(self.allocator, uri_raw);
+
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        if ls.root == null {
+            ls.analyze();
+        }
+
+        if ls.root == null {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let module = ls.root.find_module_by_path(filename);
+        if module == null || module.tests.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let module_path = self.test_module_path(module);
+
+        // Above the first test, one lens for all of them: every test name in
+        // the file starts with "<module path>: ".
+        if module.tests.length > 1 {
+            let prefix = String::new(self.allocator);
+            prefix.append(module_path.as_str());
+            prefix.append(": ");
+            let runner_args = Array<JsonNode>::new(self.allocator);
+            runner_args.append(JsonNode::String(prefix.as_str()));
+            let range = self.make_token_range(module.tests.data[0].description);
+            result.append(self.make_test_code_lens_json(&range, "Run all tests in file", runner_args, module_path.as_str()));
+        }
+
+        for test_info in module.tests {
+            let description = test_info.description.value;
+            if description.length >= 2 { description = description.slice(1, description.length - 1); }
+
+            let runner_args = Array<JsonNode>::new(self.allocator);
+            runner_args.append(JsonNode::String("--exact"));
+            runner_args.append(JsonNode::String(test_info.func_name));
+            let range = self.make_token_range(test_info.description);
+            result.append(self.make_test_code_lens_json(&range, "Run test", runner_args, description));
+        }
+
+        self.send_response(id, JsonNode::Array(result));
+    }
+
     fn workspace_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
         let result = Array<JsonNode>::new(self.allocator);
         let query = params.key("query").string();
@@ -1468,6 +1574,8 @@ impl Processor {
             self.inlay_hint(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/documentSymbol") {
             self.document_symbol(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/codeLens") {
+            self.code_lens(id, ls, msg_json.key("params"));
         } else if method.eq("workspace/symbol") {
             self.workspace_symbol(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/completion") {

@@ -54,9 +54,6 @@ struct Primitive;
 
 #line 220 "src/std/ArenaAllocator.pv"
 struct Primitive* ArenaAllocator__store_Primitive(struct ArenaAllocator* self, struct Primitive* value);
-
-#line 220 "src/std/ArenaAllocator.pv"
-struct ArenaAllocator** ArenaAllocator__store_ptr_ArenaAllocator(struct ArenaAllocator* self, struct ArenaAllocator** value);
 struct Block;
 
 #line 220 "src/std/ArenaAllocator.pv"

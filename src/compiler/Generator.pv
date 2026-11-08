@@ -34,6 +34,9 @@ struct Generator {
     // them: every impl of a type in a module shares one pair of files.
     type_impl_usages: *HashMap<usize, TypeUsage<TypeImpl>>,
     type_impl_paths: HashSet<str>,
+    // --test: tests are generated, along with a runner that supplies main in
+    // place of the program's own. Otherwise tests are left out entirely.
+    test_mode: bool,
 }
 
 impl Generator {
@@ -739,7 +742,7 @@ impl Generator {
         return trait_name;
     }
 
-    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, game_namespaces: Array<str>, root: &Root) -> bool {
+    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, game_namespaces: Array<str>, test_mode: bool, root: &Root) -> bool {
         let result = true;
 
         let self: Generator = Generator {
@@ -762,6 +765,7 @@ impl Generator {
             game_files: Array<String>::new(allocator),
             type_impl_usages: null,
             type_impl_paths: HashSet<str>::new(allocator),
+            test_mode,
         };
 
         self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);
@@ -814,7 +818,7 @@ impl Generator {
         for (_, &usage) in usages.tuples { success = file_gen.generate_tuple_loop(usage) && success; }
         for (_, &usage) in usages.type_impls { success = file_gen.generate_type_impl_loop(usage) && success; }
         file_gen.generate_globals_namespace(&root.children);
-        file_gen.generate_test_runner(&root.children);
+        if test_mode { success = file_gen.generate_test_runner(&root.children) && success; }
         if mem_file_flush() != 0 { success = false; }
 
         if !success {

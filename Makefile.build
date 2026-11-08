@@ -1,5 +1,6 @@
 # Makefile.build - Single stage build
 # Usage: make -f Makefile.build GENERATOR=<path> BUILD_DIR=<path> GEN_FLAGS=<flags> TARGET=<target>
+# A test runner is the same build with --test in GEN_FLAGS.
 
 SRC_DIR := $(BUILD_DIR)/src
 OBJ_DIR := $(BUILD_DIR)/obj
@@ -20,21 +21,17 @@ else
 	CXX := clang++-20
 endif
 
+# OBJS_OF: the objects for a list of generated sources.
+OBJS_OF = $(sort $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(1))) \
+          $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(1))))
+
 ifneq ($(wildcard $(SRCS_LST)),)
-    FILE_LIST := $(shell cat $(SRCS_LST))
-
-    OBJS := $(sort $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(FILE_LIST)))) \
-            $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(FILE_LIST))))
-
-    TEST_SRCS := $(filter %.test.c,$(FILE_LIST))
-    TEST_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(TEST_SRCS))
-    TEST_LINK_OBJS := $(filter-out %/main.o,$(OBJS)) $(TEST_OBJS)
+    OBJS := $(call OBJS_OF,$(shell cat $(SRCS_LST)))
 endif
 
-TEST_TARGET := $(BUILD_DIR)/tests$(EXE)
 FLAGS_STAMP := $(BUILD_DIR)/build-flags.txt
 
-.PHONY: all build-objs generate tests build-test-objs check-flags
+.PHONY: all build-objs generate check-flags
 .DEFAULT_GOAL := all
 
 check-flags:
@@ -47,9 +44,7 @@ check-flags:
 
 all: check-flags generate
 	@echo "Compiling generated files..."
-	$(eval GEN_FILES := $(shell cat $(SRCS_LST)))
-	$(eval CURRENT_OBJS := $(sort $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter-out %.test.c,$(filter %.c,$(GEN_FILES)))) \
-                           $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(GEN_FILES)))))
+	$(eval CURRENT_OBJS := $(call OBJS_OF,$(shell cat $(SRCS_LST))))
 
 	@$(MAKE) -f Makefile.build build-objs
 
@@ -73,21 +68,5 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) -MMD -MP -c $< -o $@
 
 build-objs: $(OBJS)
-
-build-test-objs: $(TEST_OBJS)
-
-tests: check-flags
-ifeq ($(TEST_SRCS),)
-	@echo "No tests found, skipping."
-else
-	@echo "Compiling test files..."
-	@$(MAKE) -f Makefile.build build-test-objs
-	@echo "Linking test runner..."
-	$(file >$(BUILD_DIR)/test_objs.lst)
-	$(foreach obj,$(TEST_LINK_OBJS),$(file >>$(BUILD_DIR)/test_objs.lst,$(obj)))
-	$(CC) @$(BUILD_DIR)/test_objs.lst $(LDFLAGS) -o $(TEST_TARGET)
-	@echo "Running tests..."
-	$(TEST_TARGET)
-endif
 
 -include $(shell find $(OBJ_DIR) -name '*.d' 2>/dev/null)

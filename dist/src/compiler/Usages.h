@@ -51,6 +51,7 @@ struct Usages {
 
 struct Generator;
 struct HashMap_str_ref_Namespace;
+struct Function;
 struct Module;
 struct Type;
 struct GenericMap;
@@ -64,7 +65,6 @@ struct Enum;
 struct Trait;
 struct UsageContext;
 struct Generics;
-struct Function;
 struct Block;
 struct Expression;
 
@@ -74,64 +74,67 @@ struct Usages Usages__new(struct Generator* generator);
 #line 248 "src/compiler/Usages.pv"
 void Usages__add_namespace(struct Usages* self, struct HashMap_str_ref_Namespace* children);
 
-#line 258 "src/compiler/Usages.pv"
+#line 260 "src/compiler/Usages.pv"
+bool Usages__is_root_function(struct Usages* self, struct Function* func_info);
+
+#line 268 "src/compiler/Usages.pv"
 void Usages__add_module(struct Usages* self, struct Module* module);
 
-#line 317 "src/compiler/Usages.pv"
+#line 329 "src/compiler/Usages.pv"
 void Usages__add_type(struct Usages* self, struct Type* type, struct GenericMap* generic_map);
 
-#line 457 "src/compiler/Usages.pv"
+#line 469 "src/compiler/Usages.pv"
 void Usages__add_type_impl_header(struct Usages* self, struct Type* self_type);
 
-#line 465 "src/compiler/Usages.pv"
+#line 477 "src/compiler/Usages.pv"
 void Usages__process_impls(struct Usages* self, struct Array_ref_Impl* impls, struct GenericMap* generic_map);
 
-#line 511 "src/compiler/Usages.pv"
+#line 523 "src/compiler/Usages.pv"
 void Usages__process_type_impl(struct Usages* self, struct TypeImpl* type_impl);
 
-#line 534 "src/compiler/Usages.pv"
+#line 546 "src/compiler/Usages.pv"
 void Usages__process_primitive(struct Usages* self, struct Primitive* primitive_info);
 
-#line 559 "src/compiler/Usages.pv"
+#line 571 "src/compiler/Usages.pv"
 void Usages__process_sequence(struct Usages* self, struct Sequence* sequence);
 
-#line 612 "src/compiler/Usages.pv"
+#line 624 "src/compiler/Usages.pv"
 void Usages__process_tuple(struct Usages* self, struct Tuple* tuple);
 
-#line 636 "src/compiler/Usages.pv"
+#line 648 "src/compiler/Usages.pv"
 void Usages__process_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 675 "src/compiler/Usages.pv"
+#line 687 "src/compiler/Usages.pv"
 void Usages__process_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 699 "src/compiler/Usages.pv"
+#line 711 "src/compiler/Usages.pv"
 void Usages__process_trait(struct Usages* self, struct Trait* trait_info, struct GenericMap* generic_map);
 
-#line 716 "src/compiler/Usages.pv"
+#line 728 "src/compiler/Usages.pv"
 bool Usages__usage_context_matches(struct UsageContext* uc, struct Generics* generics, struct GenericMap* generic_map);
 
-#line 730 "src/compiler/Usages.pv"
+#line 742 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_struct(struct Usages* self, struct Struct* struct_info, struct GenericMap* generic_map);
 
-#line 741 "src/compiler/Usages.pv"
+#line 753 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_enum(struct Usages* self, struct Enum* enum_info, struct GenericMap* generic_map);
 
-#line 752 "src/compiler/Usages.pv"
+#line 764 "src/compiler/Usages.pv"
 void Usages__mark_any_usage(struct Usages* self, struct Type* type);
 
-#line 774 "src/compiler/Usages.pv"
+#line 786 "src/compiler/Usages.pv"
 struct UsageContext* Usages__find_parent_usage_context_primitive(struct Usages* self, struct Primitive* primitive_info, struct GenericMap* generic_map);
 
-#line 785 "src/compiler/Usages.pv"
+#line 797 "src/compiler/Usages.pv"
 void Usages__process_function(struct Usages* self, struct Function* func_info, struct GenericMap* generic_map);
 
-#line 916 "src/compiler/Usages.pv"
+#line 928 "src/compiler/Usages.pv"
 void Usages__process_block(struct Usages* self, struct Block* block, struct GenericMap* generic_map);
 
-#line 1035 "src/compiler/Usages.pv"
+#line 1047 "src/compiler/Usages.pv"
 void Usages__process_expression(struct Usages* self, struct Expression* expression, struct GenericMap* generic_map);
 
-#line 1343 "src/compiler/Usages.pv"
+#line 1355 "src/compiler/Usages.pv"
 void Usages__normalize(struct Usages* self);
 
 #endif

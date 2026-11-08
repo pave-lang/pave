@@ -158,6 +158,7 @@ impl JsonNode {
             let c = value.ptr[pos];
             pos += 1;
 
+            if c == '\\' { result.append(value.slice(start, pos - 1)); result.append("\\\\"); start = pos; }
             if c == '"' { result.append(value.slice(start, pos - 1)); result.append("\\\""); start = pos; }
             if c == '\r' { result.append(value.slice(start, pos - 1)); result.append("\\n"); start = pos; }
             if c == '\n' { result.append(value.slice(start, pos - 1)); result.append("\\n"); start = pos; }

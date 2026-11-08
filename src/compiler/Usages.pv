@@ -255,8 +255,20 @@ impl Usages {
         }
     }
 
+    // Tests are roots only in a --test build, where the generated test runner
+    // supplies main in place of the program's own.
+    fn is_root_function(&self, func_info: &Function) -> bool {
+        let test_mode = self.generator.test_mode;
+        if func_info.type == FunctionType::Test { return test_mode; }
+        if !test_mode { return true; }
+        let name = func_info.name;
+        return name == null || !name.value.eq("main");
+    }
+
     fn add_module(&self, module: &Module) {
         for (_, &func_info) in module.functions {
+            if !self.is_root_function(func_info) { continue; }
+
             self.functions.insert(cast<usize>(func_info), TypeFunctionUsage::new(self.allocator, func_info));
 
             let name = func_info.name;
