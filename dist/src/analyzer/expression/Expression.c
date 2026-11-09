@@ -336,11 +336,12 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                         #line 136 "src/analyzer/expression/Expression.pv"
                         struct str type_def_path = context->path;
                         #line 137 "src/analyzer/expression/Expression.pv"
-                        switch (Type__resolve_typedef(type)->type) {
+                        struct Type* __pave_tmp_0 = Type__resolve_typedef(type);
+                        switch (__pave_tmp_0->type) {
                             #line 138 "src/analyzer/expression/Expression.pv"
                             case TYPE__STRUCT: {
                                 #line 138 "src/analyzer/expression/Expression.pv"
-                                struct Struct* struct_info = Type__resolve_typedef(type)->struct_value._0;
+                                struct Struct* struct_info = __pave_tmp_0->struct_value._0;
                                 #line 138 "src/analyzer/expression/Expression.pv"
                                 type_def_token = struct_info->name;
                                 #line 138 "src/analyzer/expression/Expression.pv"
@@ -349,7 +350,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                             #line 139 "src/analyzer/expression/Expression.pv"
                             case TYPE__ENUM: {
                                 #line 139 "src/analyzer/expression/Expression.pv"
-                                struct Enum* enum_info = Type__resolve_typedef(type)->enum_value._0;
+                                struct Enum* enum_info = __pave_tmp_0->enum_value._0;
                                 #line 139 "src/analyzer/expression/Expression.pv"
                                 type_def_token = enum_info->name;
                                 #line 139 "src/analyzer/expression/Expression.pv"
@@ -358,7 +359,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                             #line 140 "src/analyzer/expression/Expression.pv"
                             case TYPE__TRAIT: {
                                 #line 140 "src/analyzer/expression/Expression.pv"
-                                struct Trait* trait_info = Type__resolve_typedef(type)->trait_value._0;
+                                struct Trait* trait_info = __pave_tmp_0->trait_value._0;
                                 #line 140 "src/analyzer/expression/Expression.pv"
                                 type_def_token = trait_info->name;
                                 #line 140 "src/analyzer/expression/Expression.pv"
@@ -378,7 +379,8 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
                     }
 
                     #line 149 "src/analyzer/expression/Expression.pv"
-                    switch (Type__resolve_typedef(type)->type) {
+                    struct Type* __pave_tmp_1 = Type__resolve_typedef(type);
+                    switch (__pave_tmp_1->type) {
                         #line 150 "src/analyzer/expression/Expression.pv"
                         case TYPE__ENUM: {
                             #line 150 "src/analyzer/expression/Expression.pv"
@@ -723,7 +725,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
         #line 324 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__STRING: {
             #line 325 "src/analyzer/expression/Expression.pv"
-            struct Type return_type = str__starts_with(token->value, (struct str){ .ptr = "'", .length = strlen("'") }) ? context->type_char : (struct Type) { .type = TYPE__INDIRECT, .indirect_value = &context->pointer_const_char };
+            struct Type return_type = (str__starts_with(token->value, (struct str){ .ptr = "'", .length = strlen("'") }) ? context->type_char : (struct Type) { .type = TYPE__INDIRECT, .indirect_value = &context->pointer_const_char });
 
             #line 327 "src/analyzer/expression/Expression.pv"
             result = Expression__make_next(context, (struct Expression) {
@@ -1858,11 +1860,12 @@ bool Expression__validate_type(struct Expression* self, struct Context* context,
         #line 827 "src/analyzer/expression/Expression.pv"
         case EXPRESSION_DATA__NULL_LITERAL: {
             #line 828 "src/analyzer/expression/Expression.pv"
-            switch (Type__resolve_typedef(expected_type)->type) {
+            struct Type* __pave_tmp_0 = Type__resolve_typedef(expected_type);
+            switch (__pave_tmp_0->type) {
                 #line 829 "src/analyzer/expression/Expression.pv"
                 case TYPE__INDIRECT: {
                     #line 829 "src/analyzer/expression/Expression.pv"
-                    struct Indirect* indirect = Type__resolve_typedef(expected_type)->indirect_value;
+                    struct Indirect* indirect = __pave_tmp_0->indirect_value;
                     #line 830 "src/analyzer/expression/Expression.pv"
                     switch (indirect->type) {
                         #line 831 "src/analyzer/expression/Expression.pv"
@@ -4114,11 +4117,12 @@ void Expression__record_static_member_symbol(struct Context* context, struct Tok
         #line 18 "src/analyzer/expression/ParseTypeExpression.pv"
         default: {
             #line 19 "src/analyzer/expression/ParseTypeExpression.pv"
-            switch (Type__resolve_typedef(owner_type)->type) {
+            struct Type* __pave_tmp_0 = Type__resolve_typedef(owner_type);
+            switch (__pave_tmp_0->type) {
                 #line 20 "src/analyzer/expression/ParseTypeExpression.pv"
                 case TYPE__STRUCT: {
                     #line 20 "src/analyzer/expression/ParseTypeExpression.pv"
-                    struct Struct* struct_info = Type__resolve_typedef(owner_type)->struct_value._0;
+                    struct Struct* struct_info = __pave_tmp_0->struct_value._0;
                     #line 21 "src/analyzer/expression/ParseTypeExpression.pv"
                     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
                     #line 21 "src/analyzer/expression/ParseTypeExpression.pv"
@@ -4142,7 +4146,7 @@ void Expression__record_static_member_symbol(struct Context* context, struct Tok
                 #line 30 "src/analyzer/expression/ParseTypeExpression.pv"
                 case TYPE__ENUM: {
                     #line 30 "src/analyzer/expression/ParseTypeExpression.pv"
-                    struct Enum* enum_info = Type__resolve_typedef(owner_type)->enum_value._0;
+                    struct Enum* enum_info = __pave_tmp_0->enum_value._0;
                     #line 31 "src/analyzer/expression/ParseTypeExpression.pv"
                     { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&enum_info->impls);
                     #line 31 "src/analyzer/expression/ParseTypeExpression.pv"
@@ -5155,11 +5159,12 @@ struct Expression* Expression__parse_instance_member_expression_inner(struct Con
             #line 142 "src/analyzer/expression/PostfixExpression.pv"
             default: {
                 #line 144 "src/analyzer/expression/PostfixExpression.pv"
-                switch (Type__deref_all(&inner->return_type)->type) {
+                struct Type* __pave_tmp_0 = Type__deref_all(&inner->return_type);
+                switch (__pave_tmp_0->type) {
                     #line 145 "src/analyzer/expression/PostfixExpression.pv"
                     case TYPE__STRUCT: {
                         #line 145 "src/analyzer/expression/PostfixExpression.pv"
-                        struct Struct* struct_info = Type__deref_all(&inner->return_type)->struct_value._0;
+                        struct Struct* struct_info = __pave_tmp_0->struct_value._0;
                         #line 146 "src/analyzer/expression/PostfixExpression.pv"
                         struct StructField* field = HashMap_str_StructField__find(&struct_info->fields, &member_name->value);
                         #line 147 "src/analyzer/expression/PostfixExpression.pv"
@@ -5244,7 +5249,7 @@ struct Expression* Expression__parse_instance_member_expression_inner(struct Con
         #line 188 "src/analyzer/expression/PostfixExpression.pv"
         struct Array_InvokeArgument arguments = Array_InvokeArgument__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
         #line 189 "src/analyzer/expression/PostfixExpression.pv"
-        struct Token* name = func_info->parameters.length > 0 ? func_info->parameters.data[0].name : 0;
+        struct Token* name = (func_info->parameters.length > 0 ? func_info->parameters.data[0].name : 0);
         #line 190 "src/analyzer/expression/PostfixExpression.pv"
         if (name != 0 && str__Eq_str__eq(name->value, (struct str){ .ptr = "self", .length = strlen("self") })) {
             #line 191 "src/analyzer/expression/PostfixExpression.pv"
@@ -5490,11 +5495,12 @@ struct Expression* Expression__parse_index_expression(struct Context* context, s
     #line 317 "src/analyzer/expression/PostfixExpression.pv"
     if (Type__is_reference_sequence_dynamic(inner_return_type)) {
         #line 318 "src/analyzer/expression/PostfixExpression.pv"
-        switch (Type__deref_1(inner_return_type)->type) {
+        struct Type* __pave_tmp_0 = Type__deref_1(inner_return_type);
+        switch (__pave_tmp_0->type) {
             #line 319 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__SEQUENCE: {
                 #line 319 "src/analyzer/expression/PostfixExpression.pv"
-                struct Sequence* sequence = Type__deref_1(inner_return_type)->sequence_value;
+                struct Sequence* sequence = __pave_tmp_0->sequence_value;
                 #line 320 "src/analyzer/expression/PostfixExpression.pv"
                 element_type = &sequence->element;
             } break;
@@ -5570,11 +5576,12 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
         return Expression__parse_index_expression(context, inner, generics);
     } else if (Type__is_function(Type__resolve_typedef_function(&inner->return_type)) && (Token__eq(token, TOKEN_TYPE__SYMBOL, "<") || Token__eq(token, TOKEN_TYPE__SYMBOL, "("))) {
         #line 362 "src/analyzer/expression/PostfixExpression.pv"
-        switch (Type__resolve_typedef_function(&inner->return_type)->type) {
+        struct Type* __pave_tmp_0 = Type__resolve_typedef_function(&inner->return_type);
+        switch (__pave_tmp_0->type) {
             #line 363 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__FUNCTION: {
                 #line 363 "src/analyzer/expression/PostfixExpression.pv"
-                struct Function* func_info = Type__resolve_typedef_function(&inner->return_type)->function_value._0;
+                struct Function* func_info = __pave_tmp_0->function_value._0;
                 #line 364 "src/analyzer/expression/PostfixExpression.pv"
                 struct Array_Type parsed_generics = (struct Array_Type) { .allocator = (struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator }, .data = 0, .length = 0, .capacity = 0 };
 
@@ -5633,7 +5640,7 @@ struct Expression* Expression__parse_postfix(struct Context* context, struct Exp
             #line 391 "src/analyzer/expression/PostfixExpression.pv"
             case TYPE__FUNCTION_C: {
                 #line 391 "src/analyzer/expression/PostfixExpression.pv"
-                struct FunctionC* func_info = Type__resolve_typedef_function(&inner->return_type)->functionc_value;
+                struct FunctionC* func_info = __pave_tmp_0->functionc_value;
                 #line 392 "src/analyzer/expression/PostfixExpression.pv"
                 struct ParsedArguments* parsed = Expression__parse_call_arguments(context, generics);
                 #line 393 "src/analyzer/expression/PostfixExpression.pv"
@@ -5863,7 +5870,7 @@ void Expression__collect_null_narrowings(struct Context* context, struct Express
             }
 
             #line 86 "src/analyzer/expression/BinaryExpression.pv"
-            struct str want_op = (struct str){ .ptr = narrow_on_true ? "!=" : "==", .length = strlen(narrow_on_true ? "!=" : "==") };
+            struct str want_op = (struct str){ .ptr = (narrow_on_true ? "!=" : "=="), .length = strlen((narrow_on_true ? "!=" : "==")) };
             #line 87 "src/analyzer/expression/BinaryExpression.pv"
             if (!str__Eq_str__eq(op, want_op)) {
                 #line 87 "src/analyzer/expression/BinaryExpression.pv"
@@ -5937,7 +5944,7 @@ struct Expression* Expression__parse_binary(struct Context* context, struct Expr
         #line 115 "src/analyzer/expression/BinaryExpression.pv"
         bool shift = Expression__is_right_shift(context);
         #line 116 "src/analyzer/expression/BinaryExpression.pv"
-        uintptr_t prec = shift ? (uintptr_t)(8) : Expression__get_precedence(token);
+        uintptr_t prec = (shift ? (uintptr_t)(8) : Expression__get_precedence(token));
         #line 117 "src/analyzer/expression/BinaryExpression.pv"
         if (prec < min_prec) {
             #line 117 "src/analyzer/expression/BinaryExpression.pv"
@@ -6526,13 +6533,14 @@ struct Expression* Expression__find_index_trait_call(struct Context* context, st
     }
 
     #line 365 "src/analyzer/expression/BinaryExpression.pv"
-    switch (Type__deref_reference(&inner->return_type)->type) {
+    struct Type* __pave_tmp_0 = Type__deref_reference(&inner->return_type);
+    switch (__pave_tmp_0->type) {
         #line 366 "src/analyzer/expression/BinaryExpression.pv"
         case TYPE__STRUCT: {
             #line 366 "src/analyzer/expression/BinaryExpression.pv"
-            struct Struct* struct_info = Type__deref_reference(&inner->return_type)->struct_value._0;
+            struct Struct* struct_info = __pave_tmp_0->struct_value._0;
             #line 366 "src/analyzer/expression/BinaryExpression.pv"
-            struct GenericMap* generic_map = Type__deref_reference(&inner->return_type)->struct_value._1;
+            struct GenericMap* generic_map = __pave_tmp_0->struct_value._1;
             #line 367 "src/analyzer/expression/BinaryExpression.pv"
             { struct Iter_ref_ref_Impl __iter = Array_ref_Impl__iter(&struct_info->impls);
             #line 367 "src/analyzer/expression/BinaryExpression.pv"

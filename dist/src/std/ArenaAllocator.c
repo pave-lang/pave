@@ -910,7 +910,7 @@ void* ArenaAllocator__Allocator__realloc(void* __self, void* ptr, uintptr_t new_
     }
 
     #line 321 "src/std/ArenaAllocator.pv"
-    memcpy(new_ptr, ptr, new_size < old_size ? new_size : old_size);
+    memcpy(new_ptr, ptr, (new_size < old_size ? new_size : old_size));
     #line 322 "src/std/ArenaAllocator.pv"
     ArenaBlock__free(current_block, ptr);
 

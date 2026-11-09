@@ -49,7 +49,7 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::UnaryExpression(operator, inner) => {
-                generator.write_str(file, operator);
+                self.write_unary_operator(file, operator, inner);
                 self.write_expression_replacing(file, inner, replace, replacement_name, replacement_type, generics);
                 return true;
             },
@@ -181,6 +181,70 @@ impl ExpressionWriter {
         return false;
     }
 
+    // Whether writing `expression` twice does what evaluating it once would:
+    // it calls nothing.
+    fn is_pure(&self, expression: &Expression) -> bool {
+        match expression.data {
+            ExpressionData::Variable(_) => { return true; },
+            ExpressionData::Literal(_) => { return true; },
+            ExpressionData::NullLiteral => { return true; },
+            ExpressionData::EnumVariant(_) => { return true; },
+            ExpressionData::Type(_) => { return true; },
+            ExpressionData::UnaryExpression(_, inner) => { return self.is_pure(inner); },
+            ExpressionData::BinaryExpression(left, _, right) => { return self.is_pure(left) && self.is_pure(right); },
+            ExpressionData::IfExpression(cond, a, b) => { return self.is_pure(cond) && self.is_pure(a) && self.is_pure(b); },
+            ExpressionData::MemberStaticExpression(parent, _) => { return self.is_pure(parent); },
+            ExpressionData::MemberInstanceExpression(parent, _) => { return self.is_pure(parent); },
+            ExpressionData::IndexExpression(array_expr, index_expr) => { return self.is_pure(array_expr) && self.is_pure(index_expr); },
+            ExpressionData::ParenthesizedExpression(inner) => { return self.is_pure(inner); },
+            ExpressionData::ImplicitCast(inner) => { return self.is_pure(inner); },
+            _ => { return false; },
+        }
+        return false;
+    }
+
+    // Whether `expression` names storage in C, so its address can be taken.
+    fn is_place(&self, expression: &Expression) -> bool {
+        match expression.data {
+            ExpressionData::Variable(_) => { return true; },
+            ExpressionData::UnaryExpression(operator, _) => { return operator.eq("*"); },
+            ExpressionData::MemberInstanceExpression(parent, _) => { return parent.return_type.is_indirect() || self.is_place(parent); },
+            ExpressionData::IndexExpression(array_expr, _) => { return array_expr.return_type.is_indirect() || self.is_place(array_expr); },
+            ExpressionData::ParenthesizedExpression(inner) => { return self.is_place(inner); },
+            _ => { return false; },
+        }
+        return false;
+    }
+
+    // A variable to hold `type` for the length of an expression, or an empty
+    // name where there is no function body to declare it in.
+    fn make_temp(&self, type: &Type) -> str {
+        let function_context = self.generator.function_context;
+        if function_context == null { return ""; }
+        return function_context.add_temp(type);
+    }
+
+    // Two operators that would read as one in C (`- -x` as `--x`) are kept apart.
+    fn write_unary_operator(&self, file: &FILE, operator: str, inner: &Expression) {
+        self.generator.write_str(file, operator);
+        if operator.length == 0 { return; }
+
+        match inner.data {
+            ExpressionData::UnaryExpression(inner_operator, _) => {
+                let last = operator.ptr[operator.length - 1];
+                if inner_operator.length > 0 && inner_operator.ptr[0] == last && (last == '-' || last == '+' || last == '&') {
+                    fprintf(file, " ");
+                }
+            },
+            ExpressionData::Literal(value) => {
+                if value.length > 0 && value.ptr[0] == '-' && operator.ptr[operator.length - 1] == '-' {
+                    fprintf(file, " ");
+                }
+            },
+            _ => {},
+        }
+    }
+
     fn is_safe_to_duplicate(&self, expression: &Expression) -> bool {
         match expression.data {
             ExpressionData::Variable(_) => { return true; },
@@ -263,12 +327,26 @@ impl ExpressionWriter {
     }
 
     fn write_str_cast(&self, file: &FILE, inner_expr: &Expression, generics: &GenericMap, reference: bool) {
+        // The pointer is needed twice; one that calls something is held in a temp.
+        let temp: str = "";
+        if !self.is_pure(inner_expr) { temp = self.make_temp(&inner_expr.return_type); }
+
+        if temp.length > 0 {
+            fprintf(file, "(");
+            self.generator.write_variable(file, temp);
+            fprintf(file, " = ");
+            self.write_expression(file, inner_expr, generics);
+            fprintf(file, ", ");
+        }
+
         if reference { fprintf(file, "&"); }
         fprintf(file, "(struct str){ .ptr = ");
-        self.write_expression(file, inner_expr, generics);
+        if temp.length > 0 { self.generator.write_variable(file, temp); } else { self.write_expression(file, inner_expr, generics); }
         fprintf(file, ", .length = strlen(");
-        self.write_expression(file, inner_expr, generics);
+        if temp.length > 0 { self.generator.write_variable(file, temp); } else { self.write_expression(file, inner_expr, generics); }
         fprintf(file, ") }");
+
+        if temp.length > 0 { fprintf(file, ")"); }
     }
 
     fn write_trait_cast(&self, file: &FILE, inner_expr: &Expression, type: &Type, generics: &GenericMap) {
@@ -827,6 +905,7 @@ impl ExpressionWriter {
                         if variadic_sequence != null {
                             variadic_start = func_info.parameters.length - 1;
                         }
+                        let receiver_temp: str = "";
 
                         match func_info.parent {
                             FunctionParent::Trait(trait_info) => {
@@ -838,11 +917,28 @@ impl ExpressionWriter {
                                 let arg = args.value();
 
                                 if arg.value.return_type.deref().is_trait() {
-                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    // The receiver is needed for its vtable and its instance;
+                                    // one that calls something is held in a temp.
+                                    if !self.is_pure(arg.value) { receiver_temp = self.make_temp(&arg.value.return_type); }
+
+                                    if receiver_temp.length > 0 {
+                                        fprintf(file, "(");
+                                        generator.write_variable(file, receiver_temp);
+                                        fprintf(file, " = ");
+                                        success = self.write_expression(file, arg.value, generics) && success;
+                                        fprintf(file, ", ");
+                                        generator.write_variable(file, receiver_temp);
+                                    } else {
+                                        success = self.write_expression(file, arg.value, generics) && success;
+                                    }
                                     fprintf(file, ".vtable->fn_");
                                     success = generator.write_str(file, name) && success;
                                     fprintf(file, "(");
-                                    success = self.write_expression(file, arg.value, generics) && success;
+                                    if receiver_temp.length > 0 {
+                                        generator.write_variable(file, receiver_temp);
+                                    } else {
+                                        success = self.write_expression(file, arg.value, generics) && success;
+                                    }
                                     fprintf(file, ".instance");
                                     first = false;
                                     arg_index = 1;
@@ -883,6 +979,7 @@ impl ExpressionWriter {
                         }
 
                         fprintf(file, ")");
+                        if receiver_temp.length > 0 { fprintf(file, ")"); }
                         return success;
                     },
                     Type::FunctionC(func_info) => {
@@ -1016,7 +1113,7 @@ impl ExpressionWriter {
                     }
                 }
 
-                generator.write_str(file, operator);
+                self.write_unary_operator(file, operator, inner);
                 self.write_expression(file, inner, generics);
                 return true;
             },
@@ -1070,14 +1167,33 @@ impl ExpressionWriter {
                 return true;
             },
             ExpressionData::IfExpression(cond, a, b) => {
+                // Parenthesised: nearly every C operator binds tighter than ?:.
+                fprintf(file, "(");
                 self.write_expression(file, cond, generics);
                 fprintf(file, " ? ");
                 self.write_expression(file, a, generics);
                 fprintf(file, " : ");
                 self.write_expression(file, b, generics);
+                fprintf(file, ")");
                 return true;
             },
             ExpressionData::OptionalExpression(receiver, value) => {
+                // The receiver is tested, then used by `value`; one that calls
+                // something is held in a temp.
+                let temp: str = "";
+                if !self.is_safe_to_duplicate(receiver) { temp = self.make_temp(&receiver.return_type); }
+
+                if temp.length > 0 {
+                    fprintf(file, "((");
+                    generator.write_variable(file, temp);
+                    fprintf(file, " = ");
+                    self.write_expression(file, receiver, generics);
+                    fprintf(file, ") == 0 ? 0 : ");
+                    self.write_expression_replacing(file, value, receiver, temp, &receiver.return_type, generics);
+                    fprintf(file, ")");
+                    return true;
+                }
+
                 fprintf(file, "(");
                 self.write_expression(file, receiver, generics);
                 fprintf(file, " == 0 ? 0 : ");

@@ -1,0 +1,233 @@
+#include "stdlib.h"
+
+use std
+
+// Compiler regressions in lowering to C: an expression the C needs in two
+// places is evaluated once, `break` and `continue` in a match arm act on the
+// loop around it, operators keep their grouping, and a coroutine's variables
+// are still there after a yield.
+
+enum PaveLowerShape {
+    Circle(i32),
+    Rect(i32, i32),
+    Dot,
+}
+
+struct PaveLowerCalls { count: i32 }
+
+struct PaveLowerHolder { shape: PaveLowerShape }
+
+struct PaveLowerNode { value: i32 }
+
+impl PaveLowerNode {
+    fn get(&self) -> &i32 { return &self.value; }
+}
+
+trait PaveLowerSpeak { fn speak(&self) -> i32; }
+
+struct PaveLowerDog { volume: i32 }
+
+impl PaveLowerSpeak for PaveLowerDog {
+    fn speak(&self) -> i32 { return self.volume; }
+}
+
+// A circle on the first call, a rectangle after.
+fn pave_lower_next_shape(calls: &PaveLowerCalls) -> PaveLowerShape {
+    calls.count += 1;
+    if calls.count == 1 { return PaveLowerShape::Circle(7); }
+    return PaveLowerShape::Rect(2, 3);
+}
+
+fn pave_lower_held(holder: &PaveLowerHolder, calls: &PaveLowerCalls) -> &PaveLowerHolder {
+    calls.count += 1;
+    return holder;
+}
+
+fn pave_lower_name(calls: &PaveLowerCalls) -> *const char {
+    calls.count += 1;
+    return "abc";
+}
+
+fn pave_lower_length(text: str) -> usize { return text.length; }
+
+fn pave_lower_speaker(dog: &PaveLowerDog, calls: &PaveLowerCalls) -> &dyn PaveLowerSpeak {
+    calls.count += 1;
+    return dog;
+}
+
+fn pave_lower_find(node: *PaveLowerNode, calls: &PaveLowerCalls) -> *PaveLowerNode {
+    calls.count += 1;
+    return node;
+}
+
+fn pave_lower_value(node: *PaveLowerNode, calls: &PaveLowerCalls) -> *i32 {
+    return pave_lower_find(node, calls)?.get();
+}
+
+fn pave_lower_limit(calls: &PaveLowerCalls) -> i32 {
+    calls.count += 1;
+    return 3;
+}
+
+fn pave_lower_values(values: &[i32], calls: &PaveLowerCalls) -> &[i32] {
+    calls.count += 1;
+    return values;
+}
+
+co pave_lower_each(items: &[i32]) -> i32 {
+    for item in items {
+        yield item;
+    }
+}
+
+co pave_lower_sides(shape: PaveLowerShape) -> i32 {
+    match shape {
+        PaveLowerShape::Rect(w, h) => {
+            yield w;
+            yield h;
+            yield w * h;
+        },
+        _ => {},
+    }
+}
+
+test "match evaluates what it matches once" {
+    let calls = PaveLowerCalls { count: 0 };
+    let found = 0;
+    match pave_lower_next_shape(&calls) {
+        PaveLowerShape::Circle(r) => { found = r; },
+        PaveLowerShape::Rect(w, h) => { found = w * h; },
+        PaveLowerShape::Dot => {},
+    }
+    if calls.count != 1 || found != 7 { abort(); }
+}
+
+test "if let and else if let evaluate what they match once" {
+    let calls = PaveLowerCalls { count: 0 };
+    let found = 0;
+    if let PaveLowerShape::Rect(_, _) = pave_lower_next_shape(&calls) {
+        found = 1;
+    } else if let PaveLowerShape::Rect(w, h) = pave_lower_next_shape(&calls) {
+        found = w * h;
+    } else {
+        found = 2;
+    }
+    if calls.count != 2 || found != 6 { abort(); }
+}
+
+test "a pattern's & binding writes through to what was matched" {
+    let calls = PaveLowerCalls { count: 0 };
+    let holder = PaveLowerHolder { shape: PaveLowerShape::Circle(1) };
+    match pave_lower_held(&holder, &calls).shape {
+        PaveLowerShape::Circle(&r) => { *r = 9; },
+        _ => {},
+    }
+
+    let radius = 0;
+    match holder.shape {
+        PaveLowerShape::Circle(r) => { radius = r; },
+        _ => {},
+    }
+    if calls.count != 1 || radius != 9 { abort(); }
+}
+
+test "break in a match arm leaves the loop" {
+    let i = 0;
+    let deferred = 0;
+    while i < 10 {
+        defer { deferred += 1; }
+        match i {
+            3 => { break; },
+            _ => {},
+        }
+        i += 1;
+    }
+    if i != 3 || deferred != 4 { abort(); }
+
+    let last = 0;
+    for j in 0..10 {
+        last = j;
+        match j {
+            4 => { break; },
+            _ => {},
+        }
+    }
+    if last != 4 { abort(); }
+}
+
+test "continue in a match arm runs the loop body's defers" {
+    let i = 0;
+    let deferred = 0;
+    while i < 3 {
+        defer { deferred += 1; }
+        match i {
+            1 => { i += 1; continue; },
+            _ => {},
+        }
+        i += 1;
+    }
+    if deferred != 3 { abort(); }
+}
+
+test "a minus applied to a minus is not a decrement" {
+    let x = 5;
+    let y = - -x;
+    if x != 5 || y != 5 { abort(); }
+}
+
+test "an if expression keeps its grouping inside another expression" {
+    let on = true;
+    let scaled = 10 * if on { 1 } else { 2 };
+    if scaled != 10 { abort(); }
+}
+
+test "a C string is evaluated once when it becomes a str" {
+    let calls = PaveLowerCalls { count: 0 };
+    if pave_lower_length(pave_lower_name(&calls)) != 3 || calls.count != 1 { abort(); }
+}
+
+test "a dyn receiver is evaluated once" {
+    let calls = PaveLowerCalls { count: 0 };
+    let dog = PaveLowerDog { volume: 4 };
+    if pave_lower_speaker(&dog, &calls).speak() != 4 || calls.count != 1 { abort(); }
+}
+
+test "the receiver of ?. is evaluated once outside a let" {
+    let calls = PaveLowerCalls { count: 0 };
+    let node = PaveLowerNode { value: 5 };
+    let value = pave_lower_value(&node, &calls);
+    if calls.count != 1 || value == null { abort(); }
+    if *value != 5 { abort(); }
+    if pave_lower_value(null, &calls) != null || calls.count != 2 { abort(); }
+}
+
+test "a for loop evaluates its range end and its slice once" {
+    let calls = PaveLowerCalls { count: 0 };
+    let steps = 0;
+    for i in 0..pave_lower_limit(&calls) { steps += 1; }
+    if steps != 3 || calls.count != 1 { abort(); }
+
+    let values = [10, 20, 30];
+    let sum = 0;
+    for value in pave_lower_values(&values, &calls) { sum += value; }
+    if sum != 60 || calls.count != 2 { abort(); }
+}
+
+test "a coroutine's loop and pattern variables survive a yield" {
+    let values = [10, 20, 30];
+    let sum = 0;
+    let count = 0;
+    for value in pave_lower_each(&values) {
+        sum += value;
+        count += 1;
+    }
+    if count != 3 || sum != 60 { abort(); }
+
+    let sides = 0;
+    count = 0;
+    for side in pave_lower_sides(PaveLowerShape::Rect(2, 3)) {
+        sides += side;
+        count += 1;
+    }
+    if count != 3 || sides != 11 { abort(); }
+}

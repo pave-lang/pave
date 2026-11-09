@@ -1,6 +1,8 @@
 #ifndef PAVE_TEST_FUNCTION_COROUTINE_FIBONACCI_2
 #define PAVE_TEST_FUNCTION_COROUTINE_FIBONACCI_2
 
+#include <stdint.h>
+
 #include <std/Range_usize.h>
 struct test_FunctionCoroutine_fibonacci_2 {
     int32_t _state;

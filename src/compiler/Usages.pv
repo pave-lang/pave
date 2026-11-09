@@ -1011,6 +1011,8 @@ impl Usages {
                             self.process_expression(end, generic_map);
                         },
                         ForStatementType::Sequence(iter_expression) => {
+                            // The loop counts in a usize.
+                            self.add_type(&self.root.type_usize, generic_map);
                             self.process_expression(iter_expression, generic_map);
                         },
                         ForStatementType::Iter(iter_expression) => {

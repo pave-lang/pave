@@ -276,7 +276,7 @@ void IncludeWriter__write(struct IncludeWriter* self, FILE* file, struct Generat
             continue;
         }
         #line 104 "src/compiler/IncludeWriter.pv"
-        struct Type* resolved_nn = deref ? Type__deref_all(resolved) : resolved;
+        struct Type* resolved_nn = (deref ? Type__deref_all(resolved) : resolved);
 
         #line 106 "src/compiler/IncludeWriter.pv"
         if (generics->self_type != 0 && Root__type_impl_target_eq(generator->root, Type__deref_all(resolved), generics->self_type)) {

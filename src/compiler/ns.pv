@@ -13,3 +13,4 @@ mod Usages
 mod CStructImplTest
 mod TraitImplTest
 mod ExpressionTest
+mod LoweringTest
