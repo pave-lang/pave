@@ -5,29 +5,41 @@ use std
 
 struct JsonParser {
     allocator: &ArenaAllocator,
+    // Must be followed by a NUL: a number is read with strtod.
     data: str,
     pos: usize,
+    depth: usize,
 }
 
 impl JsonParser {
+    const MAX_DEPTH: usize = 256;
+
     fn parse(allocator: &ArenaAllocator, root: &JsonNode, data: str) -> bool {
         if data.ptr == null || data.length == 0 { return false; }
 
-        let self = JsonParser { allocator, data, pos: 0 };
+        let self = JsonParser { allocator, data, pos: 0, depth: 0 };
 
-        if self.check("[") {
-            return self.parse_array(root);
-        } else if self.check("{") {
-            return self.parse_object(root);
+        self.skip_whitespace();
+        if !self.check("[") && !self.check("{") { return false; }
+        if !self.parse_any(root) { return false; }
+
+        self.skip_whitespace();
+        return self.pos == self.data.length;
+    }
+
+    fn skip_whitespace(&self) {
+        while self.pos < self.data.length {
+            let c = self.data.ptr[self.pos];
+            if c != ' ' && c != '\t' && c != '\r' && c != '\n' { return; }
+            self.pos += 1;
         }
-
-        return false;
     }
 
     fn parse_array(&self, node: &JsonNode) -> bool {
         let data = Array<JsonNode>::new(self.allocator);
 
         if !self.expect("[") { return false; }
+        self.skip_whitespace();
         if self.expect("]") {
             *node = JsonNode::Array(data);
             return true;
@@ -39,6 +51,7 @@ impl JsonParser {
             let element = JsonNode::Undefined;
             if !self.parse_any(&element) { return false; }
             data.append(element);
+            self.skip_whitespace();
         }
 
         if !self.expect("]") { return false; }
@@ -51,6 +64,7 @@ impl JsonParser {
         let data = HashMap<str, JsonNode>::new(self.allocator);
 
         if !self.expect("{") { return false; }
+        self.skip_whitespace();
         if self.expect("}") {
             *node = JsonNode::Object(data);
             return true;
@@ -59,15 +73,18 @@ impl JsonParser {
         let first = true;
         while first || self.expect(",") {
             first = false;
+            self.skip_whitespace();
             let key = String::new(self.allocator);
             if !self.parse_string(&key) { return false; }
 
+            self.skip_whitespace();
             if !self.expect(":") { return false; }
 
             let value = JsonNode::Undefined;
             if !self.parse_any(&value) { return false; }
 
             data.insert(key.as_str(), value);
+            self.skip_whitespace();
         }
 
         if !self.expect("}") { return false; }
@@ -76,25 +93,105 @@ impl JsonParser {
         return true;
     }
 
+    // The value of a hex digit, or 16 if `c` isn't one.
+    fn hex_value(c: char) -> u32 {
+        if c >= '0' && c <= '9' { return cast<u32>(c - '0'); }
+        if c >= 'a' && c <= 'f' { return cast<u32>(c - 'a' + 10); }
+        if c >= 'A' && c <= 'F' { return cast<u32>(c - 'A' + 10); }
+        return 16;
+    }
+
+    // The four hex digits of a \u escape, at `pos`.
+    fn parse_hex4(&self, code: &u32) -> bool {
+        if self.pos + 4 > self.data.length { return false; }
+
+        let result: u32 = 0;
+        let i: usize = 0;
+        while i < 4 {
+            let digit = JsonParser::hex_value(self.data.ptr[self.pos + i]);
+            if digit > 15 { return false; }
+            result = result * 16 + digit;
+            i += 1;
+        }
+
+        self.pos += 4;
+        *code = result;
+        return true;
+    }
+
+    fn append_byte(value: &String, byte: u32) {
+        let c: char = cast<char>(byte);
+        value.append_sized(&c, 1);
+    }
+
+    fn append_utf8(value: &String, code: u32) {
+        if code < 128 {
+            JsonParser::append_byte(value, code);
+        } else if code < 2048 {
+            JsonParser::append_byte(value, 192 + code / 64);
+            JsonParser::append_byte(value, 128 + code % 64);
+        } else if code < 65536 {
+            JsonParser::append_byte(value, 224 + code / 4096);
+            JsonParser::append_byte(value, 128 + (code / 64) % 64);
+            JsonParser::append_byte(value, 128 + code % 64);
+        } else {
+            JsonParser::append_byte(value, 240 + code / 262144);
+            JsonParser::append_byte(value, 128 + (code / 4096) % 64);
+            JsonParser::append_byte(value, 128 + (code / 64) % 64);
+            JsonParser::append_byte(value, 128 + code % 64);
+        }
+    }
+
+    // The character after a backslash, at `pos`.
+    fn parse_escape(&self, value: &String) -> bool {
+        if self.pos >= self.data.length { return false; }
+
+        let c = self.data.ptr[self.pos];
+        self.pos += 1;
+
+        if c == '"' { value.append("\""); return true; }
+        if c == '\\' { value.append("\\"); return true; }
+        if c == '/' { value.append("/"); return true; }
+        if c == 'n' { value.append("\n"); return true; }
+        if c == 'r' { value.append("\r"); return true; }
+        if c == 't' { value.append("\t"); return true; }
+        if c == 'b' { JsonParser::append_byte(value, 8); return true; }
+        if c == 'f' { JsonParser::append_byte(value, 12); return true; }
+        if c != 'u' { return false; }
+
+        let code: u32 = 0;
+        if !self.parse_hex4(&code) { return false; }
+
+        // A high surrogate and the low one after it make one character.
+        if code >= 55296 && code < 56320 && self.check("\\u") {
+            let after_first = self.pos;
+            self.pos += 2;
+            let low: u32 = 0;
+            if !self.parse_hex4(&low) { return false; }
+
+            if low >= 56320 && low < 57344 {
+                code = 65536 + (code - 55296) * 1024 + (low - 56320);
+            } else {
+                self.pos = after_first;
+            }
+        }
+
+        // Half a surrogate pair is not a character.
+        if code >= 55296 && code < 57344 { code = 65533; }
+
+        JsonParser::append_utf8(value, code);
+        return true;
+    }
+
     fn parse_string(&self, value: &String) -> bool {
         if !self.expect("\"") { return false; }
 
         let start = self.pos;
         while self.pos < self.data.length && self.data.ptr[self.pos] != '\"' {
-            let c = self.data.ptr[self.pos];
-            
-            if c == '\\' {
+            if self.data.ptr[self.pos] == '\\' {
                 value.append(self.data.slice(start, self.pos));
                 self.pos += 1;
-                if self.pos >= self.data.length { return false; }
-
-                c = self.data.ptr[self.pos];
-
-                if c == '"' { value.append("\""); }
-                if c == 'r' { value.append("\r"); }
-                if c == 'n' { value.append("\n"); }
-
-                self.pos += 1;
+                if !self.parse_escape(value) { return false; }
                 start = self.pos;
                 continue;
             }
@@ -102,9 +199,10 @@ impl JsonParser {
             self.pos += 1;
         }
 
-        if !self.expect("\"") { return false; }
+        if self.pos >= self.data.length { return false; }
 
-        value.append(self.data.slice(start, self.pos - 1));
+        value.append(self.data.slice(start, self.pos));
+        self.pos += 1;
         return true;
     }
 
@@ -114,23 +212,33 @@ impl JsonParser {
 
         let value: f64 = strtod(start, &end);
         if start == end { return false; }
-        self.pos += end - start;
+
+        let length: usize = end - start;
+        if self.pos + length > self.data.length { return false; }
+        self.pos += length;
 
         *node = JsonNode::Number(value);
         return true;
     }
 
     fn parse_any(&self, node: &JsonNode) -> bool {
-        if self.check("[") {
-            return self.parse_array(node);
-        } else if self.check("{") {
-            return self.parse_object(node);
-        } else if self.check("\"") {
+        self.skip_whitespace();
+        if self.pos >= self.data.length { return false; }
+
+        let c = self.data.ptr[self.pos];
+
+        if c == '[' || c == '{' {
+            if self.depth >= JsonParser::MAX_DEPTH { return false; }
+            self.depth += 1;
+            let nested = if c == '[' { self.parse_array(node) } else { self.parse_object(node) };
+            self.depth -= 1;
+            return nested;
+        } else if c == '"' {
             let value = String::new(self.allocator);
             if !self.parse_string(&value) { return false; }
             *node = JsonNode::String(value.as_str());
             return true;
-        } else if '0' <= self.data.ptr[self.pos] && self.data.ptr[self.pos] <= '9' {
+        } else if c == '-' || ('0' <= c && c <= '9') {
             return self.parse_number(node);
         } else if self.expect("true") {
             *node = JsonNode::Boolean(true);
@@ -148,16 +256,13 @@ impl JsonParser {
 
     fn check(&self, value: *const char) -> bool {
         let len: usize = strlen(value);
-        let slice = self.data.slice(self.pos, self.pos + len);
-        return slice.eq_len(value, len);
+        if self.pos + len > self.data.length { return false; }
+        return strncmp(self.data.ptr + self.pos, value, len) == 0;
     }
 
     fn expect(&self, value: *const char) -> bool {
-        let len: usize = strlen(value);
-        let slice = self.data.slice(self.pos, self.pos + len);
-
-        let eq = slice.eq_len(value, len);
-        if eq { self.pos += len; }
+        let eq = self.check(value);
+        if eq { self.pos += strlen(value); }
         return eq;
     }
 }

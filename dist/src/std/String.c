@@ -110,10 +110,10 @@ void String__append_f64(struct String* self, double value) {
     }
 
     #line 72 "src/std/String.pv"
-    String__ensure_can_hold(self, 20);
+    String__ensure_can_hold(self, 32);
 
     #line 74 "src/std/String.pv"
-    array->length += snprintf(array->data + array->length, 20, "%g", value);
+    array->length += snprintf(array->data + array->length, 32, "%g", value);
 }
 
 #line 77 "src/std/String.pv"
@@ -134,10 +134,10 @@ void String__append_u64(struct String* self, uint64_t value) {
     }
 
     #line 87 "src/std/String.pv"
-    String__ensure_can_hold(self, 20);
+    String__ensure_can_hold(self, 32);
 
     #line 89 "src/std/String.pv"
-    array->length += snprintf(array->data + array->length, 20, "%zu", value);
+    array->length += snprintf(array->data + array->length, 32, "%zu", value);
 }
 
 #line 92 "src/std/String.pv"
@@ -158,10 +158,10 @@ void String__append_usize(struct String* self, uintptr_t value) {
     }
 
     #line 102 "src/std/String.pv"
-    String__ensure_can_hold(self, 20);
+    String__ensure_can_hold(self, 32);
 
     #line 104 "src/std/String.pv"
-    array->length += snprintf(array->data + array->length, 20, "%zu", value);
+    array->length += snprintf(array->data + array->length, 32, "%zu", value);
 }
 
 #line 107 "src/std/String.pv"

@@ -69,9 +69,9 @@ impl String {
             return;
         }
         
-        self.ensure_can_hold(20);
+        self.ensure_can_hold(32);
 
-        array.length += snprintf(array.data + array.length, 20, "%g", value);
+        array.length += snprintf(array.data + array.length, 32, "%g", value);
     }
 
     fn append_u64(&self, value: u64) {
@@ -84,9 +84,9 @@ impl String {
             return;
         }
         
-        self.ensure_can_hold(20);
+        self.ensure_can_hold(32);
 
-        array.length += snprintf(array.data + array.length, 20, "%zu", value);
+        array.length += snprintf(array.data + array.length, 32, "%zu", value);
     }
 
     fn append_usize(&self, value: usize) {
@@ -99,9 +99,9 @@ impl String {
             return;
         }
         
-        self.ensure_can_hold(20);
+        self.ensure_can_hold(32);
 
-        array.length += snprintf(array.data + array.length, 20, "%zu", value);
+        array.length += snprintf(array.data + array.length, 32, "%zu", value);
     }
 
     fn append(&self, value: str) {
@@ -180,4 +180,18 @@ impl Writer for String {
     fn write_char(&self, value: char) {
         self.append_char(value);
     }
+}
+
+test "append_u64 and append_usize hold a value of twenty digits" {
+    let allocator_ptr = ArenaAllocator::new(GeneralPurposeAllocator::default(), 1024);
+    if allocator_ptr == null { abort(); }
+    let allocator: &ArenaAllocator = allocator_ptr;
+    defer allocator.destroy();
+
+    let largest: u64 = 18446744073709551615u;
+    let text = String::new(allocator);
+    text.append_u64(largest);
+    text.append("|");
+    text.append_usize(largest);
+    if !text.as_str().eq("18446744073709551615|18446744073709551615") { abort(); }
 }
