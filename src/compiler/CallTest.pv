@@ -42,3 +42,10 @@ test "a function without self is called through an instance with its own argumen
     if counter.zero() != 0 || counter.twice(4) != 8 { abort(); }
     if counter.add(2) != 3 { abort(); }
 }
+
+fn pave_call_first(values: [i32; 3]) -> i32 { return values[0]; }
+
+test "a fixed array is a parameter type" {
+    let values = [4, 5, 6];
+    if pave_call_first(values) != 4 { abort(); }
+}

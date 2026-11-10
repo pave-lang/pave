@@ -124,11 +124,9 @@ impl Namespace {
         return self.root.find_namespace(name);
     }
 
-    fn add_module(&self, name: str) -> bool {
-        if self.modules.find(&name) != null {
-            return true;
-        }
-
+    // Where the module `name` of this namespace is: its .pave file if there
+    // is one, else its .pv file.
+    fn module_path(&self, name: str) -> String {
         let path = String::new(self.root.allocator);
         path.append(self.path);
         path.append("/");
@@ -139,6 +137,21 @@ impl Namespace {
             path.array.length -= 5;
             path.append(".pv");
         }
+
+        return path;
+    }
+
+    // `path` must be followed by a NUL, as a String's text is.
+    fn file_exists(path: str) -> bool {
+        return path_exists(path.ptr) != 0;
+    }
+
+    fn add_module(&self, name: str) -> bool {
+        if self.modules.find(&name) != null {
+            return true;
+        }
+
+        let path = self.module_path(name);
 
         let module = Module::new(self, path.as_str());
         self.modules.insert(name, module);

@@ -15,6 +15,16 @@ impl WhileStatement {
         let expression = Expression::parse(context, generics);
         if expression == null { return null; }
 
+        let is_bool = false;
+        match expression.return_type {
+            Type::Primitive(prim) => { is_bool = prim != null && prim.name.eq("bool"); },
+            _ => {},
+        }
+        if !is_bool {
+            context.error_expression(expression, "While condition must be a bool expression");
+            return null;
+        }
+
         let block = Block::new_ptr(context);
         block.is_loop = true;
 

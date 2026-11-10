@@ -8,7 +8,14 @@ struct YieldStatement {
 
 impl YieldStatement {
     fn parse(context: &Context, generics: &Generics) -> *YieldStatement {
+        let keyword = context.current();
         if !context.expect_value(TokenType::Keyword, "yield") { return null; }
+
+        let yielding = context.function;
+        if yielding == null || yielding.type != FunctionType::Coroutine {
+            context.error_token(keyword, "yield is only for a co function");
+            return null;
+        }
 
         if context.check_next(TokenType::Symbol, ";") {
             return context.allocator.store(&YieldStatement { expression: null });

@@ -167,6 +167,12 @@ impl Struct {
                 _ => {},
             }
 
+            let existing = self.fields.find(&name.value);
+            if existing != null && existing.name != name {
+                context.error_token(name, "A struct's fields need different names");
+                return false;
+            }
+
             self.fields.insert(name.value, field);
 
             if !context.check_next(TokenType::Symbol, ",") && !context.check_value(TokenType::Symbol, "}") {

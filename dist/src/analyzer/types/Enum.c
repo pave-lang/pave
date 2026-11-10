@@ -323,28 +323,38 @@ bool Enum__parse_variant(struct Enum* self) {
     };
 
     #line 195 "src/analyzer/types/Enum.pv"
+    struct EnumVariant* existing = HashMap_str_EnumVariant__find(&self->variants, &variant.name->value);
+    #line 196 "src/analyzer/types/Enum.pv"
+    if (existing != 0 && existing->name != variant.name) {
+        #line 197 "src/analyzer/types/Enum.pv"
+        Context__error_token(self->context, variant.name, "An enum's variants need different names");
+        #line 198 "src/analyzer/types/Enum.pv"
+        return false;
+    }
+
+    #line 201 "src/analyzer/types/Enum.pv"
     HashMap_str_EnumVariant__insert(&self->variants, variant.name->value, variant);
 
-    #line 197 "src/analyzer/types/Enum.pv"
+    #line 203 "src/analyzer/types/Enum.pv"
     return true;
 }
 
-#line 200 "src/analyzer/types/Enum.pv"
+#line 206 "src/analyzer/types/Enum.pv"
 bool Enum__is_discriminated_union(struct Enum* self) {
-    #line 201 "src/analyzer/types/Enum.pv"
+    #line 207 "src/analyzer/types/Enum.pv"
     { struct HashMapIter_str_EnumVariant __iter = HashMap_str_EnumVariant__iter(&self->variants);
-    #line 201 "src/analyzer/types/Enum.pv"
+    #line 207 "src/analyzer/types/Enum.pv"
     while (HashMapIter_str_EnumVariant__next(&__iter)) {
-        #line 201 "src/analyzer/types/Enum.pv"
+        #line 207 "src/analyzer/types/Enum.pv"
         struct EnumVariant* variant_info = &HashMapIter_str_EnumVariant__value(&__iter)->_1;
 
-        #line 202 "src/analyzer/types/Enum.pv"
+        #line 208 "src/analyzer/types/Enum.pv"
         if (variant_info->types.length > 0) {
-            #line 203 "src/analyzer/types/Enum.pv"
+            #line 209 "src/analyzer/types/Enum.pv"
             return true;
         }
     } }
 
-    #line 207 "src/analyzer/types/Enum.pv"
+    #line 213 "src/analyzer/types/Enum.pv"
     return false;
 }

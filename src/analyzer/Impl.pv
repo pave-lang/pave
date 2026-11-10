@@ -199,6 +199,11 @@ impl Impl {
                 func_info.parent = parent;
                 if func_info.name == null { return false; }
 
+                if self.functions.find(&func_info.name.value) != null {
+                    context.error_token(func_info.name, "An impl's functions need different names");
+                    return false;
+                }
+
                 self.functions.insert(func_info.name.value, func_info);
 
                 let impl_node: ImplNode = ImplNode::Function(func_info.name.value);

@@ -752,7 +752,7 @@ struct Expression* Expression__parse_primary(struct Context* context, struct Gen
         #line 346 "src/analyzer/expression/Expression.pv"
         case TOKEN_TYPE__SYMBOL: {
             #line 347 "src/analyzer/expression/Expression.pv"
-            if (Token__eq(token, TOKEN_TYPE__SYMBOL, "-") || Token__eq(token, TOKEN_TYPE__SYMBOL, "+") || Token__eq(token, TOKEN_TYPE__SYMBOL, "!") || Token__eq(token, TOKEN_TYPE__SYMBOL, "&") || Token__eq(token, TOKEN_TYPE__SYMBOL, "*") || Token__eq(token, TOKEN_TYPE__SYMBOL, "/") || Token__eq(token, TOKEN_TYPE__SYMBOL, "%") || Token__eq(token, TOKEN_TYPE__SYMBOL, "~")) {
+            if (Token__eq(token, TOKEN_TYPE__SYMBOL, "-") || Token__eq(token, TOKEN_TYPE__SYMBOL, "+") || Token__eq(token, TOKEN_TYPE__SYMBOL, "!") || Token__eq(token, TOKEN_TYPE__SYMBOL, "&") || Token__eq(token, TOKEN_TYPE__SYMBOL, "*") || Token__eq(token, TOKEN_TYPE__SYMBOL, "~")) {
                 #line 348 "src/analyzer/expression/Expression.pv"
                 struct Token* operator = Context__expect(context, TOKEN_TYPE__SYMBOL);
                 #line 349 "src/analyzer/expression/Expression.pv"

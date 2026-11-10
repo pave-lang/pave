@@ -299,115 +299,125 @@ bool Struct__fill_types_field(struct Struct* self) {
         }
 
         #line 170 "src/analyzer/types/Struct.pv"
-        HashMap_str_StructField__insert(&self->fields, name->value, field);
-
-        #line 172 "src/analyzer/types/Struct.pv"
-        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+        struct StructField* existing = HashMap_str_StructField__find(&self->fields, &name->value);
+        #line 171 "src/analyzer/types/Struct.pv"
+        if (existing != 0 && existing->name != name) {
+            #line 172 "src/analyzer/types/Struct.pv"
+            Context__error_token(context, name, "A struct's fields need different names");
             #line 173 "src/analyzer/types/Struct.pv"
-            Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
-            #line 174 "src/analyzer/types/Struct.pv"
             return false;
         }
-    }
 
-    #line 178 "src/analyzer/types/Struct.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+        #line 176 "src/analyzer/types/Struct.pv"
+        HashMap_str_StructField__insert(&self->fields, name->value, field);
+
         #line 178 "src/analyzer/types/Struct.pv"
-        return false;
-    }
-
-    #line 180 "src/analyzer/types/Struct.pv"
-    if (context->pos != self->token_end) {
-        #line 181 "src/analyzer/types/Struct.pv"
-        Context__error(context, "Not at closing bracket for struct definition");
+        if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+            #line 179 "src/analyzer/types/Struct.pv"
+            Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}");
+            #line 180 "src/analyzer/types/Struct.pv"
+            return false;
+        }
     }
 
     #line 184 "src/analyzer/types/Struct.pv"
-    return true;
-}
-
-#line 187 "src/analyzer/types/Struct.pv"
-bool Struct__fill_types_tuple(struct Struct* self) {
-    #line 188 "src/analyzer/types/Struct.pv"
-    struct Context* context = &self->module->context;
-
-    #line 190 "src/analyzer/types/Struct.pv"
-    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
-        #line 190 "src/analyzer/types/Struct.pv"
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "}")) {
+        #line 184 "src/analyzer/types/Struct.pv"
         return false;
     }
 
-    #line 192 "src/analyzer/types/Struct.pv"
-    uintptr_t field_index = 0;
-    #line 193 "src/analyzer/types/Struct.pv"
-    while (context->pos < self->token_end && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-        #line 194 "src/analyzer/types/Struct.pv"
-        struct String name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
-        #line 195 "src/analyzer/types/Struct.pv"
-        String__append(&name, (struct str){ .ptr = "_", .length = strlen("_") });
+    #line 186 "src/analyzer/types/Struct.pv"
+    if (context->pos != self->token_end) {
+        #line 187 "src/analyzer/types/Struct.pv"
+        Context__error(context, "Not at closing bracket for struct definition");
+    }
+
+    #line 190 "src/analyzer/types/Struct.pv"
+    return true;
+}
+
+#line 193 "src/analyzer/types/Struct.pv"
+bool Struct__fill_types_tuple(struct Struct* self) {
+    #line 194 "src/analyzer/types/Struct.pv"
+    struct Context* context = &self->module->context;
+
+    #line 196 "src/analyzer/types/Struct.pv"
+    if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, "(")) {
         #line 196 "src/analyzer/types/Struct.pv"
+        return false;
+    }
+
+    #line 198 "src/analyzer/types/Struct.pv"
+    uintptr_t field_index = 0;
+    #line 199 "src/analyzer/types/Struct.pv"
+    while (context->pos < self->token_end && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
+        #line 200 "src/analyzer/types/Struct.pv"
+        struct String name = String__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = context->allocator });
+        #line 201 "src/analyzer/types/Struct.pv"
+        String__append(&name, (struct str){ .ptr = "_", .length = strlen("_") });
+        #line 202 "src/analyzer/types/Struct.pv"
         String__append_usize(&name, field_index);
-        #line 197 "src/analyzer/types/Struct.pv"
+        #line 203 "src/analyzer/types/Struct.pv"
         struct str name_str = String__as_str(&name);
 
-        #line 199 "src/analyzer/types/Struct.pv"
+        #line 205 "src/analyzer/types/Struct.pv"
         struct Token name_token = *Context__current(context);
-        #line 200 "src/analyzer/types/Struct.pv"
+        #line 206 "src/analyzer/types/Struct.pv"
         name_token.value = name_str;
 
-        #line 202 "src/analyzer/types/Struct.pv"
+        #line 208 "src/analyzer/types/Struct.pv"
         struct Type type = self->module->root->type_void;
-        #line 203 "src/analyzer/types/Struct.pv"
+        #line 209 "src/analyzer/types/Struct.pv"
         if (!Context__parse_type(context, &type, &self->generics)) {
-            #line 203 "src/analyzer/types/Struct.pv"
+            #line 209 "src/analyzer/types/Struct.pv"
             return false;
         }
 
-        #line 205 "src/analyzer/types/Struct.pv"
+        #line 211 "src/analyzer/types/Struct.pv"
         struct StructField field = (struct StructField) {
             .name = ArenaAllocator__store_Token(context->allocator, &name_token),
             .type = type,
             .default_token_start = 0,
         };
 
-        #line 211 "src/analyzer/types/Struct.pv"
+        #line 217 "src/analyzer/types/Struct.pv"
         HashMap_str_StructField__insert(&self->fields, name_str, field);
 
-        #line 213 "src/analyzer/types/Struct.pv"
+        #line 219 "src/analyzer/types/Struct.pv"
         if (!Context__check_next(context, TOKEN_TYPE__SYMBOL, ",") && !Context__check_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-            #line 214 "src/analyzer/types/Struct.pv"
+            #line 220 "src/analyzer/types/Struct.pv"
             Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")");
-            #line 215 "src/analyzer/types/Struct.pv"
+            #line 221 "src/analyzer/types/Struct.pv"
             return false;
         }
 
-        #line 218 "src/analyzer/types/Struct.pv"
+        #line 224 "src/analyzer/types/Struct.pv"
         field_index += 1;
     }
 
-    #line 221 "src/analyzer/types/Struct.pv"
+    #line 227 "src/analyzer/types/Struct.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ")")) {
-        #line 221 "src/analyzer/types/Struct.pv"
+        #line 227 "src/analyzer/types/Struct.pv"
         return false;
     }
-    #line 222 "src/analyzer/types/Struct.pv"
+    #line 228 "src/analyzer/types/Struct.pv"
     if (!Context__expect_value(context, TOKEN_TYPE__SYMBOL, ";")) {
-        #line 222 "src/analyzer/types/Struct.pv"
+        #line 228 "src/analyzer/types/Struct.pv"
         return false;
     }
 
-    #line 224 "src/analyzer/types/Struct.pv"
+    #line 230 "src/analyzer/types/Struct.pv"
     if (context->pos != self->token_end) {
-        #line 225 "src/analyzer/types/Struct.pv"
+        #line 231 "src/analyzer/types/Struct.pv"
         Context__error(context, "Not at end of struct definition");
     }
 
-    #line 228 "src/analyzer/types/Struct.pv"
+    #line 234 "src/analyzer/types/Struct.pv"
     return true;
 }
 
-#line 231 "src/analyzer/types/Struct.pv"
+#line 237 "src/analyzer/types/Struct.pv"
 bool Struct__is_newtype(struct Struct* self) {
-    #line 232 "src/analyzer/types/Struct.pv"
+    #line 238 "src/analyzer/types/Struct.pv"
     return (self->type == STRUCT_TYPE__TUPLE) && (usize__Eq_usize__eq(self->fields.length, 1));
 }

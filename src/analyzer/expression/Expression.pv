@@ -344,7 +344,7 @@ impl Expression {
                 });
             },
             TokenType::Symbol => {
-                if token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+") || token.eq(TokenType::Symbol, "!") || token.eq(TokenType::Symbol, "&") || token.eq(TokenType::Symbol, "*") || token.eq(TokenType::Symbol, "/") || token.eq(TokenType::Symbol, "%") || token.eq(TokenType::Symbol, "~") {
+                if token.eq(TokenType::Symbol, "-") || token.eq(TokenType::Symbol, "+") || token.eq(TokenType::Symbol, "!") || token.eq(TokenType::Symbol, "&") || token.eq(TokenType::Symbol, "*") || token.eq(TokenType::Symbol, "~") {
                     let operator = context.expect(TokenType::Symbol);
                     if operator == null { return null; }
 
