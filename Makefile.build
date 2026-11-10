@@ -49,8 +49,8 @@ all: check-flags generate
 	@$(MAKE) -f Makefile.build build-objs
 
 	@echo "Linking..."
-	$(file >$(OBJS_LST))
-	$(foreach obj,$(CURRENT_OBJS),$(file >>$(OBJS_LST),$(obj)))
+	@# Built in the shell, not with $$(file), which GNU Make 3.81 (macOS) lacks.
+	@tr ' \r' '\n\n' < $(SRCS_LST) | sed -n -e 's|^$(SRC_DIR)/\(.*\)\.c$$|$(OBJ_DIR)/\1.o|p' -e 's|^$(SRC_DIR)/\(.*\)\.cpp$$|$(OBJ_DIR)/\1.o|p' | sort -u > $(OBJS_LST)
 	$(CC) @$(OBJS_LST) $(LDFLAGS) -o $(TARGET)
 	@echo "Build complete: $(TARGET)"
 
