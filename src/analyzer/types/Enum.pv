@@ -192,6 +192,12 @@ impl Enum {
             value,
         };
 
+        let existing = self.variants.find(&variant.name.value);
+        if existing != null && existing.name != variant.name {
+            self.context.error_token(variant.name, "An enum's variants need different names");
+            return false;
+        }
+
         self.variants.insert(variant.name.value, variant);
 
         return true;

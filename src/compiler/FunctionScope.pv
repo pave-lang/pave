@@ -5,6 +5,8 @@ use analyzer::statement
 struct FunctionScope {
     break_target: bool,
     continue_target: bool,
+    // The label after this loop for a `break` that C's own break can't reach, or 0.
+    break_label: usize,
     defer_statements: Array<DeferStatement>,
     variable_replacements: HashMap<str, str>,
 }
@@ -14,6 +16,7 @@ impl FunctionScope {
         return Self {
             break_target,
             continue_target,
+            break_label: 0,
             defer_statements: Array<DeferStatement>::new(allocator),
             variable_replacements: HashMap<str, str>::new(allocator),
         };

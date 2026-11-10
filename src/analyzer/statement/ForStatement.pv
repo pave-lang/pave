@@ -49,6 +49,11 @@ impl ForStatement {
             if !ForStatement::parse_for_variable(context, &for_statement.variables) { return null; }
         }
 
+        if for_statement.variables.length == 0 {
+            context.error("Expected a loop variable");
+            return null;
+        }
+
         if !context.expect_value(TokenType::Keyword, "in") { return null; }
 
         let expression_first_token = context.current();
@@ -69,6 +74,14 @@ impl ForStatement {
                         let enum_name = enum_info.name;
                         if enum_name != null && enum_name.value.eq("Range") {
                             if generic_map == null { return null; }
+                            if args.length != 2 {
+                                context.error_token(expression_first_token, "A for loop needs a range with a start and an end");
+                                return null;
+                            }
+                            if for_statement.variables.length != 1 {
+                                context.error_token(expression_first_token, "A for loop over a range binds one variable");
+                                return null;
+                            }
                             is_range = true;
                             for_statement.type = ForStatementType::Range(args.data[0].value, args.data[1].value);
                             for_statement.iter_type = &generic_map.array.data[0];

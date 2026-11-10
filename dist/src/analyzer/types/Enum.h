@@ -43,7 +43,7 @@ bool Enum__fill_variants(struct Enum* self);
 #line 122 "src/analyzer/types/Enum.pv"
 bool Enum__parse_variant(struct Enum* self);
 
-#line 200 "src/analyzer/types/Enum.pv"
+#line 206 "src/analyzer/types/Enum.pv"
 bool Enum__is_discriminated_union(struct Enum* self);
 
 #endif

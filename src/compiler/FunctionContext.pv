@@ -2,12 +2,23 @@ use std
 use analyzer::types
 use analyzer::statement
 
+struct FunctionTemp {
+    name: str,
+    type: &Type,
+}
+
 struct FunctionContext {
     allocator: &ArenaAllocator,
     func_info: *Function,
     use_scopes: bool,
     scopes: Array<FunctionScope>,
     coroutine: FunctionCoroutine,
+    // Variables codegen made to hold a value it must only evaluate once.
+    temps: Array<FunctionTemp>,
+    temp_count: usize,
+    // Whether a temp made now gets declared: only while the body is being written.
+    temps_enabled: bool,
+    label_count: usize,
 }
 
 impl FunctionContext {
@@ -18,6 +29,10 @@ impl FunctionContext {
             use_scopes,
             scopes: Array<FunctionScope>::new(allocator),
             coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
+            temps: Array<FunctionTemp>::new(allocator),
+            temp_count: 0,
+            temps_enabled: false,
+            label_count: 0,
         };
 
         if self.use_scopes {
@@ -44,6 +59,10 @@ impl FunctionContext {
             use_scopes: false,
             scopes: Array<FunctionScope>::new(allocator),
             coroutine: FunctionCoroutine { yield_count: 0, variables: HashMap<str, &Type> { allocator, buckets: null, data: null, capacity: 0, length: 0 } },
+            temps: Array<FunctionTemp>::new(allocator),
+            temp_count: 0,
+            temps_enabled: false,
+            label_count: 0,
         };
     }
 
@@ -71,15 +90,78 @@ impl FunctionContext {
         return result;
     }
 
-    fn get_loop_defer_statements(&self) -> Array<DeferStatement> {
+    // The defers a `continue` runs: those of the loop body it is in.
+    fn get_continue_defer_statements(&self) -> Array<DeferStatement> {
         let result = Array<DeferStatement>::new(self.allocator);
         for scope in self.scopes.iter().reverse() {
             for stmt in scope.defer_statements.iter().reverse() {
                 result.append(*stmt);
             }
-            if scope.break_target { return result; }
+            if scope.continue_target { return result; }
         }
         return result;
+    }
+
+    // The defers a `break` runs: those of the loop body it leaves. A match
+    // arm in between is a C switch, where C's break would only leave the
+    // switch: `label` is then the loop's label to jump to, else 0. A break in
+    // a match arm outside any loop leaves the arm.
+    fn get_break_defer_statements(&self, label: &usize) -> Array<DeferStatement> {
+        let result = Array<DeferStatement>::new(self.allocator);
+        *label = 0;
+
+        let in_loop = false;
+        for scope in self.scopes {
+            if scope.continue_target { in_loop = true; }
+        }
+
+        let in_switch = false;
+        let i = self.scopes.length;
+        while i > 0 {
+            i -= 1;
+            let scope = &self.scopes.data[i];
+            for stmt in scope.defer_statements.iter().reverse() {
+                result.append(*stmt);
+            }
+
+            if scope.continue_target {
+                if in_switch {
+                    if scope.break_label == 0 {
+                        self.label_count += 1;
+                        scope.break_label = self.label_count;
+                    }
+                    *label = scope.break_label;
+                }
+                return result;
+            }
+
+            if scope.break_target {
+                if !in_loop { return result; }
+                in_switch = true;
+            }
+        }
+        return result;
+    }
+
+    // A name no variable of the function has.
+    fn make_temp_name(&self) -> str {
+        let name = String::new(self.allocator);
+        name.append("__pave_tmp_");
+        name.append_usize(self.temp_count);
+        self.temp_count += 1;
+        return name.as_str();
+    }
+
+    // A variable declared for the whole function, for an expression to hold a
+    // value in. An empty name when the function's body isn't being written, so
+    // there is nowhere to declare it.
+    fn add_temp(&self, type: &Type) -> str {
+        if !self.temps_enabled { return ""; }
+
+        let name = self.make_temp_name();
+        self.temps.append(FunctionTemp { name, type });
+        self.add_variable(name, type);
+        return name;
     }
 
     fn get_variable_replacement(&self, name: str) -> str {

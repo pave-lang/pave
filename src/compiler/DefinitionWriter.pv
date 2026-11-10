@@ -181,6 +181,25 @@ impl DefinitionWriter {
         return success;
     }
 
+    // The variables a coroutine keeps in its context are whatever writing its
+    // body declares, and its struct is written before its body: the body is
+    // written once to the scratch file to find them.
+    fn find_coroutine_variables(&self, func_info: &Function, generics: &GenericMap) -> FunctionContext {
+        let generator = self.generator;
+        let func_context = FunctionContext::new(generator.allocator, func_info, true);
+
+        let scratch = generator.scratch_file();
+        if scratch == null { return func_context; }
+
+        let indent = generator.indent;
+        generator.function_context = &func_context;
+        BlockWriter { generator }.write_block(scratch, &func_info.return_type, func_info.body, generics, false, true);
+        generator.function_context = null;
+        generator.indent = indent;
+
+        return func_context;
+    }
+
     fn write_function_coroutine(&self, file: &FILE, func_info: &Function, generics: &GenericMap) -> bool {
         let generator = self.generator;
         fprintf(file, "struct ");
@@ -643,7 +662,8 @@ impl DefinitionWriter {
                 if func_info.generics.array.length == 0 {
                     if trait_info == null {
                         if func_info.type == FunctionType::Coroutine && function_usage != null && function_usage.usage_contexts.length > 0 {
-                            generator.function_context = &function_usage.usage_contexts.data[0].function_context;
+                            let func_context = self.find_coroutine_variables(func_info, generics);
+                            generator.function_context = &func_context;
                             self.write_function_coroutine(file, func_info, generics);
                             generator.function_context = null;
                         }

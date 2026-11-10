@@ -204,22 +204,6 @@ struct Primitive* ArenaAllocator__store_Primitive(struct ArenaAllocator* self, s
     #line 225 "src/std/ArenaAllocator.pv"
     return new_memory;
 }
-
-#line 220 "src/std/ArenaAllocator.pv"
-struct ArenaAllocator** ArenaAllocator__store_ptr_ArenaAllocator(struct ArenaAllocator* self, struct ArenaAllocator** value) {
-    #line 221 "src/std/ArenaAllocator.pv"
-    struct ArenaAllocator** new_memory = ArenaAllocator__Allocator__alloc(self, sizeof(struct ArenaAllocator*));
-    #line 222 "src/std/ArenaAllocator.pv"
-    if (new_memory == 0) {
-        #line 222 "src/std/ArenaAllocator.pv"
-        return 0;
-    }
-
-    #line 224 "src/std/ArenaAllocator.pv"
-    memcpy(new_memory, value, sizeof(struct ArenaAllocator*));
-    #line 225 "src/std/ArenaAllocator.pv"
-    return new_memory;
-}
 #include <analyzer/Block.h>
 
 #line 220 "src/std/ArenaAllocator.pv"
@@ -926,7 +910,7 @@ void* ArenaAllocator__Allocator__realloc(void* __self, void* ptr, uintptr_t new_
     }
 
     #line 321 "src/std/ArenaAllocator.pv"
-    memcpy(new_ptr, ptr, new_size < old_size ? new_size : old_size);
+    memcpy(new_ptr, ptr, (new_size < old_size ? new_size : old_size));
     #line 322 "src/std/ArenaAllocator.pv"
     ArenaBlock__free(current_block, ptr);
 

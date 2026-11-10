@@ -100,10 +100,13 @@ void FileGenerator__generate_globals_namespace(struct FileGenerator* self, struc
 #line 1482 "src/compiler/FileGenerator.pv"
 void FileGenerator__collect_tests(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children, struct Array_str* func_names, struct Array_str* descriptions, struct Array_str* header_paths, struct Array_str* module_paths);
 
-#line 1504 "src/compiler/FileGenerator.pv"
-void FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
+#line 1505 "src/compiler/FileGenerator.pv"
+bool FileGenerator__generate_test_runner(struct FileGenerator* self, struct HashMap_str_ref_Namespace* children);
 
-#line 1569 "src/compiler/FileGenerator.pv"
+#line 1587 "src/compiler/FileGenerator.pv"
+void FileGenerator__write_test_runner_main(struct FileGenerator* self, FILE* file);
+
+#line 1713 "src/compiler/FileGenerator.pv"
 void FileGenerator__create_directories(struct FileGenerator* self, struct str base_path, struct HashMap_str_ref_Namespace* children);
 
 #endif

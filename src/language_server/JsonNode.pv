@@ -1,4 +1,5 @@
 #include "math.h"
+#include "stdio.h"
 
 use std
 
@@ -118,11 +119,7 @@ impl JsonNode {
                 for (key, &value) in object {
                     if first { first = false; } else { result.append(","); }
 
-                    // write_string
-                    result.append("\"");
-                    result.append(key);
-                    result.append("\"");
-
+                    self.append_string(result, key);
                     result.append(":");
                     value.append_to(result);
                 }
@@ -130,7 +127,7 @@ impl JsonNode {
                 result.append("}");
             },
             JsonNode::Number(value) => {
-                result.append_f64(value);
+                JsonNode::append_number(result, value);
             },
             JsonNode::String(value) => {
                 self.append_string(result, value);
@@ -148,19 +145,50 @@ impl JsonNode {
         }
     }
 
+    // A whole number is written in full, so that an id or a position comes
+    // back as it was sent; JSON has no NaN or infinity.
+    fn append_number(result: &String, value: f64) {
+        if value != value || value - value != 0 {
+            result.append("null");
+            return;
+        }
+
+        let array: &Array<char> = &result.array;
+        result.ensure_can_hold(32);
+
+        if value == floor(value) && fabs(value) < 9007199254740992.0 {
+            array.length += snprintf(array.data + array.length, 32, "%.0f", value);
+        } else {
+            array.length += snprintf(array.data + array.length, 32, "%.17g", value);
+        }
+    }
+
     fn append_string(&self, result: &String, value: str) {
         result.append("\"");
 
         let pos: usize = 0;
         let start: usize = 0;
         while pos < value.length {
-            // result.append(value);
             let c = value.ptr[pos];
             pos += 1;
 
-            if c == '"' { result.append(value.slice(start, pos - 1)); result.append("\\\""); start = pos; }
-            if c == '\r' { result.append(value.slice(start, pos - 1)); result.append("\\n"); start = pos; }
-            if c == '\n' { result.append(value.slice(start, pos - 1)); result.append("\\n"); start = pos; }
+            // Unsigned, so a byte of a UTF-8 character isn't taken for a control character.
+            let byte: u32 = cast<u8>(c);
+            if c != '\\' && c != '"' && byte >= 32 { continue; }
+
+            result.append(value.slice(start, pos - 1));
+            start = pos;
+
+            if c == '\\' { result.append("\\\\"); }
+            else if c == '"' { result.append("\\\""); }
+            else if c == '\n' { result.append("\\n"); }
+            else if c == '\r' { result.append("\\r"); }
+            else if c == '\t' { result.append("\\t"); }
+            else {
+                let array: &Array<char> = &result.array;
+                result.ensure_can_hold(8);
+                array.length += snprintf(array.data + array.length, 8, "\\u%04x", byte);
+            }
         }
 
         result.append(value.slice(start, pos));

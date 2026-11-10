@@ -320,3 +320,46 @@ void mem_file_close(FILE *file) {
     fclose(file);
 #endif
 }
+
+// Moves what was written to `file` since it was last rewound onto the end of
+// `to`, and rewinds `file` so it can be written again.
+int mem_file_drain(FILE *file, FILE *to) {
+    if (file == NULL || to == NULL) {
+        return -1;
+    }
+
+    if (fflush(file) != 0) {
+        return -1;
+    }
+
+    long size = ftell(file);
+    if (size < 0) {
+        return -1;
+    }
+
+    int result = 0;
+
+#ifdef PAVE_MEMSTREAM
+    MemFile *entry = mem_file_find(file);
+    if (entry == NULL || fwrite(entry->buffer, 1, (size_t)size, to) != (size_t)size) {
+        result = -1;
+    }
+#else
+    rewind(file);
+
+    char buffer[16 * 1024];
+    size_t remaining = (size_t)size;
+    while (remaining > 0) {
+        size_t wanted = remaining < sizeof(buffer) ? remaining : sizeof(buffer);
+        size_t length = fread(buffer, 1, wanted, file);
+        if (length == 0 || fwrite(buffer, 1, length, to) != length) {
+            result = -1;
+            break;
+        }
+        remaining -= length;
+    }
+#endif
+
+    rewind(file);
+    return result;
+}

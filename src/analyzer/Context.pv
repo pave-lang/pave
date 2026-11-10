@@ -195,6 +195,8 @@ impl Context {
     }
 
     fn error(&self, message: *const char) {
+        if self.length == 0 { return; }
+
         let pos = self.pos;
 
         if pos >= self.length {
@@ -213,6 +215,8 @@ impl Context {
     }
 
     fn error_expected(&self, type: TokenType) {
+        if self.length == 0 { return; }
+
         let pos = self.pos;
 
         if pos >= self.length {
@@ -230,6 +234,8 @@ impl Context {
     }
 
     fn error_expected_value(&self, type: TokenType, value: *const char) {
+        if self.length == 0 { return; }
+
         let pos = self.pos;
 
         if pos >= self.length {
@@ -390,6 +396,7 @@ impl Context {
 
     fn expect(&self, type: TokenType) -> *Token {
         if self.pos >= self.length {
+            self.error_expected(type);
             return null;
         }
 
@@ -406,6 +413,7 @@ impl Context {
 
     fn expect_value(&self, type: TokenType, value: *const char) -> bool {
         if self.pos >= self.length {
+            self.error_expected_value(type, value);
             return false;
         }
 

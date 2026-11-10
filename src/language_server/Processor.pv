@@ -54,15 +54,26 @@ impl Processor {
       return false;
     }
 
-    fn read_message(&self) -> String {
+    // The next message, with a NUL after it. `closed` is set when there is
+    // none because the client has gone.
+    fn read_message(&self, closed: &bool) -> String {
+        *closed = false;
+
         let content_length: usize = 0;
-        if !self.read_headers(&content_length) { return String::new(self.allocator); }
+        if !self.read_headers(&content_length) {
+            *closed = true;
+            return String::new(self.allocator);
+        }
 
         let content = String::new(self.allocator);
-        content.ensure_can_hold(content_length);
+        content.ensure_can_hold(content_length + 1);
 
         content.array.length = content_length;
-        if read_pipe(self.pipe_read, content.array.data, content_length) == 0 { return String::new(self.allocator); }
+        if content_length > 0 && read_pipe(self.pipe_read, content.array.data, content_length) == 0 {
+            *closed = true;
+            return String::new(self.allocator);
+        }
+        content.array.data[content_length] = '\0';
 
         if self.log_messages {
             fprintf(stderr, "Received: %.*s\n\n", content.len_i32(), content.c_str());
@@ -90,10 +101,10 @@ impl Processor {
         self.send_response_text(text.as_str());
     }
 
-    // fn send_message_id(&self, id: f64, method: *const char, params: JsonNode) {
+    // fn send_message_id(&self, id: &JsonNode, method: *const char, params: JsonNode) {
     //     let response = HashMap<str, JsonNode>::new(self.allocator);
     //     response.insert("jsonrpc", JsonNode::String("2.0"));
-    //     response.insert("id", JsonNode::Number(id));
+    //     response.insert("id", *id);
     //     response.insert("method", JsonNode::String(method));
     //     response.insert("params", params);
         
@@ -101,12 +112,26 @@ impl Processor {
     //     self.send_response_text(text.as_str());
     // }
 
-    fn send_response(&self, id: f64, result: JsonNode) {
+    fn send_response(&self, id: &JsonNode, result: JsonNode) {
         let response = HashMap<str, JsonNode>::new(self.allocator);
         response.insert("jsonrpc", JsonNode::String("2.0"));
-        response.insert("id", JsonNode::Number(id));
+        response.insert("id", *id);
         response.insert("result", result);
         
+        let text = JsonNode::Object(response).to_string(self.allocator);
+        self.send_response_text(text.as_str());
+    }
+
+    fn send_error(&self, id: &JsonNode, code: i32, message: *const char) {
+        let error = HashMap<str, JsonNode>::new(self.allocator);
+        error.insert("code", JsonNode::Number(code));
+        error.insert("message", JsonNode::String(message));
+
+        let response = HashMap<str, JsonNode>::new(self.allocator);
+        response.insert("jsonrpc", JsonNode::String("2.0"));
+        response.insert("id", *id);
+        response.insert("error", JsonNode::Object(error));
+
         let text = JsonNode::Object(response).to_string(self.allocator);
         self.send_response_text(text.as_str());
     }
@@ -149,6 +174,10 @@ impl Processor {
         capabilities.insert("hoverProvider", JsonNode::Boolean(true));
         capabilities.insert("documentSymbolProvider", JsonNode::Boolean(true));
         capabilities.insert("workspaceSymbolProvider", JsonNode::Boolean(true));
+
+        let code_lens_provider = HashMap<str, JsonNode>::new(self.allocator);
+        code_lens_provider.insert("resolveProvider", JsonNode::Boolean(false));
+        capabilities.insert("codeLensProvider", JsonNode::Object(code_lens_provider));
 
         let completion_provider = HashMap<str, JsonNode>::new(self.allocator);
         completion_provider.insert("resolveProvider", JsonNode::Boolean(false));
@@ -361,7 +390,7 @@ impl Processor {
         ls.set_dirty_uri(uri_raw, false);
     }
 
-    fn inlay_hint(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    fn inlay_hint(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let uri_raw = params.key("textDocument").key("uri").string();
         if uri_raw.length == 0 {
             self.send_response(id, JsonNode::Array(Array<JsonNode>::new(self.allocator)));
@@ -1162,7 +1191,7 @@ impl Processor {
         }
     }
 
-    fn completion(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    fn completion(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
@@ -1218,7 +1247,7 @@ impl Processor {
         self.send_response(id, JsonNode::Array(result));
     }
 
-    fn document_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    fn document_symbol(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let uri_raw = params.key("textDocument").key("uri").string();
         let result = Array<JsonNode>::new(self.allocator);
 
@@ -1253,7 +1282,109 @@ impl Processor {
         self.send_response(id, JsonNode::Array(result));
     }
 
-    fn workspace_symbol(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    // The name a test runner gives a module: its namespaces and file stem,
+    // e.g. "std/str", matching Generator.make_rel_path in the compiler.
+    fn test_module_path(&self, module: &Module) -> String {
+        let result = String::new(self.allocator);
+        let namespace: *Namespace = module.namespace;
+        while namespace != null {
+            let namespace_info: Namespace = *namespace;
+            result.prepend("/");
+            result.prepend(namespace_info.name);
+            namespace = namespace_info.parent;
+        }
+
+        let path = module.path;
+        let stem_start: usize = 0;
+        let i: usize = 0;
+        while i < path.length {
+            if path.ptr[i] == '/' || path.ptr[i] == '\\' { stem_start = i + 1; }
+            i += 1;
+        }
+        let stem_end = path.length;
+        if stem_end >= stem_start + 3 && path.slice(stem_end - 3, stem_end).eq(".pv") { stem_end -= 3; }
+        result.append(path.slice(stem_start, stem_end));
+        return result;
+    }
+
+    // A lens running the test runner with runner_args: the client's pave.runTests
+    // command builds the test program and runs it with those arguments.
+    fn make_test_code_lens_json(&self, range: &Range, title: str, runner_args: Array<JsonNode>, label: str) -> JsonNode {
+        let arguments = Array<JsonNode>::new(self.allocator);
+        arguments.append(JsonNode::Array(runner_args));
+        arguments.append(JsonNode::String(label));
+
+        let command = HashMap<str, JsonNode>::new(self.allocator);
+        command.insert("title", JsonNode::String(title));
+        command.insert("command", JsonNode::String("pave.runTests"));
+        command.insert("arguments", JsonNode::Array(arguments));
+
+        let lens = HashMap<str, JsonNode>::new(self.allocator);
+        lens.insert("range", self.make_range_json(range));
+        lens.insert("command", JsonNode::Object(command));
+        return JsonNode::Object(lens);
+    }
+
+    fn code_lens(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
+        let uri_raw = params.key("textDocument").key("uri").string();
+        let result = Array<JsonNode>::new(self.allocator);
+
+        if uri_raw.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+        let uri = Uri::parse(self.allocator, uri_raw);
+
+        let filename = self.filename_for_uri(ls, &uri);
+        if filename.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        if ls.root == null {
+            ls.analyze();
+        }
+
+        if ls.root == null {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let module = ls.root.find_module_by_path(filename);
+        if module == null || module.tests.length == 0 {
+            self.send_response(id, JsonNode::Array(result));
+            return;
+        }
+
+        let module_path = self.test_module_path(module);
+
+        // Above the first test, one lens for all of them: every test name in
+        // the file starts with "<module path>: ".
+        if module.tests.length > 1 {
+            let prefix = String::new(self.allocator);
+            prefix.append(module_path.as_str());
+            prefix.append(": ");
+            let runner_args = Array<JsonNode>::new(self.allocator);
+            runner_args.append(JsonNode::String(prefix.as_str()));
+            let range = self.make_token_range(module.tests.data[0].description);
+            result.append(self.make_test_code_lens_json(&range, "Run all tests in file", runner_args, module_path.as_str()));
+        }
+
+        for test_info in module.tests {
+            let description = test_info.description.value;
+            if description.length >= 2 { description = description.slice(1, description.length - 1); }
+
+            let runner_args = Array<JsonNode>::new(self.allocator);
+            runner_args.append(JsonNode::String("--exact"));
+            runner_args.append(JsonNode::String(test_info.func_name));
+            let range = self.make_token_range(test_info.description);
+            result.append(self.make_test_code_lens_json(&range, "Run test", runner_args, description));
+        }
+
+        self.send_response(id, JsonNode::Array(result));
+    }
+
+    fn workspace_symbol(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let result = Array<JsonNode>::new(self.allocator);
         let query = params.key("query").string();
 
@@ -1269,7 +1400,7 @@ impl Processor {
         self.send_response(id, JsonNode::Array(result));
     }
 
-    fn definition(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    fn definition(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
@@ -1310,7 +1441,7 @@ impl Processor {
         self.send_response(id, JsonNode::Object(location));
     }
 
-    fn hover(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    fn hover(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
@@ -1348,7 +1479,7 @@ impl Processor {
         self.send_response(id, JsonNode::Object(result));
     }
 
-    fn signature_help(&self, id: f64, ls: &LanguageServer, params: &JsonNode) {
+    fn signature_help(&self, id: &JsonNode, ls: &LanguageServer, params: &JsonNode) {
         let uri_raw = params.key("textDocument").key("uri").string();
         let line: usize = params.key("position").key("line").number();
         let character: usize = params.key("position").key("character").number();
@@ -1416,17 +1547,33 @@ impl Processor {
     }
 
     fn process(&self, ls: &LanguageServer) -> bool {
-        let msg_str = self.read_message();
+        let closed = false;
+        let msg_str = self.read_message(&closed);
         defer msg_str.release();
+
+        // The client has gone without sending exit: there is nothing left to serve.
+        if closed { return false; }
+
         let msg_json = JsonNode::Undefined;
 
         if !JsonParser::parse(self.allocator, &msg_json, msg_str.as_str()) {
             fprintf(stderr, "Failed to parse json: %.*s\n\n", msg_str.len_i32(), msg_str.c_str());
+            self.send_error(&JsonNode::NULL, -32700, "Parse error");
             return true;
         }
 
-        let id = msg_json.key("id").number();
+        // A request has an id and is owed a response; a notification has none.
+        let id = msg_json.key("id");
+        let is_request = false;
+        match id {
+            JsonNode::Number(_) => { is_request = true; },
+            JsonNode::String(_) => { is_request = true; },
+            _ => {},
+        }
         let method = msg_json.key("method").string();
+
+        // A response to something the server sent: nothing to do with it.
+        if method.length == 0 { return true; }
 
         if method.eq("initialize") {
             let result = self.initialize(msg_json.key("params"));
@@ -1468,6 +1615,8 @@ impl Processor {
             self.inlay_hint(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/documentSymbol") {
             self.document_symbol(id, ls, msg_json.key("params"));
+        } else if method.eq("textDocument/codeLens") {
+            self.code_lens(id, ls, msg_json.key("params"));
         } else if method.eq("workspace/symbol") {
             self.workspace_symbol(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/completion") {
@@ -1478,8 +1627,12 @@ impl Processor {
             self.hover(id, ls, msg_json.key("params"));
         } else if method.eq("textDocument/signatureHelp") {
             self.signature_help(id, ls, msg_json.key("params"));
+        } else if method.eq("shutdown") {
+            self.send_response(id, JsonNode::Null);
         } else if method.eq("exit") {
             return false;
+        } else if is_request {
+            self.send_error(id, -32601, "Method not found");
         }
 
         return true;

@@ -43,10 +43,10 @@ bool Struct__fill_types(struct Struct* self);
 #line 120 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_field(struct Struct* self);
 
-#line 187 "src/analyzer/types/Struct.pv"
+#line 193 "src/analyzer/types/Struct.pv"
 bool Struct__fill_types_tuple(struct Struct* self);
 
-#line 231 "src/analyzer/types/Struct.pv"
+#line 237 "src/analyzer/types/Struct.pv"
 bool Struct__is_newtype(struct Struct* self);
 
 #endif

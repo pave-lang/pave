@@ -41,8 +41,8 @@ struct Include* Include__new(struct Root* root, struct str path, bool mode_cpp) 
         .path = path,
         .cxtype_to_type = HashMap_u32_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
         .typedef_to_type = HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
-        .types = mode_cpp ? &root->cpp_types : ArenaAllocator__store_HashMap_str_Type(root->allocator, (struct HashMap_str_Type[]){HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator })}),
-        .values = mode_cpp ? &root->cpp_values : ArenaAllocator__store_HashMap_str_Type(root->allocator, (struct HashMap_str_Type[]){HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator })}),
+        .types = (mode_cpp ? &root->cpp_types : ArenaAllocator__store_HashMap_str_Type(root->allocator, (struct HashMap_str_Type[]){HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator })})),
+        .values = (mode_cpp ? &root->cpp_values : ArenaAllocator__store_HashMap_str_Type(root->allocator, (struct HashMap_str_Type[]){HashMap_str_Type__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator })})),
         .macro_values = HashMap_str_i64__new((struct trait_Allocator) { .vtable = &ARENA_ALLOCATOR__VTABLE__ALLOCATOR, .instance = root->allocator }),
         .error = (struct str) { .ptr = 0, .length = 0 },
     }});

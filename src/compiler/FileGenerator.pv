@@ -55,10 +55,6 @@ impl FileGenerator {
 
         let code_ext: str = ".c";
         let header_ext: str = ".h";
-        if func_info.type == FunctionType::Test {
-            code_ext = ".test.c";
-            header_ext = ".test.h";
-        }
 
         let context = func_info.context;
         if context == null {
@@ -108,6 +104,10 @@ impl FileGenerator {
         fprintf(header_file, "\n\n");
 
         generator.write_context_primitives(header_file, &usage_context.primitive_code, null);
+        if generator.is_coroutine() {
+            // The coroutine's struct holds its body's variables, whose primitives are these.
+            generator.write_context_primitives(header_file, &usage_context.primitive_header, &usage_context.primitive_code);
+        }
         include_writer.write(header_file, generator, &usage_context.signature, generics, false);
         self.open_c_linkage(header_file);
 
@@ -1489,7 +1489,7 @@ impl FileGenerator {
                     descriptions.append(desc.slice(1, desc.length - 1));
                     func_names.append(test_info.func_name);
 
-                    let header_path = generator.make_rel_path(module, test_info.func_name, ".test.h");
+                    let header_path = generator.make_rel_path(module, test_info.func_name, ".h");
                     header_paths.append(header_path.as_str());
 
                     let module_path = generator.make_rel_path(module, module_name, "");
@@ -1501,7 +1501,8 @@ impl FileGenerator {
         }
     }
 
-    fn generate_test_runner(&self, children: &HashMap<str, &Namespace>) {
+    // In a --test build: a runner whose main runs every test in the program.
+    fn generate_test_runner(&self, children: &HashMap<str, &Namespace>) -> bool {
         let generator = self.generator;
         let allocator = generator.allocator;
 
@@ -1512,58 +1513,201 @@ impl FileGenerator {
 
         self.collect_tests(children, &func_names, &descriptions, &header_paths, &module_paths);
 
-        if func_names.length == 0 { return; }
-
         let runner_path = String::new(allocator);
         runner_path.append(generator.path);
-        runner_path.append("/main.test.c");
+        runner_path.append("/pave_test_main.c");
 
         let runner_file: *FILE = mem_file_open();
-        if runner_file == null { return; }
+        if runner_file == null { perror(runner_path.c_str()); return false; }
 
-        fprintf(runner_file, "#include <stdio.h>\n\n");
+        // fork, waitpid and _exit are POSIX, which glibc hides under -std=c99.
+        fprintf(runner_file, "#if defined(__linux__) && !defined(_DEFAULT_SOURCE)\n");
+        fprintf(runner_file, "#define _DEFAULT_SOURCE\n");
+        fprintf(runner_file, "#endif\n");
+        fprintf(runner_file, "#include <stdint.h>\n");
+        fprintf(runner_file, "#include <stdio.h>\n");
+        fprintf(runner_file, "#include <stdlib.h>\n");
+        fprintf(runner_file, "#include <string.h>\n");
+        fprintf(runner_file, "#if defined(_WIN32)\n");
+        fprintf(runner_file, "#define WIN32_LEAN_AND_MEAN\n");
+        fprintf(runner_file, "#include <windows.h>\n");
+        fprintf(runner_file, "#include <process.h>\n");
+        fprintf(runner_file, "#else\n");
+        fprintf(runner_file, "#include <sys/types.h>\n");
+        fprintf(runner_file, "#include <sys/wait.h>\n");
+        fprintf(runner_file, "#include <unistd.h>\n");
+        fprintf(runner_file, "#endif\n\n");
 
         let i: usize = 0;
         while i < header_paths.length {
-            let hp = header_paths.data[i];
             fprintf(runner_file, "#include <");
-            generator.write_str(runner_file, hp);
+            generator.write_str(runner_file, header_paths.data[i]);
             fprintf(runner_file, ">\n");
             i += 1;
         }
 
-        fprintf(runner_file, "\nint main(void) {\n");
-        fprintf(runner_file, "    int passed = 0;\n");
-        fprintf(runner_file, "    int failed = 0;\n\n");
-
+        // The id is the test's C function name, unique across the program;
+        // the name is what a person reads, and what TAP reports.
+        fprintf(runner_file, "\ntypedef struct { const char* id; const char* name; void (*fn)(void); } PaveTest;\n\n");
+        fprintf(runner_file, "static const PaveTest pave_tests[] = {\n");
         i = 0;
         while i < func_names.length {
-            let desc = descriptions.data[i];
             let func_name = func_names.data[i];
-            let module_path = module_paths.data[i];
-
-            fprintf(runner_file, "    fputs(\"[TEST] ");
-            generator.write_str(runner_file, module_path);
-            fprintf(runner_file, ": ");
-            generator.write_str(runner_file, desc);
-            fprintf(runner_file, "\\n\", stdout);\n");
-            fprintf(runner_file, "    ");
+            fprintf(runner_file, "    { \"");
             generator.write_str(runner_file, func_name);
-            fprintf(runner_file, "();\n");
-            fprintf(runner_file, "    passed++;\n\n");
-
+            fprintf(runner_file, "\", \"");
+            generator.write_str(runner_file, module_paths.data[i]);
+            fprintf(runner_file, ": ");
+            generator.write_str(runner_file, descriptions.data[i]);
+            fprintf(runner_file, "\", ");
+            generator.write_str(runner_file, func_name);
+            fprintf(runner_file, " },\n");
             i += 1;
         }
+        fprintf(runner_file, "    { 0, 0, 0 }\n");
+        fprintf(runner_file, "};\n");
+        fprintf(runner_file, "static const int pave_test_count = (int)(sizeof(pave_tests) / sizeof(pave_tests[0])) - 1;\n\n");
 
-        fprintf(runner_file, "    printf(\"[RESULT] %%d passed, %%d failed\\n\", passed, failed);\n");
-        fprintf(runner_file, "    return failed > 0 ? 1 : 0;\n");
-        fprintf(runner_file, "}\n");
+        self.write_test_runner_main(runner_file);
 
         mem_file_save(runner_file, runner_path.c_str());
         mem_file_close(runner_file);
 
         generator.current_host = true;
         generator.add_code_file(runner_path);
+        return true;
+    }
+
+    // The runner's fixed part. Each test runs in a child process, so an abort
+    // or crash fails that test alone; results are reported as TAP.
+    //   tests [--exact] [--list] [--in-process] [filter...]
+    // A filter matches a test whose name contains it, or with --exact a test
+    // whose name or id equals it. --in-process runs tests without a child
+    // process, for a debugger. --run-one <index> is the child's entry point.
+    fn write_test_runner_main(&self, file: &FILE) {
+        fprintf(file, "static int pave_test_matches(const PaveTest* test, int exact, int argc, char** argv) {\n");
+        fprintf(file, "    int i;\n");
+        fprintf(file, "    int filters = 0;\n");
+        fprintf(file, "    for (i = 1; i < argc; i++) {\n");
+        fprintf(file, "        if (argv[i] == NULL) continue;\n");
+        fprintf(file, "        filters++;\n");
+        fprintf(file, "        if (exact) {\n");
+        fprintf(file, "            if (strcmp(test->id, argv[i]) == 0 || strcmp(test->name, argv[i]) == 0) return 1;\n");
+        fprintf(file, "        } else if (strstr(test->name, argv[i]) != NULL) {\n");
+        fprintf(file, "            return 1;\n");
+        fprintf(file, "        }\n");
+        fprintf(file, "    }\n");
+        fprintf(file, "    return filters == 0;\n");
+        fprintf(file, "}\n\n");
+
+        // TAP reads a # in a description as the start of a directive.
+        fprintf(file, "static void pave_test_print_name(const char* name) {\n");
+        fprintf(file, "    for (; *name; name++) {\n");
+        fprintf(file, "        if (*name == '#') putchar('\\\\');\n");
+        fprintf(file, "        putchar(*name);\n");
+        fprintf(file, "    }\n");
+        fprintf(file, "}\n\n");
+
+        fprintf(file, "static int pave_test_isolated(int index, char* reason, size_t reason_size) {\n");
+        fprintf(file, "    fflush(stdout);\n");
+        fprintf(file, "    fflush(stderr);\n");
+        fprintf(file, "#if defined(_WIN32)\n");
+        fprintf(file, "    {\n");
+        fprintf(file, "        char path[MAX_PATH];\n");
+        fprintf(file, "        char index_arg[16];\n");
+        fprintf(file, "        intptr_t status;\n");
+        fprintf(file, "        DWORD length = GetModuleFileNameA(NULL, path, MAX_PATH);\n");
+        fprintf(file, "        if (length == 0 || length >= MAX_PATH) { snprintf(reason, reason_size, \"could not find the test executable\"); return 1; }\n");
+        fprintf(file, "        snprintf(index_arg, sizeof(index_arg), \"%%d\", index);\n");
+        fprintf(file, "        status = _spawnl(_P_WAIT, path, \"pave-test\", \"--run-one\", index_arg, NULL);\n");
+        fprintf(file, "        if (status == -1) { snprintf(reason, reason_size, \"could not start the test process\"); return 1; }\n");
+        fprintf(file, "        if (status == 0) return 0;\n");
+        fprintf(file, "        snprintf(reason, reason_size, \"exit code %%ld (0x%%08lx)\", (long)status, (unsigned long)status);\n");
+        fprintf(file, "        return 1;\n");
+        fprintf(file, "    }\n");
+        fprintf(file, "#else\n");
+        fprintf(file, "    {\n");
+        fprintf(file, "        int status = 0;\n");
+        fprintf(file, "        pid_t pid = fork();\n");
+        fprintf(file, "        if (pid < 0) { snprintf(reason, reason_size, \"could not start the test process\"); return 1; }\n");
+        fprintf(file, "        if (pid == 0) {\n");
+        fprintf(file, "            pave_tests[index].fn();\n");
+        fprintf(file, "            fflush(stdout);\n");
+        fprintf(file, "            fflush(stderr);\n");
+        fprintf(file, "            _exit(0);\n");
+        fprintf(file, "        }\n");
+        fprintf(file, "        if (waitpid(pid, &status, 0) < 0) { snprintf(reason, reason_size, \"could not wait for the test process\"); return 1; }\n");
+        fprintf(file, "        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) return 0;\n");
+        fprintf(file, "        if (WIFSIGNALED(status)) snprintf(reason, reason_size, \"signal %%d\", WTERMSIG(status));\n");
+        fprintf(file, "        else snprintf(reason, reason_size, \"exit code %%d\", WEXITSTATUS(status));\n");
+        fprintf(file, "        return 1;\n");
+        fprintf(file, "    }\n");
+        fprintf(file, "#endif\n");
+        fprintf(file, "}\n\n");
+
+        fprintf(file, "int main(int argc, char** argv) {\n");
+        fprintf(file, "    int i;\n");
+        fprintf(file, "    int exact = 0;\n");
+        fprintf(file, "    int list = 0;\n");
+        fprintf(file, "    int in_process = 0;\n");
+        fprintf(file, "    int run_one = -1;\n");
+        fprintf(file, "    int selected = 0;\n");
+        fprintf(file, "    int filtered = 0;\n");
+        fprintf(file, "    int number = 0;\n");
+        fprintf(file, "    int passed = 0;\n");
+        fprintf(file, "    int failed = 0;\n\n");
+        fprintf(file, "    for (i = 1; i < argc; i++) {\n");
+        fprintf(file, "        if (strcmp(argv[i], \"--run-one\") == 0 && i + 1 < argc) { run_one = atoi(argv[i + 1]); argv[i] = NULL; argv[++i] = NULL; }\n");
+        fprintf(file, "        else if (strcmp(argv[i], \"--exact\") == 0) { exact = 1; argv[i] = NULL; }\n");
+        fprintf(file, "        else if (strcmp(argv[i], \"--list\") == 0) { list = 1; argv[i] = NULL; }\n");
+        fprintf(file, "        else if (strcmp(argv[i], \"--in-process\") == 0) { in_process = 1; argv[i] = NULL; }\n");
+        fprintf(file, "        else if (strcmp(argv[i], \"--help\") == 0) {\n");
+        fprintf(file, "            printf(\"usage: %%s [--exact] [--list] [--in-process] [filter...]\\n\", argv[0]);\n");
+        fprintf(file, "            return 0;\n");
+        fprintf(file, "        }\n");
+        fprintf(file, "        else filtered = 1;\n");
+        fprintf(file, "    }\n\n");
+
+        fprintf(file, "    if (run_one >= 0) {\n");
+        fprintf(file, "        if (run_one >= pave_test_count) return 2;\n");
+        fprintf(file, "#if defined(_MSC_VER)\n");
+        fprintf(file, "        _set_abort_behavior(0, _CALL_REPORTFAULT);\n");
+        fprintf(file, "#endif\n");
+        fprintf(file, "        pave_tests[run_one].fn();\n");
+        fprintf(file, "        return 0;\n");
+        fprintf(file, "    }\n\n");
+
+        fprintf(file, "    for (i = 0; i < pave_test_count; i++) {\n");
+        fprintf(file, "        if (!pave_test_matches(&pave_tests[i], exact, argc, argv)) continue;\n");
+        fprintf(file, "        selected++;\n");
+        fprintf(file, "        if (list) printf(\"%%s\\t%%s\\n\", pave_tests[i].id, pave_tests[i].name);\n");
+        fprintf(file, "    }\n");
+        fprintf(file, "    if (list) return 0;\n\n");
+
+        fprintf(file, "#if defined(_WIN32)\n");
+        fprintf(file, "    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);\n");
+        fprintf(file, "#endif\n");
+        fprintf(file, "    printf(\"TAP version 13\\n1..%%d\\n\", selected);\n");
+        fprintf(file, "    for (i = 0; i < pave_test_count; i++) {\n");
+        fprintf(file, "        char reason[128];\n");
+        fprintf(file, "        int result = 0;\n");
+        fprintf(file, "        if (!pave_test_matches(&pave_tests[i], exact, argc, argv)) continue;\n");
+        fprintf(file, "        number++;\n");
+        fprintf(file, "        reason[0] = 0;\n");
+        fprintf(file, "        if (in_process) pave_tests[i].fn();\n");
+        fprintf(file, "        else result = pave_test_isolated(i, reason, sizeof(reason));\n");
+        fprintf(file, "        if (result == 0) { passed++; printf(\"ok %%d - \", number); }\n");
+        fprintf(file, "        else { failed++; printf(\"not ok %%d - \", number); }\n");
+        fprintf(file, "        pave_test_print_name(pave_tests[i].name);\n");
+        fprintf(file, "        putchar('\\n');\n");
+        fprintf(file, "        if (result != 0) printf(\"# %%s\\n\", reason);\n");
+        fprintf(file, "        fflush(stdout);\n");
+        fprintf(file, "    }\n\n");
+
+        fprintf(file, "    printf(\"# %%d passed, %%d failed\\n\", passed, failed);\n");
+        fprintf(file, "    if (filtered && selected == 0) { printf(\"# no tests matched\\n\"); return 1; }\n");
+        fprintf(file, "    return failed > 0 ? 1 : 0;\n");
+        fprintf(file, "}\n");
     }
 
     fn create_directories(&self, base_path: str, children: &HashMap<str, &Namespace>) {

@@ -64,6 +64,20 @@ impl Module {
         return self;
     }
 
+    // Adds the module a `mod` names to this module's namespace. A module
+    // with no file, on disk or open in an editor, is an error at its name.
+    fn add_module(&self, name_token: &Token, name: str) -> bool {
+        let namespace: &Namespace = self.namespace;
+        let path = namespace.module_path(name);
+
+        if !Namespace::file_exists(path.as_str()) && self.context.analysis.file_overrides.find(&path.as_str()) == null {
+            self.context.error_token(name_token, "Unable to find the module's file");
+            return true;
+        }
+
+        return namespace.add_module(name);
+    }
+
     fn parse(&self) -> bool {
         let allocator = self.namespace.root.allocator;
         let use_namespaces = &self.use_namespaces;
@@ -117,8 +131,7 @@ impl Module {
                     if name == null {
                         result = false;
                     } else {
-                        let namespace: &Namespace = self.namespace;
-                        result = namespace.add_module(name.value.slice(1, name.value.length - 1));
+                        result = self.add_module(name, name.value.slice(1, name.value.length - 1));
                     }
                 } else {
                     let name = context.expect(TokenType::Identifier);
@@ -126,8 +139,7 @@ impl Module {
                     if name == null {
                         result = false;
                     } else {
-                        let namespace: &Namespace = self.namespace;
-                        result = namespace.add_module(name.value);
+                        result = self.add_module(name, name.value);
                     }
                 }
             } else if token.eq(TokenType::Keyword, "use") {
@@ -246,7 +258,12 @@ impl Module {
                 if node.name == null {
                     result = false;
                 } else {
-                    functions.insert(node.name.value, node);
+                    if functions.find(&node.name.value) != null {
+                        context.error_token(node.name, "A module's functions need different names");
+                        result = false;
+                    } else {
+                        functions.insert(node.name.value, node);
+                    }
                 }
             } else if token.eq(TokenType::Keyword, "test") {
                 if !context.expect_value(TokenType::Keyword, "test") { return false; }
@@ -323,6 +340,13 @@ impl Module {
 
                 if !context.skip_brackets("{", "}") { return false; }
                 node.token_end = context.pos;
+
+                // The description becomes the test's function name, with every
+                // other character an underscore: two may come out the same.
+                if functions.find(&name_token.value) != null {
+                    context.error_token(description, "Another test in this file has a description that differs only in punctuation");
+                    return false;
+                }
 
                 self.tests.append(TestInfo { description, func_name: name_str.as_str() });
                 functions.insert(name_token.value, node);

@@ -23,6 +23,8 @@ struct Generator {
     naming_ident: Naming,
     naming_c99: Naming,
     function_context: *FunctionContext,
+    // One file, reused, for text that has to be written before it can be placed.
+    scratch: *FILE,
     // Split builds (--game-namespace): the namespaces whose code goes in a
     // game library loaded by the host executable, whether the file being
     // written belongs to the host, and each side's code files.
@@ -34,6 +36,9 @@ struct Generator {
     // them: every impl of a type in a module shares one pair of files.
     type_impl_usages: *HashMap<usize, TypeUsage<TypeImpl>>,
     type_impl_paths: HashSet<str>,
+    // --test: tests are generated, along with a runner that supplies main in
+    // place of the program's own. Otherwise tests are left out entirely.
+    test_mode: bool,
 }
 
 impl Generator {
@@ -528,6 +533,13 @@ impl Generator {
         return (*function_context.func_info).type == FunctionType::Coroutine;
     }
 
+    // The scratch file, empty. Null if it can't be opened.
+    fn scratch_file(&self) -> *FILE {
+        if self.scratch == null { self.scratch = mem_file_open(); }
+        if self.scratch != null { rewind(self.scratch); }
+        return self.scratch;
+    }
+
     fn write_variable(&self, file: &FILE, name: str) {
         if self.function_context != null {
             name = (*self.function_context).get_variable_replacement(name);
@@ -739,7 +751,7 @@ impl Generator {
         return trait_name;
     }
 
-    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, game_namespaces: Array<str>, root: &Root) -> bool {
+    fn generate(allocator: &ArenaAllocator, path: *const char, output_line_directives: bool, output_seperator: *const char, game_namespaces: Array<str>, test_mode: bool, root: &Root) -> bool {
         let result = true;
 
         let self: Generator = Generator {
@@ -756,12 +768,14 @@ impl Generator {
             indent: 0,
             naming_c99: Naming { allocator, type: NamingType::Ident, generic_start: "", generic_seperator: "", generic_end: "", pointer_prefix: "", pointer_suffix: "", pointer_const_prefix: "", pointer_const_suffix: "", reference_prefix: "", reference_suffix: "", sequence_slice_prefix: "", sequence_open: "", sequence_fixed_delimiter: "", sequence_close: "", tuple_prefix: "", tuple_open: "", tuple_close: "", enum_generic_type_suffix: "", enum_prefix: "", struct_prefix: "", trait_prefix: "", union_prefix: "", coroutine_instance_prefix: "", primitives: HashMap<str, str> { allocator, buckets: null, data: null, capacity: 0, length: 0 }, naming_ident: null },
             function_context: null,
+            scratch: null,
             game_namespaces,
             current_host: false,
             host_files: Array<String>::new(allocator),
             game_files: Array<String>::new(allocator),
             type_impl_usages: null,
             type_impl_paths: HashSet<str>::new(allocator),
+            test_mode,
         };
 
         self.naming_c99 = Naming::new_c99(allocator, &self.naming_ident);
@@ -814,7 +828,7 @@ impl Generator {
         for (_, &usage) in usages.tuples { success = file_gen.generate_tuple_loop(usage) && success; }
         for (_, &usage) in usages.type_impls { success = file_gen.generate_type_impl_loop(usage) && success; }
         file_gen.generate_globals_namespace(&root.children);
-        file_gen.generate_test_runner(&root.children);
+        if test_mode { success = file_gen.generate_test_runner(&root.children) && success; }
         if mem_file_flush() != 0 { success = false; }
 
         if !success {
