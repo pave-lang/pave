@@ -97,7 +97,7 @@ bool ExpressionWriter__write_invoke(struct ExpressionWriter* self, FILE* file, s
 #line 822 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_invoke_call(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct Array_InvokeArgument* arguments, struct GenericMap* generics);
 
-#line 1065 "src/compiler/ExpressionWriter.pv"
+#line 1066 "src/compiler/ExpressionWriter.pv"
 bool ExpressionWriter__write_expression(struct ExpressionWriter* self, FILE* file, struct Expression* expression, struct GenericMap* generics);
 
 #endif

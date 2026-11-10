@@ -239,7 +239,12 @@ impl Expression {
                                 _ => {},
                             }
 
+                            // A function type has no name: this is a variable holding
+                            // a function, called through the variable.
                             let func_expr = Expression::make(context.allocator, token, ExpressionData::Type(func_type), func_type);
+                            if func_info.name == null {
+                                func_expr = Expression::make(context.allocator, token, ExpressionData::Variable(token.value), func_type);
+                            }
                             result = Expression::make(context.allocator, token, ExpressionData::Invoke(func_expr, arguments), func_return_type);
                         },
                         Type::CoroutineInstance(_, _) => {
@@ -346,6 +351,7 @@ impl Expression {
                     if operator.value.eq("*") && context.check_value(TokenType::Keyword, "const") {
                         context.pos -= 1;
                         let new_type = context.parse_type2(generics);
+                        if new_type == null { return null; }
                         result = Expression::make(context.allocator, token, ExpressionData::Type(new_type), new_type);
                     } else {
                         let child = Expression::parse_primary(context, generics);
@@ -895,15 +901,29 @@ impl Expression {
         ExpressionData::Invoke(invoke, &arguments) => {
                 match expected_type {
                     Type::Tuple(tuple) => {
-                        for (i, argument) in arguments.iter().enumerate() {
-                            success = argument.value.validate_type(context, &tuple.elements.data[i], apply_implicit_cast) && success;
+                        // Only a tuple literal takes its element types from what is
+                        // expected; a call that returns a tuple is checked as a value.
+                        if invoke.return_type.is_tuple() {
+                            if arguments.length != tuple.elements.length {
+                                let message = String::new(context.allocator);
+                                message.append("Expected a tuple of ");
+                                message.append_usize(tuple.elements.length);
+                                message.append(" elements, but found ");
+                                message.append_usize(arguments.length);
+                                context.error_token(self.token, message.c_str());
+                                return false;
+                            }
+
+                            for (i, argument) in arguments.iter().enumerate() {
+                                success = argument.value.validate_type(context, &tuple.elements.data[i], apply_implicit_cast) && success;
+                            }
+
+                            invoke.data = ExpressionData::Type(expected_type);
+                            invoke.return_type = *expected_type;
+                            self.return_type = *expected_type;
+
+                            return success;
                         }
-
-                        invoke.data = ExpressionData::Type(expected_type);
-                        invoke.return_type = *expected_type;
-                        self.return_type = *expected_type;
-
-                        return success;
                     },
                     Type::Sequence(sequence) => {
                         if self.return_type.is_sequence_fixed_array() {

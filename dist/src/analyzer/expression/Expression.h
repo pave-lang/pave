@@ -52,31 +52,31 @@ struct str Expression__number_primitive(struct str value);
 #line 114 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_primary(struct Context* context, struct Generics* generics);
 
-#line 533 "src/analyzer/expression/Expression.pv"
+#line 539 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse(struct Context* context, struct Generics* generics);
 
-#line 580 "src/analyzer/expression/Expression.pv"
+#line 586 "src/analyzer/expression/Expression.pv"
 bool Expression__is_zero(struct Expression* self);
 
-#line 587 "src/analyzer/expression/Expression.pv"
+#line 593 "src/analyzer/expression/Expression.pv"
 bool Expression__is_const_expression(struct Expression* self, struct Context* context);
 
-#line 639 "src/analyzer/expression/Expression.pv"
+#line 645 "src/analyzer/expression/Expression.pv"
 bool Expression__eq_const_value(struct Expression* self, struct Expression* other);
 
-#line 719 "src/analyzer/expression/Expression.pv"
+#line 725 "src/analyzer/expression/Expression.pv"
 void Expression__append_ident_name(struct Expression* self, struct String* result);
 
-#line 776 "src/analyzer/expression/Expression.pv"
+#line 782 "src/analyzer/expression/Expression.pv"
 void Expression__append_display_name(struct Expression* self, struct String* result);
 
-#line 823 "src/analyzer/expression/Expression.pv"
+#line 829 "src/analyzer/expression/Expression.pv"
 bool Expression__validate_type(struct Expression* self, struct Context* context, struct Type* expected_type, bool apply_implicit_cast);
 
-#line 957 "src/analyzer/expression/Expression.pv"
+#line 977 "src/analyzer/expression/Expression.pv"
 struct Expression* Expression__parse_if_expression(struct Context* context, struct Generics* generics);
 
-#line 1027 "src/analyzer/expression/Expression.pv"
+#line 1047 "src/analyzer/expression/Expression.pv"
 void Expression__record_function_signature(struct Context* context, struct Type* function_type, struct Token* open_paren, struct Token* close_paren, struct Array_Position comma_positions, bool skip_self);
 
 #line 14 "src/analyzer/expression/MemberLookup.pv"
@@ -106,16 +106,16 @@ bool Expression__validate_typed_variadic_argument(struct Context* context, struc
 #line 52 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_arguments(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map, bool is_member_call);
 
-#line 251 "src/analyzer/expression/ExpressionValidate.pv"
+#line 259 "src/analyzer/expression/ExpressionValidate.pv"
 bool Expression__validate_enum_arguments(struct Context* context, struct Token* token, struct EnumVariant* variant, struct Array_InvokeArgument* arguments, struct GenericMap* generic_map);
 
-#line 322 "src/analyzer/expression/ExpressionValidate.pv"
+#line 330 "src/analyzer/expression/ExpressionValidate.pv"
 struct Type* Expression__get_return_type(struct Context* context, struct Type* type, struct Token* token, struct GenericMap* generic_map);
 
-#line 339 "src/analyzer/expression/ExpressionValidate.pv"
+#line 347 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_type_function_call(struct Context* context, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
-#line 349 "src/analyzer/expression/ExpressionValidate.pv"
+#line 357 "src/analyzer/expression/ExpressionValidate.pv"
 struct Expression* Expression__make_member_function_call(struct Context* context, struct Expression* inner, struct Token* token, struct Type* type, struct Array_InvokeArgument arguments, struct GenericMap* generic_map);
 
 #line 7 "src/analyzer/expression/ParseTypeExpression.pv"
@@ -154,10 +154,10 @@ struct Expression* Expression__parse_instance_member_expression_inner(struct Con
 #line 250 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_index_expression(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 349 "src/analyzer/expression/PostfixExpression.pv"
+#line 354 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix(struct Context* context, struct Expression* inner, struct Generics* generics);
 
-#line 416 "src/analyzer/expression/PostfixExpression.pv"
+#line 421 "src/analyzer/expression/PostfixExpression.pv"
 struct Expression* Expression__parse_postfix_chain(struct Context* context, struct Expression* inner, struct Generics* generics);
 
 #line 11 "src/analyzer/expression/BinaryExpression.pv"

@@ -1,0 +1,44 @@
+#include "stdlib.h"
+
+use std
+
+// Compiler regressions in calls: a call that returns a tuple where a tuple is
+// expected, a call through a parameter of function type, and a function
+// without self called through an instance.
+
+struct PaveCallCounter { count: i32 }
+
+impl PaveCallCounter {
+    fn zero() -> i32 { return 0; }
+    fn twice(value: i32) -> i32 { return value * 2; }
+    fn add(&self, value: i32) -> i32 { self.count += value; return self.count; }
+}
+
+fn pave_call_pair(a: i32, b: i32) -> (i32, i32) { return (b * 10, a * 10); }
+
+fn pave_call_wrap(a: i32, b: i32) -> (i32, i32) { return pave_call_pair(a, b); }
+
+fn pave_call_double(value: i32) -> i32 { return value * 2; }
+
+fn pave_call_apply(callback: fn(value: i32) -> i32, value: i32) -> i32 { return callback(value); }
+
+test "a call that returns a tuple is a value where a tuple is expected" {
+    let wrapped = pave_call_wrap(1, 2);
+    if wrapped.0 != 20 || wrapped.1 != 10 { abort(); }
+
+    let typed: (i32, i32) = pave_call_pair(3, 4);
+    if typed.0 != 40 || typed.1 != 30 { abort(); }
+
+    let literal: (i32, i32) = (5, 6);
+    if literal.0 != 5 || literal.1 != 6 { abort(); }
+}
+
+test "a parameter of function type is called through the parameter" {
+    if pave_call_apply(pave_call_double, 21) != 42 { abort(); }
+}
+
+test "a function without self is called through an instance with its own arguments" {
+    let counter = PaveCallCounter { count: 1 };
+    if counter.zero() != 0 || counter.twice(4) != 8 { abort(); }
+    if counter.add(2) != 3 { abort(); }
+}

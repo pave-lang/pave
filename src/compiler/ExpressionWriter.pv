@@ -824,7 +824,8 @@ impl ExpressionWriter {
         let data: &ExpressionData = &expression.data;
         match data {
             ExpressionData::Variable(name) => {
-                let success = generator.write_str(file, name);
+                generator.write_variable(file, name);
+                let success = true;
                 fprintf(file, "(");
                 let first = true;
                 for arg in arguments {

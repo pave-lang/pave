@@ -14,3 +14,4 @@ mod CStructImplTest
 mod TraitImplTest
 mod ExpressionTest
 mod LoweringTest
+mod CallTest

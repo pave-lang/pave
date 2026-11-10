@@ -122,6 +122,14 @@ impl Expression {
             Type::Function(function, generic_map2) => {
                 if cast<*Function>(function) == null || function.type == FunctionType::MethodCpp { return true; }
 
+                // A member call only passes its receiver to a function that takes
+                // self; a function without it is called with the written arguments.
+                let has_receiver = false;
+                if is_member_call && function.parameters.length > 0 && arguments_length > 0 {
+                    let first_name = function.parameters.data[0].name;
+                    has_receiver = first_name != null && first_name.value.eq("self");
+                }
+
                 let required_parameters_length = function.parameters.length;
                 if function.typed_variadic {
                     required_parameters_length -= 1;
@@ -131,7 +139,7 @@ impl Expression {
                     let message = String::new(context.allocator);
                     message.append("Number of arguments does not match, expected ");
 
-                    if is_member_call {
+                    if has_receiver {
                         message.append_usize(required_parameters_length - 1);
                     } else {
                         message.append_usize(required_parameters_length);
@@ -149,7 +157,7 @@ impl Expression {
                 let args_iter = arguments.iter();
                 let param_index: usize = 0;
 
-                if is_member_call {
+                if has_receiver {
                     param_iter.next();
                     args_iter.next();
                     param_index += 1;
